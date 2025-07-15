@@ -1,7 +1,11 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+// @ts-ignore
 import HomeView from '@/views/HomeView.vue'
+// @ts-ignore
 import FlashcardsView from '@/views/FlashcardsView.vue'
+// @ts-ignore
 import LeitnerView from '@/views/LeitnerView.vue'
+// @ts-ignore
 import SupportView from '@/views/SupportView.vue'
 
 // Define routes for the pages

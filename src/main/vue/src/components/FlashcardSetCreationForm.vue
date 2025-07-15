@@ -96,6 +96,7 @@ function createNewFlashcardSet() {
     flashcards: [],
     createdAt: null,
     lastUpdatedAt: null,
+    default: false,
     user: user,
   }
 

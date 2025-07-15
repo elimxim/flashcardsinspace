@@ -31,5 +31,6 @@ export interface FlashcardSet {
   flashcards: Flashcard[];
   createdAt: Date | null;
   lastUpdatedAt: Date | null;
+  default: boolean;
   user: User;
 }

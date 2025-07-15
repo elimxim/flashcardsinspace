@@ -24,17 +24,6 @@
   max-width: 90%;
   min-width: 300px;
   overflow: auto;
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
 }
 
 .modal-title {
@@ -111,7 +100,7 @@
   color: white;
 }
 
-.modal-cancel-button:hover {
+.modal-cancel-button:not(.modal-button-disabled):hover {
   background-color: #999;
 }
 
@@ -120,7 +109,7 @@
   color: white;
 }
 
-.modal-create-button:hover {
+.modal-create-button:not(.modal-button-disabled):hover {
   background-color: #45a049;
 }
 
@@ -129,7 +118,7 @@
   color: white;
 }
 
-.modal-update-button:hover {
+.modal-update-button:not(.modal-button-disabled):hover {
   background-color: #1e88e5;
 }
 
@@ -138,6 +127,12 @@
   color: white;
 }
 
-.modal-remove-button:hover {
+.modal-remove-button:not(.modal-button-disabled):hover {
   background-color: #da4437;
+}
+
+.modal-button-disabled {
+  background-color: #ededed;
+  color: #cacaca;
+  cursor: default;
 }

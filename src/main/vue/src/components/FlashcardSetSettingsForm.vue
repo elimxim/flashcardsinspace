@@ -11,17 +11,32 @@
             Please don't forget to fill this out
           </span>
         </div>
-      </div>
-      <div v-if="flashcardRemoveConfirmation" class="modal-remove-confirmation-container">
-        <span class="modal-remove-confirmation-sign"><font-awesome-icon icon="fa-solid fa-triangle-exclamation"/></span>
-        <span class="modal-remove-confirmation">
-          Are you sure you want to remove '{{ flashcardSetName }}' flashcard set? You will lose all flashcards.
-        </span>
+        <div class="modal-form-group">
+          <label>
+            <input type="checkbox" v-model="defaultFlashcardSet"/>
+            {{
+              defaultFlashcardSet
+                ? "This flashcard set is set as the default"
+                : "Set this flashcard set as the default (it will appear first if you have more than one)"
+            }}
+          </label>
+        </div>
+        <div v-if="flashcardRemoveConfirmation" class="modal-remove-confirmation-container">
+          <span class="modal-remove-confirmation-sign"><font-awesome-icon
+            icon="fa-solid fa-triangle-exclamation"/></span>
+          <span class="modal-remove-confirmation">
+            Are you sure you want to remove '{{ currFlashcardSet?.name }}' flashcard set? You will lose all flashcards.
+          </span>
+        </div>
       </div>
       <div class="modal-buttons">
         <button class="modal-button modal-cancel-button" @click="cancel">Cancel</button>
         <button class="modal-button modal-remove-button" @click="remove">Remove</button>
-        <button class="modal-button modal-update-button" @click="update">Update</button>
+        <button class="modal-button modal-update-button" @click="update"
+                :class="{ 'modal-button-disabled': !flashcardSetHasChanges }"
+                :disabled="!flashcardSetHasChanges">
+          Update
+        </button>
       </div>
     </div>
   </div>
@@ -29,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineEmits, defineProps, onMounted, onUnmounted, ref } from 'vue';
+import { computed, defineEmits, defineProps, onMounted, onUnmounted, type Ref, ref } from 'vue';
 import { required } from '@vuelidate/validators';
 import { useVuelidate } from '@vuelidate/core';
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts';
@@ -54,17 +69,22 @@ onUnmounted(() => {
 
 const dataStore = useFlashcardDataStore()
 const stateStore = useFlashcardStateStore()
-const { definedCurrFlashcardSet } = storeToRefs(stateStore)
+const { currFlashcardSet } = storeToRefs(stateStore)
 
-const flashcardSetName = ref(definedCurrFlashcardSet.value.name)
+const flashcardSetName = ref(currFlashcardSet.value?.name)
 const flashcardRemoveConfirmation = ref(false)
+const defaultFlashcardSet: Ref<boolean | undefined> = ref(false)
+const flashcardSetHasChanges = computed(() => {
+  return currFlashcardSet.value?.name !== flashcardSetName.value
+    || currFlashcardSet.value?.default !== defaultFlashcardSet.value
+})
 
 const props = defineProps({
   visible: Boolean,
 })
 
 stateStore.$subscribe((mutation, state) => {
-  flashcardSetName.value = definedCurrFlashcardSet.value.name
+  flashcardSetName.value = currFlashcardSet.value?.name
 })
 
 const emit = defineEmits(['update:visible']);
@@ -100,22 +120,31 @@ function update() {
 }
 
 function removeFlashcardSet() {
-  dataStore.removeFlashcardSet(definedCurrFlashcardSet.value)
+  if (currFlashcardSet.value !== undefined) {
+    dataStore.removeFlashcardSet(currFlashcardSet.value)
+  }
 
   const { flashcardSets } = storeToRefs(dataStore)
   stateStore.chooseCurrFlashcardSet(flashcardSets)
 }
 
 function updateFlashcardSet() {
-  if (definedCurrFlashcardSet.value.name !== flashcardSetName.value) {
-    stateStore.setFlashcardSetName(flashcardSetName.value);
+  if (flashcardSetHasChanges.value) {
     // todo save to DB
+
+    if (flashcardSetName.value !== undefined) {
+      stateStore.setFlashcardSetName(flashcardSetName.value);
+    }
+    if (defaultFlashcardSet.value !== undefined) {
+      stateStore.setFlashcardSetDefault(defaultFlashcardSet.value);
+    }
   }
 }
 
 function cleanState() {
   $v.value.$reset();
-  flashcardSetName.value = definedCurrFlashcardSet.value.name;
+  flashcardSetName.value = currFlashcardSet.value?.name;
+  defaultFlashcardSet.value = currFlashcardSet.value?.default;
   flashcardRemoveConfirmation.value = false;
 }
 

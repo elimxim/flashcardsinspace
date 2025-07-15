@@ -9,14 +9,6 @@ export const useFlashcardStateStore = defineStore('flashcard-state', {
       currFlashcardSet: undefined,
     }
   },
-  getters: {
-    definedCurrFlashcardSet(): FlashcardSet { // can be undefined!!! the code needs to be changed
-      if (this.currFlashcardSet === undefined) {
-        throw new Error("Current flashcard set is undefined")
-      }
-      return this.currFlashcardSet
-    },
-  },
   actions: {
     chooseCurrFlashcardSet(flashcardSets: Ref<FlashcardSet[]>) {
       this.currFlashcardSet = flashcardSets.value?.[0]
@@ -27,6 +19,11 @@ export const useFlashcardStateStore = defineStore('flashcard-state', {
     setFlashcardSetName(name: string) {
       if (this.currFlashcardSet !== undefined) {
         this.currFlashcardSet.name = name
+      }
+    },
+    setFlashcardSetDefault(value: boolean) {
+      if (this.currFlashcardSet !== undefined) {
+        this.currFlashcardSet.default = value
       }
     },
     addFlashcard(flashcard: Flashcard) {

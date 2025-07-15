@@ -22,20 +22,20 @@
       </div>
     </li>
     <li v-if="showFlashcardMenuItem" class="menu-buttons-container">
-      <div class="menu-item menu-item-color">
-        <ul class="menu-info">
-          <li>{{ calendar.day }}</li>
-          <li>Day</li>
-        </ul>
-      </div>
       <div class="menu-item menu-item-color menu-calendar-button">
         <font-awesome-icon icon="fa-solid fa-calendar-days"/>
+      </div>
+      <div class="menu-item menu-item-color">
+        <ul class="menu-info">
+          <li>Day</li>
+          <li class="menu-info-number">{{ calendar.day }}</li>
+        </ul>
       </div>
     </li>
     <li v-if="showFlashcardMenuItem" v-for="info in levelInfos" :key="info.name"
         class="menu-item menu-item-color">
       <ul class="menu-info">
-        <li>{{ info.count }}</li>
+        <li class="menu-info-number">{{ info.count }}</li>
         <li>{{ info.name }}</li>
       </ul>
     </li>
@@ -144,10 +144,9 @@ const calendar = {
 
 .menu-info li {
   padding: 4px 10px 4px 10px;
-  background: none;
 }
 
-.menu-info li:first-child {
+.menu-info-number {
   background-color: #ddd;
   border-radius: 4px;
 }

@@ -10,16 +10,21 @@ export const useFlashcardDataStore = defineStore('flashcard-data', {
   },
   actions: {
     loadFlashcards() {
-      this.flashcardSets = testFlashcardData()
-      return this.flashcardSets
+      // todo get from DB
+      this.flashcardSets = testFlashcardData().sort((a, b) => {
+        if (a.default && !b.default) return -1;
+        if (!a.default && b.default) return 1;
+
+        return a.name.localeCompare(b.name)
+      })
     },
     addFlashcardSet(flashcardSet: FlashcardSet) {
       // todo delete
       let max = 1
       if (this.flashcardSets.length > 0) {
         max = this.flashcardSets.reduce(
-          (prev, current) => {
-            return (prev && prev.id > current.id) ? prev : current;
+          (prev, curr) => {
+            return (prev && prev.id > curr.id) ? prev : curr;
           },
           this.flashcardSets[0]
         )?.id
@@ -79,6 +84,7 @@ export const testFlashcardData = () => {
       ],
       createdAt: new Date(),
       lastUpdatedAt: new Date(),
+      default: false,
     },
     {
       id: 2,
@@ -108,6 +114,7 @@ export const testFlashcardData = () => {
       ],
       createdAt: new Date(),
       lastUpdatedAt: new Date(),
+      default: false,
     }
   ]
 }
