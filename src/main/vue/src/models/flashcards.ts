@@ -1,8 +1,4 @@
-export interface User {
-  id: number;
-  name: string;
-  registeredAt: Date;
-}
+import type { User } from '@/models/users.ts';
 
 export interface Language {
   code: string;
@@ -21,18 +17,19 @@ export enum Level {
 
 export interface Flashcard {
   id: number;
-  frontText: string;
-  backText: string;
+  frontSide: string;
+  backSide: string;
   level: Level;
-  createdAt: Date;
-  lastUpdatedAt: Date;
+  createdAt: Date | null;
+  lastUpdatedAt: Date | null;
 }
 
 export interface FlashcardSet {
   id: number;
+  name: string;
   targetLanguage: Language;
   flashcards: Flashcard[];
-  createdAt: Date;
-  lastUpdatedAt: Date;
+  createdAt: Date | null;
+  lastUpdatedAt: Date | null;
   user: User;
 }

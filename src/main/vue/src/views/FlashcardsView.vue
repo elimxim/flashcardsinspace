@@ -1,80 +1,38 @@
 <template>
-  <div class="container">
-    <div class="menu">
-      <FlashcardSetMenu />
+  <div>
+    <div class="flashcard-menu">
+      <FlashcardMenu/>
     </div>
-  </div>
 
-  <div class="levels">
-    <ul class="levels-list">
-      <li v-for="level in levels" :key="level" @click="selectLevel(level)">
-        Level {{ level }}
-      </li>
-    </ul>
-  </div>
+    <div class="flashcard-view">
 
-  <div class="flashcards">
-
+    </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import FlashcardSetMenu from '@/components/FlashcardSetMenu.vue'
+<script setup lang="ts">
+import FlashcardMenu from '@/components/FlashcardMenu.vue'
+import { useFlashcardDataStore } from "@/stores/flashcard-data.ts";
+import { useFlashcardStateStore } from "@/stores/flashcard-state.ts";
+import { computed } from 'vue';
+import { storeToRefs } from 'pinia';
 
-import { Level } from '@/stores/model.ts'
-// const levels = Object.values(Level).filter(v => typeof v === 'number') as number[]
-
-// const selectLevel = (level: number) => {
-//   console.log('Selected level:', level)
-// }
+const dataStore = useFlashcardDataStore()
+const sateStore = useFlashcardStateStore()
 
 </script>
 
 <style scoped>
-.container {
+.flashcard-menu {
+  flex: 1;
   display: flex;
-  height: 100vh;
-}
-
-.menu {
-  flex: 1; /* Small width for menu */
-  border-right: 1px solid #ccc;
-  overflow-y: auto;
-}
-
-.levels {
-  flex: 0 0 150px; /* Fixed width or adjust as needed */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-right: 1px solid #ccc;
-  padding: 10px;
-}
-
-.levels-list {
-  display: flex;
-  gap: 10px;
-  list-style: none;
-  margin: 0;
+  justify-content: left;
   padding: 0;
 }
 
-.levels-list li {
-  padding: 8px 12px;
-  background-color: #f0f0f0;
-  cursor: pointer;
-  border-radius: 4px;
-  user-select: none;
-}
-
-.levels-list li:hover {
-  background-color: #ddd;
-}
-
-.flashcards {
-  flex: 3; /* Largest area */
-  padding: 20px;
+.flashcard-view {
+  flex: 3;
+  padding: 0;
   overflow-y: auto;
 }
 

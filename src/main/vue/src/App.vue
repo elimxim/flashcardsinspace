@@ -2,15 +2,23 @@
   <div id="app" class="app-container">
     <nav class="navbar">
       <div class="logo-container">
-        <img src="@/assets/logo.svg" alt="Logo" class="logo-image" />
+        <img src="@/assets/logo.svg" alt="Logo" class="logo-image"/>
         <div class="title-text">Flashcards in Space</div>
       </div>
 
       <ul class="nav-items">
-        <li><router-link :to="{ name: 'home' }">Home</router-link></li>
-        <li><router-link :to="{ name: 'flashcards' }">Flashcards</router-link></li>
-        <li><router-link :to="{ name: 'leitner' }">Leitner</router-link></li>
-        <li><router-link :to="{ name: 'support' }">Support</router-link></li>
+        <li>
+          <router-link :to="{ name: 'home' }">Home</router-link>
+        </li>
+        <li>
+          <router-link :to="{ name: 'flashcards' }">Flashcards</router-link>
+        </li>
+        <li>
+          <router-link :to="{ name: 'leitner' }">Leitner</router-link>
+        </li>
+        <li>
+          <router-link :to="{ name: 'support' }">Support</router-link>
+        </li>
       </ul>
     </nav>
     <router-view></router-view>
@@ -18,6 +26,16 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
+import { useFlashcardDataStore } from "@/stores/flashcard-data.ts";
+import { useFlashcardStateStore } from "@/stores/flashcard-state.ts";
+
+const flashcardDataStore = useFlashcardDataStore()
+const flashcardStateState = useFlashcardStateStore()
+
+onMounted(() => {
+  flashcardDataStore.loadFlashcards()
+})
 </script>
 
 <style scoped>
@@ -32,7 +50,7 @@
   display: flex;
   justify-content: space-between; /* Spread items to sides */
   align-items: center;
-  background-color: #333;
+  background-color: #707070;
   padding: 10px;
 }
 
