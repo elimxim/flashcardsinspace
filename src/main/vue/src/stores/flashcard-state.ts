@@ -1,5 +1,5 @@
-import { type Flashcard, type FlashcardSet } from "@/models/flashcards.ts";
-import { type FlashcardState } from '@/models/state.ts';
+import { type Flashcard, type FlashcardSet } from "@/models/flashcard.ts";
+import { type FlashcardState } from '@/models/flashcard-state.ts';
 import { defineStore } from "pinia";
 import type { Ref } from 'vue';
 

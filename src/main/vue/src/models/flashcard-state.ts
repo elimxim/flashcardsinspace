@@ -1,4 +1,4 @@
-import type { FlashcardSet } from '@/models/flashcards.ts';
+import type { FlashcardSet } from '@/models/flashcard.ts';
 
 export interface FlashcardState {
   currFlashcardSet: FlashcardSet | undefined,

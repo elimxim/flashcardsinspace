@@ -38,12 +38,20 @@
   margin-bottom: 20px;
 }
 
-.modal-form-group {
+.modal-form-group-line {
   display: flex;
   flex-direction: column;
 }
 
+.modal-form-group-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
 .modal-input {
+  flex: 1;
   resize: none;
   padding: 8px;
   font-family: Arial, sans-serif;
@@ -52,18 +60,23 @@
   border: 1px solid #ccc;
 }
 
+.modal-info-message {
+  color: #ccc;
+  font-size: 0.9em;
+  margin-bottom: 5px;
+}
+
 .modal-error-message {
   color: red;
   font-size: 0.9em;
   margin-top: 5px;
 }
 
-.modal-remove-confirmation-container {
+.modal-message-container {
   display: flex;
   flex-direction: row;
-  margin: 10px;
-  padding: 6px 10px 6px 10px;
-  border: 1px solid red;
+  margin: 4px;
+  padding: 4px 6px 4px 6px;
   border-radius: 10px;
   text-align: left;
   align-items: center;
@@ -71,14 +84,22 @@
   gap: 20px;
 }
 
-.modal-remove-confirmation-sign {
-  color: red;
+.modal-icon {
   font-size: 1.5em;
 }
 
-.modal-remove-confirmation {
+.modal-message-text {
+  font-size: 0.9em;
+}
+
+.modal-info-message-container {
+  border: 1px solid #5175cf;
+  color: #5175cf;
+}
+
+.modal-warning-message-container {
+  border: 1px solid red;
   color: red;
-  font-size: 1em;
 }
 
 .modal-buttons {
@@ -135,4 +156,30 @@
   background-color: #ededed;
   color: #cacaca;
   cursor: default;
+}
+
+.modal-searchable-dropdown {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  position: relative;
+}
+
+.modal-search-input {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.modal-select {
+  flex: 1;
+  appearance: none;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 8px 8px 8px;
+  font-size: 1em;
+  outline: none;
+  cursor: pointer;
 }

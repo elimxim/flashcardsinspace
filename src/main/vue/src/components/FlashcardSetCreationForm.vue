@@ -3,11 +3,34 @@
     <div class="modal-window">
       <h2 class="modal-title">New flashcard set</h2>
       <div class="modal-body">
-        <div class="modal-form-group">
-          <input id="flashcardSetName" v-model="flashcardSetName" rows="1"
-                    placeholder="Flashcard set name"
-                    class="modal-input"/>
-          <span v-if="$v.flashcardSetName.$errors.length" class="modal-error-message">Please don't forget to fill this out</span>
+        <div class="modal-form-group-line">
+          <input v-model="flashcardSetName" placeholder="Flashcard set name" class="modal-input"/>
+          <span v-if="$v.flashcardSetName.$errors.length" class="modal-error-message">
+            Please don't forget to fill this out
+          </span>
+        </div>
+        <div class="modal-form-group-line">
+          <div class="modal-form-group-row">
+            <span class="modal-icon" style="color: #686868;">
+              <font-awesome-icon icon="fa-solid fa-globe"/>
+            </span>
+            <select v-model="selectedLanguage" class="modal-select">
+              <option v-for="i in languages" :key="i.alpha2" :value="i">
+                {{ i.name }}
+              </option>
+            </select>
+          </div>
+          <span v-if="$v.selectedLanguage.$errors.length" class="modal-error-message">
+              Please choose one of the languages
+          </span>
+        </div>
+        <div class="modal-message-container modal-info-message-container">
+            <span class="modal-icon">
+              <font-awesome-icon icon="fa-solid fa-circle-info"/>
+            </span>
+          <span class="modal-message-text">
+              Please be careful. You will not be able to change the language in the future
+          </span>
         </div>
       </div>
       <div class="modal-buttons">
@@ -20,13 +43,26 @@
 
 <script setup lang="ts">
 import '@/assets/modal.css'
-import { defineEmits, defineProps, onMounted, onUnmounted, ref } from 'vue';
+import {
+  computed,
+  type ComputedRef,
+  defineEmits,
+  defineProps,
+  onMounted,
+  onUnmounted,
+  type Ref,
+  ref
+} from 'vue';
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts';
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
-import { type FlashcardSet, type Language } from '@/models/flashcards.ts';
+import { type FlashcardSet } from '@/models/flashcard.ts';
 import { type User } from '@/models/users.ts'
 import { required } from '@vuelidate/validators';
 import { useVuelidate } from '@vuelidate/core';
+import type { Language } from '@/models/language.ts';
+import { storeToRefs } from 'pinia';
+import { useLanguageStore } from '@/stores/language.ts';
+import { language } from '@vue/eslint-config-prettier';
 
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') {
@@ -46,8 +82,11 @@ onUnmounted(() => {
 
 const dataStore = useFlashcardDataStore()
 const stateStore = useFlashcardStateStore()
+const langStore = useLanguageStore()
+const { languages } = storeToRefs(langStore)
 
 const flashcardSetName = ref('')
+const selectedLanguage: Ref<Language | undefined> = ref(undefined)
 
 const props = defineProps({
   visible: Boolean,
@@ -56,13 +95,17 @@ const props = defineProps({
 const emit = defineEmits(['update:visible']);
 
 const validationRules = {
-  flashcardSetName: { required },
+  flashcardSetName: { required, blank: false },
+  selectedLanguage: { required },
 };
 
-const $v = useVuelidate(validationRules, { flashcardSetName: flashcardSetName });
+const $v = useVuelidate(validationRules, {
+  flashcardSetName: flashcardSetName,
+  selectedLanguage: selectedLanguage,
+});
 
 function cancel() {
-  cleanState();
+  resetState();
   emit('update:visible', false);
 }
 
@@ -70,18 +113,12 @@ function create() {
   $v.value.$touch()
   if (!$v.value.$invalid) {
     createNewFlashcardSet();
-    cleanState();
+    resetState();
     emit('update:visible', false);
   }
 }
 
 function createNewFlashcardSet() {
-  // todo
-  const language: Language = {
-    code: "la",
-    name: "Trulalalalal",
-  }
-
   // todo
   const user: User = {
     id: 1,
@@ -92,7 +129,7 @@ function createNewFlashcardSet() {
   const flashcardSet: FlashcardSet = {
     id: 0,
     name: flashcardSetName.value,
-    targetLanguage: language,
+    targetLanguage: selectedLanguage.value!,
     flashcards: [],
     createdAt: null,
     lastUpdatedAt: null,
@@ -105,8 +142,9 @@ function createNewFlashcardSet() {
   stateStore.setCurrFlashcardSet(flashcardSet)
 }
 
-function cleanState() {
+function resetState() {
   flashcardSetName.value = '';
+  selectedLanguage.value = undefined;
   $v.value.$reset();
 }
 

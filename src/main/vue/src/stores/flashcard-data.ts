@@ -1,4 +1,4 @@
-import { type FlashcardSet, Level } from '@/models/flashcards.ts';
+import { type FlashcardSet, Level } from '@/models/flashcard.ts';
 import { type User } from '@/models/users.ts';
 import { defineStore } from 'pinia'
 
@@ -11,7 +11,7 @@ export const useFlashcardDataStore = defineStore('flashcard-data', {
   actions: {
     loadFlashcards() {
       // todo get from DB
-      this.flashcardSets = testFlashcardData().sort((a, b) => {
+      this.flashcardSets = testData().sort((a, b) => {
         if (a.default && !b.default) return -1;
         if (!a.default && b.default) return 1;
 
@@ -44,11 +44,11 @@ export const useFlashcardDataStore = defineStore('flashcard-data', {
   }
 })
 
-export const testEmptyFlashcardData = () => {
-  return [] as FlashcardSet[]
+function testEmptyData(): FlashcardSet[] {
+  return []
 }
 
-export const testFlashcardData = () => {
+function testData(): FlashcardSet[] {
   const user: User = {
     id: 1,
     name: "Billy Bob",
@@ -61,8 +61,8 @@ export const testFlashcardData = () => {
       name: "Bosnian",
       user: user,
       targetLanguage: {
-        code: "bs",
         name: "Bosnian",
+        alpha2: "bs",
       },
       flashcards: [
         {
@@ -91,8 +91,8 @@ export const testFlashcardData = () => {
       user: user,
       name: "Russian",
       targetLanguage: {
-        code: "ru",
         name: "Russian",
+        alpha2: "ru",
       },
       flashcards: [
         {

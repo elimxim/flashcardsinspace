@@ -3,15 +3,21 @@
     <div class="modal-window">
       <h2 class="modal-title">Settings</h2>
       <div class="modal-body">
-        <div class="modal-form-group">
-          <input id="flashcardSetName" v-model="flashcardSetName"
-                 placeholder="Flashcard set name"
-                 class="modal-input"/>
+        <div class="modal-form-group-line">
+          <input v-model="flashcardSetName" placeholder="Flashcard set name" class="modal-input"/>
           <span v-if="$v.flashcardSetName.$errors.length" class="modal-error-message">
             Please don't forget to fill this out
           </span>
         </div>
-        <div class="modal-form-group">
+        <div class="modal-form-group-line">
+          <div class="modal-form-group-row">
+            <span class="modal-icon" style="color: #686868;">
+              <font-awesome-icon icon="fa-solid fa-globe"/>
+            </span>
+            <input v-model="flashcardSetTargetLanguage" class="modal-input" disabled="true"/>
+          </div>
+        </div>
+        <div class="modal-form-group-line">
           <label>
             <input type="checkbox" v-model="defaultFlashcardSet"/>
             {{
@@ -21,11 +27,12 @@
             }}
           </label>
         </div>
-        <div v-if="flashcardRemoveConfirmation" class="modal-remove-confirmation-container">
-          <span class="modal-remove-confirmation-sign"><font-awesome-icon
-            icon="fa-solid fa-triangle-exclamation"/></span>
-          <span class="modal-remove-confirmation">
-            Are you sure you want to remove '{{ currFlashcardSet?.name }}' flashcard set? You will lose all flashcards.
+        <div v-if="flashcardRemoveConfirmation"
+             class="modal-message-container modal-warning-message-container">
+          <span class="modal-icon">
+            <font-awesome-icon icon="fa-solid fa-triangle-exclamation"/></span>
+          <span class="modal-message-text">
+            Are you sure you want to remove '{{ currFlashcardSet?.name }}'? All progress and flash cards will disappear
           </span>
         </div>
       </div>
@@ -44,7 +51,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineEmits, defineProps, onMounted, onUnmounted, type Ref, ref } from 'vue';
+import {
+  computed,
+  defineEmits,
+  defineProps,
+  onMounted,
+  onUnmounted,
+  type Ref,
+  ref,
+  watch
+} from 'vue';
 import { required } from '@vuelidate/validators';
 import { useVuelidate } from '@vuelidate/core';
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts';
@@ -72,11 +88,18 @@ const stateStore = useFlashcardStateStore()
 const { currFlashcardSet } = storeToRefs(stateStore)
 
 const flashcardSetName = ref(currFlashcardSet.value?.name)
+const flashcardSetTargetLanguage = ref(currFlashcardSet.value?.targetLanguage.name)
 const flashcardRemoveConfirmation = ref(false)
 const defaultFlashcardSet: Ref<boolean | undefined> = ref(false)
 const flashcardSetHasChanges = computed(() => {
   return currFlashcardSet.value?.name !== flashcardSetName.value
     || currFlashcardSet.value?.default !== defaultFlashcardSet.value
+})
+watch(flashcardSetName, (_) => {
+  flashcardRemoveConfirmation.value = false;
+})
+watch(defaultFlashcardSet, (_) => {
+  flashcardRemoveConfirmation.value = false;
 })
 
 const props = defineProps({
@@ -85,6 +108,7 @@ const props = defineProps({
 
 stateStore.$subscribe((mutation, state) => {
   flashcardSetName.value = currFlashcardSet.value?.name
+  flashcardSetTargetLanguage.value = currFlashcardSet.value?.targetLanguage.name
 })
 
 const emit = defineEmits(['update:visible']);
@@ -96,14 +120,14 @@ const validationRules = {
 const $v = useVuelidate(validationRules, { flashcardSetName: flashcardSetName });
 
 function cancel() {
-  cleanState();
+  resetState();
   emit('update:visible', false);
 }
 
 function remove() {
   if (flashcardRemoveConfirmation.value) {
     removeFlashcardSet();
-    cleanState();
+    resetState();
     emit('update:visible', false);
   } else {
     flashcardRemoveConfirmation.value = true;
@@ -114,7 +138,7 @@ function update() {
   $v.value.$touch()
   if (!$v.value.$invalid) {
     updateFlashcardSet();
-    cleanState();
+    resetState();
     emit('update:visible', false);
   }
 }
@@ -141,9 +165,10 @@ function updateFlashcardSet() {
   }
 }
 
-function cleanState() {
+function resetState() {
   $v.value.$reset();
   flashcardSetName.value = currFlashcardSet.value?.name;
+  flashcardSetTargetLanguage.value = currFlashcardSet.value?.targetLanguage.name;
   defaultFlashcardSet.value = currFlashcardSet.value?.default;
   flashcardRemoveConfirmation.value = false;
 }

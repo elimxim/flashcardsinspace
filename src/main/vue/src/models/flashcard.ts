@@ -1,9 +1,5 @@
 import type { User } from '@/models/users.ts';
-
-export interface Language {
-  code: string;
-  name: string;
-}
+import type { Language } from '@/models/language.ts';
 
 export enum Level {
   FIRST = 1,

@@ -28,13 +28,14 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useFlashcardDataStore } from "@/stores/flashcard-data.ts";
-import { useFlashcardStateStore } from "@/stores/flashcard-state.ts";
+import { useLanguageStore } from '@/stores/language.ts';
 
 const flashcardDataStore = useFlashcardDataStore()
-const flashcardStateState = useFlashcardStateStore()
+const langStore = useLanguageStore()
 
 onMounted(() => {
   flashcardDataStore.loadFlashcards()
+  langStore.loadLanguages()
 })
 </script>
 

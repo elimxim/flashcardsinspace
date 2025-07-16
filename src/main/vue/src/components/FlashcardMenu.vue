@@ -1,7 +1,7 @@
 <template>
   <ul class="menu">
     <li class="menu-item menu-item-color" style="display: flex;">
-      <select v-model="currFlashcardSet">
+      <select v-model="currFlashcardSet" class="menu-select">
         <option v-for="s in flashcardSets" :key="s.id" :value="s">
           {{ truncate(s.name, 10) }}
         </option>
@@ -53,7 +53,7 @@ import FlashcardModificationForm from '@/components/FlashcardModificationForm.vu
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
 import { type LevelInfo } from '@/models/level-info.ts';
-import { type FlashcardSet, Level } from '@/models/flashcards.ts';
+import { type FlashcardSet, Level } from '@/models/flashcard.ts';
 import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 
@@ -171,7 +171,7 @@ const calendar = {
   font-size: 1.4em;
 }
 
-select {
+.menu-select {
   flex: 1;
   appearance: none;
   border: 2px solid #ddd;

@@ -3,15 +3,19 @@
     <div class="modal-window">
       <h2 class="modal-title">{{ title }}</h2>
       <div class="modal-body">
-        <div class="modal-form-group">
+        <div class="modal-form-group-line">
           <textarea id="frontSide" v-model="frontSide" rows="3" placeholder="Front side"
                     class="modal-input"></textarea>
-          <span v-if="$v.frontSide.$errors.length" class="modal-error-message">Please don't forget to fill this out</span>
+          <span v-if="$v.frontSide.$errors.length" class="modal-error-message">
+            Please don't forget to fill this out
+          </span>
         </div>
-        <div class="modal-form-group">
+        <div class="modal-form-group-line">
           <textarea id="backSide" v-model="backSide" rows="3" placeholder="Back side"
                     class="modal-input"></textarea>
-          <span v-if="$v.backSide.$errors.length" class="modal-error-message">Please don't forget to fill this out</span>
+          <span v-if="$v.backSide.$errors.length" class="modal-error-message">
+            Please don't forget to fill this out
+          </span>
         </div>
       </div>
       <div class="modal-buttons">
@@ -30,7 +34,7 @@ import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts';
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
-import { type Flashcard, Level } from '@/models/flashcards.ts';
+import { type Flashcard, Level } from '@/models/flashcard.ts';
 import { storeToRefs } from 'pinia';
 
 function handleKeydown(event: KeyboardEvent) {
