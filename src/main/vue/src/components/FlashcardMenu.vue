@@ -1,42 +1,42 @@
 <template>
-  <div class="container">
+  <div class="menu-container">
     <ul class="menu">
-      <li class="item select-item" style="display: flex;">
-        <select v-model="currFlashcardSet">
+      <li class="menu-item menu-select-item" style="display: flex;">
+        <select v-model="currFlashcardSet" class="menu-select">
           <option v-for="s in flashcardSets" :key="s.id" :value="s">
             {{ truncate(s.name, 10) }}
           </option>
         </select>
       </li>
-      <li class="buttons-container">
-        <div class="item item-color button"
+      <li class="menu-buttons-container">
+        <div class="menu-item menu-item-color menu-button"
              @click="showFlashcardSetSettingsForm = true">
           <font-awesome-icon icon="fa-solid fa-gear"/>
         </div>
-        <div class="item item-color button"
+        <div class="menu-item menu-item-color menu-button"
              @click="showFlashcardSetCreationForm = true">
           <font-awesome-icon icon="fa-solid fa-box"/>
         </div>
-        <div class="item item-color button"
+        <div class="menu-item menu-item-color menu-button"
              @click="showFlashcardCreationForm = true">
           <font-awesome-icon icon="fa-solid fa-rectangle-list"/>
         </div>
       </li>
-      <li v-if="showFlashcardMenuItem" class="buttons-container">
-        <div class="item item-color button calendar-button">
+      <li v-if="showFlashcardMenuItem" class="menu-buttons-container">
+        <div class="menu-item menu-item-color menu-button menu-calendar-button">
           <font-awesome-icon icon="fa-solid fa-calendar-days"/>
         </div>
-        <div class="item item-color">
-          <ul class="day-info">
+        <div class="menu-item menu-item-color">
+          <ul class="menu-day-info">
             <li>Day</li>
-            <li class="number">{{ calendar.day }}</li>
+            <li class="menu-number">{{ calendar.day }}</li>
           </ul>
         </div>
       </li>
       <li v-if="showFlashcardMenuItem" v-for="info in levelInfos" :key="info.name"
-          class="item item-color">
-        <ul class="day-info">
-          <li class="number">{{ info.count }}</li>
+          class="menu-item menu-item-color">
+        <ul class="menu-day-info">
+          <li class="menu-number">{{ info.count }}</li>
           <li>{{ info.name }}</li>
         </ul>
       </li>
@@ -111,7 +111,7 @@ const calendar = {
 </script>
 
 <style scoped>
-.container {
+.menu-container {
   display: flex;
 }
 
@@ -127,59 +127,59 @@ const calendar = {
   max-width: 200px;
 }
 
-.item-color {
+.menu-item-color {
   background-color: #e6e6e6;
 }
 
-.item {
+.menu-item {
   padding: 10px 10px 10px 10px;
   border-radius: 4px;
   font-size: 1em;
   user-select: none;
 }
 
-.item:not(.select-item):hover {
+.menu-item:not(.menu-select-item):hover {
   background-color: #d6d6d6;
 }
 
-.select-item {
+.menu-select-item {
   padding: 6px 6px 6px 6px;
 }
 
-.day-info {
+.menu-day-info {
   display: flex;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.day-info li {
+.menu-day-info li {
   padding: 4px 10px 4px 10px;
 }
 
-.number {
+.menu-number {
   background-color: #ccc;
   border-radius: 4px;
 }
 
-.buttons-container {
+.menu-buttons-container {
   display: flex;
   gap: 4px;
   background: none;
 }
 
-.button {
+.menu-button {
   flex: 1;
   text-align: center;
   cursor: pointer;
   font-size: 1.2em;
 }
 
-.calendar-button {
+.menu-calendar-button {
   font-size: 1.4em;
 }
 
-select {
+.menu-select {
   flex: 1;
   appearance: none;
   border: 2px solid #ddd;

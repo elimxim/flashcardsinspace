@@ -26,6 +26,7 @@
 </template>
 
 <script setup lang="ts">
+import '@/assets/main.css'
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts';
 import { useLanguageStore } from '@/stores/language.ts';
 import { onMounted } from 'vue';

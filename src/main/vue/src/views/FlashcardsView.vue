@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="app-container">
     <div class="menu">
       <FlashcardMenu/>
     </div>
@@ -18,14 +18,12 @@ import FlashcardReviewForm from '@/components/FlashcardReviewForm.vue';
 </script>
 
 <style scoped>
-.container {
+.app-container {
   display: flex;
   flex-direction: row;
-  height: 100%;
 }
 
 .menu {
-  flex: 1;
   padding: 4px;
   background-color: #f0f0f0;
 }
@@ -33,7 +31,7 @@ import FlashcardReviewForm from '@/components/FlashcardReviewForm.vue';
 .review-form {
   flex: 10;
   padding: 4px;
-  //background-color: #dadada;
+  background: none;
 }
 
 </style>
