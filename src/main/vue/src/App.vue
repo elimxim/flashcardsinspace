@@ -26,9 +26,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
-import { useFlashcardDataStore } from "@/stores/flashcard-data.ts";
+import { useFlashcardDataStore } from '@/stores/flashcard-data.ts';
 import { useLanguageStore } from '@/stores/language.ts';
+import { onMounted } from 'vue';
 
 const flashcardDataStore = useFlashcardDataStore()
 const langStore = useLanguageStore()
@@ -93,6 +93,5 @@ onMounted(() => {
   color: white;
   font-weight: bold;
 }
-
 
 </style>

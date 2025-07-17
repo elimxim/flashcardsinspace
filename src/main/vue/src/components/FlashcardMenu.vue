@@ -1,55 +1,58 @@
 <template>
-  <ul class="menu">
-    <li class="menu-item menu-item-color" style="display: flex;">
-      <select v-model="currFlashcardSet" class="menu-select">
-        <option v-for="s in flashcardSets" :key="s.id" :value="s">
-          {{ truncate(s.name, 10) }}
-        </option>
-      </select>
-    </li>
-    <li class="menu-buttons-container">
-      <div class="menu-item menu-item-color menu-button"
-           @click="showFlashcardSetSettingsForm = true">
-        <font-awesome-icon icon="fa-solid fa-gear"/>
-      </div>
-      <div class="menu-item menu-item-color menu-button"
-           @click="showFlashcardSetCreationForm = true">
-        <font-awesome-icon icon="fa-solid fa-box"/>
-      </div>
-      <div class="menu-item menu-item-color menu-button"
-           @click="showFlashcardCreationForm = true">
-        <font-awesome-icon icon="fa-solid fa-rectangle-list"/>
-      </div>
-    </li>
-    <li v-if="showFlashcardMenuItem" class="menu-buttons-container">
-      <div class="menu-item menu-item-color menu-calendar-button">
-        <font-awesome-icon icon="fa-solid fa-calendar-days"/>
-      </div>
-      <div class="menu-item menu-item-color">
-        <ul class="menu-info">
-          <li>Day</li>
-          <li class="menu-info-number">{{ calendar.day }}</li>
+  <div class="container">
+    <ul class="menu">
+      <li class="item select-item" style="display: flex;">
+        <select v-model="currFlashcardSet">
+          <option v-for="s in flashcardSets" :key="s.id" :value="s">
+            {{ truncate(s.name, 10) }}
+          </option>
+        </select>
+      </li>
+      <li class="buttons-container">
+        <div class="item item-color button"
+             @click="showFlashcardSetSettingsForm = true">
+          <font-awesome-icon icon="fa-solid fa-gear"/>
+        </div>
+        <div class="item item-color button"
+             @click="showFlashcardSetCreationForm = true">
+          <font-awesome-icon icon="fa-solid fa-box"/>
+        </div>
+        <div class="item item-color button"
+             @click="showFlashcardCreationForm = true">
+          <font-awesome-icon icon="fa-solid fa-rectangle-list"/>
+        </div>
+      </li>
+      <li v-if="showFlashcardMenuItem" class="buttons-container">
+        <div class="item item-color button calendar-button">
+          <font-awesome-icon icon="fa-solid fa-calendar-days"/>
+        </div>
+        <div class="item item-color">
+          <ul class="day-info">
+            <li>Day</li>
+            <li class="number">{{ calendar.day }}</li>
+          </ul>
+        </div>
+      </li>
+      <li v-if="showFlashcardMenuItem" v-for="info in levelInfos" :key="info.name"
+          class="item item-color">
+        <ul class="day-info">
+          <li class="number">{{ info.count }}</li>
+          <li>{{ info.name }}</li>
         </ul>
-      </div>
-    </li>
-    <li v-if="showFlashcardMenuItem" v-for="info in levelInfos" :key="info.name"
-        class="menu-item menu-item-color">
-      <ul class="menu-info">
-        <li class="menu-info-number">{{ info.count }}</li>
-        <li>{{ info.name }}</li>
-      </ul>
-    </li>
-  </ul>
+      </li>
+    </ul>
+  </div>
 
-  <FlashcardSetSettingsForm v-model:visible="showFlashcardSetSettingsForm"/>
-  <FlashcardSetCreationForm v-model:visible="showFlashcardSetCreationForm"/>
-  <FlashcardModificationForm v-model:visible="showFlashcardCreationForm" title="New flashcard"/>
+  <FlashcardSetSettingsModalForm v-model:visible="showFlashcardSetSettingsForm"/>
+  <FlashcardSetCreationModalForm v-model:visible="showFlashcardSetCreationForm"/>
+  <FlashcardModificationModalForm v-model:visible="showFlashcardCreationForm"
+                                  title="New flashcard"/>
 </template>
 
 <script setup lang="ts">
-import FlashcardSetSettingsForm from '@/components/FlashcardSetSettingsForm.vue';
-import FlashcardSetCreationForm from '@/components/FlashcardSetCreationForm.vue';
-import FlashcardModificationForm from '@/components/FlashcardModificationForm.vue';
+import FlashcardSetSettingsModalForm from '@/components/FlashcardSetSettingsModalForm.vue';
+import FlashcardSetCreationModalForm from '@/components/FlashcardSetCreationModalForm.vue';
+import FlashcardModificationModalForm from '@/components/FlashcardModificationModalForm.vue';
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
 import { type LevelInfo } from '@/models/level-info.ts';
@@ -108,6 +111,10 @@ const calendar = {
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+}
+
 .menu {
   display: grid;
   list-style: none;
@@ -120,58 +127,59 @@ const calendar = {
   max-width: 200px;
 }
 
-.menu-item-color {
-  background-color: #f0f0f0;
+.item-color {
+  background-color: #e6e6e6;
 }
 
-.menu-item {
+.item {
   padding: 10px 10px 10px 10px;
   border-radius: 4px;
   font-size: 1em;
   user-select: none;
 }
 
-.menu-item:hover {
-  background-color: #ddd;
+.item:not(.select-item):hover {
+  background-color: #d6d6d6;
 }
 
-.menu-info {
+.select-item {
+  padding: 6px 6px 6px 6px;
+}
+
+.day-info {
   display: flex;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.menu-info li {
+.day-info li {
   padding: 4px 10px 4px 10px;
 }
 
-.menu-info-number {
-  background-color: #ddd;
+.number {
+  background-color: #ccc;
   border-radius: 4px;
 }
 
-.menu-buttons-container {
+.buttons-container {
   display: flex;
   gap: 4px;
   background: none;
 }
 
-.menu-button {
+.button {
   flex: 1;
   text-align: center;
   cursor: pointer;
   font-size: 1.2em;
 }
 
-.menu-calendar-button {
-  flex: 1;
-  text-align: center;
-  cursor: pointer;
+.calendar-button {
   font-size: 1.4em;
 }
 
-.menu-select {
+select {
   flex: 1;
   appearance: none;
   border: 2px solid #ddd;

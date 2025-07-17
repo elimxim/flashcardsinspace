@@ -1,40 +1,39 @@
 <template>
-  <div>
-    <div class="flashcard-menu">
+  <div class="container">
+    <div class="menu">
       <FlashcardMenu/>
     </div>
 
-    <div class="flashcard-view">
-
+    <div class="review-form">
+      <FlashcardReviewForm/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import FlashcardMenu from '@/components/FlashcardMenu.vue'
-import { useFlashcardDataStore } from "@/stores/flashcard-data.ts";
-import { useFlashcardStateStore } from "@/stores/flashcard-state.ts";
-import { computed } from 'vue';
-import { storeToRefs } from 'pinia';
+import FlashcardReviewForm from '@/components/FlashcardReviewForm.vue';
 
-const dataStore = useFlashcardDataStore()
-const sateStore = useFlashcardStateStore()
 
 </script>
 
 <style scoped>
-.flashcard-menu {
-  flex: 1;
+.container {
   display: flex;
-  justify-content: left;
-  padding: 0;
+  flex-direction: row;
+  height: 100%;
 }
 
-.flashcard-view {
-  flex: 3;
-  padding: 0;
-  overflow-y: auto;
+.menu {
+  flex: 1;
+  padding: 4px;
+  background-color: #f0f0f0;
 }
 
+.review-form {
+  flex: 10;
+  padding: 4px;
+  //background-color: #dadada;
+}
 
 </style>
