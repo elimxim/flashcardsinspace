@@ -1,7 +1,8 @@
 import './assets/modal.css'
 
-import App from './App.vue'
-import router from './router'
+// @ts-ignore
+import App from '@/App.vue'
+import router from '@/router'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -13,6 +14,8 @@ import { faCalendarDays } from '@fortawesome/free-solid-svg-icons'
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { faGlobe } from '@fortawesome/free-solid-svg-icons';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faGear)
 library.add(faBox)
@@ -21,6 +24,8 @@ library.add(faCalendarDays)
 library.add(faTriangleExclamation)
 library.add(faCircleInfo)
 library.add(faGlobe)
+library.add(faXmark)
+library.add(faPenToSquare)
 
 const app = createApp(App)
 app.component('font-awesome-icon', FontAwesomeIcon)

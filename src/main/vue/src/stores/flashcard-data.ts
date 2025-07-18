@@ -64,24 +64,24 @@ function testData(): FlashcardSet[] {
         name: "Bosnian",
         alpha2: "bs",
       },
-      flashcards: [
-        {
+      flashcardMap: new Map([
+        [1, {
           id: 1,
           frontSide: "Prdnuti",
           backSide: "To fart",
           level: Level.FIRST,
           createdAt: new Date(),
           lastUpdatedAt: new Date(),
-        },
-        {
+        }],
+        [2, {
           id: 1,
           frontSide: "Kakati",
           backSide: "To poop",
           level: Level.FIRST,
           createdAt: new Date(),
           lastUpdatedAt: new Date(),
-        },
-      ],
+        }],
+      ]),
       createdAt: new Date(),
       lastUpdatedAt: new Date(),
       default: false,
@@ -94,24 +94,24 @@ function testData(): FlashcardSet[] {
         name: "Russian",
         alpha2: "ru",
       },
-      flashcards: [
-        {
+      flashcardMap: new Map([
+        [1, {
           id: 1,
           frontSide: "Пукать",
           backSide: "To fart",
           level: Level.SECOND,
           createdAt: new Date(),
           lastUpdatedAt: new Date(),
-        },
-        {
-          id: 1,
+        }],
+        [2, {
+          id: 2,
           frontSide: "Какать",
           backSide: "To poop",
           level: Level.SECOND,
           createdAt: new Date(),
           lastUpdatedAt: new Date(),
-        },
-      ],
+        }],
+      ]),
       createdAt: new Date(),
       lastUpdatedAt: new Date(),
       default: false,

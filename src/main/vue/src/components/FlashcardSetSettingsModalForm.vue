@@ -95,6 +95,7 @@ const flashcardSetHasChanges = computed(() => {
   return currFlashcardSet.value?.name !== flashcardSetName.value
     || currFlashcardSet.value?.default !== defaultFlashcardSet.value
 })
+
 watch(flashcardSetName, (_) => {
   flashcardRemoveConfirmation.value = false;
 })
@@ -149,7 +150,7 @@ function removeFlashcardSet() {
   }
 
   const { flashcardSets } = storeToRefs(dataStore)
-  stateStore.chooseCurrFlashcardSet(flashcardSets)
+  stateStore.chooseCurr(flashcardSets)
 }
 
 function updateFlashcardSet() {
@@ -157,10 +158,10 @@ function updateFlashcardSet() {
     // todo save to DB
 
     if (flashcardSetName.value !== undefined) {
-      stateStore.setFlashcardSetName(flashcardSetName.value);
+      stateStore.setName(flashcardSetName.value);
     }
     if (defaultFlashcardSet.value !== undefined) {
-      stateStore.setFlashcardSetDefault(defaultFlashcardSet.value);
+      stateStore.setDefault(defaultFlashcardSet.value);
     }
   }
 }

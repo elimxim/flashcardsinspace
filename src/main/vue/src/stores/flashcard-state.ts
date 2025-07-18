@@ -1,27 +1,36 @@
 import { type Flashcard, type FlashcardSet } from "@/models/flashcard.ts";
-import { type FlashcardState } from '@/models/flashcard-state.ts';
 import { defineStore } from "pinia";
 import type { Ref } from 'vue';
 
 export const useFlashcardStateStore = defineStore('flashcard-state', {
-  state: (): FlashcardState => {
+  state: () => {
     return {
-      currFlashcardSet: undefined,
+      currFlashcardSet: undefined as FlashcardSet | undefined,
+    }
+  },
+  getters: {
+    flashcards(): Flashcard[] {
+      if (this.currFlashcardSet !== undefined) {
+        return [...this.currFlashcardSet.flashcardMap.values()]
+      } else {
+        return []
+      }
     }
   },
   actions: {
-    chooseCurrFlashcardSet(flashcardSets: Ref<FlashcardSet[]>) {
+    chooseCurr(flashcardSets: Ref<FlashcardSet[]>) {
+      // todo alpha-bet search + default flag
       this.currFlashcardSet = flashcardSets.value?.[0]
     },
-    setCurrFlashcardSet(flashcardSet: FlashcardSet) {
+    setCurr(flashcardSet: FlashcardSet) {
       this.currFlashcardSet = flashcardSet
     },
-    setFlashcardSetName(name: string) {
+    setName(name: string) {
       if (this.currFlashcardSet !== undefined) {
         this.currFlashcardSet.name = name
       }
     },
-    setFlashcardSetDefault(value: boolean) {
+    setDefault(value: boolean) {
       if (this.currFlashcardSet !== undefined) {
         this.currFlashcardSet.default = value
       }
@@ -29,21 +38,29 @@ export const useFlashcardStateStore = defineStore('flashcard-state', {
     addFlashcard(flashcard: Flashcard) {
       if (this.currFlashcardSet !== undefined) {
         // todo delete
-        let max = 1
-        if (this.currFlashcardSet.flashcards.length > 0) {
-          max = this.currFlashcardSet.flashcards.reduce(
-            (prev, current) => {
-              return (prev && prev.id > current.id) ? prev : current;
-            },
-            this.currFlashcardSet.flashcards[0]
-          ).id
+        let nextId = 1
+        if (this.currFlashcardSet.flashcardMap.size) {
+          const keys = Array.from(this.currFlashcardSet.flashcardMap.keys())
+          nextId = Math.max(...keys) + 1
         }
         // todo delete
-        flashcard.id = max + 1
+        flashcard.id = nextId
 
-        this.currFlashcardSet.flashcards.push(flashcard)
+        // todo save to DB and get ID from there
+        this.currFlashcardSet.flashcardMap.set(nextId, flashcard)
       } else {
         console.error("Cannot add flashcard to undefined flashcard set")
+      }
+    },
+    updateFlashcard(flashcard: Flashcard) {
+      if (this.currFlashcardSet !== undefined) {
+        const savedFlashcard = this.currFlashcardSet.flashcardMap.get(flashcard.id) as Flashcard | undefined
+        if (savedFlashcard !== undefined) {
+          savedFlashcard.frontSide = flashcard.frontSide
+          savedFlashcard.backSide = flashcard.backSide
+          savedFlashcard.level = flashcard.level
+          savedFlashcard.lastUpdatedAt = new Date()
+        }
       }
     },
   }

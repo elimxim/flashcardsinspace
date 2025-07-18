@@ -130,7 +130,7 @@ function createNewFlashcardSet() {
     id: 0,
     name: flashcardSetName.value,
     targetLanguage: selectedLanguage.value!,
-    flashcards: [],
+    flashcardMap: new Map(),
     createdAt: null,
     lastUpdatedAt: null,
     default: false,
@@ -139,7 +139,7 @@ function createNewFlashcardSet() {
 
   // todo save to DB
   dataStore.addFlashcardSet(flashcardSet)
-  stateStore.setCurrFlashcardSet(flashcardSet)
+  stateStore.setCurr(flashcardSet)
 }
 
 function resetState() {

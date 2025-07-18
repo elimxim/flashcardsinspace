@@ -3,12 +3,12 @@ import type { Language } from '@/models/language.ts';
 
 export enum Level {
   FIRST = 1,
-  SECOND = 2,
-  THIRD = 3,
-  FORTH = 4,
-  FIFTH = 5,
-  SIXTH = 6,
-  SEVENTH = 7,
+  SECOND,
+  THIRD,
+  FORTH,
+  FIFTH,
+  SIXTH,
+  SEVENTH,
 }
 
 export interface Flashcard {
@@ -24,7 +24,7 @@ export interface FlashcardSet {
   id: number;
   name: string;
   targetLanguage: Language;
-  flashcards: Flashcard[];
+  flashcardMap: Map<number, Flashcard>;
   createdAt: Date | null;
   lastUpdatedAt: Date | null;
   default: boolean;

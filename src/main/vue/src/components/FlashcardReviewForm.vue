@@ -1,13 +1,269 @@
 <template>
-  <div>
-
+  <div class="review-form">
+    <div v-if="!started" class="review-start-container">
+      <button class="review-button review-start-button"
+              @click="startReview">
+        Start review
+      </button>
+    </div>
+    <div v-if="started" class="review-container">
+      <div class="review-top">
+        <button class="corner-button corner-close-button" @click="finishReview">
+          <font-awesome-icon icon="fa-solid fa-xmark"/>
+        </button>
+      </div>
+      <div class="review-body">
+        <div class="flashcard-container">
+          <div class="flashcard" @click="flipFlashcard">
+            <div class="flashcard-top">
+              <button class="corner-button corner-edit-button">
+                <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
+              </button>
+            </div>
+            <div class="flashcard-text">
+              {{ currFlashcardText }}
+            </div>
+          </div>
+          <div class="flashcard-nav">
+            <button class="nav-button nav-left-button" @click="moveFlashcardDown">Don't know
+            </button>
+            <button class="nav-button nav-right-button" @click="moveFlashcardUp">Know</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+// todo mark flashcards as reviewed by settings a review date (when calendar date shifts they weill be automatically marked as not reviewed)
+// todo finish review when adding a new flashcard set or selecting another one or leaving this page
+// todo show flashcard level in review
+// todo behavior if there are no more flashcards to review
+// todo confirmation modal form on closing review
+// todo edit flashcard
+
+import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
+import { computed, onMounted, onUnmounted, type Ref, ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { type Flashcard, Level } from '@/models/flashcard.ts';
+import { useReviewStateStore } from '@/stores/review-state.ts';
+
+const stateStore = useFlashcardStateStore()
+const reviewStateStore = useReviewStateStore()
+const { started, frontSide, currFlashcard } = storeToRefs(reviewStateStore)
+
+const currFlashcardText = computed(() => {
+  if (frontSide.value) {
+    return currFlashcard.value?.frontSide
+  } else {
+    return currFlashcard.value?.backSide
+  }
+})
+
+function startReview() {
+  reviewStateStore.startReview()
+}
+
+function finishReview() {
+  reviewStateStore.finishReview()
+}
+
+function flipFlashcard() {
+  reviewStateStore.flipFlashcard()
+}
+
+function moveFlashcardDown() {
+  if (currFlashcard.value !== undefined) {
+    currFlashcard.value.level = Level.FIRST
+  }
+}
+
+function moveFlashcardUp() {
+  if (currFlashcard.value !== undefined) {
+    const flashcard = currFlashcard.value
+    flashcard.level = nextLevel(flashcard.level)
+    stateStore.updateFlashcard(flashcard)
+    reviewStateStore.nextFlashcard()
+  }
+}
+
+function nextLevel(currLevel: Level): Level {
+  if (currLevel === Level.SECOND) {
+    throw new Error('NEXT LEVEL IS NOT IMPLEMENTED YET')
+  }
+  const levels = Object.values(Level).filter(value => typeof value === 'number') as Level[];
+  const currIdx = levels.indexOf(currLevel)
+  return levels[currIdx + 1]
+}
+
+function handleKeydown(event: KeyboardEvent) {
+  if (event.key == 'Enter' && !started.value) {
+    startReview();
+  } else if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
+    flipFlashcard();
+  } else if (event.key === 'ArrowLeft') {
+    moveFlashcardDown();
+  } else if (event.key === 'ArrowRight') {
+    moveFlashcardUp();
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown);
+});
 
 </script>
 
 <style scoped>
+.review-form {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
 
+.review-start-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.review-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  margin-bottom: 8%;
+}
+
+.review-start-button {
+  font-size: 1.5em;
+  background-color: #6db37c;
+  color: white;
+}
+
+.review-start-button:hover {
+  background-color: #519c53;
+}
+
+.review-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.review-top {
+  flex: 1;
+  align-items: center;
+  text-align: end;
+}
+
+.review-body {
+  flex: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.flashcard-container {
+  flex: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  min-width: 600px;
+  max-width: 600px;
+  min-height: 400px;
+  max-height: 400px;
+  margin-bottom: 5%;
+}
+
+.flashcard {
+  flex: 100;
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  user-select: none;
+  cursor: pointer;
+}
+
+.flashcard-top {
+  flex: 1;
+  align-items: center;
+  text-align: end;
+}
+
+.flashcard-text {
+  flex: 100;
+  font-size: 1.8em;
+  text-align: center;
+  align-content: center;
+}
+
+.flashcard-nav {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  width: 120px;
+  user-select: none;
+}
+
+.nav-right-button {
+  background-color: #6db37c;
+  color: white;
+}
+
+.nav-right-button:hover {
+  background-color: #519c53;
+}
+
+.nav-left-button {
+  background-color: #b36d6d;
+  color: white;
+}
+
+.nav-left-button:hover {
+  background-color: #9c5151;
+}
+
+.corner-button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #c5c5c5;
+}
+
+.corner-button:hover {
+  color: #9f9f9f;
+}
+
+.corner-close-button {
+  font-size: 2em;
+}
+
+.corner-edit-button {
+  font-size: 1.5em;
+}
 </style>

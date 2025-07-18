@@ -23,29 +23,32 @@
         </div>
       </li>
       <li v-if="showFlashcardMenuItem" class="menu-buttons-container">
-        <div class="menu-item menu-item-color menu-button menu-calendar-button">
+        <div class="menu-item menu-item-color menu-button">
           <font-awesome-icon icon="fa-solid fa-calendar-days"/>
         </div>
         <div class="menu-item menu-item-color">
-          <ul class="menu-day-info">
+          <ul class="menu-composite-item">
             <li>Day</li>
-            <li class="menu-number">{{ calendar.day }}</li>
+            <li class="menu-item-number">{{ calendar.day }}</li>
           </ul>
         </div>
       </li>
       <li v-if="showFlashcardMenuItem" v-for="info in levelInfos" :key="info.name"
           class="menu-item menu-item-color">
-        <ul class="menu-day-info">
-          <li class="menu-number">{{ info.count }}</li>
+        <ul class="menu-composite-item">
+          <li class="menu-item-number">{{ info.count }}</li>
           <li>{{ info.name }}</li>
         </ul>
       </li>
     </ul>
   </div>
 
-  <FlashcardSetSettingsModalForm v-model:visible="showFlashcardSetSettingsForm"/>
-  <FlashcardSetCreationModalForm v-model:visible="showFlashcardSetCreationForm"/>
-  <FlashcardModificationModalForm v-model:visible="showFlashcardCreationForm"
+  <FlashcardSetSettingsModalForm id="flashcard-set-settings"
+                                 v-model:visible="showFlashcardSetSettingsForm"/>
+  <FlashcardSetCreationModalForm id="new-flashcard-set"
+                                 v-model:visible="showFlashcardSetCreationForm"/>
+  <FlashcardModificationModalForm id="new-flashcard"
+                                  v-model:visible="showFlashcardCreationForm"
                                   title="New flashcard"/>
 </template>
 
@@ -55,7 +58,6 @@ import FlashcardSetCreationModalForm from '@/components/FlashcardSetCreationModa
 import FlashcardModificationModalForm from '@/components/FlashcardModificationModalForm.vue';
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
-import { type LevelInfo } from '@/models/level-info.ts';
 import { type FlashcardSet, Level } from '@/models/flashcard.ts';
 import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
@@ -64,7 +66,7 @@ const dataStore = useFlashcardDataStore()
 const stateStore = useFlashcardStateStore()
 const { flashcardSets } = storeToRefs(dataStore)
 
-stateStore.chooseCurrFlashcardSet(flashcardSets)
+stateStore.chooseCurr(flashcardSets)
 const { currFlashcardSet } = storeToRefs(stateStore)
 
 const showFlashcardMenuItem = computed(() => currFlashcardSet.value !== undefined)
@@ -73,18 +75,14 @@ const showFlashcardSetCreationForm = ref(false)
 const showFlashcardCreationForm = ref(false)
 
 const flashcardNumberByLevel = (level: number) => {
-  const set = currFlashcardSet.value
-  if (set === undefined) return 0
-  return set.flashcards.filter(f => f.level.valueOf() === level).length
+  return stateStore.flashcards.filter(f => f.level.valueOf() === level).length
 }
 
 const totalFlashcardNumber = () => {
-  const set = currFlashcardSet.value
-  if (set === undefined) return 0
-  return set.flashcards.length
+  return stateStore.flashcards.length
 }
 
-const total: LevelInfo = {
+const total = {
   name: 'Total',
   count: computed(() => totalFlashcardNumber()),
 }
@@ -112,7 +110,10 @@ const calendar = {
 
 <style scoped>
 .menu-container {
+  flex: 1;
   display: flex;
+  padding: 4px;
+  background-color: #f0f0f0;
 }
 
 .menu {
@@ -132,7 +133,8 @@ const calendar = {
 }
 
 .menu-item {
-  padding: 10px 10px 10px 10px;
+  padding: 8px;
+  margin: 0;
   border-radius: 4px;
   font-size: 1em;
   user-select: none;
@@ -143,21 +145,22 @@ const calendar = {
 }
 
 .menu-select-item {
-  padding: 6px 6px 6px 6px;
+  padding: 6px;
 }
 
-.menu-day-info {
+.menu-composite-item {
   display: flex;
+  gap: 4px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.menu-day-info li {
-  padding: 4px 10px 4px 10px;
+.menu-composite-item li {
+  padding: 2px 10px 2px 10px;
 }
 
-.menu-number {
+.menu-item-number {
   background-color: #ccc;
   border-radius: 4px;
 }
@@ -171,12 +174,9 @@ const calendar = {
 .menu-button {
   flex: 1;
   text-align: center;
+  padding: 10px;
   cursor: pointer;
   font-size: 1.2em;
-}
-
-.menu-calendar-button {
-  font-size: 1.4em;
 }
 
 .menu-select {

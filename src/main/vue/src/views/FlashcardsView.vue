@@ -4,7 +4,7 @@
       <FlashcardMenu/>
     </div>
 
-    <div class="review-form">
+    <div class="flashcards-review">
       <FlashcardReviewForm/>
     </div>
   </div>
@@ -24,13 +24,12 @@ import FlashcardReviewForm from '@/components/FlashcardReviewForm.vue';
 }
 
 .menu {
-  padding: 4px;
+  flex: 1;
   background-color: #f0f0f0;
 }
 
-.review-form {
+.flashcards-review {
   flex: 10;
-  padding: 4px;
   background: none;
 }
 
