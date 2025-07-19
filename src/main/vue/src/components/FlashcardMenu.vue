@@ -2,7 +2,7 @@
   <div class="menu-container">
     <ul class="menu">
       <li class="menu-item menu-select-item" style="display: flex;">
-        <select v-model="currFlashcardSet" class="menu-select">
+        <select id="flashcard-set-select" v-model="currFlashcardSet" class="menu-select" @change="handleSelectChange">
           <option v-for="s in flashcardSets" :key="s.id" :value="s">
             {{ truncate(s.name, 10) }}
           </option>
@@ -60,12 +60,13 @@ import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
 import { type FlashcardSet, Level } from '@/models/flashcard.ts';
 import { storeToRefs } from 'pinia';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import { useReviewStateStore } from '@/stores/review-state.ts';
 
 const dataStore = useFlashcardDataStore()
-const stateStore = useFlashcardStateStore()
 const { flashcardSets } = storeToRefs(dataStore)
 
+const stateStore = useFlashcardStateStore()
 stateStore.chooseCurr(flashcardSets)
 const { currFlashcardSet } = storeToRefs(stateStore)
 
@@ -105,6 +106,20 @@ function truncate(str: string, length: number) {
 const calendar = {
   day: 4 as number
 }
+
+const reviewStateStore = useReviewStateStore()
+
+function handleSelectChange() {
+  reviewStateStore.finishReview()
+}
+
+onMounted(() => {
+  const flashcardSetSelect = document.getElementById('flashcard-set-select') as HTMLSelectElement
+  flashcardSetSelect.addEventListener('keydown', function (event) {
+    event.preventDefault()
+  })
+});
+
 
 </script>
 

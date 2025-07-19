@@ -15,7 +15,7 @@ export const useFlashcardStateStore = defineStore('flashcard-state', {
       } else {
         return []
       }
-    }
+    },
   },
   actions: {
     chooseCurr(flashcardSets: Ref<FlashcardSet[]>) {
@@ -54,12 +54,14 @@ export const useFlashcardStateStore = defineStore('flashcard-state', {
     },
     updateFlashcard(flashcard: Flashcard) {
       if (this.currFlashcardSet !== undefined) {
-        const savedFlashcard = this.currFlashcardSet.flashcardMap.get(flashcard.id) as Flashcard | undefined
-        if (savedFlashcard !== undefined) {
-          savedFlashcard.frontSide = flashcard.frontSide
-          savedFlashcard.backSide = flashcard.backSide
-          savedFlashcard.level = flashcard.level
-          savedFlashcard.lastUpdatedAt = new Date()
+        const currFlashcard = this.currFlashcardSet.flashcardMap.get(flashcard.id) as Flashcard | undefined
+        if (currFlashcard !== undefined) {
+          currFlashcard.frontSide = flashcard.frontSide
+          currFlashcard.backSide = flashcard.backSide
+          currFlashcard.level = flashcard.level
+          currFlashcard.reviewCount = flashcard.reviewCount
+          currFlashcard.reviewHistory = flashcard.reviewHistory
+          currFlashcard.lastUpdatedAt = new Date().toISOString()
         }
       }
     },

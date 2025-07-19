@@ -25,9 +25,8 @@
             </div>
           </div>
           <div class="flashcard-nav">
-            <button class="nav-button nav-left-button" @click="moveFlashcardDown">Don't know
-            </button>
-            <button class="nav-button nav-right-button" @click="moveFlashcardUp">Know</button>
+            <button class="nav-button nav-left-button" @click="levelDown">Don't know</button>
+            <button class="nav-button nav-right-button" @click="levelUp">Know</button>
           </div>
         </div>
       </div>
@@ -36,17 +35,15 @@
 </template>
 
 <script setup lang="ts">
-// todo mark flashcards as reviewed by settings a review date (when calendar date shifts they weill be automatically marked as not reviewed)
-// todo finish review when adding a new flashcard set or selecting another one or leaving this page
 // todo show flashcard level in review
 // todo behavior if there are no more flashcards to review
 // todo confirmation modal form on closing review
-// todo edit flashcard
+// todo edit flashcard + don't flip the flashcard if click on the edit button
 
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
 import { computed, onMounted, onUnmounted, type Ref, ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { type Flashcard, Level } from '@/models/flashcard.ts';
+import { type Flashcard, Level, type ReviewInfo } from '@/models/flashcard.ts';
 import { useReviewStateStore } from '@/stores/review-state.ts';
 
 const stateStore = useFlashcardStateStore()
@@ -73,23 +70,45 @@ function flipFlashcard() {
   reviewStateStore.flipFlashcard()
 }
 
-function moveFlashcardDown() {
-  if (currFlashcard.value !== undefined) {
-    currFlashcard.value.level = Level.FIRST
-  }
-}
-
-function moveFlashcardUp() {
+function levelDown() {
   if (currFlashcard.value !== undefined) {
     const flashcard = currFlashcard.value
-    flashcard.level = nextLevel(flashcard.level)
+    updateFlashcard(flashcard, Level.FIRST)
     stateStore.updateFlashcard(flashcard)
+    reviewStateStore.setFrontSide(true)
     reviewStateStore.nextFlashcard()
   }
 }
 
+function levelUp() {
+  if (currFlashcard.value !== undefined) {
+    const flashcard = currFlashcard.value
+    updateFlashcard(flashcard, nextLevel(flashcard.level))
+    stateStore.updateFlashcard(flashcard)
+    reviewStateStore.setFrontSide(true)
+    reviewStateStore.nextFlashcard()
+  }
+}
+
+function updateFlashcard(flashcard: Flashcard, level: Level) {
+  console.debug(`Updating flashcard ${flashcard.id} to level ${level}`)
+
+  const now = new Date().toISOString()
+  const info: ReviewInfo = {
+    level: level,
+    reviewedAt: now,
+  }
+
+  flashcard.level = level
+  flashcard.reviewedAt = now
+  flashcard.reviewCount += 1
+  flashcard.reviewHistory.push(info)
+  flashcard.lastUpdatedAt = now
+}
+
 function nextLevel(currLevel: Level): Level {
-  if (currLevel === Level.SECOND) {
+  if (currLevel === Level.SEVENTH) {
+    // todo
     throw new Error('NEXT LEVEL IS NOT IMPLEMENTED YET')
   }
   const levels = Object.values(Level).filter(value => typeof value === 'number') as Level[];
@@ -103,9 +122,9 @@ function handleKeydown(event: KeyboardEvent) {
   } else if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
     flipFlashcard();
   } else if (event.key === 'ArrowLeft') {
-    moveFlashcardDown();
+    levelDown();
   } else if (event.key === 'ArrowRight') {
-    moveFlashcardUp();
+    levelUp();
   }
 }
 

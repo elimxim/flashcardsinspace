@@ -46,11 +46,11 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 onMounted(() => {
-  document.addEventListener('keydown', handleKeydown);
+  document.addEventListener('keydown', handleKeydown)
 });
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown);
+  document.removeEventListener('keydown', handleKeydown)
 });
 
 const stateStore = useFlashcardStateStore()
@@ -60,50 +60,54 @@ const props = defineProps({
   title: String,
 })
 
-const emit = defineEmits(['update:visible']);
+const emit = defineEmits(['update:visible'])
 
-const frontSide = ref('');
-const backSide = ref('');
+const frontSide = ref('')
+const backSide = ref('')
 
 const validationRules = {
   frontSide: { required },
   backSide: { required },
 };
 
-const $v = useVuelidate(validationRules, { frontSide, backSide });
+const $v = useVuelidate(validationRules, { frontSide, backSide })
 
 function cancel() {
-  cleanState();
-  emit('update:visible', false);
+  cleanState()
+  emit('update:visible', false)
 }
 
 function create() {
   $v.value.$touch()
   if (!$v.value.$invalid) {
-    createNewFlashcard();
-    cleanState();
-    emit('update:visible', false);
+    createNewFlashcard()
+    cleanState()
+    emit('update:visible', false)
   }
 }
 
+const flashcard: Flashcard = {
+  id: 0,
+  frontSide: frontSide.value,
+  backSide: backSide.value,
+  level: Level.FIRST,
+  reviewedAt: null,
+  reviewCount: 0,
+  reviewHistory: [],
+  createdAt: new Date().toISOString(),
+  lastUpdatedAt: null,
+}
+
 function createNewFlashcard() {
-  const flashcard: Flashcard = {
-    id: 0,
-    frontSide: frontSide.value,
-    backSide: backSide.value,
-    level: Level.FIRST,
-    createdAt: null,
-    lastUpdatedAt: null,
-  }
 
   // todo save to DB
   stateStore.addFlashcard(flashcard)
 }
 
 function cleanState() {
-  frontSide.value = '';
-  backSide.value = '';
-  $v.value.$reset();
+  frontSide.value = ''
+  backSide.value = ''
+  $v.value.$reset()
 }
 
 </script>

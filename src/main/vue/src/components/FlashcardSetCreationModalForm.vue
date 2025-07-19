@@ -56,13 +56,14 @@ import {
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts';
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
 import { type FlashcardSet } from '@/models/flashcard.ts';
-import { type User } from '@/models/users.ts'
+import { type User } from '@/models/user.ts'
 import { required } from '@vuelidate/validators';
 import { useVuelidate } from '@vuelidate/core';
 import type { Language } from '@/models/language.ts';
 import { storeToRefs } from 'pinia';
 import { useLanguageStore } from '@/stores/language.ts';
 import { language } from '@vue/eslint-config-prettier';
+import { useReviewStateStore } from '@/stores/review-state.ts';
 
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') {
@@ -82,6 +83,7 @@ onUnmounted(() => {
 
 const dataStore = useFlashcardDataStore()
 const stateStore = useFlashcardStateStore()
+const reviewStateStore = useReviewStateStore()
 const langStore = useLanguageStore()
 const { languages } = storeToRefs(langStore)
 
@@ -113,6 +115,7 @@ function create() {
   $v.value.$touch()
   if (!$v.value.$invalid) {
     createNewFlashcardSet();
+    reviewStateStore.finishReview()
     resetState();
     emit('update:visible', false);
   }
@@ -129,9 +132,9 @@ function createNewFlashcardSet() {
   const flashcardSet: FlashcardSet = {
     id: 0,
     name: flashcardSetName.value,
-    targetLanguage: selectedLanguage.value!,
+    language: selectedLanguage.value!,
     flashcardMap: new Map(),
-    createdAt: null,
+    createdAt: new Date().toISOString(),
     lastUpdatedAt: null,
     default: false,
     user: user,

@@ -1,5 +1,5 @@
 import { type FlashcardSet, Level } from '@/models/flashcard.ts';
-import { type User } from '@/models/users.ts';
+import { type User } from '@/models/user.ts';
 import { defineStore } from 'pinia'
 
 export const useFlashcardDataStore = defineStore('flashcard-data', {
@@ -60,7 +60,7 @@ function testData(): FlashcardSet[] {
       id: 1,
       name: "Bosnian",
       user: user,
-      targetLanguage: {
+      language: {
         name: "Bosnian",
         alpha2: "bs",
       },
@@ -70,27 +70,33 @@ function testData(): FlashcardSet[] {
           frontSide: "Prdnuti",
           backSide: "To fart",
           level: Level.FIRST,
-          createdAt: new Date(),
-          lastUpdatedAt: new Date(),
+          reviewCount: 0,
+          reviewHistory: [], // todo
+          reviewedAt: null,
+          createdAt: new Date().toISOString(),
+          lastUpdatedAt: new Date().toISOString(),
         }],
         [2, {
-          id: 1,
+          id: 2,
           frontSide: "Kakati",
           backSide: "To poop",
           level: Level.FIRST,
-          createdAt: new Date(),
-          lastUpdatedAt: new Date(),
+          reviewCount: 0,
+          reviewHistory: [],
+          reviewedAt: null,
+          createdAt: new Date().toISOString(),
+          lastUpdatedAt: new Date().toISOString(),
         }],
       ]),
-      createdAt: new Date(),
-      lastUpdatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      lastUpdatedAt: new Date().toISOString(),
       default: false,
     },
     {
       id: 2,
       user: user,
       name: "Russian",
-      targetLanguage: {
+      language: {
         name: "Russian",
         alpha2: "ru",
       },
@@ -100,20 +106,26 @@ function testData(): FlashcardSet[] {
           frontSide: "Пукать",
           backSide: "To fart",
           level: Level.SECOND,
-          createdAt: new Date(),
-          lastUpdatedAt: new Date(),
+          reviewCount: 0,
+          reviewHistory: [],
+          reviewedAt: null,
+          createdAt: new Date().toISOString(),
+          lastUpdatedAt: new Date().toISOString(),
         }],
         [2, {
           id: 2,
           frontSide: "Какать",
           backSide: "To poop",
           level: Level.SECOND,
-          createdAt: new Date(),
-          lastUpdatedAt: new Date(),
+          reviewCount: 0,
+          reviewHistory: [],
+          reviewedAt: null,
+          createdAt: new Date().toISOString(),
+          lastUpdatedAt: new Date().toISOString(),
         }],
       ]),
-      createdAt: new Date(),
-      lastUpdatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      lastUpdatedAt: new Date().toISOString(),
       default: false,
     }
   ]

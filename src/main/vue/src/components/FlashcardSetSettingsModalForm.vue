@@ -66,6 +66,7 @@ import { useVuelidate } from '@vuelidate/core';
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts';
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
 import { storeToRefs } from 'pinia';
+import { useReviewStateStore } from '@/stores/review-state.ts';
 
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') {
@@ -83,12 +84,13 @@ onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown);
 });
 
+const reviewStateStore = useReviewStateStore()
 const dataStore = useFlashcardDataStore()
 const stateStore = useFlashcardStateStore()
 const { currFlashcardSet } = storeToRefs(stateStore)
 
 const flashcardSetName = ref(currFlashcardSet.value?.name)
-const flashcardSetTargetLanguage = ref(currFlashcardSet.value?.targetLanguage.name)
+const flashcardSetTargetLanguage = ref(currFlashcardSet.value?.language.name)
 const flashcardRemoveConfirmation = ref(false)
 const defaultFlashcardSet: Ref<boolean | undefined> = ref(false)
 const flashcardSetHasChanges = computed(() => {
@@ -109,7 +111,7 @@ const props = defineProps({
 
 stateStore.$subscribe((mutation, state) => {
   flashcardSetName.value = currFlashcardSet.value?.name
-  flashcardSetTargetLanguage.value = currFlashcardSet.value?.targetLanguage.name
+  flashcardSetTargetLanguage.value = currFlashcardSet.value?.language.name
 })
 
 const emit = defineEmits(['update:visible']);
@@ -147,6 +149,7 @@ function update() {
 function removeFlashcardSet() {
   if (currFlashcardSet.value !== undefined) {
     dataStore.removeFlashcardSet(currFlashcardSet.value)
+    reviewStateStore.finishReview()
   }
 
   const { flashcardSets } = storeToRefs(dataStore)
@@ -169,7 +172,7 @@ function updateFlashcardSet() {
 function resetState() {
   $v.value.$reset();
   flashcardSetName.value = currFlashcardSet.value?.name;
-  flashcardSetTargetLanguage.value = currFlashcardSet.value?.targetLanguage.name;
+  flashcardSetTargetLanguage.value = currFlashcardSet.value?.language.name;
   defaultFlashcardSet.value = currFlashcardSet.value?.default;
   flashcardRemoveConfirmation.value = false;
 }
