@@ -16,6 +16,7 @@
         <div class="flashcard-container">
           <div class="flashcard" @click="flipFlashcard">
             <div class="flashcard-top">
+              <span v-if="currFlashcard !== undefined" class="corner-text">Level: {{ currFlashcard?.level }}</span>
               <button id="flashcard-edit-button" class="corner-button corner-edit-button"
                       @click.stop="globalStateStore.toggleFlashcardEditModalForm()">
                 <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
@@ -45,7 +46,6 @@
 </template>
 
 <script setup lang="ts">
-// todo show flashcard level in review
 // todo behavior if there are no more flashcards to review
 // todo confirmation modal form on closing review
 
@@ -248,8 +248,9 @@ const globalStateStore = useGlobalStateStore()
 
 .flashcard-top {
   flex: 1;
+  display: flex;
   align-items: center;
-  text-align: end;
+  justify-content: space-between;
 }
 
 .flashcard-text {
@@ -318,5 +319,12 @@ const globalStateStore = useGlobalStateStore()
 
 .corner-edit-button {
   font-size: 1.5em;
+}
+
+.corner-text {
+  background: none;
+  color: #9f9f9f;
+  font-size: 1.2em;
+  padding: 8px;
 }
 </style>

@@ -25,6 +25,7 @@
   max-width: 90%;
   min-width: 300px;
   overflow: auto;
+  user-select: none;
 }
 
 .modal-title {
