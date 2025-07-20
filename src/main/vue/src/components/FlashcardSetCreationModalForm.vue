@@ -64,6 +64,7 @@ import { storeToRefs } from 'pinia';
 import { useLanguageStore } from '@/stores/language.ts';
 import { language } from '@vue/eslint-config-prettier';
 import { useReviewStateStore } from '@/stores/review-state.ts';
+import { useGlobalStateStore } from '@/stores/global-state.ts';
 
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') {
@@ -108,6 +109,7 @@ const $v = useVuelidate(validationRules, {
 
 function cancel() {
   resetState();
+  globalStateStore.toggleFlashcardSetCreationModalForm()
   emit('update:visible', false);
 }
 
@@ -117,6 +119,7 @@ function create() {
     createNewFlashcardSet();
     reviewStateStore.finishReview()
     resetState();
+    globalStateStore.toggleFlashcardSetCreationModalForm()
     emit('update:visible', false);
   }
 }
@@ -150,6 +153,8 @@ function resetState() {
   selectedLanguage.value = undefined;
   $v.value.$reset();
 }
+
+const globalStateStore = useGlobalStateStore()
 
 </script>
 

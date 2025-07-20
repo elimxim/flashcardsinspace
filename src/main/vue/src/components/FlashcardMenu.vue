@@ -2,7 +2,8 @@
   <div class="menu-container">
     <ul class="menu">
       <li class="menu-item menu-select-item" style="display: flex;">
-        <select id="flashcard-set-select" v-model="currFlashcardSet" class="menu-select" @change="handleSelectChange">
+        <select id="flashcard-set-select" v-model="currFlashcardSet" class="menu-select"
+                @change="handleSelectChange">
           <option v-for="s in flashcardSets" :key="s.id" :value="s">
             {{ truncate(s.name, 10) }}
           </option>
@@ -10,15 +11,15 @@
       </li>
       <li class="menu-buttons-container">
         <div class="menu-item menu-item-color menu-button"
-             @click="showFlashcardSetSettingsForm = true">
+             @click="globalStateStore.toggleFlashcardSetSettingsModalForm()">
           <font-awesome-icon icon="fa-solid fa-gear"/>
         </div>
         <div class="menu-item menu-item-color menu-button"
-             @click="showFlashcardSetCreationForm = true">
+             @click="globalStateStore.toggleFlashcardSetCreationModalForm()">
           <font-awesome-icon icon="fa-solid fa-box"/>
         </div>
         <div class="menu-item menu-item-color menu-button"
-             @click="showFlashcardCreationForm = true">
+             @click="globalStateStore.toggleFlashcardCreationModalForm()">
           <font-awesome-icon icon="fa-solid fa-rectangle-list"/>
         </div>
       </li>
@@ -43,13 +44,9 @@
     </ul>
   </div>
 
-  <FlashcardSetSettingsModalForm id="flashcard-set-settings"
-                                 v-model:visible="showFlashcardSetSettingsForm"/>
-  <FlashcardSetCreationModalForm id="new-flashcard-set"
-                                 v-model:visible="showFlashcardSetCreationForm"/>
-  <FlashcardModificationModalForm id="new-flashcard"
-                                  v-model:visible="showFlashcardCreationForm"
-                                  title="New flashcard"/>
+  <FlashcardSetSettingsModalForm v-model:visible="globalStateStore.flashcardSetSettingsModalFormOpen"/>
+  <FlashcardSetCreationModalForm v-model:visible="globalStateStore.flashcardSetCreationModalFormOpen"/>
+  <FlashcardModificationModalForm v-model:visible="globalStateStore.flashcardCreationModalFormOpen"/>
 </template>
 
 <script setup lang="ts">
@@ -62,6 +59,7 @@ import { type FlashcardSet, Level } from '@/models/flashcard.ts';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useReviewStateStore } from '@/stores/review-state.ts';
+import { useGlobalStateStore } from '@/stores/global-state.ts';
 
 const dataStore = useFlashcardDataStore()
 const { flashcardSets } = storeToRefs(dataStore)
@@ -120,6 +118,7 @@ onMounted(() => {
   })
 });
 
+const globalStateStore = useGlobalStateStore()
 
 </script>
 

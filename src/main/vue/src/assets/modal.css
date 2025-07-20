@@ -52,7 +52,7 @@
 }
 
 .modal-input {
-  flex: 1;
+  flex: 100;
   resize: none;
   padding: 8px;
   font-family: Arial, sans-serif;
@@ -86,10 +86,12 @@
 }
 
 .modal-icon {
+  flex: 1;
   font-size: 1.5em;
 }
 
 .modal-message-text {
+  flex: 12;
   font-size: 0.9em;
 }
 
@@ -175,7 +177,7 @@
 }
 
 .modal-select {
-  flex: 1;
+  flex: 100;
   appearance: none;
   border: 2px solid #ddd;
   border-radius: 4px;

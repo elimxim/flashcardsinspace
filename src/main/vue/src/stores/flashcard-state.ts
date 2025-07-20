@@ -61,8 +61,13 @@ export const useFlashcardStateStore = defineStore('flashcard-state', {
           currFlashcard.level = flashcard.level
           currFlashcard.reviewCount = flashcard.reviewCount
           currFlashcard.reviewHistory = flashcard.reviewHistory
-          currFlashcard.lastUpdatedAt = new Date().toISOString()
+          currFlashcard.lastUpdatedAt = flashcard.lastUpdatedAt
         }
+      }
+    },
+    removeFlashcard(id: number) {
+      if (this.currFlashcardSet !== undefined) {
+        this.currFlashcardSet.flashcardMap.delete(id)
       }
     },
   }

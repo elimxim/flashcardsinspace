@@ -14,7 +14,7 @@
             <span class="modal-icon" style="color: #686868;">
               <font-awesome-icon icon="fa-solid fa-globe"/>
             </span>
-            <input v-model="flashcardSetTargetLanguage" class="modal-input" disabled="true"/>
+            <input v-model="flashcardSetTargetLanguage" class="modal-input" disabled/>
           </div>
         </div>
         <div class="modal-form-group-line">
@@ -67,6 +67,7 @@ import { useFlashcardDataStore } from '@/stores/flashcard-data.ts';
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
 import { storeToRefs } from 'pinia';
 import { useReviewStateStore } from '@/stores/review-state.ts';
+import { useGlobalStateStore } from '@/stores/global-state.ts';
 
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') {
@@ -124,6 +125,7 @@ const $v = useVuelidate(validationRules, { flashcardSetName: flashcardSetName })
 
 function cancel() {
   resetState();
+  globalStateStore.toggleFlashcardSetSettingsModalForm()
   emit('update:visible', false);
 }
 
@@ -131,6 +133,7 @@ function remove() {
   if (flashcardRemoveConfirmation.value) {
     removeFlashcardSet();
     resetState();
+    globalStateStore.toggleFlashcardSetSettingsModalForm()
     emit('update:visible', false);
   } else {
     flashcardRemoveConfirmation.value = true;
@@ -142,6 +145,7 @@ function update() {
   if (!$v.value.$invalid) {
     updateFlashcardSet();
     resetState();
+    globalStateStore.toggleFlashcardSetSettingsModalForm()
     emit('update:visible', false);
   }
 }
@@ -176,6 +180,8 @@ function resetState() {
   defaultFlashcardSet.value = currFlashcardSet.value?.default;
   flashcardRemoveConfirmation.value = false;
 }
+
+const globalStateStore = useGlobalStateStore()
 
 </script>
 

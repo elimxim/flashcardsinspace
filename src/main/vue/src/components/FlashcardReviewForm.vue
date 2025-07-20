@@ -16,7 +16,8 @@
         <div class="flashcard-container">
           <div class="flashcard" @click="flipFlashcard">
             <div class="flashcard-top">
-              <button class="corner-button corner-edit-button">
+              <button id="flashcard-edit-button" class="corner-button corner-edit-button"
+                      @click.stop="globalStateStore.toggleFlashcardEditModalForm()">
                 <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
               </button>
             </div>
@@ -26,32 +27,42 @@
           </div>
           <div class="flashcard-nav">
             <button class="nav-button nav-left-button" @click="levelDown">Don't know</button>
-            <button class="nav-button nav-right-button" @click="levelUp">Know</button>
+            <button class="nav-button nav-right-button" @click="levelUp"
+                    :class="{ 'nav-button-disabled': editFormWasOpened }"
+                    :disabled="editFormWasOpened">
+              Know
+            </button>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <FlashcardModificationModalForm editMode
+                                  v-model:visible="globalStateStore.flashcardEditModalFormOpen"
+                                  v-model:flashcard="currFlashcard"
+                                  v-model:removed="flashcardWasRemoved"/>
 </template>
 
 <script setup lang="ts">
 // todo show flashcard level in review
 // todo behavior if there are no more flashcards to review
 // todo confirmation modal form on closing review
-// todo edit flashcard + don't flip the flashcard if click on the edit button
 
+import FlashcardModificationModalForm from '@/components/FlashcardModificationModalForm.vue';
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
-import { computed, onMounted, onUnmounted, type Ref, ref } from 'vue';
+import { computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { type Flashcard, Level, type ReviewInfo } from '@/models/flashcard.ts';
 import { useReviewStateStore } from '@/stores/review-state.ts';
+import { useGlobalStateStore } from '@/stores/global-state.ts';
 
 const stateStore = useFlashcardStateStore()
 const reviewStateStore = useReviewStateStore()
-const { started, frontSide, currFlashcard } = storeToRefs(reviewStateStore)
+const { started, isFrontSide, currFlashcard, editFormWasOpened } = storeToRefs(reviewStateStore)
 
 const currFlashcardText = computed(() => {
-  if (frontSide.value) {
+  if (isFrontSide.value) {
     return currFlashcard.value?.frontSide
   } else {
     return currFlashcard.value?.backSide
@@ -75,6 +86,7 @@ function levelDown() {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, Level.FIRST)
     stateStore.updateFlashcard(flashcard)
+    reviewStateStore.setEditFormWasOpened(false)
     reviewStateStore.setFrontSide(true)
     reviewStateStore.nextFlashcard()
   }
@@ -117,6 +129,10 @@ function nextLevel(currLevel: Level): Level {
 }
 
 function handleKeydown(event: KeyboardEvent) {
+  if (globalStateStore.isAnyModalOpen()) {
+    return
+  }
+
   if (event.key == 'Enter' && !started.value) {
     startReview();
   } else if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
@@ -135,6 +151,17 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown);
 });
+
+const flashcardWasRemoved = ref(false)
+
+watch(flashcardWasRemoved, (newValue) => {
+  if (newValue) {
+    reviewStateStore.setEditFormWasOpened(false)
+    reviewStateStore.nextFlashcard()
+  }
+})
+
+const globalStateStore = useGlobalStateStore()
 
 </script>
 
@@ -254,7 +281,7 @@ onUnmounted(() => {
   color: white;
 }
 
-.nav-right-button:hover {
+.nav-right-button:not(.nav-button-disabled):hover {
   background-color: #519c53;
 }
 
@@ -263,12 +290,19 @@ onUnmounted(() => {
   color: white;
 }
 
-.nav-left-button:hover {
+.nav-left-button:not(.nav-button-disabled):hover {
   background-color: #9c5151;
+}
+
+.nav-button-disabled {
+  background-color: #ededed;
+  color: #cacaca;
+  cursor: default;
 }
 
 .corner-button {
   border: none;
+  outline: none;
   background: none;
   cursor: pointer;
   color: #c5c5c5;
