@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
-    <div class="menu">
+    <div class="menu-container">
       <FlashcardMenu/>
     </div>
 
-    <div class="flashcards-review">
+    <div class="main-container">
       <FlashcardReviewForm/>
     </div>
   </div>
@@ -12,9 +12,9 @@
 
 <script setup lang="ts">
 import FlashcardMenu from '@/components/FlashcardMenu.vue'
-import FlashcardReviewForm from '@/components/FlashcardReviewForm.vue';
-import { onBeforeRouteLeave } from 'vue-router';
-import { useReviewStateStore } from '@/stores/review-state.ts';
+import FlashcardReviewForm from '@/components/FlashcardReviewForm.vue'
+import { onBeforeRouteLeave } from 'vue-router'
+import { useReviewStateStore } from '@/stores/review-state.ts'
 
 const reviewStateStore = useReviewStateStore()
 
@@ -30,12 +30,12 @@ onBeforeRouteLeave((to, from, next) => {
   flex-direction: row;
 }
 
-.menu {
+.menu-container {
   flex: 1;
   background-color: #f0f0f0;
 }
 
-.flashcards-review {
+.main-container {
   flex: 10;
   background: none;
 }

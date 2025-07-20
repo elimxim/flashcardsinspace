@@ -91,6 +91,10 @@
   font-size: 1.5em;
 }
 
+.modal-globe-icon {
+  color: #686868;
+}
+
 .modal-message-text {
   flex: 12;
   font-size: 0.9em;

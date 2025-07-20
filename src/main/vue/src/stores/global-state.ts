@@ -1,27 +1,14 @@
-import { defineStore } from 'pinia';
-import { useReviewStateStore } from '@/stores/review-state';
+import { defineStore } from 'pinia'
+import { useReviewStateStore } from '@/stores/review-state'
+import { type GlobalState } from '@/models/store.ts'
 
 export const useGlobalStateStore = defineStore('global-state', {
-  state: () => {
+  state: (): GlobalState => {
     return {
       flashcardSetSettingsModalFormOpen: false,
       flashcardSetCreationModalFormOpen: false,
       flashcardCreationModalFormOpen: false,
       flashcardEditModalFormOpen: false,
-    }
-  },
-  getters: {
-    isFlashcardSetSettingsModalFormOpen() {
-      return this.flashcardSetSettingsModalFormOpen
-    },
-    isFlashcardSetCreationModalFormOpen() {
-      return this.flashcardSetCreationModalFormOpen
-    },
-    isFlashcardCreationModalFormOpen() {
-      return this.flashcardCreationModalFormOpen
-    },
-    isFlashcardEditModalFormOpen() {
-      return this.flashcardEditModalFormOpen
     }
   },
   actions: {
@@ -36,16 +23,14 @@ export const useGlobalStateStore = defineStore('global-state', {
     },
     toggleFlashcardEditModalForm() {
       this.flashcardEditModalFormOpen = !this.flashcardEditModalFormOpen
-      if (this.flashcardEditModalFormOpen) {
-        const reviewStateStore = useReviewStateStore()
-        reviewStateStore.setEditFormWasOpened(true)
-      }
+      const reviewStateStore = useReviewStateStore()
+      reviewStateStore.setEditFormWasOpened(true)
     },
-    isAnyModalOpen() {
-      return this.flashcardSetCreationModalFormOpen
-        || this.flashcardSetSettingsModalFormOpen
+    isAnyModalFormOpen() {
+      return this.flashcardSetSettingsModalFormOpen
+        || this.flashcardSetCreationModalFormOpen
         || this.flashcardCreationModalFormOpen
-        || this.flashcardSetSettingsModalFormOpen
+        || this.flashcardEditModalFormOpen
     },
   }
 })

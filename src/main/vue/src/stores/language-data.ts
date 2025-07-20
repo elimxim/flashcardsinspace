@@ -1,20 +1,18 @@
-import type { Language } from '@/models/language.ts';
-import { defineStore } from 'pinia';
+import type { Language } from '@/models/language.ts'
+import { defineStore } from 'pinia'
 
-export const useLanguageStore = defineStore('language', {
+export const useLanguageDataStore = defineStore('language-data', {
   state: () => {
     return {
       languages: [] as Language[],
     }
   },
   actions: {
-    loadLanguages() {
-      // todo get from DB
+    loadData() {
       this.languages = testData()
     },
   }
 })
-
 
 function testData(): Language[] {
   return [

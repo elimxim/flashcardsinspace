@@ -1,8 +1,9 @@
 <template>
   <div class="menu-container">
-    <ul class="menu">
-      <li class="menu-item menu-select-item" style="display: flex;">
-        <select id="flashcard-set-select" v-model="currFlashcardSet" class="menu-select"
+    <ul class="menu-list">
+      <li class="menu-item menu-select-item">
+        <select id="flashcard-set-select" class="menu-select"
+                v-model="flashcardSet"
                 @change="handleSelectChange">
           <option v-for="s in flashcardSets" :key="s.id" :value="s">
             {{ truncate(s.name, 10) }}
@@ -23,72 +24,81 @@
           <font-awesome-icon icon="fa-solid fa-rectangle-list"/>
         </div>
       </li>
-      <li v-if="showFlashcardMenuItem" class="menu-buttons-container">
+      <li class="menu-buttons-container"
+          v-if="showFlashcardMenuItem">
         <div class="menu-item menu-item-color menu-button">
           <font-awesome-icon icon="fa-solid fa-calendar-days"/>
         </div>
         <div class="menu-item menu-item-color">
           <ul class="menu-composite-item">
             <li>Day</li>
-            <li class="menu-item-number">{{ calendar.day }}</li>
+            <li class="menu-item-number">{{ 40 }}</li>
           </ul>
         </div>
       </li>
-      <li v-if="showFlashcardMenuItem" v-for="info in levelInfos" :key="info.name"
-          class="menu-item menu-item-color">
+      <li class="menu-item menu-item-color"
+          v-if="showFlashcardMenuItem"
+          v-for="b in buckets" :key="b.name">
         <ul class="menu-composite-item">
-          <li class="menu-item-number">{{ info.count }}</li>
-          <li>{{ info.name }}</li>
+          <li class="menu-item-number">{{ b.count }}</li>
+          <li>{{ b.name }}</li>
         </ul>
       </li>
     </ul>
   </div>
 
-  <FlashcardSetSettingsModalForm v-model:visible="globalStateStore.flashcardSetSettingsModalFormOpen"/>
-  <FlashcardSetCreationModalForm v-model:visible="globalStateStore.flashcardSetCreationModalFormOpen"/>
-  <FlashcardModificationModalForm v-model:visible="globalStateStore.flashcardCreationModalFormOpen"/>
+  <FlashcardSetSettingsModalForm
+    v-model:visible="flashcardSetSettingsModalFormOpen"/>
+  <FlashcardSetCreationModalForm
+    v-model:visible="flashcardSetCreationModalFormOpen"/>
+  <FlashcardModificationModalForm
+    v-model:visible="flashcardCreationModalFormOpen"/>
 </template>
 
 <script setup lang="ts">
-import FlashcardSetSettingsModalForm from '@/components/FlashcardSetSettingsModalForm.vue';
-import FlashcardSetCreationModalForm from '@/components/FlashcardSetCreationModalForm.vue';
-import FlashcardModificationModalForm from '@/components/FlashcardModificationModalForm.vue';
+import FlashcardSetSettingsModalForm from '@/components/modal/FlashcardSetSettingsModalForm.vue'
+import FlashcardSetCreationModalForm from '@/components/modal/FlashcardSetCreationModalForm.vue'
+import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
-import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
-import { type FlashcardSet, Level } from '@/models/flashcard.ts';
-import { storeToRefs } from 'pinia';
-import { computed, onMounted, ref } from 'vue';
-import { useReviewStateStore } from '@/stores/review-state.ts';
-import { useGlobalStateStore } from '@/stores/global-state.ts';
+import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
+import { storeToRefs } from 'pinia'
+import { computed, type ComputedRef, onMounted } from 'vue'
+import { useReviewStateStore } from '@/stores/review-state.ts'
+import { useGlobalStateStore } from '@/stores/global-state.ts'
+import { truncate } from '@/utils/string.ts'
+import { levelNumbers } from '@/utils/level.ts'
 
-const dataStore = useFlashcardDataStore()
-const { flashcardSets } = storeToRefs(dataStore)
+const flashcardDataStore = useFlashcardDataStore()
+const flashcardStateStore = useFlashcardStateStore()
+const globalStateStore = useGlobalStateStore()
+const reviewStateStore = useReviewStateStore()
 
-const stateStore = useFlashcardStateStore()
-stateStore.chooseCurr(flashcardSets)
-const { currFlashcardSet } = storeToRefs(stateStore)
+const { flashcardSets } = storeToRefs(flashcardDataStore)
+const { flashcardSet } = storeToRefs(flashcardStateStore)
+const {
+  flashcardSetSettingsModalFormOpen,
+  flashcardSetCreationModalFormOpen,
+  flashcardCreationModalFormOpen,
+} = storeToRefs(globalStateStore)
 
-const showFlashcardMenuItem = computed(() => currFlashcardSet.value !== undefined)
-const showFlashcardSetSettingsForm = ref(false)
-const showFlashcardSetCreationForm = ref(false)
-const showFlashcardCreationForm = ref(false)
+flashcardStateStore.initFromList(flashcardSets.value)
 
-const flashcardNumberByLevel = (level: number) => {
-  return stateStore.flashcards.filter(f => f.level.valueOf() === level).length
+const showFlashcardMenuItem = computed(() => flashcardSet.value !== null)
+
+// buckets>
+
+interface Bucket {
+  name: string
+  count: ComputedRef<number>
 }
 
-const totalFlashcardNumber = () => {
-  return stateStore.flashcards.length
-}
-
-const total = {
+const total: Bucket = {
   name: 'Total',
-  count: computed(() => totalFlashcardNumber()),
+  count: computed(() => flashcardStateStore.flashcards.length),
 }
 
-const levelNumbers = Object.values(Level).filter(v => typeof v === 'number') as number[]
-const levelInfos = [total].concat(
-  levelNumbers.map(level => {
+const buckets = [total].concat(
+  levelNumbers().map(level => {
     return {
       name: `Level ${level}`,
       count: computed(() => flashcardNumberByLevel(level)),
@@ -96,16 +106,11 @@ const levelInfos = [total].concat(
   })
 )
 
-function truncate(str: string, length: number) {
-  return str.length > length ? `${str.slice(0, length)}...` : str;
+function flashcardNumberByLevel(level: number): number {
+  return flashcardStateStore.flashcards.filter(f => f.level.valueOf() === level).length
 }
 
-// todo
-const calendar = {
-  day: 4 as number
-}
-
-const reviewStateStore = useReviewStateStore()
+// <buckets
 
 function handleSelectChange() {
   reviewStateStore.finishReview()
@@ -118,8 +123,6 @@ onMounted(() => {
   })
 });
 
-const globalStateStore = useGlobalStateStore()
-
 </script>
 
 <style scoped>
@@ -130,7 +133,7 @@ const globalStateStore = useGlobalStateStore()
   background-color: #f0f0f0;
 }
 
-.menu {
+.menu-list {
   display: grid;
   list-style: none;
   gap: 4px;
@@ -138,7 +141,7 @@ const globalStateStore = useGlobalStateStore()
   margin: 0;
 }
 
-.menu li {
+.menu-list li {
   max-width: 200px;
 }
 
@@ -159,6 +162,7 @@ const globalStateStore = useGlobalStateStore()
 }
 
 .menu-select-item {
+  display: flex;
   padding: 6px;
 }
 

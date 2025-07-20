@@ -1,26 +1,25 @@
-import { type Flashcard, Level } from '@/models/flashcard';
-import { defineStore } from 'pinia';
-import { useFlashcardStateStore } from '@/stores/flashcard-state';
-import { isStringBefore, isStringBetween } from '@/utils/date.ts'
+import { type Flashcard, Level } from '@/models/flashcard'
+import { defineStore } from 'pinia'
+import { useFlashcardStateStore } from '@/stores/flashcard-state'
+import { isStringBefore } from '@/utils/date.ts'
+import type { ReviewState } from '@/models/store.ts'
 
 export const useReviewStateStore = defineStore('review-state', {
-  state: () => {
+  state: (): ReviewState => {
     return {
       started: false,
       isFrontSide: true,
-      reviewQueue: [] as Flashcard[],
-      currFlashcard: undefined as Flashcard | undefined,
+      reviewQueue: [],
+      currFlashcard: null,
       editFormWasOpened: false,
     }
   },
   getters: {
     frontSide(): string {
-      if (this.currFlashcard === undefined) return ''
-      return this.currFlashcard.frontSide
+      return this.currFlashcard?.frontSide ?? ''
     },
     backSide(): string {
-      if (this.currFlashcard === undefined) return ''
-      return this.currFlashcard.backSide
+      return this.currFlashcard?.backSide ?? ''
     }
   },
   actions: {
@@ -34,7 +33,8 @@ export const useReviewStateStore = defineStore('review-state', {
       this.started = false
       this.isFrontSide = true
       this.reviewQueue = []
-      this.currFlashcard = undefined
+      this.currFlashcard = null
+      this.editFormWasOpened = false
     },
     initReviewQueue() {
       // todo implement calendar logic
@@ -44,8 +44,8 @@ export const useReviewStateStore = defineStore('review-state', {
       const calendarLevels: Level[] = [Level.FIRST, Level.SECOND, Level.THIRD, Level.FORTH, Level.FIFTH, Level.SIXTH, Level.SEVENTH]
       const breakCalendarRules = true
 
-      const stateStore = useFlashcardStateStore()
-      const filteredFlashcards = stateStore.flashcards
+      const flashcardStateStore = useFlashcardStateStore()
+      const filteredFlashcards = flashcardStateStore.flashcards
         .filter(f => breakCalendarRules || calendarLevels.includes(f.level))
         .filter(f => breakCalendarRules || (
             // the flashcard was reviewed before the beginning of the current calendar day
@@ -53,15 +53,15 @@ export const useReviewStateStore = defineStore('review-state', {
               // or the flashcard wasn't reviewed yet but was created before the beginning of the current calendar day
               (f.reviewedAt === null && isStringBefore(f.createdAt, calendarFrom)))
           )
-        )
-      // todo sort
+        ).sort((a, b) => a.id - b.id)
+
       this.reviewQueue = [...filteredFlashcards]
     },
     isNoCardsForReview() {
-      return this.currFlashcard === undefined
+      return this.currFlashcard === null
     },
     nextFlashcard() {
-      this.currFlashcard = this.reviewQueue.shift()
+      this.currFlashcard = this.reviewQueue.shift() ?? null
     },
     flipFlashcard() {
       this.isFrontSide = !this.isFrontSide

@@ -1,12 +1,12 @@
 <template>
   <div class="review-form">
-    <div v-if="!started" class="review-start-container">
+    <div class="review-start-container" v-if="!started">
       <button class="review-button review-start-button"
               @click="startReview">
         Start review
       </button>
     </div>
-    <div v-if="started" class="review-container">
+    <div class="review-container" v-if="started">
       <div class="review-top">
         <button class="corner-button corner-close-button" @click="finishReview">
           <font-awesome-icon icon="fa-solid fa-xmark"/>
@@ -14,13 +14,16 @@
       </div>
       <div class="review-body">
         <div class="flashcard-container">
-          <div class="flashcard" @click="flipFlashcard"
+          <div class="flashcard"
+               @click="flipFlashcard"
                :class="{ 'flashcard-no-background': reviewStateStore.isNoCardsForReview() }">
             <div class="flashcard-top">
-              <span class="corner-text" :hidden="reviewStateStore.isNoCardsForReview()">
+              <span class="corner-text"
+                    :hidden="reviewStateStore.isNoCardsForReview()">
                 Level: {{ currFlashcard?.level }}
               </span>
-              <button id="flashcard-edit-button" class="corner-button corner-edit-button"
+              <button id="flashcard-edit-button"
+                      class="corner-button corner-edit-button"
                       @click.stop="globalStateStore.toggleFlashcardEditModalForm()"
                       :disabled="reviewStateStore.isNoCardsForReview()"
                       :hidden="reviewStateStore.isNoCardsForReview()">
@@ -33,15 +36,17 @@
             </div>
           </div>
           <div class="flashcard-nav">
-            <button class="nav-button nav-left-button" @click="levelDown"
+            <button class="nav-button nav-left-button"
                     :disabled="reviewStateStore.isNoCardsForReview()"
-                    :hidden="reviewStateStore.isNoCardsForReview()">
+                    :hidden="reviewStateStore.isNoCardsForReview()"
+                    @click="levelDown">
               Don't know
             </button>
-            <button class="nav-button nav-right-button" @click="levelUp"
+            <button class="nav-button nav-right-button"
                     :class="{ 'nav-button-disabled': editFormWasOpened }"
                     :disabled="editFormWasOpened || reviewStateStore.isNoCardsForReview()"
-                    :hidden="reviewStateStore.isNoCardsForReview()">
+                    :hidden="reviewStateStore.isNoCardsForReview()"
+                    @click="levelUp">
               Know
             </button>
           </div>
@@ -50,26 +55,34 @@
     </div>
   </div>
 
-  <FlashcardModificationModalForm editMode
-                                  v-model:visible="globalStateStore.flashcardEditModalFormOpen"
-                                  v-model:flashcard="currFlashcard"
-                                  v-model:removed="flashcardWasRemoved"/>
+  <FlashcardModificationModalForm
+    editMode
+    v-model:visible="flashcardEditModalFormOpen"
+    v-model:flashcard="currFlashcard"
+    v-model:removed="flashcardWasRemoved"/>
 </template>
 
 <script setup lang="ts">
-// todo confirmation modal form on closing review
+import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
+import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { type Flashcard, Level, type ReviewInfo } from '@/models/flashcard.ts'
+import { useReviewStateStore } from '@/stores/review-state.ts'
+import { useGlobalStateStore } from '@/stores/global-state.ts'
+import { nextLevel } from '@/utils/level.ts'
 
-import FlashcardModificationModalForm from '@/components/FlashcardModificationModalForm.vue';
-import { useFlashcardStateStore } from '@/stores/flashcard-state.ts';
-import { computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
-import { storeToRefs } from 'pinia';
-import { type Flashcard, Level, type ReviewInfo } from '@/models/flashcard.ts';
-import { useReviewStateStore } from '@/stores/review-state.ts';
-import { useGlobalStateStore } from '@/stores/global-state.ts';
-
-const stateStore = useFlashcardStateStore()
+const flashcardStateStore = useFlashcardStateStore()
 const reviewStateStore = useReviewStateStore()
-const { started, isFrontSide, currFlashcard, editFormWasOpened } = storeToRefs(reviewStateStore)
+const globalStateStore = useGlobalStateStore()
+
+const { flashcardEditModalFormOpen } = storeToRefs(globalStateStore)
+const {
+  started,
+  isFrontSide,
+  currFlashcard,
+  editFormWasOpened
+} = storeToRefs(reviewStateStore)
 
 const currFlashcardText = computed(() => {
   if (reviewStateStore.isNoCardsForReview()) {
@@ -94,10 +107,10 @@ function flipFlashcard() {
 }
 
 function levelDown() {
-  if (currFlashcard.value !== undefined) {
+  if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, Level.FIRST)
-    stateStore.updateFlashcard(flashcard)
+    flashcardStateStore.updateFlashcard(flashcard)
     reviewStateStore.setEditFormWasOpened(false)
     reviewStateStore.setFrontSide(true)
     reviewStateStore.nextFlashcard()
@@ -105,17 +118,17 @@ function levelDown() {
 }
 
 function levelUp() {
-  if (currFlashcard.value !== undefined) {
+  if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, nextLevel(flashcard.level))
-    stateStore.updateFlashcard(flashcard)
+    flashcardStateStore.updateFlashcard(flashcard)
     reviewStateStore.setFrontSide(true)
     reviewStateStore.nextFlashcard()
   }
 }
 
 function updateFlashcard(flashcard: Flashcard, level: Level) {
-  console.debug(`Updating flashcard ${flashcard.id} to level ${level}`)
+  console.debug(`Moving flashcard ${flashcard.id} to level ${level}`)
 
   const now = new Date().toISOString()
   const info: ReviewInfo = {
@@ -130,40 +143,6 @@ function updateFlashcard(flashcard: Flashcard, level: Level) {
   flashcard.lastUpdatedAt = now
 }
 
-function nextLevel(currLevel: Level): Level {
-  if (currLevel === Level.SEVENTH) {
-    // todo
-    throw new Error('NEXT LEVEL IS NOT IMPLEMENTED YET')
-  }
-  const levels = Object.values(Level).filter(value => typeof value === 'number') as Level[];
-  const currIdx = levels.indexOf(currLevel)
-  return levels[currIdx + 1]
-}
-
-function handleKeydown(event: KeyboardEvent) {
-  if (globalStateStore.isAnyModalOpen()) {
-    return
-  }
-
-  if (event.key == 'Enter' && !started.value) {
-    startReview();
-  } else if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
-    flipFlashcard();
-  } else if (event.key === 'ArrowLeft') {
-    levelDown();
-  } else if (event.key === 'ArrowRight') {
-    levelUp();
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('keydown', handleKeydown);
-});
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown);
-});
-
 const flashcardWasRemoved = ref(false)
 
 watch(flashcardWasRemoved, (newValue) => {
@@ -173,7 +152,29 @@ watch(flashcardWasRemoved, (newValue) => {
   }
 })
 
-const globalStateStore = useGlobalStateStore()
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
+})
+
+function handleKeydown(event: KeyboardEvent) {
+  if (globalStateStore.isAnyModalFormOpen()) {
+    return
+  }
+
+  if (event.key == 'Enter' && !started.value) {
+    startReview()
+  } else if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
+    flipFlashcard()
+  } else if (event.key === 'ArrowLeft') {
+    levelDown()
+  } else if (event.key === 'ArrowRight') {
+    levelUp()
+  }
+}
 
 </script>
 

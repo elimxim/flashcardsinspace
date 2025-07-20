@@ -1,74 +1,82 @@
-import { type Flashcard, type FlashcardSet } from "@/models/flashcard.ts";
-import { defineStore } from "pinia";
-import type { Ref } from 'vue';
+import { type Flashcard, type FlashcardSet } from '@/models/flashcard.ts';
+import { defineStore } from 'pinia';
+import type { FlashcardSetState } from '@/models/store.ts';
 
 export const useFlashcardStateStore = defineStore('flashcard-state', {
-  state: () => {
+  state: (): FlashcardSetState => {
     return {
-      currFlashcardSet: undefined as FlashcardSet | undefined,
+      flashcardSet: null,
     }
   },
   getters: {
     flashcards(): Flashcard[] {
-      if (this.currFlashcardSet !== undefined) {
-        return [...this.currFlashcardSet.flashcardMap.values()]
+      if (this.flashcardSet !== null) {
+        return [...this.flashcardSet.flashcardMap.values()]
       } else {
         return []
       }
     },
   },
   actions: {
-    chooseCurr(flashcardSets: Ref<FlashcardSet[]>) {
-      // todo alpha-bet search + default flag
-      this.currFlashcardSet = flashcardSets.value?.[0]
+    init(flashcardSet: FlashcardSet) {
+      this.flashcardSet = flashcardSet
     },
-    setCurr(flashcardSet: FlashcardSet) {
-      this.currFlashcardSet = flashcardSet
+    initFromList(flashcardSets: FlashcardSet[]) {
+      this.flashcardSet = flashcardSets[0] ?? null
     },
-    setName(name: string) {
-      if (this.currFlashcardSet !== undefined) {
-        this.currFlashcardSet.name = name
+    setName(value: string) {
+      if (this.flashcardSet !== null) {
+        this.flashcardSet.name = value
+      } else {
+        throw new Error(`Can't set name=${value}: flashcard set is null`)
       }
     },
     setDefault(value: boolean) {
-      if (this.currFlashcardSet !== undefined) {
-        this.currFlashcardSet.default = value
+      if (this.flashcardSet !== null) {
+        this.flashcardSet.default = value
+      } else {
+        throw new Error(`Can't set default=${value}: flashcard set is null`)
       }
     },
     addFlashcard(flashcard: Flashcard) {
-      if (this.currFlashcardSet !== undefined) {
-        // todo delete
-        let nextId = 1
-        if (this.currFlashcardSet.flashcardMap.size) {
-          const keys = Array.from(this.currFlashcardSet.flashcardMap.keys())
-          nextId = Math.max(...keys) + 1
-        }
-        // todo delete
-        flashcard.id = nextId
-
-        // todo save to DB and get ID from there
-        this.currFlashcardSet.flashcardMap.set(nextId, flashcard)
+      if (this.flashcardSet !== null) {
+        flashcard.id = nextId(this.flashcardSet.flashcardMap)
+        this.flashcardSet.flashcardMap.set(flashcard.id, flashcard)
       } else {
-        console.error("Cannot add flashcard to undefined flashcard set")
+        console.error(`Can't add flashcard ${flashcard}: flashcard set is null`)
       }
     },
-    updateFlashcard(flashcard: Flashcard) {
-      if (this.currFlashcardSet !== undefined) {
-        const currFlashcard = this.currFlashcardSet.flashcardMap.get(flashcard.id) as Flashcard | undefined
-        if (currFlashcard !== undefined) {
-          currFlashcard.frontSide = flashcard.frontSide
-          currFlashcard.backSide = flashcard.backSide
-          currFlashcard.level = flashcard.level
-          currFlashcard.reviewCount = flashcard.reviewCount
-          currFlashcard.reviewHistory = flashcard.reviewHistory
-          currFlashcard.lastUpdatedAt = flashcard.lastUpdatedAt
+    updateFlashcard(value: Flashcard) {
+      if (this.flashcardSet !== null) {
+        const flashcard = this.flashcardSet.flashcardMap.get(value.id) as Flashcard | undefined
+        if (flashcard !== undefined) {
+          flashcard.frontSide = value.frontSide
+          flashcard.backSide = value.backSide
+          flashcard.level = value.level
+          flashcard.reviewCount = value.reviewCount
+          flashcard.reviewHistory = value.reviewHistory
+          flashcard.lastUpdatedAt = value.lastUpdatedAt
         }
+      } else {
+        throw new Error(`Can't update flashcard=${value}: flashcard set is null`)
       }
     },
     removeFlashcard(id: number) {
-      if (this.currFlashcardSet !== undefined) {
-        this.currFlashcardSet.flashcardMap.delete(id)
+      if (this.flashcardSet !== null) {
+        this.flashcardSet.flashcardMap.delete(id)
+      } else {
+        throw new Error(`Can't remove flashcard with id=${id}: flashcard set is null`)
       }
     },
   }
 })
+
+// fixme for testing purpose
+function nextId(flashcardMap: Map<number, Flashcard>): number {
+  let max = 1
+  if (flashcardMap.size) {
+    const keys = Array.from(flashcardMap.keys())
+    max = Math.max(...keys)
+  }
+  return max + 1
+}

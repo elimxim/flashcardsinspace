@@ -1,38 +1,27 @@
-import { type FlashcardSet, Level } from '@/models/flashcard.ts';
-import { type User } from '@/models/user.ts';
+import { type FlashcardSet, Level } from '@/models/flashcard.ts'
+import { type User } from '@/models/user.ts'
 import { defineStore } from 'pinia'
+import type { FlashcardData } from '@/models/store.ts'
 
 export const useFlashcardDataStore = defineStore('flashcard-data', {
-  state: () => {
+  state: (): FlashcardData => {
     return {
-      flashcardSets: [] as FlashcardSet[],
+      flashcardSets: [],
     }
   },
   actions: {
-    loadFlashcards() {
-      // todo get from DB
+    loadData() {
       this.flashcardSets = testData().sort((a, b) => {
-        if (a.default && !b.default) return -1;
-        if (!a.default && b.default) return 1;
+        if (a.default && !b.default) return -1
+        if (!a.default && b.default) return 1
 
         return a.name.localeCompare(b.name)
       })
     },
     addFlashcardSet(flashcardSet: FlashcardSet) {
-      // todo delete
-      let max = 1
-      if (this.flashcardSets.length > 0) {
-        max = this.flashcardSets.reduce(
-          (prev, curr) => {
-            return (prev && prev.id > curr.id) ? prev : curr;
-          },
-          this.flashcardSets[0]
-        )?.id
-      }
-
-      // todo delete
-      flashcardSet.id = max + 1
-
+      flashcardSet.id = nextId(this.flashcardSets)
+      flashcardSet.createdAt = new Date().toISOString()
+      flashcardSet.lastUpdatedAt = new Date().toISOString()
       this.flashcardSets.push(flashcardSet)
     },
     removeFlashcardSet(flashcardSet: FlashcardSet) {
@@ -44,6 +33,19 @@ export const useFlashcardDataStore = defineStore('flashcard-data', {
   }
 })
 
+function nextId(flashcardSets: FlashcardSet[]): number {
+  let max = 1
+  if (flashcardSets.length > 0) {
+    max = flashcardSets.reduce(
+      (prev, curr) => {
+        return (prev && prev.id > curr.id) ? prev : curr
+      },
+      flashcardSets[0]
+    )?.id
+  }
+  return max + 1
+}
+
 function testEmptyData(): FlashcardSet[] {
   return []
 }
@@ -53,7 +55,7 @@ function testData(): FlashcardSet[] {
     id: 1,
     name: "Billy Bob",
     registeredAt: new Date(),
-  };
+  }
 
   return [
     {

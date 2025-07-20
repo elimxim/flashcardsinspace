@@ -28,15 +28,15 @@
 <script setup lang="ts">
 import '@/assets/main.css'
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts';
-import { useLanguageStore } from '@/stores/language.ts';
+import { useLanguageDataStore } from '@/stores/language-data.ts';
 import { onMounted } from 'vue';
 
 const flashcardDataStore = useFlashcardDataStore()
-const langStore = useLanguageStore()
+const langStore = useLanguageDataStore()
 
 onMounted(() => {
-  flashcardDataStore.loadFlashcards()
-  langStore.loadLanguages()
+  flashcardDataStore.loadData()
+  langStore.loadData()
 })
 </script>
 
