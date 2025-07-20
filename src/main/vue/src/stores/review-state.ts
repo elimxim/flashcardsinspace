@@ -57,6 +57,9 @@ export const useReviewStateStore = defineStore('review-state', {
       // todo sort
       this.reviewQueue = [...filteredFlashcards]
     },
+    isNoCardsForReview() {
+      return this.currFlashcard === undefined
+    },
     nextFlashcard() {
       this.currFlashcard = this.reviewQueue.shift()
     },

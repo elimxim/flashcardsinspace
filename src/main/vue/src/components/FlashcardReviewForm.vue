@@ -14,23 +14,34 @@
       </div>
       <div class="review-body">
         <div class="flashcard-container">
-          <div class="flashcard" @click="flipFlashcard">
+          <div class="flashcard" @click="flipFlashcard"
+               :class="{ 'flashcard-no-background': reviewStateStore.isNoCardsForReview() }">
             <div class="flashcard-top">
-              <span v-if="currFlashcard !== undefined" class="corner-text">Level: {{ currFlashcard?.level }}</span>
+              <span class="corner-text" :hidden="reviewStateStore.isNoCardsForReview()">
+                Level: {{ currFlashcard?.level }}
+              </span>
               <button id="flashcard-edit-button" class="corner-button corner-edit-button"
-                      @click.stop="globalStateStore.toggleFlashcardEditModalForm()">
+                      @click.stop="globalStateStore.toggleFlashcardEditModalForm()"
+                      :disabled="reviewStateStore.isNoCardsForReview()"
+                      :hidden="reviewStateStore.isNoCardsForReview()">
                 <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
               </button>
             </div>
-            <div class="flashcard-text">
+            <div class="flashcard-text"
+                 :class="{ 'flashcard-text-color-dark': !reviewStateStore.isNoCardsForReview(), 'flashcard-text-color-light': reviewStateStore.isNoCardsForReview() }">
               {{ currFlashcardText }}
             </div>
           </div>
           <div class="flashcard-nav">
-            <button class="nav-button nav-left-button" @click="levelDown">Don't know</button>
+            <button class="nav-button nav-left-button" @click="levelDown"
+                    :disabled="reviewStateStore.isNoCardsForReview()"
+                    :hidden="reviewStateStore.isNoCardsForReview()">
+              Don't know
+            </button>
             <button class="nav-button nav-right-button" @click="levelUp"
                     :class="{ 'nav-button-disabled': editFormWasOpened }"
-                    :disabled="editFormWasOpened">
+                    :disabled="editFormWasOpened || reviewStateStore.isNoCardsForReview()"
+                    :hidden="reviewStateStore.isNoCardsForReview()">
               Know
             </button>
           </div>
@@ -46,7 +57,6 @@
 </template>
 
 <script setup lang="ts">
-// todo behavior if there are no more flashcards to review
 // todo confirmation modal form on closing review
 
 import FlashcardModificationModalForm from '@/components/FlashcardModificationModalForm.vue';
@@ -62,7 +72,9 @@ const reviewStateStore = useReviewStateStore()
 const { started, isFrontSide, currFlashcard, editFormWasOpened } = storeToRefs(reviewStateStore)
 
 const currFlashcardText = computed(() => {
-  if (isFrontSide.value) {
+  if (reviewStateStore.isNoCardsForReview()) {
+    return 'No more cards for review'
+  } else if (isFrontSide.value) {
     return currFlashcard.value?.frontSide
   } else {
     return currFlashcard.value?.backSide
@@ -246,6 +258,10 @@ const globalStateStore = useGlobalStateStore()
   cursor: pointer;
 }
 
+.flashcard-no-background {
+  background: none;
+}
+
 .flashcard-top {
   flex: 1;
   display: flex;
@@ -258,6 +274,14 @@ const globalStateStore = useGlobalStateStore()
   font-size: 1.8em;
   text-align: center;
   align-content: center;
+}
+
+.flashcard-text-color-dark {
+  color: #686868;
+}
+
+.flashcard-text-color-light {
+  color: #aeaeae;
 }
 
 .flashcard-nav {
