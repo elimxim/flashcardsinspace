@@ -20,7 +20,7 @@
             <div class="flashcard-top">
               <span class="corner-text"
                     :hidden="reviewStateStore.isNoCardsForReview()">
-                Level: {{ currFlashcard?.level }}
+                {{ currFlashcard?.level.name }}
               </span>
               <button id="flashcard-edit-button"
                       class="corner-button corner-edit-button"
@@ -67,10 +67,9 @@ import FlashcardModificationModalForm from '@/components/modal/FlashcardModifica
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { type Flashcard, Level, type ReviewInfo } from '@/models/flashcard.ts'
 import { useReviewStateStore } from '@/stores/review-state.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
-import { nextLevel } from '@/utils/level.ts'
+import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 
 const flashcardStateStore = useFlashcardStateStore()
 const reviewStateStore = useReviewStateStore()
@@ -109,7 +108,7 @@ function flipFlashcard() {
 function levelDown() {
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
-    updateFlashcard(flashcard, Level.FIRST)
+    updateFlashcard(flashcard, false)
     flashcardStateStore.updateFlashcard(flashcard)
     reviewStateStore.setEditFormWasOpened(false)
     reviewStateStore.setFrontSide(true)
@@ -120,27 +119,11 @@ function levelDown() {
 function levelUp() {
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
-    updateFlashcard(flashcard, nextLevel(flashcard.level))
+    updateFlashcard(flashcard, true)
     flashcardStateStore.updateFlashcard(flashcard)
     reviewStateStore.setFrontSide(true)
     reviewStateStore.nextFlashcard()
   }
-}
-
-function updateFlashcard(flashcard: Flashcard, level: Level) {
-  console.debug(`Moving flashcard ${flashcard.id} to level ${level}`)
-
-  const now = new Date().toISOString()
-  const info: ReviewInfo = {
-    level: level,
-    reviewedAt: now,
-  }
-
-  flashcard.level = level
-  flashcard.reviewedAt = now
-  flashcard.reviewCount += 1
-  flashcard.reviewHistory.push(info)
-  flashcard.lastUpdatedAt = now
 }
 
 const flashcardWasRemoved = ref(false)

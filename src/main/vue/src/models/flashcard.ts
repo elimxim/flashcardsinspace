@@ -1,14 +1,9 @@
 import type { User } from '@/models/user.ts'
 import type { Language } from '@/models/language.ts'
 
-export enum Level {
-  FIRST = 1,
-  SECOND,
-  THIRD,
-  FORTH,
-  FIFTH,
-  SIXTH,
-  SEVENTH,
+export interface Level {
+  name: string,
+  order: number
 }
 
 export interface ReviewInfo {

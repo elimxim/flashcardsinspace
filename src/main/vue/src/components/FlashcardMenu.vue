@@ -66,7 +66,8 @@ import { computed, type ComputedRef, onMounted } from 'vue'
 import { useReviewStateStore } from '@/stores/review-state.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
 import { truncate } from '@/utils/string.ts'
-import { levelNumbers } from '@/utils/level.ts'
+
+import { levelNames } from '@/core-logic/level-logic.ts';
 
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardStateStore = useFlashcardStateStore()
@@ -98,16 +99,16 @@ const total: Bucket = {
 }
 
 const buckets = [total].concat(
-  levelNumbers().map(level => {
+  levelNames.map(name => {
     return {
-      name: `Level ${level}`,
-      count: computed(() => flashcardNumberByLevel(level)),
+      name: name,
+      count: computed(() => flashcardNumberByLevel(name)),
     }
   })
 )
 
-function flashcardNumberByLevel(level: number): number {
-  return flashcardStateStore.flashcards.filter(f => f.level.valueOf() === level).length
+function flashcardNumberByLevel(levelName: string): number {
+  return flashcardStateStore.flashcards.filter(f => f.level.name === levelName).length
 }
 
 // <buckets
@@ -172,6 +173,7 @@ onMounted(() => {
   list-style: none;
   margin: 0;
   padding: 0;
+  text-wrap: nowrap;
 }
 
 .menu-composite-item li {

@@ -27,6 +27,7 @@ export const useFlashcardStateStore = defineStore('flashcard-state', {
     setName(value: string) {
       if (this.flashcardSet !== null) {
         this.flashcardSet.name = value
+        this.flashcardSet.lastUpdatedAt = new Date().toISOString()
       } else {
         throw new Error(`Can't set name=${value}: flashcard set is null`)
       }
@@ -34,6 +35,7 @@ export const useFlashcardStateStore = defineStore('flashcard-state', {
     setDefault(value: boolean) {
       if (this.flashcardSet !== null) {
         this.flashcardSet.default = value
+        this.flashcardSet.lastUpdatedAt = new Date().toISOString()
       } else {
         throw new Error(`Can't set default=${value}: flashcard set is null`)
       }

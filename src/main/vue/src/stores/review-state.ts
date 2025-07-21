@@ -1,8 +1,10 @@
-import { type Flashcard, Level } from '@/models/flashcard'
+import { type Flashcard, type Level } from '@/models/flashcard'
 import { defineStore } from 'pinia'
 import { useFlashcardStateStore } from '@/stores/flashcard-state'
 import { isStringBefore } from '@/utils/date.ts'
 import type { ReviewState } from '@/models/store.ts'
+import { levels } from '@/core-logic/level-logic.ts';
+import { flashcardsForReview } from '@/core-logic/review-logic.ts';
 
 export const useReviewStateStore = defineStore('review-state', {
   state: (): ReviewState => {
@@ -37,25 +39,9 @@ export const useReviewStateStore = defineStore('review-state', {
       this.editFormWasOpened = false
     },
     initReviewQueue() {
-      // todo implement calendar logic
-      const calendarFrom = new Date()
-      const calendarTo = new Date()
-      calendarTo.setDate(calendarTo.getDate() + 1)
-      const calendarLevels: Level[] = [Level.FIRST, Level.SECOND, Level.THIRD, Level.FORTH, Level.FIFTH, Level.SIXTH, Level.SEVENTH]
-      const breakCalendarRules = true
-
       const flashcardStateStore = useFlashcardStateStore()
-      const filteredFlashcards = flashcardStateStore.flashcards
-        .filter(f => breakCalendarRules || calendarLevels.includes(f.level))
-        .filter(f => breakCalendarRules || (
-            // the flashcard was reviewed before the beginning of the current calendar day
-            (f.reviewedAt !== null && isStringBefore(f.reviewedAt, calendarFrom) ||
-              // or the flashcard wasn't reviewed yet but was created before the beginning of the current calendar day
-              (f.reviewedAt === null && isStringBefore(f.createdAt, calendarFrom)))
-          )
-        ).sort((a, b) => a.id - b.id)
-
-      this.reviewQueue = [...filteredFlashcards]
+      const flashcards = flashcardsForReview(flashcardStateStore.flashcards)
+      this.reviewQueue = [...flashcards]
     },
     isNoCardsForReview() {
       return this.currFlashcard === null

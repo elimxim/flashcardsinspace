@@ -76,8 +76,10 @@ import {
 import { useVuelidate } from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
-import { type Flashcard, Level } from '@/models/flashcard.ts'
+import { type Flashcard } from '@/models/flashcard.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
+import { newFlashcard, updateFlashcardSides } from '@/core-logic/flashcard-logic.ts'
+import { levels } from '@/core-logic/level-logic.ts';
 
 const props = defineProps({
   visible: Boolean,
@@ -163,7 +165,7 @@ function remove() {
 function create() {
   $v.value.$touch()
   if (!$v.value.$invalid) {
-    createNewFlashcard()
+    addNewFlashcard()
     resetState()
     toggleModalForm()
     emit('update:visible', false)
@@ -190,28 +192,22 @@ function removeFlashcard() {
   }
 }
 
-function createNewFlashcard() {
-  const newFlashcard: Flashcard = {
-    id: 0,
-    frontSide: flashcardFrontSide.value,
-    backSide: flashcardBackSide.value,
-    level: Level.FIRST,
-    reviewedAt: null,
-    reviewCount: 0,
-    reviewHistory: [],
-    createdAt: new Date().toISOString(),
-    lastUpdatedAt: null,
-  }
-
-  flashcardStateStore.addFlashcard(newFlashcard)
+function addNewFlashcard() {
+  flashcardStateStore.addFlashcard(
+    newFlashcard(
+      flashcardFrontSide.value,
+      flashcardBackSide.value,
+    )
+  )
 }
 
 function updateFlashcard() {
   if (props.flashcard !== null && props.flashcard !== undefined) {
-    const flashcard = props.flashcard
-    flashcard.frontSide = flashcardFrontSide.value
-    flashcard.backSide = flashcardBackSide.value
-    flashcard.lastUpdatedAt = new Date().toISOString()
+    const flashcard = updateFlashcardSides(
+      props.flashcard,
+      flashcardFrontSide.value,
+      flashcardBackSide.value
+    )
     flashcardStateStore.updateFlashcard(flashcard)
   } else {
     console.error("can't update an undefined flashcard")
