@@ -11,22 +11,22 @@
         </select>
       </li>
       <li class="menu-buttons-container">
-        <div class="menu-item menu-item-color menu-button"
+        <div class="menu-item menu-item-color menu-icon-button"
              @click="globalStateStore.toggleFlashcardSetSettingsModalForm()">
           <font-awesome-icon icon="fa-solid fa-gear"/>
         </div>
-        <div class="menu-item menu-item-color menu-button"
+        <div class="menu-item menu-item-color menu-icon-button"
              @click="globalStateStore.toggleFlashcardSetCreationModalForm()">
           <font-awesome-icon icon="fa-solid fa-box"/>
         </div>
-        <div class="menu-item menu-item-color menu-button"
+        <div class="menu-item menu-item-color menu-icon-button"
              @click="globalStateStore.toggleFlashcardCreationModalForm()">
           <font-awesome-icon icon="fa-solid fa-rectangle-list"/>
         </div>
       </li>
       <li class="menu-buttons-container"
           v-if="showFlashcardMenuItem">
-        <div class="menu-item menu-item-color menu-button">
+        <div class="menu-item menu-item-color menu-icon-button">
           <font-awesome-icon icon="fa-solid fa-calendar-days"/>
         </div>
         <div class="menu-item menu-item-color">
@@ -36,12 +36,20 @@
           </ul>
         </div>
       </li>
+      <li class="menu-item menu-item-color">
+        <ul class="menu-composite-item">
+          <li class="menu-item-number">{{ totalFlashcardNumber }}</li>
+          <li>Total</li>
+        </ul>
+      </li>
       <li class="menu-item menu-item-color"
           v-if="showFlashcardMenuItem"
-          v-for="b in buckets" :key="b.name">
-        <ul class="menu-composite-item">
-          <li class="menu-item-number">{{ b.count }}</li>
-          <li>{{ b.name }}</li>
+          v-for="b in buckets" :key="b.level.name">
+        <ul class="menu-composite-item"
+            :class="{ 'menu-button': b.reviewable }"
+            @click="b.reviewable ? startReview(b.level) : null">
+          <li class="menu-item-number">{{ b.flashcardNumber }}</li>
+          <li>{{ b.level.name }}</li>
         </ul>
       </li>
     </ul>
@@ -66,7 +74,7 @@ import { computed, type ComputedRef, onMounted } from 'vue'
 import { useReviewStateStore } from '@/stores/review-state.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
 import { truncate } from '@/utils/string.ts'
-import { levelNames } from '@/core-logic/level-logic.ts'
+import { allLevels, type Level, specialLevels } from '@/core-logic/level-logic.ts'
 
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardStateStore = useFlashcardStateStore()
@@ -75,6 +83,7 @@ const reviewStateStore = useReviewStateStore()
 
 const { flashcardSets } = storeToRefs(flashcardDataStore)
 const { flashcardSet } = storeToRefs(flashcardStateStore)
+const { started: reviewStarted } = storeToRefs(reviewStateStore)
 const {
   flashcardSetSettingsModalFormOpen,
   flashcardSetCreationModalFormOpen,
@@ -88,32 +97,35 @@ const showFlashcardMenuItem = computed(() => flashcardSet.value !== null)
 // buckets>
 
 interface Bucket {
-  name: string
-  count: ComputedRef<number>
+  level: string
+  flashcardNumber: ComputedRef<number>
+  reviewable: boolean
 }
 
-const total: Bucket = {
-  name: 'Total',
-  count: computed(() => flashcardStateStore.flashcards.length),
-}
+const totalFlashcardNumber = computed(() => flashcardStateStore.flashcards.length)
 
-const buckets = [total].concat(
-  levelNames.map(name => {
-    return {
-      name: name,
-      count: computed(() => flashcardNumberByLevel(name)),
-    }
-  })
-)
+const buckets = allLevels.map(level => {
+  return {
+    level: level,
+    flashcardNumber: computed(() => flashcardNumberByLevel(level)),
+    reviewable: specialLevels.has(level),
+  }
+})
 
-function flashcardNumberByLevel(levelName: string): number {
-  return flashcardStateStore.flashcards.filter(f => f.level.name === levelName).length
+function flashcardNumberByLevel(level: Level): number {
+  return flashcardStateStore.flashcards.filter(f => f.level === level.name).length
 }
 
 // <buckets
 
 function handleSelectChange() {
   reviewStateStore.finishReview()
+}
+
+function startReview(level: Level) {
+  reviewStateStore.startReview(level.name)
+  reviewStateStore.initLevelReviewQueue(level)
+  reviewStateStore.nextFlashcard()
 }
 
 onMounted(() => {
@@ -191,6 +203,10 @@ onMounted(() => {
 }
 
 .menu-button {
+  cursor: pointer;
+}
+
+.menu-icon-button {
   flex: 1;
   text-align: center;
   padding: 10px;

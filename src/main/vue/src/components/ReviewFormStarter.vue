@@ -18,7 +18,9 @@ const reviewStateStore = useReviewStateStore()
 const { started } = storeToRefs(reviewStateStore)
 
 function startReview() {
-  reviewStateStore.startReview('Flashcards')
+  reviewStateStore.startReview('Review')
+  reviewStateStore.initReviewQueue()
+  reviewStateStore.nextFlashcard()
 }
 
 onMounted(() => {

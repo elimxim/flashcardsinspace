@@ -1,5 +1,5 @@
-import { type Flashcard, type Level, type ReviewInfo } from '@/models/flashcard.ts'
-import { levels, nextLevel } from '@/core-logic/level-logic.ts'
+import { type Flashcard, type ReviewInfo } from '@/models/flashcard.ts'
+import { type Level, levels, nextLevel } from '@/core-logic/level-logic.ts'
 
 /**
  * Creates a new flashcard object.
@@ -10,7 +10,7 @@ export function newFlashcard(frontSide: string, backSide: string): Flashcard {
     id: 0,
     frontSide: frontSide,
     backSide: backSide,
-    level: levels.UNKNOWN,
+    level: levels.UNKNOWN.name,
     reviewedAt: null,
     reviewCount: 0,
     reviewHistory: [],
@@ -50,12 +50,14 @@ export function updateFlashcard(flashcard: Flashcard, moveUp: boolean): Flashcar
  * to be moved down, it moves to the “ATTEMPTED” level;
  * - Flashcards in "UNKNOWN" or "ATTEMPTED" levels cannot move up or down.
  */
-function determineFlashcardLevel(flashcard: Flashcard, moveUp: boolean): Level {
-  if (flashcard.level === levels.UNKNOWN || flashcard.level === levels.ATTEMPTED) {
+function determineFlashcardLevel(flashcard: Flashcard, moveUp: boolean): string {
+  if (flashcard.level === levels.UNKNOWN.name || flashcard.level === levels.ATTEMPTED.name) {
     return flashcard.level
-  } else if (moveUp) {
-    return nextLevel(flashcard.level)
+  }
+
+  if (moveUp) {
+    return nextLevel(flashcard.level).name
   } else {
-    return levels.ATTEMPTED
+    return levels.ATTEMPTED.name
   }
 }

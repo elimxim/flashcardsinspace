@@ -1,15 +1,21 @@
 import { type Flashcard } from '@/models/flashcard.ts'
-import { allLevels, stopLevels } from '@/core-logic/level-logic.ts'
+import { type Level, mainLevels, levelNameMap } from '@/core-logic/level-logic.ts'
 
 // fixme implement real calendar
-const calendarLevels = allLevels.filter(l => !stopLevels.includes(l)).map(l => l.name)
+const calendarLevels = [...mainLevels].map(v => v.name)
 
 export function flashcardsForReview(flashcards: Flashcard[]): Flashcard[] {
-  return flashcards.filter(f => calendarLevels.includes(f.level.name))
+  return flashcards.filter(f => calendarLevels.includes(f.level))
     .sort((a, b) => {
-      if (a.level.order !== b.level.order) {
-        return a.level.order - b.level.order
+      if (a.level !== b.level) {
+        const l1 = levelNameMap.get(a.level)?.order ?? 0
+        const l2 = levelNameMap.get(b.level)?.order ?? 0
+        return l1 - l2
       }
       return a.id - b.id
     })
+}
+
+export function flashcardsForLevel(flashcards: Flashcard[], level: Level): Flashcard[] {
+  return flashcards.filter(f => f.level === level.name)
 }

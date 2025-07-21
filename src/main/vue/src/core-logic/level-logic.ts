@@ -1,4 +1,7 @@
-import { type Level } from '@/models/flashcard.ts'
+export interface Level {
+  name: string
+  order: number
+}
 
 export const levels = {
   UNKNOWN: { name: 'Unknown', order: 0 } as Level,
@@ -13,17 +16,17 @@ export const levels = {
   OUTER_SPACE: { name: 'Outer space', order: 8 } as Level,
 }
 
-export const levelNames: string[] = [
-  levels.UNKNOWN.name,
-  levels.ATTEMPTED.name,
-  levels.FIRST.name,
-  levels.SECOND.name,
-  levels.THIRD.name,
-  levels.FORTH.name,
-  levels.FIFTH.name,
-  levels.SIXTH.name,
-  levels.SEVENTH.name,
-  levels.OUTER_SPACE.name,
+export const allLevels: Level[] = [
+  levels.UNKNOWN,
+  levels.ATTEMPTED,
+  levels.FIRST,
+  levels.SECOND,
+  levels.THIRD,
+  levels.FORTH,
+  levels.FIFTH,
+  levels.SIXTH,
+  levels.SEVENTH,
+  levels.OUTER_SPACE,
 ]
 
 export const levelOrderMap = new Map<number, Level>([
@@ -52,9 +55,7 @@ export const levelNameMap = new Map<string, Level>([
   [levels.OUTER_SPACE.name, levels.OUTER_SPACE],
 ])
 
-export const allLevels = [
-  levels.UNKNOWN,
-  levels.ATTEMPTED,
+export const mainLevels = new Set([
   levels.FIRST,
   levels.SECOND,
   levels.THIRD,
@@ -62,14 +63,15 @@ export const allLevels = [
   levels.FIFTH,
   levels.SIXTH,
   levels.SEVENTH,
-  levels.OUTER_SPACE,
-]
+])
 
-export const stopLevels = [
+export const specialLevels = new Set([
   levels.UNKNOWN,
   levels.ATTEMPTED,
   levels.OUTER_SPACE,
-]
+])
+
+const specialLevelNames = new Set([...specialLevels].map(v => v.name))
 
 /**
  * Determines and returns the next level based on the current level.
@@ -79,14 +81,21 @@ export const stopLevels = [
  * - Flashcards cannot move from "UNKNOWN" or "ATTEMPTED" levels
  * (it happens when the calendar day is switched).
  */
-export function nextLevel(level: Level): Level {
-  if (stopLevels.includes(level)) {
+export function nextLevel(levelName: string): Level {
+  const level = levelNameMap.get(levelName)
+  if (level === undefined) {
+    throw new Error(`Couldn't find level by name=${levelName}`)
+  }
+
+  if (specialLevels.has(level)) {
+    console.log("What the heck " + level)
     return level
   }
+  console.log("What the heck??? " + level)
 
   const nextLevel = levelOrderMap.get(level.order + 1)
   if (nextLevel === undefined) {
-    throw new Error(`Can't get next level for ${level}`)
+    throw new Error(`Couldn't get next level for ${level}`)
   }
   return nextLevel
 }

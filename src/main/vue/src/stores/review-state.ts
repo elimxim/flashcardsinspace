@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
 import { useFlashcardStateStore } from '@/stores/flashcard-state'
 import type { ReviewState } from '@/models/store.ts'
-import { flashcardsForReview } from '@/core-logic/review-logic.ts';
+import { flashcardsForLevel, flashcardsForReview } from '@/core-logic/review-logic.ts'
+
+import type { Level } from '@/core-logic/level-logic.ts';
 
 export const useReviewStateStore = defineStore('review-state', {
   state: (): ReviewState => {
@@ -27,8 +29,6 @@ export const useReviewStateStore = defineStore('review-state', {
       this.started = true
       this.topic = topic
       this.isFrontSide = true
-      this.initReviewQueue()
-      this.nextFlashcard()
     },
     finishReview() {
       this.started = false
@@ -40,6 +40,11 @@ export const useReviewStateStore = defineStore('review-state', {
     initReviewQueue() {
       const flashcardStateStore = useFlashcardStateStore()
       const flashcards = flashcardsForReview(flashcardStateStore.flashcards)
+      this.reviewQueue = [...flashcards]
+    },
+    initLevelReviewQueue(level: Level) {
+      const flashcardStateStore = useFlashcardStateStore()
+      const flashcards = flashcardsForLevel(flashcardStateStore.flashcards, level)
       this.reviewQueue = [...flashcards]
     },
     isNoCardsForReview() {

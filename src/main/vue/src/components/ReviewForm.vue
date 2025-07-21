@@ -141,7 +141,9 @@ function handleKeydown(event: KeyboardEvent) {
     return
   }
 
-  if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
+  if (event.key == 'Escape') {
+    finishReview()
+  } else if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
     flipFlashcard()
   } else if (event.key === 'ArrowLeft') {
     levelDown()
