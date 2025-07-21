@@ -1,5 +1,5 @@
 import { type Flashcard, type ReviewInfo } from '@/models/flashcard.ts'
-import { type Level, levels, nextLevel } from '@/core-logic/level-logic.ts'
+import { type Level, levels, nextLevel, specialLevels, getLevel } from '@/core-logic/level-logic.ts'
 
 /**
  * Creates a new flashcard object.
@@ -26,15 +26,14 @@ export function updateFlashcardSides(flashcard: Flashcard, frontSide: string, ba
   return flashcard
 }
 
-export function updateFlashcard(flashcard: Flashcard, moveUp: boolean): Flashcard {
+export function updateFlashcard(flashcard: Flashcard, level: Level): Flashcard {
   const now = new Date().toISOString()
-  const level = determineFlashcardLevel(flashcard, moveUp)
   const info: ReviewInfo = {
-    level: level,
+    level: level.name,
     reviewedAt: now,
   }
 
-  flashcard.level = level
+  flashcard.level = level.name
   flashcard.reviewedAt = now
   flashcard.reviewCount += 1
   flashcard.reviewHistory.push(info)
@@ -42,22 +41,3 @@ export function updateFlashcard(flashcard: Flashcard, moveUp: boolean): Flashcar
   return flashcard
 }
 
-/**
- * Determines the new level of a flashcard according
- * to the following criteria:
- * - If the flashcard moves up, it simply moves to the next level;
- * - If the flashcard's in the “FIRST” level or above and needs
- * to be moved down, it moves to the “ATTEMPTED” level;
- * - Flashcards in "UNKNOWN" or "ATTEMPTED" levels cannot move up or down.
- */
-function determineFlashcardLevel(flashcard: Flashcard, moveUp: boolean): string {
-  if (flashcard.level === levels.UNKNOWN.name || flashcard.level === levels.ATTEMPTED.name) {
-    return flashcard.level
-  }
-
-  if (moveUp) {
-    return nextLevel(flashcard.level).name
-  } else {
-    return levels.ATTEMPTED.name
-  }
-}

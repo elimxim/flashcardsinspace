@@ -119,7 +119,7 @@ function testData(): FlashcardSet[] {
           id: 2,
           frontSide: "Какать",
           backSide: "To poop",
-          level: levels.SECOND.name,
+          level: levels.SEVENTH.name,
           reviewCount: 0,
           reviewHistory: [],
           reviewedAt: null,

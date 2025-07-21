@@ -1,15 +1,17 @@
 import { defineStore } from 'pinia'
 import { useFlashcardStateStore } from '@/stores/flashcard-state'
-import type { ReviewState } from '@/models/store.ts'
+import { ReviewMode, type ReviewState } from '@/models/store.ts'
 import { flashcardsForLevel, flashcardsForReview } from '@/core-logic/review-logic.ts'
-
-import type { Level } from '@/core-logic/level-logic.ts';
+import { type Level, levels } from '@/core-logic/level-logic.ts'
 
 export const useReviewStateStore = defineStore('review-state', {
   state: (): ReviewState => {
     return {
+      settings: {
+        topic: '',
+        mode: ReviewMode.LEITNER,
+      },
       started: false,
-      topic: '',
       isFrontSide: true,
       reviewQueue: [],
       currFlashcard: null,
@@ -25,12 +27,25 @@ export const useReviewStateStore = defineStore('review-state', {
     }
   },
   actions: {
-    startReview(topic: string) {
+    startReview() {
+      this.settings.topic = 'Leitner'
+      this.settings.mode = ReviewMode.LEITNER
       this.started = true
-      this.topic = topic
       this.isFrontSide = true
+      this.initReviewQueue()
+      this.nextFlashcard()
+    },
+    startSpecialReview(level: Level) {
+      this.settings.topic = level.name
+      this.settings.mode = level === levels.OUTER_SPACE ? ReviewMode.SPACE : ReviewMode.SPECIAL
+      this.started = true
+      this.isFrontSide = true
+      this.initLevelReviewQueue(level)
+      this.nextFlashcard()
     },
     finishReview() {
+      this.settings.topic = ''
+      this.settings.mode = ReviewMode.LEITNER
       this.started = false
       this.isFrontSide = true
       this.reviewQueue = []

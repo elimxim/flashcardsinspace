@@ -2,7 +2,8 @@
   <div class="menu-area">
     <ul class="menu-list">
       <li class="menu-item menu-select-item">
-        <select id="flashcard-set-select" class="menu-select"
+        <select class="menu-select"
+                ref="menuSelect"
                 v-model="flashcardSet"
                 @change="handleSelectChange">
           <option v-for="s in flashcardSets" :key="s.id" :value="s">
@@ -70,7 +71,7 @@ import FlashcardModificationModalForm from '@/components/modal/FlashcardModifica
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
 import { storeToRefs } from 'pinia'
-import { computed, type ComputedRef, onMounted } from 'vue'
+import { computed, type ComputedRef, onMounted, ref } from 'vue'
 import { useReviewStateStore } from '@/stores/review-state.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
 import { truncate } from '@/utils/string.ts'
@@ -83,7 +84,6 @@ const reviewStateStore = useReviewStateStore()
 
 const { flashcardSets } = storeToRefs(flashcardDataStore)
 const { flashcardSet } = storeToRefs(flashcardStateStore)
-const { started: reviewStarted } = storeToRefs(reviewStateStore)
 const {
   flashcardSetSettingsModalFormOpen,
   flashcardSetCreationModalFormOpen,
@@ -93,6 +93,8 @@ const {
 flashcardStateStore.initFromList(flashcardSets.value)
 
 const showFlashcardMenuItem = computed(() => flashcardSet.value !== null)
+
+const menuSelect = ref<HTMLSelectElement>()
 
 // buckets>
 
@@ -123,14 +125,11 @@ function handleSelectChange() {
 }
 
 function startReview(level: Level) {
-  reviewStateStore.startReview(level.name)
-  reviewStateStore.initLevelReviewQueue(level)
-  reviewStateStore.nextFlashcard()
+  reviewStateStore.startSpecialReview(level)
 }
 
 onMounted(() => {
-  const flashcardSetSelect = document.getElementById('flashcard-set-select') as HTMLSelectElement
-  flashcardSetSelect.addEventListener('keydown', function (event) {
+  menuSelect.value?.addEventListener('keydown', function (event) {
     event.preventDefault()
   })
 });

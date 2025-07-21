@@ -60,7 +60,6 @@ import {
   defineProps,
   onMounted,
   onUnmounted,
-  type Ref,
   ref,
   watch
 } from 'vue'
@@ -147,12 +146,14 @@ function remove() {
 }
 
 function update() {
-  $v.value.$touch()
-  if (!$v.value.$invalid) {
-    updateFlashcardSet()
-    resetState()
-    globalStateStore.toggleFlashcardSetSettingsModalForm()
-    emit('update:visible', false)
+  if (stateChanged.value) {
+    $v.value.$touch()
+    if (!$v.value.$invalid) {
+      updateFlashcardSet()
+      resetState()
+      globalStateStore.toggleFlashcardSetSettingsModalForm()
+      emit('update:visible', false)
+    }
   }
 }
 
@@ -165,13 +166,11 @@ function removeFlashcardSet() {
 }
 
 function updateFlashcardSet() {
-  if (stateChanged.value) {
-    if (flashcardSetName.value !== null) {
-      flashcardStateStore.setName(flashcardSetName.value)
-    }
-    if (flashcardSetDefault.value !== null) {
-      flashcardStateStore.setDefault(flashcardSetDefault.value)
-    }
+  if (flashcardSetName.value !== null) {
+    flashcardStateStore.setName(flashcardSetName.value)
+  }
+  if (flashcardSetDefault.value !== null) {
+    flashcardStateStore.setDefault(flashcardSetDefault.value)
   }
 }
 

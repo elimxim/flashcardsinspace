@@ -71,22 +71,15 @@ export const specialLevels = new Set([
   levels.OUTER_SPACE,
 ])
 
-const specialLevelNames = new Set([...specialLevels].map(v => v.name))
-
 /**
- * Determines and returns the next level based on the current level.
- *
- * With the following exclusions:
+ * Determines and returns the next level based on the current level
+ * with the following exclusions:
  * - Flashcards cannot move above the "OUTER_SPACE" level(last level);
  * - Flashcards cannot move from "UNKNOWN" or "ATTEMPTED" levels
  * (it happens when the calendar day is switched).
  */
 export function nextLevel(levelName: string): Level {
-  const level = levelNameMap.get(levelName)
-  if (level === undefined) {
-    throw new Error(`Couldn't find level by name=${levelName}`)
-  }
-
+  const level = getLevel(levelName)
   if (specialLevels.has(level)) {
     console.log("What the heck " + level)
     return level
@@ -98,4 +91,27 @@ export function nextLevel(levelName: string): Level {
     throw new Error(`Couldn't get next level for ${level}`)
   }
   return nextLevel
+}
+
+/**
+ * Determines and returns the previous level of a flashcard according
+ * to the following criteria:
+ * - If the flashcard's in the “FIRST” level or above, it moves to the “ATTEMPTED” level;
+ * - Flashcards in "UNKNOWN", "ATTEMPTED", and "OUTER_SPACE" levels cannot move down.
+ */
+export function prevLevel(levelName: string): Level {
+  let level = getLevel(levelName)
+  if (specialLevels.has(level)) {
+    return level
+  }
+
+  return levels.ATTEMPTED
+}
+
+export function getLevel(name: string): Level {
+  const level = levelNameMap.get(name)
+  if (level === undefined) {
+    throw new Error(`Couldn't find level by name=${name}`)
+  }
+  return level
 }
