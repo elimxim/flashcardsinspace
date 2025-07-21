@@ -36,22 +36,26 @@
       </div>
       <div class="modal-buttons">
         <button class="modal-button modal-cancel-button"
+                ref="cancelButton"
                 @click="cancel">
           Cancel
         </button>
         <button class="modal-button modal-remove-button"
+                ref="removeButton"
                 v-if="editMode"
                 @click="remove">
           Remove
         </button>
-        <button class="modal-button modal-create-button"
+        <button class="modal-button modal-update-button"
                 :class="{ 'modal-button-disabled': !stateChanged }"
+                ref="updateButton"
                 v-if="editMode"
                 :disabled="!stateChanged"
                 @click="update">
           Update
         </button>
         <button class="modal-button modal-create-button"
+                ref="createButton"
                 v-if="!editMode"
                 @click="create">
           Create
@@ -142,11 +146,16 @@ const stateChanged = computed(() => {
 
 // <state
 
+const cancelButton = ref<HTMLButtonElement>()
+const removeButton = ref<HTMLButtonElement>()
+const createButton = ref<HTMLButtonElement>()
+const updateButton = ref<HTMLButtonElement>()
+
 function cancel() {
   resetState()
-
   emit('update:visible', false)
   emit('update:removed', false)
+  cancelButton.value?.blur()
 }
 
 function remove() {
@@ -159,6 +168,7 @@ function remove() {
   } else {
     removeConfirmation.value = true
   }
+  removeButton.value?.blur()
 }
 
 function create() {
@@ -169,6 +179,7 @@ function create() {
     toggleModalForm()
     emit('update:visible', false)
   }
+  createButton.value?.blur()
 }
 
 function update() {
@@ -181,6 +192,7 @@ function update() {
       emit('update:visible', false)
     }
   }
+  updateButton.value?.blur()
 }
 
 function removeFlashcard() {
@@ -230,10 +242,14 @@ onUnmounted(() => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') {
-    cancel()
-  } else if (event.key === 'Enter' && event.ctrlKey) {
-    create()
+  if (event.shiftKey && (event.key === 'c' || event.key === 'C')) {
+    cancelButton.value?.click()
+  } else if (event.shiftKey && (event.key === 'e' || event.key === 'E')) {
+    createButton.value?.click()
+  } else if (event.shiftKey && (event.key === 'u' || event.key === 'U')) {
+    updateButton.value?.click()
+  } else if (event.shiftKey && (event.key === 'r' || event.key === 'R')) {
+    removeButton.value?.click()
   }
 }
 

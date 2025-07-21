@@ -215,7 +215,7 @@ function handleKeydown(event: KeyboardEvent) {
   } else if (event.key === 'ArrowRight') {
     levelUpButton.value?.click()
     nextButton.value?.click()
-  } else if (event.altKey) {
+  } else if (event.shiftKey && (event.key === 'e' || event.key === 'E')) {
     flashcardEditButton.value?.click()
   }
 }

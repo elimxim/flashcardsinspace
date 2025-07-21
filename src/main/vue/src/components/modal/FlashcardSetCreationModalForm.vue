@@ -36,8 +36,16 @@
         </div>
       </div>
       <div class="modal-buttons">
-        <button class="modal-button modal-cancel-button" @click="cancel">Cancel</button>
-        <button class="modal-button modal-create-button" @click="create">Create</button>
+        <button class="modal-button modal-cancel-button"
+                ref="cancelButton"
+                @click="cancel">
+          Cancel
+        </button>
+        <button class="modal-button modal-create-button"
+                ref="createButton"
+                @click="create">
+          Create
+        </button>
       </div>
     </div>
   </div>
@@ -95,10 +103,14 @@ function resetState() {
 
 // <state
 
+const cancelButton = ref<HTMLButtonElement>()
+const createButton = ref<HTMLButtonElement>()
+
 function cancel() {
   resetState()
   globalStateStore.toggleFlashcardSetCreationModalForm()
   emit('update:visible', false)
+  cancelButton.value?.blur()
 }
 
 function create() {
@@ -110,6 +122,7 @@ function create() {
     globalStateStore.toggleFlashcardSetCreationModalForm()
     emit('update:visible', false)
   }
+  createButton.value?.blur()
 }
 
 function createNewFlashcardSet() {
@@ -144,10 +157,10 @@ onUnmounted(() => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') {
-    cancel()
-  } else if (event.key === 'Enter' && event.ctrlKey) {
-    create()
+  if (event.shiftKey && (event.key === 'c' || event.key === 'C')) {
+    cancelButton.value?.click()
+  } else if (event.shiftKey && (event.key === 'e' || event.key === 'E')) {
+    createButton.value?.click()
   }
 }
 

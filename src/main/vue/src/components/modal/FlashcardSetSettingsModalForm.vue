@@ -39,10 +39,19 @@
         </div>
       </div>
       <div class="modal-buttons">
-        <button class="modal-button modal-cancel-button" @click="cancel">Cancel</button>
-        <button class="modal-button modal-remove-button" @click="remove">Remove</button>
+        <button class="modal-button modal-cancel-button"
+                ref="cancelButton"
+                @click="cancel">
+          Cancel
+        </button>
+        <button class="modal-button modal-remove-button"
+                ref="removeButton"
+                @click="remove">
+          Remove
+        </button>
         <button class="modal-button modal-update-button"
                 :class="{ 'modal-button-disabled': !stateChanged }"
+                ref="updateButton"
                 :disabled="!stateChanged"
                 @click="update">
           Update
@@ -128,6 +137,10 @@ function resetState() {
 
 // <state
 
+const cancelButton = ref<HTMLButtonElement>()
+const removeButton = ref<HTMLButtonElement>()
+const updateButton = ref<HTMLButtonElement>()
+
 function cancel() {
   resetState()
   globalStateStore.toggleFlashcardSetSettingsModalForm()
@@ -183,10 +196,12 @@ onUnmounted(() => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') {
-    cancel()
-  } else if (event.key === 'Enter' && event.ctrlKey) {
-    update()
+  if (event.shiftKey && (event.key === 'c' || event.key === 'C')) {
+    cancelButton.value?.click()
+  } else if (event.shiftKey && (event.key === 'u' || event.key === 'U')) {
+    updateButton.value?.click()
+  } else if (event.shiftKey && (event.key === 'r' || event.key === 'R')) {
+    removeButton.value?.click()
   }
 }
 
