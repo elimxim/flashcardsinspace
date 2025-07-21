@@ -1,4 +1,4 @@
-import { type Level } from '@/models/flashcard.ts';
+import { type Level } from '@/models/flashcard.ts'
 
 export const levels = {
   UNKNOWN: { name: 'Unknown', order: 0 } as Level,

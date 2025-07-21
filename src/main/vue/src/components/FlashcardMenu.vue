@@ -66,8 +66,7 @@ import { computed, type ComputedRef, onMounted } from 'vue'
 import { useReviewStateStore } from '@/stores/review-state.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
 import { truncate } from '@/utils/string.ts'
-
-import { levelNames } from '@/core-logic/level-logic.ts';
+import { levelNames } from '@/core-logic/level-logic.ts'
 
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardStateStore = useFlashcardStateStore()

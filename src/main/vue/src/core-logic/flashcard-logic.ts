@@ -1,5 +1,5 @@
 import { type Flashcard, type Level, type ReviewInfo } from '@/models/flashcard.ts'
-import { levels, nextLevel } from '@/core-logic/level-logic.ts';
+import { levels, nextLevel } from '@/core-logic/level-logic.ts'
 
 /**
  * Creates a new flashcard object.
