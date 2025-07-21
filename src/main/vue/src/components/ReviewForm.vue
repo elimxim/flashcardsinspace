@@ -189,7 +189,9 @@ const flashcardWasRemoved = ref(false)
 watch(flashcardWasRemoved, (newValue) => {
   if (newValue) {
     reviewStateStore.setEditFormWasOpened(false)
+    reviewStateStore.setFrontSide(true)
     reviewStateStore.nextFlashcard()
+    flashcardWasRemoved.value = false
   }
 })
 
