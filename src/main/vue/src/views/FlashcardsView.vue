@@ -1,22 +1,29 @@
 <template>
   <div class="app-container">
-    <div class="menu-container">
-      <FlashcardMenu/>
+    <div class="menu-area">
+      <MainMenu/>
     </div>
 
-    <div class="main-container">
-      <FlashcardReviewForm/>
+    <div class="main-area" v-if="!started">
+      <ReviewFormStarter/>
+    </div>
+
+    <div class="main-area" v-if="started">
+      <ReviewForm/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import FlashcardMenu from '@/components/FlashcardMenu.vue'
-import FlashcardReviewForm from '@/components/FlashcardReviewForm.vue'
+import MainMenu from '@/components/MainMenu.vue'
+import ReviewFormStarter from '@/components/ReviewFormStarter.vue'
+import ReviewForm from '@/components/ReviewForm.vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { useReviewStateStore } from '@/stores/review-state.ts'
+import { storeToRefs } from 'pinia'
 
 const reviewStateStore = useReviewStateStore()
+const { started } = storeToRefs(reviewStateStore)
 
 onBeforeRouteLeave((to, from, next) => {
   reviewStateStore.finishReview()
@@ -30,12 +37,12 @@ onBeforeRouteLeave((to, from, next) => {
   flex-direction: row;
 }
 
-.menu-container {
+.menu-area {
   flex: 1;
   background-color: #f0f0f0;
 }
 
-.main-container {
+.main-area {
   flex: 10;
   background: none;
 }

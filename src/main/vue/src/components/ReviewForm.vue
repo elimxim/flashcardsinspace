@@ -1,59 +1,55 @@
 <template>
-  <div class="review-form">
-    <div class="review-start-container" v-if="!started">
-      <button class="review-button review-start-button"
-              @click="startReview">
-        Start review
+  <div class="main-area" v-if="started">
+    <div class="top-row">
+        <span class="corner-text">
+          {{ topic }}
+        </span>
+      <button class="corner-button" @click="finishReview">
+        <font-awesome-icon icon="fa-solid fa-xmark"/>
       </button>
     </div>
-    <div class="review-container" v-if="started">
-      <div class="review-top">
-        <button class="corner-button corner-close-button" @click="finishReview">
-          <font-awesome-icon icon="fa-solid fa-xmark"/>
-        </button>
-      </div>
-      <div class="review-body">
-        <div class="flashcard-container">
-          <div class="flashcard"
-               @click="flipFlashcard"
-               :class="{ 'flashcard-no-background': reviewStateStore.isNoCardsForReview() }">
-            <div class="flashcard-top">
+    <div class="review-body">
+      <div class="flashcard-container">
+        <div class="flashcard"
+             @click="flipFlashcard"
+             :class="{ 'flashcard-no-background': reviewStateStore.isNoCardsForReview() }">
+          <div class="top-row">
               <span class="corner-text"
                     :hidden="reviewStateStore.isNoCardsForReview()">
                 {{ currFlashcard?.level.name }}
               </span>
-              <button id="flashcard-edit-button"
-                      class="corner-button corner-edit-button"
-                      @click.stop="globalStateStore.toggleFlashcardEditModalForm()"
-                      :disabled="reviewStateStore.isNoCardsForReview()"
-                      :hidden="reviewStateStore.isNoCardsForReview()">
-                <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
-              </button>
-            </div>
-            <div class="flashcard-text"
-                 :class="{ 'flashcard-text-color-dark': !reviewStateStore.isNoCardsForReview(), 'flashcard-text-color-light': reviewStateStore.isNoCardsForReview() }">
-              {{ currFlashcardText }}
-            </div>
-          </div>
-          <div class="flashcard-nav">
-            <button class="nav-button nav-left-button"
+            <button id="flashcard-edit-button"
+                    class="corner-button"
+                    @click.stop="globalStateStore.toggleFlashcardEditModalForm()"
                     :disabled="reviewStateStore.isNoCardsForReview()"
-                    :hidden="reviewStateStore.isNoCardsForReview()"
-                    @click="levelDown">
-              Don't know
-            </button>
-            <button class="nav-button nav-right-button"
-                    :class="{ 'nav-button-disabled': editFormWasOpened }"
-                    :disabled="editFormWasOpened || reviewStateStore.isNoCardsForReview()"
-                    :hidden="reviewStateStore.isNoCardsForReview()"
-                    @click="levelUp">
-              Know
+                    :hidden="reviewStateStore.isNoCardsForReview()">
+              <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
             </button>
           </div>
+          <div class="flashcard-text"
+               :class="{ 'flashcard-text-color-dark': !reviewStateStore.isNoCardsForReview(), 'flashcard-text-color-light': reviewStateStore.isNoCardsForReview() }">
+            {{ currFlashcardText }}
+          </div>
+        </div>
+        <div class="flashcard-nav">
+          <button class="nav-button nav-left-button"
+                  :disabled="reviewStateStore.isNoCardsForReview()"
+                  :hidden="reviewStateStore.isNoCardsForReview()"
+                  @click="levelDown">
+            Don't know
+          </button>
+          <button class="nav-button nav-right-button"
+                  :class="{ 'nav-button-disabled': editFormWasOpened }"
+                  :disabled="editFormWasOpened || reviewStateStore.isNoCardsForReview()"
+                  :hidden="reviewStateStore.isNoCardsForReview()"
+                  @click="levelUp">
+            Know
+          </button>
         </div>
       </div>
     </div>
   </div>
+
 
   <FlashcardModificationModalForm
     editMode
@@ -78,6 +74,7 @@ const globalStateStore = useGlobalStateStore()
 const { flashcardEditModalFormOpen } = storeToRefs(globalStateStore)
 const {
   started,
+  topic,
   isFrontSide,
   currFlashcard,
   editFormWasOpened
@@ -92,10 +89,6 @@ const currFlashcardText = computed(() => {
     return currFlashcard.value?.backSide
   }
 })
-
-function startReview() {
-  reviewStateStore.startReview()
-}
 
 function finishReview() {
   reviewStateStore.finishReview()
@@ -148,9 +141,7 @@ function handleKeydown(event: KeyboardEvent) {
     return
   }
 
-  if (event.key == 'Enter' && !started.value) {
-    startReview()
-  } else if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
+  if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
     flipFlashcard()
   } else if (event.key === 'ArrowLeft') {
     levelDown()
@@ -162,51 +153,14 @@ function handleKeydown(event: KeyboardEvent) {
 </script>
 
 <style scoped>
-.review-form {
+.main-area {
+  flex: 1;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   height: 100%;
   width: 100%;
   padding: 0;
   margin: 0;
-}
-
-.review-start-container {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.review-button {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1em;
-  margin-bottom: 8%;
-}
-
-.review-start-button {
-  font-size: 1.5em;
-  background-color: #6db37c;
-  color: white;
-}
-
-.review-start-button:hover {
-  background-color: #519c53;
-}
-
-.review-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.review-top {
-  flex: 1;
-  align-items: center;
-  text-align: end;
 }
 
 .review-body {
@@ -246,7 +200,7 @@ function handleKeydown(event: KeyboardEvent) {
   background: none;
 }
 
-.flashcard-top {
+.top-row {
   flex: 1;
   display: flex;
   align-items: center;
@@ -314,19 +268,12 @@ function handleKeydown(event: KeyboardEvent) {
   outline: none;
   background: none;
   cursor: pointer;
+  font-size: 1.5em;
   color: #c5c5c5;
 }
 
 .corner-button:hover {
   color: #9f9f9f;
-}
-
-.corner-close-button {
-  font-size: 2em;
-}
-
-.corner-edit-button {
-  font-size: 1.5em;
 }
 
 .corner-text {

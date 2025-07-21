@@ -10,6 +10,7 @@ export interface FlashcardSetState {
 
 export interface ReviewState {
   started: boolean,
+  topic: string,
   isFrontSide: boolean,
   reviewQueue: Flashcard[],
   currFlashcard: Flashcard | null,

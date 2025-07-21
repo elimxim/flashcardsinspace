@@ -1,15 +1,13 @@
-import { type Flashcard, type Level } from '@/models/flashcard'
 import { defineStore } from 'pinia'
 import { useFlashcardStateStore } from '@/stores/flashcard-state'
-import { isStringBefore } from '@/utils/date.ts'
 import type { ReviewState } from '@/models/store.ts'
-import { levels } from '@/core-logic/level-logic.ts';
 import { flashcardsForReview } from '@/core-logic/review-logic.ts';
 
 export const useReviewStateStore = defineStore('review-state', {
   state: (): ReviewState => {
     return {
       started: false,
+      topic: '',
       isFrontSide: true,
       reviewQueue: [],
       currFlashcard: null,
@@ -25,8 +23,9 @@ export const useReviewStateStore = defineStore('review-state', {
     }
   },
   actions: {
-    startReview() {
+    startReview(topic: string) {
       this.started = true
+      this.topic = topic
       this.isFrontSide = true
       this.initReviewQueue()
       this.nextFlashcard()

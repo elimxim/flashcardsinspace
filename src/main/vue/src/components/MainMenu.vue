@@ -1,5 +1,5 @@
 <template>
-  <div class="menu-container">
+  <div class="menu-area">
     <ul class="menu-list">
       <li class="menu-item menu-select-item">
         <select id="flashcard-set-select" class="menu-select"
@@ -126,7 +126,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.menu-container {
+.menu-area {
   flex: 1;
   display: flex;
   padding: 4px;
