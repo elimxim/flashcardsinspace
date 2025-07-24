@@ -97,7 +97,7 @@ import { storeToRefs } from 'pinia'
 import { useReviewStateStore } from '@/stores/review-state.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
 import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
-import { ReviewMode } from '@/models/store.ts'
+import { ReviewMode } from '@/models/state.ts'
 import { getLevel, levels, nextLevel, prevLevel } from '@/core-logic/level-logic.ts'
 
 const flashcardStateStore = useFlashcardStateStore()

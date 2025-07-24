@@ -65,6 +65,7 @@ import { storeToRefs } from 'pinia'
 import { useLanguageDataStore } from '@/stores/language-data.ts'
 import { useReviewStateStore } from '@/stores/review-state.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
+import { newFlashcardSet } from '@/core-logic/flashcard-logic.ts';
 
 defineProps({
   visible: Boolean,
@@ -126,24 +127,10 @@ function create() {
 }
 
 function createNewFlashcardSet() {
-  // todo
-  const user: User = {
-    id: 1,
-    name: "Billy Bob",
-    registeredAt: new Date(),
+  if (flashcardSetLanguage.value === null) {
+    throw new Error('Can\'t a new flashcard set because language is not set')
   }
-
-  const flashcardSet: FlashcardSet = {
-    id: 0,
-    name: flashcardSetName.value,
-    language: flashcardSetLanguage.value!,
-    flashcardMap: new Map(),
-    createdAt: new Date().toISOString(),
-    lastUpdatedAt: null,
-    default: false,
-    user: user,
-  }
-
+  const flashcardSet = newFlashcardSet(flashcardSetName.value, flashcardSetLanguage.value)
   flashcardDataStore.addFlashcardSet(flashcardSet)
   flashcardStateStore.init(flashcardSet)
 }

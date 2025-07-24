@@ -26,5 +26,4 @@ export interface FlashcardSet {
   createdAt: string
   lastUpdatedAt: string | null
   default: boolean
-  user: User
 }

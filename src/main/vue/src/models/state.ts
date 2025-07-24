@@ -35,3 +35,6 @@ export interface GlobalState {
   flashcardEditModalFormOpen: boolean
 }
 
+export interface CalendarState {
+
+}

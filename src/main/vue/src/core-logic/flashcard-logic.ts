@@ -1,5 +1,6 @@
-import { type Flashcard, type ReviewInfo } from '@/models/flashcard.ts'
+import { type Flashcard, type FlashcardSet, type ReviewInfo } from '@/models/flashcard.ts'
 import { type Level, levels, nextLevel, specialLevels, getLevel } from '@/core-logic/level-logic.ts'
+import type { Language } from '@/models/language.ts';
 
 /**
  * Creates a new flashcard object.
@@ -39,5 +40,17 @@ export function updateFlashcard(flashcard: Flashcard, level: Level): Flashcard {
   flashcard.reviewHistory.push(info)
   flashcard.lastUpdatedAt = now
   return flashcard
+}
+
+export function newFlashcardSet(name: string, language: Language): FlashcardSet {
+  return {
+    id: 0,
+    name: name,
+    language: language,
+    flashcardMap: new Map(),
+    createdAt: new Date().toISOString(),
+    lastUpdatedAt: null,
+    default: false,
+  }
 }
 

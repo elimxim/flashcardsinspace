@@ -1,6 +1,6 @@
 import { type Flashcard, type FlashcardSet } from '@/models/flashcard.ts';
 import { defineStore } from 'pinia';
-import type { FlashcardSetState } from '@/models/store.ts';
+import type { FlashcardSetState } from '@/models/state.ts';
 
 export const useFlashcardStateStore = defineStore('flashcard-state', {
   state: (): FlashcardSetState => {

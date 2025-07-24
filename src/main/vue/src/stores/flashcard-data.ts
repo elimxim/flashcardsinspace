@@ -1,7 +1,7 @@
 import { type FlashcardSet } from '@/models/flashcard.ts'
 import { type User } from '@/models/user.ts'
 import { defineStore } from 'pinia'
-import type { FlashcardData } from '@/models/store.ts'
+import type { FlashcardData } from '@/models/state.ts'
 import { levels } from '@/core-logic/level-logic.ts';
 
 export const useFlashcardDataStore = defineStore('flashcard-data', {
@@ -52,17 +52,10 @@ function testEmptyData(): FlashcardSet[] {
 }
 
 function testData(): FlashcardSet[] {
-  const user: User = {
-    id: 1,
-    name: "Billy Bob",
-    registeredAt: new Date(),
-  }
-
   return [
     {
       id: 1,
       name: "Bosnian",
-      user: user,
       language: {
         name: "Bosnian",
         alpha2: "bs",
@@ -97,7 +90,6 @@ function testData(): FlashcardSet[] {
     },
     {
       id: 2,
-      user: user,
       name: "Russian",
       language: {
         name: "Russian",

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { useFlashcardStateStore } from '@/stores/flashcard-state'
-import { ReviewMode, type ReviewState } from '@/models/store.ts'
+import { ReviewMode, type ReviewState } from '@/models/state.ts'
 import { flashcardsForLevel, flashcardsForReview } from '@/core-logic/review-logic.ts'
 import { type Level, levels } from '@/core-logic/level-logic.ts'
 
