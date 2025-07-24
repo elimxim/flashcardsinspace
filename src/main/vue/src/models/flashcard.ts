@@ -1,8 +1,7 @@
-import type { User } from '@/models/user.ts'
 import type { Language } from '@/models/language.ts'
 
 export interface ReviewInfo {
-  level: string
+  stage: string
   reviewedAt: string
 }
 
@@ -10,7 +9,7 @@ export interface Flashcard {
   id: number
   frontSide: string
   backSide: string
-  level: string
+  stage: string
   reviewCount: number
   reviewHistory: ReviewInfo[]
   createdAt: string

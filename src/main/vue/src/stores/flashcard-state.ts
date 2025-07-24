@@ -54,7 +54,7 @@ export const useFlashcardStateStore = defineStore('flashcard-state', {
         if (flashcard !== undefined) {
           flashcard.frontSide = value.frontSide
           flashcard.backSide = value.backSide
-          flashcard.level = value.level
+          flashcard.stage = value.stage
           flashcard.reviewCount = value.reviewCount
           flashcard.reviewHistory = value.reviewHistory
           flashcard.lastUpdatedAt = value.lastUpdatedAt

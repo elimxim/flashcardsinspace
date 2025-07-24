@@ -1,17 +1,17 @@
 import { type Flashcard, type FlashcardSet, type ReviewInfo } from '@/models/flashcard.ts'
-import { type Level, levels, nextLevel, specialLevels, getLevel } from '@/core-logic/level-logic.ts'
+import { type Stage, stages } from '@/core-logic/stage-logic.ts'
 import type { Language } from '@/models/language.ts';
 
 /**
  * Creates a new flashcard object.
- * Every newly created flashcard goes to the UNKNOWN level first.
+ * Every newly created flashcard goes to the UNKNOWN stage first.
  */
 export function newFlashcard(frontSide: string, backSide: string): Flashcard {
   return {
     id: 0,
     frontSide: frontSide,
     backSide: backSide,
-    level: levels.UNKNOWN.name,
+    stage: stages.UNKNOWN.name,
     reviewedAt: null,
     reviewCount: 0,
     reviewHistory: [],
@@ -27,14 +27,14 @@ export function updateFlashcardSides(flashcard: Flashcard, frontSide: string, ba
   return flashcard
 }
 
-export function updateFlashcard(flashcard: Flashcard, level: Level): Flashcard {
+export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
   const now = new Date().toISOString()
   const info: ReviewInfo = {
-    level: level.name,
+    stage: stage.name,
     reviewedAt: now,
   }
 
-  flashcard.level = level.name
+  flashcard.stage = stage.name
   flashcard.reviewedAt = now
   flashcard.reviewCount += 1
   flashcard.reviewHistory.push(info)

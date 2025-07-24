@@ -45,12 +45,12 @@
       </li>
       <li class="menu-item menu-item-color"
           v-if="showFlashcardMenuItem"
-          v-for="b in buckets" :key="b.level.name">
+          v-for="b in buckets" :key="b.stage.name">
         <ul class="menu-composite-item"
             :class="{ 'menu-button': b.reviewable }"
-            @click="b.reviewable ? startReview(b.level) : null">
+            @click="b.reviewable ? startReview(b.stage) : null">
           <li class="menu-item-number">{{ b.flashcardNumber }}</li>
-          <li>{{ b.level.name }}</li>
+          <li>{{ b.stage.name }}</li>
         </ul>
       </li>
     </ul>
@@ -75,7 +75,7 @@ import { computed, type ComputedRef, onMounted, ref } from 'vue'
 import { useReviewStateStore } from '@/stores/review-state.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
 import { truncate } from '@/utils/string.ts'
-import { allLevels, type Level, specialLevels } from '@/core-logic/level-logic.ts'
+import { allStages, type Stage, specialStages } from '@/core-logic/stage-logic.ts'
 
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardStateStore = useFlashcardStateStore()
@@ -99,23 +99,23 @@ const menuSelect = ref<HTMLSelectElement>()
 // buckets>
 
 interface Bucket {
-  level: string
+  stage: string
   flashcardNumber: ComputedRef<number>
   reviewable: boolean
 }
 
 const totalFlashcardNumber = computed(() => flashcardStateStore.flashcards.length)
 
-const buckets = allLevels.map(level => {
+const buckets = allStages.map(stage => {
   return {
-    level: level,
-    flashcardNumber: computed(() => flashcardNumberByLevel(level)),
-    reviewable: specialLevels.has(level),
+    stage: stage,
+    flashcardNumber: computed(() => flashcardNumberByStage(stage)),
+    reviewable: specialStages.has(stage),
   }
 })
 
-function flashcardNumberByLevel(level: Level): number {
-  return flashcardStateStore.flashcards.filter(f => f.level === level.name).length
+function flashcardNumberByStage(stage: Stage): number {
+  return flashcardStateStore.flashcards.filter(f => f.stage === stage.name).length
 }
 
 // <buckets
@@ -124,8 +124,8 @@ function handleSelectChange() {
   reviewStateStore.finishReview()
 }
 
-function startReview(level: Level) {
-  reviewStateStore.startSpecialReview(level)
+function startReview(stage: Stage) {
+  reviewStateStore.startSpecialReview(stage)
 }
 
 onMounted(() => {

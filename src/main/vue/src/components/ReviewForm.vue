@@ -19,7 +19,7 @@
           <div class="top-row">
               <span class="corner-text"
                     :hidden="reviewStateStore.isNoCardsForReview()">
-                {{ currFlashcard?.level }}
+                {{ currFlashcard?.stage }}
               </span>
             <button id="flashcard-edit-button"
                     class="corner-button"
@@ -39,16 +39,16 @@
           <button class="nav-button nav-red-button"
                   :disabled="reviewStateStore.isNoCardsForReview()"
                   :hidden="reviewStateStore.isNoCardsForReview()"
-                  ref="levelDownButton"
-                  @click="levelDown">
+                  ref="stageDownButton"
+                  @click="stageDown">
             Don't know
           </button>
           <button class="nav-button nav-green-button"
                   :class="{ 'nav-button-disabled': editFormWasOpened }"
                   :disabled="editFormWasOpened || reviewStateStore.isNoCardsForReview()"
                   :hidden="reviewStateStore.isNoCardsForReview()"
-                  ref="levelUpButton"
-                  @click="levelUp">
+                  ref="stageUpButton"
+                  @click="stageUp">
             Know
           </button>
         </div>
@@ -98,7 +98,7 @@ import { useReviewStateStore } from '@/stores/review-state.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
 import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { ReviewMode } from '@/models/state.ts'
-import { getLevel, levels, nextLevel, prevLevel } from '@/core-logic/level-logic.ts'
+import { getStage, stages, nextStage, prevStage } from '@/core-logic/stage-logic.ts'
 
 const flashcardStateStore = useFlashcardStateStore()
 const reviewStateStore = useReviewStateStore()
@@ -125,8 +125,8 @@ const currFlashcardText = computed(() => {
 
 const escapeButton = ref<HTMLButtonElement>()
 const flashcardButton = ref<HTMLDivElement>()
-const levelDownButton = ref<HTMLButtonElement>()
-const levelUpButton = ref<HTMLButtonElement>()
+const stageDownButton = ref<HTMLButtonElement>()
+const stageUpButton = ref<HTMLButtonElement>()
 const nextButton = ref<HTMLButtonElement>()
 const moveBackButton = ref<HTMLButtonElement>()
 const flashcardEditButton = ref<HTMLButtonElement>()
@@ -139,33 +139,33 @@ function flipFlashcard() {
   reviewStateStore.flipFlashcard()
 }
 
-function levelDown() {
+function stageDown() {
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
-    updateFlashcard(flashcard, prevLevel(flashcard.level))
+    updateFlashcard(flashcard, prevStage(flashcard.stage))
     flashcardStateStore.updateFlashcard(flashcard)
     reviewStateStore.setEditFormWasOpened(false)
     reviewStateStore.setFrontSide(true)
     reviewStateStore.nextFlashcard()
   }
-  levelDownButton.value?.blur()
+  stageDownButton.value?.blur()
 }
 
-function levelUp() {
+function stageUp() {
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
-    updateFlashcard(flashcard, nextLevel(flashcard.level))
+    updateFlashcard(flashcard, nextStage(flashcard.stage))
     flashcardStateStore.updateFlashcard(flashcard)
     reviewStateStore.setFrontSide(true)
     reviewStateStore.nextFlashcard()
   }
-  levelUpButton.value?.blur()
+  stageUpButton.value?.blur()
 }
 
 function next() {
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
-    updateFlashcard(flashcard, getLevel(flashcard.level))
+    updateFlashcard(flashcard, getStage(flashcard.stage))
     flashcardStateStore.updateFlashcard(flashcard)
     reviewStateStore.setFrontSide(true)
     reviewStateStore.nextFlashcard()
@@ -176,7 +176,7 @@ function next() {
 function moveBack() {
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
-    updateFlashcard(flashcard, levels.ATTEMPTED)
+    updateFlashcard(flashcard, stages.ATTEMPTED)
     flashcardStateStore.updateFlashcard(flashcard)
     reviewStateStore.setFrontSide(true)
     reviewStateStore.nextFlashcard()
@@ -213,9 +213,9 @@ function handleKeydown(event: KeyboardEvent) {
   } else if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
     flashcardButton.value?.click()
   } else if (event.key === 'ArrowLeft') {
-    levelDownButton.value?.click()
+    stageDownButton.value?.click()
   } else if (event.key === 'ArrowRight') {
-    levelUpButton.value?.click()
+    stageUpButton.value?.click()
     nextButton.value?.click()
   } else if (event.shiftKey && (event.key === 'e' || event.key === 'E')) {
     flashcardEditButton.value?.click()

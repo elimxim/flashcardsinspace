@@ -2,7 +2,7 @@ import { type FlashcardSet } from '@/models/flashcard.ts'
 import { type User } from '@/models/user.ts'
 import { defineStore } from 'pinia'
 import type { FlashcardData } from '@/models/state.ts'
-import { levels } from '@/core-logic/level-logic.ts';
+import { stages } from '@/core-logic/stage-logic.ts';
 
 export const useFlashcardDataStore = defineStore('flashcard-data', {
   state: (): FlashcardData => {
@@ -65,7 +65,7 @@ function testData(): FlashcardSet[] {
           id: 1,
           frontSide: "Prdnuti",
           backSide: "To fart",
-          level: levels.UNKNOWN.name,
+          stage: stages.UNKNOWN.name,
           reviewCount: 0,
           reviewHistory: [], // todo
           reviewedAt: null,
@@ -76,7 +76,7 @@ function testData(): FlashcardSet[] {
           id: 2,
           frontSide: "Kakati",
           backSide: "To poop",
-          level: levels.ATTEMPTED.name,
+          stage: stages.ATTEMPTED.name,
           reviewCount: 0,
           reviewHistory: [],
           reviewedAt: null,
@@ -100,7 +100,7 @@ function testData(): FlashcardSet[] {
           id: 1,
           frontSide: "Пукать",
           backSide: "To fart",
-          level: levels.FIRST.name,
+          stage: stages.FIRST.name,
           reviewCount: 0,
           reviewHistory: [],
           reviewedAt: null,
@@ -111,7 +111,7 @@ function testData(): FlashcardSet[] {
           id: 2,
           frontSide: "Какать",
           backSide: "To poop",
-          level: levels.SEVENTH.name,
+          stage: stages.SEVENTH.name,
           reviewCount: 0,
           reviewHistory: [],
           reviewedAt: null,

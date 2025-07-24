@@ -1,19 +1,19 @@
 import { type Flashcard } from '@/models/flashcard.ts'
-import { type Level, mainLevels, getLevel } from '@/core-logic/level-logic.ts'
+import { type Stage, mainStages, getStage } from '@/core-logic/stage-logic.ts'
 
 // fixme implement real calendar
-const calendarLevels = [...mainLevels].map(v => v.name)
+const calendarStages = [...mainStages].map(v => v.name)
 
 export function flashcardsForReview(flashcards: Flashcard[]): Flashcard[] {
-  return flashcards.filter(f => calendarLevels.includes(f.level))
+  return flashcards.filter(f => calendarStages.includes(f.stage))
     .sort((a, b) => {
-      if (a.level !== b.level) {
-        return getLevel(a.level).order - getLevel(b.level).order
+      if (a.stage !== b.stage) {
+        return getStage(a.stage).order - getStage(b.stage).order
       }
       return a.id - b.id
     })
 }
 
-export function flashcardsForLevel(flashcards: Flashcard[], level: Level): Flashcard[] {
-  return flashcards.filter(f => f.level === level.name)
+export function flashcardsForStage(flashcards: Flashcard[], stage: Stage): Flashcard[] {
+  return flashcards.filter(f => f.stage === stage.name)
 }

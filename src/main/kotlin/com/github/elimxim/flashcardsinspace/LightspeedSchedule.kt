@@ -116,7 +116,7 @@ class PrintableSchedule(private val schedule: StudySchedule): StudySchedule by s
                     .joinToString(separator = ", ")
                     .padEnd(10, ' ')
 
-                print("Day $fDay: Level $fStages")
+                print("Day $fDay: Stage $fStages")
                 idx += rows
             }
             println()
