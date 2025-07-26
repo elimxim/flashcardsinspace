@@ -80,7 +80,7 @@ import { computed, type ComputedRef, onMounted, ref } from 'vue'
 import { useReviewStateStore } from '@/stores/review-state.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
 import { truncate } from '@/utils/string.ts'
-import { allStages, type Stage, specialStages } from '@/core-logic/stage-logic.ts'
+import { allStages, type Stage, specialStageSet } from '@/core-logic/stage-logic.ts'
 import { countFlashcards } from '@/core-logic/review-logic.ts'
 
 const globalStateStore = useGlobalStateStore()
@@ -119,7 +119,7 @@ const buckets: Bucket[] = allStages.map(stage => {
   return {
     stage: stage,
     flashcardNumber: computed(() => flashcardNumberByStage(stage)),
-    reviewable: specialStages.has(stage),
+    reviewable: specialStageSet.has(stage),
   }
 })
 

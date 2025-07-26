@@ -3,11 +3,13 @@ export interface Stage {
   order: number
 }
 
-export const stages = {
-  // special stage (part of FIRST stage) for recently added flashcards
+export const specialStages = {
   UNKNOWN: { name: 'Unknown', order: 0 } as Stage,
-  // special stage (part of FIRST stage) for attempted flashcards
   ATTEMPTED: { name: 'Attempted', order: 0 } as Stage,
+  OUTER_SPACE: { name: 'Outer space', order: 8 } as Stage,
+}
+
+export const stages = {
   FIRST: { name: 'Stage 1', order: 1 } as Stage,
   SECOND: { name: 'Stage 2', order: 2 } as Stage,
   THIRD: { name: 'Stage 3', order: 3 } as Stage,
@@ -15,13 +17,11 @@ export const stages = {
   FIFTH: { name: 'Stage 5', order: 5 } as Stage,
   SIXTH: { name: 'Stage 6', order: 6 } as Stage,
   SEVENTH: { name: 'Stage 7', order: 7 } as Stage,
-  // special stage for memorized flashcards
-  OUTER_SPACE: { name: 'Outer space', order: 8 } as Stage,
 }
 
 export const allStages: Stage[] = [
-  stages.UNKNOWN,
-  stages.ATTEMPTED,
+  specialStages.UNKNOWN,
+  specialStages.ATTEMPTED,
   stages.FIRST,
   stages.SECOND,
   stages.THIRD,
@@ -29,12 +29,12 @@ export const allStages: Stage[] = [
   stages.FIFTH,
   stages.SIXTH,
   stages.SEVENTH,
-  stages.OUTER_SPACE,
+  specialStages.OUTER_SPACE,
 ]
 
 export const stageOrderMap = new Map<number, Stage>([
-  [stages.UNKNOWN.order, stages.UNKNOWN],
-  [stages.ATTEMPTED.order, stages.ATTEMPTED],
+  [specialStages.UNKNOWN.order, specialStages.UNKNOWN],
+  [specialStages.ATTEMPTED.order, specialStages.ATTEMPTED],
   [stages.FIRST.order, stages.FIRST],
   [stages.SECOND.order, stages.SECOND],
   [stages.THIRD.order, stages.THIRD],
@@ -42,12 +42,12 @@ export const stageOrderMap = new Map<number, Stage>([
   [stages.FIFTH.order, stages.FIFTH],
   [stages.SIXTH.order, stages.SIXTH],
   [stages.SEVENTH.order, stages.SEVENTH],
-  [stages.OUTER_SPACE.order, stages.OUTER_SPACE],
+  [specialStages.OUTER_SPACE.order, specialStages.OUTER_SPACE],
 ])
 
 export const stageNameMap = new Map<string, Stage>([
-  [stages.UNKNOWN.name, stages.UNKNOWN],
-  [stages.ATTEMPTED.name, stages.ATTEMPTED],
+  [specialStages.UNKNOWN.name, specialStages.UNKNOWN],
+  [specialStages.ATTEMPTED.name, specialStages.ATTEMPTED],
   [stages.FIRST.name, stages.FIRST],
   [stages.SECOND.name, stages.SECOND],
   [stages.THIRD.name, stages.THIRD],
@@ -55,10 +55,10 @@ export const stageNameMap = new Map<string, Stage>([
   [stages.FIFTH.name, stages.FIFTH],
   [stages.SIXTH.name, stages.SIXTH],
   [stages.SEVENTH.name, stages.SEVENTH],
-  [stages.OUTER_SPACE.name, stages.OUTER_SPACE],
+  [specialStages.OUTER_SPACE.name, specialStages.OUTER_SPACE],
 ])
 
-export const mainStages = new Set([
+export const mainStageSet = new Set([
   stages.FIRST,
   stages.SECOND,
   stages.THIRD,
@@ -68,10 +68,10 @@ export const mainStages = new Set([
   stages.SEVENTH,
 ])
 
-export const specialStages = new Set([
-  stages.UNKNOWN,
-  stages.ATTEMPTED,
-  stages.OUTER_SPACE,
+export const specialStageSet = new Set([
+  specialStages.UNKNOWN,
+  specialStages.ATTEMPTED,
+  specialStages.OUTER_SPACE,
 ])
 
 /**
@@ -83,7 +83,7 @@ export const specialStages = new Set([
  */
 export function nextStage(name: string): Stage {
   const stage = getStage(name)
-  if (specialStages.has(stage)) {
+  if (specialStageSet.has(stage)) {
     return stage
   }
 
@@ -102,11 +102,11 @@ export function nextStage(name: string): Stage {
  */
 export function prevStage(name: string): Stage {
   let stage = getStage(name)
-  if (specialStages.has(stage)) {
+  if (specialStageSet.has(stage)) {
     return stage
   }
 
-  return stages.ATTEMPTED
+  return stages.FIRST
 }
 
 export function getStage(name: string): Stage {

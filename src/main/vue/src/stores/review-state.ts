@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { useFlashcardStateStore } from '@/stores/flashcard-state'
 import { ReviewMode, type ReviewState } from '@/models/state.ts'
 import { flashcardsForStage, findFlashcardsForReview } from '@/core-logic/review-logic.ts'
-import { type Stage, stages } from '@/core-logic/stage-logic.ts'
+import { type Stage, stages, specialStages } from '@/core-logic/stage-logic.ts'
 
 export const useReviewStateStore = defineStore('review-state', {
   state: (): ReviewState => {
@@ -37,7 +37,7 @@ export const useReviewStateStore = defineStore('review-state', {
     },
     startSpecialReview(stage: Stage) {
       this.settings.topic = stage.name
-      this.settings.mode = stage === stages.OUTER_SPACE ? ReviewMode.SPACE : ReviewMode.SPECIAL
+      this.settings.mode = stage === specialStages.OUTER_SPACE ? ReviewMode.SPACE : ReviewMode.SPECIAL
       this.started = true
       this.isFrontSide = true
       this.initStageReviewQueue(stage)
