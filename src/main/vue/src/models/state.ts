@@ -33,8 +33,5 @@ export interface GlobalState {
   flashcardSetCreationModalFormOpen: boolean
   flashcardCreationModalFormOpen: boolean
   flashcardEditModalFormOpen: boolean
-}
-
-export interface CalendarState {
-
+  calendarModalFormOpen: boolean
 }

@@ -27,16 +27,19 @@
 
 <script setup lang="ts">
 import '@/assets/main.css'
-import { useFlashcardDataStore } from '@/stores/flashcard-data.ts';
-import { useLanguageDataStore } from '@/stores/language-data.ts';
-import { onMounted } from 'vue';
+import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
+import { useLanguageDataStore } from '@/stores/language-data.ts'
+import { useCalendarDataStore } from '@/stores/calendar-data.ts'
+import { onMounted } from 'vue'
 
 const flashcardDataStore = useFlashcardDataStore()
-const langStore = useLanguageDataStore()
+const languageDataStore = useLanguageDataStore()
+const calendarDataStore = useCalendarDataStore()
 
 onMounted(() => {
   flashcardDataStore.loadData()
-  langStore.loadData()
+  languageDataStore.loadData()
+  calendarDataStore.loadData()
 })
 </script>
 

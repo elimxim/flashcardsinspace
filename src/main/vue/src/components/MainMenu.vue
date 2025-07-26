@@ -27,13 +27,14 @@
       </li>
       <li class="menu-buttons-container"
           v-if="showFlashcardMenuItem">
-        <div class="menu-item menu-item-color menu-icon-button">
+        <div class="menu-item menu-item-color menu-icon-button"
+             @click="globalStateStore.toggleCalendarModalForm()">
           <font-awesome-icon icon="fa-solid fa-calendar-days"/>
         </div>
         <div class="menu-item menu-item-color">
           <ul class="menu-composite-item">
             <li>Day</li>
-            <li class="menu-item-number">{{ 40 }}</li>
+            <li class="menu-item-number">{{ currLightDay.seqNumber }}</li>
           </ul>
         </div>
       </li>
@@ -48,7 +49,7 @@
           v-for="b in buckets" :key="b.stage.name">
         <ul class="menu-composite-item"
             :class="{ 'menu-button': b.reviewable }"
-            @click="b.reviewable ? startReview(b.stage) : null">
+            @click="b.reviewable ? startStageReview(b.stage) : null">
           <li class="menu-item-number">{{ b.flashcardNumber }}</li>
           <li>{{ b.stage.name }}</li>
         </ul>
@@ -62,32 +63,40 @@
     v-model:visible="flashcardSetCreationModalFormOpen"/>
   <FlashcardModificationModalForm
     v-model:visible="flashcardCreationModalFormOpen"/>
+  <CalendarModalForm
+    v-model:visible="calendarModalFormOpen"/>
 </template>
 
 <script setup lang="ts">
 import FlashcardSetSettingsModalForm from '@/components/modal/FlashcardSetSettingsModalForm.vue'
 import FlashcardSetCreationModalForm from '@/components/modal/FlashcardSetCreationModalForm.vue'
 import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
+import CalendarModalForm from '@/components/modal/CalendarModalForm.vue'
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
+import { useCalendarDataStore } from '@/stores/calendar-data.ts'
 import { storeToRefs } from 'pinia'
 import { computed, type ComputedRef, onMounted, ref } from 'vue'
 import { useReviewStateStore } from '@/stores/review-state.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
 import { truncate } from '@/utils/string.ts'
 import { allStages, type Stage, specialStages } from '@/core-logic/stage-logic.ts'
+import { countFlashcards } from '@/core-logic/review-logic.ts'
 
+const globalStateStore = useGlobalStateStore()
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardStateStore = useFlashcardStateStore()
-const globalStateStore = useGlobalStateStore()
 const reviewStateStore = useReviewStateStore()
+const calendarDataStore = useCalendarDataStore()
 
 const { flashcardSets } = storeToRefs(flashcardDataStore)
 const { flashcardSet } = storeToRefs(flashcardStateStore)
+const { currLightDay } = storeToRefs(calendarDataStore)
 const {
   flashcardSetSettingsModalFormOpen,
   flashcardSetCreationModalFormOpen,
   flashcardCreationModalFormOpen,
+  calendarModalFormOpen
 } = storeToRefs(globalStateStore)
 
 flashcardStateStore.initFromList(flashcardSets.value)
@@ -99,14 +108,14 @@ const menuSelect = ref<HTMLSelectElement>()
 // buckets>
 
 interface Bucket {
-  stage: string
+  stage: Stage
   flashcardNumber: ComputedRef<number>
   reviewable: boolean
 }
 
 const totalFlashcardNumber = computed(() => flashcardStateStore.flashcards.length)
 
-const buckets = allStages.map(stage => {
+const buckets: Bucket[] = allStages.map(stage => {
   return {
     stage: stage,
     flashcardNumber: computed(() => flashcardNumberByStage(stage)),
@@ -115,7 +124,7 @@ const buckets = allStages.map(stage => {
 })
 
 function flashcardNumberByStage(stage: Stage): number {
-  return flashcardStateStore.flashcards.filter(f => f.stage === stage.name).length
+  return countFlashcards(flashcardStateStore.flashcards, stage)
 }
 
 // <buckets
@@ -124,7 +133,7 @@ function handleSelectChange() {
   reviewStateStore.finishReview()
 }
 
-function startReview(stage: Stage) {
+function startStageReview(stage: Stage) {
   reviewStateStore.startSpecialReview(stage)
 }
 

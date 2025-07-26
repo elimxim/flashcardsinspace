@@ -4,11 +4,11 @@
       <MainMenu/>
     </div>
 
-    <div class="main-area" v-if="!started">
+    <div class="main-area" v-if="!reviewStarted">
       <ReviewFormStarter/>
     </div>
 
-    <div class="main-area" v-if="started">
+    <div class="main-area" v-if="reviewStarted">
       <ReviewForm/>
     </div>
   </div>
@@ -23,7 +23,7 @@ import { useReviewStateStore } from '@/stores/review-state.ts'
 import { storeToRefs } from 'pinia'
 
 const reviewStateStore = useReviewStateStore()
-const { started } = storeToRefs(reviewStateStore)
+const { started: reviewStarted } = storeToRefs(reviewStateStore)
 
 onBeforeRouteLeave((to, from, next) => {
   reviewStateStore.finishReview()

@@ -9,6 +9,7 @@ export const useGlobalStateStore = defineStore('global-state', {
       flashcardSetCreationModalFormOpen: false,
       flashcardCreationModalFormOpen: false,
       flashcardEditModalFormOpen: false,
+      calendarModalFormOpen: false,
     }
   },
   actions: {
@@ -26,11 +27,15 @@ export const useGlobalStateStore = defineStore('global-state', {
       const reviewStateStore = useReviewStateStore()
       reviewStateStore.setEditFormWasOpened(true)
     },
-    isAnyModalFormOpen() {
+    toggleCalendarModalForm() {
+      this.calendarModalFormOpen = !this.calendarModalFormOpen
+    },
+    isAnyModalFormOpen(): boolean {
       return this.flashcardSetSettingsModalFormOpen
         || this.flashcardSetCreationModalFormOpen
         || this.flashcardCreationModalFormOpen
         || this.flashcardEditModalFormOpen
+        || this.calendarModalFormOpen
     },
   }
 })

@@ -4,7 +4,7 @@
         <span class="corner-text">
           {{ settings.topic }}
         </span>
-      <button class="corner-button"
+      <button class="modal-corner-button"
               ref="escapeButton"
               @click="finishReview">
         <font-awesome-icon icon="fa-solid fa-xmark"/>
@@ -22,7 +22,7 @@
                 {{ currFlashcard?.stage }}
               </span>
             <button id="flashcard-edit-button"
-                    class="corner-button"
+                    class="modal-corner-button"
                     ref="flashcardEditButton"
                     @click.stop="globalStateStore.toggleFlashcardEditModalForm()"
                     :disabled="reviewStateStore.isNoCardsForReview()"
@@ -165,7 +165,6 @@ function stageUp() {
 function next() {
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
-    updateFlashcard(flashcard, getStage(flashcard.stage))
     flashcardStateStore.updateFlashcard(flashcard)
     reviewStateStore.setFrontSide(true)
     reviewStateStore.nextFlashcard()
@@ -176,7 +175,7 @@ function next() {
 function moveBack() {
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
-    updateFlashcard(flashcard, stages.ATTEMPTED)
+    updateFlashcard(flashcard, stages.FIRST)
     flashcardStateStore.updateFlashcard(flashcard)
     reviewStateStore.setFrontSide(true)
     reviewStateStore.nextFlashcard()
@@ -360,7 +359,7 @@ function handleKeydown(event: KeyboardEvent) {
   cursor: default;
 }
 
-.corner-button {
+.modal-corner-button {
   border: none;
   outline: none;
   background: none;
@@ -369,7 +368,7 @@ function handleKeydown(event: KeyboardEvent) {
   color: #c5c5c5;
 }
 
-.corner-button:hover {
+.modal-corner-button:hover {
   color: #9f9f9f;
 }
 

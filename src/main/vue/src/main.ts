@@ -16,6 +16,8 @@ import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import { faAngleLeft } from '@fortawesome/free-solid-svg-icons';
+import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faGear)
 library.add(faBox)
@@ -26,6 +28,8 @@ library.add(faCircleInfo)
 library.add(faGlobe)
 library.add(faXmark)
 library.add(faPenToSquare)
+library.add(faAngleLeft)
+library.add(faAngleRight)
 
 const app = createApp(App)
 app.component('font-awesome-icon', FontAwesomeIcon)

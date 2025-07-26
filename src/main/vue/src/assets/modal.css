@@ -20,10 +20,13 @@
   margin-bottom: 10%;
   display: flex;
   flex-direction: column;
-  resize: horizontal;
-  width: 400px;
-  max-width: 90%;
-  min-width: 300px;
+  resize: both;
+  max-width: 90vw;
+  width: fit-content;
+  min-width: fit-content;
+  max-height: 90vh;
+  height: fit-content;
+  min-height: fit-content;
   overflow: auto;
   user-select: none;
 }
@@ -60,6 +63,11 @@
   font-size: 1em;
   border-radius: 4px;
   border: 1px solid #ccc;
+}
+
+.modal-input-responsive {
+  min-width: 30vw;
+  min-height: 10vh;
 }
 
 .modal-info-message {
@@ -190,4 +198,24 @@
   font-size: 1em;
   outline: none;
   cursor: pointer;
+}
+
+.modal-top-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+}
+
+.modal-corner-button {
+  border: none;
+  outline: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.5em;
+  color: #c5c5c5;
+}
+
+.modal-corner-button:hover {
+  color: #9f9f9f;
 }

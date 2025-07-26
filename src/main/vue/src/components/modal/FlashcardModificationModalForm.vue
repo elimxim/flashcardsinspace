@@ -7,7 +7,7 @@
       <div class="modal-body">
         <div class="modal-form-group-line">
           <textarea id="frontSide"
-                    class="modal-input"
+                    class="modal-input modal-input-responsive "
                     rows="3"
                     placeholder="Front side"
                     v-model="flashcardFrontSide"/>
@@ -17,7 +17,7 @@
         </div>
         <div class="modal-form-group-line">
           <textarea id="backSide"
-                    class="modal-input"
+                    class="modal-input modal-input-responsive "
                     rows="3"
                     placeholder="Back side"
                     v-model="flashcardBackSide"/>

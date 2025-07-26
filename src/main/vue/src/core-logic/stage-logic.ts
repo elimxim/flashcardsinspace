@@ -4,7 +4,9 @@ export interface Stage {
 }
 
 export const stages = {
+  // special stage (part of FIRST stage) for recently added flashcards
   UNKNOWN: { name: 'Unknown', order: 0 } as Stage,
+  // special stage (part of FIRST stage) for attempted flashcards
   ATTEMPTED: { name: 'Attempted', order: 0 } as Stage,
   FIRST: { name: 'Stage 1', order: 1 } as Stage,
   SECOND: { name: 'Stage 2', order: 2 } as Stage,
@@ -13,6 +15,7 @@ export const stages = {
   FIFTH: { name: 'Stage 5', order: 5 } as Stage,
   SIXTH: { name: 'Stage 6', order: 6 } as Stage,
   SEVENTH: { name: 'Stage 7', order: 7 } as Stage,
+  // special stage for memorized flashcards
   OUTER_SPACE: { name: 'Outer space', order: 8 } as Stage,
 }
 

@@ -3,6 +3,7 @@ import { type User } from '@/models/user.ts'
 import { defineStore } from 'pinia'
 import type { FlashcardData } from '@/models/state.ts'
 import { stages } from '@/core-logic/stage-logic.ts';
+import { today, asIsoDate, yesterday, minusDays } from '@/utils/date';
 
 export const useFlashcardDataStore = defineStore('flashcard-data', {
   state: (): FlashcardData => {
@@ -65,27 +66,27 @@ function testData(): FlashcardSet[] {
           id: 1,
           frontSide: "Prdnuti",
           backSide: "To fart",
-          stage: stages.UNKNOWN.name,
+          stage: stages.FIRST.name, // unknown
           reviewCount: 0,
           reviewHistory: [], // todo
           reviewedAt: null,
-          createdAt: new Date().toISOString(),
-          lastUpdatedAt: new Date().toISOString(),
+          createdAt: asIsoDate(today()),
+          lastUpdatedAt: asIsoDate(today()),
         }],
         [2, {
           id: 2,
           frontSide: "Kakati",
           backSide: "To poop",
-          stage: stages.ATTEMPTED.name,
+          stage: stages.FIRST.name, // attempted
           reviewCount: 0,
           reviewHistory: [],
-          reviewedAt: null,
-          createdAt: new Date().toISOString(),
-          lastUpdatedAt: new Date().toISOString(),
+          reviewedAt: asIsoDate(today()),
+          createdAt: asIsoDate(yesterday()),
+          lastUpdatedAt: asIsoDate(today()),
         }],
       ]),
-      createdAt: new Date().toISOString(),
-      lastUpdatedAt: new Date().toISOString(),
+      createdAt: asIsoDate(yesterday()),
+      lastUpdatedAt: asIsoDate(yesterday()),
       default: false,
     },
     {
@@ -103,9 +104,9 @@ function testData(): FlashcardSet[] {
           stage: stages.FIRST.name,
           reviewCount: 0,
           reviewHistory: [],
-          reviewedAt: null,
-          createdAt: new Date().toISOString(),
-          lastUpdatedAt: new Date().toISOString(),
+          reviewedAt: asIsoDate(yesterday()),
+          createdAt: asIsoDate(minusDays(today(), 2)),
+          lastUpdatedAt: asIsoDate(minusDays(today(), 2)),
         }],
         [2, {
           id: 2,
@@ -114,13 +115,13 @@ function testData(): FlashcardSet[] {
           stage: stages.SEVENTH.name,
           reviewCount: 0,
           reviewHistory: [],
-          reviewedAt: null,
-          createdAt: new Date().toISOString(),
-          lastUpdatedAt: new Date().toISOString(),
+          reviewedAt: asIsoDate(yesterday()),
+          createdAt: asIsoDate(minusDays(today(), 64)),
+          lastUpdatedAt: asIsoDate(yesterday()),
         }],
       ]),
-      createdAt: new Date().toISOString(),
-      lastUpdatedAt: new Date().toISOString(),
+      createdAt: asIsoDate(minusDays(today(), 64)),
+      lastUpdatedAt: asIsoDate(minusDays(today(), 64)),
       default: false,
     }
   ]

@@ -1,0 +1,64 @@
+import { defineStore } from 'pinia'
+import { type LightspeedCalendar, type LightDay, StudyStatus } from '@/models/calendar.ts'
+import { type Stage, stages } from '@/core-logic/stage-logic.ts'
+import { asIsoDate } from '@/utils/date.ts'
+
+export const useCalendarDataStore = defineStore('calendar-data', {
+  state: (): LightspeedCalendar => {
+    const isoDate = asIsoDate(new Date())
+    return {
+      lightStartDate: isoDate,
+      currLightDay: {
+        isoDate: isoDate,
+        seqNumber: 0,
+        stages: [],
+        status: StudyStatus.COMPLETED,
+      },
+      lightDays: [],
+    }
+  },
+  getters: {
+    currLightDayStages(): Set<string> {
+      return new Set(this.currLightDay.stages.map(v => v.name))
+    }
+  },
+  actions: {
+    loadData() {
+      const calendar = testData()
+      this.lightStartDate = calendar.lightStartDate
+      this.currLightDay = calendar.currLightDay
+      this.lightDays = calendar.lightDays
+    },
+    initCalendar(startDate: Date) {
+
+    },
+  }
+})
+
+function testData(): LightspeedCalendar {
+  const days: LightDay[] = []
+  const startDate = new Date()
+  startDate.setDate(startDate.getDate() - 19)
+  for (let i = 1; i <= 30; i++) {
+    const date = new Date(startDate)
+    date.setDate(date.getDate() + i)
+    let status = StudyStatus.COMPLETED
+    if (i > 14 && i < 18) {
+      status = StudyStatus.IN_PROGRESS
+    } else if (i >= 18) {
+      status = StudyStatus.NOT_STARTED
+    }
+    days.push({
+      isoDate: date.toISOString().split('T')[0],
+      seqNumber: i,
+      stages: [stages.SEVENTH, stages.FIRST],
+      status: status,
+    })
+  }
+
+  return {
+    lightStartDate: days[0].isoDate,
+    currLightDay: days[18],
+    lightDays: days,
+  }
+}

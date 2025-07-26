@@ -1,3 +1,23 @@
+export function asIsoDate(date: Date): string {
+  return date.toISOString().split('T')[0]
+}
+
+export const today = () => new Date()
+export const yesterday = () => minusDays(new Date(), 1)
+export const tomorrow = () => plusDays(new Date(), 1)
+
+export function minusDays(origDate: Date, days: number): Date {
+  const date = new Date(origDate)
+  date.setDate(date.getDate() - days)
+  return date
+}
+
+export function plusDays(origDate: Date, days: number): Date {
+  const date = new Date(origDate)
+  date.setDate(date.getDate() + days)
+  return date
+}
+
 export function isDateBetween(date: Date, from: Date, to: Date): boolean {
   const fromTime = from.getTime()
   const toTime = to.getTime()
