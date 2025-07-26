@@ -5,8 +5,9 @@ import { useCalendarDataStore } from '@/stores/calendar-data.ts'
 import { storeToRefs } from 'pinia'
 
 /**
- * Creates a new flashcard object.
- * Every newly created flashcard goes to the FIRST stage.
+ * Creates a new flashcard object. Every newly created
+ * flashcard goes to the FIRST stage. Flashcards are
+ * created in the current {@link LightspeedCalendar.currLightDay calendar day}.
  */
 export function newFlashcard(frontSide: string, backSide: string): Flashcard {
   const calendarDateStore = useCalendarDataStore()
@@ -32,6 +33,11 @@ export function updateFlashcardSides(flashcard: Flashcard, frontSide: string, ba
   return flashcard
 }
 
+/**
+ * Updates a flashcard object and sets
+ * {@link Flashcard.reviewedAt review date} as a date
+ * of the current {@link LightspeedCalendar.currLightDay calendar day}.
+ */
 export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
   const calendarDateStore = useCalendarDataStore()
   const { currLightDay } = storeToRefs(calendarDateStore)
@@ -51,6 +57,10 @@ export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
   return flashcard
 }
 
+/**
+ * Create a new flashcard set object. Flashcard sets are
+ * created in the current {@link LightspeedCalendar.currLightDay calendar day}.
+ */
 export function newFlashcardSet(name: string, language: Language): FlashcardSet {
   const calendarDateStore = useCalendarDataStore()
   const { currLightDay } = storeToRefs(calendarDateStore)

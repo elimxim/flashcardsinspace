@@ -33,8 +33,6 @@ export const allStages: Stage[] = [
 ]
 
 export const stageOrderMap = new Map<number, Stage>([
-  [specialStages.UNKNOWN.order, specialStages.UNKNOWN],
-  [specialStages.ATTEMPTED.order, specialStages.ATTEMPTED],
   [stages.FIRST.order, stages.FIRST],
   [stages.SECOND.order, stages.SECOND],
   [stages.THIRD.order, stages.THIRD],
@@ -76,10 +74,9 @@ export const specialStageSet = new Set([
 
 /**
  * Determines and returns the next stage based on the current stage
- * with the following exclusions:
- * - Flashcards cannot move above the "OUTER_SPACE" stage (last stages);
- * - Flashcards cannot move from "UNKNOWN" or "ATTEMPTED" stages
- * (it happens when the calendar day is switched).
+ * with the following exclusion:
+ * - flashcards cannot move from
+ * "UNKNOWN", "ATTEMPTED" or "OUTER_SPACE" stages
  */
 export function nextStage(name: string): Stage {
   const stage = getStage(name)
