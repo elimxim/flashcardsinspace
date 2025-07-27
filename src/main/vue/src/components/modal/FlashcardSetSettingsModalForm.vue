@@ -1,5 +1,5 @@
 <template>
-  <ModalFormContainer :visible="visible"
+  <ModalForm :visible="visible"
                       :onExit="cancel"
                       title="Settings">
     <div class="form-body">
@@ -57,11 +57,12 @@
         Update
       </button>
     </div>
-  </ModalFormContainer>
+  </ModalForm>
 </template>
 
 <script setup lang="ts">
-import ModalFormContainer from '@/components/modal/ModalFormContainer.vue'
+import '@/assets/modal.css'
+import ModalForm from '@/components/modal/ModalForm.vue'
 import {
   computed,
   defineEmits,

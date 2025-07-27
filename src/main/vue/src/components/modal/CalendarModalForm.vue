@@ -1,5 +1,5 @@
 <template>
-  <ModalFormContainer :visible="visible" :onExit="exit">
+  <ModalForm :visible="visible" :onExit="exit">
       <div class="calendar">
         <div class="calendar-month">
           <button class="calendar-nav-button"
@@ -33,18 +33,17 @@
           </div>
         </div>
       </div>
-  </ModalFormContainer>
+  </ModalForm>
 </template>
 
 <script setup lang="ts">
-import ModalFormContainer from '@/components/modal/ModalFormContainer.vue'
+import ModalForm from '@/components/modal/ModalForm.vue'
 import { computed, defineEmits, ref } from 'vue'
 import { StudyStatus } from '@/models/calendar.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
 import { useCalendarDataStore } from '@/stores/calendar-data.ts'
 import { storeToRefs } from 'pinia'
-import type { Stage } from '@/core-logic/stage-logic.ts'
-import { asIsoDate } from '@/utils/date.ts';
+import { asIsoDate } from '@/utils/date.ts'
 
 defineProps({
   visible: Boolean

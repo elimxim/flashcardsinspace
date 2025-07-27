@@ -1,5 +1,5 @@
 <template>
-  <ModalFormContainer :visible="visible"
+  <ModalForm :visible="visible"
                       :onExit="cancel"
                       :title="editMode ? 'Edit flashcard' : 'New flashcard'">
     <div class="form-body">
@@ -59,11 +59,12 @@
         Create
       </button>
     </div>
-  </ModalFormContainer>
+  </ModalForm>
 </template>
 
 <script setup lang="ts">
 import '@/assets/modal.css'
+import ModalForm from '@/components/modal/ModalForm.vue'
 import {
   computed,
   defineEmits,
@@ -80,7 +81,6 @@ import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
 import { type Flashcard } from '@/models/flashcard.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
 import { newFlashcard, updateFlashcardSides } from '@/core-logic/flashcard-logic.ts'
-import ModalFormContainer from '@/components/modal/ModalFormContainer.vue';
 
 const props = defineProps({
   visible: Boolean,

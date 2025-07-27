@@ -1,5 +1,5 @@
 <template>
-  <ModalFormContainer :visible="visible"
+  <ModalForm :visible="visible"
                       :onExit="cancel"
                       title="New flashcard set">
     <div class="form-body">
@@ -47,12 +47,12 @@
         Create
       </button>
     </div>
-  </ModalFormContainer>
+  </ModalForm>
 </template>
 
 <script setup lang="ts">
-import ModalFormContainer from '@/components/modal/ModalFormContainer.vue'
 import '@/assets/modal.css'
+import ModalForm from '@/components/modal/ModalForm.vue'
 import { defineEmits, defineProps, onMounted, onUnmounted, type Ref, ref } from 'vue'
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
