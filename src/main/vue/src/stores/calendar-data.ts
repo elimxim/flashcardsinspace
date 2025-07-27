@@ -20,7 +20,7 @@ export const useCalendarDataStore = defineStore('calendar-data', {
   getters: {
     currLightDayStages(): Set<string> {
       return new Set(this.currLightDay.stages.map(v => v.name))
-    }
+    },
   },
   actions: {
     loadData() {
@@ -32,6 +32,17 @@ export const useCalendarDataStore = defineStore('calendar-data', {
     initCalendar(startDate: Date) {
 
     },
+    switchLightDay() {
+      const next = this.lightDays[this.currLightDay.seqNumber] as LightDay | undefined
+      if (next === undefined) {
+        throw new Error(
+          `Can't get next light day by index ${this.currLightDay.seqNumber}:
+          total number of days is ${this.lightDays.length}`
+        )
+      }
+
+      this.currLightDay = next
+    },
   }
 })
 
@@ -39,7 +50,7 @@ function testData(): LightspeedCalendar {
   const days: LightDay[] = []
   const startDate = new Date()
   startDate.setDate(startDate.getDate() - 19)
-  for (let i = 1; i <= 30; i++) {
+  for (let i = 1; i <= 60; i++) {
     const date = new Date(startDate)
     date.setDate(date.getDate() + i)
     let status = StudyStatus.COMPLETED
@@ -51,7 +62,7 @@ function testData(): LightspeedCalendar {
     days.push({
       isoDate: date.toISOString().split('T')[0],
       seqNumber: i,
-      stages: [stages.SEVENTH, stages.FIRST],
+      stages: [stages.SEVENTH, stages.SECOND, stages.THIRD, stages.FIRST],
       status: status,
     })
   }

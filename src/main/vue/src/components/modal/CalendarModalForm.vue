@@ -1,46 +1,53 @@
 <template>
   <ModalForm :visible="visible" :onExit="exit">
-      <div class="calendar">
-        <div class="calendar-month">
-          <button class="calendar-nav-button"
-                  @click="navigate(NavMonthDirection.PREV)">
-            <font-awesome-icon icon="fa-solid fa-angle-left"/>
-          </button>
-          <span>{{ formattedCurrMonth }}</span>
-          <button class="calendar-nav-button"
-                  @click="navigate(NavMonthDirection.NEXT)">
-            <font-awesome-icon icon="fa-solid fa-angle-right"/>
-          </button>
+    <div class="calendar">
+      <div class="calendar-month">
+        <button class="calendar-nav-button"
+                @click="navigate(NavMonthDirection.PREV)">
+          <font-awesome-icon icon="fa-solid fa-angle-left"/>
+        </button>
+        <span>{{ formattedCurrMonth }}</span>
+        <button class="calendar-nav-button"
+                @click="navigate(NavMonthDirection.NEXT)">
+          <font-awesome-icon icon="fa-solid fa-angle-right"/>
+        </button>
+      </div>
+      <div class="calendar-weekdays">
+        <div class="calendar-weekday"
+             v-for="day in weekdays"
+             :key="day">
+          {{ day }}
         </div>
-        <div class="calendar-weekdays">
-          <div class="calendar-weekday"
-               v-for="day in weekdays"
-               :key="day">
-            {{ day }}
+      </div>
+      <div class="calendar-dates">
+        <div class="calendar-day"
+             :class="day.cssClass"
+             v-for="day in monthDays"
+             :key="day.date">
+          <div class="calendar-day-number">
+            {{ day.number }}
           </div>
-        </div>
-        <div class="calendar-dates">
-          <div class="calendar-day"
-               :class="day.cssClass"
-               v-for="day in monthDays"
-               :key="day.date">
-            <div class="calendar-day-number">
-              {{ day.number }}
-            </div>
-            <div v-if="day.stages" class="calendar-day-stages">
-              {{ day.stages }}
-            </div>
+          <div v-if="day.stages" class="calendar-day-stages">
+            {{ day.stages }}
           </div>
         </div>
       </div>
+    </div>
+    <div class="calendar-bottom-nav">
+      <button class="modal-button modal-update-button"
+              ref="updateButton"
+              @click="switchCalendarDay">
+        Switch day
+      </button>
+    </div>
   </ModalForm>
 </template>
 
 <script setup lang="ts">
+import '@/assets/modal.css'
 import ModalForm from '@/components/modal/ModalForm.vue'
 import { computed, defineEmits, ref } from 'vue'
-import { StudyStatus } from '@/models/calendar.ts'
-import { useGlobalStateStore } from '@/stores/global-state.ts'
+import { type LightDay, StudyStatus } from '@/models/calendar.ts'
 import { useCalendarDataStore } from '@/stores/calendar-data.ts'
 import { storeToRefs } from 'pinia'
 import { asIsoDate } from '@/utils/date.ts'
@@ -53,7 +60,6 @@ const emit = defineEmits([
   'update:visible',
 ])
 
-const globalStateStore = useGlobalStateStore()
 const calendarDataStore = useCalendarDataStore()
 const { lightStartDate, currLightDay, lightDays } = storeToRefs(calendarDataStore)
 
@@ -103,13 +109,11 @@ const monthDays = computed(() => {
   for (let i = 1; i <= totalDaysInMonth; i++) {
     const date = new Date(year, month, i)
     const lightDay = lightDayMap.value.get(asIsoDate(date))
-    const isStartDay = asIsoDate(date) === lightStartDate.value
-    const isCurrDay = date.toDateString() === calendarCurrDate.value.toDateString()
 
     result.push({
       number: i,
       date: date.toDateString(),
-      cssClass: getCellCssClass(isStartDay, isCurrDay, lightDay?.status ?? null),
+      cssClass: getCellCssClass(date, lightDay),
       stages: (lightDay?.stages ?? []).map(v => v.order).toString(),
     })
   }
@@ -156,18 +160,16 @@ function navigate(direction: NavMonthDirection) {
   currMonth.value = newMonth
 }
 
-function getCellCssClass(
-  isStartDay: boolean,
-  isCurrDay: boolean,
-  status: StudyStatus | null
-): string {
-  if (isStartDay) {
+function getCellCssClass(date: Date, lightDay: LightDay | undefined): string {
+  if (asIsoDate(date) === lightStartDate.value) {
     return 'calendar-start-day'
-  } else if (isCurrDay) {
+  } else if (date.toDateString() === calendarCurrDate.value.toDateString()) {
     return 'calendar-current-day'
+  } else if (lightDay === undefined) {
+    return 'calendar-another-day'
   }
 
-  switch (status) {
+  switch (lightDay.status) {
     case StudyStatus.COMPLETED:
       return 'calendar-completed-day'
     case StudyStatus.IN_PROGRESS:
@@ -184,6 +186,11 @@ function getCellCssClass(
 function exit() {
   currMonth.value = calendarCurrDate.value
   emit('update:visible', false)
+}
+
+function switchCalendarDay() {
+  calendarDataStore.switchLightDay()
+  calendarCurrDate.value = new Date(currLightDay.value.isoDate)
 }
 
 </script>
@@ -275,5 +282,13 @@ function exit() {
 
 .calendar-day-stages {
   font-size: 0.8em;
+}
+
+.calendar-bottom-nav {
+  flex: 1;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  margin-top: 1em;
 }
 </style>

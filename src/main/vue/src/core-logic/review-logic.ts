@@ -6,16 +6,17 @@ import { storeToRefs } from 'pinia'
 
 export function findFlashcardsForReview(flashcards: Flashcard[]): Flashcard[] {
   const calendarDataStore = useCalendarDataStore()
-  const { currLightDay, currLightDayStages } = storeToRefs(calendarDataStore)
+  const currLightDay = calendarDataStore.currLightDay
+  const currLightDayStages = calendarDataStore.currLightDayStages
 
   return flashcards.filter(f => {
-    const isStageAvailable = currLightDayStages.value.has(f.stage)
+    const isStageAvailable = currLightDayStages.has(f.stage)
     if (f.stage === stages.FIRST.name) {
       return isStageAvailable
-        && !isUnknownFlashcard(f, currLightDay.value)
-        && !isAttemptedFlashcard(f, currLightDay.value)
+        && !isUnknownFlashcard(f, currLightDay)
+        && !isReviewedFlashcard(f, currLightDay)
     }
-    return isStageAvailable
+    return isStageAvailable && !isReviewedFlashcard(f, currLightDay)
   })
     .sort((a, b) => {
       if (a.stage !== b.stage) {
@@ -29,7 +30,7 @@ function isUnknownFlashcard(flashcard: Flashcard, lightDay: LightDay): boolean {
   return flashcard.createdAt === lightDay.isoDate
 }
 
-function isAttemptedFlashcard(flashcard: Flashcard, lightDay: LightDay): boolean {
+function isReviewedFlashcard(flashcard: Flashcard, lightDay: LightDay): boolean {
   return flashcard.reviewedAt === lightDay.isoDate
 }
 
@@ -44,7 +45,7 @@ export function flashcardsForStage(flashcards: Flashcard[], stage: Stage): Flash
   } else if (stage === specialStages.ATTEMPTED) {
     console.log('ATTEMPTED')
     return flashcards.filter(f =>
-      f.stage === stages.FIRST.name && isAttemptedFlashcard(f, currLightDay.value)
+      f.stage === stages.FIRST.name && isReviewedFlashcard(f, currLightDay.value)
     )
   }
 
@@ -61,11 +62,11 @@ export function countFlashcards(flashcards: Flashcard[], stage: Stage): number {
     ).length
   } else if (stage === specialStages.ATTEMPTED) {
     return flashcards.filter(f =>
-      f.stage === stages.FIRST.name && isAttemptedFlashcard(f, currLightDay.value)
+      f.stage === stages.FIRST.name && isReviewedFlashcard(f, currLightDay.value)
     ).length
   } else if (stage == stages.FIRST) {
     return flashcards.filter(f =>
-      f.stage === stages.FIRST.name && !isUnknownFlashcard(f, currLightDay.value) && !isAttemptedFlashcard(f, currLightDay.value)
+      f.stage === stages.FIRST.name && !isUnknownFlashcard(f, currLightDay.value) && !isReviewedFlashcard(f, currLightDay.value)
     ).length
   } else {
     return flashcards.filter(f => f.stage === stage.name).length
