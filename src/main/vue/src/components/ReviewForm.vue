@@ -4,7 +4,7 @@
         <span class="corner-text">
           {{ settings.topic }}
         </span>
-      <button class="modal-corner-button"
+      <button class="corner-button"
               ref="escapeButton"
               @click="finishReview">
         <font-awesome-icon icon="fa-solid fa-xmark"/>
@@ -22,7 +22,7 @@
                 {{ currFlashcard?.stage }}
               </span>
             <button id="flashcard-edit-button"
-                    class="modal-corner-button"
+                    class="corner-button"
                     ref="flashcardEditButton"
                     @click.stop="globalStateStore.toggleFlashcardEditModalForm()"
                     :disabled="reviewStateStore.isNoCardsForReview()"
@@ -359,7 +359,7 @@ function handleKeydown(event: KeyboardEvent) {
   cursor: default;
 }
 
-.modal-corner-button {
+.corner-button {
   border: none;
   outline: none;
   background: none;
@@ -368,7 +368,7 @@ function handleKeydown(event: KeyboardEvent) {
   color: #c5c5c5;
 }
 
-.modal-corner-button:hover {
+.corner-button:hover {
   color: #9f9f9f;
 }
 

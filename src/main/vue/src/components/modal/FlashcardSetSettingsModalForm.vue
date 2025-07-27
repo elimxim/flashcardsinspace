@@ -1,68 +1,67 @@
 <template>
-  <div v-if="visible" class="modal-overlay" role="dialog" tabindex="-1">
-    <div class="modal-window">
-      <h2 class="modal-title">Settings</h2>
-      <div class="modal-body">
-        <div class="modal-form-group-line">
-          <input class="modal-input"
-                 placeholder="Flashcard set name"
-                 v-model="flashcardSetName"/>
-          <span class="modal-error-message" v-if="$v.flashcardSetName.$errors.length">
+  <ModalFormContainer :visible="visible"
+                      :onExit="cancel"
+                      title="Settings">
+    <div class="form-body">
+      <div class="modal-vertical-group">
+        <input class="modal-input"
+               placeholder="Flashcard set name"
+               v-model="flashcardSetName"/>
+        <span class="modal-error-text" v-if="$v.flashcardSetName.$errors.length">
             Please don't forget to fill this out
           </span>
-        </div>
-        <div class="modal-form-group-line">
-          <div class="modal-form-group-row">
+      </div>
+      <div class="modal-vertical-group">
+        <div class="modal-horizontal-group">
             <span class="modal-icon modal-globe-icon">
               <font-awesome-icon icon="fa-solid fa-globe"/>
             </span>
-            <input class="modal-input" v-model="flashcardSetLanguage" disabled/>
-          </div>
+          <input class="modal-input" v-model="flashcardSetLanguage" disabled/>
         </div>
-        <div class="modal-form-group-line">
-          <label>
-            <input type="checkbox" v-model="flashcardSetDefault"/>
-            {{
-              flashcardSetDefault
-                ? "This flashcard set is set as the default"
-                : "Set this flashcard set as the default (it will appear first if you have more than one)"
-            }}
-          </label>
-        </div>
-        <div class="modal-message-container modal-warning-message-container"
-             v-if="removeConfirmation">
+      </div>
+      <div class="modal-vertical-group">
+        <label>
+          <input type="checkbox" v-model="flashcardSetDefault"/>
+          {{
+            flashcardSetDefault
+              ? "This flashcard set is set as the default"
+              : "Set this flashcard set as the default (it will appear first if you have more than one)"
+          }}
+        </label>
+      </div>
+      <div class="modal-message-group modal-warning"
+           v-if="removeConfirmation">
           <span class="modal-icon">
             <font-awesome-icon icon="fa-solid fa-triangle-exclamation"/></span>
-          <span class="modal-message-text">
+        <span class="modal-message-text">
             Are you sure you want to remove '{{ flashcardSet?.name }}'? All progress and flash cards will disappear
           </span>
-        </div>
-      </div>
-      <div class="modal-buttons">
-        <button class="modal-button modal-cancel-button"
-                ref="cancelButton"
-                @click="cancel">
-          Cancel
-        </button>
-        <button class="modal-button modal-remove-button"
-                ref="removeButton"
-                @click="remove">
-          Remove
-        </button>
-        <button class="modal-button modal-update-button"
-                :class="{ 'modal-button-disabled': !stateChanged }"
-                ref="updateButton"
-                :disabled="!stateChanged"
-                @click="update">
-          Update
-        </button>
       </div>
     </div>
-  </div>
-
+    <div class="modal-bottom">
+      <button class="modal-button modal-cancel-button"
+              ref="cancelButton"
+              @click="cancel">
+        Cancel
+      </button>
+      <button class="modal-button modal-remove-button"
+              ref="removeButton"
+              @click="remove">
+        Remove
+      </button>
+      <button class="modal-button modal-update-button"
+              :class="{ 'modal-button-disabled': !stateChanged }"
+              ref="updateButton"
+              :disabled="!stateChanged"
+              @click="update">
+        Update
+      </button>
+    </div>
+  </ModalFormContainer>
 </template>
 
 <script setup lang="ts">
+import ModalFormContainer from '@/components/modal/ModalFormContainer.vue'
 import {
   computed,
   defineEmits,
@@ -208,4 +207,12 @@ function handleKeydown(event: KeyboardEvent) {
 </script>
 
 <style scoped>
+.form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  min-width: 30vw;
+  width: 30vw;
+}
 </style>

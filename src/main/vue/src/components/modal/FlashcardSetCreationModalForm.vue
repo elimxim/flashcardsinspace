@@ -1,57 +1,57 @@
 <template>
-  <div class="modal-overlay" role="dialog" tabindex="-1" v-if="visible">
-    <div class="modal-window">
-      <h2 class="modal-title">New flashcard set</h2>
-      <div class="modal-body">
-        <div class="modal-form-group-line">
-          <input class="modal-input"
-                 v-model="flashcardSetName"
-                 placeholder="Flashcard set name"/>
-          <span class="modal-error-message" v-if="$v.flashcardSetName.$errors.length">
+  <ModalFormContainer :visible="visible"
+                      :onExit="cancel"
+                      title="New flashcard set">
+    <div class="form-body">
+      <div class="modal-vertical-group">
+        <input class="modal-input"
+               v-model="flashcardSetName"
+               placeholder="Flashcard set name"/>
+        <span class="modal-error-text" v-if="$v.flashcardSetName.$errors.length">
             Please don't forget to fill this out
           </span>
-        </div>
-        <div class="modal-form-group-line">
-          <div class="modal-form-group-row">
+      </div>
+      <div class="modal-vertical-group">
+        <div class="modal-horizontal-group">
             <span class="modal-icon modal-globe-icon">
               <font-awesome-icon icon="fa-solid fa-globe"/>
             </span>
-            <select class="modal-select" v-model="flashcardSetLanguage">
-              <option v-for="i in languages" :key="i.alpha2" :value="i">
-                {{ i.name }}
-              </option>
-            </select>
-          </div>
-          <span class="modal-error-message" v-if="$v.selectedLanguage.$errors.length">
+          <select class="modal-select" v-model="flashcardSetLanguage">
+            <option v-for="i in languages" :key="i.alpha2" :value="i">
+              {{ i.name }}
+            </option>
+          </select>
+        </div>
+        <span class="modal-error-text" v-if="$v.selectedLanguage.$errors.length">
               Please choose one of the languages
           </span>
-        </div>
-        <div class="modal-message-container modal-info-message-container">
+      </div>
+      <div class="modal-message-group modal-info">
             <span class="modal-icon">
               <font-awesome-icon icon="fa-solid fa-circle-info"/>
             </span>
-          <span class="modal-message-text">
+        <span class="modal-message-text">
               Please be careful. You will not be able to change the language in the future
           </span>
-        </div>
-      </div>
-      <div class="modal-buttons">
-        <button class="modal-button modal-cancel-button"
-                ref="cancelButton"
-                @click="cancel">
-          Cancel
-        </button>
-        <button class="modal-button modal-create-button"
-                ref="createButton"
-                @click="create">
-          Create
-        </button>
       </div>
     </div>
-  </div>
+    <div class="modal-bottom">
+      <button class="modal-button modal-cancel-button"
+              ref="cancelButton"
+              @click="cancel">
+        Cancel
+      </button>
+      <button class="modal-button modal-create-button"
+              ref="createButton"
+              @click="create">
+        Create
+      </button>
+    </div>
+  </ModalFormContainer>
 </template>
 
 <script setup lang="ts">
+import ModalFormContainer from '@/components/modal/ModalFormContainer.vue'
 import '@/assets/modal.css'
 import { defineEmits, defineProps, onMounted, onUnmounted, type Ref, ref } from 'vue'
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
@@ -65,7 +65,7 @@ import { storeToRefs } from 'pinia'
 import { useLanguageDataStore } from '@/stores/language-data.ts'
 import { useReviewStateStore } from '@/stores/review-state.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
-import { newFlashcardSet } from '@/core-logic/flashcard-logic.ts';
+import { newFlashcardSet } from '@/core-logic/flashcard-logic.ts'
 
 defineProps({
   visible: Boolean,
@@ -154,4 +154,12 @@ function handleKeydown(event: KeyboardEvent) {
 </script>
 
 <style scoped>
+.form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  min-width: 30vw;
+  width: 30vw;
+}
 </style>

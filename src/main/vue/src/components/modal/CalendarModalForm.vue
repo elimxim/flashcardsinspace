@@ -1,13 +1,5 @@
 <template>
-  <div class="modal-overlay" role="dialog" tabindex="-1" v-if="visible">
-    <div class="modal-window">
-      <div class="modal-top-row">
-        <button class="modal-corner-button"
-                @click="exit">
-          <font-awesome-icon icon="fa-solid fa-xmark"/>
-        </button>
-      </div>
-
+  <ModalFormContainer :visible="visible" :onExit="exit">
       <div class="calendar">
         <div class="calendar-month">
           <button class="calendar-nav-button"
@@ -41,11 +33,11 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
+  </ModalFormContainer>
 </template>
 
 <script setup lang="ts">
+import ModalFormContainer from '@/components/modal/ModalFormContainer.vue'
 import { computed, defineEmits, ref } from 'vue'
 import { StudyStatus } from '@/models/calendar.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'

@@ -1,68 +1,65 @@
 <template>
-  <div class="modal-overlay" role="dialog" tabindex="-1" v-if="visible">
-    <div class="modal-window">
-      <h2 class="modal-title">
-        {{ editMode ? 'Edit flashcard' : 'New flashcard' }}
-      </h2>
-      <div class="modal-body">
-        <div class="modal-form-group-line">
+  <ModalFormContainer :visible="visible"
+                      :onExit="cancel"
+                      :title="editMode ? 'Edit flashcard' : 'New flashcard'">
+    <div class="form-body">
+      <div class="modal-vertical-group">
           <textarea id="frontSide"
-                    class="modal-input modal-input-responsive "
-                    rows="3"
+                    class="modal-input"
+                    rows="6"
                     placeholder="Front side"
                     v-model="flashcardFrontSide"/>
-          <span class="modal-error-message" v-if="$v.frontSide.$errors.length">
+        <span class="modal-error-text" v-if="$v.frontSide.$errors.length">
             Please don't forget to fill this out
           </span>
-        </div>
-        <div class="modal-form-group-line">
+      </div>
+      <div class="modal-vertical-group">
           <textarea id="backSide"
-                    class="modal-input modal-input-responsive "
-                    rows="3"
+                    class="modal-input"
+                    rows="6"
                     placeholder="Back side"
                     v-model="flashcardBackSide"/>
-          <span class="modal-error-message" v-if="$v.backSide.$errors.length">
+        <span class="modal-error-text" v-if="$v.backSide.$errors.length">
             Please don't forget to fill this out
           </span>
-        </div>
-        <div class="modal-message-container modal-warning-message-container"
-             v-if="removeConfirmation">
+      </div>
+      <div class="modal-message-group modal-warning"
+           v-if="removeConfirmation">
           <span class="modal-icon">
             <font-awesome-icon icon="fa-solid fa-triangle-exclamation"/></span>
-          <span class="modal-message-text">
+        <span class="modal-message-text">
             Are you sure you want to remove this flashcard?
           </span>
-        </div>
-      </div>
-      <div class="modal-buttons">
-        <button class="modal-button modal-cancel-button"
-                ref="cancelButton"
-                @click="cancel">
-          Cancel
-        </button>
-        <button class="modal-button modal-remove-button"
-                ref="removeButton"
-                v-if="editMode"
-                @click="remove">
-          Remove
-        </button>
-        <button class="modal-button modal-update-button"
-                :class="{ 'modal-button-disabled': !stateChanged }"
-                ref="updateButton"
-                v-if="editMode"
-                :disabled="!stateChanged"
-                @click="update">
-          Update
-        </button>
-        <button class="modal-button modal-create-button"
-                ref="createButton"
-                v-if="!editMode"
-                @click="create">
-          Create
-        </button>
       </div>
     </div>
-  </div>
+    <div class="modal-bottom">
+      <button class="modal-button modal-cancel-button"
+              ref="cancelButton"
+              @click="cancel">
+        Cancel
+      </button>
+      <button class="modal-button modal-remove-button"
+              ref="removeButton"
+              v-if="editMode"
+              @click="remove">
+        Remove
+      </button>
+      <button class="modal-button modal-update-button"
+              :class="{ 'modal-button-disabled': !stateChanged }"
+              ref="updateButton"
+              v-if="editMode"
+              :disabled="!stateChanged"
+              @click="update">
+        Update
+      </button>
+      <button class="modal-button modal-create-button"
+              ref="createButton"
+              v-if="!editMode"
+              @click="create">
+        Create
+      </button>
+    </div>
+  </ModalFormContainer>
 </template>
 
 <script setup lang="ts">
@@ -83,6 +80,7 @@ import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
 import { type Flashcard } from '@/models/flashcard.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
 import { newFlashcard, updateFlashcardSides } from '@/core-logic/flashcard-logic.ts'
+import ModalFormContainer from '@/components/modal/ModalFormContainer.vue';
 
 const props = defineProps({
   visible: Boolean,
@@ -256,4 +254,12 @@ function handleKeydown(event: KeyboardEvent) {
 </script>
 
 <style scoped>
+.form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  min-width: 30vw;
+  width: 30vw;
+}
 </style>
