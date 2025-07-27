@@ -21,13 +21,13 @@
       </div>
       <div class="calendar-dates">
         <div class="calendar-day"
-             :class="day.cssClass"
+             :class="cellClass(day)"
              v-for="day in monthDays"
              :key="day.date">
           <div class="calendar-day-number">
             {{ day.number }}
           </div>
-          <div v-if="day.stages" class="calendar-day-stages">
+          <div v-if="day.isCurrMonth && day.stages !== null" class="calendar-day-stages">
             {{ day.stages }}
           </div>
         </div>
@@ -68,20 +68,21 @@ const { lightStartDate, currLightDay, lightDays } = storeToRefs(calendarDataStor
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 const lightDayMap = ref(new Map(lightDays.value.map(day => [day.isoDate, day])))
-const calendarCurrDate = ref(new Date(currLightDay.value.isoDate))
+const currDate = ref(new Date(currLightDay.value.isoDate))
 
 interface CalendarDay {
   number: number
   date: string
-  cssClass: string
-  stages: string
+  status: StudyStatus | null
+  stages: string | null
+  isCurrMonth: boolean
+  isStartDay: boolean
+  isCurrDay: boolean
 }
 
-const currMonth = ref(calendarCurrDate.value)
-
 const monthDays = computed(() => {
-  const year = currMonth.value.getFullYear()
-  const month = currMonth.value.getMonth()
+  const year = currDate.value.getFullYear()
+  const month = currDate.value.getMonth()
 
   const firstMonthDay = new Date(year, month, 1)
   const firstWeekDay = firstMonthDay.getDay()
@@ -98,8 +99,11 @@ const monthDays = computed(() => {
     result.push({
       number: date.getDate(),
       date: date.toDateString(),
-      cssClass: 'calendar-empty-day',
-      stages: (lightDay?.stages ?? []).map(v => v.order).toString(),
+      status: null,
+      stages: lightDay?.stages.map(v => v.order).toString() ?? null,
+      isCurrMonth: false,
+      isStartDay: false,
+      isCurrDay: false,
     })
   }
 
@@ -113,8 +117,11 @@ const monthDays = computed(() => {
     result.push({
       number: i,
       date: date.toDateString(),
-      cssClass: getCellCssClass(date, lightDay),
-      stages: (lightDay?.stages ?? []).map(v => v.order).toString(),
+      status: lightDay?.status ?? null,
+      stages: lightDay?.stages.map(v => v.order).toString() ?? null,
+      isCurrMonth: true,
+      isStartDay: asIsoDate(date) === lightStartDate.value,
+      isCurrDay: date.toDateString() === currDate.value.toDateString(),
     })
   }
 
@@ -131,8 +138,11 @@ const monthDays = computed(() => {
     result.push({
       number: i,
       date: date.toDateString(),
-      cssClass: 'calendar-empty-day',
-      stages: (lightDay?.stages ?? []).map(v => v.order).toString(),
+      status: null,
+      stages: lightDay?.stages.map(v => v.order).toString() ?? null,
+      isCurrMonth: false,
+      isStartDay: false,
+      isCurrDay: false,
     })
   }
 
@@ -145,31 +155,31 @@ function totalDays(year: number, month: number): number {
 
 const dateFormatter = new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' })
 const formattedCurrMonth = computed(() => {
-  return dateFormatter.format(currMonth.value)
+  return dateFormatter.format(currDate.value)
 })
 
 enum NavMonthDirection { NEXT, PREV }
 
 function navigate(direction: NavMonthDirection) {
-  const newMonth = new Date(currMonth.value)
+  const newMonth = new Date(currDate.value)
   if (direction === NavMonthDirection.PREV) {
-    newMonth.setMonth(currMonth.value.getMonth() - 1)
+    newMonth.setMonth(currDate.value.getMonth() - 1)
   } else {
-    newMonth.setMonth(currMonth.value.getMonth() + 1)
+    newMonth.setMonth(currDate.value.getMonth() + 1)
   }
-  currMonth.value = newMonth
+  currDate.value = newMonth
 }
 
-function getCellCssClass(date: Date, lightDay: LightDay | undefined): string {
-  if (asIsoDate(date) === lightStartDate.value) {
+function cellClass(day: CalendarDay): string {
+  if (!day.isCurrMonth) {
+    return 'calendar-empty-day'
+  } if (day.isStartDay) {
     return 'calendar-start-day'
-  } else if (date.toDateString() === calendarCurrDate.value.toDateString()) {
+  } else if (day.isCurrDay) {
     return 'calendar-current-day'
-  } else if (lightDay === undefined) {
-    return 'calendar-another-day'
   }
 
-  switch (lightDay.status) {
+  switch (day?.status) {
     case StudyStatus.COMPLETED:
       return 'calendar-completed-day'
     case StudyStatus.IN_PROGRESS:
@@ -184,13 +194,12 @@ function getCellCssClass(date: Date, lightDay: LightDay | undefined): string {
 // <calendar
 
 function exit() {
-  currMonth.value = calendarCurrDate.value
   emit('update:visible', false)
 }
 
 function switchCalendarDay() {
   calendarDataStore.switchLightDay()
-  calendarCurrDate.value = new Date(currLightDay.value.isoDate)
+  currDate.value = new Date(currLightDay.value.isoDate)
 }
 
 </script>

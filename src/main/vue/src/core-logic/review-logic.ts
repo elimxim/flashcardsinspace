@@ -20,9 +20,9 @@ export function findFlashcardsForReview(flashcards: Flashcard[]): Flashcard[] {
   })
     .sort((a, b) => {
       if (a.stage !== b.stage) {
-        return getStage(a.stage).order - getStage(b.stage).order
+        return getStage(b.stage).order - getStage(a.stage).order
       }
-      return a.id - b.id
+      return b.id - a.id
     })
 }
 
