@@ -26,6 +26,7 @@ class AuthService(
     // todo signup journal
     // todo more logs
     fun signUp(request: SignUpRequest): User {
+        // todo validate request fields
         if (userRepository.findByEmail(request.email).isPresent) {
             log.error("Email {} is already taken", request.email)
             throw IllegalArgumentException("Email already exists")

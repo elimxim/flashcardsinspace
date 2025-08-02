@@ -1,19 +1,19 @@
 <template>
-  <!-- todo more user friendly message -->
-  <p>You've been logged out</p>
+  <!-- todo show something more here -->
+  <div style="font-size: 10em; text-align: center;">
+    <font-awesome-icon icon="fa-solid fa-circle-user"/>
+  </div>
 </template>
+
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth-state.ts'
-import { routeNames } from '@/router/index.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-authStore.logout()
-
-// router.push({ name: routeNames.login })
+// todo logout button
 </script>
 
 <style scoped>

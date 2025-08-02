@@ -27,6 +27,8 @@ data class User(
 
     @Column(nullable = false)
     var registeredAt: ZonedDateTime,
+
+    // todo more field?
 ) : UserDetails {
     override fun getAuthorities(): Collection<GrantedAuthority> =
         roles.split(",").map { SimpleGrantedAuthority(it.trim()) }

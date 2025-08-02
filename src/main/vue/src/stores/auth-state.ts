@@ -23,6 +23,7 @@ export const useAuthStore = defineStore('auth', {
         const response = await apiClient.get<User>('/users/me')
         this.user = response.data
       } catch (error) {
+        console.error('Failed to log in: ', error)
         this.user = null
       }
     },
@@ -30,7 +31,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         await apiClient.post('/auth/logout')
       } catch (error) {
-        // todo deal with that
+        console.error('Failed to log out: ', error)
       }
       this.user = null
     },

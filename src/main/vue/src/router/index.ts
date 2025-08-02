@@ -10,6 +10,8 @@ import LeitnerView from '@/views/LeitnerView.vue'
 // @ts-ignore
 import SupportView from '@/views/SupportView.vue'
 // @ts-ignore
+import UserView from '@/views/UserView.vue'
+// @ts-ignore
 import SignupView from '@/views/auth/SignupView.vue'
 // @ts-ignore
 import LoginView from '@/views/auth/LoginView.vue'
@@ -18,48 +20,74 @@ import LogoutView from '@/views/auth/LogoutView.vue'
 // @ts-ignore
 import PasswordResetView from '@/views/auth/PasswordResetView.vue'
 
+export const routeNames = {
+  base: 'base',
+  home: 'home',
+  flashcards: 'flashcards',
+  leitner: 'leitner',
+  user: 'user',
+  support: 'support',
+  signup: 'signup',
+  login: 'login',
+  logout: 'logout',
+  passwordReset: 'passwordReset',
+}
+
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    name: routeNames.base,
+    redirect: { name: routeNames.home },
   },
   {
     path: '/flashcards',
-    name: 'flashcards',
+    name: routeNames.flashcards,
     component: FlashcardsView,
     meta: {
       requiresAuth: true,
-    }
+    },
+  },
+  {
+    path: '/home',
+    name: routeNames.home,
+    component: HomeView
   },
   {
     path: '/leitner',
-    name: 'leitner',
+    name: routeNames.leitner,
     component: LeitnerView
   },
   {
     path: '/support',
-    name: 'support',
+    name: routeNames.support,
     component: SupportView
   },
   {
+    path: '/user',
+    name: routeNames.user,
+    component: UserView,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: '/signup',
-    name: 'signup',
+    name: routeNames.signup,
     component: SignupView,
   },
   {
     path: '/login',
-    name: 'login',
+    name: routeNames.login,
     component: LoginView,
   },
   {
     path: '/logout',
-    name: 'logout',
+    name: routeNames.logout,
     component: LogoutView,
   },
   {
     path: '/password-reset',
-    name: 'passwordReset',
+    name: routeNames.passwordReset,
     component: PasswordResetView,
   },
 ]
@@ -74,7 +102,7 @@ router.beforeEach(async (to, from, next) => {
   const { isAuthenticated } = storeToRefs(authStore)
 
   if (to.meta.requiresAuth && !isAuthenticated.value) {
-    next({ name: 'signup' })
+    next({ name: routeNames.signup })
   } else {
     next()
   }

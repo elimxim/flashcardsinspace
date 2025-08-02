@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(
     private val userService: UserService,
 ) {
-
     @GetMapping("/me")
     fun getMe(@AuthenticationPrincipal userDetails: UserDetails): ResponseEntity<UserDto> {
         val user = userService.findByEmail(userDetails.username)

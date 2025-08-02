@@ -22,6 +22,7 @@ class AuthController(
     private val jwtService: JwtService,
 ) {
     // todo log every request to the requests.log
+
     @PostMapping("/signup")
     fun signup(
         @Valid @RequestBody request: SignUpRequest, // todo unified error handler instead of @Valid
@@ -46,6 +47,8 @@ class AuthController(
         jwtService.setCookies(user, response)
         return ResponseEntity.ok(JwtAuthResponse(user.toDto()))
     }
+
+    // todo password reset
 
     @PostMapping("/logout")
     fun logout(response: HttpServletResponse): ResponseEntity<Unit> {

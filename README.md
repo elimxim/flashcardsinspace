@@ -4,8 +4,11 @@ TODOS:
 - logging
 - indexable for robots
 - review flashcards from other skipped days
-- get rid of the left vertical menu bar
-- logo
-- user settings
-- user page
+- logo and theme
+- log in page => sign up page
+- log in page => password reset page
+- password reset functionality
+- menu bar => flash cards page
+- remember if signed up using cookie
+- refresh JWT token support on the frontend
 - etc

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
 
+// todo SMTP server and account
 //@Service
 class EmailService(
     private val mailSender: JavaMailSender,

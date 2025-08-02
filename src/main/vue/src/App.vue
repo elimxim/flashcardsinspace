@@ -8,27 +8,27 @@
 
       <ul class="nav-items">
         <li :hidden="!isAuthenticated">
-          <router-link :to="{ name: 'flashcards' }">
+          <router-link :to="{ name: routeNames.flashcards }">
             Flashcards
           </router-link>
         </li>
         <li>
-          <router-link :to="{ name: 'home' }">
+          <router-link :to="{ name: routeNames.home }">
             Home
           </router-link>
         </li>
         <li>
-          <router-link :to="{ name: 'leitner' }">
+          <router-link :to="{ name: routeNames.leitner }">
             Leitner
           </router-link>
         </li>
         <li>
-          <router-link :to="{ name: 'support' }">
+          <router-link :to="{ name: routeNames.support }">
             Support
           </router-link>
         </li>
         <li class="nav-user">
-          <router-link :to="{ name: 'signup' }">
+          <router-link :to="{ name: routeNames.user }">
             <font-awesome-icon icon="fa-solid fa-circle-user"/>
           </router-link>
         </li>
@@ -46,6 +46,7 @@ import { useCalendarDataStore } from '@/stores/calendar-data.ts'
 import { useAuthStore } from '@/stores/auth-state.ts'
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { routeNames } from '@/router'
 
 const authStore = useAuthStore()
 const flashcardDataStore = useFlashcardDataStore()
