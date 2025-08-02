@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import type { AuthState } from '@/models/state.ts'
 import type { User } from '@/models/user.ts'
 import apiClient from '@/api/api-client.ts'
+import { email } from '@vuelidate/validators';
+import type { UserResponse } from '@/api/api-dto.ts';
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => {
@@ -15,25 +17,38 @@ export const useAuthStore = defineStore('auth', {
     }
   },
   actions: {
-    setUser(user: User) {
+    setUser(user: User | null) {
       this.user = user
     },
-    async login() {
-      try {
-        const response = await apiClient.get<User>('/users/me')
-        this.user = response.data
-      } catch (error) {
-        console.error('Failed to log in: ', error)
-        this.user = null
-      }
+    async signup(name: string, email: string, password: string) {
+      const response = await apiClient.post<UserResponse>('/auth/signup', {
+        email: email,
+        secret: password,
+        name: name,
+      })
+      this.setUser(response.data.user)
+    },
+    async login(email: string, password: string) {
+      const response = await apiClient.post<UserResponse>('/auth/login', {
+        email: email,
+        secret: password,
+      })
+      this.setUser(response.data.user)
     },
     async logout() {
-      try {
-        await apiClient.post('/auth/logout')
-      } catch (error) {
-        console.error('Failed to log out: ', error)
+      await apiClient.post('/auth/logout')
+      this.setUser(null)
+    },
+    async updateJwt() {
+      const response = await apiClient.get<UserResponse>('/users/me', {
+        validateStatus: () => true,
+      })
+
+      if (response.status === 200) {
+        this.setUser(response.data.user)
+      } else {
+        this.setUser(null)
       }
-      this.user = null
     },
   }
 })

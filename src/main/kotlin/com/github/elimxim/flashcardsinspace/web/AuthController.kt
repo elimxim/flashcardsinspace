@@ -1,6 +1,6 @@
 package com.github.elimxim.flashcardsinspace.web
 
-import com.github.elimxim.flashcardsinspace.web.dto.JwtAuthResponse
+import com.github.elimxim.flashcardsinspace.web.dto.UserResponse
 import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
 import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
@@ -27,11 +27,11 @@ class AuthController(
     fun signup(
         @Valid @RequestBody request: SignUpRequest, // todo unified error handler instead of @Valid
         response: HttpServletResponse,
-    ): ResponseEntity<JwtAuthResponse> {
+    ): ResponseEntity<UserResponse> {
         return try {
             val user = authService.signUp(request)
             jwtService.setCookies(user, response)
-            ResponseEntity.ok(JwtAuthResponse(user.toDto()))
+            ResponseEntity.ok(UserResponse(user.toDto()))
         } catch (e: IllegalArgumentException) { // todo use specific exception class
             // todo send an error
             ResponseEntity.badRequest().build()
@@ -42,10 +42,10 @@ class AuthController(
     fun login(
         @Valid @RequestBody request: LoginRequest,
         response: HttpServletResponse,
-    ): ResponseEntity<JwtAuthResponse> {
+    ): ResponseEntity<UserResponse> {
         val user = authService.login(request)
         jwtService.setCookies(user, response)
-        return ResponseEntity.ok(JwtAuthResponse(user.toDto()))
+        return ResponseEntity.ok(UserResponse(user.toDto()))
     }
 
     // todo password reset
@@ -61,9 +61,9 @@ class AuthController(
     fun refresh(
         @CookieValue(name = "refreshToken") refreshToken: String,
         response: HttpServletResponse,
-    ): ResponseEntity<JwtAuthResponse> {
+    ): ResponseEntity<UserResponse> {
         val user = authService.refreshToken(refreshToken)
         jwtService.setCookies(user, response)
-        return ResponseEntity.ok(JwtAuthResponse(user.toDto()))
+        return ResponseEntity.ok(UserResponse(user.toDto()))
     }
 }

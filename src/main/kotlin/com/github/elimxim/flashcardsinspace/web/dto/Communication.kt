@@ -14,7 +14,7 @@ data class LoginRequest(
     @field:NotBlank val secret: String
 )
 
-data class JwtAuthResponse(
+data class UserResponse(
     val user: UserDto
 )
 

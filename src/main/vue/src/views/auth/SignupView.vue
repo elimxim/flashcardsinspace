@@ -37,22 +37,8 @@ const confirmPassword = ref('')
 
 async function signup() {
   try {
-    const response = await apiClient.post('/auth/signup', {
-      email: email.value,
-      secret: password.value,
-      name: name.value,
-    })
-
-    const user: User = {
-      id: response.data.id,
-      email: response.data.email,
-      name: response.data.name,
-      registeredAt: response.data.registeredAt,
-    }
-
-    authStore.setUser(user)
-
-    console.log('Successfully signed up: ', response.data.id)
+    await authStore.signup(name.value, email.value, password.value)
+    console.log('Successfully signed up: ', authStore.user?.id)
     await router.push({ name: routeNames.flashcards })
   } catch (error) {
     // todo show the error to the user

@@ -26,19 +26,8 @@ const password = ref('')
 
 async function handleLogin() {
   try {
-    const response = await apiClient.post('/auth/login', {
-      email: email.value,
-      secret: password.value,
-    })
-
-    authStore.setUser({
-      id: response.data.id,
-      email: response.data.email,
-      name: response.data.name,
-      registeredAt: response.data.registeredAt,
-    })
-
-    console.log('Successfully logged in: ', response.data.id)
+    await authStore.login(email.value, password.value)
+    console.log('Successfully logged in: ', authStore.user?.id)
     await router.push({ name: routeNames.flashcards })
   } catch (error) {
     // todo show the error to the user

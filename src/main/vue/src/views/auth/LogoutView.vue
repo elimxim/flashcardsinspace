@@ -11,7 +11,11 @@ import { routeNames } from '@/router/index.ts'
 const router = useRouter()
 const authStore = useAuthStore()
 
-authStore.logout()
+try {
+  authStore.logout()
+} catch (error) {
+  console.error('Failed to log out: ', error)
+}
 
 // router.push({ name: routeNames.login })
 </script>

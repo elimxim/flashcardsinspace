@@ -40,7 +40,7 @@ app.use(createPinia())
 
 const authStore = useAuthStore()
 
-authStore.login().then(() => {
+authStore.updateJwt().then(() => {
   app.use(router)
   app.mount('#app')
 })
