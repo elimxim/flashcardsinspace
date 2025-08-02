@@ -1,4 +1,4 @@
-import type { Language } from '@/models/language.ts'
+import type { Language } from '@/model/language.ts'
 import { defineStore } from 'pinia'
 
 export const useLanguageDataStore = defineStore('language-data', {

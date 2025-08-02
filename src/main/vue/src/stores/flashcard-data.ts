@@ -1,7 +1,7 @@
-import { type FlashcardSet } from '@/models/flashcard.ts'
-import { type User } from '@/models/user.ts'
+import { type FlashcardSet } from '@/model/flashcard.ts'
+import { type User } from '@/model/user.ts'
 import { defineStore } from 'pinia'
-import type { FlashcardData } from '@/models/state.ts'
+import type { FlashcardData } from '@/model/state.ts'
 import { stages } from '@/core-logic/stage-logic.ts';
 import { today, asIsoDate, yesterday, minusDays } from '@/utils/date';
 

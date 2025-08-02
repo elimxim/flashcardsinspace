@@ -1,6 +1,6 @@
-import { type Flashcard, type FlashcardSet, type ReviewInfo } from '@/models/flashcard.ts'
+import { type Flashcard, type FlashcardSet, type ReviewInfo } from '@/model/flashcard.ts'
 import { type Stage, stages } from '@/core-logic/stage-logic.ts'
-import type { Language } from '@/models/language.ts'
+import type { Language } from '@/model/language.ts'
 import { useCalendarDataStore } from '@/stores/calendar-data.ts'
 import { storeToRefs } from 'pinia'
 

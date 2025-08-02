@@ -1,4 +1,4 @@
-import type { User } from '@/models/user.ts'
+import type { User } from '@/model/user.ts'
 
 export interface UserResponse {
   user: User

@@ -22,7 +22,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-state.js"
 import { routeNames } from "@/router/index.js"
-import { type User } from '@/models/user.ts'
+import { type User } from '@/model/user.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()

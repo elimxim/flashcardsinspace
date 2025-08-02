@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { useReviewStateStore } from '@/stores/review-state'
-import { type GlobalState } from '@/models/state.ts'
+import { type GlobalState } from '@/model/state.ts'
 
 export const useGlobalStateStore = defineStore('global-state', {
   state: (): GlobalState => {

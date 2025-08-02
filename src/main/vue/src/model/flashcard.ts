@@ -1,4 +1,4 @@
-import type { Language } from '@/models/language.ts'
+import type { Language } from '@/model/language.ts'
 
 export interface ReviewInfo {
   stage: string

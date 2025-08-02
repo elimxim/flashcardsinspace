@@ -1,5 +1,5 @@
-import type { Flashcard, FlashcardSet } from '@/models/flashcard.ts'
-import type { User } from '@/models/user.ts'
+import type { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
+import type { User } from '@/model/user.ts'
 
 export interface FlashcardData {
   flashcardSets: FlashcardSet[]

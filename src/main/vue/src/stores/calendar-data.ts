@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { type LightspeedCalendar, type LightDay, StudyStatus } from '@/models/calendar.ts'
+import { type LightspeedCalendar, type LightDay, StudyStatus } from '@/model/calendar.ts'
 import { type Stage, stages } from '@/core-logic/stage-logic.ts'
 import { asIsoDate } from '@/utils/date.ts'
 

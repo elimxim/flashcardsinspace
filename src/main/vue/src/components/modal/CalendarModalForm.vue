@@ -47,7 +47,7 @@
 import '@/assets/modal.css'
 import ModalForm from '@/components/modal/ModalForm.vue'
 import { computed, defineEmits, ref } from 'vue'
-import { type LightDay, StudyStatus } from '@/models/calendar.ts'
+import { type LightDay, StudyStatus } from '@/model/calendar.ts'
 import { useCalendarDataStore } from '@/stores/calendar-data.ts'
 import { storeToRefs } from 'pinia'
 import { asIsoDate } from '@/utils/date.ts'

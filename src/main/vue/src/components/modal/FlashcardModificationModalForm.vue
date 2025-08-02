@@ -78,7 +78,7 @@ import {
 import { useVuelidate } from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
 import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
-import { type Flashcard } from '@/models/flashcard.ts'
+import { type Flashcard } from '@/model/flashcard.ts'
 import { useGlobalStateStore } from '@/stores/global-state.ts'
 import { newFlashcard, updateFlashcardSides } from '@/core-logic/flashcard-logic.ts'
 

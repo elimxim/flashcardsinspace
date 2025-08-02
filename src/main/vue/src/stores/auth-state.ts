@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import type { AuthState } from '@/models/state.ts'
-import type { User } from '@/models/user.ts'
+import type { AuthState } from '@/model/state.ts'
+import type { User } from '@/model/user.ts'
 import apiClient from '@/api/api-client.ts'
 import { email } from '@vuelidate/validators';
 import type { UserResponse } from '@/api/api-dto.ts';

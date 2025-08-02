@@ -1,7 +1,7 @@
-import { type Flashcard } from '@/models/flashcard.ts'
+import { type Flashcard } from '@/model/flashcard.ts'
 import { type Stage, getStage, stages, specialStages } from '@/core-logic/stage-logic.ts'
 import { useCalendarDataStore } from '@/stores/calendar-data.ts'
-import type { LightDay } from '@/models/calendar.ts'
+import type { LightDay } from '@/model/calendar.ts'
 import { storeToRefs } from 'pinia'
 
 export function findFlashcardsForReview(flashcards: Flashcard[]): Flashcard[] {
