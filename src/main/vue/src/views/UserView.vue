@@ -18,8 +18,8 @@ const authStore = useAuthStore()
 
 <style scoped>
 .user-container {
+  height: 92vh;
   display: flex;
-  height: 100vh;
   flex-direction: column;
   justify-content: center;
   align-items: center;

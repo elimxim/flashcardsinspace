@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="flashcards-container">
     <div class="menu-area">
       <MainMenu/>
     </div>
@@ -32,9 +32,10 @@ onBeforeRouteLeave((to, from, next) => {
 </script>
 
 <style scoped>
-.app-container {
+.flashcards-container {
   display: flex;
   flex-direction: row;
+  min-height: 92vh;
 }
 
 .menu-area {

@@ -64,16 +64,24 @@ onMounted(() => {
 
 <style scoped>
 .app-container {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  height: 100vh;
 }
 
 .navbar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   justify-content: space-between;
   background-color: #707070;
-  padding: 10px;
+  padding: 1vh;
+  min-height: 6vh;
+  height: 6vh;
+  max-height: 6vh;
 }
 
 .nav-items {

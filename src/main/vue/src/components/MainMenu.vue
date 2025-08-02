@@ -1,5 +1,5 @@
 <template>
-  <div class="menu-area">
+  <div class="menu-container">
     <ul class="menu-list">
       <li class="menu-item menu-select-item">
         <select class="menu-select"
@@ -146,7 +146,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.menu-area {
+.menu-container {
   flex: 1;
   display: flex;
   padding: 4px;
