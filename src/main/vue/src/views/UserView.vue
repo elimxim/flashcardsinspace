@@ -1,6 +1,6 @@
 <template>
   <!-- todo show something more here -->
-  <div style="font-size: 10em; text-align: center;">
+  <div class="user-container">
     <font-awesome-icon icon="fa-solid fa-circle-user"/>
   </div>
 </template>
@@ -17,4 +17,14 @@ const authStore = useAuthStore()
 </script>
 
 <style scoped>
+.user-container {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 20em;
+  color: #d6d6d6;
+}
+
 </style>
