@@ -7,17 +7,30 @@
       </div>
 
       <ul class="nav-items">
-        <li>
-          <router-link :to="{ name: 'home' }">Home</router-link>
+        <li :hidden="!isAuthenticated">
+          <router-link :to="{ name: 'flashcards' }">
+            Flashcards
+          </router-link>
         </li>
         <li>
-          <router-link :to="{ name: 'flashcards' }">Flashcards</router-link>
+          <router-link :to="{ name: 'home' }">
+            Home
+          </router-link>
         </li>
         <li>
-          <router-link :to="{ name: 'leitner' }">Leitner</router-link>
+          <router-link :to="{ name: 'leitner' }">
+            Leitner
+          </router-link>
         </li>
         <li>
-          <router-link :to="{ name: 'support' }">Support</router-link>
+          <router-link :to="{ name: 'support' }">
+            Support
+          </router-link>
+        </li>
+        <li class="nav-user">
+          <router-link :to="{ name: 'signup' }">
+            <font-awesome-icon icon="fa-solid fa-circle-user"/>
+          </router-link>
         </li>
       </ul>
     </nav>
@@ -30,11 +43,16 @@ import '@/assets/main.css'
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
 import { useLanguageDataStore } from '@/stores/language-data.ts'
 import { useCalendarDataStore } from '@/stores/calendar-data.ts'
+import { useAuthStore } from '@/stores/auth-state.ts'
 import { onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 
+const authStore = useAuthStore()
 const flashcardDataStore = useFlashcardDataStore()
 const languageDataStore = useLanguageDataStore()
 const calendarDataStore = useCalendarDataStore()
+
+const { isAuthenticated } = storeToRefs(authStore)
 
 onMounted(() => {
   flashcardDataStore.loadData()
@@ -50,24 +68,21 @@ onMounted(() => {
   height: 100vh;
 }
 
-/* Style the navbar */
 .navbar {
   display: flex;
-  justify-content: space-between; /* Spread items to sides */
-  align-items: center;
+  justify-content: space-between;
   background-color: #707070;
   padding: 10px;
 }
 
-/* Navigation items aligned to the left, but in this layout, they stay on the left by default */
 .nav-items {
   display: flex;
   list-style-type: none;
+  align-items: center;
   margin: 0;
   padding: 0;
 }
 
-/* Style links */
 .nav-items li {
   margin-right: 15px;
 }
@@ -82,18 +97,22 @@ onMounted(() => {
   text-decoration: underline;
 }
 
+.nav-user {
+  font-size: 1.6em;
+}
+
 .logo-container {
   display: flex;
   align-items: center;
 }
 
 .logo-image {
-  height: 50px; /* Adjust size as needed */
-  margin-right: 10px; /* Space between logo and text */
+  height: 2em;
+  margin-right: 10px;
 }
 
 .title-text {
-  font-size: 2em; /* Make it bigger */
+  font-size: 1.5em;
   color: white;
   font-weight: bold;
 }

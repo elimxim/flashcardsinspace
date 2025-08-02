@@ -1,0 +1,19 @@
+package com.github.elimxim.flashcardsinspace.web.dto
+
+import jakarta.validation.constraints.NotBlank
+
+data class SignUpRequest(
+    @field:NotBlank val email: String,
+    @field:NotBlank val secret: String,
+    @field:NotBlank val name: String,
+)
+
+data class LoginRequest(
+    @field:NotBlank val email: String,
+    @field:NotBlank val secret: String
+)
+
+data class JwtAuthResponse(
+    val user: UserDto
+)
+

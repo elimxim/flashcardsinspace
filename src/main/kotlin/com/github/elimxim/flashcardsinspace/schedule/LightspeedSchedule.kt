@@ -1,4 +1,4 @@
-package com.github.elimxim.flashcardsinspace
+package com.github.elimxim.flashcardsinspace.schedule
 
 import com.github.elimxim.flashcardsinspace.entity.Stage
 import kotlin.collections.joinToString

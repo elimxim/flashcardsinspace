@@ -1,0 +1,66 @@
+package com.github.elimxim.flashcardsinspace.web
+
+import com.github.elimxim.flashcardsinspace.web.dto.JwtAuthResponse
+import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
+import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
+import com.github.elimxim.flashcardsinspace.web.dto.toDto
+import com.github.elimxim.flashcardsinspace.security.AuthService
+import com.github.elimxim.flashcardsinspace.security.JwtService
+import jakarta.servlet.http.HttpServletResponse
+import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CookieValue
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+
+@RestController
+@RequestMapping("/api/auth")
+class AuthController(
+    private val authService: AuthService,
+    private val jwtService: JwtService,
+) {
+    // todo log every request to the requests.log
+    @PostMapping("/signup")
+    fun signup(
+        @Valid @RequestBody request: SignUpRequest, // todo unified error handler instead of @Valid
+        response: HttpServletResponse,
+    ): ResponseEntity<JwtAuthResponse> {
+        return try {
+            val user = authService.signUp(request)
+            jwtService.setCookies(user, response)
+            ResponseEntity.ok(JwtAuthResponse(user.toDto()))
+        } catch (e: IllegalArgumentException) { // todo use specific exception class
+            // todo send an error
+            ResponseEntity.badRequest().build()
+        }
+    }
+
+    @PostMapping("/login")
+    fun login(
+        @Valid @RequestBody request: LoginRequest,
+        response: HttpServletResponse,
+    ): ResponseEntity<JwtAuthResponse> {
+        val user = authService.login(request)
+        jwtService.setCookies(user, response)
+        return ResponseEntity.ok(JwtAuthResponse(user.toDto()))
+    }
+
+    @PostMapping("/logout")
+    fun logout(response: HttpServletResponse): ResponseEntity<Unit> {
+        authService.logout()
+        jwtService.clearCookies(response)
+        return ResponseEntity.ok().build()
+    }
+
+    @PostMapping("/refresh")
+    fun refresh(
+        @CookieValue(name = "refreshToken") refreshToken: String,
+        response: HttpServletResponse,
+    ): ResponseEntity<JwtAuthResponse> {
+        val user = authService.refreshToken(refreshToken)
+        jwtService.setCookies(user, response)
+        return ResponseEntity.ok(JwtAuthResponse(user.toDto()))
+    }
+}

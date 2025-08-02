@@ -20,6 +20,7 @@
     "@fortawesome/vue-fontawesome": "^3.0.8",
     "@vuelidate/core": "^2.0.3",
     "@vuelidate/validators": "^2.0.4",
+    "axios": "^1.11.0",
     "pinia": "^3.0.3",
     "vue": "^3.5.17",
     "vue-country-flag-next": "^2.3.2",

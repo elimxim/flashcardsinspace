@@ -1,4 +1,5 @@
 import type { Flashcard, FlashcardSet } from '@/models/flashcard.ts'
+import type { User } from '@/models/user.ts'
 
 export interface FlashcardData {
   flashcardSets: FlashcardSet[]
@@ -34,4 +35,8 @@ export interface GlobalState {
   flashcardCreationModalFormOpen: boolean
   flashcardEditModalFormOpen: boolean
   calendarModalFormOpen: boolean
+}
+
+export interface AuthState {
+  user: User | null,
 }

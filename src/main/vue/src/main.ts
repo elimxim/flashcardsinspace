@@ -11,13 +11,15 @@ import { faGear } from '@fortawesome/free-solid-svg-icons'
 import { faBox } from '@fortawesome/free-solid-svg-icons'
 import { faRectangleList } from '@fortawesome/free-solid-svg-icons'
 import { faCalendarDays } from '@fortawesome/free-solid-svg-icons'
-import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
-import { faGlobe } from '@fortawesome/free-solid-svg-icons';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
-import { faAngleLeft } from '@fortawesome/free-solid-svg-icons';
-import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
+import { faCircleInfo } from '@fortawesome/free-solid-svg-icons'
+import { faGlobe } from '@fortawesome/free-solid-svg-icons'
+import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons'
+import { faAngleLeft } from '@fortawesome/free-solid-svg-icons'
+import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
+import { faCircleUser } from '@fortawesome/free-solid-svg-icons'
+import { useAuthStore } from '@/stores/auth-state.ts';
 
 library.add(faGear)
 library.add(faBox)
@@ -30,9 +32,15 @@ library.add(faXmark)
 library.add(faPenToSquare)
 library.add(faAngleLeft)
 library.add(faAngleRight)
+library.add(faCircleUser)
 
 const app = createApp(App)
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(createPinia())
-app.use(router)
-app.mount('#app')
+
+const authStore = useAuthStore()
+
+authStore.login().then(() => {
+  app.use(router)
+  app.mount('#app')
+})
