@@ -60,6 +60,7 @@ function testData(): FlashcardSet[] {
       id: 1,
       name: "Bosnian",
       language: {
+        id: 1,
         name: "Bosnian",
         code: "bs",
       },
@@ -95,6 +96,7 @@ function testData(): FlashcardSet[] {
       id: 2,
       name: "Russian",
       language: {
+        id: 2,
         name: "Russian",
         code: "ru",
       },

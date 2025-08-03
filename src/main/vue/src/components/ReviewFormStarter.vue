@@ -13,12 +13,12 @@ import { useReviewStore } from '@/stores/review.ts'
 import { storeToRefs } from 'pinia'
 import { onMounted, onUnmounted } from 'vue'
 
-const globalStateStore = useGlobalStore()
-const reviewStateStore = useReviewStore()
-const { started } = storeToRefs(reviewStateStore)
+const globalStore = useGlobalStore()
+const reviewStore = useReviewStore()
+const { started } = storeToRefs(reviewStore)
 
 function startReview() {
-  reviewStateStore.startReview()
+  reviewStore.startReview()
 }
 
 onMounted(() => {
@@ -30,7 +30,7 @@ onUnmounted(() => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
-  if (globalStateStore.isAnyModalFormOpen()) {
+  if (globalStore.isAnyModalFormOpen()) {
     return
   }
 

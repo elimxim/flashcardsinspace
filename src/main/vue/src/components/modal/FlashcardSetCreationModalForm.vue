@@ -73,13 +73,13 @@ defineProps({
 
 const emit = defineEmits(['update:visible'])
 
-const globalStateStore = useGlobalStore()
+const globalStore = useGlobalStore()
 const flashcardDataStore = useFlashcardDataStore()
-const flashcardStateStore = useFlashcardSetStore()
-const reviewStateStore = useReviewStore()
-const languageDataStore = useLanguageStore()
+const flashcardSetStore = useFlashcardSetStore()
+const reviewStore = useReviewStore()
+const languageStore = useLanguageStore()
 
-const { languages } = storeToRefs(languageDataStore)
+const { languages } = storeToRefs(languageStore)
 
 // state>
 
@@ -109,7 +109,7 @@ const createButton = ref<HTMLButtonElement>()
 
 function cancel() {
   resetState()
-  globalStateStore.toggleFlashcardSetCreationModalForm()
+  globalStore.toggleFlashcardSetCreationModalForm()
   emit('update:visible', false)
   cancelButton.value?.blur()
 }
@@ -118,9 +118,9 @@ function create() {
   $v.value.$touch()
   if (!$v.value.$invalid) {
     createNewFlashcardSet()
-    reviewStateStore.finishReview()
+    reviewStore.finishReview()
     resetState()
-    globalStateStore.toggleFlashcardSetCreationModalForm()
+    globalStore.toggleFlashcardSetCreationModalForm()
     emit('update:visible', false)
   }
   createButton.value?.blur()
@@ -132,7 +132,7 @@ function createNewFlashcardSet() {
   }
   const flashcardSet = newFlashcardSet(flashcardSetName.value, flashcardSetLanguage.value)
   flashcardDataStore.addFlashcardSet(flashcardSet)
-  flashcardStateStore.init(flashcardSet)
+  flashcardSetStore.init(flashcardSet)
 }
 
 onMounted(() => {

@@ -97,8 +97,8 @@ const emit = defineEmits([
   'update:removed',
 ])
 
-const globalStateStore = useGlobalStore()
-const flashcardStateStore = useFlashcardSetStore()
+const globalStore = useGlobalStore()
+const flashcardSetStore = useFlashcardSetStore()
 
 // state>
 
@@ -195,14 +195,14 @@ function update() {
 
 function removeFlashcard() {
   if (props.flashcard !== null && props.flashcard !== undefined) {
-    flashcardStateStore.removeFlashcard(props.flashcard?.id)
+    flashcardSetStore.removeFlashcard(props.flashcard?.id)
   } else {
     console.error("can't remove an undefined flashcard")
   }
 }
 
 function addNewFlashcard() {
-  flashcardStateStore.addFlashcard(
+  flashcardSetStore.addFlashcard(
     newFlashcard(
       flashcardFrontSide.value,
       flashcardBackSide.value,
@@ -217,7 +217,7 @@ function updateFlashcard() {
       flashcardFrontSide.value,
       flashcardBackSide.value
     )
-    flashcardStateStore.updateFlashcard(flashcard)
+    flashcardSetStore.updateFlashcard(flashcard)
   } else {
     console.error("can't update an undefined flashcard")
   }
@@ -225,9 +225,9 @@ function updateFlashcard() {
 
 function toggleModalForm() {
   if (props.editMode) {
-    globalStateStore.toggleFlashcardEditModalForm()
+    globalStore.toggleFlashcardEditModalForm()
   } else {
-    globalStateStore.toggleFlashcardCreationModalForm()
+    globalStore.toggleFlashcardCreationModalForm()
   }
 }
 

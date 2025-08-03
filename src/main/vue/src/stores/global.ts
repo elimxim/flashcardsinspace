@@ -31,8 +31,8 @@ export const useGlobalStore = defineStore('global', {
     },
     toggleFlashcardEditModalForm() {
       this.flashcardEditModalFormOpen = !this.flashcardEditModalFormOpen
-      const reviewStateStore = useReviewStore()
-      reviewStateStore.setEditFormWasOpened(true)
+      const reviewStore = useReviewStore()
+      reviewStore.setEditFormWasOpened(true)
     },
     toggleCalendarModalForm() {
       this.calendarModalFormOpen = !this.calendarModalFormOpen

@@ -73,13 +73,13 @@ export const useReviewStore = defineStore('review', {
       this.editFormWasOpened = false
     },
     initReviewQueue() {
-      const flashcardStateStore = useFlashcardSetStore()
-      const flashcards = findFlashcardsForReview(flashcardStateStore.flashcards)
+      const flashcardSetStore = useFlashcardSetStore()
+      const flashcards = findFlashcardsForReview(flashcardSetStore.flashcards)
       this.reviewQueue = [...flashcards]
     },
     initStageReviewQueue(stage: Stage) {
-      const flashcardStateStore = useFlashcardSetStore()
-      const flashcards = flashcardsForStage(flashcardStateStore.flashcards, stage)
+      const flashcardSetStore = useFlashcardSetStore()
+      const flashcards = flashcardsForStage(flashcardSetStore.flashcards, stage)
       this.reviewQueue = [...flashcards]
     },
     isNoCardsForReview() {

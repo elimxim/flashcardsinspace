@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import type { User } from '@/model/user.ts'
 import apiClient from '@/api/api-client.ts'
 import type { UserResponse } from '@/api/api-dto.ts'
-import type { Language } from '@/model/language.ts';
 
 export interface AuthState {
   user: User | null,

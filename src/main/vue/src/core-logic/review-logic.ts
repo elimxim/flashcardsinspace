@@ -5,9 +5,9 @@ import type { LightDay } from '@/model/calendar.ts'
 import { storeToRefs } from 'pinia'
 
 export function findFlashcardsForReview(flashcards: Flashcard[]): Flashcard[] {
-  const calendarDataStore = useCalendarStore()
-  const currLightDay = calendarDataStore.currLightDay
-  const currLightDayStages = calendarDataStore.currLightDayStages
+  const calendarStore = useCalendarStore()
+  const currLightDay = calendarStore.currLightDay
+  const currLightDayStages = calendarStore.currLightDayStages
 
   return flashcards.filter(f => {
     const isStageAvailable = currLightDayStages.has(f.stage)
@@ -35,8 +35,8 @@ function isReviewedFlashcard(flashcard: Flashcard, lightDay: LightDay): boolean 
 }
 
 export function flashcardsForStage(flashcards: Flashcard[], stage: Stage): Flashcard[] {
-  const calendarDataStore = useCalendarStore()
-  const { currLightDay } = storeToRefs(calendarDataStore)
+  const calendarStore = useCalendarStore()
+  const { currLightDay } = storeToRefs(calendarStore)
 
   if (stage === specialStages.UNKNOWN) {
     return flashcards.filter(f =>
@@ -52,8 +52,8 @@ export function flashcardsForStage(flashcards: Flashcard[], stage: Stage): Flash
 }
 
 export function countFlashcards(flashcards: Flashcard[], stage: Stage): number {
-  const calendarDataStore = useCalendarStore()
-  const { currLightDay } = storeToRefs(calendarDataStore)
+  const calendarStore = useCalendarStore()
+  const { currLightDay } = storeToRefs(calendarStore)
 
   if (stage === specialStages.UNKNOWN) {
     return flashcards.filter(f =>

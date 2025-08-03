@@ -10,8 +10,8 @@ import { storeToRefs } from 'pinia'
  * created in the current {@link LightspeedCalendar.currLightDay calendar day}.
  */
 export function newFlashcard(frontSide: string, backSide: string): Flashcard {
-  const calendarDateStore = useCalendarStore()
-  const { currLightDay } = storeToRefs(calendarDateStore)
+  const calendarStore = useCalendarStore()
+  const { currLightDay } = storeToRefs(calendarStore)
 
   return {
     id: 0,
@@ -39,8 +39,8 @@ export function updateFlashcardSides(flashcard: Flashcard, frontSide: string, ba
  * of the current {@link LightspeedCalendar.currLightDay calendar day}.
  */
 export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
-  const calendarDateStore = useCalendarStore()
-  const { currLightDay } = storeToRefs(calendarDateStore)
+  const calendarStore = useCalendarStore()
+  const { currLightDay } = storeToRefs(calendarStore)
 
   const reviewedAt = currLightDay.value.isoDate
 
@@ -62,8 +62,8 @@ export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
  * created in the current {@link LightspeedCalendar.currLightDay calendar day}.
  */
 export function newFlashcardSet(name: string, language: Language): FlashcardSet {
-  const calendarDateStore = useCalendarStore()
-  const { currLightDay } = storeToRefs(calendarDateStore)
+  const calendarStore = useCalendarStore()
+  const { currLightDay } = storeToRefs(calendarStore)
 
   return {
     id: 0,

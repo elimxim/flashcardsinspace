@@ -13,22 +13,22 @@
       </li>
       <li class="menu-buttons-container">
         <div class="menu-item menu-item-color menu-icon-button"
-             @click="globalStateStore.toggleFlashcardSetSettingsModalForm()">
+             @click="globalStore.toggleFlashcardSetSettingsModalForm()">
           <font-awesome-icon icon="fa-solid fa-gear"/>
         </div>
         <div class="menu-item menu-item-color menu-icon-button"
-             @click="globalStateStore.toggleFlashcardSetCreationModalForm()">
+             @click="globalStore.toggleFlashcardSetCreationModalForm()">
           <font-awesome-icon icon="fa-solid fa-box"/>
         </div>
         <div class="menu-item menu-item-color menu-icon-button"
-             @click="globalStateStore.toggleFlashcardCreationModalForm()">
+             @click="globalStore.toggleFlashcardCreationModalForm()">
           <font-awesome-icon icon="fa-solid fa-rectangle-list"/>
         </div>
       </li>
       <li class="menu-buttons-container"
           v-if="showFlashcardMenuItem">
         <div class="menu-item menu-item-color menu-icon-button"
-             @click="globalStateStore.toggleCalendarModalForm()">
+             @click="globalStore.toggleCalendarModalForm()">
           <font-awesome-icon icon="fa-solid fa-calendar-days"/>
         </div>
         <div class="menu-item menu-item-color">
@@ -83,23 +83,23 @@ import { truncate } from '@/utils/string.ts'
 import { allStages, type Stage, specialStageSet } from '@/core-logic/stage-logic.ts'
 import { countFlashcards } from '@/core-logic/review-logic.ts'
 
-const globalStateStore = useGlobalStore()
+const globalStore = useGlobalStore()
 const flashcardDataStore = useFlashcardDataStore()
-const flashcardStateStore = useFlashcardSetStore()
-const reviewStateStore = useReviewStore()
-const calendarDataStore = useCalendarStore()
+const flashcardSetStore = useFlashcardSetStore()
+const reviewStore = useReviewStore()
+const calendarStore = useCalendarStore()
 
 const { flashcardSets } = storeToRefs(flashcardDataStore)
-const { flashcardSet } = storeToRefs(flashcardStateStore)
-const { currLightDay } = storeToRefs(calendarDataStore)
+const { flashcardSet } = storeToRefs(flashcardSetStore)
+const { currLightDay } = storeToRefs(calendarStore)
 const {
   flashcardSetSettingsModalFormOpen,
   flashcardSetCreationModalFormOpen,
   flashcardCreationModalFormOpen,
   calendarModalFormOpen
-} = storeToRefs(globalStateStore)
+} = storeToRefs(globalStore)
 
-flashcardStateStore.initFromList(flashcardSets.value)
+flashcardSetStore.initFromList(flashcardSets.value)
 
 const showFlashcardMenuItem = computed(() => flashcardSet.value !== null)
 
@@ -113,7 +113,7 @@ interface Bucket {
   reviewable: boolean
 }
 
-const totalFlashcardNumber = computed(() => flashcardStateStore.flashcards.length)
+const totalFlashcardNumber = computed(() => flashcardSetStore.flashcards.length)
 
 const buckets: Bucket[] = allStages.map(stage => {
   return {
@@ -124,17 +124,17 @@ const buckets: Bucket[] = allStages.map(stage => {
 })
 
 function flashcardNumberByStage(stage: Stage): number {
-  return countFlashcards(flashcardStateStore.flashcards, stage)
+  return countFlashcards(flashcardSetStore.flashcards, stage)
 }
 
 // <buckets
 
 function handleSelectChange() {
-  reviewStateStore.finishReview()
+  reviewStore.finishReview()
 }
 
 function startStageReview(stage: Stage) {
-  reviewStateStore.startSpecialReview(stage)
+  reviewStore.startSpecialReview(stage)
 }
 
 onMounted(() => {

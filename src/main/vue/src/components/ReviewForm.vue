@@ -13,40 +13,40 @@
     <div class="review-body">
       <div class="flashcard-container">
         <div class="flashcard"
-             :class="{ 'flashcard-no-background': reviewStateStore.isNoCardsForReview() }"
+             :class="{ 'flashcard-no-background': reviewStore.isNoCardsForReview() }"
              ref="flashcardButton"
              @click="flipFlashcard">
           <div class="top-row">
               <span class="corner-text"
-                    :hidden="reviewStateStore.isNoCardsForReview()">
+                    :hidden="reviewStore.isNoCardsForReview()">
                 {{ currFlashcard?.stage }}
               </span>
             <button id="flashcard-edit-button"
                     class="corner-button"
                     ref="flashcardEditButton"
-                    @click.stop="globalStateStore.toggleFlashcardEditModalForm()"
-                    :disabled="reviewStateStore.isNoCardsForReview()"
-                    :hidden="reviewStateStore.isNoCardsForReview()">
+                    @click.stop="globalStore.toggleFlashcardEditModalForm()"
+                    :disabled="reviewStore.isNoCardsForReview()"
+                    :hidden="reviewStore.isNoCardsForReview()">
               <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
             </button>
           </div>
           <div class="flashcard-text"
-               :class="{ 'flashcard-text-color-dark': !reviewStateStore.isNoCardsForReview(), 'flashcard-text-color-light': reviewStateStore.isNoCardsForReview() }">
+               :class="{ 'flashcard-text-color-dark': !reviewStore.isNoCardsForReview(), 'flashcard-text-color-light': reviewStore.isNoCardsForReview() }">
             {{ currFlashcardText }}
           </div>
         </div>
         <div class="flashcard-nav" v-if="settings.mode === ReviewMode.LEITNER">
           <button class="nav-button nav-red-button"
-                  :disabled="reviewStateStore.isNoCardsForReview()"
-                  :hidden="reviewStateStore.isNoCardsForReview()"
+                  :disabled="reviewStore.isNoCardsForReview()"
+                  :hidden="reviewStore.isNoCardsForReview()"
                   ref="stageDownButton"
                   @click="stageDown">
             Don't know
           </button>
           <button class="nav-button nav-green-button"
                   :class="{ 'nav-button-disabled': editFormWasOpened }"
-                  :disabled="editFormWasOpened || reviewStateStore.isNoCardsForReview()"
-                  :hidden="reviewStateStore.isNoCardsForReview()"
+                  :disabled="editFormWasOpened || reviewStore.isNoCardsForReview()"
+                  :hidden="reviewStore.isNoCardsForReview()"
                   ref="stageUpButton"
                   @click="stageUp">
             Know
@@ -54,8 +54,8 @@
         </div>
         <div class="flashcard-nav-single" v-if="settings.mode === ReviewMode.SPECIAL">
           <button class="nav-button nav-blue-button"
-                  :disabled="reviewStateStore.isNoCardsForReview()"
-                  :hidden="reviewStateStore.isNoCardsForReview()"
+                  :disabled="reviewStore.isNoCardsForReview()"
+                  :hidden="reviewStore.isNoCardsForReview()"
                   ref="nextButton"
                   @click="next">
             Next
@@ -63,15 +63,15 @@
         </div>
         <div class="flashcard-nav" v-if="settings.mode === ReviewMode.SPACE">
           <button class="nav-button nav-black-button"
-                  :disabled="reviewStateStore.isNoCardsForReview()"
-                  :hidden="reviewStateStore.isNoCardsForReview()"
+                  :disabled="reviewStore.isNoCardsForReview()"
+                  :hidden="reviewStore.isNoCardsForReview()"
                   ref="moveBackButton"
                   @click="moveBack">
             Move back
           </button>
           <button class="nav-button nav-blue-button"
-                  :disabled="reviewStateStore.isNoCardsForReview()"
-                  :hidden="reviewStateStore.isNoCardsForReview()"
+                  :disabled="reviewStore.isNoCardsForReview()"
+                  :hidden="reviewStore.isNoCardsForReview()"
                   ref="nextButton"
                   @click="next">
             Next
@@ -99,21 +99,21 @@ import { useGlobalStore } from '@/stores/global.ts'
 import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { getStage, stages, nextStage, prevStage } from '@/core-logic/stage-logic.ts'
 
-const flashcardStateStore = useFlashcardSetStore()
-const reviewStateStore = useReviewStore()
-const globalStateStore = useGlobalStore()
+const flashcardSetStore = useFlashcardSetStore()
+const reviewStore = useReviewStore()
+const globalStore = useGlobalStore()
 
-const { flashcardEditModalFormOpen } = storeToRefs(globalStateStore)
+const { flashcardEditModalFormOpen } = storeToRefs(globalStore)
 const {
   settings,
   started,
   isFrontSide,
   currFlashcard,
   editFormWasOpened
-} = storeToRefs(reviewStateStore)
+} = storeToRefs(reviewStore)
 
 const currFlashcardText = computed(() => {
-  if (reviewStateStore.isNoCardsForReview()) {
+  if (reviewStore.isNoCardsForReview()) {
     return 'No more cards for review'
   } else if (isFrontSide.value) {
     return currFlashcard.value?.frontSide
@@ -131,21 +131,21 @@ const moveBackButton = ref<HTMLButtonElement>()
 const flashcardEditButton = ref<HTMLButtonElement>()
 
 function finishReview() {
-  reviewStateStore.finishReview()
+  reviewStore.finishReview()
 }
 
 function flipFlashcard() {
-  reviewStateStore.flipFlashcard()
+  reviewStore.flipFlashcard()
 }
 
 function stageDown() {
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, prevStage(flashcard.stage))
-    flashcardStateStore.updateFlashcard(flashcard)
-    reviewStateStore.setEditFormWasOpened(false)
-    reviewStateStore.setFrontSide(true)
-    reviewStateStore.nextFlashcard()
+    flashcardSetStore.updateFlashcard(flashcard)
+    reviewStore.setEditFormWasOpened(false)
+    reviewStore.setFrontSide(true)
+    reviewStore.nextFlashcard()
   }
   stageDownButton.value?.blur()
 }
@@ -154,9 +154,9 @@ function stageUp() {
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, nextStage(flashcard.stage))
-    flashcardStateStore.updateFlashcard(flashcard)
-    reviewStateStore.setFrontSide(true)
-    reviewStateStore.nextFlashcard()
+    flashcardSetStore.updateFlashcard(flashcard)
+    reviewStore.setFrontSide(true)
+    reviewStore.nextFlashcard()
   }
   stageUpButton.value?.blur()
 }
@@ -164,9 +164,9 @@ function stageUp() {
 function next() {
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
-    flashcardStateStore.updateFlashcard(flashcard)
-    reviewStateStore.setFrontSide(true)
-    reviewStateStore.nextFlashcard()
+    flashcardSetStore.updateFlashcard(flashcard)
+    reviewStore.setFrontSide(true)
+    reviewStore.nextFlashcard()
   }
   nextButton.value?.blur()
 }
@@ -175,9 +175,9 @@ function moveBack() {
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, stages.FIRST)
-    flashcardStateStore.updateFlashcard(flashcard)
-    reviewStateStore.setFrontSide(true)
-    reviewStateStore.nextFlashcard()
+    flashcardSetStore.updateFlashcard(flashcard)
+    reviewStore.setFrontSide(true)
+    reviewStore.nextFlashcard()
   }
   moveBackButton.value?.blur()
 }
@@ -186,9 +186,9 @@ const flashcardWasRemoved = ref(false)
 
 watch(flashcardWasRemoved, (newValue) => {
   if (newValue) {
-    reviewStateStore.setEditFormWasOpened(false)
-    reviewStateStore.setFrontSide(true)
-    reviewStateStore.nextFlashcard()
+    reviewStore.setEditFormWasOpened(false)
+    reviewStore.setFrontSide(true)
+    reviewStore.nextFlashcard()
     flashcardWasRemoved.value = false
   }
 })
@@ -202,7 +202,7 @@ onUnmounted(() => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
-  if (globalStateStore.isAnyModalFormOpen()) {
+  if (globalStore.isAnyModalFormOpen()) {
     return
   }
 

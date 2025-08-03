@@ -86,13 +86,13 @@ defineProps({
   visible: Boolean,
 })
 
-const globalStateStore = useGlobalStore()
-const reviewStateStore = useReviewStore()
+const globalStore = useGlobalStore()
+const reviewStore = useReviewStore()
 const flashcardDataStore = useFlashcardDataStore()
-const flashcardStateStore = useFlashcardSetStore()
+const flashcardSetStore = useFlashcardSetStore()
 
 const { flashcardSets } = storeToRefs(flashcardDataStore)
-const { flashcardSet } = storeToRefs(flashcardStateStore)
+const { flashcardSet } = storeToRefs(flashcardSetStore)
 
 // state>
 
@@ -115,7 +115,7 @@ watch(flashcardSetDefault, (_) => {
   removeConfirmation.value = false
 })
 
-flashcardStateStore.$subscribe((mutation, newState) => {
+flashcardSetStore.$subscribe((mutation, newState) => {
   flashcardSetName.value = newState.flashcardSet?.name ?? null
   flashcardSetLanguage.value = newState.flashcardSet?.language.name ?? null
   flashcardSetDefault.value = newState.flashcardSet?.default ?? null
@@ -143,7 +143,7 @@ const updateButton = ref<HTMLButtonElement>()
 
 function cancel() {
   resetState()
-  globalStateStore.toggleFlashcardSetSettingsModalForm()
+  globalStore.toggleFlashcardSetSettingsModalForm()
   emit('update:visible', false)
 }
 
@@ -151,7 +151,7 @@ function remove() {
   if (removeConfirmation.value) {
     removeFlashcardSet()
     resetState()
-    globalStateStore.toggleFlashcardSetSettingsModalForm()
+    globalStore.toggleFlashcardSetSettingsModalForm()
     emit('update:visible', false)
   } else {
     removeConfirmation.value = true
@@ -164,7 +164,7 @@ function update() {
     if (!$v.value.$invalid) {
       updateFlashcardSet()
       resetState()
-      globalStateStore.toggleFlashcardSetSettingsModalForm()
+      globalStore.toggleFlashcardSetSettingsModalForm()
       emit('update:visible', false)
     }
   }
@@ -173,17 +173,17 @@ function update() {
 function removeFlashcardSet() {
   if (flashcardSet.value !== null) {
     flashcardDataStore.removeFlashcardSet(flashcardSet.value)
-    reviewStateStore.finishReview()
-    flashcardStateStore.initFromList(flashcardSets.value)
+    reviewStore.finishReview()
+    flashcardSetStore.initFromList(flashcardSets.value)
   }
 }
 
 function updateFlashcardSet() {
   if (flashcardSetName.value !== null) {
-    flashcardStateStore.setName(flashcardSetName.value)
+    flashcardSetStore.setName(flashcardSetName.value)
   }
   if (flashcardSetDefault.value !== null) {
-    flashcardStateStore.setDefault(flashcardSetDefault.value)
+    flashcardSetStore.setDefault(flashcardSetDefault.value)
   }
 }
 

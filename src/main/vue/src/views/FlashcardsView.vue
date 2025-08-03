@@ -26,17 +26,17 @@ import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
 import { useCalendarStore } from '@/stores/calendar.ts'
 
 const flashcardDataStore = useFlashcardDataStore()
-const calendarDataStore = useCalendarStore()
-const reviewStateStore = useReviewStore()
-const { started: reviewStarted } = storeToRefs(reviewStateStore)
+const calendarStore = useCalendarStore()
+const reviewStore = useReviewStore()
+const { started: reviewStarted } = storeToRefs(reviewStore)
 
 onMounted(() => {
   flashcardDataStore.loadData()
-  calendarDataStore.loadData()
+  calendarStore.loadData()
 })
 
 onBeforeRouteLeave((to, from, next) => {
-  reviewStateStore.finishReview()
+  reviewStore.finishReview()
   next()
 })
 

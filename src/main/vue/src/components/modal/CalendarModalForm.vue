@@ -60,8 +60,8 @@ const emit = defineEmits([
   'update:visible',
 ])
 
-const calendarDataStore = useCalendarStore()
-const { lightStartDate, currLightDay, lightDays } = storeToRefs(calendarDataStore)
+const calendarStore = useCalendarStore()
+const { lightStartDate, currLightDay, lightDays } = storeToRefs(calendarStore)
 
 // calendar>
 
@@ -198,7 +198,7 @@ function exit() {
 }
 
 function switchCalendarDay() {
-  calendarDataStore.switchLightDay()
+  calendarStore.switchLightDay()
   currDate.value = new Date(currLightDay.value.isoDate)
 }
 
