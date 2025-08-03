@@ -69,7 +69,7 @@ function testData(): FlashcardSet[] {
           id: 1,
           frontSide: "Prdnuti",
           backSide: "To fart",
-          stage: stages.FIRST.name, // unknown
+          stage: stages.S1.name, // unknown
           reviewCount: 0,
           reviewHistory: [], // todo
           reviewedAt: null,
@@ -80,7 +80,7 @@ function testData(): FlashcardSet[] {
           id: 2,
           frontSide: "Kakati",
           backSide: "To poop",
-          stage: stages.FIRST.name, // attempted
+          stage: stages.S1.name, // attempted
           reviewCount: 0,
           reviewHistory: [],
           reviewedAt: asIsoDate(today()),
@@ -105,7 +105,7 @@ function testData(): FlashcardSet[] {
           id: 1,
           frontSide: "Пукать",
           backSide: "To fart",
-          stage: stages.FIRST.name,
+          stage: stages.S1.name,
           reviewCount: 0,
           reviewHistory: [],
           reviewedAt: asIsoDate(yesterday()),
@@ -116,7 +116,7 @@ function testData(): FlashcardSet[] {
           id: 2,
           frontSide: "Какать",
           backSide: "To poop",
-          stage: stages.SEVENTH.name,
+          stage: stages.S7.name,
           reviewCount: 0,
           reviewHistory: [],
           reviewedAt: asIsoDate(yesterday()),

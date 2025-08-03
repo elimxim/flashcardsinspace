@@ -11,7 +11,7 @@ export function findFlashcardsForReview(flashcards: Flashcard[]): Flashcard[] {
 
   return flashcards.filter(f => {
     const isStageAvailable = currLightDayStages.has(f.stage)
-    if (f.stage === stages.FIRST.name) {
+    if (f.stage === stages.S1.name) {
       return isStageAvailable
         && !isUnknownFlashcard(f, currLightDay)
         && !isReviewedFlashcard(f, currLightDay)
@@ -40,11 +40,11 @@ export function flashcardsForStage(flashcards: Flashcard[], stage: Stage): Flash
 
   if (stage === specialStages.UNKNOWN) {
     return flashcards.filter(f =>
-      f.stage === stages.FIRST.name && isUnknownFlashcard(f, currLightDay.value)
+      f.stage === stages.S1.name && isUnknownFlashcard(f, currLightDay.value)
     )
   } else if (stage === specialStages.ATTEMPTED) {
     return flashcards.filter(f =>
-      f.stage === stages.FIRST.name && isReviewedFlashcard(f, currLightDay.value)
+      f.stage === stages.S1.name && isReviewedFlashcard(f, currLightDay.value)
     )
   }
 
@@ -57,15 +57,15 @@ export function countFlashcards(flashcards: Flashcard[], stage: Stage): number {
 
   if (stage === specialStages.UNKNOWN) {
     return flashcards.filter(f =>
-      f.stage === stages.FIRST.name && isUnknownFlashcard(f, currLightDay.value)
+      f.stage === stages.S1.name && isUnknownFlashcard(f, currLightDay.value)
     ).length
   } else if (stage === specialStages.ATTEMPTED) {
     return flashcards.filter(f =>
-      f.stage === stages.FIRST.name && isReviewedFlashcard(f, currLightDay.value)
+      f.stage === stages.S1.name && isReviewedFlashcard(f, currLightDay.value)
     ).length
-  } else if (stage == stages.FIRST) {
+  } else if (stage == stages.S1) {
     return flashcards.filter(f =>
-      f.stage === stages.FIRST.name && !isUnknownFlashcard(f, currLightDay.value) && !isReviewedFlashcard(f, currLightDay.value)
+      f.stage === stages.S1.name && !isUnknownFlashcard(f, currLightDay.value) && !isReviewedFlashcard(f, currLightDay.value)
     ).length
   } else {
     return flashcards.filter(f => f.stage === stage.name).length

@@ -174,7 +174,7 @@ function next() {
 function moveBack() {
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
-    updateFlashcard(flashcard, stages.FIRST)
+    updateFlashcard(flashcard, stages.S1)
     flashcardSetStore.updateFlashcard(flashcard)
     reviewStore.setFrontSide(true)
     reviewStore.nextFlashcard()

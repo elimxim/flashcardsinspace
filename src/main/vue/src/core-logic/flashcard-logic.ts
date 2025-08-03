@@ -17,7 +17,7 @@ export function newFlashcard(frontSide: string, backSide: string): Flashcard {
     id: 0,
     frontSide: frontSide,
     backSide: backSide,
-    stage: stages.FIRST.name,
+    stage: stages.S1.name,
     reviewedAt: null,
     reviewCount: 0,
     reviewHistory: [],

@@ -10,60 +10,60 @@ export const specialStages = {
 }
 
 export const stages = {
-  FIRST: { name: 'Stage 1', order: 1 } as Stage,
-  SECOND: { name: 'Stage 2', order: 2 } as Stage,
-  THIRD: { name: 'Stage 3', order: 3 } as Stage,
-  FORTH: { name: 'Stage 4', order: 4 } as Stage,
-  FIFTH: { name: 'Stage 5', order: 5 } as Stage,
-  SIXTH: { name: 'Stage 6', order: 6 } as Stage,
-  SEVENTH: { name: 'Stage 7', order: 7 } as Stage,
+  S1: { name: 'Stage 1', order: 1 } as Stage,
+  S2: { name: 'Stage 2', order: 2 } as Stage,
+  S3: { name: 'Stage 3', order: 3 } as Stage,
+  S4: { name: 'Stage 4', order: 4 } as Stage,
+  S5: { name: 'Stage 5', order: 5 } as Stage,
+  S6: { name: 'Stage 6', order: 6 } as Stage,
+  S7: { name: 'Stage 7', order: 7 } as Stage,
 }
 
 export const allStages: Stage[] = [
   specialStages.UNKNOWN,
   specialStages.ATTEMPTED,
-  stages.FIRST,
-  stages.SECOND,
-  stages.THIRD,
-  stages.FORTH,
-  stages.FIFTH,
-  stages.SIXTH,
-  stages.SEVENTH,
+  stages.S1,
+  stages.S2,
+  stages.S3,
+  stages.S4,
+  stages.S5,
+  stages.S6,
+  stages.S7,
   specialStages.OUTER_SPACE,
 ]
 
 export const stageOrderMap = new Map<number, Stage>([
-  [stages.FIRST.order, stages.FIRST],
-  [stages.SECOND.order, stages.SECOND],
-  [stages.THIRD.order, stages.THIRD],
-  [stages.FORTH.order, stages.FORTH],
-  [stages.FIFTH.order, stages.FIFTH],
-  [stages.SIXTH.order, stages.SIXTH],
-  [stages.SEVENTH.order, stages.SEVENTH],
+  [stages.S1.order, stages.S1],
+  [stages.S2.order, stages.S2],
+  [stages.S3.order, stages.S3],
+  [stages.S4.order, stages.S4],
+  [stages.S5.order, stages.S5],
+  [stages.S6.order, stages.S6],
+  [stages.S7.order, stages.S7],
   [specialStages.OUTER_SPACE.order, specialStages.OUTER_SPACE],
 ])
 
 export const stageNameMap = new Map<string, Stage>([
   [specialStages.UNKNOWN.name, specialStages.UNKNOWN],
   [specialStages.ATTEMPTED.name, specialStages.ATTEMPTED],
-  [stages.FIRST.name, stages.FIRST],
-  [stages.SECOND.name, stages.SECOND],
-  [stages.THIRD.name, stages.THIRD],
-  [stages.FORTH.name, stages.FORTH],
-  [stages.FIFTH.name, stages.FIFTH],
-  [stages.SIXTH.name, stages.SIXTH],
-  [stages.SEVENTH.name, stages.SEVENTH],
+  [stages.S1.name, stages.S1],
+  [stages.S2.name, stages.S2],
+  [stages.S3.name, stages.S3],
+  [stages.S4.name, stages.S4],
+  [stages.S5.name, stages.S5],
+  [stages.S6.name, stages.S6],
+  [stages.S7.name, stages.S7],
   [specialStages.OUTER_SPACE.name, specialStages.OUTER_SPACE],
 ])
 
 export const mainStageSet = new Set([
-  stages.FIRST,
-  stages.SECOND,
-  stages.THIRD,
-  stages.FORTH,
-  stages.FIFTH,
-  stages.SIXTH,
-  stages.SEVENTH,
+  stages.S1,
+  stages.S2,
+  stages.S3,
+  stages.S4,
+  stages.S5,
+  stages.S6,
+  stages.S7,
 ])
 
 export const specialStageSet = new Set([
@@ -103,7 +103,7 @@ export function prevStage(name: string): Stage {
     return stage
   }
 
-  return stages.FIRST
+  return stages.S1
 }
 
 export function getStage(name: string): Stage {

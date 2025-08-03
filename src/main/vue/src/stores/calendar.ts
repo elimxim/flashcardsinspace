@@ -68,7 +68,7 @@ function testData(): CalendarState {
     days.push({
       isoDate: date.toISOString().split('T')[0],
       seqNumber: i,
-      stages: [stages.SEVENTH, stages.SECOND, stages.THIRD, stages.FIRST],
+      stages: [stages.S7, stages.S2, stages.S3, stages.S1],
       status: status,
     })
   }
