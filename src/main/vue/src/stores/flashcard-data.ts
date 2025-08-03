@@ -1,12 +1,14 @@
 import { type FlashcardSet } from '@/model/flashcard.ts'
-import { type User } from '@/model/user.ts'
 import { defineStore } from 'pinia'
-import type { FlashcardData } from '@/model/state.ts'
-import { stages } from '@/core-logic/stage-logic.ts';
-import { today, asIsoDate, yesterday, minusDays } from '@/utils/date';
+import { stages } from '@/core-logic/stage-logic.ts'
+import { asIsoDate, minusDays, today, yesterday } from '@/utils/date'
+
+export interface FlashcardDataState {
+  flashcardSets: FlashcardSet[]
+}
 
 export const useFlashcardDataStore = defineStore('flashcard-data', {
-  state: (): FlashcardData => {
+  state: (): FlashcardDataState => {
     return {
       flashcardSets: [],
     }

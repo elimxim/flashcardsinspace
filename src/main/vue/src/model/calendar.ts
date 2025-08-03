@@ -1,11 +1,5 @@
 import type { Stage } from '@/core-logic/stage-logic.ts';
 
-export interface LightspeedCalendar {
-  lightStartDate: string
-  currLightDay: LightDay
-  lightDays: LightDay[]
-}
-
 export interface LightDay {
   isoDate: string
   seqNumber: number

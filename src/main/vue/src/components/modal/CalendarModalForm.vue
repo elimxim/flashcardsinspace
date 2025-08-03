@@ -48,7 +48,7 @@ import '@/assets/modal.css'
 import ModalForm from '@/components/modal/ModalForm.vue'
 import { computed, defineEmits, ref } from 'vue'
 import { type LightDay, StudyStatus } from '@/model/calendar.ts'
-import { useCalendarDataStore } from '@/stores/calendar-data.ts'
+import { useCalendarStore } from '@/stores/calendar.ts'
 import { storeToRefs } from 'pinia'
 import { asIsoDate } from '@/utils/date.ts'
 
@@ -60,7 +60,7 @@ const emit = defineEmits([
   'update:visible',
 ])
 
-const calendarDataStore = useCalendarDataStore()
+const calendarDataStore = useCalendarStore()
 const { lightStartDate, currLightDay, lightDays } = storeToRefs(calendarDataStore)
 
 // calendar>

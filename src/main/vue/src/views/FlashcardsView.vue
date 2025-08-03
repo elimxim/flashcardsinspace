@@ -19,10 +19,10 @@ import MainMenu from '@/components/MainMenu.vue'
 import ReviewFormStarter from '@/components/ReviewFormStarter.vue'
 import ReviewForm from '@/components/ReviewForm.vue'
 import { onBeforeRouteLeave } from 'vue-router'
-import { useReviewStateStore } from '@/stores/review-state.ts'
+import { useReviewStore } from '@/stores/review.ts'
 import { storeToRefs } from 'pinia'
 
-const reviewStateStore = useReviewStateStore()
+const reviewStateStore = useReviewStore()
 const { started: reviewStarted } = storeToRefs(reviewStateStore)
 
 onBeforeRouteLeave((to, from, next) => {

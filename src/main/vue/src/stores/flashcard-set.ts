@@ -1,8 +1,11 @@
-import { type Flashcard, type FlashcardSet } from '@/model/flashcard.ts';
-import { defineStore } from 'pinia';
-import type { FlashcardSetState } from '@/model/state.ts';
+import { type Flashcard, type FlashcardSet } from '@/model/flashcard.ts'
+import { defineStore } from 'pinia'
 
-export const useFlashcardStateStore = defineStore('flashcard-state', {
+export interface FlashcardSetState {
+  flashcardSet: FlashcardSet | null
+}
+
+export const useFlashcardSetStore = defineStore('flashcard-set', {
   state: (): FlashcardSetState => {
     return {
       flashcardSet: null,

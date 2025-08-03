@@ -19,7 +19,7 @@ import { faPenToSquare } from '@fortawesome/free-solid-svg-icons'
 import { faAngleLeft } from '@fortawesome/free-solid-svg-icons'
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
 import { faCircleUser } from '@fortawesome/free-solid-svg-icons'
-import { useAuthStore } from '@/stores/auth-state.ts';
+import { useAuthStore } from '@/stores/auth.ts';
 
 library.add(faGear)
 library.add(faBox)

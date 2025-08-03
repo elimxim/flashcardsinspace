@@ -8,13 +8,13 @@
 </template>
 
 <script setup lang="ts">
-import { useGlobalStateStore } from '@/stores/global-state.ts'
-import { useReviewStateStore } from '@/stores/review-state.ts'
+import { useGlobalStore } from '@/stores/global.ts'
+import { useReviewStore } from '@/stores/review.ts'
 import { storeToRefs } from 'pinia'
 import { onMounted, onUnmounted } from 'vue'
 
-const globalStateStore = useGlobalStateStore()
-const reviewStateStore = useReviewStateStore()
+const globalStateStore = useGlobalStore()
+const reviewStateStore = useReviewStore()
 const { started } = storeToRefs(reviewStateStore)
 
 function startReview() {

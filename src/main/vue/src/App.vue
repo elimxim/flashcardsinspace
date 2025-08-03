@@ -41,17 +41,17 @@
 <script setup lang="ts">
 import '@/assets/main.css'
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
-import { useLanguageDataStore } from '@/stores/language-data.ts'
-import { useCalendarDataStore } from '@/stores/calendar-data.ts'
-import { useAuthStore } from '@/stores/auth-state.ts'
+import { useLanguageStore } from '@/stores/language.ts'
+import { useCalendarStore } from '@/stores/calendar.ts'
+import { useAuthStore } from '@/stores/auth.ts'
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { routeNames } from '@/router'
 
 const authStore = useAuthStore()
 const flashcardDataStore = useFlashcardDataStore()
-const languageDataStore = useLanguageDataStore()
-const calendarDataStore = useCalendarDataStore()
+const languageDataStore = useLanguageStore()
+const calendarDataStore = useCalendarStore()
 
 const { isAuthenticated } = storeToRefs(authStore)
 

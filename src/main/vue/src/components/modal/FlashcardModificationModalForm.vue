@@ -77,9 +77,9 @@ import {
 } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
-import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
-import { useGlobalStateStore } from '@/stores/global-state.ts'
+import { useGlobalStore } from '@/stores/global.ts'
 import { newFlashcard, updateFlashcardSides } from '@/core-logic/flashcard-logic.ts'
 
 const props = defineProps({
@@ -97,8 +97,8 @@ const emit = defineEmits([
   'update:removed',
 ])
 
-const globalStateStore = useGlobalStateStore()
-const flashcardStateStore = useFlashcardStateStore()
+const globalStateStore = useGlobalStore()
+const flashcardStateStore = useFlashcardSetStore()
 
 // state>
 

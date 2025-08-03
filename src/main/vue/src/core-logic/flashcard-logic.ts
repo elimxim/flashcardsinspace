@@ -1,7 +1,7 @@
 import { type Flashcard, type FlashcardSet, type ReviewInfo } from '@/model/flashcard.ts'
 import { type Stage, stages } from '@/core-logic/stage-logic.ts'
 import type { Language } from '@/model/language.ts'
-import { useCalendarDataStore } from '@/stores/calendar-data.ts'
+import { useCalendarStore } from '@/stores/calendar.ts'
 import { storeToRefs } from 'pinia'
 
 /**
@@ -10,7 +10,7 @@ import { storeToRefs } from 'pinia'
  * created in the current {@link LightspeedCalendar.currLightDay calendar day}.
  */
 export function newFlashcard(frontSide: string, backSide: string): Flashcard {
-  const calendarDateStore = useCalendarDataStore()
+  const calendarDateStore = useCalendarStore()
   const { currLightDay } = storeToRefs(calendarDateStore)
 
   return {
@@ -39,7 +39,7 @@ export function updateFlashcardSides(flashcard: Flashcard, frontSide: string, ba
  * of the current {@link LightspeedCalendar.currLightDay calendar day}.
  */
 export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
-  const calendarDateStore = useCalendarDataStore()
+  const calendarDateStore = useCalendarStore()
   const { currLightDay } = storeToRefs(calendarDateStore)
 
   const reviewedAt = currLightDay.value.isoDate
@@ -62,7 +62,7 @@ export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
  * created in the current {@link LightspeedCalendar.currLightDay calendar day}.
  */
 export function newFlashcardSet(name: string, language: Language): FlashcardSet {
-  const calendarDateStore = useCalendarDataStore()
+  const calendarDateStore = useCalendarStore()
   const { currLightDay } = storeToRefs(calendarDateStore)
 
   return {

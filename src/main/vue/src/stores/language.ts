@@ -1,8 +1,12 @@
 import type { Language } from '@/model/language.ts'
 import { defineStore } from 'pinia'
 
-export const useLanguageDataStore = defineStore('language-data', {
-  state: () => {
+export interface LanguageState {
+  languages: Language[],
+}
+
+export const useLanguageStore = defineStore('language', {
+  state: (): LanguageState => {
     return {
       languages: [] as Language[],
     }

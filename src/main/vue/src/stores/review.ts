@@ -1,10 +1,30 @@
 import { defineStore } from 'pinia'
-import { useFlashcardStateStore } from '@/stores/flashcard-state'
-import { ReviewMode, type ReviewState } from '@/model/state.ts'
-import { flashcardsForStage, findFlashcardsForReview } from '@/core-logic/review-logic.ts'
-import { type Stage, stages, specialStages } from '@/core-logic/stage-logic.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set.ts'
+import { findFlashcardsForReview, flashcardsForStage } from '@/core-logic/review-logic.ts'
+import { specialStages, type Stage } from '@/core-logic/stage-logic.ts'
+import type { Flashcard } from '@/model/flashcard.ts'
 
-export const useReviewStateStore = defineStore('review-state', {
+export enum ReviewMode {
+  LEITNER = 'LEITNER',
+  SPECIAL = 'SPECIAL',
+  SPACE = 'SPACE',
+}
+
+export interface ReviewSettings {
+  topic: string
+  mode: ReviewMode
+}
+
+export interface ReviewState {
+  settings: ReviewSettings
+  started: boolean
+  isFrontSide: boolean
+  reviewQueue: Flashcard[]
+  currFlashcard: Flashcard | null
+  editFormWasOpened: boolean
+}
+
+export const useReviewStore = defineStore('review', {
   state: (): ReviewState => {
     return {
       settings: {
@@ -53,12 +73,12 @@ export const useReviewStateStore = defineStore('review-state', {
       this.editFormWasOpened = false
     },
     initReviewQueue() {
-      const flashcardStateStore = useFlashcardStateStore()
+      const flashcardStateStore = useFlashcardSetStore()
       const flashcards = findFlashcardsForReview(flashcardStateStore.flashcards)
       this.reviewQueue = [...flashcards]
     },
     initStageReviewQueue(stage: Stage) {
-      const flashcardStateStore = useFlashcardStateStore()
+      const flashcardStateStore = useFlashcardSetStore()
       const flashcards = flashcardsForStage(flashcardStateStore.flashcards, stage)
       this.reviewQueue = [...flashcards]
     },

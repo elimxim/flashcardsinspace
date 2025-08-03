@@ -75,10 +75,10 @@ import {
 import { required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
-import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set.ts'
 import { storeToRefs } from 'pinia'
-import { useReviewStateStore } from '@/stores/review-state.ts'
-import { useGlobalStateStore } from '@/stores/global-state.ts'
+import { useReviewStore } from '@/stores/review.ts'
+import { useGlobalStore } from '@/stores/global.ts'
 
 const emit = defineEmits(['update:visible'])
 
@@ -86,10 +86,10 @@ defineProps({
   visible: Boolean,
 })
 
-const globalStateStore = useGlobalStateStore()
-const reviewStateStore = useReviewStateStore()
+const globalStateStore = useGlobalStore()
+const reviewStateStore = useReviewStore()
 const flashcardDataStore = useFlashcardDataStore()
-const flashcardStateStore = useFlashcardStateStore()
+const flashcardStateStore = useFlashcardSetStore()
 
 const { flashcardSets } = storeToRefs(flashcardDataStore)
 const { flashcardSet } = storeToRefs(flashcardStateStore)

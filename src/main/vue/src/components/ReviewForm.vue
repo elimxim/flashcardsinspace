@@ -91,18 +91,17 @@
 
 <script setup lang="ts">
 import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
-import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useReviewStateStore } from '@/stores/review-state.ts'
-import { useGlobalStateStore } from '@/stores/global-state.ts'
+import { ReviewMode, useReviewStore } from '@/stores/review.ts'
+import { useGlobalStore } from '@/stores/global.ts'
 import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
-import { ReviewMode } from '@/model/state.ts'
 import { getStage, stages, nextStage, prevStage } from '@/core-logic/stage-logic.ts'
 
-const flashcardStateStore = useFlashcardStateStore()
-const reviewStateStore = useReviewStateStore()
-const globalStateStore = useGlobalStateStore()
+const flashcardStateStore = useFlashcardSetStore()
+const reviewStateStore = useReviewStore()
+const globalStateStore = useGlobalStore()
 
 const { flashcardEditModalFormOpen } = storeToRefs(globalStateStore)
 const {

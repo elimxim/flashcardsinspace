@@ -73,21 +73,21 @@ import FlashcardSetCreationModalForm from '@/components/modal/FlashcardSetCreati
 import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
 import CalendarModalForm from '@/components/modal/CalendarModalForm.vue'
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
-import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
-import { useCalendarDataStore } from '@/stores/calendar-data.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set.ts'
+import { useCalendarStore } from '@/stores/calendar.ts'
 import { storeToRefs } from 'pinia'
 import { computed, type ComputedRef, onMounted, ref } from 'vue'
-import { useReviewStateStore } from '@/stores/review-state.ts'
-import { useGlobalStateStore } from '@/stores/global-state.ts'
+import { useReviewStore } from '@/stores/review.ts'
+import { useGlobalStore } from '@/stores/global.ts'
 import { truncate } from '@/utils/string.ts'
 import { allStages, type Stage, specialStageSet } from '@/core-logic/stage-logic.ts'
 import { countFlashcards } from '@/core-logic/review-logic.ts'
 
-const globalStateStore = useGlobalStateStore()
+const globalStateStore = useGlobalStore()
 const flashcardDataStore = useFlashcardDataStore()
-const flashcardStateStore = useFlashcardStateStore()
-const reviewStateStore = useReviewStateStore()
-const calendarDataStore = useCalendarDataStore()
+const flashcardStateStore = useFlashcardSetStore()
+const reviewStateStore = useReviewStore()
+const calendarDataStore = useCalendarStore()
 
 const { flashcardSets } = storeToRefs(flashcardDataStore)
 const { flashcardSet } = storeToRefs(flashcardStateStore)

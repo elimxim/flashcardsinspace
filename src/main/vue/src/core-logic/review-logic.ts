@@ -1,11 +1,11 @@
 import { type Flashcard } from '@/model/flashcard.ts'
 import { type Stage, getStage, stages, specialStages } from '@/core-logic/stage-logic.ts'
-import { useCalendarDataStore } from '@/stores/calendar-data.ts'
+import { useCalendarStore } from '@/stores/calendar.ts'
 import type { LightDay } from '@/model/calendar.ts'
 import { storeToRefs } from 'pinia'
 
 export function findFlashcardsForReview(flashcards: Flashcard[]): Flashcard[] {
-  const calendarDataStore = useCalendarDataStore()
+  const calendarDataStore = useCalendarStore()
   const currLightDay = calendarDataStore.currLightDay
   const currLightDayStages = calendarDataStore.currLightDayStages
 
@@ -35,7 +35,7 @@ function isReviewedFlashcard(flashcard: Flashcard, lightDay: LightDay): boolean 
 }
 
 export function flashcardsForStage(flashcards: Flashcard[], stage: Stage): Flashcard[] {
-  const calendarDataStore = useCalendarDataStore()
+  const calendarDataStore = useCalendarStore()
   const { currLightDay } = storeToRefs(calendarDataStore)
 
   if (stage === specialStages.UNKNOWN) {
@@ -43,7 +43,6 @@ export function flashcardsForStage(flashcards: Flashcard[], stage: Stage): Flash
       f.stage === stages.FIRST.name && isUnknownFlashcard(f, currLightDay.value)
     )
   } else if (stage === specialStages.ATTEMPTED) {
-    console.log('ATTEMPTED')
     return flashcards.filter(f =>
       f.stage === stages.FIRST.name && isReviewedFlashcard(f, currLightDay.value)
     )
@@ -53,7 +52,7 @@ export function flashcardsForStage(flashcards: Flashcard[], stage: Stage): Flash
 }
 
 export function countFlashcards(flashcards: Flashcard[], stage: Stage): number {
-  const calendarDataStore = useCalendarDataStore()
+  const calendarDataStore = useCalendarStore()
   const { currLightDay } = storeToRefs(calendarDataStore)
 
   if (stage === specialStages.UNKNOWN) {

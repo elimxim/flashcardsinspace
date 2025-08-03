@@ -55,16 +55,16 @@ import '@/assets/modal.css'
 import ModalForm from '@/components/modal/ModalForm.vue'
 import { defineEmits, defineProps, onMounted, onUnmounted, type Ref, ref } from 'vue'
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
-import { useFlashcardStateStore } from '@/stores/flashcard-state.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set.ts'
 import { type FlashcardSet } from '@/model/flashcard.ts'
 import { type User } from '@/model/user.ts'
 import { required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
 import type { Language } from '@/model/language.ts'
 import { storeToRefs } from 'pinia'
-import { useLanguageDataStore } from '@/stores/language-data.ts'
-import { useReviewStateStore } from '@/stores/review-state.ts'
-import { useGlobalStateStore } from '@/stores/global-state.ts'
+import { useLanguageStore } from '@/stores/language.ts'
+import { useReviewStore } from '@/stores/review.ts'
+import { useGlobalStore } from '@/stores/global.ts'
 import { newFlashcardSet } from '@/core-logic/flashcard-logic.ts'
 
 defineProps({
@@ -73,11 +73,11 @@ defineProps({
 
 const emit = defineEmits(['update:visible'])
 
-const globalStateStore = useGlobalStateStore()
+const globalStateStore = useGlobalStore()
 const flashcardDataStore = useFlashcardDataStore()
-const flashcardStateStore = useFlashcardStateStore()
-const reviewStateStore = useReviewStateStore()
-const languageDataStore = useLanguageDataStore()
+const flashcardStateStore = useFlashcardSetStore()
+const reviewStateStore = useReviewStore()
+const languageDataStore = useLanguageStore()
 
 const { languages } = storeToRefs(languageDataStore)
 

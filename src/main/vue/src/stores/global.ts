@@ -1,8 +1,15 @@
 import { defineStore } from 'pinia'
-import { useReviewStateStore } from '@/stores/review-state'
-import { type GlobalState } from '@/model/state.ts'
+import { useReviewStore } from '@/stores/review.ts'
 
-export const useGlobalStateStore = defineStore('global-state', {
+export interface GlobalState {
+  flashcardSetSettingsModalFormOpen: boolean
+  flashcardSetCreationModalFormOpen: boolean
+  flashcardCreationModalFormOpen: boolean
+  flashcardEditModalFormOpen: boolean
+  calendarModalFormOpen: boolean
+}
+
+export const useGlobalStore = defineStore('global', {
   state: (): GlobalState => {
     return {
       flashcardSetSettingsModalFormOpen: false,
@@ -24,7 +31,7 @@ export const useGlobalStateStore = defineStore('global-state', {
     },
     toggleFlashcardEditModalForm() {
       this.flashcardEditModalFormOpen = !this.flashcardEditModalFormOpen
-      const reviewStateStore = useReviewStateStore()
+      const reviewStateStore = useReviewStore()
       reviewStateStore.setEditFormWasOpened(true)
     },
     toggleCalendarModalForm() {

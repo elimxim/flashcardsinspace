@@ -5,7 +5,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth-state.ts'
+import { useAuthStore } from '@/stores/auth.ts'
 import { routeNames } from '@/router/index.ts'
 
 const router = useRouter()

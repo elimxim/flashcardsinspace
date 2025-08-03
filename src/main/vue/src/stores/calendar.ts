@@ -1,10 +1,16 @@
 import { defineStore } from 'pinia'
-import { type LightspeedCalendar, type LightDay, StudyStatus } from '@/model/calendar.ts'
-import { type Stage, stages } from '@/core-logic/stage-logic.ts'
+import { type LightDay, StudyStatus } from '@/model/calendar.ts'
+import { stages } from '@/core-logic/stage-logic.ts'
 import { asIsoDate } from '@/utils/date.ts'
 
-export const useCalendarDataStore = defineStore('calendar-data', {
-  state: (): LightspeedCalendar => {
+export interface CalendarState {
+  lightStartDate: string
+  currLightDay: LightDay
+  lightDays: LightDay[]
+}
+
+export const useCalendarStore = defineStore('calendar', {
+  state: (): CalendarState => {
     const isoDate = asIsoDate(new Date())
     return {
       lightStartDate: isoDate,
@@ -46,7 +52,7 @@ export const useCalendarDataStore = defineStore('calendar-data', {
   }
 })
 
-function testData(): LightspeedCalendar {
+function testData(): CalendarState {
   const days: LightDay[] = []
   const startDate = new Date()
   startDate.setDate(startDate.getDate() - 19)
