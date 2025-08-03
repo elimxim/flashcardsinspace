@@ -55,6 +55,7 @@ class SecurityConfig {
         .authorizeHttpRequests { auth ->
             auth
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/api/users/**").authenticated()
                 .requestMatchers("/api/flashcards/**").authenticated()
                 .anyRequest().authenticated()

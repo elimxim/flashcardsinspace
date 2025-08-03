@@ -61,7 +61,7 @@ function testData(): FlashcardSet[] {
       name: "Bosnian",
       language: {
         name: "Bosnian",
-        alpha2: "bs",
+        code: "bs",
       },
       flashcardMap: new Map([
         [1, {
@@ -96,7 +96,7 @@ function testData(): FlashcardSet[] {
       name: "Russian",
       language: {
         name: "Russian",
-        alpha2: "ru",
+        code: "ru",
       },
       flashcardMap: new Map([
         [1, {

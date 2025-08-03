@@ -1,9 +1,11 @@
 package com.github.elimxim.flashcardsinspace.security
 
+import com.github.elimxim.flashcardsinspace.entity.Language
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
 import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
 import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
+import com.github.elimxim.flashcardsinspace.service.LanguageService
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -18,8 +20,9 @@ private val log = LoggerFactory.getLogger(AuthService::class.java)
 class AuthService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtService: JwtService,
     private val authenticationManager: AuthenticationManager,
+    private val jwtService: JwtService,
+    private val languageService: LanguageService,
 ) {
 
     // todo SignUpResponse with errors instead of throwing exceptions
@@ -32,10 +35,14 @@ class AuthService(
             throw IllegalArgumentException("Email already exists")
         }
 
+        val language = languageService.getLanguage(request.languageId)
+            .orElseThrow { NullPointerException("Language not found") } // fixme
+
         val user = User(
             email = request.email,
             name = request.name,
             secret = passwordEncoder.encode(request.secret),
+            language = language,
             roles = "ASTRONAUT", // todo role model
             registeredAt = ZonedDateTime.now(),
         )

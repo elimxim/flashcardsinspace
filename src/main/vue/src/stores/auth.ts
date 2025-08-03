@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import type { User } from '@/model/user.ts'
 import apiClient from '@/api/api-client.ts'
 import type { UserResponse } from '@/api/api-dto.ts'
+import type { Language } from '@/model/language.ts';
 
 export interface AuthState {
   user: User | null,
@@ -22,11 +23,12 @@ export const useAuthStore = defineStore('auth', {
     setUser(user: User | null) {
       this.user = user
     },
-    async signup(name: string, email: string, password: string) {
+    async signup(name: string, email: string, password: string, languageId: number) {
       const response = await apiClient.post<UserResponse>('/auth/signup', {
         email: email,
         secret: password,
         name: name,
+        languageId: languageId,
       })
       this.setUser(response.data.user)
     },

@@ -9,7 +9,7 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5439/postgres?currentSchema=flashcardsinspace&sessionTimezone=UTC
+    url: jdbc:postgresql://localhost:5439/flashcardsinspace?sessionTimezone=UTC
     username: postgres
     password:
   jpa:

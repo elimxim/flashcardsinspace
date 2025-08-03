@@ -21,14 +21,25 @@ import ReviewForm from '@/components/ReviewForm.vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { useReviewStore } from '@/stores/review.ts'
 import { storeToRefs } from 'pinia'
+import { onMounted } from 'vue'
+import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
+import { useCalendarStore } from '@/stores/calendar.ts'
 
+const flashcardDataStore = useFlashcardDataStore()
+const calendarDataStore = useCalendarStore()
 const reviewStateStore = useReviewStore()
 const { started: reviewStarted } = storeToRefs(reviewStateStore)
+
+onMounted(() => {
+  flashcardDataStore.loadData()
+  calendarDataStore.loadData()
+})
 
 onBeforeRouteLeave((to, from, next) => {
   reviewStateStore.finishReview()
   next()
 })
+
 </script>
 
 <style scoped>

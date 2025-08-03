@@ -22,11 +22,21 @@ data class User(
     @Column(nullable = false)
     var secret: String,
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "language_id", referencedColumnName = "id")
+    var language: Language,
+
     @Column(nullable = false)
     var roles: String,
 
     @Column(nullable = false)
     var registeredAt: ZonedDateTime,
+
+    @Column(nullable = true)
+    var lastLoginAt: ZonedDateTime? = null,
+
+    @Column(nullable = true)
+    var lastUpdateAt: ZonedDateTime? = null,
 
     // todo more field?
 ) : UserDetails {

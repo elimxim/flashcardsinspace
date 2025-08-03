@@ -17,7 +17,7 @@
               <font-awesome-icon icon="fa-solid fa-globe"/>
             </span>
           <select class="modal-select" v-model="flashcardSetLanguage">
-            <option v-for="i in languages" :key="i.alpha2" :value="i">
+            <option v-for="i in languages" :key="i.id" :value="i">
               {{ i.name }}
             </option>
           </select>

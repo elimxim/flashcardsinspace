@@ -40,26 +40,21 @@
 
 <script setup lang="ts">
 import '@/assets/main.css'
-import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
 import { useLanguageStore } from '@/stores/language.ts'
-import { useCalendarStore } from '@/stores/calendar.ts'
 import { useAuthStore } from '@/stores/auth.ts'
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { routeNames } from '@/router'
 
 const authStore = useAuthStore()
-const flashcardDataStore = useFlashcardDataStore()
-const languageDataStore = useLanguageStore()
-const calendarDataStore = useCalendarStore()
+const languageStore = useLanguageStore()
 
 const { isAuthenticated } = storeToRefs(authStore)
 
 onMounted(() => {
-  flashcardDataStore.loadData()
-  languageDataStore.loadData()
-  calendarDataStore.loadData()
+  languageStore.loadData()
 })
+
 </script>
 
 <style scoped>

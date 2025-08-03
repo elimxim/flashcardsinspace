@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
-      file: db/changelog/changeset/001-create-astro-user-table.yaml
+      file: db/changelog/changeset/001-create-language-table.yaml
+  - include:
+      file: db/changelog/changeset/002-insert-languages.yaml
+  - include:
+      file: db/changelog/changeset/003-create-astro-user-table.yaml

@@ -7,3 +7,9 @@ data class UserDto(
     val roles: List<String>,
     val registeredAt: String,
 )
+
+data class LanguageDto(
+    val id: Long,
+    val name: String,
+    val code: String,
+)

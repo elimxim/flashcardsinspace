@@ -1,0 +1,985 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-insert-languages
+      author: elimxim
+      changes:
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Afrikaans" }
+              - column: { name: "code", value: "af" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Aghem" }
+              - column: { name: "code", value: "agq" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Akan" }
+              - column: { name: "code", value: "ak" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Albanian" }
+              - column: { name: "code", value: "sq" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Amharic" }
+              - column: { name: "code", value: "am" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Arabic" }
+              - column: { name: "code", value: "ar" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Armenian" }
+              - column: { name: "code", value: "hy" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Assamese" }
+              - column: { name: "code", value: "as" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Asturian" }
+              - column: { name: "code", value: "ast" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Asu" }
+              - column: { name: "code", value: "asa" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Azerbaijani" }
+              - column: { name: "code", value: "az" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Bafia" }
+              - column: { name: "code", value: "ksf" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Bambara" }
+              - column: { name: "code", value: "bm" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Bangla" }
+              - column: { name: "code", value: "bn" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Basaa" }
+              - column: { name: "code", value: "bas" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Basque" }
+              - column: { name: "code", value: "eu" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Belarusian" }
+              - column: { name: "code", value: "be" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Bemba" }
+              - column: { name: "code", value: "bem" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Bena" }
+              - column: { name: "code", value: "bez" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Bodo" }
+              - column: { name: "code", value: "brx" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Bosnian" }
+              - column: { name: "code", value: "bs" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Breton" }
+              - column: { name: "code", value: "br" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Bulgarian" }
+              - column: { name: "code", value: "bg" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Burmese" }
+              - column: { name: "code", value: "my" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Cantonese" }
+              - column: { name: "code", value: "yue" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Catalan" }
+              - column: { name: "code", value: "ca" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "CentralAtlasTamazight" }
+              - column: { name: "code", value: "tzm" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "CentralKurdish" }
+              - column: { name: "code", value: "ckb" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Chakma" }
+              - column: { name: "code", value: "ccp" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Chechen" }
+              - column: { name: "code", value: "ce" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Cherokee" }
+              - column: { name: "code", value: "chr" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Chiga" }
+              - column: { name: "code", value: "cgg" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Chinese" }
+              - column: { name: "code", value: "zh" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Colognian" }
+              - column: { name: "code", value: "ksh" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Cornish" }
+              - column: { name: "code", value: "kw" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Croatian" }
+              - column: { name: "code", value: "hr" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Czech" }
+              - column: { name: "code", value: "cs" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Danish" }
+              - column: { name: "code", value: "da" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Duala" }
+              - column: { name: "code", value: "dua" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Dutch" }
+              - column: { name: "code", value: "nl" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Dzongkha" }
+              - column: { name: "code", value: "dz" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Embu" }
+              - column: { name: "code", value: "ebu" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "English" }
+              - column: { name: "code", value: "en" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Esperanto" }
+              - column: { name: "code", value: "eo" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Estonian" }
+              - column: { name: "code", value: "et" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Ewe" }
+              - column: { name: "code", value: "ee" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Ewondo" }
+              - column: { name: "code", value: "ewo" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Faroese" }
+              - column: { name: "code", value: "fo" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Filipino" }
+              - column: { name: "code", value: "fil" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Finnish" }
+              - column: { name: "code", value: "fi" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "French" }
+              - column: { name: "code", value: "fr" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Friulian" }
+              - column: { name: "code", value: "fur" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Fulah" }
+              - column: { name: "code", value: "ff" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Galician" }
+              - column: { name: "code", value: "gl" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Ganda" }
+              - column: { name: "code", value: "lg" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Georgian" }
+              - column: { name: "code", value: "ka" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "German" }
+              - column: { name: "code", value: "de" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Greek" }
+              - column: { name: "code", value: "el" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Gujarati" }
+              - column: { name: "code", value: "gu" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Gusii" }
+              - column: { name: "code", value: "guz" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Hausa" }
+              - column: { name: "code", value: "ha" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Hawaiian" }
+              - column: { name: "code", value: "haw" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Hebrew" }
+              - column: { name: "code", value: "he" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Hindi" }
+              - column: { name: "code", value: "hi" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Hungarian" }
+              - column: { name: "code", value: "hu" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Icelandic" }
+              - column: { name: "code", value: "is" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Igbo" }
+              - column: { name: "code", value: "ig" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "InariSami" }
+              - column: { name: "code", value: "smn" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Indonesian" }
+              - column: { name: "code", value: "id" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Irish" }
+              - column: { name: "code", value: "ga" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Italian" }
+              - column: { name: "code", value: "it" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Japanese" }
+              - column: { name: "code", value: "ja" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Jola-Fonyi" }
+              - column: { name: "code", value: "dyo" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Kabuverdianu" }
+              - column: { name: "code", value: "kea" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Kabyle" }
+              - column: { name: "code", value: "kab" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Kako" }
+              - column: { name: "code", value: "kkj" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Kalaallisut" }
+              - column: { name: "code", value: "kl" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Kalenjin" }
+              - column: { name: "code", value: "kln" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Kamba" }
+              - column: { name: "code", value: "kam" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Kannada" }
+              - column: { name: "code", value: "kn" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Kashmiri" }
+              - column: { name: "code", value: "ks" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Kazakh" }
+              - column: { name: "code", value: "kk" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Khmer" }
+              - column: { name: "code", value: "km" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Kikuyu" }
+              - column: { name: "code", value: "ki" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Kinyarwanda" }
+              - column: { name: "code", value: "rw" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Konkani" }
+              - column: { name: "code", value: "kok" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Korean" }
+              - column: { name: "code", value: "ko" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "KoyraChiini" }
+              - column: { name: "code", value: "khq" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "KoyraboroSenni" }
+              - column: { name: "code", value: "ses" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Kwasio" }
+              - column: { name: "code", value: "nmg" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Kyrgyz" }
+              - column: { name: "code", value: "ky" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Lakota" }
+              - column: { name: "code", value: "lkt" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Langi" }
+              - column: { name: "code", value: "lag" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Lao" }
+              - column: { name: "code", value: "lo" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Latvian" }
+              - column: { name: "code", value: "lv" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Lingala" }
+              - column: { name: "code", value: "ln" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Lithuanian" }
+              - column: { name: "code", value: "lt" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "LowGerman" }
+              - column: { name: "code", value: "nds" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "LowerSorbian" }
+              - column: { name: "code", value: "dsb" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Luba-Katanga" }
+              - column: { name: "code", value: "lu" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Luo" }
+              - column: { name: "code", value: "luo" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Luxembourgish" }
+              - column: { name: "code", value: "lb" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Luyia" }
+              - column: { name: "code", value: "luy" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Macedonian" }
+              - column: { name: "code", value: "mk" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Machame" }
+              - column: { name: "code", value: "jmc" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Makhuwa-Meetto" }
+              - column: { name: "code", value: "mgh" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Makonde" }
+              - column: { name: "code", value: "kde" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Malagasy" }
+              - column: { name: "code", value: "mg" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Malay" }
+              - column: { name: "code", value: "ms" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Malayalam" }
+              - column: { name: "code", value: "ml" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Maltese" }
+              - column: { name: "code", value: "mt" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Manx" }
+              - column: { name: "code", value: "gv" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Marathi" }
+              - column: { name: "code", value: "mr" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Masai" }
+              - column: { name: "code", value: "mas" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Mazanderani" }
+              - column: { name: "code", value: "mzn" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Meru" }
+              - column: { name: "code", value: "mer" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Metaʼ" }
+              - column: { name: "code", value: "mgo" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Mongolian" }
+              - column: { name: "code", value: "mn" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Morisyen" }
+              - column: { name: "code", value: "mfe" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Mundang" }
+              - column: { name: "code", value: "mua" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Nama" }
+              - column: { name: "code", value: "naq" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Nepali" }
+              - column: { name: "code", value: "ne" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Ngiemboon" }
+              - column: { name: "code", value: "nnh" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Ngomba" }
+              - column: { name: "code", value: "jgo" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "NorthNdebele" }
+              - column: { name: "code", value: "nd" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "NorthernLuri" }
+              - column: { name: "code", value: "lrc" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "NorthernSami" }
+              - column: { name: "code", value: "se" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "NorwegianBokmål" }
+              - column: { name: "code", value: "nb" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "NorwegianNynorsk" }
+              - column: { name: "code", value: "nn" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Nuer" }
+              - column: { name: "code", value: "nus" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Nyankole" }
+              - column: { name: "code", value: "nyn" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Odia" }
+              - column: { name: "code", value: "or" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Oromo" }
+              - column: { name: "code", value: "om" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Ossetic" }
+              - column: { name: "code", value: "os" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Pashto" }
+              - column: { name: "code", value: "ps" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Persian" }
+              - column: { name: "code", value: "fa" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Polish" }
+              - column: { name: "code", value: "pl" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Portuguese" }
+              - column: { name: "code", value: "pt" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Punjabi" }
+              - column: { name: "code", value: "pa" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Quechua" }
+              - column: { name: "code", value: "qu" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Romanian" }
+              - column: { name: "code", value: "ro" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Romansh" }
+              - column: { name: "code", value: "rm" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Rombo" }
+              - column: { name: "code", value: "rof" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Rundi" }
+              - column: { name: "code", value: "rn" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Russian" }
+              - column: { name: "code", value: "ru" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Rwa" }
+              - column: { name: "code", value: "rwk" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Sakha" }
+              - column: { name: "code", value: "sah" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Samburu" }
+              - column: { name: "code", value: "saq" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Sango" }
+              - column: { name: "code", value: "sg" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Sangu" }
+              - column: { name: "code", value: "sbp" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "ScottishGaelic" }
+              - column: { name: "code", value: "gd" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Sena" }
+              - column: { name: "code", value: "seh" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Serbian" }
+              - column: { name: "code", value: "sr" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Shambala" }
+              - column: { name: "code", value: "ksb" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Shona" }
+              - column: { name: "code", value: "sn" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "SichuanYi" }
+              - column: { name: "code", value: "ii" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Sinhala" }
+              - column: { name: "code", value: "si" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Slovak" }
+              - column: { name: "code", value: "sk" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Slovenian" }
+              - column: { name: "code", value: "sl" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Soga" }
+              - column: { name: "code", value: "xog" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Somali" }
+              - column: { name: "code", value: "so" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Spanish" }
+              - column: { name: "code", value: "es" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "StandardMoroccanTamazight" }
+              - column: { name: "code", value: "zgh" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Swahili" }
+              - column: { name: "code", value: "sw" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Swedish" }
+              - column: { name: "code", value: "sv" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "SwissGerman" }
+              - column: { name: "code", value: "gsw" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Tachelhit" }
+              - column: { name: "code", value: "shi" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Taita" }
+              - column: { name: "code", value: "dav" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Tajik" }
+              - column: { name: "code", value: "tg" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Tamil" }
+              - column: { name: "code", value: "ta" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Tasawaq" }
+              - column: { name: "code", value: "twq" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Tatar" }
+              - column: { name: "code", value: "tt" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Telugu" }
+              - column: { name: "code", value: "te" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Teso" }
+              - column: { name: "code", value: "teo" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Thai" }
+              - column: { name: "code", value: "th" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Tibetan" }
+              - column: { name: "code", value: "bo" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Tigrinya" }
+              - column: { name: "code", value: "ti" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Tongan" }
+              - column: { name: "code", value: "to" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Turkish" }
+              - column: { name: "code", value: "tr" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Ukrainian" }
+              - column: { name: "code", value: "uk" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "UpperSorbian" }
+              - column: { name: "code", value: "hsb" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Urdu" }
+              - column: { name: "code", value: "ur" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Uyghur" }
+              - column: { name: "code", value: "ug" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Uzbek" }
+              - column: { name: "code", value: "uz" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Vai" }
+              - column: { name: "code", value: "vai" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Vietnamese" }
+              - column: { name: "code", value: "vi" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Vunjo" }
+              - column: { name: "code", value: "vun" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Walser" }
+              - column: { name: "code", value: "wae" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Welsh" }
+              - column: { name: "code", value: "cy" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "WesternFrisian" }
+              - column: { name: "code", value: "fy" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Wolof" }
+              - column: { name: "code", value: "wo" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Yangben" }
+              - column: { name: "code", value: "yav" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Yiddish" }
+              - column: { name: "code", value: "yi" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Yoruba" }
+              - column: { name: "code", value: "yo" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Zarma" }
+              - column: { name: "code", value: "dje" }
+        - insert:
+            tableName: language
+            columns:
+              - column: { name: "name", value: "Zulu" }
+              - column: { name: "code", value: "zu" }
