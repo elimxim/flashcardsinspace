@@ -1,5 +1,9 @@
 import type { Language } from '@/model/language.ts'
 
+export interface ReviewHistory {
+  history: ReviewInfo[]
+}
+
 export interface ReviewInfo {
   stage: string
   reviewedAt: string
@@ -11,18 +15,17 @@ export interface Flashcard {
   backSide: string
   stage: string
   reviewCount: number
-  reviewHistory: ReviewInfo[]
-  createdAt: string
-  reviewedAt: string | null
+  reviewHistory: ReviewHistory
+  createdAt: string // fixme creationDate
+  reviewedAt: string | null // fixme reviewDate
   lastUpdatedAt: string | null
 }
 
 export interface FlashcardSet {
   id: number
   name: string
-  language: Language
-  flashcardMap: Map<number, Flashcard>
-  createdAt: string
+  languageId: number,
+  createdAt: string // fixme creationDate
+  default: boolean // fixme first
   lastUpdatedAt: string | null
-  default: boolean
 }

@@ -51,7 +51,7 @@
             :class="{ 'menu-button': b.reviewable }"
             @click="b.reviewable ? startStageReview(b.stage) : null">
           <li class="menu-item-number">{{ b.flashcardNumber }}</li>
-          <li>{{ b.stage.name }}</li>
+          <li>{{ b.stage.displayName }}</li>
         </ul>
       </li>
     </ul>
@@ -98,8 +98,6 @@ const {
   flashcardCreationModalFormOpen,
   calendarModalFormOpen
 } = storeToRefs(globalStore)
-
-flashcardSetStore.initFromList(flashcardSets.value)
 
 const showFlashcardMenuItem = computed(() => flashcardSet.value !== null)
 

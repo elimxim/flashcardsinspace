@@ -23,13 +23,19 @@ import { useReviewStore } from '@/stores/review.ts'
 import { storeToRefs } from 'pinia'
 import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
 import { useCalendarStore } from '@/stores/calendar.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set.ts'
 
 const flashcardDataStore = useFlashcardDataStore()
+const flashcardSetStore = useFlashcardSetStore()
 const calendarStore = useCalendarStore()
 const reviewStore = useReviewStore()
-const { started: reviewStarted } = storeToRefs(reviewStore)
 
-flashcardDataStore.loadData()
+const { started: reviewStarted } = storeToRefs(reviewStore)
+const { flashcardSets } = storeToRefs(flashcardDataStore)
+
+flashcardDataStore.loadData().then(() => {
+  flashcardSetStore.initFromList(flashcardSets.value)
+})
 calendarStore.loadData()
 
 onBeforeRouteLeave((to, from, next) => {

@@ -20,7 +20,7 @@ export function newFlashcard(frontSide: string, backSide: string): Flashcard {
     stage: stages.S1.name,
     reviewedAt: null,
     reviewCount: 0,
-    reviewHistory: [],
+    reviewHistory: { history: [] },
     createdAt: currLightDay.value.isoDate,
     lastUpdatedAt: null,
   }
@@ -52,7 +52,7 @@ export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
   flashcard.stage = stage.name
   flashcard.reviewedAt = reviewedAt
   flashcard.reviewCount += 1
-  flashcard.reviewHistory.push(info)
+  flashcard.reviewHistory.history.push(info)
   flashcard.lastUpdatedAt = new Date().toISOString()
   return flashcard
 }
@@ -68,8 +68,7 @@ export function newFlashcardSet(name: string, language: Language): FlashcardSet 
   return {
     id: 0,
     name: name,
-    language: language,
-    flashcardMap: new Map(),
+    languageId: language.id,
     createdAt: currLightDay.value.isoDate,
     lastUpdatedAt: null,
     default: false,

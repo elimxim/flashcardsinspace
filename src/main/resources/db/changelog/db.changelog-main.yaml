@@ -5,3 +5,7 @@ databaseChangeLog:
       file: db/changelog/changeset/002-insert-languages.yaml
   - include:
       file: db/changelog/changeset/003-create-astro-user-table.yaml
+  - include:
+      file: db/changelog/changeset/004-create-flashcard-set-table.yaml
+  - include:
+      file: db/changelog/changeset/005-create-flashcard-table.yaml

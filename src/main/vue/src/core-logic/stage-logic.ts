@@ -1,22 +1,23 @@
 export interface Stage {
   name: string
+  displayName: string
   order: number
 }
 
 export const specialStages = {
-  UNKNOWN: { name: 'Unknown', order: 0 } as Stage,
-  ATTEMPTED: { name: 'Attempted', order: 0 } as Stage,
-  OUTER_SPACE: { name: 'Outer space', order: 8 } as Stage,
+  UNKNOWN: { name: 'UNKNOWN', displayName: 'Unknown', order: 0 } as Stage,
+  ATTEMPTED: { name: 'ATTEMPTED', displayName: 'Attempted', order: 0 } as Stage,
+  OUTER_SPACE: { name: 'OUTER_SPACE', displayName: 'Outer space', order: 8 } as Stage,
 }
 
 export const stages = {
-  S1: { name: 'Stage 1', order: 1 } as Stage,
-  S2: { name: 'Stage 2', order: 2 } as Stage,
-  S3: { name: 'Stage 3', order: 3 } as Stage,
-  S4: { name: 'Stage 4', order: 4 } as Stage,
-  S5: { name: 'Stage 5', order: 5 } as Stage,
-  S6: { name: 'Stage 6', order: 6 } as Stage,
-  S7: { name: 'Stage 7', order: 7 } as Stage,
+  S1: { name: 'S1', displayName: 'Stage 1', order: 1 } as Stage,
+  S2: { name: 'S2', displayName: 'Stage 2', order: 2 } as Stage,
+  S3: { name: 'S3', displayName: 'Stage 3', order: 3 } as Stage,
+  S4: { name: 'S4', displayName: 'Stage 4', order: 4 } as Stage,
+  S5: { name: 'S5', displayName: 'Stage 5', order: 5 } as Stage,
+  S6: { name: 'S6', displayName: 'Stage 6', order: 6 } as Stage,
+  S7: { name: 'S7', displayName: 'Stage 7', order: 7 } as Stage,
 }
 
 export const allStages: Stage[] = [

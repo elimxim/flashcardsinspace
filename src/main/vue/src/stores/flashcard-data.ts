@@ -1,7 +1,11 @@
 import { type FlashcardSet } from '@/model/flashcard.ts'
 import { defineStore } from 'pinia'
-import { stages } from '@/core-logic/stage-logic.ts'
-import { asIsoDate, minusDays, today, yesterday } from '@/utils/date'
+import apiClient from '@/api/api-client.ts'
+import type {
+  FlashcardSetsPostRequest,
+  FlashcardSetsPostResponse,
+  FlashcardSetsGetResponse
+} from '@/api/communication.ts'
 
 export interface FlashcardDataState {
   flashcardSets: FlashcardSet[]
@@ -14,119 +18,39 @@ export const useFlashcardDataStore = defineStore('flashcard-data', {
     }
   },
   actions: {
-    loadData() {
-      this.flashcardSets = testData().sort((a, b) => {
-        if (a.default && !b.default) return -1
-        if (!a.default && b.default) return 1
+    async loadData(): Promise<void> {
+      await apiClient.get<FlashcardSetsGetResponse>('/flashcard-sets').then(response => {
+        this.flashcardSets = response.data.flashcardSets.sort((a, b) => {
+          if (a.default && !b.default) return -1
+          if (!a.default && b.default) return 1
 
-        return a.name.localeCompare(b.name)
+          return a.name.localeCompare(b.name)
+        })
       })
+      // todo handle errors
     },
-    addFlashcardSet(flashcardSet: FlashcardSet) {
-      flashcardSet.id = nextId(this.flashcardSets)
-      flashcardSet.createdAt = new Date().toISOString()
-      flashcardSet.lastUpdatedAt = new Date().toISOString()
-      this.flashcardSets.push(flashcardSet)
-    },
-    removeFlashcardSet(flashcardSet: FlashcardSet) {
-      const idx = this.flashcardSets.indexOf(flashcardSet, 0)
-      if (idx > -1) {
-        this.flashcardSets.splice(idx, 1)
+    async addFlashcardSet(flashcardSet: FlashcardSet): Promise<FlashcardSet | null> {
+      const request: FlashcardSetsPostRequest = {
+        flashcardSet: flashcardSet,
       }
+
+      try {
+        const response = await apiClient.post<FlashcardSetsPostResponse>('/flashcard-sets', request)
+        this.flashcardSets.push(response.data.flashcardSet)
+        return response.data.flashcardSet
+      } catch (error) {
+        return null // fixme
+        // todo handle errors
+      }
+    },
+    async removeFlashcardSet(flashcardSet: FlashcardSet): Promise<void> {
+      await apiClient.delete(`/flashcard-sets/${flashcardSet.id}`).then(_ => {
+        const idx = this.flashcardSets.indexOf(flashcardSet, 0)
+        if (idx > -1) {
+          this.flashcardSets.splice(idx, 1)
+        }
+      })
+      // todo handle errors
     },
   }
 })
-
-function nextId(flashcardSets: FlashcardSet[]): number {
-  let max = 1
-  if (flashcardSets.length > 0) {
-    max = flashcardSets.reduce(
-      (prev, curr) => {
-        return (prev && prev.id > curr.id) ? prev : curr
-      },
-      flashcardSets[0]
-    )?.id
-  }
-  return max + 1
-}
-
-function testEmptyData(): FlashcardSet[] {
-  return []
-}
-
-function testData(): FlashcardSet[] {
-  return [
-    {
-      id: 1,
-      name: "Bosnian",
-      language: {
-        id: 1,
-        name: "Bosnian",
-        code: "bs",
-      },
-      flashcardMap: new Map([
-        [1, {
-          id: 1,
-          frontSide: "Prdnuti",
-          backSide: "To fart",
-          stage: stages.S1.name, // unknown
-          reviewCount: 0,
-          reviewHistory: [], // todo
-          reviewedAt: null,
-          createdAt: asIsoDate(today()),
-          lastUpdatedAt: asIsoDate(today()),
-        }],
-        [2, {
-          id: 2,
-          frontSide: "Kakati",
-          backSide: "To poop",
-          stage: stages.S1.name, // attempted
-          reviewCount: 0,
-          reviewHistory: [],
-          reviewedAt: asIsoDate(today()),
-          createdAt: asIsoDate(yesterday()),
-          lastUpdatedAt: asIsoDate(today()),
-        }],
-      ]),
-      createdAt: asIsoDate(yesterday()),
-      lastUpdatedAt: asIsoDate(yesterday()),
-      default: false,
-    },
-    {
-      id: 2,
-      name: "Russian",
-      language: {
-        id: 2,
-        name: "Russian",
-        code: "ru",
-      },
-      flashcardMap: new Map([
-        [1, {
-          id: 1,
-          frontSide: "Пукать",
-          backSide: "To fart",
-          stage: stages.S1.name,
-          reviewCount: 0,
-          reviewHistory: [],
-          reviewedAt: asIsoDate(yesterday()),
-          createdAt: asIsoDate(minusDays(today(), 2)),
-          lastUpdatedAt: asIsoDate(minusDays(today(), 2)),
-        }],
-        [2, {
-          id: 2,
-          frontSide: "Какать",
-          backSide: "To poop",
-          stage: stages.S7.name,
-          reviewCount: 0,
-          reviewHistory: [],
-          reviewedAt: asIsoDate(yesterday()),
-          createdAt: asIsoDate(minusDays(today(), 64)),
-          lastUpdatedAt: asIsoDate(yesterday()),
-        }],
-      ]),
-      createdAt: asIsoDate(minusDays(today(), 64)),
-      lastUpdatedAt: asIsoDate(minusDays(today(), 64)),
-      default: false,
-    }
-  ]
-}

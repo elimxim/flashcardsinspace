@@ -1,6 +1,10 @@
 package com.github.elimxim.flashcardsinspace.web.dto
 
+import com.github.elimxim.flashcardsinspace.entity.Flashcard
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
 import com.github.elimxim.flashcardsinspace.entity.Language
+import com.github.elimxim.flashcardsinspace.entity.ReviewHistory
+import com.github.elimxim.flashcardsinspace.entity.ReviewInfo
 import com.github.elimxim.flashcardsinspace.entity.User
 
 fun User.toDto() = UserDto(
@@ -15,4 +19,34 @@ fun Language.toDto() = LanguageDto(
     id = id,
     name = name,
     code = code,
+)
+
+fun FlashcardSet.toDto() = FlashcardSetDto(
+    id = id,
+    name = name,
+    languageId = language.id,
+    default = first,
+    createdAt = creationDate.toString(),
+    lastUpdatedAt = lastUpdatedAt?.toString(),
+)
+
+fun Flashcard.toDto() = FlashcardDto(
+    id = id,
+    frontSide = frontSide,
+    backSide = backSide,
+    stage = stage.name,
+    reviewedTimes = reviewedTimes,
+    reviewHistory = reviewHistory.toDto(),
+    createdAt = creationDate.toString(),
+    reviewedAt = reviewDate?.toString(),
+    lastUpdatedAt = lastUpdatedAt?.toString(),
+)
+
+fun ReviewHistory.toDto() = ReviewHistoryDto(
+    history = history.map { it.toDto() }
+)
+
+fun ReviewInfo.toDto() = ReviewInfoDto(
+    stage = stage.name,
+    reviewedAt = reviewDate.toString(),
 )

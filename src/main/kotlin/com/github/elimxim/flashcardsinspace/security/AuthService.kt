@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
 
 private val log = LoggerFactory.getLogger(AuthService::class.java)
@@ -28,6 +29,7 @@ class AuthService(
     // todo SignUpResponse with errors instead of throwing exceptions
     // todo signup journal
     // todo more logs
+    @Transactional
     fun signUp(request: SignUpRequest): User {
         // todo validate request fields
         if (userRepository.findByEmail(request.email).isPresent) {
@@ -35,8 +37,7 @@ class AuthService(
             throw IllegalArgumentException("Email already exists")
         }
 
-        val language = languageService.getLanguage(request.languageId)
-            .orElseThrow { NullPointerException("Language not found") } // fixme
+        val language = languageService.getLanguage(request.languageId) // fixme
 
         val user = User(
             email = request.email,
@@ -55,6 +56,7 @@ class AuthService(
     // todo LoginResponse with errors instead of throwing exceptions
     // todo login journal
     // todo more logs
+    @Transactional
     fun login(request: LoginRequest): User {
         val token = UsernamePasswordAuthenticationToken(request.email, request.secret)
         authenticationManager.authenticate(token)
@@ -65,12 +67,14 @@ class AuthService(
         return user
     }
 
+    @Transactional
     fun logout() {
         // todo log
     }
 
     // todo RefreshTokenResponse with errors
     // todo more logs
+    @Transactional
     fun refreshToken(refreshToken: String): User {
         val email = jwtService.extractUsername(refreshToken)
         val user = userRepository.findByEmail(email)

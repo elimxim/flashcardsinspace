@@ -131,8 +131,11 @@ function createNewFlashcardSet() {
     throw new Error('Can\'t a new flashcard set because language is not set')
   }
   const flashcardSet = newFlashcardSet(flashcardSetName.value, flashcardSetLanguage.value)
-  flashcardDataStore.addFlashcardSet(flashcardSet)
-  flashcardSetStore.init(flashcardSet)
+  flashcardDataStore.addFlashcardSet(flashcardSet).then((savedFlashcardSet: FlashcardSet | null) => {
+    if (savedFlashcardSet !== null) { // fixme
+      flashcardSetStore.init(savedFlashcardSet)
+    }
+  })
 }
 
 onMounted(() => {

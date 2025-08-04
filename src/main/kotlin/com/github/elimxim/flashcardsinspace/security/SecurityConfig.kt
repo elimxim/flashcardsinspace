@@ -57,7 +57,7 @@ class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/api/users/**").authenticated()
-                .requestMatchers("/api/flashcards/**").authenticated()
+                .requestMatchers("/api/flashcard-sets/**").authenticated()
                 .anyRequest().authenticated()
         }
         .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }

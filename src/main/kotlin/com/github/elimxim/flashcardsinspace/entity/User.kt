@@ -36,9 +36,14 @@ data class User(
     var lastLoginAt: ZonedDateTime? = null,
 
     @Column(nullable = true)
-    var lastUpdateAt: ZonedDateTime? = null,
+    var lastUpdatedAt: ZonedDateTime? = null,
 
-    // todo more field?
+    @OneToMany(
+        mappedBy = "user",
+        cascade = [CascadeType.ALL],
+        fetch = FetchType.LAZY,
+    )
+    var flashcardSets: List<FlashcardSet> = listOf(),
 ) : UserDetails {
     override fun getAuthorities(): Collection<GrantedAuthority> =
         roles.split(",").map { SimpleGrantedAuthority(it.trim()) }

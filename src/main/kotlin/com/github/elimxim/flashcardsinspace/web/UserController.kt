@@ -1,6 +1,5 @@
 package com.github.elimxim.flashcardsinspace.web
 
-import com.github.elimxim.flashcardsinspace.web.dto.UserDto
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
 import com.github.elimxim.flashcardsinspace.service.UserService
 import com.github.elimxim.flashcardsinspace.web.dto.UserResponse

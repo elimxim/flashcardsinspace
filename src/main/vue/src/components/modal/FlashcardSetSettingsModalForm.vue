@@ -68,8 +68,8 @@ import {
   defineEmits,
   defineProps,
   onMounted,
-  onUnmounted,
-  ref,
+  onUnmounted, type Ref,
+  ref, type UnwrapRef,
   watch
 } from 'vue'
 import { required } from '@vuelidate/validators'
@@ -79,6 +79,7 @@ import { useFlashcardSetStore } from '@/stores/flashcard-set.ts'
 import { storeToRefs } from 'pinia'
 import { useReviewStore } from '@/stores/review.ts'
 import { useGlobalStore } from '@/stores/global.ts'
+import { useLanguageStore } from '@/stores/language.ts'
 
 const emit = defineEmits(['update:visible'])
 
@@ -92,12 +93,12 @@ const flashcardDataStore = useFlashcardDataStore()
 const flashcardSetStore = useFlashcardSetStore()
 
 const { flashcardSets } = storeToRefs(flashcardDataStore)
-const { flashcardSet } = storeToRefs(flashcardSetStore)
+const { flashcardSet, language } = storeToRefs(flashcardSetStore)
 
 // state>
 
 const flashcardSetName = ref(flashcardSet.value?.name ?? null)
-const flashcardSetLanguage = ref(flashcardSet.value?.language.name ?? null)
+const flashcardSetLanguage = ref(language.value?.name ?? null)
 const flashcardSetDefault = ref(flashcardSet.value?.default ?? null)
 
 const stateChanged = computed(() => {
@@ -106,6 +107,10 @@ const stateChanged = computed(() => {
 })
 
 const removeConfirmation = ref(false)
+
+watch(language, (newValue) => {
+  flashcardSetLanguage.value = newValue?.name ?? null
+})
 
 watch(flashcardSetName, (_) => {
   removeConfirmation.value = false
@@ -117,7 +122,6 @@ watch(flashcardSetDefault, (_) => {
 
 flashcardSetStore.$subscribe((mutation, newState) => {
   flashcardSetName.value = newState.flashcardSet?.name ?? null
-  flashcardSetLanguage.value = newState.flashcardSet?.language.name ?? null
   flashcardSetDefault.value = newState.flashcardSet?.default ?? null
 })
 
@@ -130,7 +134,7 @@ const $v = useVuelidate(validationRules, { flashcardSetName: flashcardSetName })
 function resetState() {
   $v.value.$reset()
   flashcardSetName.value = flashcardSet.value?.name ?? null
-  flashcardSetLanguage.value = flashcardSet.value?.language.name ?? null
+  flashcardSetLanguage.value = language.value?.name ?? null
   flashcardSetDefault.value = flashcardSet.value?.default ?? null
   removeConfirmation.value = false
 }
@@ -172,19 +176,15 @@ function update() {
 
 function removeFlashcardSet() {
   if (flashcardSet.value !== null) {
-    flashcardDataStore.removeFlashcardSet(flashcardSet.value)
-    reviewStore.finishReview()
-    flashcardSetStore.initFromList(flashcardSets.value)
+    flashcardDataStore.removeFlashcardSet(flashcardSet.value).then(() => {
+      reviewStore.finishReview()
+      flashcardSetStore.initFromList(flashcardSets.value)
+    })
   }
 }
 
 function updateFlashcardSet() {
-  if (flashcardSetName.value !== null) {
-    flashcardSetStore.setName(flashcardSetName.value)
-  }
-  if (flashcardSetDefault.value !== null) {
-    flashcardSetStore.setDefault(flashcardSetDefault.value)
-  }
+  flashcardSetStore.updateFlashcardSet(flashcardSetName.value, flashcardSetDefault.value)
 }
 
 onMounted(() => {
