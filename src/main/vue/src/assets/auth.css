@@ -38,26 +38,40 @@
   background-color: #0056b3;
 }
 
-.auth-container select {
+.auth-select-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.auth-select-container-icon {
+  flex: 1;
+  font-size: 2rem;
+  color: #007bff;
+}
+
+.auth-select-container select {
+  flex: 10;
   appearance: none;
   border: 2px solid #ddd;
   border-radius: 4px;
-  padding: 8px;
+  padding: 0.75rem;
   font-size: 1rem;
   outline: none;
   cursor: pointer;
 }
 
-.auth-option {
+.auth-alternative {
   margin-top: 1.5rem;
   font-size: 0.9rem;
 }
 
-.auth-option a {
+.auth-alternative a {
   color: #007bff;
   text-decoration: none;
 }
 
-.auth-option a:hover {
+.auth-alternative a:hover {
   text-decoration: underline;
 }

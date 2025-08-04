@@ -3,17 +3,20 @@
     <form @submit.prevent="signup">
       <input v-model="name" type="text" placeholder="Name" required/>
       <input v-model="email" type="email" placeholder="Email" required/>
-      <select v-model="language">
-        <option v-for="i in languages" :key="i.id" :value="i">
-          {{ i.name }}
-        </option>
-      </select>
+      <div class="auth-select-container">
+        <font-awesome-icon icon="fa-solid fa-globe" class="auth-select-container-icon"/>
+        <select v-model="language">
+          <option v-for="i in languages" :key="i.id" :value="i">
+            {{ i.name }}
+          </option>
+        </select>
+      </div>
       <!-- todo ability to see the password -->
       <input v-model="password" type="password" placeholder="Password" required/>
       <input v-model="confirmPassword" type="password" placeholder="Confirm Password" required/>
       <button type="submit">Sign Up</button>
     </form>
-    <p class="auth-option">
+    <p class="auth-alternative">
       Already signed up?
       <router-link to="/login">Login</router-link>
     </p>
@@ -45,6 +48,7 @@ const language = ref(null as Language | null)
 const password = ref('')
 // todo validate if the inputs have the same email
 const confirmPassword = ref('')
+
 // todo password strength
 
 async function signup() {
