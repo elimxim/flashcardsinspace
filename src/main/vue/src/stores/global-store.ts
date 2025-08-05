@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useReviewStore } from '@/stores/review.ts'
+import { useReviewStore } from '@/stores/review-store.ts'
 
 export interface GlobalState {
   flashcardSetSettingsModalFormOpen: boolean

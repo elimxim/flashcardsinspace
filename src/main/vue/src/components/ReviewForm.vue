@@ -91,11 +91,11 @@
 
 <script setup lang="ts">
 import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
-import { useFlashcardSetStore } from '@/stores/flashcard-set.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { ReviewMode, useReviewStore } from '@/stores/review.ts'
-import { useGlobalStore } from '@/stores/global.ts'
+import { ReviewMode, useReviewStore } from '@/stores/review-store.ts'
+import { useGlobalStore } from '@/stores/global-store.ts'
 import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { getStage, stages, nextStage, prevStage } from '@/core-logic/stage-logic.ts'
 

@@ -74,12 +74,12 @@ import {
 } from 'vue'
 import { required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
-import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
-import { useFlashcardSetStore } from '@/stores/flashcard-set.ts'
+import { useFlashcardDataStore } from '@/stores/flashcard-data-store.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { storeToRefs } from 'pinia'
-import { useReviewStore } from '@/stores/review.ts'
-import { useGlobalStore } from '@/stores/global.ts'
-import { useLanguageStore } from '@/stores/language.ts'
+import { useReviewStore } from '@/stores/review-store.ts'
+import { useGlobalStore } from '@/stores/global-store.ts'
+import { useLanguageStore } from '@/stores/language-store.ts'
 
 const emit = defineEmits(['update:visible'])
 

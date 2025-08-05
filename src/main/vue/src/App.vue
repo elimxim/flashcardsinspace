@@ -40,8 +40,8 @@
 
 <script setup lang="ts">
 import '@/assets/main.css'
-import { useLanguageStore } from '@/stores/language.ts'
-import { useAuthStore } from '@/stores/auth.ts'
+import { useLanguageStore } from '@/stores/language-store.ts'
+import { useAuthStore } from '@/stores/auth-store.ts'
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { routeNames } from '@/router'

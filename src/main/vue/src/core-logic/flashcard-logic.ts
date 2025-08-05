@@ -1,7 +1,7 @@
 import { type Flashcard, type FlashcardSet, type ReviewInfo } from '@/model/flashcard.ts'
 import { type Stage, stages } from '@/core-logic/stage-logic.ts'
 import type { Language } from '@/model/language.ts'
-import { useCalendarStore } from '@/stores/calendar.ts'
+import { useCalendarStore } from '@/stores/calendar-store.ts'
 import { storeToRefs } from 'pinia'
 
 /**

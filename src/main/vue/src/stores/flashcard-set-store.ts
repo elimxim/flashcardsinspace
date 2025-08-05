@@ -11,7 +11,7 @@ import type {
   FlashcardsPostResponse,
 } from '@/api/communication.ts'
 import type { Language } from '@/model/language.ts'
-import { useLanguageStore } from '@/stores/language.ts'
+import { useLanguageStore } from '@/stores/language-store.ts'
 
 export interface FlashcardSetState {
   flashcardSet: FlashcardSet | null

@@ -8,8 +8,8 @@
 </template>
 
 <script setup lang="ts">
-import { useGlobalStore } from '@/stores/global.ts'
-import { useReviewStore } from '@/stores/review.ts'
+import { useGlobalStore } from '@/stores/global-store.ts'
+import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
 import { onMounted, onUnmounted } from 'vue'
 

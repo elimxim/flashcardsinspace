@@ -19,11 +19,11 @@ import MainMenu from '@/components/MainMenu.vue'
 import ReviewFormStarter from '@/components/ReviewFormStarter.vue'
 import ReviewForm from '@/components/ReviewForm.vue'
 import { onBeforeRouteLeave } from 'vue-router'
-import { useReviewStore } from '@/stores/review.ts'
+import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
-import { useFlashcardDataStore } from '@/stores/flashcard-data.ts'
-import { useCalendarStore } from '@/stores/calendar.ts'
-import { useFlashcardSetStore } from '@/stores/flashcard-set.ts'
+import { useFlashcardDataStore } from '@/stores/flashcard-data-store.ts'
+import { useCalendarStore } from '@/stores/calendar-store.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardSetStore = useFlashcardSetStore()

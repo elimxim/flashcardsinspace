@@ -77,9 +77,9 @@ import {
 } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
-import { useFlashcardSetStore } from '@/stores/flashcard-set.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
-import { useGlobalStore } from '@/stores/global.ts'
+import { useGlobalStore } from '@/stores/global-store.ts'
 import { newFlashcard, updateFlashcardSides } from '@/core-logic/flashcard-logic.ts'
 
 const props = defineProps({

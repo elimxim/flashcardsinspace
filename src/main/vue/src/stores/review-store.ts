@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useFlashcardSetStore } from '@/stores/flashcard-set.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { findFlashcardsForReview, flashcardsForStage } from '@/core-logic/review-logic.ts'
 import { specialStages, type Stage } from '@/core-logic/stage-logic.ts'
 import type { Flashcard } from '@/model/flashcard.ts'

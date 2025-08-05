@@ -14,7 +14,7 @@ import '@/assets/auth.css'
 import apiClient from '@/api/api-client.ts'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from "@/stores/auth.ts"
+import { useAuthStore } from "@/stores/auth-store.ts"
 import { routeNames } from "@/router/index.js"
 
 const router = useRouter()
