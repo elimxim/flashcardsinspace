@@ -4,8 +4,7 @@
       <li class="menu-item menu-select-item">
         <select class="menu-select"
                 ref="menuSelect"
-                v-model="flashcardSet"
-                @change="handleSelectChange">
+                v-model="selectedFlashcardSet">
           <option v-for="s in flashcardSets" :key="s.id" :value="s">
             {{ truncate(s.name, 10) }}
           </option>
@@ -38,7 +37,8 @@
           </ul>
         </div>
       </li>
-      <li class="menu-item menu-item-color">
+      <li class="menu-item menu-item-color"
+          v-if="showFlashcardMenuItem">
         <ul class="menu-composite-item">
           <li class="menu-item-number">{{ totalFlashcardNumber }}</li>
           <li>Total</li>
@@ -127,9 +127,15 @@ function flashcardNumberByStage(stage: Stage): number {
 
 // <buckets
 
-function handleSelectChange() {
-  reviewStore.finishReview()
+const selectedFlashcardSet = computed({
+  get: () => flashcardSetStore.flashcardSet,
+  set: (newValue) => {
+    if (newValue !== null) {
+      flashcardSetStore.init(newValue)
+      reviewStore.finishReview()
+    }
 }
+})
 
 function startStageReview(stage: Stage) {
   reviewStore.startSpecialReview(stage)
