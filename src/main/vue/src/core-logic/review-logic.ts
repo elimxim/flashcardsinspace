@@ -17,13 +17,12 @@ export function findFlashcardsForReview(flashcards: Flashcard[]): Flashcard[] {
         && !isReviewedFlashcard(f, currLightDay)
     }
     return isStageAvailable && !isReviewedFlashcard(f, currLightDay)
+  }).sort((a, b) => {
+    if (a.stage !== b.stage) {
+      return getStage(b.stage).order - getStage(a.stage).order
+    }
+    return a.id - b.id
   })
-    .sort((a, b) => {
-      if (a.stage !== b.stage) {
-        return getStage(b.stage).order - getStage(a.stage).order
-      }
-      return b.id - a.id
-    })
 }
 
 function isUnknownFlashcard(flashcard: Flashcard, lightDay: LightDay): boolean {
@@ -41,14 +40,19 @@ export function flashcardsForStage(flashcards: Flashcard[], stage: Stage): Flash
   if (stage === specialStages.UNKNOWN) {
     return flashcards.filter(f =>
       f.stage === stages.S1.name && isUnknownFlashcard(f, currLightDay.value)
+    ).sort((a, b) =>
+      a.id - b.id
     )
   } else if (stage === specialStages.ATTEMPTED) {
     return flashcards.filter(f =>
       f.stage === stages.S1.name && isReviewedFlashcard(f, currLightDay.value)
+    ).sort((a, b) =>
+      a.id - b.id
     )
   }
 
   return flashcards.filter(f => f.stage === stage.name)
+    .sort((a, b) => a.id - b.id)
 }
 
 export function countFlashcards(flashcards: Flashcard[], stage: Stage): number {

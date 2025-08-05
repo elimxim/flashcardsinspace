@@ -2,6 +2,7 @@ package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.Flashcard
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
 import com.github.elimxim.flashcardsinspace.entity.ReviewHistory
 import com.github.elimxim.flashcardsinspace.entity.ReviewInfo
 import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
@@ -24,7 +25,11 @@ class FlashcardService(
 ) {
     @Transactional
     fun getFlashcardSets(user: User): List<FlashcardSetDto> {
-        return flashcardSetRepository.findAllByUserId(user.id).map { it.toDto() }
+        val result = flashcardSetRepository.findAllByUserAndStatus(
+            user = user,
+            status = FlashcardSetStatus.ACTIVE
+        )
+        return result.map { it.toDto() }
     }
 
     @Transactional
@@ -82,7 +87,13 @@ class FlashcardService(
     fun removeFlashcardSet(id: Long) {
         // todo check for existence
         // todo check if it's possible
-        flashcardSetRepository.deleteById(id)
+        val flashcardSet = getFlashcardSet(id)
+        if (flashcardSet.flashcards.size >= 10) {
+            flashcardSet.status = FlashcardSetStatus.DELETED
+            flashcardSetRepository.save(flashcardSet)
+        } else {
+            flashcardSetRepository.deleteById(id)
+        }
     }
 
     @Transactional

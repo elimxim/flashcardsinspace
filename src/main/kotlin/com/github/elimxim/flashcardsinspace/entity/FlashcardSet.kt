@@ -3,6 +3,8 @@ package com.github.elimxim.flashcardsinspace.entity
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -27,6 +29,10 @@ data class FlashcardSet(
     @JoinColumn(name = "language_id", referencedColumnName = "id")
     var language: Language,
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var status: FlashcardSetStatus = FlashcardSetStatus.ACTIVE,
+
     @Column(nullable = false)
     var first: Boolean = false,
 
@@ -44,6 +50,10 @@ data class FlashcardSet(
         mappedBy = "flashcardSet",
         cascade = [CascadeType.ALL],
         orphanRemoval = true,
-        )
+    )
     val flashcards: MutableList<Flashcard> = arrayListOf(),
 )
+
+enum class FlashcardSetStatus {
+    ACTIVE, SUSPENDED, DELETED, ARCHIVED
+}

@@ -80,13 +80,10 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
         }
 
         if (changed) {
-          console.log("Updating...")
           apiClient.put<FlashcardSetPutResponse>('/flashcard-sets/' + this.flashcardSet.id, request).then(response => {
             if (this.flashcardSet !== null) {
               this.flashcardSet.name = response.data.flashcardSet.name
             }
-            console.log("Updated")
-            console.log(JSON.stringify(response.data.flashcardSet))
           })
           // todo handle errors
         }

@@ -19,6 +19,7 @@ export interface ReviewState {
   settings: ReviewSettings
   started: boolean
   isFrontSide: boolean
+  flashcardIndex: number
   reviewQueue: Flashcard[]
   currFlashcard: Flashcard | null
   editFormWasOpened: boolean
@@ -33,6 +34,7 @@ export const useReviewStore = defineStore('review', {
       },
       started: false,
       isFrontSide: true,
+      flashcardIndex: 0,
       reviewQueue: [],
       currFlashcard: null,
       editFormWasOpened: false,
@@ -52,6 +54,7 @@ export const useReviewStore = defineStore('review', {
       this.settings.mode = ReviewMode.LEITNER
       this.started = true
       this.isFrontSide = true
+      this.flashcardIndex = -1
       this.initReviewQueue()
       this.nextFlashcard()
     },
@@ -60,6 +63,7 @@ export const useReviewStore = defineStore('review', {
       this.settings.mode = stage === specialStages.OUTER_SPACE ? ReviewMode.SPACE : ReviewMode.SPECIAL
       this.started = true
       this.isFrontSide = true
+      this.flashcardIndex = -1
       this.initStageReviewQueue(stage)
       this.nextFlashcard()
     },
@@ -68,6 +72,7 @@ export const useReviewStore = defineStore('review', {
       this.settings.mode = ReviewMode.LEITNER
       this.started = false
       this.isFrontSide = true
+      this.flashcardIndex = -1
       this.reviewQueue = []
       this.currFlashcard = null
       this.editFormWasOpened = false
@@ -82,11 +87,16 @@ export const useReviewStore = defineStore('review', {
       const flashcards = flashcardsForStage(flashcardSetStore.flashcards, stage)
       this.reviewQueue = [...flashcards]
     },
-    isNoCardsForReview() {
+    isReviewFinished() {
       return this.currFlashcard === null
     },
+    prevFlashcard() {
+      if (this.flashcardIndex <= 0) return
+      this.currFlashcard = this.reviewQueue[--this.flashcardIndex] ?? null
+    },
     nextFlashcard() {
-      this.currFlashcard = this.reviewQueue.shift() ?? null
+      if (this.flashcardIndex >= this.reviewQueue.length) return
+      this.currFlashcard = this.reviewQueue[++this.flashcardIndex] ?? null
     },
     flipFlashcard() {
       this.isFrontSide = !this.isFrontSide

@@ -28,6 +28,11 @@ databaseChangeLog:
                     referencedColumnNames: id
                     validateForeignKey: true
               - column:
+                  name: status
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
                   name: first
                   type: BOOLEAN
                   constraints:
