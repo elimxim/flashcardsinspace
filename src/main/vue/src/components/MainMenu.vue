@@ -4,7 +4,8 @@
       <li class="menu-item menu-select-item">
         <select class="menu-select"
                 ref="menuSelect"
-                v-model="selectedFlashcardSet">
+                v-model="selectedFlashcardSet"
+                :disabled="isNoFlashcardSets">
           <option v-for="s in flashcardSets" :key="s.id" :value="s">
             {{ truncate(s.name, 10) }}
           </option>
@@ -12,7 +13,8 @@
       </li>
       <li class="menu-buttons-container">
         <div class="menu-item menu-item-color menu-icon-button"
-             @click="globalStore.toggleFlashcardSetSettingsModalForm()">
+             :class="{ 'menu-icon-disabled-button': isNoFlashcardSets }"
+             @click="handleFlashcardSetSettings">
           <font-awesome-icon icon="fa-solid fa-gear"/>
         </div>
         <div class="menu-item menu-item-color menu-icon-button"
@@ -20,7 +22,8 @@
           <font-awesome-icon icon="fa-solid fa-box"/>
         </div>
         <div class="menu-item menu-item-color menu-icon-button"
-             @click="globalStore.toggleFlashcardCreationModalForm()">
+             :class="{ 'menu-icon-disabled-button': isNoFlashcardSets }"
+             @click="handleFlashcardSetCreation">
           <font-awesome-icon icon="fa-solid fa-rectangle-list"/>
         </div>
       </li>
@@ -89,7 +92,7 @@ const flashcardSetStore = useFlashcardSetStore()
 const reviewStore = useReviewStore()
 const calendarStore = useCalendarStore()
 
-const { flashcardSets } = storeToRefs(flashcardDataStore)
+const { flashcardSets, isEmpty: isNoFlashcardSets } = storeToRefs(flashcardDataStore)
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 const { currLightDay } = storeToRefs(calendarStore)
 const {
@@ -100,7 +103,6 @@ const {
 } = storeToRefs(globalStore)
 
 const showFlashcardMenuItem = computed(() => flashcardSet.value !== null)
-
 const menuSelect = ref<HTMLSelectElement>()
 
 // buckets>
@@ -134,8 +136,20 @@ const selectedFlashcardSet = computed({
       flashcardSetStore.init(newValue)
       reviewStore.finishReview()
     }
-}
+  }
 })
+
+function handleFlashcardSetSettings() {
+  if (!isNoFlashcardSets.value) {
+    globalStore.toggleFlashcardSetSettingsModalForm()
+  }
+}
+
+function handleFlashcardSetCreation() {
+  if (!isNoFlashcardSets.value) {
+    globalStore.toggleFlashcardCreationModalForm()
+  }
+}
 
 function startStageReview(stage: Stage) {
   reviewStore.startSpecialReview(stage)
@@ -181,7 +195,7 @@ onMounted(() => {
   user-select: none;
 }
 
-.menu-item:not(.menu-select-item):hover {
+.menu-item:not(.menu-select-item, .menu-icon-disabled-button):hover {
   background-color: #d6d6d6;
 }
 
@@ -224,6 +238,11 @@ onMounted(() => {
   padding: 10px;
   cursor: pointer;
   font-size: 1.2em;
+}
+
+.menu-icon-disabled-button {
+  color: #ccc;
+  cursor: default;
 }
 
 .menu-select {

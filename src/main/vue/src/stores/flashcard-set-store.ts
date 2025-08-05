@@ -41,6 +41,9 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
         return null
       }
     },
+    isInitialized(): boolean {
+      return this.flashcardSet !== null
+    },
   },
   actions: {
     init(flashcardSet: FlashcardSet) {

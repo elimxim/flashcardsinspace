@@ -17,6 +17,11 @@ export const useFlashcardDataStore = defineStore('flashcard-data', {
       flashcardSets: [],
     }
   },
+  getters: {
+    isEmpty(): boolean {
+      return this.flashcardSets.length === 0
+    }
+  },
   actions: {
     async loadData(): Promise<void> {
       await apiClient.get<FlashcardSetsGetResponse>('/flashcard-sets').then(response => {

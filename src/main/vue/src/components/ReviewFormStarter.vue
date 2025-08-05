@@ -1,6 +1,8 @@
 <template>
   <div class="review-form-starter" v-if="!started">
     <button class="review-button review-start-button"
+            :class="{ 'review-start-button-disabled': !isFlashcardSetStoreInitialized }"
+            :disabled="!isFlashcardSetStoreInitialized"
             @click="startReview">
       Start review
     </button>
@@ -12,10 +14,14 @@ import { useGlobalStore } from '@/stores/global-store.ts'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
 import { onMounted, onUnmounted } from 'vue'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 
 const globalStore = useGlobalStore()
 const reviewStore = useReviewStore()
+const flashcardSetStore = useFlashcardSetStore()
+
 const { started } = storeToRefs(reviewStore)
+const { isInitialized: isFlashcardSetStoreInitialized } = storeToRefs(flashcardSetStore)
 
 function startReview() {
   reviewStore.startReview()
@@ -66,7 +72,13 @@ function handleKeydown(event: KeyboardEvent) {
   color: white;
 }
 
-.review-start-button:hover {
+.review-start-button:not(.review-start-button-disabled):hover {
   background-color: #519c53;
+}
+
+.review-start-button-disabled {
+  background-color: #ededed;
+  color: #cacaca;
+  cursor: default;
 }
 </style>
