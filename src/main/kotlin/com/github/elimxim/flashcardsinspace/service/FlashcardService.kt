@@ -4,7 +4,7 @@ import com.github.elimxim.flashcardsinspace.entity.Flashcard
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
 import com.github.elimxim.flashcardsinspace.entity.ReviewHistory
 import com.github.elimxim.flashcardsinspace.entity.ReviewInfo
-import com.github.elimxim.flashcardsinspace.entity.Stage
+import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
@@ -99,7 +99,7 @@ class FlashcardService(
         val flashcard = Flashcard(
             frontSide = dto.frontSide,
             backSide = dto.backSide,
-            stage = Stage.valueOf(dto.stage),
+            stage = FlashcardStage.valueOf(dto.stage),
             reviewedTimes = dto.reviewedTimes,
             creationDate = LocalDate.parse(dto.createdAt),
             flashcardSet = flashcardSet,
@@ -126,7 +126,7 @@ class FlashcardService(
             flashcard.backSide = dto.backSide
             changed = true
         }
-        val stage = Stage.valueOf(dto.stage)
+        val stage = FlashcardStage.valueOf(dto.stage)
         if (flashcard.stage != stage) {
             flashcard.stage = stage
             changed = true
@@ -139,7 +139,7 @@ class FlashcardService(
             flashcard.reviewHistory = ReviewHistory(
                 history = dto.reviewHistory.history.map {
                     ReviewInfo(
-                        stage = Stage.valueOf(it.stage),
+                        stage = FlashcardStage.valueOf(it.stage),
                         reviewDate = LocalDate.parse(it.reviewedAt)
                     )
                 }.toMutableList()

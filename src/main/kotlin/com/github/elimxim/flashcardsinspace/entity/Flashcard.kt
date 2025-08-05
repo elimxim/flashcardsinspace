@@ -31,7 +31,7 @@ data class Flashcard(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var stage: Stage,
+    var stage: FlashcardStage,
 
     @Column(nullable = false)
     var reviewedTimes: Int,
@@ -59,7 +59,7 @@ data class ReviewHistory(
 )
 
 data class ReviewInfo(
-    val stage: Stage,
+    val stage: FlashcardStage,
     @JsonFormat(pattern = "yyyy-MM-dd")
     val reviewDate: LocalDate
 )

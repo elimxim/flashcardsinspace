@@ -1,26 +1,26 @@
 package com.github.elimxim.flashcardsinspace.schedule
 
-import com.github.elimxim.flashcardsinspace.entity.Stage
+import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
 import kotlin.collections.joinToString
 
 val lightspeedCfg = mapOf(
-    Stage.S1 to Interval(delay = 0, gap = 1),
-    Stage.S2 to Interval(delay = 1, gap = 2),
-    Stage.S3 to Interval(delay = 2, gap = 4),
-    Stage.S4 to Interval(delay = 4, gap = 8),
-    Stage.S5 to Interval(delay = 0, gap = 16),
-    Stage.S6 to Interval(delay = 8, gap = 32),
-    Stage.S7 to Interval(delay = -8, gap = 64)
+    FlashcardStage.S1 to Interval(delay = 0, gap = 1),
+    FlashcardStage.S2 to Interval(delay = 1, gap = 2),
+    FlashcardStage.S3 to Interval(delay = 2, gap = 4),
+    FlashcardStage.S4 to Interval(delay = 4, gap = 8),
+    FlashcardStage.S5 to Interval(delay = 0, gap = 16),
+    FlashcardStage.S6 to Interval(delay = 8, gap = 32),
+    FlashcardStage.S7 to Interval(delay = -8, gap = 64)
 )
 
 val wynerCfg = mapOf(
-    Stage.S1 to Interval(delay = 0, gap = 1),
-    Stage.S2 to Interval(delay = -1, gap = 2),
-    Stage.S3 to Interval(delay = -2, gap = 4),
-    Stage.S4 to Interval(delay = -3, gap = intArrayOf(7, 9)),
-    Stage.S5 to Interval(delay = -4, gap = 16),
-    Stage.S6 to Interval(delay = -5, gap = intArrayOf(29, 35)),
-    Stage.S7 to Interval(delay = -8, gap = 64)
+    FlashcardStage.S1 to Interval(delay = 0, gap = 1),
+    FlashcardStage.S2 to Interval(delay = -1, gap = 2),
+    FlashcardStage.S3 to Interval(delay = -2, gap = 4),
+    FlashcardStage.S4 to Interval(delay = -3, gap = intArrayOf(7, 9)),
+    FlashcardStage.S5 to Interval(delay = -4, gap = 16),
+    FlashcardStage.S6 to Interval(delay = -5, gap = intArrayOf(29, 35)),
+    FlashcardStage.S7 to Interval(delay = -8, gap = 64)
 )
 
 interface StudySchedule {
@@ -30,7 +30,7 @@ interface StudySchedule {
 class WynerSchedule(capacity: Int) : StudySchedule by ConfigurableSchedule(capacity, wynerCfg)
 class LightspeedSchedule(capacity: Int) : StudySchedule by ConfigurableSchedule(capacity, lightspeedCfg)
 
-class ConfigurableSchedule(capacity: Int, cfg: Map<Stage, Interval>) : StudySchedule {
+class ConfigurableSchedule(capacity: Int, cfg: Map<FlashcardStage, Interval>) : StudySchedule {
     private val days = ArrayList<Day>(capacity)
 
     init {
@@ -43,17 +43,17 @@ class ConfigurableSchedule(capacity: Int, cfg: Map<Stage, Interval>) : StudySche
     override fun days() = days
 }
 
-data class Day(val number: Int, val stages: List<Stage>)
+data class Day(val number: Int, val stages: List<FlashcardStage>)
 
-class StageResolver(private val cfg: Map<Stage, Interval>) {
-    private val stages = Stage.entries.toTypedArray()
+class StageResolver(private val cfg: Map<FlashcardStage, Interval>) {
+    private val stages = FlashcardStage.entries.toTypedArray()
         .sortedByDescending { stage -> stage.ordinal }
 
-    private val stageDay: MutableMap<Stage, Int> = Stage.entries
+    private val stageDay: MutableMap<FlashcardStage, Int> = FlashcardStage.entries
         .associateWith { stage -> cfg.getValue(stage).next() }
         .toMutableMap()
 
-    fun stages(day: Int): List<Stage> {
+    fun stages(day: Int): List<FlashcardStage> {
         return stages.filter { s ->
             val interval = stageDay.getValue(s)
             if (interval - day == 0) {
