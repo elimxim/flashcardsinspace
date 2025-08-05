@@ -56,7 +56,7 @@ export const useReviewStore = defineStore('review', {
       this.nextFlashcard()
     },
     startSpecialReview(stage: Stage) {
-      this.settings.topic = stage.name
+      this.settings.topic = stage.displayName
       this.settings.mode = stage === specialStages.OUTER_SPACE ? ReviewMode.SPACE : ReviewMode.SPECIAL
       this.started = true
       this.isFrontSide = true
