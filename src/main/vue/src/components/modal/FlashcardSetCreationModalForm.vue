@@ -1,7 +1,7 @@
 <template>
   <ModalForm :visible="visible"
-                      :onExit="cancel"
-                      title="New flashcard set">
+             :onExit="cancel"
+             title="New flashcard set">
     <div class="form-body">
       <div class="modal-vertical-group">
         <input class="modal-input"
@@ -147,9 +147,9 @@ onUnmounted(() => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
-  if (event.shiftKey && (event.key === 'c' || event.key === 'C')) {
+  if (event.key === 'Escape') {
     cancelButton.value?.click()
-  } else if (event.shiftKey && (event.key === 'e' || event.key === 'E')) {
+  } else if (event.key === 'Enter') {
     createButton.value?.click()
   }
 }

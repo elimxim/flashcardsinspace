@@ -1,7 +1,7 @@
 <template>
   <ModalForm :visible="visible"
-                      :onExit="cancel"
-                      title="Settings">
+             :onExit="cancel"
+             title="Settings">
     <div class="form-body">
       <div class="modal-vertical-group">
         <input class="modal-input"
@@ -196,11 +196,11 @@ onUnmounted(() => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
-  if (event.shiftKey && (event.key === 'c' || event.key === 'C')) {
+  if (event.key === 'Escape') {
     cancelButton.value?.click()
-  } else if (event.shiftKey && (event.key === 'u' || event.key === 'U')) {
+  } else if (event.key === 'Enter') {
     updateButton.value?.click()
-  } else if (event.shiftKey && (event.key === 'r' || event.key === 'R')) {
+  } else if (event.key === 'Delete') {
     removeButton.value?.click()
   }
 }

@@ -13,24 +13,26 @@
       </li>
       <li class="menu-buttons-container">
         <div class="menu-item menu-item-color menu-icon-button"
-             :class="{ 'menu-icon-disabled-button': isNoFlashcardSets }"
-             @click="handleFlashcardSetSettings">
+             :class="{ 'menu-icon-disabled-button': isNoFlashcardSets || reviewStarted }"
+             @click="onFlashcardSetSettingsClick">
           <font-awesome-icon icon="fa-solid fa-gear"/>
         </div>
         <div class="menu-item menu-item-color menu-icon-button"
-             @click="globalStore.toggleFlashcardSetCreationModalForm()">
+             :class="{ 'menu-icon-disabled-button': reviewStarted }"
+             @click="onFlashcardSetCreationClick">
           <font-awesome-icon icon="fa-solid fa-box"/>
         </div>
         <div class="menu-item menu-item-color menu-icon-button"
-             :class="{ 'menu-icon-disabled-button': isNoFlashcardSets }"
-             @click="handleFlashcardSetCreation">
+             :class="{ 'menu-icon-disabled-button': isNoFlashcardSets || reviewStarted }"
+             @click="onFlashcardCreationClick">
           <font-awesome-icon icon="fa-solid fa-rectangle-list"/>
         </div>
       </li>
       <li class="menu-buttons-container"
           v-if="showFlashcardMenuItem">
         <div class="menu-item menu-item-color menu-icon-button"
-             @click="globalStore.toggleCalendarModalForm()">
+             :class="{ 'menu-icon-disabled-button': reviewStarted }"
+             @click="onCalendarClick">
           <font-awesome-icon icon="fa-solid fa-calendar-days"/>
         </div>
         <div class="menu-item menu-item-color">
@@ -95,6 +97,7 @@ const calendarStore = useCalendarStore()
 const { flashcardSets, isEmpty: isNoFlashcardSets } = storeToRefs(flashcardDataStore)
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 const { currLightDay } = storeToRefs(calendarStore)
+const { started: reviewStarted } = storeToRefs(reviewStore)
 const {
   flashcardSetSettingsModalFormOpen,
   flashcardSetCreationModalFormOpen,
@@ -139,15 +142,27 @@ const selectedFlashcardSet = computed({
   }
 })
 
-function handleFlashcardSetSettings() {
-  if (!isNoFlashcardSets.value) {
+function onFlashcardSetSettingsClick() {
+  if (!isNoFlashcardSets.value && !reviewStarted.value) {
     globalStore.toggleFlashcardSetSettingsModalForm()
   }
 }
 
-function handleFlashcardSetCreation() {
-  if (!isNoFlashcardSets.value) {
+function onFlashcardSetCreationClick() {
+  if (!reviewStarted.value) {
+    globalStore.toggleFlashcardSetCreationModalForm()
+  }
+}
+
+function onFlashcardCreationClick() {
+  if (!isNoFlashcardSets.value && !reviewStarted.value) {
     globalStore.toggleFlashcardCreationModalForm()
+  }
+}
+
+function onCalendarClick() {
+  if (!reviewStarted.value) {
+    globalStore.toggleCalendarModalForm()
   }
 }
 

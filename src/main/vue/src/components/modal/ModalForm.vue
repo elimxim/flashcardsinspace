@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits } from 'vue'
+import { defineEmits, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
   visible: {
@@ -41,6 +41,21 @@ const emit = defineEmits([
 function exit() {
   props.onExit()
   emit('update:visible', false)
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
+})
+
+function handleKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') {
+    event.stopPropagation()
+    props.onExit()
+  }
 }
 
 </script>

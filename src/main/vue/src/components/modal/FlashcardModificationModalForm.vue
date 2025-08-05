@@ -1,7 +1,7 @@
 <template>
   <ModalForm :visible="visible"
-                      :onExit="cancel"
-                      :title="editMode ? 'Edit flashcard' : 'New flashcard'">
+             :onExit="cancel"
+             :title="editMode ? 'Edit flashcard' : 'New flashcard'">
     <div class="form-body">
       <div class="modal-vertical-group">
           <textarea id="frontSide"
@@ -240,13 +240,12 @@ onUnmounted(() => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
-  if (event.shiftKey && (event.key === 'c' || event.key === 'C')) {
+  if (event.key === 'Escape') {
     cancelButton.value?.click()
-  } else if (event.shiftKey && (event.key === 'e' || event.key === 'E')) {
+  } else if (event.key === 'Enter') {
     createButton.value?.click()
-  } else if (event.shiftKey && (event.key === 'u' || event.key === 'U')) {
     updateButton.value?.click()
-  } else if (event.shiftKey && (event.key === 'r' || event.key === 'R')) {
+  } else if (event.key === 'Delete') {
     removeButton.value?.click()
   }
 }
