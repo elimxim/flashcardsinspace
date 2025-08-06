@@ -34,9 +34,8 @@ databaseChangeLog:
                   type: BIGINT
                   constraints:
                     nullable: false
-                    foreignKeyName: astro_user_to_language_id
-                    referencedTableName: language
-                    referencedColumnNames: id
+                    foreignKeyName: fk_astro_user_2_language_id
+                    references: language(id)
                     validateForeignKey: true
               - column:
                   name: roles

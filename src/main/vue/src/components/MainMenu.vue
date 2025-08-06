@@ -38,7 +38,7 @@
         <div class="menu-item menu-item-color">
           <ul class="menu-composite-item">
             <li>Day</li>
-            <li class="menu-item-number">{{ currLightDay.seqNumber }}</li>
+            <li class="menu-item-number">{{ currDay.order }}</li>
           </ul>
         </div>
       </li>
@@ -79,7 +79,7 @@ import FlashcardModificationModalForm from '@/components/modal/FlashcardModifica
 import CalendarModalForm from '@/components/modal/CalendarModalForm.vue'
 import { useFlashcardDataStore } from '@/stores/flashcard-data-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
-import { useCalendarStore } from '@/stores/calendar-store.ts'
+import { useLightspeedScheduleStore } from '@/stores/lightspeed-schedule-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, type ComputedRef, onMounted, ref } from 'vue'
 import { useReviewStore } from '@/stores/review-store.ts'
@@ -92,11 +92,11 @@ const globalStore = useGlobalStore()
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardSetStore = useFlashcardSetStore()
 const reviewStore = useReviewStore()
-const calendarStore = useCalendarStore()
+const lightspeedScheduleStore = useLightspeedScheduleStore()
 
 const { flashcardSets, isEmpty: isNoFlashcardSets } = storeToRefs(flashcardDataStore)
 const { flashcardSet } = storeToRefs(flashcardSetStore)
-const { currLightDay } = storeToRefs(calendarStore)
+const { currDay } = storeToRefs(lightspeedScheduleStore)
 const { started: reviewStarted } = storeToRefs(reviewStore)
 const {
   flashcardSetSettingsModalFormOpen,

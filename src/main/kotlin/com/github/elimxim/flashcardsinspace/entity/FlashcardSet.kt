@@ -11,23 +11,20 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
 @Entity
 @Table(name = "flashcard_set")
-data class FlashcardSet(
+class FlashcardSet(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
     @Column(nullable = false)
     var name: String,
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "language_id", referencedColumnName = "id")
-    var language: Language,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -43,6 +40,10 @@ data class FlashcardSet(
     var lastUpdatedAt: ZonedDateTime? = null,
 
     @ManyToOne(optional = false)
+    @JoinColumn(name = "language_id", referencedColumnName = "id")
+    var language: Language,
+
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     var user: User,
 
@@ -51,9 +52,16 @@ data class FlashcardSet(
         cascade = [CascadeType.ALL],
         orphanRemoval = true,
     )
-    val flashcards: MutableList<Flashcard> = arrayListOf(),
+    var flashcards: MutableList<Flashcard> = arrayListOf(),
+
+    @OneToOne(
+        mappedBy = "flashcardSet",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+    )
+    var timeline: FlashcardTimeline? = null,
 )
 
 enum class FlashcardSetStatus {
-    ACTIVE, SUSPENDED, DELETED, ARCHIVED
+    ACTIVE, DELETED, ARCHIVED
 }

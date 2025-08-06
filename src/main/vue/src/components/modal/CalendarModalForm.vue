@@ -47,8 +47,8 @@
 import '@/assets/modal.css'
 import ModalForm from '@/components/modal/ModalForm.vue'
 import { computed, defineEmits, ref } from 'vue'
-import { StudyStatus } from '@/model/calendar.ts'
-import { useCalendarStore } from '@/stores/calendar-store.ts'
+import { lightDayStatuses } from '@/model/lightspeed-schedule.ts'
+import { useLightspeedScheduleStore } from '@/stores/lightspeed-schedule-store.ts'
 import { storeToRefs } from 'pinia'
 import { asIsoDate } from '@/utils/date.ts'
 
@@ -60,20 +60,20 @@ const emit = defineEmits([
   'update:visible',
 ])
 
-const calendarStore = useCalendarStore()
-const { lightStartDate, currLightDay, lightDays } = storeToRefs(calendarStore)
+const lightspeedScheduleStore = useLightspeedScheduleStore()
+const { startDate, currDay, days } = storeToRefs(lightspeedScheduleStore)
 
 // calendar>
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-const lightDayMap = ref(new Map(lightDays.value.map(day => [day.isoDate, day])))
-const currDate = ref(new Date(currLightDay.value.isoDate))
+const lightDayMap = ref(new Map(days.value.map(day => [day.date, day])))
+const currDate = ref(new Date(currDay.value.date))
 
 interface CalendarDay {
   number: number
   date: string
-  status: StudyStatus | null
+  status: string | null
   stages: string | null
   isCurrMonth: boolean
   isStartDay: boolean
@@ -120,7 +120,7 @@ const monthDays = computed(() => {
       status: lightDay?.status ?? null,
       stages: lightDay?.stages.map(v => v.order).toString() ?? null,
       isCurrMonth: true,
-      isStartDay: asIsoDate(date) === lightStartDate.value,
+      isStartDay: asIsoDate(date) === startDate.value,
       isCurrDay: date.toDateString() === currDate.value.toDateString(),
     })
   }
@@ -180,11 +180,11 @@ function cellClass(day: CalendarDay): string {
   }
 
   switch (day?.status) {
-    case StudyStatus.COMPLETED:
+    case lightDayStatuses.COMPLETED:
       return 'calendar-completed-day'
-    case StudyStatus.IN_PROGRESS:
+    case lightDayStatuses.IN_PROGRESS:
       return 'calendar-in-progress-day'
-    case StudyStatus.NOT_STARTED:
+    case lightDayStatuses.NOT_STARTED:
       return 'calendar-not-started-day'
     default:
       return 'calendar-another-day'
@@ -198,8 +198,8 @@ function exit() {
 }
 
 function switchCalendarDay() {
-  calendarStore.switchLightDay()
-  currDate.value = new Date(currLightDay.value.isoDate)
+  lightspeedScheduleStore.switchLightDay()
+  currDate.value = new Date(currDay.value.date)
 }
 
 </script>

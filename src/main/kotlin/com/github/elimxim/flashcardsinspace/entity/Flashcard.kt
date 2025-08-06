@@ -18,7 +18,7 @@ import java.time.ZonedDateTime
 
 @Entity
 @Table(name = "flashcard")
-data class Flashcard(
+class Flashcard(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
@@ -53,6 +53,10 @@ data class Flashcard(
     @JoinColumn(name = "flashcard_set_id", referencedColumnName = "id")
     var flashcardSet: FlashcardSet,
 )
+
+enum class FlashcardStage {
+    S1, S2, S3, S4, S5, S6, S7
+}
 
 data class ReviewHistory(
     val history: MutableList<ReviewInfo> = arrayListOf()

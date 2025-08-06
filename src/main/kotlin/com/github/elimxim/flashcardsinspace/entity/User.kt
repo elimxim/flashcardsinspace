@@ -8,7 +8,7 @@ import java.time.ZonedDateTime
 
 @Entity
 @Table(name = "astro_user")
-data class User(
+class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
@@ -22,10 +22,6 @@ data class User(
     @Column(nullable = false)
     var secret: String,
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "language_id", referencedColumnName = "id")
-    var language: Language,
-
     @Column(nullable = false)
     var roles: String,
 
@@ -37,6 +33,10 @@ data class User(
 
     @Column(nullable = true)
     var lastUpdatedAt: ZonedDateTime? = null,
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "language_id", referencedColumnName = "id")
+    var language: Language,
 
     @OneToMany(
         mappedBy = "user",

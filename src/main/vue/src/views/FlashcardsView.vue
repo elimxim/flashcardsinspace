@@ -22,12 +22,12 @@ import { onBeforeRouteLeave } from 'vue-router'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
 import { useFlashcardDataStore } from '@/stores/flashcard-data-store.ts'
-import { useCalendarStore } from '@/stores/calendar-store.ts'
+import { useLightspeedScheduleStore } from '@/stores/lightspeed-schedule-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardSetStore = useFlashcardSetStore()
-const calendarStore = useCalendarStore()
+const lightspeedScheduleStore = useLightspeedScheduleStore()
 const reviewStore = useReviewStore()
 
 const { started: reviewStarted } = storeToRefs(reviewStore)
@@ -36,7 +36,7 @@ const { flashcardSets } = storeToRefs(flashcardDataStore)
 flashcardDataStore.loadData().then(() => {
   flashcardSetStore.initFromList(flashcardSets.value)
 })
-calendarStore.loadData()
+lightspeedScheduleStore.loadData()
 
 onBeforeRouteLeave((to, from, next) => {
   reviewStore.finishReview()

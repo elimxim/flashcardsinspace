@@ -1,7 +1,7 @@
 import { type Flashcard, type FlashcardSet, type ReviewInfo } from '@/model/flashcard.ts'
 import { type Stage, stages } from '@/core-logic/stage-logic.ts'
 import type { Language } from '@/model/language.ts'
-import { useCalendarStore } from '@/stores/calendar-store.ts'
+import { useLightspeedScheduleStore } from '@/stores/lightspeed-schedule-store.ts'
 import { storeToRefs } from 'pinia'
 
 /**
@@ -10,8 +10,8 @@ import { storeToRefs } from 'pinia'
  * created in the current {@link LightspeedCalendar.currLightDay calendar day}.
  */
 export function newFlashcard(frontSide: string, backSide: string): Flashcard {
-  const calendarStore = useCalendarStore()
-  const { currLightDay } = storeToRefs(calendarStore)
+  const lightspeedScheduleStore = useLightspeedScheduleStore()
+  const { currDay } = storeToRefs(lightspeedScheduleStore)
 
   return {
     id: 0,
@@ -21,7 +21,7 @@ export function newFlashcard(frontSide: string, backSide: string): Flashcard {
     reviewedAt: null,
     reviewCount: 0,
     reviewHistory: { history: [] },
-    createdAt: currLightDay.value.isoDate,
+    createdAt: currDay.value.date,
     lastUpdatedAt: null,
   }
 }
@@ -39,10 +39,10 @@ export function updateFlashcardSides(flashcard: Flashcard, frontSide: string, ba
  * of the current {@link LightspeedCalendar.currLightDay calendar day}.
  */
 export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
-  const calendarStore = useCalendarStore()
-  const { currLightDay } = storeToRefs(calendarStore)
+  const lightspeedScheduleStore = useLightspeedScheduleStore()
+  const { currDay } = storeToRefs(lightspeedScheduleStore)
 
-  const reviewedAt = currLightDay.value.isoDate
+  const reviewedAt = currDay.value.date
 
   const info: ReviewInfo = {
     stage: stage.name,
@@ -62,14 +62,14 @@ export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
  * created in the current {@link LightspeedCalendar.currLightDay calendar day}.
  */
 export function newFlashcardSet(name: string, language: Language): FlashcardSet {
-  const calendarStore = useCalendarStore()
-  const { currLightDay } = storeToRefs(calendarStore)
+  const lightspeedScheduleStore = useLightspeedScheduleStore()
+  const { currDay } = storeToRefs(lightspeedScheduleStore)
 
   return {
     id: 0,
     name: name,
     languageId: language.id,
-    createdAt: currLightDay.value.isoDate,
+    createdAt: currDay.value.date,
     lastUpdatedAt: null,
     default: false,
   }

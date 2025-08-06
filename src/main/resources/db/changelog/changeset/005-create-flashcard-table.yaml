@@ -28,9 +28,8 @@ databaseChangeLog:
                   type: BIGINT
                   constraints:
                     nullable: false
-                    foreignKeyName: flashcard_to_flashcard_set_id
-                    referencedTableName: flashcard_set
-                    referencedColumnNames: id
+                    foreignKeyName: fk_flashcard_2_flashcard_set_id
+                    references: flashcard_set(id)
                     validateForeignKey: true
               - column:
                   name: stage
