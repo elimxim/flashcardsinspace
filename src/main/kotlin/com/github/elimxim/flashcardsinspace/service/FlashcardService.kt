@@ -82,8 +82,8 @@ class FlashcardService(
             )
             changed = true
         }
-        if (flashcard.reviewDate?.toString() != dto.reviewedAt) {
-            flashcard.reviewDate = dto.reviewedAt?.let { LocalDate.parse(it) }
+        if (flashcard.lastReviewDate?.toString() != dto.reviewedAt) {
+            flashcard.lastReviewDate = dto.reviewedAt?.let { LocalDate.parse(it) }
         }
 
         if (changed) {

@@ -1,7 +1,6 @@
 package com.github.elimxim.flashcardsinspace.web
 
 import com.github.elimxim.flashcardsinspace.service.FlashcardService
-import com.github.elimxim.flashcardsinspace.service.FlashcardSetService
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardPutRequest
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardPutResponse
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardsGetResponse
@@ -18,41 +17,41 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 
 @Controller
-@RequestMapping("/api/flashcard-sets/{flashcardSetId}/flashcards")
+@RequestMapping("/api/flashcard-sets/{setId}/flashcards")
 class FlashcardController(
     private val flashcardService: FlashcardService,
 ) {
-    @GetMapping()
-    fun getFlashcards(@PathVariable flashcardSetId: Long): ResponseEntity<FlashcardsGetResponse> {
-        val flashcards = flashcardService.getFlashcards(flashcardSetId)
+    @GetMapping
+    fun getFlashcards(@PathVariable setId: Long): ResponseEntity<FlashcardsGetResponse> {
+        val flashcards = flashcardService.getFlashcards(setId)
         return ResponseEntity.ok(FlashcardsGetResponse(flashcards))
     }
 
-    @PostMapping()
+    @PostMapping
     fun addFlashcard(
-        @PathVariable flashcardSetId: Long,
+        @PathVariable setId: Long,
         @RequestBody request: FlashcardsPostRequest,
     ): ResponseEntity<FlashcardsPostResponse> {
-        val savedFlashcard = flashcardService.addFlashcard(flashcardSetId, request.flashcard)
+        val savedFlashcard = flashcardService.addFlashcard(setId, request.flashcard)
         return ResponseEntity.ok(FlashcardsPostResponse(savedFlashcard))
     }
 
-    @PutMapping("/{flashcardId}")
+    @PutMapping("/{id}")
     fun updateFlashcard(
-        @PathVariable flashcardSetId: Long,
-        @PathVariable flashcardId: Long,
+        @PathVariable setId: Long,
+        @PathVariable id: Long,
         @RequestBody request: FlashcardPutRequest,
     ): ResponseEntity<FlashcardPutResponse> {
-        val updatedFlashcard = flashcardService.updateFlashcard(flashcardSetId, flashcardId, request.flashcard)
+        val updatedFlashcard = flashcardService.updateFlashcard(setId, id, request.flashcard)
         return ResponseEntity.ok(FlashcardPutResponse(updatedFlashcard))
     }
 
-    @DeleteMapping("/{flashcardId}")
+    @DeleteMapping("/{id}")
     fun removeFlashcard(
-        @PathVariable flashcardSetId: Long,
-        @PathVariable flashcardId: Long,
+        @PathVariable setId: Long,
+        @PathVariable id: Long,
     ): ResponseEntity<Unit> {
-        flashcardService.removeFlashcard(flashcardSetId, flashcardId)
+        flashcardService.removeFlashcard(setId, id)
         return ResponseEntity.ok().build()
     }
 }

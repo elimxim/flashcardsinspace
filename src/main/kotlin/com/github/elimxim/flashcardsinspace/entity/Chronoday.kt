@@ -26,7 +26,7 @@ class Chronoday(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var status: DayStatus = DayStatus.NOT_STARTED,
+    var status: DayStatus,
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "flashcard_timeline_id", referencedColumnName = "id")
@@ -34,5 +34,5 @@ class Chronoday(
 )
 
 enum class DayStatus {
-    INITIAL, COMPLETED, IN_PROGRESS, NOT_STARTED
+    INITIAL, COMPLETED, IN_PROGRESS, NOT_STARTED, OFF
 }

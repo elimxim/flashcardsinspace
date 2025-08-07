@@ -2,6 +2,7 @@ package com.github.elimxim.flashcardsinspace.web.dto
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
+import java.time.ZonedDateTime
 
 // todo kotlin way for jakarta annotations?
 data class SignUpRequest(
@@ -16,6 +17,7 @@ data class LoginRequest(
     @field:NotBlank val secret: String
 )
 
+// fixme
 data class UserResponse(val user: UserDto)
 data class LanguagesGetResponse(val languages: List<LanguageDto>)
 data class FlashcardSetsGetResponse(val flashcardSets: List<FlashcardSetDto>)
@@ -28,4 +30,12 @@ data class FlashcardsPostRequest(val flashcard: FlashcardDto)
 data class FlashcardsPostResponse(val flashcard: FlashcardDto)
 data class FlashcardPutRequest(val flashcard: FlashcardDto)
 data class FlashcardPutResponse(val flashcard: FlashcardDto)
+// end of fixme
 
+data class TimelinePostRequest(val clientDatetime: ZonedDateTime)
+data class TimelinePutRequest(val timelineStatus: String)
+data class ChronodaysGetRequest(val clientDatetime: ZonedDateTime)
+data class ChronodayPutRequest(val dayStatus: String)
+
+data class TimelineResponse(val timeline: TimelineDto)
+data class ChronodayResponse(val chronoday: ChronodayDto)

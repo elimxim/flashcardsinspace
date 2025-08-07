@@ -46,17 +46,17 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     },
   },
   actions: {
-    init(flashcardSet: FlashcardSet) {
+    async loadData(flashcardSet: FlashcardSet) {
       this.flashcardSet = flashcardSet
-      apiClient.get<FlashcardsGetResponse>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards').then(response => {
+      await apiClient.get<FlashcardsGetResponse>('/flashcard-sets/' + flashcardSet.id + '/flashcards').then(response => {
         this.flashcardMap = new Map(response.data.flashcards.map(v => [v.id, v]))
       })
       // todo handle errors
     },
-    initFromList(flashcardSets: FlashcardSet[]) {
+    async loadDataOrResetState(flashcardSets: FlashcardSet[]) {
       const flashcardSet = flashcardSets[0] ?? null
       if (flashcardSet !== null) {
-        this.init(flashcardSet)
+        await this.loadData(flashcardSet)
       } else {
         this.flashcardSet = null
         this.flashcardMap = new Map()

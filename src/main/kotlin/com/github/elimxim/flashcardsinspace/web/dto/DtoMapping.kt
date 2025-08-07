@@ -2,6 +2,7 @@ package com.github.elimxim.flashcardsinspace.web.dto
 
 import com.github.elimxim.flashcardsinspace.entity.Flashcard
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
+import com.github.elimxim.flashcardsinspace.entity.FlashcardTimeline
 import com.github.elimxim.flashcardsinspace.entity.Language
 import com.github.elimxim.flashcardsinspace.entity.ReviewHistory
 import com.github.elimxim.flashcardsinspace.entity.ReviewInfo
@@ -38,7 +39,7 @@ fun Flashcard.toDto() = FlashcardDto(
     reviewedTimes = reviewedTimes,
     reviewHistory = reviewHistory.toDto(),
     createdAt = creationDate.toString(),
-    reviewedAt = reviewDate?.toString(),
+    reviewedAt = lastReviewDate?.toString(),
     lastUpdatedAt = lastUpdatedAt?.toString(),
 )
 
@@ -49,4 +50,11 @@ fun ReviewHistory.toDto() = ReviewHistoryDto(
 fun ReviewInfo.toDto() = ReviewInfoDto(
     stage = stage.name,
     reviewedAt = reviewDate.toString(),
+)
+
+fun FlashcardTimeline.toDto() = TimelineDto(
+    id = id,
+    startedAt = startedAt.toString(),
+    status = status.name,
+    lastUpdatedAt = lastUpdatedAt?.toString()
 )

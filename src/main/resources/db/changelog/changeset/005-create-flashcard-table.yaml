@@ -52,7 +52,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: review_date
+                  name: last_review_date
                   type: DATE
               - column:
                   name: last_updated_at

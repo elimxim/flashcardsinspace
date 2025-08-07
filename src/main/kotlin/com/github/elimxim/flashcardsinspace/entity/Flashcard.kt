@@ -44,7 +44,7 @@ class Flashcard(
     var creationDate: LocalDate,
 
     @Column(nullable = true)
-    var reviewDate: LocalDate? = null,
+    var lastReviewDate: LocalDate? = null,
 
     @Column(nullable = true)
     var lastUpdatedAt: ZonedDateTime? = null,

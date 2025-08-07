@@ -133,7 +133,7 @@ function createNewFlashcardSet() {
   const flashcardSet = newFlashcardSet(flashcardSetName.value, flashcardSetLanguage.value)
   flashcardDataStore.addFlashcardSet(flashcardSet).then((savedFlashcardSet: FlashcardSet | null) => {
     if (savedFlashcardSet !== null) { // fixme
-      flashcardSetStore.init(savedFlashcardSet)
+      flashcardSetStore.loadData(savedFlashcardSet)
     }
   })
 }

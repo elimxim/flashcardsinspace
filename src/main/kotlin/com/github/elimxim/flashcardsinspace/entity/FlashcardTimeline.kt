@@ -19,7 +19,7 @@ import java.time.ZonedDateTime
 class FlashcardTimeline(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    val id: Long = 0,
 
     @Column(nullable = false)
     var startedAt: ZonedDateTime,
@@ -40,8 +40,10 @@ class FlashcardTimeline(
         cascade = [CascadeType.ALL],
         orphanRemoval = true,
     )
-    var days: MutableList<Chronoday> = arrayListOf(),
-)
+    var chronodays: MutableList<Chronoday> = arrayListOf(),
+) {
+    fun lastChronoday(): Chronoday? = chronodays.maxByOrNull { it.chronodate }
+}
 
 enum class TimelineStatus {
     ACTIVE, SUSPENDED

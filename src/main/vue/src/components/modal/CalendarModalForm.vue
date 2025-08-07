@@ -36,8 +36,13 @@
     <div class="calendar-bottom-nav">
       <button class="modal-button modal-update-button"
               ref="updateButton"
-              @click="switchCalendarDay">
-        Switch day
+              @click="switchToPrevDay">
+        Prev
+      </button>
+      <button class="modal-button modal-update-button"
+              ref="updateButton"
+              @click="switchToNextDay">
+        Next
       </button>
     </div>
   </ModalForm>
@@ -47,10 +52,10 @@
 import '@/assets/modal.css'
 import ModalForm from '@/components/modal/ModalForm.vue'
 import { computed, defineEmits, ref } from 'vue'
-import { lightDayStatuses } from '@/model/lightspeed-schedule.ts'
-import { useLightspeedScheduleStore } from '@/stores/lightspeed-schedule-store.ts'
+import { lightDayStatuses } from '@/model/timeline.ts'
+import { useTimelineStore } from '@/stores/timeline-store.ts'
 import { storeToRefs } from 'pinia'
-import { asIsoDate } from '@/utils/date.ts'
+import { isoDateStr } from '@/utils/date.ts'
 
 defineProps({
   visible: Boolean
@@ -60,15 +65,15 @@ const emit = defineEmits([
   'update:visible',
 ])
 
-const lightspeedScheduleStore = useLightspeedScheduleStore()
-const { startDate, currDay, days } = storeToRefs(lightspeedScheduleStore)
+const timelineStore = useTimelineStore()
+const { timeline, chronodays, currDay } = storeToRefs(timelineStore)
 
 // calendar>
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-const lightDayMap = ref(new Map(days.value.map(day => [day.date, day])))
-const currDate = ref(new Date(currDay.value.date))
+const lightDayMap = ref(new Map(chronodays.value.map(day => [day.chronodate, day])))
+const currDate = ref(new Date(currDay.value.chronodate))
 
 interface CalendarDay {
   number: number
@@ -94,7 +99,7 @@ const monthDays = computed(() => {
   const result: CalendarDay[] = []
   for (let i = firstWeekDay - 1; i >= 0; i--) {
     const date = new Date(prevYear, prevMonth, totalDaysInPrevMonth - i)
-    const lightDay = lightDayMap.value.get(asIsoDate(date))
+    const lightDay = lightDayMap.value.get(isoDateStr(date))
 
     result.push({
       number: date.getDate(),
@@ -112,7 +117,7 @@ const monthDays = computed(() => {
   // filling the current month
   for (let i = 1; i <= totalDaysInMonth; i++) {
     const date = new Date(year, month, i)
-    const lightDay = lightDayMap.value.get(asIsoDate(date))
+    const lightDay = lightDayMap.value.get(isoDateStr(date))
 
     result.push({
       number: i,
@@ -120,7 +125,7 @@ const monthDays = computed(() => {
       status: lightDay?.status ?? null,
       stages: lightDay?.stages.map(v => v.order).toString() ?? null,
       isCurrMonth: true,
-      isStartDay: asIsoDate(date) === startDate.value,
+      isStartDay: date.toISOString() === timeline.value.startedAt,
       isCurrDay: date.toDateString() === currDate.value.toDateString(),
     })
   }
@@ -133,7 +138,7 @@ const monthDays = computed(() => {
   // filling empty slots at the end
   for (let i = 1; i <= 6 - lastWeekDay; i++) {
     const date = new Date(nextYear, nextMonth, i)
-    const lightDay = lightDayMap.value.get(asIsoDate(date))
+    const lightDay = lightDayMap.value.get(isoDateStr(date))
 
     result.push({
       number: i,
@@ -186,6 +191,8 @@ function cellClass(day: CalendarDay): string {
       return 'calendar-in-progress-day'
     case lightDayStatuses.NOT_STARTED:
       return 'calendar-not-started-day'
+    case lightDayStatuses.OFF:
+      return 'calendar-off-day'
     default:
       return 'calendar-another-day'
   }
@@ -197,9 +204,14 @@ function exit() {
   emit('update:visible', false)
 }
 
-function switchCalendarDay() {
-  lightspeedScheduleStore.switchLightDay()
-  currDate.value = new Date(currDay.value.date)
+function switchToNextDay() {
+  timelineStore.switchToNextDay()
+  currDate.value = new Date(currDay.value.chronodate)
+}
+
+function switchToPrevDay() {
+  timelineStore.switchToPrevDay()
+  currDate.value = new Date(currDay.value.chronodate)
 }
 
 </script>
@@ -271,6 +283,10 @@ function switchCalendarDay() {
   background-color: #884393;
 }
 
+.calendar-off-day {
+  background-color: #43938a;
+}
+
 .calendar-another-day {
   background-color: #e8e8e8;
 }
@@ -296,7 +312,7 @@ function switchCalendarDay() {
 .calendar-bottom-nav {
   flex: 1;
   display: flex;
-  justify-content: right;
+  justify-content: space-between;
   align-items: center;
   margin-top: 1em;
 }

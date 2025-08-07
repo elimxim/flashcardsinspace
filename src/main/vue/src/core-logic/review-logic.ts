@@ -1,13 +1,13 @@
 import { type Flashcard } from '@/model/flashcard.ts'
 import { type Stage, getStage, stages, specialStages } from '@/core-logic/stage-logic.ts'
-import { useLightspeedScheduleStore } from '@/stores/lightspeed-schedule-store.ts'
-import type { LightDay } from '@/model/lightspeed-schedule.ts'
+import { useTimelineStore } from '@/stores/timeline-store.ts'
+import type { Chronoday } from '@/model/timeline.ts'
 import { storeToRefs } from 'pinia'
 
 export function findFlashcardsForReview(flashcards: Flashcard[]): Flashcard[] {
-  const lightspeedScheduleStore = useLightspeedScheduleStore()
-  const currDay = lightspeedScheduleStore.currDay
-  const currDayStages = lightspeedScheduleStore.currLightDayStages
+  const timelineStore = useTimelineStore()
+  const currDay = timelineStore.currDay
+  const currDayStages = timelineStore.currLightDayStages
 
   return flashcards.filter(f => {
     const isStageAvailable = currDayStages.has(f.stage)
@@ -25,17 +25,17 @@ export function findFlashcardsForReview(flashcards: Flashcard[]): Flashcard[] {
   })
 }
 
-function isUnknownFlashcard(flashcard: Flashcard, lightDay: LightDay): boolean {
-  return flashcard.createdAt === lightDay.date
+function isUnknownFlashcard(flashcard: Flashcard, lightDay: Chronoday): boolean {
+  return flashcard.createdAt === lightDay.chronodate
 }
 
-function isReviewedFlashcard(flashcard: Flashcard, lightDay: LightDay): boolean {
-  return flashcard.reviewedAt === lightDay.date
+function isReviewedFlashcard(flashcard: Flashcard, lightDay: Chronoday): boolean {
+  return flashcard.reviewedAt === lightDay.chronodate
 }
 
 export function flashcardsForStage(flashcards: Flashcard[], stage: Stage): Flashcard[] {
-  const lightspeedScheduleStore = useLightspeedScheduleStore()
-  const { currDay } = storeToRefs(lightspeedScheduleStore)
+  const timelineStore = useTimelineStore()
+  const { currDay } = storeToRefs(timelineStore)
 
   if (stage === specialStages.UNKNOWN) {
     return flashcards.filter(f =>
@@ -56,8 +56,8 @@ export function flashcardsForStage(flashcards: Flashcard[], stage: Stage): Flash
 }
 
 export function countFlashcards(flashcards: Flashcard[], stage: Stage): number {
-  const lightspeedScheduleStore = useLightspeedScheduleStore()
-  const { currDay } = storeToRefs(lightspeedScheduleStore)
+  const timelineStore = useTimelineStore()
+  const { currDay } = storeToRefs(timelineStore)
 
   if (stage === specialStages.UNKNOWN) {
     return flashcards.filter(f =>

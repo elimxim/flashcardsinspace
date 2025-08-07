@@ -178,7 +178,7 @@ function removeFlashcardSet() {
   if (flashcardSet.value !== null) {
     flashcardDataStore.removeFlashcardSet(flashcardSet.value).then(() => {
       reviewStore.finishReview()
-      flashcardSetStore.initFromList(flashcardSets.value)
+      flashcardSetStore.loadDataOrResetState(flashcardSets.value)
     })
   }
 }

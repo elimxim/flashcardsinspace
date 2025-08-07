@@ -5,7 +5,7 @@ data class UserDto(
     val email: String,
     val name: String,
     val roles: List<String>,
-    val registeredAt: String,
+    val registeredAt: String, // fixme ZonedDateTime
 )
 
 data class LanguageDto(
@@ -19,8 +19,8 @@ data class FlashcardSetDto(
     val name: String,
     val languageId: Long,
     val default: Boolean,
-    val createdAt: String, // fixme creationDate
-    val lastUpdatedAt: String?,
+    val createdAt: String, // fixme creationDate + LocalDate
+    val lastUpdatedAt: String?, // fixme ZonedDateTime
 )
 
 data class FlashcardDto(
@@ -30,9 +30,9 @@ data class FlashcardDto(
     val stage: String,
     val reviewedTimes: Int,
     val reviewHistory: ReviewHistoryDto,
-    val createdAt: String, // fixme creationDate
-    val reviewedAt: String?, // fixme reviewDate
-    val lastUpdatedAt: String?,
+    val createdAt: String, // fixme creationDate + LocalDate
+    val reviewedAt: String?, // fixme lastReviewDate + LocalDate
+    val lastUpdatedAt: String?, // fixme ZonedDateTime
 )
 
 data class ReviewHistoryDto(
@@ -42,4 +42,19 @@ data class ReviewHistoryDto(
 data class ReviewInfoDto(
     val stage: String,
     val reviewedAt: String, // fixme reviewDate
+)
+
+data class TimelineDto(
+    val id: Long,
+    val startedAt: String, // fixme ZonedDateTime
+    val status: String,
+    val lastUpdatedAt: String?, // fixme ZonedDateTime
+)
+
+data class ChronodayDto(
+    val id: Long,
+    val chronodate: String, // fixme LocalDate
+    val seqNumber: Int,
+    val status: String,
+    val stages: List<String>,
 )

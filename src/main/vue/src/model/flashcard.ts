@@ -6,7 +6,7 @@ export interface ReviewHistory {
 
 export interface ReviewInfo {
   stage: string
-  reviewedAt: string
+  reviewedAt: string // fixme reviewDate
 }
 
 export interface Flashcard {
@@ -25,7 +25,7 @@ export interface FlashcardSet {
   id: number
   name: string
   languageId: number,
-  createdAt: string // fixme creationDate
+  createdAt: string // fixme lastCreationDate
   default: boolean // fixme first
   lastUpdatedAt: string | null
 }

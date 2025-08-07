@@ -5,4 +5,6 @@ const apiClient = axios.create({
   withCredentials: true,
 })
 
+// todo move api calls here
+
 export default apiClient

@@ -1,4 +1,4 @@
-export function asIsoDate(date: Date): string {
+export function isoDateStr(date: Date): string {
   return date.toISOString().split('T')[0]
 }
 
