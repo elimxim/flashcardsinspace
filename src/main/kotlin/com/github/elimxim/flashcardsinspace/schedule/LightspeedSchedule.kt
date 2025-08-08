@@ -1,26 +1,27 @@
 package com.github.elimxim.flashcardsinspace.schedule
 
 import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
+import com.github.elimxim.flashcardsinspace.entity.FlashcardStage.*
 import kotlin.collections.joinToString
 
 val lightspeedCfg = mapOf(
-    FlashcardStage.S1 to Interval(delay = 0, gap = 1),
-    FlashcardStage.S2 to Interval(delay = 1, gap = 2),
-    FlashcardStage.S3 to Interval(delay = 2, gap = 4),
-    FlashcardStage.S4 to Interval(delay = 4, gap = 8),
-    FlashcardStage.S5 to Interval(delay = 0, gap = 16),
-    FlashcardStage.S6 to Interval(delay = 8, gap = 32),
-    FlashcardStage.S7 to Interval(delay = -8, gap = 64)
+    S1 to interval(delay = 0, gap = 1),
+    S2 to interval(delay = 1, gap = 2),
+    S3 to interval(delay = 2, gap = 4),
+    S4 to interval(delay = 4, gap = 8),
+    S5 to interval(delay = 0, gap = 16),
+    S6 to interval(delay = 8, gap = 32),
+    S7 to interval(delay = -8, gap = 64)
 )
 
 val wynerCfg = mapOf(
-    FlashcardStage.S1 to Interval(delay = 0, gap = 1),
-    FlashcardStage.S2 to Interval(delay = -1, gap = 2),
-    FlashcardStage.S3 to Interval(delay = -2, gap = 4),
-    FlashcardStage.S4 to Interval(delay = -3, gap = intArrayOf(7, 9)),
-    FlashcardStage.S5 to Interval(delay = -4, gap = 16),
-    FlashcardStage.S6 to Interval(delay = -5, gap = intArrayOf(29, 35)),
-    FlashcardStage.S7 to Interval(delay = -8, gap = 64)
+    S1 to interval(delay = 0, gap = 1),
+    S2 to interval(delay = -1, gap = 2),
+    S3 to interval(delay = -2, gap = 4),
+    S4 to interval(delay = -3, gap = gaps(7, 9)),
+    S5 to interval(delay = -4, gap = 16),
+    S6 to interval(delay = -5, gap = gaps(29, 35)),
+    S7 to interval(delay = -8, gap = 64)
 )
 
 interface StudySchedule {
@@ -30,11 +31,11 @@ interface StudySchedule {
 class WynerSchedule(capacity: Int) : StudySchedule by ConfigurableSchedule(capacity, wynerCfg)
 class LightspeedSchedule(capacity: Int) : StudySchedule by ConfigurableSchedule(capacity, lightspeedCfg)
 
-class ConfigurableSchedule(capacity: Int, cfg: Map<FlashcardStage, Interval>) : StudySchedule {
+class ConfigurableSchedule(capacity: Int, cfg: Map<FlashcardStage, IntervalDefinition>) : StudySchedule {
     private val days = ArrayList<Day>(capacity)
 
     init {
-        val stageResolver = StageResolver(cfg)
+        val stageResolver = StageResolver(cfg = cfg.entries.associate { it.key to Interval(it.value) })
         for (day in 1..capacity) {
             days.add(Day(number = day, stages = stageResolver.stages(day)))
         }
@@ -66,9 +67,25 @@ class StageResolver(private val cfg: Map<FlashcardStage, Interval>) {
     }
 }
 
+fun interval(delay: Int, gap: DynamicGapDefinition) = IntervalDefinition(delay, gap)
+fun interval(delay: Int, gap: Int) = IntervalDefinition(delay, StaticGapDefinition(gap))
+fun gaps(vararg gaps: Int) = DynamicGapDefinition(gaps)
+
+class IntervalDefinition(val delay: Int, val gap: GapDefinition)
+interface GapDefinition
+class StaticGapDefinition(val gap: Int) : GapDefinition
+class DynamicGapDefinition(val gaps: IntArray) : GapDefinition
+
+fun mapGapDefinition(def: GapDefinition): Gap {
+    return when (def) {
+        is StaticGapDefinition -> StaticGap(def.gap)
+        is DynamicGapDefinition -> DynamicGap(def.gaps)
+        else -> throw IllegalArgumentException("Unknown gap definition type: ${def::class.simpleName}")
+    }
+}
+
 class Interval(private val delay: Int, private val gap: Gap) {
-    constructor(delay: Int, gap: Int) : this(delay, StaticGap(gap))
-    constructor(delay: Int, gap: IntArray) : this(delay, gap = DynamicGap(*gap))
+    constructor(def: IntervalDefinition) : this(def.delay, mapGapDefinition(def.gap))
 
     private var delayed = false
     fun next(): Int {
@@ -89,8 +106,7 @@ class StaticGap(val value: Int) : Gap {
     override fun value() = value
 }
 
-class DynamicGap(vararg values: Int) : Gap {
-    private val values: Array<Int> = values.toTypedArray()
+class DynamicGap(private val values: IntArray) : Gap {
     private val lastIdx = values.size - 1
     private var currIdx = 0
 
@@ -100,7 +116,7 @@ class DynamicGap(vararg values: Int) : Gap {
     }
 }
 
-class PrintableSchedule(private val schedule: StudySchedule): StudySchedule by schedule {
+class PrintableSchedule(private val schedule: StudySchedule) : StudySchedule by schedule {
     fun print(rows: Int, columns: Int) {
         for (i in 0..<rows) {
             var idx = i
@@ -129,7 +145,6 @@ fun main() {
     val lightspeedSchedule = PrintableSchedule(LightspeedSchedule(64))
 
     wynerSchedule.print(rows = 16, columns = 4)
-    println()
-    println()
+    print("\n\n")
     lightspeedSchedule.print(rows = 16, columns = 4)
 }

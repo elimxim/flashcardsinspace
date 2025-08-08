@@ -82,7 +82,7 @@ class FlashcardTimelineService(
         val flashcardSet = flashcardSetService.getFlashcardSet(flashcardSetId)
         val timeline = flashcardSet.timeline
         if (timeline == null) {
-            throw IllegalArgumentException("Flashcard set doesn't have timeline") // fixme
+            return applyLightspeedSchedule(clientDatetime)
         }
 
         val currDate = clientDatetime.toLocalDate()
@@ -184,8 +184,44 @@ class FlashcardTimelineService(
     }
 
     private fun applyLightspeedSchedule(
+        startDatetime: ZonedDateTime,
+        capacity: Int = 200,
+    ): List<ChronodayDto> {
+        println(startDatetime)
+        val scheduleDays = LightspeedSchedule(capacity).days()
+        val startDate = startDatetime.toLocalDate()
+        val result = mutableListOf<ChronodayDto>()
+        for (i in 1..scheduleDays.size) {
+            val date = startDate.plusDays(i.toLong())
+            val scheduleDay = scheduleDays[i - 1]
+
+            result.add(
+                ChronodayDto(
+                    id = 0,
+                    chronodate = date.toString(),
+                    seqNumber = scheduleDay.number,
+                    status = DayStatus.NOT_STARTED.name,
+                    stages = scheduleDay.stages.map { it.name }
+                )
+            )
+        }
+
+        result.addFirst(
+            ChronodayDto(
+                id = 0,
+                chronodate = startDate.toString(),
+                seqNumber = 0,
+                status = DayStatus.INITIAL.name,
+                stages = listOf()
+            )
+        )
+
+        return result.toList()
+    }
+
+    private fun applyLightspeedSchedule(
         timeline: FlashcardTimeline,
-        daysAhead: Int = 100,
+        daysAhead: Int = 200,
     ): List<ChronodayDto> {
         if (timeline.chronodays.isEmpty()) return listOf()
 
@@ -219,6 +255,16 @@ class FlashcardTimelineService(
                 )
             )
         }
+
+        result.addFirst(
+            ChronodayDto(
+                id = initialChronoday.id,
+                chronodate = initialChronoday.chronodate.toString(),
+                seqNumber = 0,
+                status = initialChronoday.status.name,
+                stages = listOf()
+            )
+        )
 
         return result.toList()
     }

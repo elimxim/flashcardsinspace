@@ -59,7 +59,7 @@ export interface FlashcardTimelineResponse {
   timeline: Timeline
 }
 
-export interface ChronodaysGetRequest {
+export interface ChronodaysGetParams {
   clientDatetime: string,
 }
 

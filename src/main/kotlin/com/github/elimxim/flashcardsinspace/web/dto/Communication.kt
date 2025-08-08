@@ -34,8 +34,8 @@ data class FlashcardPutResponse(val flashcard: FlashcardDto)
 
 data class TimelinePostRequest(val clientDatetime: ZonedDateTime)
 data class TimelinePutRequest(val timelineStatus: String)
-data class ChronodaysGetRequest(val clientDatetime: ZonedDateTime)
 data class ChronodayPutRequest(val dayStatus: String)
 
 data class TimelineResponse(val timeline: TimelineDto)
 data class ChronodayResponse(val chronoday: ChronodayDto)
+data class ChronodaysGetResponse(val chronodays: List<ChronodayDto>)

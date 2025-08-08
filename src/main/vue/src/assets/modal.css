@@ -112,6 +112,15 @@
   background-color: #da4437;
 }
 
+.modal-danger-button {
+  background-color: #f39121;
+  color: white;
+}
+
+.modal-danger-button:not(.modal-button-disabled):hover {
+  background-color: #c58034;
+}
+
 .modal-button-disabled {
   background-color: #ededed;
   color: #cacaca;

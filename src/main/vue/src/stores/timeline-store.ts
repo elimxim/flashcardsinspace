@@ -1,20 +1,19 @@
 import { defineStore } from 'pinia'
 import {
   type Chronoday,
-  lightDayStatuses,
-  type Timeline,
-  timelineStatuses
+  type Timeline
 } from '@/model/timeline.ts'
 import { stages } from '@/core-logic/stage-logic.ts'
 import { isoDateStr } from '@/utils/date.ts'
 import apiClient from '@/api/api-client.ts'
 import type {
-  ChronodaysGetRequest,
+  ChronodaysGetParams,
   ChronodaysGetResponse, ChronodaysPostResponse,
   FlashcardTimelineResponse
 } from '@/api/communication.ts'
 import type { FlashcardSet } from '@/model/flashcard.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts';
+import { chronodayStatuses, timelineStatuses } from '@/core-logic/calendar-logic.ts';
 
 export interface TimelineState {
   timeline: Timeline
@@ -36,35 +35,43 @@ export const useTimelineStore = defineStore('timeline', {
         chronodate: isoDateStr(new Date()),
         seqNumber: 0,
         stages: [],
-        status: lightDayStatuses.INITIAL,
+        status: chronodayStatuses.INITIAL,
       },
     }
   },
   getters: {
     currLightDayStages(): Set<string> {
-      return new Set(this.currDay.stages.map(v => v.name))
+      return new Set(this.currDay.stages)
     },
   },
   actions: {
     async loadData(flashcardSet: FlashcardSet) {
-      try {
-        const timelineResponse = await apiClient.get<FlashcardTimelineResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline')
-        this.timeline = timelineResponse.data.timeline
-
-        const chronodaysRequest: ChronodaysGetRequest = {
-          clientDatetime: new Date().toISOString()
-        }
-
-        const chronodaysResponse = await apiClient.get<ChronodaysGetResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays', {
-          data: chronodaysRequest
+      apiClient.get<FlashcardTimelineResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline')
+        .then(response => {
+          this.timeline = response.data.timeline
         })
+        .catch(error => {
+          if (error.response.status === 404) {
+            // todo OK
+          } else {
+            // todo not OK
+          }
+        })
+        .then(() => {
+          const chronodaysRequest: ChronodaysGetParams = {
+            clientDatetime: new Date().toISOString()
+          }
 
-        this.chronodays = chronodaysResponse.data.chronodays
-        this.currDay = this.chronodays[this.chronodays.length - 1]
-      } catch (error) {
-        // fixme if timelineResponse failed - it's OKAY = return 404
-        // todo catch errors
-      }
+          apiClient.get<ChronodaysGetResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays', {
+            params: chronodaysRequest
+          }).then(response => {
+            console.log("chronodays: " + response.data.chronodays.length)
+            this.chronodays = response.data.chronodays
+            this.currDay = this.chronodays[this.chronodays.length - 201] // fixme magic number
+            console.log("currDay: " + JSON.stringify(this.currDay))
+          })
+          // todo catch errors
+        })
     },
     switchToNextDay() {
       if (this.currDay.seqNumber === this.chronodays.length - 1) return

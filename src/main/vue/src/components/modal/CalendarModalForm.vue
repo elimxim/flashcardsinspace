@@ -3,11 +3,13 @@
     <div class="calendar">
       <div class="calendar-month">
         <button class="calendar-nav-button"
+                ref="prevMonthButton"
                 @click="navigate(NavMonthDirection.PREV)">
           <font-awesome-icon icon="fa-solid fa-angle-left"/>
         </button>
         <span>{{ formattedCurrMonth }}</span>
         <button class="calendar-nav-button"
+                ref="nextMonthButton"
                 @click="navigate(NavMonthDirection.NEXT)">
           <font-awesome-icon icon="fa-solid fa-angle-right"/>
         </button>
@@ -34,12 +36,12 @@
       </div>
     </div>
     <div class="calendar-bottom-nav">
-      <button class="modal-button modal-update-button"
+      <button class="modal-button modal-danger-button"
               ref="updateButton"
               @click="switchToPrevDay">
         Prev
       </button>
-      <button class="modal-button modal-update-button"
+      <button class="modal-button modal-danger-button"
               ref="updateButton"
               @click="switchToNextDay">
         Next
@@ -51,11 +53,12 @@
 <script setup lang="ts">
 import '@/assets/modal.css'
 import ModalForm from '@/components/modal/ModalForm.vue'
-import { computed, defineEmits, ref } from 'vue'
-import { lightDayStatuses } from '@/model/timeline.ts'
+import { computed, type ComputedRef, defineEmits, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useTimelineStore } from '@/stores/timeline-store.ts'
 import { storeToRefs } from 'pinia'
 import { isoDateStr } from '@/utils/date.ts'
+import { chronodayStatuses } from '@/core-logic/calendar-logic.ts'
+import { toSortedOrders } from '@/core-logic/stage-logic.ts'
 
 defineProps({
   visible: Boolean
@@ -72,8 +75,12 @@ const { timeline, chronodays, currDay } = storeToRefs(timelineStore)
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-const lightDayMap = ref(new Map(chronodays.value.map(day => [day.chronodate, day])))
+const chronodayMap = computed(() => new Map(chronodays.value.map(day => [day.chronodate, day])))
 const currDate = ref(new Date(currDay.value.chronodate))
+
+watch(currDay, (newValue) => {
+  currDate.value = new Date(newValue.chronodate)
+})
 
 interface CalendarDay {
   number: number
@@ -81,11 +88,10 @@ interface CalendarDay {
   status: string | null
   stages: string | null
   isCurrMonth: boolean
-  isStartDay: boolean
   isCurrDay: boolean
 }
 
-const monthDays = computed(() => {
+const monthDays: ComputedRef<CalendarDay[]> = computed(() => {
   const year = currDate.value.getFullYear()
   const month = currDate.value.getMonth()
 
@@ -99,15 +105,13 @@ const monthDays = computed(() => {
   const result: CalendarDay[] = []
   for (let i = firstWeekDay - 1; i >= 0; i--) {
     const date = new Date(prevYear, prevMonth, totalDaysInPrevMonth - i)
-    const lightDay = lightDayMap.value.get(isoDateStr(date))
 
     result.push({
       number: date.getDate(),
       date: date.toDateString(),
       status: null,
-      stages: lightDay?.stages.map(v => v.order).toString() ?? null,
+      stages: null,
       isCurrMonth: false,
-      isStartDay: false,
       isCurrDay: false,
     })
   }
@@ -117,16 +121,15 @@ const monthDays = computed(() => {
   // filling the current month
   for (let i = 1; i <= totalDaysInMonth; i++) {
     const date = new Date(year, month, i)
-    const lightDay = lightDayMap.value.get(isoDateStr(date))
+    const chronoday = chronodayMap.value.get(isoDateStr(date))
 
     result.push({
       number: i,
       date: date.toDateString(),
-      status: lightDay?.status ?? null,
-      stages: lightDay?.stages.map(v => v.order).toString() ?? null,
+      status: chronoday?.status ?? null,
+      stages: toSortedOrders(chronoday?.stages ?? []).toString(),
       isCurrMonth: true,
-      isStartDay: date.toISOString() === timeline.value.startedAt,
-      isCurrDay: date.toDateString() === currDate.value.toDateString(),
+      isCurrDay: date.toISOString() === currDay.value.chronodate,
     })
   }
 
@@ -138,15 +141,13 @@ const monthDays = computed(() => {
   // filling empty slots at the end
   for (let i = 1; i <= 6 - lastWeekDay; i++) {
     const date = new Date(nextYear, nextMonth, i)
-    const lightDay = lightDayMap.value.get(isoDateStr(date))
 
     result.push({
-      number: i,
+      number: date.getDate(),
       date: date.toDateString(),
       status: null,
-      stages: lightDay?.stages.map(v => v.order).toString() ?? null,
+      stages: null,
       isCurrMonth: false,
-      isStartDay: false,
       isCurrDay: false,
     })
   }
@@ -178,20 +179,20 @@ function navigate(direction: NavMonthDirection) {
 function cellClass(day: CalendarDay): string {
   if (!day.isCurrMonth) {
     return 'calendar-empty-day'
-  } if (day.isStartDay) {
-    return 'calendar-start-day'
   } else if (day.isCurrDay) {
     return 'calendar-current-day'
   }
 
   switch (day?.status) {
-    case lightDayStatuses.COMPLETED:
+    case chronodayStatuses.INITIAL:
+      return 'calendar-start-day'
+    case chronodayStatuses.COMPLETED:
       return 'calendar-completed-day'
-    case lightDayStatuses.IN_PROGRESS:
+    case chronodayStatuses.IN_PROGRESS:
       return 'calendar-in-progress-day'
-    case lightDayStatuses.NOT_STARTED:
+    case chronodayStatuses.NOT_STARTED:
       return 'calendar-not-started-day'
-    case lightDayStatuses.OFF:
+    case chronodayStatuses.OFF:
       return 'calendar-off-day'
     default:
       return 'calendar-another-day'
@@ -212,6 +213,25 @@ function switchToNextDay() {
 function switchToPrevDay() {
   timelineStore.switchToPrevDay()
   currDate.value = new Date(currDay.value.chronodate)
+}
+
+const prevMonthButton = ref<HTMLButtonElement>()
+const nextMonthButton = ref<HTMLButtonElement>()
+
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
+})
+
+function handleKeydown(event: KeyboardEvent) {
+  if (event.key === 'ArrowLeft') {
+    prevMonthButton.value?.click()
+  } else if (event.key === 'ArrowRight') {
+    nextMonthButton.value?.click()
+  }
 }
 
 </script>
@@ -239,6 +259,7 @@ function switchToPrevDay() {
   border: none;
   cursor: pointer;
   font-size: 1em;
+  outline: none;
 }
 
 .calendar-nav-button:hover {
@@ -312,7 +333,8 @@ function switchToPrevDay() {
 .calendar-bottom-nav {
   flex: 1;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 0.5em;
   align-items: center;
   margin-top: 1em;
 }

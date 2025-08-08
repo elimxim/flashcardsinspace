@@ -1,9 +1,9 @@
 package com.github.elimxim.flashcardsinspace.web
 
 import com.github.elimxim.flashcardsinspace.service.FlashcardTimelineService
-import com.github.elimxim.flashcardsinspace.web.dto.ChronodaysGetRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayPutRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayResponse
+import com.github.elimxim.flashcardsinspace.web.dto.ChronodaysGetResponse
 import com.github.elimxim.flashcardsinspace.web.dto.TimelinePutRequest
 import com.github.elimxim.flashcardsinspace.web.dto.TimelinePostRequest
 import com.github.elimxim.flashcardsinspace.web.dto.TimelineResponse
@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import java.time.ZonedDateTime
 
 @Controller
 @RequestMapping("/api/flashcard-sets/{setId}/timeline")
@@ -49,10 +51,10 @@ class FlashcardTimelineController(
     @GetMapping("/chronodays")
     fun getChronodays(
         @PathVariable setId: Long,
-        @RequestBody request: ChronodaysGetRequest,
-    ): ResponseEntity<List<ChronodayResponse>> {
-        val chronodays = flashcardTimelineService.getChronodays(setId, request.clientDatetime)
-        return ResponseEntity.ok(chronodays.map { ChronodayResponse(it) })
+        @RequestParam clientDatetime: ZonedDateTime,
+    ): ResponseEntity<ChronodaysGetResponse> {
+        val chronodays = flashcardTimelineService.getChronodays(setId, clientDatetime)
+        return ResponseEntity.ok(ChronodaysGetResponse(chronodays))
     }
 
     @PostMapping("/chronodays")

@@ -73,6 +73,16 @@ export const specialStageSet = new Set([
   specialStages.OUTER_SPACE,
 ])
 
+export function toSortedOrders(stageNames: String[]) {
+  return stageNames.map(name =>
+    stageNameMap.get(name.toString())?.order
+  ).filter(order =>
+    order !== undefined
+  ).sort(
+    (a, b) => b - a
+  ) as number[]
+}
+
 /**
  * Determines and returns the next stage based on the current stage
  * with the following exclusion:
