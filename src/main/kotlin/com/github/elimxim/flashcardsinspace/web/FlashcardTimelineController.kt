@@ -53,8 +53,8 @@ class FlashcardTimelineController(
         @PathVariable setId: Long,
         @RequestParam clientDatetime: ZonedDateTime,
     ): ResponseEntity<ChronodaysGetResponse> {
-        val chronodays = flashcardTimelineService.getChronodays(setId, clientDatetime)
-        return ResponseEntity.ok(ChronodaysGetResponse(chronodays))
+        val (currDay, chronodays) = flashcardTimelineService.getChronodays(setId, clientDatetime)
+        return ResponseEntity.ok(ChronodaysGetResponse(currDay, chronodays))
     }
 
     @PostMapping("/chronodays")

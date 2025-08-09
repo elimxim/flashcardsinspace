@@ -65,6 +65,7 @@ export interface ChronodaysGetParams {
 
 export interface ChronodaysGetResponse {
   chronodays: Chronoday[]
+  currDay: Chronoday,
 }
 
 export interface ChronodaysPostResponse {

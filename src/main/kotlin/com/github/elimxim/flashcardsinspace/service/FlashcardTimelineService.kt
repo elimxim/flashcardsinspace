@@ -10,9 +10,12 @@ import com.github.elimxim.flashcardsinspace.schedule.LightspeedSchedule
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
 import com.github.elimxim.flashcardsinspace.web.dto.TimelineDto
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
+
+private val log = LoggerFactory.getLogger(FlashcardTimelineService::class.java)
 
 @Service
 class FlashcardTimelineService(
@@ -76,13 +79,17 @@ class FlashcardTimelineService(
     // todo split into two services
 
     @Transactional
-    fun getChronodays(flashcardSetId: Long, clientDatetime: ZonedDateTime): List<ChronodayDto> {
+    fun getChronodays(flashcardSetId: Long, clientDatetime: ZonedDateTime): Pair<ChronodayDto, List<ChronodayDto>> {
         // todo check flashcard set for existence
         // todo check timeline for existence
         val flashcardSet = flashcardSetService.getFlashcardSet(flashcardSetId)
         val timeline = flashcardSet.timeline
         if (timeline == null) {
-            return applyLightspeedSchedule(clientDatetime)
+            val schedule = applyLightspeedSchedule(clientDatetime)
+            val currDayStr = clientDatetime.toLocalDate().toString()
+            val currDay = schedule.find { it.chronodate == currDayStr }
+                ?: throw IllegalArgumentException("Can't find current day in schedule") // fixme
+            return currDay to schedule
         }
 
         val currDate = clientDatetime.toLocalDate()
@@ -105,7 +112,11 @@ class FlashcardTimelineService(
             flashcardTimelineRepository.save(timeline)
         } else timeline
 
-        return applyLightspeedSchedule(updatedTimeLine)
+        val schedule = applyLightspeedSchedule(updatedTimeLine)
+        val currDayStr = clientDatetime.toLocalDate().toString()
+        val currDay = schedule.find { it.chronodate == currDayStr }
+            ?: throw IllegalArgumentException("Can't find current day in schedule") // fixme
+        return currDay to schedule
     }
 
     @Transactional
@@ -131,8 +142,8 @@ class FlashcardTimelineService(
 
         timeline.chronodays.add(chronoday)
         val updatedTimeline = flashcardTimelineRepository.save(timeline)
-        val lightspeedDays = applyLightspeedSchedule(updatedTimeline)
-        return lightspeedDays.last()
+        val schedule = applyLightspeedSchedule(updatedTimeline)
+        return schedule.last()
     }
 
     @Transactional
@@ -157,8 +168,8 @@ class FlashcardTimelineService(
             chronodayRepository.save(chronoday)
         } else chronoday
 
-        val lightspeedDays = applyLightspeedSchedule(updatedChronoday.timeline)
-        return lightspeedDays.last()
+        val schedule = applyLightspeedSchedule(updatedChronoday.timeline)
+        return schedule.last()
     }
 
     @Transactional
@@ -187,7 +198,6 @@ class FlashcardTimelineService(
         startDatetime: ZonedDateTime,
         capacity: Int = 200,
     ): List<ChronodayDto> {
-        println(startDatetime)
         val scheduleDays = LightspeedSchedule(capacity).days()
         val startDate = startDatetime.toLocalDate()
         val result = mutableListOf<ChronodayDto>()

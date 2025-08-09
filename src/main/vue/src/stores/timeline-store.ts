@@ -65,10 +65,8 @@ export const useTimelineStore = defineStore('timeline', {
           apiClient.get<ChronodaysGetResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays', {
             params: chronodaysRequest
           }).then(response => {
-            console.log("chronodays: " + response.data.chronodays.length)
             this.chronodays = response.data.chronodays
-            this.currDay = this.chronodays[this.chronodays.length - 201] // fixme magic number
-            console.log("currDay: " + JSON.stringify(this.currDay))
+            this.currDay = response.data.currDay
           })
           // todo catch errors
         })

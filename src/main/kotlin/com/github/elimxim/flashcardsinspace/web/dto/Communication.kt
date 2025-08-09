@@ -38,4 +38,4 @@ data class ChronodayPutRequest(val dayStatus: String)
 
 data class TimelineResponse(val timeline: TimelineDto)
 data class ChronodayResponse(val chronoday: ChronodayDto)
-data class ChronodaysGetResponse(val chronodays: List<ChronodayDto>)
+data class ChronodaysGetResponse(val currDay: ChronodayDto, val chronodays: List<ChronodayDto>)

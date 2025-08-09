@@ -4,13 +4,13 @@
       <div class="calendar-month">
         <button class="calendar-nav-button"
                 ref="prevMonthButton"
-                @click="navigate(NavMonthDirection.PREV)">
+                @click="navigate(MonthNav.PREV)">
           <font-awesome-icon icon="fa-solid fa-angle-left"/>
         </button>
         <span>{{ formattedCurrMonth }}</span>
         <button class="calendar-nav-button"
                 ref="nextMonthButton"
-                @click="navigate(NavMonthDirection.NEXT)">
+                @click="navigate(MonthNav.NEXT)">
           <font-awesome-icon icon="fa-solid fa-angle-right"/>
         </button>
       </div>
@@ -24,7 +24,7 @@
       <div class="calendar-dates">
         <div class="calendar-day"
              :class="cellClass(day)"
-             v-for="day in monthDays"
+             v-for="day in calendarPage"
              :key="day.date">
           <div class="calendar-day-number">
             {{ day.number }}
@@ -37,12 +37,16 @@
     </div>
     <div class="calendar-bottom-nav">
       <button class="modal-button modal-danger-button"
+              :class="{ 'modal-button-disabled': isTimelineSuspended }"
               ref="updateButton"
+              :disabled="isTimelineSuspended"
               @click="switchToPrevDay">
         Prev
       </button>
       <button class="modal-button modal-danger-button"
+              :class="{ 'modal-button-disabled': isTimelineSuspended }"
               ref="updateButton"
+              :disabled="isTimelineSuspended"
               @click="switchToNextDay">
         Next
       </button>
@@ -56,9 +60,11 @@ import ModalForm from '@/components/modal/ModalForm.vue'
 import { computed, type ComputedRef, defineEmits, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useTimelineStore } from '@/stores/timeline-store.ts'
 import { storeToRefs } from 'pinia'
-import { isoDateStr } from '@/utils/date.ts'
-import { chronodayStatuses } from '@/core-logic/calendar-logic.ts'
-import { toSortedOrders } from '@/core-logic/stage-logic.ts'
+import {
+  calcCalendarPage,
+  type CalendarDay,
+  chronodayStatuses
+} from '@/core-logic/calendar-logic.ts'
 
 defineProps({
   visible: Boolean
@@ -76,113 +82,34 @@ const { timeline, chronodays, currDay } = storeToRefs(timelineStore)
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 const chronodayMap = computed(() => new Map(chronodays.value.map(day => [day.chronodate, day])))
-const currDate = ref(new Date(currDay.value.chronodate))
+const currMonth = ref(new Date(currDay.value.chronodate))
 
 watch(currDay, (newValue) => {
-  currDate.value = new Date(newValue.chronodate)
+  currMonth.value = new Date(newValue.chronodate)
 })
 
-interface CalendarDay {
-  number: number
-  date: string
-  status: string | null
-  stages: string | null
-  isCurrMonth: boolean
-  isCurrDay: boolean
-}
+const calendarPage = computed(() =>
+  calcCalendarPage(currMonth.value, currDay.value, chronodayMap.value)
+)
 
-const monthDays: ComputedRef<CalendarDay[]> = computed(() => {
-  const year = currDate.value.getFullYear()
-  const month = currDate.value.getMonth()
-
-  const firstMonthDay = new Date(year, month, 1)
-  const firstWeekDay = firstMonthDay.getDay()
-  const prevYear = month === 0 ? year - 1 : year
-  const prevMonth = month === 0 ? 11 : month - 1
-  const totalDaysInPrevMonth = totalDays(prevYear, prevMonth + 1)
-
-  // filling empty slots at the start
-  const result: CalendarDay[] = []
-  for (let i = firstWeekDay - 1; i >= 0; i--) {
-    const date = new Date(prevYear, prevMonth, totalDaysInPrevMonth - i)
-
-    result.push({
-      number: date.getDate(),
-      date: date.toDateString(),
-      status: null,
-      stages: null,
-      isCurrMonth: false,
-      isCurrDay: false,
-    })
-  }
-
-  const totalDaysInMonth = totalDays(year, month + 1)
-
-  // filling the current month
-  for (let i = 1; i <= totalDaysInMonth; i++) {
-    const date = new Date(year, month, i)
-    const chronoday = chronodayMap.value.get(isoDateStr(date))
-
-    result.push({
-      number: i,
-      date: date.toDateString(),
-      status: chronoday?.status ?? null,
-      stages: toSortedOrders(chronoday?.stages ?? []).toString(),
-      isCurrMonth: true,
-      isCurrDay: date.toISOString() === currDay.value.chronodate,
-    })
-  }
-
-  const lastMonthDay = new Date(year, month + 1, 0)
-  const lastWeekDay = lastMonthDay.getDay()
-  const nextMonth = month === 11 ? 0 : month + 1
-  const nextYear = month === 11 ? year + 1 : year
-
-  // filling empty slots at the end
-  for (let i = 1; i <= 6 - lastWeekDay; i++) {
-    const date = new Date(nextYear, nextMonth, i)
-
-    result.push({
-      number: date.getDate(),
-      date: date.toDateString(),
-      status: null,
-      stages: null,
-      isCurrMonth: false,
-      isCurrDay: false,
-    })
-  }
-
-  return result
-})
-
-function totalDays(year: number, month: number): number {
-  return new Date(year, month, 0).getDate()
-}
-
-const dateFormatter = new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' })
+const userDateFormatter = new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' })
 const formattedCurrMonth = computed(() => {
-  return dateFormatter.format(currDate.value)
+  return userDateFormatter.format(currMonth.value)
 })
 
-enum NavMonthDirection { NEXT, PREV }
+enum MonthNav { NEXT, PREV }
 
-function navigate(direction: NavMonthDirection) {
-  const newMonth = new Date(currDate.value)
-  if (direction === NavMonthDirection.PREV) {
-    newMonth.setMonth(currDate.value.getMonth() - 1)
+function navigate(direction: MonthNav) {
+  const newMonth = new Date(currMonth.value)
+  if (direction === MonthNav.PREV) {
+    newMonth.setMonth(currMonth.value.getMonth() - 1)
   } else {
-    newMonth.setMonth(currDate.value.getMonth() + 1)
+    newMonth.setMonth(currMonth.value.getMonth() + 1)
   }
-  currDate.value = newMonth
+  currMonth.value = newMonth
 }
 
 function cellClass(day: CalendarDay): string {
-  if (!day.isCurrMonth) {
-    return 'calendar-empty-day'
-  } else if (day.isCurrDay) {
-    return 'calendar-current-day'
-  }
-
   switch (day?.status) {
     case chronodayStatuses.INITIAL:
       return 'calendar-start-day'
@@ -194,8 +121,14 @@ function cellClass(day: CalendarDay): string {
       return 'calendar-not-started-day'
     case chronodayStatuses.OFF:
       return 'calendar-off-day'
-    default:
-      return 'calendar-another-day'
+  }
+
+  if (!day.isCurrMonth) {
+    return 'calendar-empty-day'
+  } else if (day.isCurrDay) {
+    return 'calendar-current-day'
+  } else {
+    return 'calendar-another-day'
   }
 }
 
@@ -203,16 +136,21 @@ function cellClass(day: CalendarDay): string {
 
 function exit() {
   emit('update:visible', false)
+  currMonth.value = new Date(currDay.value.chronodate)
 }
 
 function switchToNextDay() {
   timelineStore.switchToNextDay()
-  currDate.value = new Date(currDay.value.chronodate)
+  currMonth.value = new Date(currDay.value.chronodate)
 }
 
 function switchToPrevDay() {
   timelineStore.switchToPrevDay()
-  currDate.value = new Date(currDay.value.chronodate)
+  currMonth.value = new Date(currDay.value.chronodate)
+}
+
+function isTimelineSuspended(): boolean {
+  return timeline !== null && timeline.value.status === 'SUSPENDED'
 }
 
 const prevMonthButton = ref<HTMLButtonElement>()
