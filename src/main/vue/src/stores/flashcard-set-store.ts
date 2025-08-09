@@ -12,6 +12,7 @@ import type {
 } from '@/api/communication.ts'
 import type { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
+import { useTimelineStore } from '@/stores/timeline-store.ts'
 
 export interface FlashcardSetState {
   flashcardSet: FlashcardSet | null
@@ -99,6 +100,11 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
 
         apiClient.post<FlashcardsPostResponse>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards', request).then(response => {
           this.flashcardMap.set(response.data.flashcard.id, response.data.flashcard)
+        }).then(() => {
+          if (this.flashcardSet !== null) {
+            const timelineStore = useTimelineStore()
+            timelineStore.startTimeline(this.flashcardSet)
+          }
         })
         // todo handle errors
       } else {

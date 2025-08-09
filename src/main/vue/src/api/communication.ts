@@ -55,7 +55,11 @@ export interface FlashcardPutResponse {
   flashcard: Flashcard,
 }
 
-export interface FlashcardTimelineResponse {
+export interface TimelinePostRequest {
+  clientDatetime: Date
+}
+
+export interface TimelineResponse {
   timeline: Timeline
 }
 

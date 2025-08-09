@@ -1,22 +1,24 @@
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import {
   type Chronoday,
   type Timeline
 } from '@/model/timeline.ts'
-import { stages } from '@/core-logic/stage-logic.ts'
-import { isoDateStr } from '@/utils/date.ts'
+import { asIsoDateStr } from '@/utils/date.ts'
 import apiClient from '@/api/api-client.ts'
 import type {
   ChronodaysGetParams,
-  ChronodaysGetResponse, ChronodaysPostResponse,
-  FlashcardTimelineResponse
+  ChronodaysGetResponse,
+  ChronodaysPostResponse,
+  TimelinePostRequest,
+  TimelineResponse
 } from '@/api/communication.ts'
 import type { FlashcardSet } from '@/model/flashcard.ts'
-import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts';
-import { chronodayStatuses, timelineStatuses } from '@/core-logic/calendar-logic.ts';
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
+import { chronodayStatuses, timelineStatuses } from '@/core-logic/calendar-logic.ts'
+import { computed } from 'vue';
 
 export interface TimelineState {
-  timeline: Timeline
+  timeline: Timeline | null
   chronodays: Chronoday[]
   currDay: Chronoday
 }
@@ -24,15 +26,11 @@ export interface TimelineState {
 export const useTimelineStore = defineStore('timeline', {
   state: (): TimelineState => {
     return {
-      timeline: {
-        id: 0,
-        startedAt: new Date().toISOString(),
-        status: timelineStatuses.ACTIVE,
-      },
+      timeline: null,
       chronodays: [],
       currDay: {
         id: 0,
-        chronodate: isoDateStr(new Date()),
+        chronodate: asIsoDateStr(new Date()),
         seqNumber: 0,
         stages: [],
         status: chronodayStatuses.INITIAL,
@@ -45,8 +43,18 @@ export const useTimelineStore = defineStore('timeline', {
     },
   },
   actions: {
-    async loadData(flashcardSet: FlashcardSet) {
-      apiClient.get<FlashcardTimelineResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline')
+    async loadData(flashcardSet: FlashcardSet): Promise<void> {
+      await this.loadTimeline(flashcardSet).then(() =>
+        this.loadChronodays(flashcardSet)
+      )
+    },
+    async startTimeline(flashcardSet: FlashcardSet) {
+      await this.createTimeline(flashcardSet).then(() =>
+        this.loadChronodays(flashcardSet)
+      )
+    },
+    async loadTimeline(flashcardSet: FlashcardSet): Promise<void> {
+      await apiClient.get<TimelineResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline')
         .then(response => {
           this.timeline = response.data.timeline
         })
@@ -57,19 +65,32 @@ export const useTimelineStore = defineStore('timeline', {
             // todo not OK
           }
         })
-        .then(() => {
-          const chronodaysRequest: ChronodaysGetParams = {
-            clientDatetime: new Date().toISOString()
-          }
+    },
+    async loadChronodays(flashcardSet: FlashcardSet): Promise<void> {
+      const chronodaysRequest: ChronodaysGetParams = {
+        clientDatetime: new Date().toISOString()
+      }
 
-          apiClient.get<ChronodaysGetResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays', {
-            params: chronodaysRequest
-          }).then(response => {
-            this.chronodays = response.data.chronodays
-            this.currDay = response.data.currDay
-          })
-          // todo catch errors
+      await apiClient.get<ChronodaysGetResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays', {
+        params: chronodaysRequest
+      }).then(response => {
+        this.chronodays = response.data.chronodays
+        this.currDay = response.data.currDay
+      })
+      // todo catch errors
+    },
+    async createTimeline(flashcardSet: FlashcardSet): Promise<void> {
+      if (this.timeline === null) {
+        const request: TimelinePostRequest = {
+          clientDatetime: new Date(),
+        }
+
+        await apiClient.post<TimelineResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline', request).then(response => {
+          this.timeline = response.data.timeline
         })
+      } else {
+        // todo else
+      }
     },
     switchToNextDay() {
       if (this.currDay.seqNumber === this.chronodays.length - 1) return
@@ -81,7 +102,9 @@ export const useTimelineStore = defineStore('timeline', {
         if (next !== undefined) {
           apiClient.post<ChronodaysPostResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays').then(response => {
             this.currDay = response.data.chronoday
-          })
+          }).then(() =>
+            this.loadChronodays(flashcardSet)
+          )
           // todo catch errors
         } else {
           // todo do smth
@@ -99,8 +122,12 @@ export const useTimelineStore = defineStore('timeline', {
           if (prev !== undefined) {
             this.currDay = prev
           }
-        })
+        }).then(() =>
+          this.loadChronodays(flashcardSet)
+        )
         // todo catch errors
+      } else {
+        // todo smth
       }
     },
   }

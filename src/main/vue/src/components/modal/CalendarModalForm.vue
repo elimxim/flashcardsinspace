@@ -23,7 +23,7 @@
       </div>
       <div class="calendar-dates">
         <div class="calendar-day"
-             :class="cellClass(day)"
+             :class="cellClasses(day)"
              v-for="day in calendarPage"
              :key="day.date">
           <div class="calendar-day-number">
@@ -37,16 +37,16 @@
     </div>
     <div class="calendar-bottom-nav">
       <button class="modal-button modal-danger-button"
-              :class="{ 'modal-button-disabled': isTimelineSuspended }"
+              :class="{ 'modal-button-disabled': timelineSuspended }"
               ref="updateButton"
-              :disabled="isTimelineSuspended"
+              :disabled="timelineSuspended"
               @click="switchToPrevDay">
         Prev
       </button>
       <button class="modal-button modal-danger-button"
-              :class="{ 'modal-button-disabled': isTimelineSuspended }"
+              :class="{ 'modal-button-disabled': timelineSuspended }"
               ref="updateButton"
-              :disabled="isTimelineSuspended"
+              :disabled="timelineSuspended"
               @click="switchToNextDay">
         Next
       </button>
@@ -109,27 +109,38 @@ function navigate(direction: MonthNav) {
   currMonth.value = newMonth
 }
 
-function cellClass(day: CalendarDay): string {
-  switch (day?.status) {
-    case chronodayStatuses.INITIAL:
-      return 'calendar-start-day'
-    case chronodayStatuses.COMPLETED:
-      return 'calendar-completed-day'
-    case chronodayStatuses.IN_PROGRESS:
-      return 'calendar-in-progress-day'
-    case chronodayStatuses.NOT_STARTED:
-      return 'calendar-not-started-day'
-    case chronodayStatuses.OFF:
-      return 'calendar-off-day'
-  }
-
+function cellClasses(day: CalendarDay): string {
   if (!day.isCurrMonth) {
     return 'calendar-empty-day'
-  } else if (day.isCurrDay) {
-    return 'calendar-current-day'
-  } else {
-    return 'calendar-another-day'
   }
+
+  const result: string[] = []
+  switch (day?.status) {
+    case chronodayStatuses.INITIAL:
+      result.push('calendar-start-day')
+      break
+    case chronodayStatuses.COMPLETED:
+      result.push('calendar-completed-day')
+      break
+    case chronodayStatuses.IN_PROGRESS:
+      result.push('calendar-in-progress-day')
+      break
+    case chronodayStatuses.NOT_STARTED:
+      result.push('calendar-not-started-day')
+      break
+    case chronodayStatuses.OFF:
+      result.push('calendar-off-day')
+      break
+    default:
+      result.push('calendar-another-day')
+      break
+  }
+
+  if (day.isCurrDay) {
+    result.push('calendar-current-day')
+  }
+
+  return result.join(" ")
 }
 
 // <calendar
@@ -139,19 +150,19 @@ function exit() {
   currMonth.value = new Date(currDay.value.chronodate)
 }
 
-function switchToNextDay() {
-  timelineStore.switchToNextDay()
-  currMonth.value = new Date(currDay.value.chronodate)
-}
-
 function switchToPrevDay() {
   timelineStore.switchToPrevDay()
   currMonth.value = new Date(currDay.value.chronodate)
 }
 
-function isTimelineSuspended(): boolean {
-  return timeline !== null && timeline.value.status === 'SUSPENDED'
+function switchToNextDay() {
+  timelineStore.switchToNextDay()
+  currMonth.value = new Date(currDay.value.chronodate)
 }
+
+const timelineSuspended = computed(() =>
+  timeline.value !== null && timeline.value.status === 'SUSPENDED'
+)
 
 const prevMonthButton = ref<HTMLButtonElement>()
 const nextMonthButton = ref<HTMLButtonElement>()
@@ -239,7 +250,10 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .calendar-current-day {
-  background-color: #884393;
+  border-color: #884393;
+  border-style: solid;
+  border-width: 1px;
+  box-sizing: border-box;
 }
 
 .calendar-off-day {

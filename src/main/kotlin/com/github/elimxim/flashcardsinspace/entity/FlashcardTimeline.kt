@@ -42,7 +42,7 @@ class FlashcardTimeline(
     )
     var chronodays: MutableList<Chronoday> = arrayListOf(),
 ) {
-    fun lastChronoday(): Chronoday? = chronodays.maxByOrNull { it.chronodate }
+    fun lastChronoday(): Chronoday? = chronodays.maxByOrNull { it.chronodate } // fixme can't be null
 }
 
 enum class TimelineStatus {

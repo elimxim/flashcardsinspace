@@ -26,13 +26,13 @@ class Chronoday(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var status: DayStatus,
+    var status: ChronodayStatus,
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "flashcard_timeline_id", referencedColumnName = "id")
     var timeline: FlashcardTimeline,
 )
 
-enum class DayStatus {
+enum class ChronodayStatus {
     INITIAL, COMPLETED, IN_PROGRESS, NOT_STARTED, OFF
 }

@@ -1,7 +1,7 @@
 package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.Chronoday
-import com.github.elimxim.flashcardsinspace.entity.DayStatus
+import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
 import com.github.elimxim.flashcardsinspace.entity.FlashcardTimeline
 import com.github.elimxim.flashcardsinspace.entity.TimelineStatus
 import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepository
@@ -46,7 +46,15 @@ class FlashcardTimelineService(
             flashcardSet = flashcardSet,
         )
 
+        val initialDay = Chronoday(
+            chronodate = timeline.startedAt.toLocalDate(),
+            status = ChronodayStatus.INITIAL,
+            timeline = timeline,
+        )
+
+        timeline.chronodays.add(initialDay)
         flashcardSet.timeline = timeline
+
         val savedTimeline = flashcardTimelineRepository.save(timeline)
         return savedTimeline.toDto()
     }
@@ -94,10 +102,11 @@ class FlashcardTimelineService(
 
         val currDate = clientDatetime.toLocalDate()
         val lastDate = timeline.lastChronoday()?.chronodate ?: currDate
-        val updatedTimeLine = if (!currDate.isBefore(lastDate)) {
+        // fixme GET is a wrong place to modify data
+        val updatedTimeLine = if (currDate.isAfter(lastDate)) {
             val status = if (timeline.status == TimelineStatus.SUSPENDED) {
-                DayStatus.OFF
-            } else DayStatus.NOT_STARTED
+                ChronodayStatus.OFF
+            } else ChronodayStatus.NOT_STARTED
 
             lastDate.datesUntil(currDate.plusDays(1)).forEach {
                 timeline.chronodays.add(
@@ -113,8 +122,8 @@ class FlashcardTimelineService(
         } else timeline
 
         val schedule = applyLightspeedSchedule(updatedTimeLine)
-        val currDayStr = clientDatetime.toLocalDate().toString()
-        val currDay = schedule.find { it.chronodate == currDayStr }
+        val lastChronoDateStr = timeline.lastChronoday()?.chronodate?.toString()
+        val currDay = schedule.find { it.chronodate == lastChronoDateStr }
             ?: throw IllegalArgumentException("Can't find current day in schedule") // fixme
         return currDay to schedule
     }
@@ -136,7 +145,7 @@ class FlashcardTimelineService(
 
         val chronoday = Chronoday(
             chronodate = lastChronoday.chronodate.plusDays(1),
-            status = DayStatus.NOT_STARTED,
+            status = ChronodayStatus.NOT_STARTED,
             timeline = timeline,
         )
 
@@ -159,7 +168,7 @@ class FlashcardTimelineService(
 
         var changed = false
         if (chronoday.status.name != status) {
-            val newStatus = DayStatus.valueOf(status) // todo check if value exists
+            val newStatus = ChronodayStatus.valueOf(status) // todo check if value exists
             chronoday.status = newStatus
             changed = true
         }
@@ -210,7 +219,7 @@ class FlashcardTimelineService(
                     id = 0,
                     chronodate = date.toString(),
                     seqNumber = scheduleDay.number,
-                    status = DayStatus.NOT_STARTED.name,
+                    status = ChronodayStatus.NOT_STARTED.name,
                     stages = scheduleDay.stages.map { it.name }
                 )
             )
@@ -221,7 +230,7 @@ class FlashcardTimelineService(
                 id = 0,
                 chronodate = startDate.toString(),
                 seqNumber = 0,
-                status = DayStatus.INITIAL.name,
+                status = ChronodayStatus.INITIAL.name,
                 stages = listOf()
             )
         )
@@ -240,7 +249,7 @@ class FlashcardTimelineService(
         val initialChronoday = timeline.chronodays.first()
         val startDate = initialChronoday.chronodate
 
-        var prevStatus: DayStatus = initialChronoday.status
+        var prevStatus: ChronodayStatus = initialChronoday.status
         val result = mutableListOf<ChronodayDto>()
         for (i in 1..scheduleDays.size) {
             val date = startDate.plusDays(i.toLong())
@@ -260,7 +269,7 @@ class FlashcardTimelineService(
                     id = chronoday?.id ?: 0,
                     chronodate = date.toString(),
                     seqNumber = scheduleDay.number,
-                    status = chronoday?.status?.name ?: DayStatus.NOT_STARTED.name,
+                    status = chronoday?.status?.name ?: ChronodayStatus.NOT_STARTED.name,
                     stages = scheduleDay.stages.map { it.name }
                 )
             )

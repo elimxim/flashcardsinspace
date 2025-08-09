@@ -1,4 +1,4 @@
-import { isoDateStr } from '@/utils/date.ts'
+import { asIsoDateStr } from '@/utils/date.ts'
 import { toSortedOrders } from '@/core-logic/stage-logic.ts'
 import type { Chronoday } from '@/model/timeline.ts'
 
@@ -54,7 +54,8 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, dayMap: Ma
   // filling the current month
   for (let i = 1; i <= totalDaysInMonth; i++) {
     const date = new Date(year, month, i)
-    const chronoday = dayMap.get(isoDateStr(date))
+    const isoDateStr = asIsoDateStr(date)
+    const chronoday = dayMap.get(isoDateStr)
 
     result.push({
       number: i,
@@ -62,7 +63,7 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, dayMap: Ma
       status: chronoday?.status ?? null,
       stages: toSortedOrders(chronoday?.stages ?? []).toString(),
       isCurrMonth: true,
-      isCurrDay: date.toISOString() === currDay.chronodate,
+      isCurrDay: isoDateStr === currDay.chronodate,
     })
   }
 
