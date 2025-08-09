@@ -1,6 +1,7 @@
 import { asIsoDateStr } from '@/utils/date.ts'
 import { toSortedOrders } from '@/core-logic/stage-logic.ts'
 import type { Chronoday } from '@/model/timeline.ts'
+import { computed } from 'vue';
 
 export const timelineStatuses = {
   ACTIVE: "ACTIVE",
@@ -24,7 +25,8 @@ export interface CalendarDay {
   isCurrDay: boolean
 }
 
-export function calcCalendarPage(currMonth: Date, currDay: Chronoday, dayMap: Map<string, Chronoday>): CalendarDay[] {
+export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays: Chronoday[]): CalendarDay[] {
+  const chronodayMap = new Map(chronodays.map(day => [day.chronodate, day]))
   const year = currMonth.getFullYear()
   const month = currMonth.getMonth()
 
@@ -55,7 +57,7 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, dayMap: Ma
   for (let i = 1; i <= totalDaysInMonth; i++) {
     const date = new Date(year, month, i)
     const isoDateStr = asIsoDateStr(date)
-    const chronoday = dayMap.get(isoDateStr)
+    const chronoday = chronodayMap.get(isoDateStr)
 
     result.push({
       number: i,

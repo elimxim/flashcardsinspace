@@ -80,8 +80,6 @@ const { timeline, chronodays, currDay } = storeToRefs(timelineStore)
 // calendar>
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
-const chronodayMap = computed(() => new Map(chronodays.value.map(day => [day.chronodate, day])))
 const currMonth = ref(new Date(currDay.value.chronodate))
 
 watch(currDay, (newValue) => {
@@ -89,7 +87,7 @@ watch(currDay, (newValue) => {
 })
 
 const calendarPage = computed(() =>
-  calcCalendarPage(currMonth.value, currDay.value, chronodayMap.value)
+  calcCalendarPage(currMonth.value, currDay.value, chronodays.value)
 )
 
 const userDateFormatter = new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' })
