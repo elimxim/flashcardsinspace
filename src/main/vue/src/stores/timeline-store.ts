@@ -92,42 +92,39 @@ export const useTimelineStore = defineStore('timeline', {
         // todo else
       }
     },
-    switchToNextDay() {
-      if (this.currDay.seqNumber === this.chronodays.length - 1) return
-
+    switchToPrevDay() {
+      if (this.currDay.seqNumber === 0) return // todo log
       const flashcardSetStore = useFlashcardSetStore()
-      const flashcardSet = flashcardSetStore.flashcardSet as FlashcardSet
+      const flashcardSet = flashcardSetStore.flashcardSet
+      if (flashcardSet !== null) {
+        const prev = this.chronodays[this.currDay.seqNumber - 1] as Chronoday | undefined
+        if (prev !== undefined) {
+          apiClient.delete('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays/' + this.currDay.id)
+            .then(() =>
+              this.loadChronodays(flashcardSet)
+            )
+          // todo catch errors
+        } else {
+          // todo smth
+        }
+      } else {
+        // todo smth
+      }
+    },
+    switchToNextDay() {
+      const flashcardSetStore = useFlashcardSetStore()
+      const flashcardSet = flashcardSetStore.flashcardSet
       if (flashcardSet !== null) {
         const next = this.chronodays[this.currDay.seqNumber] as Chronoday | undefined
         if (next !== undefined) {
-          apiClient.post<ChronodaysPostResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays').then(response => {
-            this.currDay = response.data.chronoday
-          }).then(() =>
-            this.loadChronodays(flashcardSet)
-          )
+          apiClient.post<ChronodaysPostResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays')
+            .then(() =>
+              this.loadChronodays(flashcardSet)
+            )
           // todo catch errors
         } else {
           // todo do smth
         }
-      }
-    },
-    switchToPrevDay() {
-      if (this.currDay.seqNumber === 0) return
-
-      const flashcardSetStore = useFlashcardSetStore()
-      const flashcardSet = flashcardSetStore.flashcardSet as FlashcardSet
-      if (flashcardSet !== null) {
-        apiClient.delete('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays/' + this.currDay.id).then(response => {
-          const prev = this.chronodays[this.currDay.seqNumber - 1] as Chronoday | undefined
-          if (prev !== undefined) {
-            this.currDay = prev
-          }
-        }).then(() =>
-          this.loadChronodays(flashcardSet)
-        )
-        // todo catch errors
-      } else {
-        // todo smth
       }
     },
   }

@@ -1,12 +1,12 @@
 export interface Timeline {
   id: number
-  startedAt: string
+  startedAt: string // fixme Date
   status: string
 }
 
 export interface Chronoday {
   id: number
-  chronodate: string
+  chronodate: string // fixme Date
   seqNumber: number
   status: string
   stages: string[]

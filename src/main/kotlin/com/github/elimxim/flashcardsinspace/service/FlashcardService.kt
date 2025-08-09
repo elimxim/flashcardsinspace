@@ -36,7 +36,7 @@ class FlashcardService(
             frontSide = dto.frontSide,
             backSide = dto.backSide,
             stage = FlashcardStage.valueOf(dto.stage),
-            reviewedTimes = dto.reviewedTimes,
+            timesReviewed = dto.reviewCount,
             creationDate = LocalDate.parse(dto.createdAt),
             flashcardSet = flashcardSet,
         )
@@ -67,8 +67,8 @@ class FlashcardService(
             flashcard.stage = stage
             changed = true
         }
-        if (flashcard.reviewedTimes != dto.reviewedTimes) {
-            flashcard.reviewedTimes = dto.reviewedTimes
+        if (flashcard.timesReviewed != dto.reviewCount) {
+            flashcard.timesReviewed = dto.reviewCount
             changed = true
         }
         if (flashcard.reviewHistory.history.size != dto.reviewHistory.history.size) {

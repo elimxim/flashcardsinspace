@@ -1,12 +1,10 @@
-import type { Language } from '@/model/language.ts'
-
 export interface ReviewHistory {
   history: ReviewInfo[]
 }
 
 export interface ReviewInfo {
   stage: string
-  reviewedAt: string // fixme reviewDate
+  reviewedAt: string // fixme reviewDate + Date
 }
 
 export interface Flashcard {
@@ -14,10 +12,10 @@ export interface Flashcard {
   frontSide: string
   backSide: string
   stage: string
-  reviewCount: number
+  reviewCount: number // fixme timesReviewed
   reviewHistory: ReviewHistory
-  createdAt: string // fixme creationDate
-  reviewedAt: string | null // fixme reviewDate
+  createdAt: string // fixme creationDate + Date
+  reviewedAt: string | null // fixme reviewDate + Date
   lastUpdatedAt: string | null
 }
 
@@ -25,7 +23,7 @@ export interface FlashcardSet {
   id: number
   name: string
   languageId: number,
-  createdAt: string // fixme lastCreationDate
+  createdAt: string // fixme lastCreationDate + Date
   default: boolean // fixme first
-  lastUpdatedAt: string | null
+  lastUpdatedAt: string | null // fixme DAte
 }

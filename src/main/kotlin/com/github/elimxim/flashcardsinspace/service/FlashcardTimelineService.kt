@@ -193,14 +193,14 @@ class FlashcardTimelineService(
             throw IllegalArgumentException("Timeline is suspended") // fixme
         }
 
-        val isRemovable = chronoday.timeline.flashcardSet.flashcards
-            .any { it.lastReviewDate != chronoday.chronodate }
+        val isNotRemovable = chronoday.timeline.flashcardSet.flashcards
+            .any { it.lastReviewDate != null && chronoday.chronodate.isBefore(it.lastReviewDate) }
 
-        if (isRemovable) {
-            chronodayRepository.deleteById(chronodayId)
-        } else {
+        if (isNotRemovable) {
             throw IllegalArgumentException("Can't remove chronoday with flashcards get reviewed on this date") // fixme
         }
+
+        chronodayRepository.deleteById(chronodayId)
     }
 
     private fun applyLightspeedSchedule(

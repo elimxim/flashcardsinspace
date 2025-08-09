@@ -34,7 +34,7 @@ class Flashcard(
     var stage: FlashcardStage,
 
     @Column(nullable = false)
-    var reviewedTimes: Int,
+    var timesReviewed: Int,
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = true)

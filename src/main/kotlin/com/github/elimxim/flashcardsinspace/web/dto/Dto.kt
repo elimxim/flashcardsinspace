@@ -28,7 +28,7 @@ data class FlashcardDto(
     val frontSide: String,
     val backSide: String,
     val stage: String,
-    val reviewedTimes: Int,
+    val reviewCount: Int, // fixme timesReviewed
     val reviewHistory: ReviewHistoryDto,
     val createdAt: String, // fixme creationDate + LocalDate
     val reviewedAt: String?, // fixme lastReviewDate + LocalDate
