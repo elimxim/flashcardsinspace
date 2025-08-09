@@ -46,7 +46,10 @@ export const useReviewStore = defineStore('review', {
     },
     backSide(): string {
       return this.currFlashcard?.backSide ?? ''
-    }
+    },
+    reviewFinished(): boolean {
+      return this.currFlashcard === null
+    },
   },
   actions: {
     startReview() {
@@ -87,16 +90,14 @@ export const useReviewStore = defineStore('review', {
       const flashcards = flashcardsForStage(flashcardSetStore.flashcards, stage)
       this.reviewQueue = [...flashcards]
     },
-    isReviewFinished() {
-      return this.currFlashcard === null
-    },
     prevFlashcard() {
       if (this.flashcardIndex <= 0) return
       this.currFlashcard = this.reviewQueue[--this.flashcardIndex] ?? null
     },
-    nextFlashcard() {
-      if (this.flashcardIndex >= this.reviewQueue.length) return
+    nextFlashcard(): boolean {
+      if (this.flashcardIndex >= this.reviewQueue.length) return false
       this.currFlashcard = this.reviewQueue[++this.flashcardIndex] ?? null
+      return this.currFlashcard !== null
     },
     flipFlashcard() {
       this.isFrontSide = !this.isFrontSide

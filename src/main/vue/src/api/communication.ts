@@ -72,9 +72,10 @@ export interface ChronodaysGetResponse {
   currDay: Chronoday,
 }
 
-export interface ChronodaysPostResponse {
+export interface ChronodaysResponse {
   chronoday: Chronoday,
 }
 
 export interface ChronodaysPutRequest {
+  chronodayStatus: string,
 }

@@ -8,7 +8,7 @@ import apiClient from '@/api/api-client.ts'
 import type {
   ChronodaysGetParams,
   ChronodaysGetResponse,
-  ChronodaysPostResponse,
+  ChronodaysResponse, ChronodaysPutRequest,
   TimelinePostRequest,
   TimelineResponse
 } from '@/api/communication.ts'
@@ -100,6 +100,7 @@ export const useTimelineStore = defineStore('timeline', {
         const prev = this.chronodays[this.currDay.seqNumber - 1] as Chronoday | undefined
         if (prev !== undefined) {
           apiClient.delete('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays/' + this.currDay.id)
+            // todo log response
             .then(() =>
               this.loadChronodays(flashcardSet)
             )
@@ -117,7 +118,8 @@ export const useTimelineStore = defineStore('timeline', {
       if (flashcardSet !== null) {
         const next = this.chronodays[this.currDay.seqNumber] as Chronoday | undefined
         if (next !== undefined) {
-          apiClient.post<ChronodaysPostResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays')
+          apiClient.post<ChronodaysResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays')
+            // todo log response
             .then(() =>
               this.loadChronodays(flashcardSet)
             )
@@ -125,7 +127,36 @@ export const useTimelineStore = defineStore('timeline', {
         } else {
           // todo do smth
         }
+      } else {
+        // todo smth
       }
+    },
+    async markCurrDayAsInProgress(flashcardSet: FlashcardSet) {
+      if (this.currDay.status === chronodayStatuses.NOT_STARTED) {
+        const request: ChronodaysPutRequest = {
+          chronodayStatus: chronodayStatuses.IN_PROGRESS
+        }
+        await apiClient.put<ChronodaysResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays/' + this.currDay.id, request)
+          // todo log response
+          .then(() =>
+            this.loadChronodays(flashcardSet)
+          )
+      }
+    },
+    async markCurrDayAsCompleted(flashcardSet: FlashcardSet) {
+      if (this.currDay.status === chronodayStatuses.IN_PROGRESS) {
+        await this.forceMarkCurrDayAsCompleted(flashcardSet)
+      }
+    },
+    async forceMarkCurrDayAsCompleted(flashcardSet: FlashcardSet) {
+      const request: ChronodaysPutRequest = {
+        chronodayStatus: chronodayStatuses.COMPLETED
+      }
+      await apiClient.put<ChronodaysResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays/' + this.currDay.id, request)
+        // todo log response
+        .then(() =>
+          this.loadChronodays(flashcardSet)
+        )
     },
   }
 })

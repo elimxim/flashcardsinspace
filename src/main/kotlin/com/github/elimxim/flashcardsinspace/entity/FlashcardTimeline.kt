@@ -11,6 +11,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
+import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
 import java.time.ZonedDateTime
 
@@ -40,6 +41,7 @@ class FlashcardTimeline(
         cascade = [CascadeType.ALL],
         orphanRemoval = true,
     )
+    @OrderBy("chronodate ASC")
     var chronodays: MutableList<Chronoday> = arrayListOf(),
 ) {
     fun lastChronoday(): Chronoday? = chronodays.maxByOrNull { it.chronodate } // fixme can't be null

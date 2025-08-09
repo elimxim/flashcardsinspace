@@ -13,40 +13,40 @@
     <div class="review-body">
       <div class="flashcard-container">
         <div class="flashcard"
-             :class="{ 'flashcard-no-background': reviewStore.isReviewFinished() }"
+             :class="{ 'flashcard-no-background': reviewFinished }"
              ref="flashcardButton"
              @click="flipFlashcard">
           <div class="top-row">
               <span class="corner-text"
-                    :hidden="reviewStore.isReviewFinished()">
+                    :hidden="reviewFinished">
                 {{ currFlashcard?.stage }}
               </span>
             <button id="flashcard-edit-button"
                     class="corner-button"
                     ref="flashcardEditButton"
                     @click.stop="globalStore.toggleFlashcardEditModalForm()"
-                    :disabled="reviewStore.isReviewFinished()"
-                    :hidden="reviewStore.isReviewFinished()">
+                    :disabled="reviewFinished"
+                    :hidden="reviewFinished">
               <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
             </button>
           </div>
           <div class="flashcard-text"
-               :class="{ 'flashcard-text-color-dark': !reviewStore.isReviewFinished(), 'flashcard-text-color-light': reviewStore.isReviewFinished() }">
+               :class="{ 'flashcard-text-color-dark': !reviewFinished, 'flashcard-text-color-light': reviewFinished }">
             {{ currFlashcardText }}
           </div>
         </div>
         <div class="flashcard-nav" v-if="settings.mode === ReviewMode.LEITNER">
           <button class="nav-button nav-red-button"
-                  :disabled="reviewStore.isReviewFinished()"
-                  :hidden="reviewStore.isReviewFinished()"
+                  :disabled="reviewFinished"
+                  :hidden="reviewFinished"
                   ref="stageDownButton"
                   @click="stageDown">
             Don't know
           </button>
           <button class="nav-button nav-green-button"
                   :class="{ 'nav-button-disabled': editFormWasOpened }"
-                  :disabled="editFormWasOpened || reviewStore.isReviewFinished()"
-                  :hidden="reviewStore.isReviewFinished()"
+                  :disabled="editFormWasOpened || reviewFinished"
+                  :hidden="reviewFinished"
                   ref="stageUpButton"
                   @click="stageUp">
             Know
@@ -54,14 +54,14 @@
         </div>
         <div class="flashcard-nav" v-if="settings.mode === ReviewMode.SPECIAL">
           <button class="nav-button nav-blue-button"
-                  :hidden="reviewStore.isReviewFinished()"
+                  :hidden="reviewFinished"
                   ref="prevButton"
                   @click="prev">
             Prev
           </button>
           <button class="nav-button nav-blue-button"
-                  :disabled="reviewStore.isReviewFinished()"
-                  :hidden="reviewStore.isReviewFinished()"
+                  :disabled="reviewFinished"
+                  :hidden="reviewFinished"
                   ref="nextButton"
                   @click="next">
             Next
@@ -69,21 +69,21 @@
         </div>
         <div class="flashcard-nav" v-if="settings.mode === ReviewMode.SPACE">
           <button class="nav-button nav-blue-button"
-                  :hidden="reviewStore.isReviewFinished()"
+                  :hidden="reviewFinished"
                   ref="prevButton"
                   @click="prev">
             Prev
           </button>
           <button class="nav-button nav-black-button"
-                  :disabled="reviewStore.isReviewFinished()"
-                  :hidden="reviewStore.isReviewFinished()"
+                  :disabled="reviewFinished"
+                  :hidden="reviewFinished"
                   ref="moveBackButton"
                   @click="moveBack">
             Move back
           </button>
           <button class="nav-button nav-blue-button"
-                  :disabled="reviewStore.isReviewFinished()"
-                  :hidden="reviewStore.isReviewFinished()"
+                  :disabled="reviewFinished"
+                  :hidden="reviewFinished"
                   ref="nextButton"
                   @click="next">
             Next
@@ -109,23 +109,27 @@ import { storeToRefs } from 'pinia'
 import { ReviewMode, useReviewStore } from '@/stores/review-store.ts'
 import { useGlobalStore } from '@/stores/global-store.ts'
 import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
-import { stages, nextStage, prevStage } from '@/core-logic/stage-logic.ts'
+import { nextStage, prevStage, stages } from '@/core-logic/stage-logic.ts'
+import { useTimelineStore } from '@/stores/timeline-store.ts'
 
 const flashcardSetStore = useFlashcardSetStore()
+const timelineStore = useTimelineStore()
 const reviewStore = useReviewStore()
 const globalStore = useGlobalStore()
 
+const { flashcardSet } = storeToRefs(flashcardSetStore)
 const { flashcardEditModalFormOpen } = storeToRefs(globalStore)
 const {
   settings,
   started,
   isFrontSide,
   currFlashcard,
-  editFormWasOpened
+  editFormWasOpened,
+  reviewFinished
 } = storeToRefs(reviewStore)
 
 const currFlashcardText = computed(() => {
-  if (reviewStore.isReviewFinished()) {
+  if (reviewFinished.value) {
     return 'No more cards for review'
   } else if (isFrontSide.value) {
     return currFlashcard.value?.frontSide
@@ -144,6 +148,10 @@ const moveBackButton = ref<HTMLButtonElement>()
 const flashcardEditButton = ref<HTMLButtonElement>()
 
 function finishReview() {
+  console.log('finishReview ' + flashcardSet.value)
+  if (reviewFinished.value && flashcardSet.value !== null) {
+    timelineStore.forceMarkCurrDayAsCompleted(flashcardSet.value)
+  }
   reviewStore.finishReview()
 }
 
@@ -151,25 +159,35 @@ function flipFlashcard() {
   reviewStore.flipFlashcard()
 }
 
-function stageDown() {
-  if (currFlashcard.value !== null) {
+async function stageDown() {
+  if (flashcardSet.value !== null && currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, prevStage(flashcard.stage))
     flashcardSetStore.updateFlashcard(flashcard)
+    if (settings.value.mode === ReviewMode.LEITNER) {
+      await timelineStore.markCurrDayAsInProgress(flashcardSet.value)
+    }
     reviewStore.setEditFormWasOpened(false)
     reviewStore.setFrontSide(true)
-    reviewStore.nextFlashcard()
+    if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LEITNER) {
+      await timelineStore.markCurrDayAsCompleted(flashcardSet.value)
+    }
   }
   stageDownButton.value?.blur()
 }
 
-function stageUp() {
-  if (currFlashcard.value !== null) {
+async function stageUp() {
+  if (flashcardSet.value !== null && currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, nextStage(flashcard.stage))
     flashcardSetStore.updateFlashcard(flashcard)
+    if (settings.value.mode === ReviewMode.LEITNER) {
+      await timelineStore.markCurrDayAsInProgress(flashcardSet.value)
+    }
     reviewStore.setFrontSide(true)
-    reviewStore.nextFlashcard()
+    if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LEITNER) {
+      await timelineStore.markCurrDayAsCompleted(flashcardSet.value)
+    }
   }
   stageUpButton.value?.blur()
 }

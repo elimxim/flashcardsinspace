@@ -29,6 +29,7 @@
           }}
         </label>
       </div>
+      <!-- todo suspend calendar -->
       <div class="modal-message-group modal-warning"
            v-if="removeConfirmation">
           <span class="modal-icon">

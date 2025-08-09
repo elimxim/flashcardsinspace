@@ -69,7 +69,7 @@ class FlashcardTimelineController(
         @PathVariable id: Long,
         @RequestBody request: ChronodayPutRequest
     ): ResponseEntity<ChronodayResponse> {
-        val chronoday = flashcardTimelineService.updateChronodayStatus(setId, id, request.dayStatus)
+        val chronoday = flashcardTimelineService.updateChronodayStatus(setId, id, request.chronodayStatus)
         return ResponseEntity.ok(ChronodayResponse(chronoday))
     }
 
