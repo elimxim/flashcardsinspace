@@ -93,7 +93,7 @@ const reviewStore = useReviewStore()
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardSetStore = useFlashcardSetStore()
 
-const { flashcardSets } = storeToRefs(flashcardDataStore)
+const { firstFlashcardSet } = storeToRefs(flashcardDataStore)
 const { flashcardSet, language } = storeToRefs(flashcardSetStore)
 
 // state>
@@ -179,7 +179,11 @@ function removeFlashcardSet() {
   if (flashcardSet.value !== null) {
     flashcardDataStore.removeFlashcardSet(flashcardSet.value).then(() => {
       reviewStore.finishReview()
-      flashcardSetStore.loadDataOrResetState(flashcardSets.value)
+      if (firstFlashcardSet.value !== null) {
+        flashcardSetStore.loadData(firstFlashcardSet.value)
+      } else {
+        flashcardSetStore.resetState()
+      }
     })
   }
 }

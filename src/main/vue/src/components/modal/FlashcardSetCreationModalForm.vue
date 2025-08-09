@@ -65,7 +65,8 @@ import { storeToRefs } from 'pinia'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { useGlobalStore } from '@/stores/global-store.ts'
-import { newFlashcardSet } from '@/core-logic/flashcard-logic.ts'
+import { createFlashcardSet } from '@/core-logic/flashcard-logic.ts'
+import { useTimelineStore } from '@/stores/timeline-store.ts'
 
 defineProps({
   visible: Boolean,
@@ -76,10 +77,13 @@ const emit = defineEmits(['update:visible'])
 const globalStore = useGlobalStore()
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardSetStore = useFlashcardSetStore()
+const timelineStore = useTimelineStore()
 const reviewStore = useReviewStore()
 const languageStore = useLanguageStore()
 
 const { languages } = storeToRefs(languageStore)
+const { lastFlashcardSet } = storeToRefs(flashcardDataStore)
+const { flashcardSet } = storeToRefs(flashcardSetStore)
 
 // state>
 
@@ -130,10 +134,14 @@ function createNewFlashcardSet() {
   if (flashcardSetLanguage.value === null) {
     throw new Error('Can\'t a new flashcard set because language is not set')
   }
-  const flashcardSet = newFlashcardSet(flashcardSetName.value, flashcardSetLanguage.value)
-  flashcardDataStore.addFlashcardSet(flashcardSet).then((savedFlashcardSet: FlashcardSet | null) => {
-    if (savedFlashcardSet !== null) { // fixme
-      flashcardSetStore.loadData(savedFlashcardSet)
+  const newSet = createFlashcardSet(flashcardSetName.value, flashcardSetLanguage.value)
+  flashcardDataStore.addFlashcardSet(newSet).then(() => {
+    if (lastFlashcardSet.value !== null) {
+      flashcardSetStore.loadData(lastFlashcardSet.value).then(() => {
+        if (flashcardSet.value !== null) {
+          timelineStore.loadData(flashcardSet.value)
+        }
+      })
     }
   })
 }

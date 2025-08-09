@@ -31,15 +31,24 @@ const timelineStore = useTimelineStore()
 const reviewStore = useReviewStore()
 
 const { started: reviewStarted } = storeToRefs(reviewStore)
-const { flashcardSets } = storeToRefs(flashcardDataStore)
+const { firstFlashcardSet } = storeToRefs(flashcardDataStore)
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 
-flashcardDataStore.loadData().then(() => {
-  flashcardSetStore.loadDataOrResetState(flashcardSets.value).then(() => {
-    if (flashcardSet.value !== null) {
-      timelineStore.loadData(flashcardSet.value)
-    }
-  })
+flashcardDataStore.loadData().then(async () => {
+  console.log('flashcard data loaded')
+  if (firstFlashcardSet.value !== null) {
+    await flashcardSetStore.loadData(firstFlashcardSet.value)
+  } else {
+    flashcardSetStore.resetState()
+  }
+}).then(async () => {
+  console.log('flashcard set initialized')
+  if (flashcardSet.value !== null) {
+    await timelineStore.loadData(flashcardSet.value)
+    console.log('timeline data loaded')
+  } else {
+    console.log('flashcard set hasn\'t been initialized')
+  }
 })
 
 onBeforeRouteLeave((to, from, next) => {

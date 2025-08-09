@@ -61,7 +61,7 @@ export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
  * Create a new flashcard set object. Flashcard sets are
  * created in the current {@link LightspeedCalendar.currLightDay calendar day}.
  */
-export function newFlashcardSet(name: string, language: Language): FlashcardSet {
+export function createFlashcardSet(name: string, language: Language): FlashcardSet {
   const timelineStore = useTimelineStore()
   const { currDay } = storeToRefs(timelineStore)
 

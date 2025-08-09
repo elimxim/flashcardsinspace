@@ -54,14 +54,9 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       })
       // todo handle errors
     },
-    async loadDataOrResetState(flashcardSets: FlashcardSet[]) {
-      const flashcardSet = flashcardSets[0] ?? null
-      if (flashcardSet !== null) {
-        await this.loadData(flashcardSet)
-      } else {
-        this.flashcardSet = null
-        this.flashcardMap = new Map()
-      }
+    resetState() {
+      this.flashcardSet = null
+      this.flashcardMap = new Map()
     },
     // todo move to the flashcard-data store
     updateFlashcardSet(name: string | null, first: boolean | null) {

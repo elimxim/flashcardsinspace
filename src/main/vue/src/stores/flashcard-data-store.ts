@@ -20,7 +20,13 @@ export const useFlashcardDataStore = defineStore('flashcard-data', {
   getters: {
     isEmpty(): boolean {
       return this.flashcardSets.length === 0
-    }
+    },
+    firstFlashcardSet(): FlashcardSet | null {
+      return this.flashcardSets[0] ?? null
+    },
+    lastFlashcardSet(): FlashcardSet | null {
+      return this.flashcardSets[this.flashcardSets.length - 1] ?? null
+    },
   },
   actions: {
     async loadData(): Promise<void> {
@@ -34,7 +40,7 @@ export const useFlashcardDataStore = defineStore('flashcard-data', {
       })
       // todo handle errors
     },
-    async addFlashcardSet(flashcardSet: FlashcardSet): Promise<FlashcardSet | null> {
+    async addFlashcardSet(flashcardSet: FlashcardSet): Promise<void> {
       const request: FlashcardSetsPostRequest = {
         flashcardSet: flashcardSet,
       }
@@ -42,9 +48,7 @@ export const useFlashcardDataStore = defineStore('flashcard-data', {
       try {
         const response = await apiClient.post<FlashcardSetsPostResponse>('/flashcard-sets', request)
         this.flashcardSets.push(response.data.flashcardSet)
-        return response.data.flashcardSet
       } catch (error) {
-        return null // fixme
         // todo handle errors
       }
     },
