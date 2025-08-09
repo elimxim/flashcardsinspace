@@ -148,7 +148,6 @@ const moveBackButton = ref<HTMLButtonElement>()
 const flashcardEditButton = ref<HTMLButtonElement>()
 
 function finishReview() {
-  console.log('finishReview ' + flashcardSet.value)
   if (reviewFinished.value && flashcardSet.value !== null) {
     timelineStore.markCurrDayAsCompleted(flashcardSet.value)
   }

@@ -2,6 +2,7 @@ package com.github.elimxim.flashcardsinspace.schedule
 
 import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
 import com.github.elimxim.flashcardsinspace.entity.FlashcardStage.*
+import com.github.elimxim.flashcardsinspace.entity.TERMINAL_STAGE_NAME
 import kotlin.collections.joinToString
 
 val lightspeedCfg = mapOf(
@@ -47,18 +48,21 @@ class ConfigurableSchedule(capacity: Int, cfg: Map<FlashcardStage, IntervalDefin
 data class Day(val number: Int, val stages: List<FlashcardStage>)
 
 class StageResolver(private val cfg: Map<FlashcardStage, Interval>) {
-    private val stages = FlashcardStage.entries.toTypedArray()
+    private val stages = FlashcardStage.entries
+        .filter { it.name != TERMINAL_STAGE_NAME }
+        .toTypedArray()
         .sortedByDescending { stage -> stage.ordinal }
 
-    private val stageDay: MutableMap<FlashcardStage, Int> = FlashcardStage.entries
+    private val stageMap: MutableMap<FlashcardStage, Int> = FlashcardStage.entries
+        .filter { it.name != TERMINAL_STAGE_NAME }
         .associateWith { stage -> cfg.getValue(stage).next() }
         .toMutableMap()
 
     fun stages(day: Int): List<FlashcardStage> {
         return stages.filter { s ->
-            val interval = stageDay.getValue(s)
+            val interval = stageMap.getValue(s)
             if (interval - day == 0) {
-                stageDay[s] = interval + cfg.getValue(s).next()
+                stageMap[s] = interval + cfg.getValue(s).next()
                 true
             } else {
                 false
