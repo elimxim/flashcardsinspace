@@ -42,8 +42,8 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
         return null
       }
     },
-    isInitialized(): boolean {
-      return this.flashcardSet !== null
+    isEmpty(): boolean {
+      return this.flashcardMap.size === 0
     },
   },
   actions: {
