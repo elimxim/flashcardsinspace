@@ -10,9 +10,9 @@ export const timelineStatuses = {
 
 export const chronodayStatuses = {
   INITIAL: "INITIAL",
-  COMPLETED: "COMPLETED",
-  IN_PROGRESS: "IN_PROGRESS",
   NOT_STARTED: "NOT_STARTED",
+  IN_PROGRESS: "IN_PROGRESS",
+  COMPLETED: "COMPLETED",
   OFF: "OFF",
 }
 
@@ -23,6 +23,29 @@ export interface CalendarDay {
   stages: string | null
   isCurrMonth: boolean
   isCurrDay: boolean
+}
+
+export function isInProgressAvailable(chronoday: Chronoday): boolean {
+  switch (chronoday.status) {
+    case chronodayStatuses.INITIAL:
+    case chronodayStatuses.IN_PROGRESS:
+    case chronodayStatuses.COMPLETED:
+    case chronodayStatuses.OFF:
+      return false
+    default:
+      return true
+  }
+}
+
+export function isCompleteAvailable(chronoday: Chronoday): boolean {
+  switch (chronoday.status) {
+    case chronodayStatuses.INITIAL:
+    case chronodayStatuses.COMPLETED:
+    case chronodayStatuses.OFF:
+      return false
+    default:
+      return true
+  }
 }
 
 export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays: Chronoday[]): CalendarDay[] {

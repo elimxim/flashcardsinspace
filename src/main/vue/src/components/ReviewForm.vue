@@ -150,7 +150,7 @@ const flashcardEditButton = ref<HTMLButtonElement>()
 function finishReview() {
   console.log('finishReview ' + flashcardSet.value)
   if (reviewFinished.value && flashcardSet.value !== null) {
-    timelineStore.forceMarkCurrDayAsCompleted(flashcardSet.value)
+    timelineStore.markCurrDayAsCompleted(flashcardSet.value)
   }
   reviewStore.finishReview()
 }

@@ -14,8 +14,10 @@ import type {
 } from '@/api/communication.ts'
 import type { FlashcardSet } from '@/model/flashcard.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
-import { chronodayStatuses, timelineStatuses } from '@/core-logic/calendar-logic.ts'
-import { computed } from 'vue';
+import {
+  chronodayStatuses,
+  isCompleteAvailable, isInProgressAvailable,
+} from '@/core-logic/calendar-logic.ts'
 
 export interface TimelineState {
   timeline: Timeline | null
@@ -132,7 +134,7 @@ export const useTimelineStore = defineStore('timeline', {
       }
     },
     async markCurrDayAsInProgress(flashcardSet: FlashcardSet) {
-      if (this.currDay.status === chronodayStatuses.NOT_STARTED) {
+      if (isInProgressAvailable(this.currDay)) {
         const request: ChronodaysPutRequest = {
           chronodayStatus: chronodayStatuses.IN_PROGRESS
         }
@@ -144,19 +146,17 @@ export const useTimelineStore = defineStore('timeline', {
       }
     },
     async markCurrDayAsCompleted(flashcardSet: FlashcardSet) {
-      if (this.currDay.status === chronodayStatuses.IN_PROGRESS) {
-        await this.forceMarkCurrDayAsCompleted(flashcardSet)
+      if (isCompleteAvailable(this.currDay)) {
+        const request: ChronodaysPutRequest = {
+          chronodayStatus: chronodayStatuses.COMPLETED
+        }
+        await apiClient.put<ChronodaysResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays/' + this.currDay.id, request)
+          // todo log response
+          .then(() =>
+            this.loadChronodays(flashcardSet)
+          )
+        // todo handle errors
       }
-    },
-    async forceMarkCurrDayAsCompleted(flashcardSet: FlashcardSet) {
-      const request: ChronodaysPutRequest = {
-        chronodayStatus: chronodayStatuses.COMPLETED
-      }
-      await apiClient.put<ChronodaysResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline/chronodays/' + this.currDay.id, request)
-        // todo log response
-        .then(() =>
-          this.loadChronodays(flashcardSet)
-        )
     },
   }
 })
