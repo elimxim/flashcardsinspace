@@ -111,7 +111,7 @@ onMounted(() => {
 }
 
 .logo-image {
-  height: 2em;
+  height: 5em;
   margin-right: 10px;
 }
 
