@@ -13,12 +13,12 @@ import java.util.*
 import javax.crypto.SecretKey
 
 @Service
-class JwtService(private val jwtProperties: JwtProperties) {
+class JwtService(private val securityProperties: SecurityProperties) {
     private lateinit var secretKey: SecretKey
 
     @PostConstruct
     fun init() {
-        secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtProperties.secret))
+        secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(securityProperties.jwt.secret))
     }
 
     fun extractUsername(token: String): String = extractClaim(token, Claims::getSubject)
@@ -34,7 +34,7 @@ class JwtService(private val jwtProperties: JwtProperties) {
             isHttpOnly = true
             secure = true
             path = "/"
-            maxAge = (jwtProperties.accessTokenExpirationMs / 1000).toInt()
+            maxAge = (securityProperties.jwt.accessTokenExpirationMs / 1000).toInt()
         }
 
         val refreshToken = generateRefreshToken(userDetails)
@@ -42,7 +42,7 @@ class JwtService(private val jwtProperties: JwtProperties) {
             isHttpOnly = true
             secure = true
             path = "/api/auth/refresh-token"
-            maxAge = (jwtProperties.refreshTokenExpirationMs / 1000).toInt()
+            maxAge = (securityProperties.jwt.refreshTokenExpirationMs / 1000).toInt()
         }
 
         response.addCookie(accessTokenCookie)
@@ -74,11 +74,11 @@ class JwtService(private val jwtProperties: JwtProperties) {
     }
 
     private fun generateAccessToken(userDetails: UserDetails): String {
-        return generateToken(userDetails, jwtProperties.accessTokenExpirationMs)
+        return generateToken(userDetails, securityProperties.jwt.accessTokenExpirationMs)
     }
 
     private fun generateRefreshToken(userDetails: UserDetails): String {
-        return generateToken(userDetails, jwtProperties.refreshTokenExpirationMs)
+        return generateToken(userDetails, securityProperties.jwt.refreshTokenExpirationMs)
     }
 
     private fun generateToken(userDetails: UserDetails, expirationMs: Long): String {

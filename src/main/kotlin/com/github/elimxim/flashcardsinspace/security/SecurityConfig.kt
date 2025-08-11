@@ -20,7 +20,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig {
+class SecurityConfig(
+    private val securityProperties: SecurityProperties,
+) {
 
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
@@ -56,13 +58,10 @@ class SecurityConfig {
             auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
-                .requestMatchers("/api/users/**").authenticated()
-                .requestMatchers("/api/flashcard-sets/**").authenticated()
                 .anyRequest().authenticated()
         }
         .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
-        .oauth2ResourceServer { oauth2 -> oauth2.jwt {} }
         .headers { headers ->
             headers
                 .xssProtection { xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK) }
@@ -73,7 +72,7 @@ class SecurityConfig {
     @Bean
     fun corsConfigurationSource() = UrlBasedCorsConfigurationSource().apply {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("https://localhost:5176")
+        configuration.allowedOrigins = securityProperties.cors.allowedOrigins
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("*")
         configuration.allowCredentials = true
