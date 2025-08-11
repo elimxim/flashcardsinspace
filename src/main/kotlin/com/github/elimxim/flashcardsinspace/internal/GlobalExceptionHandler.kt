@@ -1,4 +1,4 @@
-package com.github.elimxim.flashcardsinspace.web.advice
+package com.github.elimxim.flashcardsinspace.internal
 
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
