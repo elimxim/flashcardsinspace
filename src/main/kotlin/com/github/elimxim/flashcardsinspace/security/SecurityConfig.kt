@@ -1,6 +1,7 @@
 package com.github.elimxim.flashcardsinspace.security
 
 import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
+import com.github.elimxim.flashcardsinspace.web.filter.RequestLoggingFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -22,6 +23,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableWebSecurity
 class SecurityConfig(
     private val securityProperties: SecurityProperties,
+    private val requestLoggingFilter: RequestLoggingFilter,
 ) {
 
     @Bean
@@ -62,6 +64,7 @@ class SecurityConfig(
         }
         .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
+        .addFilterAfter(requestLoggingFilter, UsernamePasswordAuthenticationFilter::class.java)
         .headers { headers ->
             headers
                 .xssProtection { xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK) }
