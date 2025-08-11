@@ -1,10 +1,10 @@
 server:
   port: 8443
   ssl:
-    key-store-type: PKCS12
-    key-store: classpath:keystore.p12
-    key-store-password: password
-    key-alias: springboot
+    key-store-type: ${app.security.ssl.key-store-type}
+    key-store: ${app.security.ssl.key-store}
+    key-store-password: ${app.security.ssl.key-store-password}
+    key-alias: ${app.security.ssl.key-alias}
 
 spring:
   datasource:
@@ -31,16 +31,3 @@ spring:
 #          auth: true
 #          starttls:
 #            enable: true
-
-app:
-  jwt:
-    secret: "ZHVtbXlzZWNyZXRmb3Jqd3RzYW1wbGVhcHBsaWNhdGlvbg=="
-    access-token-expiration-ms: 3600000 # 1 hour
-    refresh-token-expiration-ms: 86400000 # 24 hours
-
-logging:
-  file:
-    name: logs/app.log
-  pattern:
-    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS, UTC}){faint} %clr(%5p) %clr(${PID:- }){magenta} --- [%15.15t] %clr(%-40.40logger{39}){cyan} : %m%n%wEx"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS, UTC} %5p ${PID:- } --- [%15.15t] %-40.40logger{39} : %m%n%wEx"

@@ -9,6 +9,8 @@ data class SecurityProperties(
     val jwt: JwtProperties,
     @NestedConfigurationProperty
     val cors: CorsProperties,
+    @NestedConfigurationProperty
+    val ssl: SslProperties,
 )
 
 data class JwtProperties(
@@ -19,4 +21,11 @@ data class JwtProperties(
 
 data class CorsProperties(
     val allowedOrigins: List<String>,
+)
+
+data class SslProperties(
+    val keyStoreType: String,
+    val keyStore: String,
+    val keyAlias: String,
+    val keyStorePassword: String,
 )

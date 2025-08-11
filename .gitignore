@@ -4,5 +4,7 @@
 build
 out
 logs
+certs
 */**/*.p12
 */**/*.pem
+*/**/*-dev.yaml
