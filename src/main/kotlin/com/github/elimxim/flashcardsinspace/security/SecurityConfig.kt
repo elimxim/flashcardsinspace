@@ -58,9 +58,12 @@ class SecurityConfig(
         }
         .cors { it.configurationSource(corsConfigurationSource()) }
         .csrf { it.disable() }
+        .logout { it.disable() }
         .authorizeHttpRequests { auth ->
             auth
                 .requestMatchers("/api/**").authenticated()
+                .requestMatchers("/api-public/**").permitAll()
+                .requestMatchers("/auth/**").permitAll()
                 .anyRequest().permitAll()
         }
         .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }

@@ -13,8 +13,10 @@ const authStore = useAuthStore()
 
 try {
   authStore.logout()
+  router.push({ name: routeNames.login })
 } catch (error) {
   console.error('Failed to log out: ', error)
+  router.push({ name: routeNames.login })
 }
 
 // router.push({ name: routeNames.login })

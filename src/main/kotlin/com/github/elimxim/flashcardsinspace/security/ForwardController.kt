@@ -9,7 +9,7 @@ private val log = LoggerFactory.getLogger(ForwardController::class.java)
 
 @Controller
 class ForwardController {
-    @RequestMapping(value = ["/{path:^(?!api|auth|api-public|assets|images|\\.well-known|.*\\.).*}/**"])
+    @RequestMapping(value = ["/{path:^(?!api|api-public|auth|assets|images|\\.well-known|.*\\.).*}/**"])
     fun forward(@PathVariable path: String): String {
         log.info("Forwarding '$path' to index.html") // fixme debug
         return "forward:/index.html"
