@@ -1,17 +1,6 @@
-server:
-  port: 8443
-  ssl:
-    key-store-type: ${app.security.ssl.key-store-type}
-    key-store: ${app.security.ssl.key-store}
-    key-store-password: ${app.security.ssl.key-store-password}
-    key-alias: ${app.security.ssl.key-alias}
-
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5439/flashcardsinspace?sessionTimezone=UTC
-    username: postgres
-    password:
   jpa:
     hibernate:
       ddl-auto: validate

@@ -6,14 +6,14 @@
 </template>
 
 <script setup lang="ts">
-import apicClient from '@/api/api-client.ts'
 import { ref } from 'vue'
+import authClient from '@/api/auth-client.ts'
 
 const email = ref('')
 
 async function handleForgotPassword() {
   try {
-    const response = await apicClient.post('/auth/password-reset', {
+    const response = await authClient.post('/password-reset', {
       email: email.value,
     })
 

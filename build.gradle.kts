@@ -1,3 +1,5 @@
+import com.github.gradle.node.npm.task.NpmTask
+
 plugins {
     val kotlinVersion = "2.1.0"
     kotlin("jvm") version kotlinVersion
@@ -5,6 +7,8 @@ plugins {
     kotlin("plugin.jpa") version kotlinVersion
     id("org.springframework.boot") version "3.5.4"
     id("io.spring.dependency-management") version "1.1.7"
+    id("com.github.node-gradle.node") version "7.1.0"
+    id("application")
 }
 
 kotlin {
@@ -50,6 +54,41 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+application {
+    mainClass.set("com.github.elimxim.flashcardsinspace.AppKt")
+    applicationName = "flash"
+}
+
+sourceSets {
+    main {
+        resources {
+            exclude("**/application-dev.yaml")
+        }
+    }
+}
+
+springBoot {
+    mainClass.set("com.github.elimxim.flashcardsinspace.AppKt")
+}
+
+node {
+    version = "22.17.0"
+    npmVersion = "10.9.2"
+    download = true
+    nodeProjectDir = file("src/main/vue")
+}
+
+tasks.register<NpmTask>("npmRunBuild") {
+    dependsOn("npmInstall")
+    npmCommand.set(listOf("run", "build"))
+    inputs.dir("src/main/vue")
+    outputs.dir(project.layout.buildDirectory.dir("/resources/main/static/").get().asFile.toString())
+}
+
+tasks.named("processResources") {
+    dependsOn("npmRunBuild")
 }
 
 tasks.withType<Test> {

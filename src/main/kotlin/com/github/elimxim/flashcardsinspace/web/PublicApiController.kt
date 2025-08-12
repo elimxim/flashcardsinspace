@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/public/languages")
-class LanguageController(
+@RequestMapping("/api-public")
+class PublicApiController(
     private val languageService: LanguageService,
 ) {
-    @GetMapping()
+    @GetMapping("/languages")
     fun getLanguages(): ResponseEntity<LanguagesGetResponse> {
         val languages = languageService.getAllLanguages().map { it.toDto() }
         return ResponseEntity.ok(LanguagesGetResponse(languages))

@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import type { User } from '@/model/user.ts'
-import apiClient from '@/api/api-client.ts'
 import type { UserGetResponse } from '@/api/communication.ts'
+import apiClient from '@/api/api-client.ts'
+import authClient from '@/api/auth-client.ts'
 
 export interface AuthState {
   user: User | null,
@@ -23,7 +24,7 @@ export const useAuthStore = defineStore('auth', {
       this.user = user
     },
     async signup(name: string, email: string, password: string, languageId: number) {
-      const response = await apiClient.post<UserGetResponse>('/auth/signup', {
+      const response = await authClient.post<UserGetResponse>('/signup', {
         email: email,
         secret: password,
         name: name,
@@ -32,14 +33,14 @@ export const useAuthStore = defineStore('auth', {
       this.setUser(response.data.user)
     },
     async login(email: string, password: string) {
-      const response = await apiClient.post<UserGetResponse>('/auth/login', {
+      const response = await authClient.post<UserGetResponse>('/login', {
         email: email,
         secret: password,
       })
       this.setUser(response.data.user)
     },
     async logout() {
-      await apiClient.post('/auth/logout')
+      await authClient.post('/logout')
       this.setUser(null)
     },
     async updateJwt() {

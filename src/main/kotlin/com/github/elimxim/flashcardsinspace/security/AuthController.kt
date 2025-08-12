@@ -1,11 +1,9 @@
-package com.github.elimxim.flashcardsinspace.web
+package com.github.elimxim.flashcardsinspace.security
 
-import com.github.elimxim.flashcardsinspace.web.dto.UserResponse
 import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
 import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
+import com.github.elimxim.flashcardsinspace.web.dto.UserResponse
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
-import com.github.elimxim.flashcardsinspace.security.AuthService
-import com.github.elimxim.flashcardsinspace.security.JwtService
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -16,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 class AuthController(
     private val authService: AuthService,
     private val jwtService: JwtService,

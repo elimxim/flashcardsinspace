@@ -1,7 +1,7 @@
 import type { Language } from '@/model/language.ts'
 import { defineStore } from 'pinia'
-import apiClient from '@/api/api-client.ts'
 import type { LanguageGetResponse } from '@/api/communication.ts'
+import publicApiClient from '@/api/public-api-client.ts'
 
 export interface LanguageState {
   languageMap: Map<number, Language>,
@@ -20,7 +20,7 @@ export const useLanguageStore = defineStore('language', {
   },
   actions: {
     loadData() {
-      apiClient.get<LanguageGetResponse>('/public/languages')
+      publicApiClient.get<LanguageGetResponse>('/languages')
         .then(response => {
           this.languageMap = new Map(response.data.languages.map(v => [v.id, v]))
         })
