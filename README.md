@@ -2,18 +2,29 @@
 
 ## TODOS
 
-- UX
-  - responsive UI
-  - indexable for robots
-  - logo and theme
-  - log in page -> sign up page
-  - log in page -> password reset page
-  - password reset functionality
-  - menu bar => flash cards page
-  - remember if signed up using cookie
-  - refresh JWT token support on the frontend
-  - user page -> change password, email, username + show username, email, registration date
-  - emails with a confirmation link
-  - custom select
-- Functionality
-  - review flashcards from other skipped days
+- UX:
+  - Responsive UI
+  - Indexable for robots
+  - Light and Dark themes
+  - Link from Login in page to Signing up page
+  - Link from Login page to Password reset page
+  - Password reset functionality (sending emails)
+  - New design of Menu bar
+  - Remember if signed up using cookie (on/off refreshing JWT)
+  - Refreshing JWT support on the frontend
+  - User page functionality: 
+    - changing password, email, username
+    - showing username, email, registration date
+  - Sending emails with a confirmation link
+  - Custom select
+- Flashcards functionality:
+  - Reviewing flashcards from all skipped days
+- Tech debt:
+  - Requests validation on the backend
+  - Errors handling (frontend & backend)
+  - Adding logging to help investigating bugs
+  - Including User.id in the logging context
+- Project:
+  - README.md
+- DevOps:
+  - CI/CD
