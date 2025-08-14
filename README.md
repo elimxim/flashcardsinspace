@@ -17,6 +17,7 @@
     - showing username, email, registration date
   - Sending emails with a confirmation link
   - Custom select
+  - Maintenance page if the server is not available
 - Flashcards functionality:
   - Reviewing flashcards from all skipped days
 - Tech debt:
