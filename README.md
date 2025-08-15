@@ -4,7 +4,7 @@
 
 - UX:
   - Responsive UI
-  - Indexable for robots
+  - Indexable for robots (searchable improvements)
   - Light and Dark themes
   - Link from Login in page to Signing up page
   - Link from Login page to Password reset page
@@ -17,7 +17,7 @@
     - showing username, email, registration date
   - Sending emails with a confirmation link
   - Custom select
-  - Maintenance page if the server is not available
+  - Icons for Apple and Android
 - Flashcards functionality:
   - Reviewing flashcards from all skipped days
 - Tech debt:
