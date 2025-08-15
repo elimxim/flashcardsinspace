@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Houston, We Have a Problem!</title>
+    <link rel="icon" href="/maintenance/favicon.ico" sizes="any">
+    <link rel="icon" href="/maintenance/favicon.svg" type="image/svg+xml">
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0c0a1e; /* Deep space blue */
+            color: #e0e0e0;
+            text-align: center;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Pushes content to the bottom */
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* This will prevent scrolling */
+
+            /* Added for the new background effect */
+            background-size: cover;
+            background-position: center bottom;
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5); /* Inner shadow for vignette effect */
+        }
+
+        .container {
+            max-width: 900px; /* Made the container wider */
+            background-color: rgba(12, 10, 30, 0.8); /* Slightly more opaque for readability */
+            padding: 30px 40px; /* Adjusted padding for banner layout */
+            border-radius: 12px;
+            border: 1px solid rgba(123, 91, 218, 0.3);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 2.2rem; /* Slightly smaller for a banner */
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 0 10px #575757;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            max-width: 550px;
+            margin: 0 auto 1rem auto;
+        }
+
+        .footer {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>System Anomaly Detected</h1>
+    <p>
+        Our crew is on an unscheduled spacewalk to wrangle a batch of floating grammar cards that escaped their
+        container. It seems "i before e" doesn't apply in zero gravity.
+    </p>
+    <p class="footer">
+        We're re-calibrating our trajectory and should be back in orbit shortly. Thanks for your patience!
+    </p>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const images = [
+            '/maintenance/image1.jpg',
+            '/maintenance/image2.jpg',
+        ];
+        const randomIndex = Math.floor(Math.random() * images.length);
+        const randomImage = images[randomIndex];
+        document.body.style.backgroundImage = `url('${randomImage}')`;
+    });
+</script>
+</body>
+</html>
