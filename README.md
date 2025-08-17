@@ -25,7 +25,9 @@
   - Errors handling (frontend & backend)
   - Adding logging to help investigating bugs
   - Including User.id in the logging context
+  - Tests
 - Project:
   - README.md
 - DevOps:
-  - CI/CD
+  - Health checks
+  - CI + test coverage

@@ -1,0 +1,150 @@
+name: Deploy on Version Change
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'settings.gradle'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 2. Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: 3. Build with Gradle
+        run: ./gradlew clean build
+
+      - name: 4. Generate application.yaml from template
+        run: |
+          echo "Generating application.yaml with secrets"
+          
+          export APP_PORT=${{ secrets.APP_PORT }}
+          export APP_SSL_KEYSTORE_PATH=${{ secrets.APP_SSL_KEYSTORE_PATH }}
+          export APP_SSL_KEYSTORE_PASSWORD=${{ secrets.APP_SSL_KEYSTORE_PASSWORD }}
+          export APP_SSL_KEYSTORE_ALIAS=${{ secrets.APP_SSL_KEYSTORE_ALIAS }}
+          export APP_DATASOURCE_URL=${{ secrets.APP_DATASOURCE_URL }}
+          export APP_DATASOURCE_USERNAME=${{ secrets.APP_DATASOURCE_USERNAME }}
+          export APP_DATASOURCE_PASSWORD=${{ secrets.APP_DATASOURCE_PASSWORD }}
+          export APP_SECURITY_JWT_SECRET=${{ secrets.APP_SECURITY_JWT_SECRET }}
+          
+          envsubst < props/application.yaml > application.yaml
+
+      - name: 5. Copy generated application.yaml to Droplet
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.TARGET_IP }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: 22
+          source: "application.yaml"
+          target: "/tmp"
+
+      - name: 6. Copy App Archive to Droplet
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.TARGET_IP }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: 22
+          source: "build/distributions/*boot*.tar"
+          target: "/tmp"
+      
+      - name: 7. Deploy New Version
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.TARGET_IP }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            # --- Configuration ---
+            APP_BASE_DIR="/opt/flashcardsinspace"
+            CONFIG_DIR="${APP_BASE_DIR}/cfg"
+            CONFIG_FILE_PATH="${CONFIG_DIR}/application.yaml"
+            RELEASES_DIR="${APP_BASE_DIR}/releases"
+            CURRENT_RELEASE="${APP_BASE_DIR}/current"
+            # --- End Configuration ---
+
+            echo "----> Starting deployment"
+            
+            # 0. Create dirs
+            echo "----> Creating directories"
+            mkdir -p "${APP_BASE_DIR}"
+            mkdir -p "${CONFIG_DIR}"
+            mkdir -p "${CURRENT_RELEASE}"
+            mkdir -p "${RELEASES_DIR}"
+            
+            # 1. Set up configuration
+            echo "----> Setting up configuration file"
+            mv /tmp/application.yaml "${CONFIG_FILE_PATH}"
+            if [ ! -f "${CONFIG_FILE_PATH}" ]; then
+              echo "Error: Configuration file '/tmp/application.yaml' not found on remote server. Aborting."
+              rm -rf "${NEW_RELEASE_DIR}" # Clean up failed release dir
+              exit 1
+            fi
+
+            # 2. Find the archive and extract the version name
+            ARCHIVE_PATH=$(find /tmp -name '*boot*.tar')
+            if [ -z "${ARCHIVE_PATH}" ]; then
+              echo "Error: No '*boot*.tar' archive found in /tmp. Aborting."
+              exit 1
+            fi
+            
+            ARCHIVE_FILENAME=$(basename "${ARCHIVE_PATH}")
+            # Extract semver using a regular expression.
+            # This finds the last hyphen and captures everything between it and '.tar'.
+            # Example: 'my-app-1.2.3-SNAPSHOT.tar' becomes '1.2.3-SNAPSHOT'.
+            VERSION_NAME=$(echo "${ARCHIVE_FILENAME}" | sed -E 's/.*-([0-9]+\.[0-9].*)\.tar/\1/')
+            
+            # Add a check to ensure semver extraction was successful
+            if [ "${VERSION_NAME}" = "${ARCHIVE_FILENAME}" ]; then
+              echo "Error: Could not extract semver from '${ARCHIVE_FILENAME}'."
+              echo "Filename must be in a format like 'project-name-1.2.3.tar'. Aborting."
+              rm "${ARCHIVE_PATH}"
+              exit 1
+            fi
+            
+            # 3. Check if the release directory already exists
+            NEW_RELEASE_DIR="${RELEASES_DIR}/${VERSION_NAME}"
+            echo "----> Preparing new release directory: ${NEW_RELEASE_DIR}"
+            if [ -d "${NEW_RELEASE_DIR}" ]; then
+              echo "Error: Release directory '${NEW_RELEASE_DIR}' already exists. Aborting."
+              rm "${ARCHIVE_PATH}"
+              exit 1
+            fi
+            
+            # 4. Create the new release directory and unpack the archive
+            mkdir -p "${NEW_RELEASE_DIR}"
+            echo "----> Unpacking ${ARCHIVE_PATH}"
+            tar -xf "${ARCHIVE_PATH}" -C "${NEW_RELEASE_DIR}"
+            
+            UNPACKED_SUBDIR=$(tar -tf "${ARCHIVE_PATH}" | head -1 | cut -f1 -d"/")
+            if [ -n "$UNPACKED_SUBDIR" ]; then
+                mv "${NEW_RELEASE_DIR}/${UNPACKED_SUBDIR}"/* "${NEW_RELEASE_DIR}/"
+                rmdir "${NEW_RELEASE_DIR}/${UNPACKED_SUBDIR}"
+            fi
+
+            # 5. Stop the currently running application
+            echo "----> Stopping the current application"
+            pgrep -f "${CURRENT_RELEASE}" | xargs kill || true
+            sleep 2
+
+            # 6. Atomically switch the symbolic link to the new version
+            echo "----> Activating new release by updating the symbolic link"
+            ln -snf "${NEW_RELEASE_DIR}" "${CURRENT_RELEASE}"
+
+            # 7. Run the new application
+            START_SCRIPT_PATH=$(find "${CURRENT_RELEASE}/bin" -type f | head -n 1)
+            echo "----> Starting new application: ${START_SCRIPT_PATH}"
+            nohup "${START_SCRIPT_PATH}" --spring.config.additional-location="file:${CONFIG_DIR}/" > "${APP_BASE_DIR}/app.log" 2>&1 &
+
+            # 8. Clean up the uploaded archive from /tmp
+            echo "----> Cleaning up temporary archive"
+            rm "${ARCHIVE_PATH}"
+
+            echo "----> Deployment successful!"
