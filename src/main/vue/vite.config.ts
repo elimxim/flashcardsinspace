@@ -26,10 +26,6 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
     },
     server: {
-      https: {
-        key: fs.readFileSync(path.resolve(__dirname, env.VITE_TLS_KEY_FILE)),
-        cert: fs.readFileSync(path.resolve(__dirname, env.VITE_TLS_CERT_FILE)),
-      },
       port: 5174,
       proxy: {
         '/api': {
