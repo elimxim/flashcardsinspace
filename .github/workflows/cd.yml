@@ -24,7 +24,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build --console=plain
 
       - name: Generate application.yaml from template
         run: |
@@ -44,8 +44,8 @@ jobs:
       - name: Copy generated application.yaml to Droplet
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.TARGET_IP }}
-          username: ${{ secrets.DEPLOY_USER }}
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
           key: ${{ secrets.DEPLOY_KEY }}
           port: 22
           source: "application.yaml"
@@ -54,8 +54,8 @@ jobs:
       - name: Copy App Archive to Droplet
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.TARGET_IP }}
-          username: ${{ secrets.DEPLOY_USER }}
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
           key: ${{ secrets.DEPLOY_KEY }}
           port: 22
           source: "build/distributions/*boot*.tar"
@@ -64,8 +64,8 @@ jobs:
       - name: Deploy New Version
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.TARGET_IP }}
-          username: ${{ secrets.DEPLOY_USER }}
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
             # --- Configuration ---
