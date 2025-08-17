@@ -84,7 +84,7 @@ tasks.register<NpmTask>("npmRunBuild") {
     dependsOn("npmInstall")
     npmCommand.set(listOf("run", "build"))
     inputs.dir("src/main/vue")
-    outputs.dir(project.layout.buildDirectory.dir("/resources/main/static/").get().asFile.toString())
+    outputs.dir(project.layout.buildDirectory.dir("resources/main/static/").get().asFile.toString())
 }
 
 tasks.named("processResources") {
