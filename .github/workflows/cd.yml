@@ -88,17 +88,8 @@ jobs:
             mkdir -p "${APP_BASE_DIR}"
             mkdir -p "${CONFIG_DIR}"
             mkdir -p "${RELEASES_DIR}"
-            
-            # 1. Set up configuration
-            echo "----> Setting up configuration file"
-            mv /tmp/application.yaml "${CONFIG_FILE_PATH}"
-            if [ ! -f "${CONFIG_FILE_PATH}" ]; then
-              echo "Error: Configuration file '/tmp/application.yaml' not found on remote server. Aborting."
-              rm -rf "${NEW_RELEASE_DIR}" # Clean up failed release dir
-              exit 1
-            fi
 
-            # 2. Find the archive and extract the version name
+            # 1. Find the archive and extract the version name
             ARCHIVE_PATH=$(find /tmp -name '*boot*.tar')
             if [ -z "${ARCHIVE_PATH}" ]; then
               echo "Error: No '*boot*.tar' archive found in /tmp. Aborting."
@@ -119,6 +110,15 @@ jobs:
               exit 1
             fi
             
+            # 2. Set up configuration
+            echo "----> Setting up configuration file"
+            mv /tmp/application.yaml "${CONFIG_FILE_PATH}"
+            if [ ! -f "${CONFIG_FILE_PATH}" ]; then
+              echo "Error: Configuration file '/tmp/application.yaml' not found on remote server. Aborting."
+              rm "${ARCHIVE_PATH}"
+              exit 1
+            fi
+                        
             # 3. Check if the release directory already exists
             NEW_RELEASE_DIR="${RELEASES_DIR}/${VERSION_NAME}"
             echo "----> Preparing new release directory: ${NEW_RELEASE_DIR}"
