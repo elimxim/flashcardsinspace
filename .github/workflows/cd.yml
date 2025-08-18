@@ -168,9 +168,9 @@ jobs:
 
             # 9. Health Check
             echo "----> Performing health check"
-            HEALTH_CHECK_URL="https://localhost:${{ secrets.APP_PORT }}/actuator/health"
+            HEALTH_CHECK_URL="http://localhost:${{ secrets.APP_PORT }}/actuator/health"
             for i in {1..30}; do
-              HTTP_STATUS=$(curl -k -o /dev/null -s -w "%{http_code}" $HEALTH_CHECK_URL)
+              HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" $HEALTH_CHECK_URL)
               if [ "$HTTP_STATUS" -eq 200 ]; then
                 echo "----> Health check successful! Application is up and running."
                 break
