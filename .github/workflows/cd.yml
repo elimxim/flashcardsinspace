@@ -76,11 +76,14 @@ jobs:
             CONFIG_FILE_PATH="${CONFIG_DIR}/application.yaml"
             RELEASES_DIR="${APP_BASE_DIR}/releases"
             CURRENT_RELEASE="${APP_BASE_DIR}/current"
+            PID_FILE="${APP_BASE_DIR}/app.pid"
             # --- End Configuration ---
 
             echo "----> Starting deployment"
             
             # 0. Create dirs
+            echo "----> Going to '${APP_BASE_DIR}'"
+            cd "${APP_BASE_DIR}"
             echo "----> Creating directories"
             mkdir -p "${APP_BASE_DIR}"
             mkdir -p "${CONFIG_DIR}"
@@ -138,7 +141,13 @@ jobs:
 
             # 5. Stop the currently running application
             echo "----> Stopping the current application"
-            pgrep -f "${CURRENT_RELEASE}" | xargs kill || true
+            if [ -f "${PID_FILE}" ]; then
+              echo "Found PID file, killing process $(cat ${PID_FILE})"
+              kill $(cat "${PID_FILE}") || true
+              rm -f "${PID_FILE}"
+            else
+              echo "PID file not found, skipping kill."
+            fi
             sleep 2
 
             # 6. Atomically switch the symbolic link to the new version
@@ -148,7 +157,10 @@ jobs:
             # 7. Run the new application
             START_SCRIPT_PATH="${CURRENT_RELEASE}/bin/flash"
             echo "----> Starting new application: ${START_SCRIPT_PATH}"
+            rm -f "${APP_BASE_DIR}/app.log"
             nohup "${START_SCRIPT_PATH}" --spring.config.additional-location="file:${CONFIG_DIR}/" > "${APP_BASE_DIR}/app.log" 2>&1 &
+            echo $! > "${PID_FILE}"
+            echo "----> New application started with PID $(cat ${PID_FILE})"
 
             # 8. Clean up the uploaded archive from /tmp
             echo "----> Cleaning up temporary archive"
