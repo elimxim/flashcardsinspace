@@ -8,7 +8,7 @@ data class SecurityProperties(
     @NestedConfigurationProperty
     val jwt: JwtProperties,
     @NestedConfigurationProperty
-    val cors: CorsProperties,
+    val cors: CorsProperties = CorsProperties(),
 )
 
 data class JwtProperties(
@@ -18,5 +18,5 @@ data class JwtProperties(
 )
 
 data class CorsProperties(
-    val allowedOrigins: List<String>,
+    val allowedOrigins: List<String> = listOf(),
 )
