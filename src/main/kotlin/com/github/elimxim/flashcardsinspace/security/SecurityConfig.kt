@@ -2,6 +2,8 @@ package com.github.elimxim.flashcardsinspace.security
 
 import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
 import com.github.elimxim.flashcardsinspace.web.filter.RequestLoggingFilter
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
+import org.springframework.boot.actuate.health.HealthEndpoint
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -61,6 +63,7 @@ class SecurityConfig(
         .logout { it.disable() }
         .authorizeHttpRequests { auth ->
             auth
+                .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .requestMatchers("/api-public/**").permitAll()
                 .requestMatchers("/auth/**").permitAll()

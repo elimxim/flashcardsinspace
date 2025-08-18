@@ -1,3 +1,14 @@
+server:
+  forward-headers-strategy: NATIVE
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver

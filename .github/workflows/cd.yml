@@ -166,4 +166,23 @@ jobs:
             echo "----> Cleaning up temporary archive"
             rm "${ARCHIVE_PATH}"
 
+            # 9. Health Check
+            echo "----> Performing health check"
+            HEALTH_CHECK_URL="https://localhost:${{ secrets.APP_PORT }}/actuator/health"
+            for i in {1..30}; do
+              HTTP_STATUS=$(curl -k -o /dev/null -s -w "%{http_code}" $HEALTH_CHECK_URL)
+              if [ "$HTTP_STATUS" -eq 200 ]; then
+                echo "----> Health check successful! Application is up and running."
+                break
+              else
+                echo "----> Health check attempt $i failed with status $HTTP_STATUS. Retrying in 5 seconds..."
+                sleep 5
+              fi
+            done
+
+            if [ "$HTTP_STATUS" -ne 200 ]; then
+              echo "Error: Health check failed after several attempts. Deployment failed."
+              exit 1
+            fi
+
             echo "----> Deployment successful!"
