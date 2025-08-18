@@ -56,7 +56,9 @@ class SecurityConfig(
         jwtAuthFilter: JwtAuthFilter,
     ): SecurityFilterChain = http
         .requiresChannel { channel ->
-            channel.anyRequest().requiresSecure()
+            channel
+                .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).requiresInsecure()
+                .anyRequest().requiresSecure()
         }
         .cors { it.configurationSource(corsConfigurationSource()) }
         .csrf { it.disable() }
