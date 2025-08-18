@@ -1,11 +1,5 @@
 server:
   port: ${APP_PORT}
-  ssl:
-    enabled: true
-    key-store-type: PKCS12
-    key-store: ${APP_SSL_KEYSTORE_PATH}
-    key-store-password: ${APP_SSL_KEYSTORE_PASSWORD}
-    key-alias: ${APP_SSL_KEYSTORE_ALIAS}
 spring:
   datasource:
     url: ${APP_DATASOURCE_URL}
