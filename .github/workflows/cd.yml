@@ -84,7 +84,6 @@ jobs:
             echo "----> Creating directories"
             mkdir -p "${APP_BASE_DIR}"
             mkdir -p "${CONFIG_DIR}"
-            mkdir -p "${CURRENT_RELEASE}"
             mkdir -p "${RELEASES_DIR}"
             
             # 1. Set up configuration
