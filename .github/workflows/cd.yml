@@ -32,14 +32,14 @@ jobs:
         run: |
           echo "Generating application.yaml with secrets"
           
-          export APP_PORT=${{ secrets.APP_PORT }}
-          export APP_SSL_KEYSTORE_PATH=${{ secrets.APP_SSL_KEYSTORE_PATH }}
-          export APP_SSL_KEYSTORE_PASSWORD=${{ secrets.APP_SSL_KEYSTORE_PASSWORD }}
-          export APP_SSL_KEYSTORE_ALIAS=${{ secrets.APP_SSL_KEYSTORE_ALIAS }}
-          export APP_DATASOURCE_URL=${{ secrets.APP_DATASOURCE_URL }}
-          export APP_DATASOURCE_USERNAME=${{ secrets.APP_DATASOURCE_USERNAME }}
-          export APP_DATASOURCE_PASSWORD=${{ secrets.APP_DATASOURCE_PASSWORD }}
-          export APP_SECURITY_JWT_SECRET=${{ secrets.APP_SECURITY_JWT_SECRET }}
+          export APP_PORT="${{ secrets.APP_PORT }}"
+          export APP_SSL_KEYSTORE_PATH="${{ secrets.APP_SSL_KEYSTORE_PATH }}"
+          export APP_SSL_KEYSTORE_PASSWORD="${{ secrets.APP_SSL_KEYSTORE_PASSWORD }}"
+          export APP_SSL_KEYSTORE_ALIAS="${{ secrets.APP_SSL_KEYSTORE_ALIAS }}"
+          export APP_DATASOURCE_URL="${{ secrets.APP_DATASOURCE_URL }}"
+          export APP_DATASOURCE_USERNAME="${{ secrets.APP_DATASOURCE_USERNAME }}"
+          export APP_DATASOURCE_PASSWORD="${{ secrets.APP_DATASOURCE_PASSWORD }}"
+          export APP_SECURITY_JWT_SECRET="${{ secrets.APP_SECURITY_JWT_SECRET }}"
           
           envsubst < props/application.yaml > application.yaml
 
