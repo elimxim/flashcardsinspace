@@ -8,7 +8,7 @@ on:
       - 'settings.gradle.kts'
 
 jobs:
-  build-and-deploy:
+  launch-rocket:
     runs-on: ubuntu-latest
     environment:
       name: Production
@@ -146,7 +146,7 @@ jobs:
             ln -snf "${NEW_RELEASE_DIR}" "${CURRENT_RELEASE}"
 
             # 7. Run the new application
-            START_SCRIPT_PATH=$(find "${CURRENT_RELEASE}/bin" -type f | head -n 1)
+            START_SCRIPT_PATH="${CURRENT_RELEASE}/bin/flash"
             echo "----> Starting new application: ${START_SCRIPT_PATH}"
             nohup "${START_SCRIPT_PATH}" --spring.config.additional-location="file:${CONFIG_DIR}/" > "${APP_BASE_DIR}/app.log" 2>&1 &
 
