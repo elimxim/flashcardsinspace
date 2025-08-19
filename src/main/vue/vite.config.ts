@@ -29,17 +29,17 @@ export default defineConfig(({ mode }) => {
       port: 5174,
       proxy: {
         '/api': {
-          target: 'https://localhost:8443',
+          target: 'http://localhost:8442',
           changeOrigin: true,
           secure: false,
         },
         '/api-public': {
-          target: 'https://localhost:8443',
+          target: 'http://localhost:8442',
           changeOrigin: true,
           secure: false,
         },
         '/auth': {
-          target: 'https://localhost:8443',
+          target: 'http://localhost:8442',
           changeOrigin: true,
           secure: false,
         },

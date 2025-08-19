@@ -7,6 +7,7 @@ import org.springframework.boot.actuate.health.HealthEndpoint
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.env.Environment
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -26,6 +27,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableWebSecurity
 @EnableConfigurationProperties(SecurityProperties::class)
 class SecurityConfig(
+    private val env: Environment,
     private val securityProperties: SecurityProperties,
     private val requestLoggingFilter: RequestLoggingFilter,
 ) {
@@ -54,32 +56,37 @@ class SecurityConfig(
     fun apiSecurityFilterChain(
         http: HttpSecurity,
         jwtAuthFilter: JwtAuthFilter,
-    ): SecurityFilterChain = http
-        .requiresChannel { channel ->
-            channel
-                .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).requiresInsecure()
-                .anyRequest().requiresSecure()
+    ): SecurityFilterChain {
+        if (env.activeProfiles.none { it == "dev" }) {
+            http.requiresChannel { channel ->
+                channel
+                    .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).requiresInsecure()
+                    .anyRequest().requiresSecure()
+            }
         }
-        .cors { it.configurationSource(corsConfigurationSource()) }
-        .csrf { it.disable() }
-        .logout { it.disable() }
-        .authorizeHttpRequests { auth ->
-            auth
-                .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).permitAll()
-                .requestMatchers("/api/**").authenticated()
-                .requestMatchers("/api-public/**").permitAll()
-                .requestMatchers("/auth/**").permitAll()
-                .anyRequest().permitAll()
-        }
-        .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
-        .addFilterAfter(requestLoggingFilter, UsernamePasswordAuthenticationFilter::class.java)
-        .headers { headers ->
-            headers
-                .xssProtection { xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK) }
-                .contentSecurityPolicy { csp -> csp.policyDirectives("script-src 'self'") }
-        }
-        .build()
+
+        return http
+            .cors { it.configurationSource(corsConfigurationSource()) }
+            .csrf { it.disable() }
+            .logout { it.disable() }
+            .authorizeHttpRequests { auth ->
+                auth
+                    .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).permitAll()
+                    .requestMatchers("/api/**").authenticated()
+                    .requestMatchers("/api-public/**").permitAll()
+                    .requestMatchers("/auth/**").permitAll()
+                    .anyRequest().permitAll()
+            }
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterAfter(requestLoggingFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .headers { headers ->
+                headers
+                    .xssProtection { xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK) }
+                    .contentSecurityPolicy { csp -> csp.policyDirectives("script-src 'self'") }
+            }
+            .build()
+    }
 
     @Bean
     fun corsConfigurationSource() = UrlBasedCorsConfigurationSource().apply {

@@ -10,6 +10,7 @@ import com.github.elimxim.flashcardsinspace.schedule.LightspeedSchedule
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
 import com.github.elimxim.flashcardsinspace.web.dto.TimelineDto
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
+import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetTimelineNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,20 +26,19 @@ class FlashcardTimelineService(
 ) {
     @Transactional
     fun getTimeline(flashcardSetId: Long): TimelineDto {
-        // todo check for existence
-        // todo check flashcard set existence
-        val flashcardSet = flashcardSetService.getFlashcardSet(flashcardSetId)
-        val timeline = flashcardSet.timeline
-        if (timeline == null) {
-            throw IllegalArgumentException("Flashcard set doesn't have timeline") // fixme
-        }
-        return timeline.toDto()
+        return getTimelineInt(flashcardSetId).toDto()
+    }
+
+    @Transactional
+    fun getTimelineInt(flashcardSetId: Long): FlashcardTimeline {
+        val flashcardSet = flashcardSetService.getFlashcardSetInt(flashcardSetId)
+        return flashcardSet.timeline ?: throw FlashcardSetTimelineNotFoundException(flashcardSetId)
     }
 
     @Transactional
     fun createTimeline(flashcardSetId: Long, clientDateTime: ZonedDateTime): TimelineDto {
         // todo check flashcard set for existence
-        val flashcardSet = flashcardSetService.getFlashcardSet(flashcardSetId)
+        val flashcardSet = flashcardSetService.getFlashcardSetInt(flashcardSetId)
 
         val timeline = FlashcardTimeline(
             startedAt = clientDateTime,
@@ -64,7 +64,7 @@ class FlashcardTimelineService(
         // todo check for existence
         // todo check flashcard set existence
         // todo check timeline for existence
-        val flashcardSet = flashcardSetService.getFlashcardSet(flashcardSetId)
+        val flashcardSet = flashcardSetService.getFlashcardSetInt(flashcardSetId)
         val timeline = flashcardSet.timeline
         if (timeline == null) {
             throw IllegalArgumentException("Flashcard set doesn't have timeline") // fixme
@@ -90,7 +90,7 @@ class FlashcardTimelineService(
     fun getChronodays(flashcardSetId: Long, clientDatetime: ZonedDateTime): Pair<ChronodayDto, List<ChronodayDto>> {
         // todo check flashcard set for existence
         // todo check timeline for existence
-        val flashcardSet = flashcardSetService.getFlashcardSet(flashcardSetId)
+        val flashcardSet = flashcardSetService.getFlashcardSetInt(flashcardSetId)
         val timeline = flashcardSet.timeline
         if (timeline == null) {
             val schedule = applyLightspeedSchedule(clientDatetime)
@@ -130,12 +130,7 @@ class FlashcardTimelineService(
 
     @Transactional
     fun addChronoday(flashcardSetId: Long): ChronodayDto {
-        val flashcardSet = flashcardSetService.getFlashcardSet(flashcardSetId)
-        val timeline = flashcardSet.timeline
-        if (timeline == null) {
-            throw IllegalArgumentException("Flashcard set doesn't have timeline") // fixme
-        }
-
+        val timeline = getTimelineInt(flashcardSetId)
         if (timeline.status == TimelineStatus.SUSPENDED) {
             throw IllegalArgumentException("Timeline is suspended") // fixme
         }

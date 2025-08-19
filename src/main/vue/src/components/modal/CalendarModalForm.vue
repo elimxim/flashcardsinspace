@@ -37,16 +37,16 @@
     </div>
     <div class="calendar-bottom-nav">
       <button class="modal-button modal-danger-button"
-              :class="{ 'modal-button-disabled': !timelineSuspended }"
+              :class="{ 'modal-button-disabled': !daySwitchPossible }"
               ref="updateButton"
-              :disabled="!timelineSuspended"
+              :disabled="!daySwitchPossible"
               @click="switchToPrevDay">
         Prev
       </button>
       <button class="modal-button modal-danger-button"
-              :class="{ 'modal-button-disabled': !timelineSuspended }"
+              :class="{ 'modal-button-disabled': !daySwitchPossible }"
               ref="updateButton"
-              :disabled="!timelineSuspended"
+              :disabled="!daySwitchPossible"
               @click="switchToNextDay">
         Next
       </button>
@@ -158,8 +158,8 @@ function switchToNextDay() {
   currMonth.value = new Date(currDay.value.chronodate)
 }
 
-const timelineSuspended = computed(() =>
-  timeline.value !== null && timeline.value.status === 'SUSPENDED'
+const daySwitchPossible = computed(() =>
+  timeline.value !== null && timeline.value.status !== 'SUSPENDED'
 )
 
 const prevMonthButton = ref<HTMLButtonElement>()

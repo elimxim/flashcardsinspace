@@ -137,7 +137,8 @@ const selectedFlashcardSet = computed({
   set: (newValue) => {
     if (newValue !== null) {
       flashcardSetStore.loadData(newValue)
-      reviewStore.finishReview()
+        .then(() => timelineStore.loadData(newValue))
+        .then(() => reviewStore.finishReview())
     }
   }
 })

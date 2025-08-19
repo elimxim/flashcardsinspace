@@ -30,13 +30,7 @@ export const useTimelineStore = defineStore('timeline', {
     return {
       timeline: null,
       chronodays: [],
-      currDay: {
-        id: 0,
-        chronodate: asIsoDateStr(new Date()),
-        seqNumber: 0,
-        stages: [],
-        status: chronodayStatuses.INITIAL,
-      },
+      currDay: defaultCurrDay(),
     }
   },
   getters: {
@@ -46,14 +40,21 @@ export const useTimelineStore = defineStore('timeline', {
   },
   actions: {
     async loadData(flashcardSet: FlashcardSet): Promise<void> {
+      this.resetState()
       await this.loadTimeline(flashcardSet).then(() =>
         this.loadChronodays(flashcardSet)
       )
     },
     async startTimeline(flashcardSet: FlashcardSet) {
+      this.resetState()
       await this.createTimeline(flashcardSet).then(() =>
         this.loadChronodays(flashcardSet)
       )
+    },
+    resetState() {
+      this.timeline = null
+      this.chronodays = []
+      this.currDay = defaultCurrDay()
     },
     async loadTimeline(flashcardSet: FlashcardSet): Promise<void> {
       await apiClient.get<TimelineResponse>('/flashcard-sets/' + flashcardSet.id + '/timeline')
@@ -62,7 +63,8 @@ export const useTimelineStore = defineStore('timeline', {
         })
         .catch(error => {
           if (error.response.status === 404) {
-            // todo OK
+            console.log('Timeline is not set yet for Flashcard Set ' + flashcardSet.id)
+            this.timeline = null
           } else {
             // todo not OK
           }
@@ -160,3 +162,13 @@ export const useTimelineStore = defineStore('timeline', {
     },
   }
 })
+
+const defaultCurrDay = (): Chronoday => {
+  return {
+    id: 0,
+    chronodate: asIsoDateStr(new Date()),
+    seqNumber: 0,
+    stages: [],
+    status: chronodayStatuses.INITIAL,
+  }
+}
