@@ -37,16 +37,16 @@
     </div>
     <div class="calendar-bottom-nav">
       <button class="modal-button modal-danger-button"
-              :class="{ 'modal-button-disabled': timelineSuspended }"
+              :class="{ 'modal-button-disabled': !timelineSuspended }"
               ref="updateButton"
-              :disabled="timelineSuspended"
+              :disabled="!timelineSuspended"
               @click="switchToPrevDay">
         Prev
       </button>
       <button class="modal-button modal-danger-button"
-              :class="{ 'modal-button-disabled': timelineSuspended }"
+              :class="{ 'modal-button-disabled': !timelineSuspended }"
               ref="updateButton"
-              :disabled="timelineSuspended"
+              :disabled="!timelineSuspended"
               @click="switchToNextDay">
         Next
       </button>
