@@ -9,6 +9,7 @@
   - Link from Login in page to Signing up page
   - Link from Login page to Password reset page
   - Password reset functionality (sending emails)
+  - Password matching
   - New design of Menu bar
   - Remember if signed up using cookie (on/off refreshing JWT)
   - Refreshing JWT support on the frontend
@@ -20,6 +21,7 @@
   - Icons for Apple and Android
 - Flashcards functionality:
   - Reviewing flashcards from all skipped days
+  - Flashcard shuffling
 - Tech debt:
   - Requests validation on the backend
   - Errors handling (frontend & backend)
@@ -29,5 +31,5 @@
 - Project:
   - README.md
 - DevOps:
-  - Health checks
+  - Notifications if the app is down
   - CI + test coverage
