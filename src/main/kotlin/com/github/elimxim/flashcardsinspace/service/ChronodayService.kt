@@ -31,13 +31,12 @@ class ChronodayService(
 
         val currDate = clientDatetime.toLocalDate()
         val lastDate = flashcardSet.lastChronoday()?.chronodate ?: currDate
-        // fixme GET is a wrong place to modify data
         val updatedFlashcardSet = if (currDate.isAfter(lastDate)) {
             val status = if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
                 ChronodayStatus.OFF
             } else ChronodayStatus.NOT_STARTED
 
-            lastDate.datesUntil(currDate.plusDays(1)).forEach {
+            lastDate.minusDays(1).datesUntil(currDate.plusDays(1)).forEach {
                 flashcardSet.chronodays.add(
                     Chronoday(
                         chronodate = it,

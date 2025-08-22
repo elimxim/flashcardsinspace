@@ -3,24 +3,24 @@ package com.github.elimxim.flashcardsinspace.web
 import com.github.elimxim.flashcardsinspace.service.ChronodayService
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayPutRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayResponse
-import com.github.elimxim.flashcardsinspace.web.dto.ChronodaysGetResponse
+import com.github.elimxim.flashcardsinspace.web.dto.ChronodaysPutRequest
+import com.github.elimxim.flashcardsinspace.web.dto.ChronodaysPutResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
-import java.time.ZonedDateTime
 
 @Controller
 @RequestMapping("/api/flashcard-sets/{setId}/chronodays")
 class ChronodayController(
     private val chronodayService: ChronodayService,
 ) {
-    @GetMapping
+    @PutMapping
     fun getChronodays(
         @PathVariable setId: Long,
-        @RequestParam clientDatetime: ZonedDateTime,
-    ): ResponseEntity<ChronodaysGetResponse> {
-        val (currDay, chronodays) = chronodayService.getChronodays(setId, clientDatetime)
-        return ResponseEntity.ok(ChronodaysGetResponse(currDay, chronodays))
+        @RequestBody request: ChronodaysPutRequest,
+    ): ResponseEntity<ChronodaysPutResponse> {
+        val (currDay, chronodays) = chronodayService.getChronodays(setId, request.clientDatetime)
+        return ResponseEntity.ok(ChronodaysPutResponse(currDay, chronodays))
     }
 
     @PostMapping

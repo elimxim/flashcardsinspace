@@ -52,12 +52,11 @@ export const useChronoStore = defineStore('chrono', {
         clientDatetime: new Date().toISOString()
       }
 
-      await apiClient.get<ChronodaysGetResponse>('/flashcard-sets/' + flashcardSet.id + '/chronodays', {
-        params: chronodaysRequest
-      }).then(response => {
-        this.chronodays = response.data.chronodays
-        this.currDay = response.data.currDay
-      })
+      await apiClient.put<ChronodaysGetResponse>('/flashcard-sets/' + flashcardSet.id + '/chronodays', chronodaysRequest)
+        .then(response => {
+          this.chronodays = response.data.chronodays
+          this.currDay = response.data.currDay
+        })
       // todo catch errors
     },
     async addInitialChronoday(flashcardSet: FlashcardSet): Promise<boolean> {
