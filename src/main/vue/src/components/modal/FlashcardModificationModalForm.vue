@@ -80,7 +80,14 @@ import { required } from '@vuelidate/validators'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import { useGlobalStore } from '@/stores/global-store.ts'
-import { newFlashcard, updateFlashcardSides } from '@/core-logic/flashcard-logic.ts'
+import {
+  flashcardSetStatuses,
+  newFlashcard,
+  updateFlashcardSides
+} from '@/core-logic/flashcard-logic.ts'
+import { useChronoStore } from '@/stores/chrono-store.ts';
+import { storeToRefs } from 'pinia';
+import { useFlashcardDataStore } from '@/stores/flashcard-data-store.ts';
 
 const props = defineProps({
   visible: Boolean,
@@ -98,7 +105,11 @@ const emit = defineEmits([
 ])
 
 const globalStore = useGlobalStore()
+const chronoStore = useChronoStore()
+const flashcardDataStore = useFlashcardDataStore()
 const flashcardSetStore = useFlashcardSetStore()
+
+const { flashcardSet } = storeToRefs(flashcardSetStore)
 
 // state>
 
@@ -201,13 +212,26 @@ function removeFlashcard() {
   }
 }
 
-function addNewFlashcard() {
-  flashcardSetStore.addFlashcard(
+async function addNewFlashcard() {
+  await flashcardSetStore.addFlashcard(
     newFlashcard(
       flashcardFrontSide.value,
       flashcardBackSide.value,
     )
-  )
+  ).then(async () => {
+    if (flashcardSet.value !== null) {
+      await chronoStore.addInitialChronoday(flashcardSet.value)
+        .then(async (initialized: boolean) => {
+          if (initialized) {
+            await flashcardSetStore.syncFlashcardSet().then(async () => {
+              if (flashcardSet.value != null) {
+                flashcardDataStore.overrideFlashcardSet(flashcardSet.value)
+              }
+            })
+          }
+        })
+    }
+  })
 }
 
 function updateFlashcard() {

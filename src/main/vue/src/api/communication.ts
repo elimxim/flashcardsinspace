@@ -1,7 +1,7 @@
 import type { User } from '@/model/user.ts'
 import type { Language } from '@/model/language.ts'
 import type { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
-import type { Chronoday, Timeline } from '@/model/timeline.ts'
+import type { Chronoday } from '@/model/chrono.ts'
 
 // todo UserPostResponse
 // todo UserLoginRequest
@@ -39,6 +39,10 @@ export interface FlashcardsGetResponse {
   flashcards: Flashcard[]
 }
 
+export interface FlashcardSetGetResponse {
+  flashcardSet: FlashcardSet,
+}
+
 export interface FlashcardsPostRequest {
   flashcard: Flashcard,
 }
@@ -53,14 +57,6 @@ export interface FlashcardPutRequest {
 
 export interface FlashcardPutResponse {
   flashcard: Flashcard,
-}
-
-export interface TimelinePostRequest {
-  clientDatetime: Date
-}
-
-export interface TimelineResponse {
-  timeline: Timeline
 }
 
 export interface ChronodaysGetParams {

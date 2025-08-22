@@ -61,5 +61,11 @@ export const useFlashcardDataStore = defineStore('flashcard-data', {
       })
       // todo handle errors
     },
+    overrideFlashcardSet(flashcardSet: FlashcardSet) {
+      const idx = this.flashcardSets.findIndex((v) => v.id == flashcardSet.id)
+      if (idx !== -1) {
+        this.flashcardSets[idx] = flashcardSet
+      }
+    },
   }
 })

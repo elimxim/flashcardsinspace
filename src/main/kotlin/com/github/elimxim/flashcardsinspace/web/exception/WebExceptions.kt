@@ -6,9 +6,6 @@ import java.time.LocalDateTime
 
 open class NotFoundException(resource: String, by: Any) : RuntimeException("$resource not found by $by")
 class FlashcardSetNotFoundException(by: Any) : NotFoundException(resource = "Flashcard Set", by = by)
-class FlashcardSetTimelineNotFoundException(by: Any) : NotFoundException(resource = "Flashcard Set Timeline", by = by)
-
-
 
 data class ExceptionResponseBody(
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -1,16 +1,7 @@
 package com.github.elimxim.flashcardsinspace.entity
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.time.LocalDate
 
 @Entity
@@ -29,8 +20,8 @@ class Chronoday(
     var status: ChronodayStatus,
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "flashcard_timeline_id", referencedColumnName = "id")
-    var timeline: FlashcardTimeline,
+    @JoinColumn(name = "flashcard_set_id", referencedColumnName = "id")
+    var flashcardSet: FlashcardSet,
 )
 
 enum class ChronodayStatus {

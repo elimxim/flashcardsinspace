@@ -37,16 +37,16 @@
     </div>
     <div class="calendar-bottom-nav">
       <button class="modal-button modal-danger-button"
-              :class="{ 'modal-button-disabled': !daySwitchPossible }"
+              :class="{ 'modal-button-disabled': !isDaySwitchPossible }"
               ref="updateButton"
-              :disabled="!daySwitchPossible"
+              :disabled="!isDaySwitchPossible"
               @click="switchToPrevDay">
         Prev
       </button>
       <button class="modal-button modal-danger-button"
-              :class="{ 'modal-button-disabled': !daySwitchPossible }"
+              :class="{ 'modal-button-disabled': !isDaySwitchPossible }"
               ref="updateButton"
-              :disabled="!daySwitchPossible"
+              :disabled="!isDaySwitchPossible"
               @click="switchToNextDay">
         Next
       </button>
@@ -58,13 +58,15 @@
 import '@/assets/modal.css'
 import ModalForm from '@/components/modal/ModalForm.vue'
 import { computed, type ComputedRef, defineEmits, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useTimelineStore } from '@/stores/timeline-store.ts'
+import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import {
   calcCalendarPage,
   type CalendarDay,
   chronodayStatuses
 } from '@/core-logic/calendar-logic.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
+import { flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
 
 defineProps({
   visible: Boolean
@@ -74,8 +76,11 @@ const emit = defineEmits([
   'update:visible',
 ])
 
-const timelineStore = useTimelineStore()
-const { timeline, chronodays, currDay } = storeToRefs(timelineStore)
+const flashcardSetStore = useFlashcardSetStore()
+const chronoStore = useChronoStore()
+
+const { isStarted, isSuspended } = storeToRefs(flashcardSetStore)
+const { chronodays, currDay } = storeToRefs(chronoStore)
 
 // calendar>
 
@@ -149,17 +154,17 @@ function exit() {
 }
 
 function switchToPrevDay() {
-  timelineStore.switchToPrevDay()
+  chronoStore.switchToPrevDay()
   currMonth.value = new Date(currDay.value.chronodate)
 }
 
 function switchToNextDay() {
-  timelineStore.switchToNextDay()
+  chronoStore.switchToNextDay()
   currMonth.value = new Date(currDay.value.chronodate)
 }
 
-const daySwitchPossible = computed(() =>
-  timeline.value !== null && timeline.value.status !== 'SUSPENDED'
+const isDaySwitchPossible = computed(() =>
+  isStarted.value && !isSuspended.value
 )
 
 const prevMonthButton = ref<HTMLButtonElement>()

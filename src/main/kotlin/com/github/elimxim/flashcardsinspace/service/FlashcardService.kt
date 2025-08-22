@@ -20,7 +20,7 @@ class FlashcardService(
     @Transactional
     fun getFlashcards(flashcardSetId: Long): List<FlashcardDto> {
         // todo check for existence
-        return flashcardSetService.getFlashcardSetInt(flashcardSetId).flashcards.map { it.toDto() }
+        return flashcardSetService.getEntity(flashcardSetId).flashcards.map { it.toDto() }
     }
 
     fun getFlashcard(id: Long): Flashcard {
@@ -30,7 +30,7 @@ class FlashcardService(
     @Transactional
     fun addFlashcard(flashcardSetId: Long, dto: FlashcardDto): FlashcardDto {
         // todo validate
-        val flashcardSet = flashcardSetService.getFlashcardSetInt(flashcardSetId)
+        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
         // todo check for existence
         val flashcard = Flashcard(
             frontSide = dto.frontSide,
@@ -49,7 +49,7 @@ class FlashcardService(
     fun updateFlashcard(flashcardSetId: Long, id: Long, dto: FlashcardDto): FlashcardDto {
         // todo validate
         // todo check for existence
-        val flashcardSet = flashcardSetService.getFlashcardSetInt(flashcardSetId)
+        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
         // todo check for existence
         val flashcard = getFlashcard(id)
         // todo move merge to a separate method
@@ -98,7 +98,7 @@ class FlashcardService(
     @Transactional
     fun removeFlashcard(flashcardSetId: Long, id: Long) {
         // check for existence
-        val flashcardSet = flashcardSetService.getFlashcardSetInt(flashcardSetId)
+        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
         // check for existence
         val flashcard = getFlashcard(id)
         flashcardSet.flashcards.remove(flashcard)

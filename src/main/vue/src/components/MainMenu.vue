@@ -79,7 +79,7 @@ import FlashcardModificationModalForm from '@/components/modal/FlashcardModifica
 import CalendarModalForm from '@/components/modal/CalendarModalForm.vue'
 import { useFlashcardDataStore } from '@/stores/flashcard-data-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
-import { useTimelineStore } from '@/stores/timeline-store.ts'
+import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, type ComputedRef, onMounted, ref } from 'vue'
 import { useReviewStore } from '@/stores/review-store.ts'
@@ -92,11 +92,11 @@ const globalStore = useGlobalStore()
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardSetStore = useFlashcardSetStore()
 const reviewStore = useReviewStore()
-const timelineStore = useTimelineStore()
+const chronoStore = useChronoStore()
 
 const { flashcardSets, isEmpty: isNoFlashcardSets } = storeToRefs(flashcardDataStore)
 const { flashcardSet } = storeToRefs(flashcardSetStore)
-const { currDay } = storeToRefs(timelineStore)
+const { currDay } = storeToRefs(chronoStore)
 const { started: reviewStarted } = storeToRefs(reviewStore)
 const {
   flashcardSetSettingsModalFormOpen,
@@ -137,7 +137,7 @@ const selectedFlashcardSet = computed({
   set: (newValue) => {
     if (newValue !== null) {
       flashcardSetStore.loadData(newValue)
-        .then(() => timelineStore.loadData(newValue))
+        .then(() => chronoStore.loadData(newValue))
         .then(() => reviewStore.finishReview())
     }
   }

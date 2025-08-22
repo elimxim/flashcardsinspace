@@ -1,17 +1,18 @@
 import { type Flashcard, type FlashcardSet, type ReviewInfo } from '@/model/flashcard.ts'
 import { type Stage, stages } from '@/core-logic/stage-logic.ts'
 import type { Language } from '@/model/language.ts'
-import { useTimelineStore } from '@/stores/timeline-store.ts'
+import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 
-/**
- * Creates a new flashcard object. Every newly created
- * flashcard goes to the FIRST stage. Flashcards are
- * created in the current {@link LightspeedCalendar.currLightDay calendar day}.
- */
+export const flashcardSetStatuses = {
+  ACTIVE: 'ACTIVE',
+  DELETED: 'DELETED',
+  SUSPENDED: 'SUSPENDED',
+}
+
 export function newFlashcard(frontSide: string, backSide: string): Flashcard {
-  const timelineStore = useTimelineStore()
-  const { currDay } = storeToRefs(timelineStore)
+  const chronoStore = useChronoStore()
+  const { currDay } = storeToRefs(chronoStore)
 
   return {
     id: 0,
@@ -33,14 +34,9 @@ export function updateFlashcardSides(flashcard: Flashcard, frontSide: string, ba
   return flashcard
 }
 
-/**
- * Updates a flashcard object and sets
- * {@link Flashcard.reviewedAt review date} as a date
- * of the current {@link LightspeedCalendar.currLightDay calendar day}.
- */
 export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
-  const timelineStore = useTimelineStore()
-  const { currDay } = storeToRefs(timelineStore)
+  const chronoStore = useChronoStore()
+  const { currDay } = storeToRefs(chronoStore)
 
   const reviewedAt = currDay.value.chronodate
 
@@ -57,21 +53,16 @@ export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
   return flashcard
 }
 
-/**
- * Create a new flashcard set object. Flashcard sets are
- * created in the current {@link LightspeedCalendar.currLightDay calendar day}.
- */
 export function createFlashcardSet(name: string, language: Language): FlashcardSet {
-  const timelineStore = useTimelineStore()
-  const { currDay } = storeToRefs(timelineStore)
-
   return {
     id: 0,
     name: name,
-    languageId: language.id,
-    createdAt: currDay.value.chronodate,
-    lastUpdatedAt: null,
+    status: flashcardSetStatuses.ACTIVE,
     default: false,
+    languageId: language.id,
+    createdAt: new Date(),
+    startedAt: null,
+    lastUpdatedAt: null,
   }
 }
 

@@ -1,9 +1,3 @@
-export interface Timeline {
-  id: number
-  startedAt: string // fixme Date
-  status: string
-}
-
 export interface Chronoday {
   id: number
   chronodate: string // fixme Date

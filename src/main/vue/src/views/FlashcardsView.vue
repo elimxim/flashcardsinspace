@@ -22,12 +22,12 @@ import { onBeforeRouteLeave } from 'vue-router'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
 import { useFlashcardDataStore } from '@/stores/flashcard-data-store.ts'
-import { useTimelineStore } from '@/stores/timeline-store.ts'
+import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardSetStore = useFlashcardSetStore()
-const timelineStore = useTimelineStore()
+const chronoStore = useChronoStore()
 const reviewStore = useReviewStore()
 
 const { started: reviewStarted } = storeToRefs(reviewStore)
@@ -44,8 +44,8 @@ flashcardDataStore.loadData().then(async () => {
 }).then(async () => {
   console.log('flashcard set initialized')
   if (flashcardSet.value !== null) {
-    await timelineStore.loadData(flashcardSet.value)
-    console.log('timeline data loaded')
+    await chronoStore.loadData(flashcardSet.value)
+    console.log('chrono data loaded')
   } else {
     console.log('flashcard set hasn\'t been initialized')
   }

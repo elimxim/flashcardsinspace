@@ -1,19 +1,6 @@
 package com.github.elimxim.flashcardsinspace.entity
 
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToMany
-import jakarta.persistence.OneToOne
-import jakarta.persistence.Table
-import java.time.LocalDate
+import jakarta.persistence.*
 import java.time.ZonedDateTime
 
 @Entity
@@ -34,7 +21,10 @@ class FlashcardSet(
     var first: Boolean = false,
 
     @Column(nullable = false)
-    var creationDate: LocalDate,
+    var createdAt: ZonedDateTime,
+
+    @Column(nullable = false)
+    var startedAt: ZonedDateTime? = null,
 
     @Column(nullable = true)
     var lastUpdatedAt: ZonedDateTime? = null,
@@ -54,14 +44,18 @@ class FlashcardSet(
     )
     var flashcards: MutableList<Flashcard> = arrayListOf(),
 
-    @OneToOne(
+    @OneToMany(
         mappedBy = "flashcardSet",
         cascade = [CascadeType.ALL],
         orphanRemoval = true,
     )
-    var timeline: FlashcardTimeline? = null,
+    @OrderBy("chronodate ASC")
+    var chronodays: MutableList<Chronoday> = arrayListOf(),
 )
 
 enum class FlashcardSetStatus {
-    ACTIVE, DELETED, ARCHIVED
+    ACTIVE, DELETED, SUSPENDED
 }
+
+fun FlashcardSet.lastChronoday(): Chronoday? =
+    chronodays.maxByOrNull { it.chronodate } // fixme can't be null

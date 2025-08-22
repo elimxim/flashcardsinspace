@@ -110,10 +110,10 @@ import { ReviewMode, useReviewStore } from '@/stores/review-store.ts'
 import { useGlobalStore } from '@/stores/global-store.ts'
 import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { nextStage, prevStage, stages } from '@/core-logic/stage-logic.ts'
-import { useTimelineStore } from '@/stores/timeline-store.ts'
+import { useChronoStore } from '@/stores/chrono-store.ts'
 
 const flashcardSetStore = useFlashcardSetStore()
-const timelineStore = useTimelineStore()
+const chronoStore = useChronoStore()
 const reviewStore = useReviewStore()
 const globalStore = useGlobalStore()
 
@@ -149,7 +149,7 @@ const flashcardEditButton = ref<HTMLButtonElement>()
 
 function finishReview() {
   if (reviewFinished.value && flashcardSet.value !== null) {
-    timelineStore.markCurrDayAsCompleted(flashcardSet.value)
+    chronoStore.markCurrDayAsCompleted(flashcardSet.value)
   }
   reviewStore.finishReview()
 }
@@ -164,12 +164,12 @@ async function stageDown() {
     updateFlashcard(flashcard, prevStage(flashcard.stage))
     flashcardSetStore.updateFlashcard(flashcard)
     if (settings.value.mode === ReviewMode.LEITNER) {
-      await timelineStore.markCurrDayAsInProgress(flashcardSet.value)
+      await chronoStore.markCurrDayAsInProgress(flashcardSet.value)
     }
     reviewStore.setEditFormWasOpened(false)
     reviewStore.setFrontSide(true)
     if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LEITNER) {
-      await timelineStore.markCurrDayAsCompleted(flashcardSet.value)
+      await chronoStore.markCurrDayAsCompleted(flashcardSet.value)
     }
   }
   stageDownButton.value?.blur()
@@ -181,11 +181,11 @@ async function stageUp() {
     updateFlashcard(flashcard, nextStage(flashcard.stage))
     flashcardSetStore.updateFlashcard(flashcard)
     if (settings.value.mode === ReviewMode.LEITNER) {
-      await timelineStore.markCurrDayAsInProgress(flashcardSet.value)
+      await chronoStore.markCurrDayAsInProgress(flashcardSet.value)
     }
     reviewStore.setFrontSide(true)
     if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LEITNER) {
-      await timelineStore.markCurrDayAsCompleted(flashcardSet.value)
+      await chronoStore.markCurrDayAsCompleted(flashcardSet.value)
     }
   }
   stageUpButton.value?.blur()

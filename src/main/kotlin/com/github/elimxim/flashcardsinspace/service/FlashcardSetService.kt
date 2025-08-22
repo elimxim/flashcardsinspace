@@ -9,9 +9,7 @@ import com.github.elimxim.flashcardsinspace.web.dto.toDto
 import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 import java.time.ZonedDateTime
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 class FlashcardSetService(
@@ -19,7 +17,7 @@ class FlashcardSetService(
     private val languageService: LanguageService,
 ) {
     @Transactional
-    fun getFlashcardSets(user: User): List<FlashcardSetDto> {
+    fun findAll(user: User): List<FlashcardSetDto> {
         val result = flashcardSetRepository.findAllByUserAndStatus(
             user = user,
             status = FlashcardSetStatus.ACTIVE
@@ -28,17 +26,7 @@ class FlashcardSetService(
     }
 
     @Transactional
-    fun findFlashcardSetInt(id: Long): FlashcardSet? {
-        return flashcardSetRepository.findById(id).getOrNull()
-    }
-
-    @Transactional
-    fun getFlashcardSetInt(id: Long): FlashcardSet {
-        return findFlashcardSetInt(id) ?: throw FlashcardSetNotFoundException(id)
-    }
-
-    @Transactional
-    fun addFlashcardSet(user: User, dto: FlashcardSetDto): FlashcardSetDto {
+    fun createNew(user: User, dto: FlashcardSetDto): FlashcardSetDto {
         // todo check duplicates
         // todo check language
         val language = languageService.getLanguage(dto.languageId)
@@ -47,7 +35,7 @@ class FlashcardSetService(
             name = dto.name,
             language = language,
             first = dto.default,
-            creationDate = LocalDate.parse(dto.createdAt),
+            createdAt = ZonedDateTime.parse(dto.createdAt),
             lastUpdatedAt = dto.lastUpdatedAt?.let { ZonedDateTime.parse(it) },
             user = user,
             flashcards = arrayListOf(),
@@ -58,7 +46,7 @@ class FlashcardSetService(
     }
 
     @Transactional
-    fun updateFlashcardSet(id: Long, dto: FlashcardSetDto): FlashcardSetDto {
+    fun update(id: Long, dto: FlashcardSetDto): FlashcardSetDto {
         // todo check for existence
         // todo validate
         val flashcardSet = flashcardSetRepository.getReferenceById(id) // fixme
@@ -66,6 +54,10 @@ class FlashcardSetService(
         var changed = false
         if (flashcardSet.name != dto.name) {
             flashcardSet.name = dto.name
+            changed = true
+        }
+        if (flashcardSet.status.name != dto.status) {
+            flashcardSet.status = FlashcardSetStatus.valueOf(dto.status) // todo validate
             changed = true
         }
         if (flashcardSet.first != dto.default) {
@@ -89,10 +81,10 @@ class FlashcardSetService(
     }
 
     @Transactional
-    fun removeFlashcardSet(id: Long) {
+    fun remove(id: Long) {
         // todo check for existence
         // todo check if it's possible
-        val flashcardSet = getFlashcardSetInt(id)
+        val flashcardSet = getEntity(id)
         if (flashcardSet.flashcards.size >= 10) {
             flashcardSet.status = FlashcardSetStatus.DELETED
             flashcardSetRepository.save(flashcardSet)
@@ -100,5 +92,12 @@ class FlashcardSetService(
             flashcardSetRepository.deleteById(id)
         }
     }
+
+    @Transactional
+    fun get(id: Long): FlashcardSetDto = getEntity(id).toDto()
+
+    @Transactional
+    fun getEntity(id: Long): FlashcardSet =
+        flashcardSetRepository.findById(id).orElseThrow { FlashcardSetNotFoundException(id) }
 
 }

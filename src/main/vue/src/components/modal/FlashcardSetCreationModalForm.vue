@@ -66,7 +66,7 @@ import { useLanguageStore } from '@/stores/language-store.ts'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { useGlobalStore } from '@/stores/global-store.ts'
 import { createFlashcardSet } from '@/core-logic/flashcard-logic.ts'
-import { useTimelineStore } from '@/stores/timeline-store.ts'
+import { useChronoStore } from '@/stores/chrono-store.ts'
 
 defineProps({
   visible: Boolean,
@@ -77,7 +77,7 @@ const emit = defineEmits(['update:visible'])
 const globalStore = useGlobalStore()
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardSetStore = useFlashcardSetStore()
-const timelineStore = useTimelineStore()
+const chronoStore = useChronoStore()
 const reviewStore = useReviewStore()
 const languageStore = useLanguageStore()
 
@@ -139,7 +139,7 @@ function createNewFlashcardSet() {
     if (lastFlashcardSet.value !== null) {
       flashcardSetStore.loadData(lastFlashcardSet.value).then(() => {
         if (flashcardSet.value !== null) {
-          timelineStore.loadData(flashcardSet.value)
+          chronoStore.loadData(flashcardSet.value)
         }
       })
     }

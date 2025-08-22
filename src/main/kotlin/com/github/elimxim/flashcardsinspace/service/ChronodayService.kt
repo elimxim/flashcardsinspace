@@ -1,98 +1,27 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.Chronoday
-import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
-import com.github.elimxim.flashcardsinspace.entity.FlashcardTimeline
-import com.github.elimxim.flashcardsinspace.entity.TimelineStatus
+import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepository
-import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardTimelineRepository
+import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.schedule.LightspeedSchedule
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
-import com.github.elimxim.flashcardsinspace.web.dto.TimelineDto
-import com.github.elimxim.flashcardsinspace.web.dto.toDto
-import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetTimelineNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
 
-private val log = LoggerFactory.getLogger(FlashcardTimelineService::class.java)
+private val log = LoggerFactory.getLogger(ChronodayService::class.java)
 
 @Service
-class FlashcardTimelineService(
+class ChronodayService(
     private val flashcardSetService: FlashcardSetService,
-    private val flashcardTimelineRepository: FlashcardTimelineRepository,
+    private val flashcardSetRepository: FlashcardSetRepository,
     private val chronodayRepository: ChronodayRepository,
 ) {
     @Transactional
-    fun getTimeline(flashcardSetId: Long): TimelineDto {
-        return getTimelineInt(flashcardSetId).toDto()
-    }
-
-    @Transactional
-    fun getTimelineInt(flashcardSetId: Long): FlashcardTimeline {
-        val flashcardSet = flashcardSetService.getFlashcardSetInt(flashcardSetId)
-        return flashcardSet.timeline ?: throw FlashcardSetTimelineNotFoundException(flashcardSetId)
-    }
-
-    @Transactional
-    fun createTimeline(flashcardSetId: Long, clientDateTime: ZonedDateTime): TimelineDto {
-        // todo check flashcard set for existence
-        val flashcardSet = flashcardSetService.getFlashcardSetInt(flashcardSetId)
-
-        val timeline = FlashcardTimeline(
-            startedAt = clientDateTime,
-            status = TimelineStatus.ACTIVE,
-            flashcardSet = flashcardSet,
-        )
-
-        val initialDay = Chronoday(
-            chronodate = timeline.startedAt.toLocalDate(),
-            status = ChronodayStatus.INITIAL,
-            timeline = timeline,
-        )
-
-        timeline.chronodays.add(initialDay)
-        flashcardSet.timeline = timeline
-
-        val savedTimeline = flashcardTimelineRepository.save(timeline)
-        return savedTimeline.toDto()
-    }
-
-    @Transactional
-    fun updateTimelineStatus(flashcardSetId: Long, status: String): TimelineDto {
-        // todo check for existence
-        // todo check flashcard set existence
-        // todo check timeline for existence
-        val flashcardSet = flashcardSetService.getFlashcardSetInt(flashcardSetId)
-        val timeline = flashcardSet.timeline
-        if (timeline == null) {
-            throw IllegalArgumentException("Flashcard set doesn't have timeline") // fixme
-        }
-
-        var changed = false
-        if (timeline.status.name != status) {
-            timeline.status = TimelineStatus.valueOf(status) // todo check if value exists
-            changed = true
-        }
-
-        if (changed) {
-            val updatedTimeline = flashcardTimelineRepository.save(timeline)
-            return updatedTimeline.toDto()
-        } else {
-            return timeline.toDto()
-        }
-    }
-
-    // todo split into two services
-
-    @Transactional
     fun getChronodays(flashcardSetId: Long, clientDatetime: ZonedDateTime): Pair<ChronodayDto, List<ChronodayDto>> {
-        // todo check flashcard set for existence
-        // todo check timeline for existence
-        val flashcardSet = flashcardSetService.getFlashcardSetInt(flashcardSetId)
-        val timeline = flashcardSet.timeline
-        if (timeline == null) {
+        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
+        if (flashcardSet.chronodays.isEmpty()) {
             val schedule = applyLightspeedSchedule(clientDatetime)
             val currDayStr = clientDatetime.toLocalDate().toString()
             val currDay = schedule.find { it.chronodate == currDayStr }
@@ -101,52 +30,71 @@ class FlashcardTimelineService(
         }
 
         val currDate = clientDatetime.toLocalDate()
-        val lastDate = timeline.lastChronoday()?.chronodate ?: currDate
+        val lastDate = flashcardSet.lastChronoday()?.chronodate ?: currDate
         // fixme GET is a wrong place to modify data
-        val updatedTimeLine = if (currDate.isAfter(lastDate)) {
-            val status = if (timeline.status == TimelineStatus.SUSPENDED) {
+        val updatedFlashcardSet = if (currDate.isAfter(lastDate)) {
+            val status = if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
                 ChronodayStatus.OFF
             } else ChronodayStatus.NOT_STARTED
 
             lastDate.datesUntil(currDate.plusDays(1)).forEach {
-                timeline.chronodays.add(
+                flashcardSet.chronodays.add(
                     Chronoday(
                         chronodate = it,
                         status = status,
-                        timeline = timeline,
+                        flashcardSet = flashcardSet,
                     )
                 )
             }
 
-            flashcardTimelineRepository.save(timeline)
-        } else timeline
+            flashcardSetRepository.save(flashcardSet)
+        } else flashcardSet
 
-        val schedule = applyLightspeedSchedule(updatedTimeLine)
-        val lastChronoDateStr = timeline.lastChronoday()?.chronodate?.toString()
+        val schedule = applyLightspeedSchedule(updatedFlashcardSet)
+        val lastChronoDateStr = flashcardSet.lastChronoday()?.chronodate?.toString()
         val currDay = schedule.find { it.chronodate == lastChronoDateStr }
             ?: throw IllegalArgumentException("Can't find current day in schedule") // fixme
         return currDay to schedule
     }
 
     @Transactional
+    fun addInitialChronoday(flashcardSetId: Long): ChronodayDto {
+        val now = ZonedDateTime.now()
+
+        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
+        flashcardSet.startedAt = now
+
+        val initial = Chronoday(
+            chronodate = now.toLocalDate(),
+            status = ChronodayStatus.INITIAL,
+            flashcardSet = flashcardSet,
+        )
+
+        flashcardSet.chronodays.add(initial)
+        val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
+        val schedule = applyLightspeedSchedule(updatedFlashcardSet)
+        return schedule.last()
+    }
+
+    @Transactional
     fun addChronoday(flashcardSetId: Long): ChronodayDto {
-        val timeline = getTimelineInt(flashcardSetId)
-        if (timeline.status == TimelineStatus.SUSPENDED) {
-            throw IllegalArgumentException("Timeline is suspended") // fixme
+        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
+        if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
+            throw IllegalArgumentException("FlashcardSet is suspended") // fixme
         }
 
-        val lastChronoday = timeline.lastChronoday()
-            ?: throw IllegalArgumentException("Flashcard set doesn't have chronodays yet") // fixme
+        val lastChronoday = flashcardSet.lastChronoday()
+            ?: throw IllegalArgumentException("FlashcardSet is not started") // fixme
 
         val chronoday = Chronoday(
             chronodate = lastChronoday.chronodate.plusDays(1),
             status = ChronodayStatus.NOT_STARTED,
-            timeline = timeline,
+            flashcardSet = flashcardSet,
         )
 
-        timeline.chronodays.add(chronoday)
-        val updatedTimeline = flashcardTimelineRepository.save(timeline)
-        val schedule = applyLightspeedSchedule(updatedTimeline)
+        flashcardSet.chronodays.add(chronoday)
+        val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
+        val schedule = applyLightspeedSchedule(updatedFlashcardSet)
         return schedule.last()
     }
 
@@ -154,11 +102,10 @@ class FlashcardTimelineService(
     fun updateChronodayStatus(flashcardSetId: Long, chronodayId: Long, status: String): ChronodayDto {
         // todo check for existence
         // todo check flashcard set for existence
-        // todo check timeline for existence
         val chronoday = chronodayRepository.getReferenceById(chronodayId) // fixme
 
-        if (chronoday.timeline.status == TimelineStatus.SUSPENDED) {
-            throw IllegalArgumentException("Timeline is suspended") // fixme
+        if (chronoday.flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
+            throw IllegalArgumentException("FlashcardSet is suspended") // fixme
         }
 
         var changed = false
@@ -172,7 +119,7 @@ class FlashcardTimelineService(
             chronodayRepository.save(chronoday)
         } else chronoday
 
-        val schedule = applyLightspeedSchedule(updatedChronoday.timeline)
+        val schedule = applyLightspeedSchedule(updatedChronoday.flashcardSet)
         return schedule.last()
     }
 
@@ -181,14 +128,13 @@ class FlashcardTimelineService(
         // todo check for existence
         // todo check if it's last
         // todo check flashcard set for existence
-        // todo check timeline for existence
         val chronoday = chronodayRepository.getReferenceById(chronodayId) // fixme
 
-        if (chronoday.timeline.status == TimelineStatus.SUSPENDED) {
-            throw IllegalArgumentException("Timeline is suspended") // fixme
+        if (chronoday.flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
+            throw IllegalArgumentException("FlashcardSet is suspended") // fixme
         }
 
-        val isNotRemovable = chronoday.timeline.flashcardSet.flashcards
+        val isNotRemovable = chronoday.flashcardSet.flashcards
             .any { it.lastReviewDate != null && chronoday.chronodate.isBefore(it.lastReviewDate) }
 
         if (isNotRemovable) {
@@ -234,14 +180,14 @@ class FlashcardTimelineService(
     }
 
     private fun applyLightspeedSchedule(
-        timeline: FlashcardTimeline,
+        flashcardSet: FlashcardSet,
         daysAhead: Int = 200,
     ): List<ChronodayDto> {
-        if (timeline.chronodays.isEmpty()) return listOf()
+        if (flashcardSet.chronodays.isEmpty()) return listOf()
 
-        val scheduleDays = LightspeedSchedule(timeline.chronodays.size + daysAhead).days()
-        val chronodays = timeline.chronodays.sortedBy { it.chronodate }
-        val initialChronoday = timeline.chronodays.first()
+        val scheduleDays = LightspeedSchedule(flashcardSet.chronodays.size + daysAhead).days()
+        val chronodays = flashcardSet.chronodays.sortedBy { it.chronodate }
+        val initialChronoday = flashcardSet.chronodays.first()
         val startDate = initialChronoday.chronodate
 
         var prevStatus: ChronodayStatus = initialChronoday.status

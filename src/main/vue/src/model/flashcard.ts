@@ -22,8 +22,10 @@ export interface Flashcard {
 export interface FlashcardSet {
   id: number
   name: string
-  languageId: number,
-  createdAt: string // fixme lastCreationDate + Date
+  status: string,
   default: boolean // fixme first
-  lastUpdatedAt: string | null // fixme DAte
+  languageId: number
+  createdAt: Date
+  startedAt: string | null // fixme Date
+  lastUpdatedAt: string | null // fixme Date
 }

@@ -17,9 +17,11 @@ data class LanguageDto(
 data class FlashcardSetDto(
     val id: Long,
     val name: String,
+    val default: Boolean, // fixme first
+    val status: String,
     val languageId: Long,
-    val default: Boolean,
-    val createdAt: String, // fixme creationDate + LocalDate
+    val createdAt: String, // fixme ZonedDateTime
+    val startedAt: String?, // fixme ZonedDateTime
     val lastUpdatedAt: String?, // fixme ZonedDateTime
 )
 
@@ -42,13 +44,6 @@ data class ReviewHistoryDto(
 data class ReviewInfoDto(
     val stage: String,
     val reviewedAt: String, // fixme reviewDate
-)
-
-data class TimelineDto(
-    val id: Long,
-    val startedAt: String, // fixme ZonedDateTime
-    val status: String,
-    val lastUpdatedAt: String?, // fixme ZonedDateTime
 )
 
 data class ChronodayDto(

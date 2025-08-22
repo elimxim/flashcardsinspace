@@ -2,6 +2,7 @@ import { type Flashcard, type FlashcardSet } from '@/model/flashcard.ts'
 import { defineStore } from 'pinia'
 import apiClient from '@/api/api-client.ts'
 import type {
+  ChronodaysResponse, FlashcardSetGetResponse,
   FlashcardPutRequest,
   FlashcardPutResponse,
   FlashcardSetPutRequest,
@@ -12,7 +13,8 @@ import type {
 } from '@/api/communication.ts'
 import type { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
-import { useTimelineStore } from '@/stores/timeline-store.ts'
+import { flashcardSetStatuses, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
+import { useChronoStore } from '@/stores/chrono-store.ts'
 
 export interface FlashcardSetState {
   flashcardSet: FlashcardSet | null
@@ -45,8 +47,23 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     isEmpty(): boolean {
       return this.flashcardMap.size === 0
     },
+    isStarted(): boolean {
+      return this.flashcardSet?.startedAt !== null
+    },
+    isSuspended(): boolean {
+      return this.flashcardSet?.status === flashcardSetStatuses.SUSPENDED
+    },
   },
   actions: {
+    async syncFlashcardSet(): Promise<void> {
+      if (this.flashcardSet !== null) {
+        await apiClient.get<FlashcardSetGetResponse>('/flashcard-sets/' + this.flashcardSet.id).then(response => {
+          this.flashcardSet = response.data.flashcardSet
+        }).catch(error => {
+          console.log(error)
+        })
+      }
+    },
     async loadData(flashcardSet: FlashcardSet) {
       this.flashcardSet = flashcardSet
       await apiClient.get<FlashcardsGetResponse>('/flashcard-sets/' + flashcardSet.id + '/flashcards').then(response => {
@@ -58,7 +75,7 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       this.flashcardSet = null
       this.flashcardMap = new Map()
     },
-    // todo move to the flashcard-data store
+    // accept an update request instead of specific fields
     updateFlashcardSet(name: string | null, first: boolean | null) {
       if (this.flashcardSet !== null) {
         const request: FlashcardSetPutRequest = {
@@ -87,19 +104,15 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
         throw new Error(`Can't update flashcard set: it is null`)
       }
     },
-    addFlashcard(flashcard: Flashcard) {
+    async addFlashcard(flashcard: Flashcard): Promise<void> {
       if (this.flashcardSet !== null) {
         const request: FlashcardsPostRequest = {
           flashcard: flashcard,
         }
 
-        apiClient.post<FlashcardsPostResponse>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards', request).then(response => {
+        await apiClient.post<FlashcardsPostResponse>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards', request).then(response => {
+          console.log(`Added flashcard ${response.data.flashcard.id}`)
           this.flashcardMap.set(response.data.flashcard.id, response.data.flashcard)
-        }).then(() => {
-          if (this.flashcardSet !== null) {
-            const timelineStore = useTimelineStore()
-            timelineStore.startTimeline(this.flashcardSet)
-          }
         })
         // todo handle errors
       } else {

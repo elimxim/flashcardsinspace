@@ -1,19 +1,13 @@
 import { asIsoDateStr } from '@/utils/date.ts'
 import { toSortedOrders } from '@/core-logic/stage-logic.ts'
-import type { Chronoday } from '@/model/timeline.ts'
-import { computed } from 'vue';
-
-export const timelineStatuses = {
-  ACTIVE: "ACTIVE",
-  SUSPENDED: "SUSPENDED",
-}
+import type { Chronoday } from '@/model/chrono.ts'
 
 export const chronodayStatuses = {
-  INITIAL: "INITIAL",
-  NOT_STARTED: "NOT_STARTED",
-  IN_PROGRESS: "IN_PROGRESS",
-  COMPLETED: "COMPLETED",
-  OFF: "OFF",
+  INITIAL: 'INITIAL',
+  NOT_STARTED: 'NOT_STARTED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  OFF: 'OFF',
 }
 
 export interface CalendarDay {
