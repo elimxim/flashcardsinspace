@@ -36,7 +36,7 @@ class ChronodayService(
                 ChronodayStatus.OFF
             } else ChronodayStatus.NOT_STARTED
 
-            lastDate.minusDays(1).datesUntil(currDate.plusDays(1)).forEach {
+            lastDate.plusDays(1).datesUntil(currDate.plusDays(1)).forEach {
                 flashcardSet.chronodays.add(
                     Chronoday(
                         chronodate = it,
