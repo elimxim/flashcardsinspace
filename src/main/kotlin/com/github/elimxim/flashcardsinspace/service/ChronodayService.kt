@@ -134,7 +134,7 @@ class ChronodayService(
         }
 
         val isNotRemovable = chronoday.flashcardSet.flashcards
-            .any { it.lastReviewDate != null && chronoday.chronodate.isBefore(it.lastReviewDate) }
+            .any { it.lastReviewDate != null && !chronoday.chronodate.isAfter(it.lastReviewDate) }
 
         if (isNotRemovable) {
             throw IllegalArgumentException("Can't remove chronoday with flashcards get reviewed on this date") // fixme
