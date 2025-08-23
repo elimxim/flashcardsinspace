@@ -98,6 +98,8 @@ class FlashcardSetService(
 
     @Transactional
     fun getEntity(id: Long): FlashcardSet =
-        flashcardSetRepository.findById(id).orElseThrow { FlashcardSetNotFoundException(id) }
+        flashcardSetRepository.findById(id).orElseThrow {
+            FlashcardSetNotFoundException("Flashcard set with id $id not found")
+        }
 
 }

@@ -5,6 +5,8 @@ import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepositor
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.schedule.LightspeedSchedule
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
+import com.github.elimxim.flashcardsinspace.web.exception.CorruptedChronoStateException
+import com.github.elimxim.flashcardsinspace.web.exception.FlashcardsSetAlreadyInitializedException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -58,9 +60,12 @@ class ChronodayService(
 
     @Transactional
     fun addInitialChronoday(flashcardSetId: Long): ChronodayDto {
-        val now = ZonedDateTime.now()
-
         val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
+        if (flashcardSet.chronodays.isNotEmpty()) {
+            throw FlashcardsSetAlreadyInitializedException("FlashcardSet id=$flashcardSetId is already initialized")
+        }
+
+        val now = ZonedDateTime.now()
         flashcardSet.startedAt = now
 
         val initial = Chronoday(
@@ -189,7 +194,7 @@ class ChronodayService(
         val initialChronoday = flashcardSet.chronodays.first()
         val startDate = initialChronoday.chronodate
 
-        var prevStatus: ChronodayStatus = initialChronoday.status
+        var prevChronoday: Chronoday? = initialChronoday
         val result = mutableListOf<ChronodayDto>()
         for (i in 1..scheduleDays.size) {
             val date = startDate.plusDays(i.toLong())
@@ -197,6 +202,9 @@ class ChronodayService(
             val chronoday = chronodays.getOrElse(i) { null }
 
             if (chronoday != null) {
+                if (prevChronoday != null && prevChronoday.chronodate == chronoday.chronodate) {
+                    throw CorruptedChronoStateException("Same chronoday dates in flashcard set with id=${flashcardSet.id} and dates=${chronoday.chronodate}")
+                }
                 // todo check if chronodays have inconsistent statuses:
                 // todo prevStatus = IN_PROGRESS && currStatus = COMPLETED || INITIAL
                 // todo prevStatus = NOT_STARTED && currStatus = IN_PROGRESS || COMPLETED || INITIAL
@@ -213,6 +221,8 @@ class ChronodayService(
                     stages = scheduleDay.stages.map { it.name }
                 )
             )
+
+            prevChronoday = chronoday
         }
 
         result.addFirst(

@@ -33,9 +33,6 @@ export const useChronoStore = defineStore('chrono', {
     currDayStages(): Set<string> {
       return new Set(this.currDay.stages)
     },
-    isInitialized(): boolean {
-      return this.chronodays.length === 0
-    }
   },
   actions: {
     async loadData(flashcardSet: FlashcardSet): Promise<void> {
@@ -58,22 +55,17 @@ export const useChronoStore = defineStore('chrono', {
         })
       // todo catch errors
     },
-    async addInitialChronoday(flashcardSet: FlashcardSet): Promise<boolean> {
-      if (!this.isInitialized) {
-        console.log(`Adding initial chronoday for flashcard set ${flashcardSet.id}`)
-        await apiClient.post<ChronodaysResponse>('/flashcard-sets/' + flashcardSet.id + '/chronodays?initial=true')
-          .then(response => {
-            console.log(`Added initial chronoday ${response.data.chronoday.chronodate} for flashcard set ${flashcardSet.id}`)
-          })
-          // todo catch errors
-          .then(async () => {
-            await this.loadData(flashcardSet)
-            console.log(`Reloaded chrono data for flashcard set ${flashcardSet.id}`)
-          })
-        return true
-      } else {
-        return false
-      }
+    async addInitialChronoday(flashcardSet: FlashcardSet): Promise<void> {
+      console.log(`Adding initial chronoday for flashcard set ${flashcardSet.id}`)
+      await apiClient.post<ChronodaysResponse>('/flashcard-sets/' + flashcardSet.id + '/chronodays?initial=true')
+        .then(response => {
+          console.log(`Added initial chronoday ${response.data.chronoday.chronodate} for flashcard set ${flashcardSet.id}`)
+        })
+        // todo catch errors
+        .then(async () => {
+          await this.loadData(flashcardSet)
+          console.log(`Reloaded chrono data for flashcard set ${flashcardSet.id}`)
+        })
     },
     switchToPrevDay() {
       if (this.currDay.seqNumber === 0) return // todo log

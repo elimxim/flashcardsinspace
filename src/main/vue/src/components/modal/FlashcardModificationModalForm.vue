@@ -108,7 +108,7 @@ const chronoStore = useChronoStore()
 const flashcardDataStore = useFlashcardDataStore()
 const flashcardSetStore = useFlashcardSetStore()
 
-const { flashcardSet } = storeToRefs(flashcardSetStore)
+const { flashcardSet, isStarted } = storeToRefs(flashcardSetStore)
 
 // state>
 
@@ -218,16 +218,14 @@ async function addNewFlashcard() {
       flashcardBackSide.value,
     )
   ).then(async () => {
-    if (flashcardSet.value !== null) {
+    if (flashcardSet.value !== null && !isStarted.value) {
       await chronoStore.addInitialChronoday(flashcardSet.value)
-        .then(async (initialized: boolean) => {
-          if (initialized) {
-            await flashcardSetStore.syncFlashcardSet().then(async () => {
-              if (flashcardSet.value != null) {
-                flashcardDataStore.overrideFlashcardSet(flashcardSet.value)
-              }
-            })
-          }
+        .then(async () => {
+          await flashcardSetStore.syncFlashcardSet().then(async () => {
+            if (flashcardSet.value != null) {
+              flashcardDataStore.overrideFlashcardSet(flashcardSet.value)
+            }
+          })
         })
     }
   })

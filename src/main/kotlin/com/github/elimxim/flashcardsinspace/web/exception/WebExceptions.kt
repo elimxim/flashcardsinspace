@@ -4,8 +4,13 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import org.springframework.http.HttpStatus
 import java.time.LocalDateTime
 
-open class NotFoundException(resource: String, by: Any) : RuntimeException("$resource not found by $by")
-class FlashcardSetNotFoundException(by: Any) : NotFoundException(resource = "Flashcard Set", by = by)
+open class NotFoundException(message: String) : Exception(message)
+class FlashcardSetNotFoundException(message: String) : NotFoundException(message)
+
+open class BadRequestException(message: String) : Exception(message)
+class FlashcardsSetAlreadyInitializedException(message: String) : BadRequestException(message)
+
+class CorruptedChronoStateException(message: String) : Exception(message)
 
 data class ExceptionResponseBody(
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -20,7 +20,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun handleUnexpectedException(ex: Exception, request: WebRequest): ResponseEntity<ExceptionResponseBody> {
-        log.error("An unexpected error occurred: ${ex.message}", ex)
+        log.error("INTERNAL_SERVER_ERROR exception occurred: ${ex.message}", ex)
         val response = ExceptionResponseBody.from(
             status = HttpStatus.INTERNAL_SERVER_ERROR,
             exception = ex,
@@ -40,5 +40,17 @@ class GlobalExceptionHandler {
         )
 
         return ResponseEntity(response, HttpStatus.NOT_FOUND)
+    }
+
+    @ExceptionHandler(BadRequestException::class)
+    fun handleBadRequestException(ex: BadRequestException, request: WebRequest): ResponseEntity<ExceptionResponseBody> {
+        log.info("BAD_REQUEST exception occurred: ${ex.message}")
+        val response = ExceptionResponseBody.from(
+            status = HttpStatus.BAD_REQUEST,
+            exception = ex,
+            path = request.getDescription(false)
+        )
+
+        return ResponseEntity(response, HttpStatus.BAD_REQUEST)
     }
 }
