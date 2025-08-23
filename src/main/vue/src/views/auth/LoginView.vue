@@ -42,9 +42,13 @@ async function handleLogin() {
 
 // lilrocket>
 
+// @ts-ignore
 import clayImg from '@/assets/rocket/clay.png'
+// @ts-ignore
 import crochetImg from '@/assets/rocket/crochet.png'
+// @ts-ignore
 import originalImg from '@/assets/rocket/original.png'
+// @ts-ignore
 import toyImg from '@/assets/rocket/toy.png'
 
 const rockets = [

@@ -2,7 +2,7 @@ import { type Flashcard, type FlashcardSet } from '@/model/flashcard.ts'
 import { defineStore } from 'pinia'
 import apiClient from '@/api/api-client.ts'
 import type {
-  ChronodaysResponse, FlashcardSetGetResponse,
+  FlashcardSetGetResponse,
   FlashcardPutRequest,
   FlashcardPutResponse,
   FlashcardSetPutRequest,
@@ -13,8 +13,7 @@ import type {
 } from '@/api/communication.ts'
 import type { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
-import { flashcardSetStatuses, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
-import { useChronoStore } from '@/stores/chrono-store.ts'
+import { flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
 
 export interface FlashcardSetState {
   flashcardSet: FlashcardSet | null

@@ -1,10 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig, loadEnv, PluginOption } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import fs from 'node:fs'
-import path from 'node:path'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())

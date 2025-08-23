@@ -57,7 +57,7 @@
 <script setup lang="ts">
 import '@/assets/modal.css'
 import ModalForm from '@/components/modal/ModalForm.vue'
-import { computed, type ComputedRef, defineEmits, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, defineEmits, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import {
@@ -66,7 +66,6 @@ import {
   chronodayStatuses
 } from '@/core-logic/calendar-logic.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
-import { flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
 
 defineProps({
   visible: Boolean

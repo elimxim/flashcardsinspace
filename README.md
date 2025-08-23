@@ -21,7 +21,6 @@
   - Icons for Apple and Android
 - Flashcards functionality:
   - Reviewing flashcards from all skipped days
-  - Flashcard shuffling
 - Tech debt:
   - Requests validation on the backend
   - Errors handling (frontend & backend)

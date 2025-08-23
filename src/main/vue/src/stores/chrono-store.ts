@@ -16,7 +16,6 @@ import {
   chronodayStatuses,
   isCompleteAvailable, isInProgressAvailable,
 } from '@/core-logic/calendar-logic.ts'
-import type { AxiosError } from 'axios';
 
 export interface ChronoState {
   chronodays: Chronoday[]
@@ -31,7 +30,7 @@ export const useChronoStore = defineStore('chrono', {
     }
   },
   getters: {
-    currLightDayStages(): Set<string> {
+    currDayStages(): Set<string> {
       return new Set(this.currDay.stages)
     },
     isInitialized(): boolean {

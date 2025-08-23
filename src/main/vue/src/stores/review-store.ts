@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
-import { findFlashcardsForReview, flashcardsForStage } from '@/core-logic/review-logic.ts'
+import {
+  createReviewQueue,
+  createReviewQueueForStage,
+  EmptyReviewQueue,
+  ReviewQueue
+} from '@/core-logic/review-logic.ts'
 import { specialStages, type Stage } from '@/core-logic/stage-logic.ts'
 import type { Flashcard } from '@/model/flashcard.ts'
 
@@ -19,8 +24,7 @@ export interface ReviewState {
   settings: ReviewSettings
   started: boolean
   isFrontSide: boolean
-  flashcardIndex: number
-  reviewQueue: Flashcard[]
+  reviewQueue: ReviewQueue
   currFlashcard: Flashcard | null
   editFormWasOpened: boolean
 }
@@ -34,8 +38,7 @@ export const useReviewStore = defineStore('review', {
       },
       started: false,
       isFrontSide: true,
-      flashcardIndex: 0,
-      reviewQueue: [],
+      reviewQueue: new EmptyReviewQueue(),
       currFlashcard: null,
       editFormWasOpened: false,
     }
@@ -57,7 +60,6 @@ export const useReviewStore = defineStore('review', {
       this.settings.mode = ReviewMode.LEITNER
       this.started = true
       this.isFrontSide = true
-      this.flashcardIndex = -1
       this.initReviewQueue()
       this.nextFlashcard()
     },
@@ -66,7 +68,6 @@ export const useReviewStore = defineStore('review', {
       this.settings.mode = stage === specialStages.OUTER_SPACE ? ReviewMode.SPACE : ReviewMode.SPECIAL
       this.started = true
       this.isFrontSide = true
-      this.flashcardIndex = -1
       this.initStageReviewQueue(stage)
       this.nextFlashcard()
     },
@@ -75,28 +76,24 @@ export const useReviewStore = defineStore('review', {
       this.settings.mode = ReviewMode.LEITNER
       this.started = false
       this.isFrontSide = true
-      this.flashcardIndex = -1
-      this.reviewQueue = []
+      this.reviewQueue = new EmptyReviewQueue()
       this.currFlashcard = null
       this.editFormWasOpened = false
     },
     initReviewQueue() {
       const flashcardSetStore = useFlashcardSetStore()
-      const flashcards = findFlashcardsForReview(flashcardSetStore.flashcards)
-      this.reviewQueue = [...flashcards]
+      this.reviewQueue = createReviewQueue(flashcardSetStore.flashcards)
     },
     initStageReviewQueue(stage: Stage) {
       const flashcardSetStore = useFlashcardSetStore()
-      const flashcards = flashcardsForStage(flashcardSetStore.flashcards, stage)
-      this.reviewQueue = [...flashcards]
+      this.reviewQueue = createReviewQueueForStage(flashcardSetStore.flashcards, stage)
     },
-    prevFlashcard() {
-      if (this.flashcardIndex <= 0) return
-      this.currFlashcard = this.reviewQueue[--this.flashcardIndex] ?? null
+    prevFlashcard(): boolean {
+      this.currFlashcard = this.reviewQueue.prev()
+      return this.currFlashcard !== null
     },
     nextFlashcard(): boolean {
-      if (this.flashcardIndex >= this.reviewQueue.length) return false
-      this.currFlashcard = this.reviewQueue[++this.flashcardIndex] ?? null
+      this.currFlashcard = this.reviewQueue.next()
       return this.currFlashcard !== null
     },
     flipFlashcard() {

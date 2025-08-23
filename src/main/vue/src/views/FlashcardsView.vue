@@ -51,9 +51,8 @@ flashcardDataStore.loadData().then(async () => {
   }
 })
 
-onBeforeRouteLeave((to, from, next) => {
+onBeforeRouteLeave(() => {
   reviewStore.finishReview()
-  next()
 })
 
 </script>

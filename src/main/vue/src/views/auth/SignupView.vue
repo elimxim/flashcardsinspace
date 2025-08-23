@@ -25,12 +25,10 @@
 
 <script setup lang="ts">
 import '@/assets/auth.css'
-import apiClient from '@/api/api-client.ts'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"
 import { routeNames } from "@/router/index.js"
-import { type User } from '@/model/user.ts'
 import type { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'

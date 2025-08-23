@@ -69,8 +69,8 @@ import {
   defineEmits,
   defineProps,
   onMounted,
-  onUnmounted, type Ref,
-  ref, type UnwrapRef,
+  onUnmounted,
+  ref,
   watch
 } from 'vue'
 import { required } from '@vuelidate/validators'
@@ -80,7 +80,6 @@ import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { storeToRefs } from 'pinia'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { useGlobalStore } from '@/stores/global-store.ts'
-import { useLanguageStore } from '@/stores/language-store.ts'
 
 const emit = defineEmits(['update:visible'])
 
@@ -121,7 +120,7 @@ watch(flashcardSetDefault, (_) => {
   removeConfirmation.value = false
 })
 
-flashcardSetStore.$subscribe((mutation, newState) => {
+flashcardSetStore.$subscribe((_, newState) => {
   flashcardSetName.value = newState.flashcardSet?.name ?? null
   flashcardSetDefault.value = newState.flashcardSet?.default ?? null
 })

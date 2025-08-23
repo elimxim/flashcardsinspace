@@ -81,7 +81,6 @@ import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import { useGlobalStore } from '@/stores/global-store.ts'
 import {
-  flashcardSetStatuses,
   newFlashcard,
   updateFlashcardSides
 } from '@/core-logic/flashcard-logic.ts'

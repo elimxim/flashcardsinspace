@@ -57,7 +57,7 @@ export const stageNameMap = new Map<string, Stage>([
   [specialStages.OUTER_SPACE.name, specialStages.OUTER_SPACE],
 ])
 
-export const mainStageSet = new Set([
+export const mainStageArray = [
   stages.S1,
   stages.S2,
   stages.S3,
@@ -65,7 +65,7 @@ export const mainStageSet = new Set([
   stages.S5,
   stages.S6,
   stages.S7,
-])
+]
 
 export const specialStageSet = new Set([
   specialStages.UNKNOWN,
