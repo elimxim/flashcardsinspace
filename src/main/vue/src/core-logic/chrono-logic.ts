@@ -21,25 +21,38 @@ export interface CalendarDay {
 
 export function isInProgressAvailable(chronoday: Chronoday): boolean {
   switch (chronoday.status) {
-    case chronodayStatuses.INITIAL:
-    case chronodayStatuses.IN_PROGRESS:
-    case chronodayStatuses.COMPLETED:
-    case chronodayStatuses.OFF:
-      return false
-    default:
+    case chronodayStatuses.NOT_STARTED:
       return true
+    default:
+      return false
   }
 }
 
 export function isCompleteAvailable(chronoday: Chronoday): boolean {
   switch (chronoday.status) {
-    case chronodayStatuses.INITIAL:
-    case chronodayStatuses.COMPLETED:
-    case chronodayStatuses.OFF:
-      return false
-    default:
+    case chronodayStatuses.NOT_STARTED:
+    case chronodayStatuses.IN_PROGRESS:
       return true
+    default:
+      return false
   }
+}
+
+export function selectConsecutiveDaysBeforeIncluding(
+  chronodays: Chronoday[],
+  startDay: Chronoday,
+  condition: (chronoday: Chronoday) => boolean,
+): Chronoday[] {
+  const result: Chronoday[] = []
+  for (let i = startDay.seqNumber; i >= 0; i--) {
+    const chronoday = chronodays[i]
+    if (chronoday !== undefined && condition(chronoday)) {
+      result.push(chronoday)
+    } else {
+      break
+    }
+  }
+  return result
 }
 
 export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays: Chronoday[]): CalendarDay[] {

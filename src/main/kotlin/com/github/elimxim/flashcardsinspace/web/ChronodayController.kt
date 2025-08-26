@@ -1,10 +1,7 @@
 package com.github.elimxim.flashcardsinspace.web
 
 import com.github.elimxim.flashcardsinspace.service.ChronodayService
-import com.github.elimxim.flashcardsinspace.web.dto.ChronodayPutRequest
-import com.github.elimxim.flashcardsinspace.web.dto.ChronodayResponse
-import com.github.elimxim.flashcardsinspace.web.dto.ChronodaysPutRequest
-import com.github.elimxim.flashcardsinspace.web.dto.ChronodaysPutResponse
+import com.github.elimxim.flashcardsinspace.web.dto.*
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
@@ -15,7 +12,7 @@ class ChronodayController(
     private val chronodayService: ChronodayService,
 ) {
     @PutMapping
-    fun getChronodays(
+    fun get(
         @PathVariable setId: Long,
         @RequestBody request: ChronodaysPutRequest,
     ): ResponseEntity<ChronodaysPutResponse> {
@@ -24,7 +21,7 @@ class ChronodayController(
     }
 
     @PostMapping
-    fun addChronoday(
+    fun add(
         @PathVariable setId: Long,
         @RequestParam initial: Boolean = false,
     ): ResponseEntity<ChronodayResponse> {
@@ -36,18 +33,18 @@ class ChronodayController(
         return ResponseEntity.ok(ChronodayResponse(chronoday))
     }
 
-    @PutMapping("/{id}")
-    fun updateChronoday(
+    @PutMapping("/bulk")
+    fun bulkUpdate(
         @PathVariable setId: Long,
-        @PathVariable id: Long,
-        @RequestBody request: ChronodayPutRequest
-    ): ResponseEntity<ChronodayResponse> {
-        val chronoday = chronodayService.updateChronodayStatus(setId, id, request.chronodayStatus)
-        return ResponseEntity.ok(ChronodayResponse(chronoday))
+        @RequestParam ids: List<Long>,
+        @RequestBody request: RequestBodyContainer.ChronodayStatus,
+    ): ResponseEntity<List<ChronodayDto>> {
+        val chronodays = chronodayService.updateChronodays(setId, ids, request.status)
+        return ResponseEntity.ok(chronodays)
     }
 
     @DeleteMapping("/{id}")
-    fun removeChronoday(@PathVariable setId: Long, @PathVariable id: Long): ResponseEntity<Unit> {
+    fun delete(@PathVariable setId: Long, @PathVariable id: Long): ResponseEntity<Unit> {
         chronodayService.removeChronoday(setId, id)
         return ResponseEntity.ok().build()
     }

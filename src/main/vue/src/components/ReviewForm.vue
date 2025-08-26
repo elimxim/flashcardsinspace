@@ -149,7 +149,7 @@ const flashcardEditButton = ref<HTMLButtonElement>()
 
 function finishReview() {
   if (reviewFinished.value && flashcardSet.value !== null) {
-    chronoStore.markCurrDayAsCompleted(flashcardSet.value)
+    chronoStore.markLastDaysAsCompleted(flashcardSet.value)
   }
   reviewStore.finishReview()
 }
@@ -164,12 +164,12 @@ async function stageDown() {
     updateFlashcard(flashcard, prevStage(flashcard.stage))
     flashcardSetStore.updateFlashcard(flashcard)
     if (settings.value.mode === ReviewMode.LEITNER) {
-      await chronoStore.markCurrDayAsInProgress(flashcardSet.value)
+      await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
     reviewStore.setEditFormWasOpened(false)
     reviewStore.setFrontSide(true)
     if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LEITNER) {
-      await chronoStore.markCurrDayAsCompleted(flashcardSet.value)
+      await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
     }
   }
   stageDownButton.value?.blur()
@@ -181,11 +181,11 @@ async function stageUp() {
     updateFlashcard(flashcard, nextStage(flashcard.stage))
     flashcardSetStore.updateFlashcard(flashcard)
     if (settings.value.mode === ReviewMode.LEITNER) {
-      await chronoStore.markCurrDayAsInProgress(flashcardSet.value)
+      await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
     reviewStore.setFrontSide(true)
     if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LEITNER) {
-      await chronoStore.markCurrDayAsCompleted(flashcardSet.value)
+      await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
     }
   }
   stageUpButton.value?.blur()

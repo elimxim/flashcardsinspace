@@ -19,8 +19,6 @@
   - Sending emails with a confirmation link
   - Custom select
   - Icons for Apple and Android
-- Flashcards functionality:
-  - Reviewing flashcards from all skipped days
 - Tech debt:
   - Requests validation on the backend
   - Errors handling (frontend & backend)
@@ -31,4 +29,5 @@
   - README.md
 - DevOps:
   - Notifications if the app is down
+  - Notifications on errors in logs
   - CI + test coverage

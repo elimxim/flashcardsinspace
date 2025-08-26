@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.util.ContentCachingRequestWrapper
 import org.springframework.web.util.ContentCachingResponseWrapper
+import java.nio.charset.StandardCharsets
 
 private val log = LoggerFactory.getLogger(RequestLoggingFilter::class.java)
 
@@ -49,6 +50,7 @@ class RequestLoggingFilter(
         val requestQuery = request.queryString?.let { "?$it" } ?: ""
         val userAgent = request.getHeader("User-Agent") ?: "N/A"
         val headers = headers(request)
+        val body = requestBody(request)
 
         val requestDetails = mapOf(
             "Principal" to principal,
@@ -58,7 +60,7 @@ class RequestLoggingFilter(
             "Duration" to "${duration}ms",
             "User-Agent" to userAgent,
             "Headers" to headers,
-            "Request Body" to "NA"
+            "Request Body" to body
         )
 
         log.info(objectMapper.writeValueAsString(requestDetails))
@@ -67,7 +69,20 @@ class RequestLoggingFilter(
     private fun headers(request: HttpServletRequest): Map<String, String> =
         buildMap {
             for (headerName in request.headerNames.asSequence()) {
+                if (headerName == "cookie") continue
                 put(headerName, request.getHeader(headerName))
             }
         }
+
+    private fun requestBody(request: ContentCachingRequestWrapper): Any {
+        val requestBody = request.contentAsByteArray
+        if (requestBody.isEmpty()) return "NA"
+
+        return try {
+            objectMapper.readTree(requestBody)
+        } catch (_: Exception) {
+            String(requestBody, StandardCharsets.UTF_8)
+        }
+    }
+
 }

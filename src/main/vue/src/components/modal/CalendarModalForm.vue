@@ -64,7 +64,7 @@ import {
   calcCalendarPage,
   type CalendarDay,
   chronodayStatuses
-} from '@/core-logic/calendar-logic.ts'
+} from '@/core-logic/chrono-logic.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 
 defineProps({

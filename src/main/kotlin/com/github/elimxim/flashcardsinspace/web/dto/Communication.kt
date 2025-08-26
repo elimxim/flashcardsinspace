@@ -36,3 +36,7 @@ data class ChronodayResponse(val chronoday: ChronodayDto)
 data class ChronodaysPutRequest(val clientDatetime: ZonedDateTime)
 data class ChronodaysPutResponse(val currDay: ChronodayDto, val chronodays: List<ChronodayDto>)
 // end of fixme
+
+sealed class RequestBodyContainer {
+    data class ChronodayStatus(val status: String) : RequestBodyContainer()
+}

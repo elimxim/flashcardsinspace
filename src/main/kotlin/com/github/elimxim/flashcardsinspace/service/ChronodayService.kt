@@ -1,6 +1,9 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.entity.Chronoday
+import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
+import com.github.elimxim.flashcardsinspace.entity.lastChronoday
 import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.schedule.LightspeedSchedule
@@ -51,7 +54,7 @@ class ChronodayService(
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
-        val schedule = applyLightspeedSchedule(updatedFlashcardSet)
+        val schedule = applyLightspeedSchedule(updatedFlashcardSet.chronodays)
         val lastChronoDateStr = flashcardSet.lastChronoday()?.chronodate?.toString()
         val currDay = schedule.find { it.chronodate == lastChronoDateStr }
             ?: throw IllegalArgumentException("Can't find current day in schedule") // fixme
@@ -76,7 +79,7 @@ class ChronodayService(
 
         flashcardSet.chronodays.add(initial)
         val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
-        val schedule = applyLightspeedSchedule(updatedFlashcardSet)
+        val schedule = applyLightspeedSchedule(updatedFlashcardSet.chronodays)
         return schedule.last()
     }
 
@@ -98,33 +101,32 @@ class ChronodayService(
 
         flashcardSet.chronodays.add(chronoday)
         val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
-        val schedule = applyLightspeedSchedule(updatedFlashcardSet)
+        val schedule = applyLightspeedSchedule(updatedFlashcardSet.chronodays)
         return schedule.last()
     }
 
     @Transactional
-    fun updateChronodayStatus(flashcardSetId: Long, chronodayId: Long, status: String): ChronodayDto {
-        // todo check for existence
-        // todo check flashcard set for existence
-        val chronoday = chronodayRepository.getReferenceById(chronodayId) // fixme
-
-        if (chronoday.flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
+    fun updateChronodays(flashcardSetId: Long, chronodayIds: List<Long>, status: String): List<ChronodayDto> {
+        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
+        if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
             throw IllegalArgumentException("FlashcardSet is suspended") // fixme
         }
 
         var changed = false
-        if (chronoday.status.name != status) {
-            val newStatus = ChronodayStatus.valueOf(status) // todo check if value exists
-            chronoday.status = newStatus
-            changed = true
+        flashcardSet.chronodays.forEach { chronoday ->
+            if (chronoday.id in chronodayIds) {
+                chronoday.status = ChronodayStatus.valueOf(status)
+                changed = true
+            }
         }
 
-        val updatedChronoday = if (changed) {
-            chronodayRepository.save(chronoday)
-        } else chronoday
+        val updateFlashcardSet = if (changed) {
+            flashcardSetRepository.save(flashcardSet)
+        } else flashcardSet
 
-        val schedule = applyLightspeedSchedule(updatedChronoday.flashcardSet)
-        return schedule.last()
+        val chronodays = updateFlashcardSet.chronodays.filter { it.id in chronodayIds }
+        val schedule = applyLightspeedSchedule(chronodays, daysAhead = 0)
+        return schedule
     }
 
     @Transactional
@@ -184,14 +186,14 @@ class ChronodayService(
     }
 
     private fun applyLightspeedSchedule(
-        flashcardSet: FlashcardSet,
+        chronodays: List<Chronoday>,
         daysAhead: Int = 200,
     ): List<ChronodayDto> {
-        if (flashcardSet.chronodays.isEmpty()) return listOf()
+        if (chronodays.isEmpty()) return listOf()
 
-        val scheduleDays = LightspeedSchedule(flashcardSet.chronodays.size + daysAhead).days()
-        val chronodays = flashcardSet.chronodays.sortedBy { it.chronodate }
-        val initialChronoday = flashcardSet.chronodays.first()
+        val scheduleDays = LightspeedSchedule(chronodays.size + daysAhead).days()
+        val chronodays = chronodays.sortedBy { it.chronodate }
+        val initialChronoday = chronodays.first()
         val startDate = initialChronoday.chronodate
 
         var prevChronoday: Chronoday? = initialChronoday
@@ -203,7 +205,13 @@ class ChronodayService(
 
             if (chronoday != null) {
                 if (prevChronoday != null && prevChronoday.chronodate == chronoday.chronodate) {
-                    throw CorruptedChronoStateException("Same chronoday dates in flashcard set with id=${flashcardSet.id} and dates=${chronoday.chronodate}")
+                    throw CorruptedChronoStateException(
+                        """
+                        Same chronoday dates in flashcard set with 
+                        id=${chronoday.flashcardSet.id} and 
+                        dates=${chronoday.chronodate}
+                        """.trimIndent()
+                    )
                 }
                 // todo check if chronodays have inconsistent statuses:
                 // todo prevStatus = IN_PROGRESS && currStatus = COMPLETED || INITIAL

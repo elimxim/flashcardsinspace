@@ -14,8 +14,10 @@ import type { FlashcardSet } from '@/model/flashcard.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import {
   chronodayStatuses,
-  isCompleteAvailable, isInProgressAvailable,
-} from '@/core-logic/calendar-logic.ts'
+  isCompleteAvailable,
+  isInProgressAvailable,
+  selectConsecutiveDaysBeforeIncluding,
+} from '@/core-logic/chrono-logic.ts'
 
 export interface ChronoState {
   chronodays: Chronoday[]
@@ -106,31 +108,47 @@ export const useChronoStore = defineStore('chrono', {
         // todo smth
       }
     },
-    async markCurrDayAsInProgress(flashcardSet: FlashcardSet) {
+    async markLastDaysAsInProgress(flashcardSet: FlashcardSet) {
       if (isInProgressAvailable(this.currDay)) {
-        const request: ChronodaysPutRequest = {
-          chronodayStatus: chronodayStatuses.IN_PROGRESS
-        }
-        await apiClient.put<ChronodaysResponse>('/flashcard-sets/' + flashcardSet.id + '/chronodays/' + this.currDay.id, request)
-          // todo log response
-          .then(() =>
-            this.loadChronodays(flashcardSet)
-          )
+        await this.markDaysAs(flashcardSet, chronodayStatuses.IN_PROGRESS, isInProgressAvailable)
       }
     },
-    async markCurrDayAsCompleted(flashcardSet: FlashcardSet) {
+    async markLastDaysAsCompleted(flashcardSet: FlashcardSet) {
       if (isCompleteAvailable(this.currDay)) {
-        const request: ChronodaysPutRequest = {
-          chronodayStatus: chronodayStatuses.COMPLETED
-        }
-        await apiClient.put<ChronodaysResponse>('/flashcard-sets/' + flashcardSet.id + '/chronodays/' + this.currDay.id, request)
-          // todo log response
-          .then(() =>
-            this.loadChronodays(flashcardSet)
-          )
-        // todo handle errors
+        await this.markDaysAs(flashcardSet, chronodayStatuses.COMPLETED, isCompleteAvailable)
       }
     },
+    async markDaysAs(
+      flashcardSet: FlashcardSet,
+      status: string,
+      daysFilter: (chronoday: Chronoday) => boolean,
+    ) {
+      const request: ChronodaysPutRequest = {
+        status: status
+      }
+      const days = selectConsecutiveDaysBeforeIncluding(
+        this.chronodays, this.currDay, daysFilter
+      )
+
+      if (days.length === 0) {
+        console.error(`No days to mark as ${status}, flashcard set ID: ${flashcardSet.id}, current day: ${this.currDay.id}`)
+        return
+      }
+
+      const idsStr = days.map(v => v.id).join(',')
+      await apiClient.put<ChronodaysResponse>('/flashcard-sets/' + flashcardSet.id + '/chronodays/bulk',
+        request,
+        {
+          params: {
+            ids: idsStr,
+          },
+        })
+        // todo log response
+        .then(() =>
+          this.loadChronodays(flashcardSet)
+        )
+      // todo handle errors
+    }
   }
 })
 

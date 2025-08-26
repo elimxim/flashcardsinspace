@@ -10,6 +10,10 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 import { storeToRefs } from 'pinia'
 import { shuffle } from '@/utils/array.ts'
+import {
+  isCompleteAvailable,
+  selectConsecutiveDaysBeforeIncluding
+} from '@/core-logic/chrono-logic.ts';
 
 export interface ReviewQueue {
   shuffle(): void
@@ -110,11 +114,14 @@ export class MonoStageReviewQueue implements ReviewQueue {
 export function createReviewQueue(flashcards: Flashcard[]): ReviewQueue {
   const chronoStore = useChronoStore()
   const currDay = chronoStore.currDay
-  const currDayStages = chronoStore.currDayStages
+  const daysForReview = selectConsecutiveDaysBeforeIncluding(
+    chronoStore.chronodays, chronoStore.currDay, isCompleteAvailable
+  )
+  const stagesForReview = new Set(daysForReview.map(d => d.stages).flat())
 
   const result = new Map<Stage, Flashcard[]>()
   flashcards.filter(f => {
-    const isStageAvailable = currDayStages.has(f.stage)
+    const isStageAvailable = stagesForReview.has(f.stage)
     if (f.stage === stages.S1.name) {
       return isStageAvailable
         && !isUnknownFlashcard(f, currDay)
@@ -157,55 +164,12 @@ export function createReviewQueueForStage(flashcards: Flashcard[], stage: Stage)
   return queue
 }
 
-export function findFlashcardsForReview(flashcards: Flashcard[]): Flashcard[] {
-  const chronoStore = useChronoStore()
-  const currDay = chronoStore.currDay
-  const currDayStages = chronoStore.currDayStages
-
-  return flashcards.filter(f => {
-    const isStageAvailable = currDayStages.has(f.stage)
-    if (f.stage === stages.S1.name) {
-      return isStageAvailable
-        && !isUnknownFlashcard(f, currDay)
-        && !isReviewedFlashcard(f, currDay)
-    }
-    return isStageAvailable && !isReviewedFlashcard(f, currDay)
-  }).sort((a, b) => {
-    if (a.stage !== b.stage) {
-      return getStage(b.stage).order - getStage(a.stage).order
-    }
-    return a.id - b.id
-  })
+function isUnknownFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
+  return flashcard.createdAt === day.chronodate
 }
 
-function isUnknownFlashcard(flashcard: Flashcard, lightDay: Chronoday): boolean {
-  return flashcard.createdAt === lightDay.chronodate
-}
-
-function isReviewedFlashcard(flashcard: Flashcard, lightDay: Chronoday): boolean {
-  return flashcard.reviewedAt === lightDay.chronodate
-}
-
-export function flashcardsForStage(flashcards: Flashcard[], stage: Stage): Flashcard[] {
-  const chronoStore = useChronoStore()
-  const { currDay } = storeToRefs(chronoStore)
-
-  if (stage === specialStages.UNKNOWN) {
-    return flashcards.filter(f =>
-      f.stage === stages.S1.name && isUnknownFlashcard(f, currDay.value)
-    ).sort((a, b) =>
-      a.id - b.id
-    )
-  } else if (stage === specialStages.ATTEMPTED) {
-    return flashcards.filter(f =>
-      f.stage === stages.S1.name && isReviewedFlashcard(f, currDay.value)
-    ).sort((a, b) =>
-      a.id - b.id
-    )
-  }
-
-  return flashcards.filter(f => f.stage === stage.name)
-    .sort((a, b) => a.id - b.id)
+function isReviewedFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
+  return flashcard.reviewedAt === day.chronodate
 }
 
 export function countFlashcards(flashcards: Flashcard[], stage: Stage): number {

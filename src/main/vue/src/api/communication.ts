@@ -73,5 +73,5 @@ export interface ChronodaysResponse {
 }
 
 export interface ChronodaysPutRequest {
-  chronodayStatus: string,
+  status: string,
 }

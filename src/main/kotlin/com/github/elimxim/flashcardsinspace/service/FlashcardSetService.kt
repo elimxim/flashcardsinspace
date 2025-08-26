@@ -57,7 +57,8 @@ class FlashcardSetService(
             changed = true
         }
         if (flashcardSet.status.name != dto.status) {
-            flashcardSet.status = FlashcardSetStatus.valueOf(dto.status) // todo validate
+            val newStatus = FlashcardSetStatus.valueOf(dto.status) // todo validate
+            flashcardSet.status = newStatus
             changed = true
         }
         if (flashcardSet.first != dto.default) {
