@@ -51,15 +51,12 @@
   color: #007bff;
 }
 
-.auth-select-container select {
+.auth-select-container-select {
   flex: 10;
-  appearance: none;
   border: 2px solid #ddd;
   border-radius: 4px;
   padding: 0.75rem;
   font-size: 1rem;
-  outline: none;
-  cursor: pointer;
 }
 
 .auth-alternative {

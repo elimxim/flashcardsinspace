@@ -5,11 +5,14 @@
       <input v-model="email" type="email" placeholder="Email" required/>
       <div class="auth-select-container">
         <font-awesome-icon icon="fa-solid fa-globe" class="auth-select-container-icon"/>
-        <select v-model="language">
-          <option v-for="i in languages" :key="i.id" :value="i">
-            {{ i.name }}
-          </option>
-        </select>
+        <FuzzySelect
+          class="auth-select-container-select"
+          :options="languages"
+          v-model="language"
+          :optionLabel="(lang) => lang.name"
+          optionPlaceholder="Language"
+          searchPlaceholder="Search..."
+        />
       </div>
       <!-- todo ability to see the password -->
       <input v-model="password" type="password" placeholder="Password" required/>
@@ -24,6 +27,7 @@
 </template>
 
 <script setup lang="ts">
+import FuzzySelect from '@/components/FuzzySelect.vue'
 import '@/assets/auth.css'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
