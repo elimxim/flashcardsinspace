@@ -73,7 +73,7 @@ watch(filteredOptions, () => {
 })
 
 const selectedOptionLabel = computed(() => {
-  if (!props.modelValue) return props.optionPlaceholder
+  if (!props.modelValue) return ''
   return optionLabel(props.modelValue)
 })
 
