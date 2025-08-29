@@ -136,12 +136,12 @@ databaseChangeLog:
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "CentralAtlasTamazight" }
+              - column: { name: "name", value: "Central Atlas Tamazight" }
               - column: { name: "code", value: "tzm" }
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "CentralKurdish" }
+              - column: { name: "name", value: "Central Kurdish" }
               - column: { name: "code", value: "ckb" }
         - insert:
             tableName: language
@@ -341,7 +341,7 @@ databaseChangeLog:
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "InariSami" }
+              - column: { name: "name", value: "Inari Sami" }
               - column: { name: "code", value: "smn" }
         - insert:
             tableName: language
@@ -441,12 +441,12 @@ databaseChangeLog:
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "KoyraChiini" }
+              - column: { name: "name", value: "Koyra Chiini" }
               - column: { name: "code", value: "khq" }
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "KoyraboroSenni" }
+              - column: { name: "name", value: "Koyraboro Senni" }
               - column: { name: "code", value: "ses" }
         - insert:
             tableName: language
@@ -491,12 +491,12 @@ databaseChangeLog:
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "LowGerman" }
+              - column: { name: "name", value: "Low German" }
               - column: { name: "code", value: "nds" }
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "LowerSorbian" }
+              - column: { name: "name", value: "Lower Sorbian" }
               - column: { name: "code", value: "dsb" }
         - insert:
             tableName: language
@@ -626,27 +626,27 @@ databaseChangeLog:
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "NorthNdebele" }
+              - column: { name: "name", value: "North Ndebele" }
               - column: { name: "code", value: "nd" }
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "NorthernLuri" }
+              - column: { name: "name", value: "Northern Luri" }
               - column: { name: "code", value: "lrc" }
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "NorthernSami" }
+              - column: { name: "name", value: "Northern Sami" }
               - column: { name: "code", value: "se" }
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "NorwegianBokmål" }
+              - column: { name: "name", value: "Norwegian Bokmål" }
               - column: { name: "code", value: "nb" }
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "NorwegianNynorsk" }
+              - column: { name: "name", value: "Norwegian Nynorsk" }
               - column: { name: "code", value: "nn" }
         - insert:
             tableName: language
@@ -756,7 +756,7 @@ databaseChangeLog:
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "ScottishGaelic" }
+              - column: { name: "name", value: "Scottish Gaelic" }
               - column: { name: "code", value: "gd" }
         - insert:
             tableName: language
@@ -781,7 +781,7 @@ databaseChangeLog:
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "SichuanYi" }
+              - column: { name: "name", value: "Sichuan Yi" }
               - column: { name: "code", value: "ii" }
         - insert:
             tableName: language
@@ -816,7 +816,7 @@ databaseChangeLog:
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "StandardMoroccanTamazight" }
+              - column: { name: "name", value: "Standard Moroccan Amazigh" }
               - column: { name: "code", value: "zgh" }
         - insert:
             tableName: language
@@ -831,7 +831,7 @@ databaseChangeLog:
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "SwissGerman" }
+              - column: { name: "name", value: "Swiss German" }
               - column: { name: "code", value: "gsw" }
         - insert:
             tableName: language
@@ -906,7 +906,7 @@ databaseChangeLog:
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "UpperSorbian" }
+              - column: { name: "name", value: "Upper Sorbian" }
               - column: { name: "code", value: "hsb" }
         - insert:
             tableName: language
@@ -951,7 +951,7 @@ databaseChangeLog:
         - insert:
             tableName: language
             columns:
-              - column: { name: "name", value: "WesternFrisian" }
+              - column: { name: "name", value: "Western Frisian" }
               - column: { name: "code", value: "fy" }
         - insert:
             tableName: language

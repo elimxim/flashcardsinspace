@@ -7,5 +7,5 @@ pluginManagement {
 rootProject.name = "flash-cards-in-space"
 gradle.rootProject {
     group = "com.github.elimxim"
-    version = "0.0.33-alpha"
+    version = "0.0.34-alpha"
 }
