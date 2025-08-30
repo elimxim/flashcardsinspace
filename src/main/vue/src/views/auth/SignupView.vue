@@ -1,28 +1,30 @@
 <template>
-  <div class="auth-container">
-    <form @submit.prevent="signup">
-      <input v-model="name" type="text" placeholder="Name" required/>
-      <input v-model="email" type="email" placeholder="Email" required/>
-      <div class="auth-select-container">
-        <font-awesome-icon icon="fa-solid fa-globe" class="auth-select-container-icon"/>
-        <FuzzySelect
-          class="auth-select-container-select"
-          :options="languages"
-          v-model="language"
-          :optionLabel="(lang) => lang.name"
-          optionPlaceholder="Language"
-          searchPlaceholder="Search..."
-        />
-      </div>
-      <!-- todo ability to see the password -->
-      <input v-model="password" type="password" placeholder="Password" required/>
-      <input v-model="confirmPassword" type="password" placeholder="Confirm Password" required/>
-      <button type="submit">Sign Up</button>
-    </form>
-    <p class="auth-alternative">
-      Already signed up?
-      <router-link to="/login">Login</router-link>
-    </p>
+  <div class="page-center-container">
+    <div class="auth-container">
+      <form @submit.prevent="signup">
+        <input v-model="name" type="text" placeholder="Name" required/>
+        <input v-model="email" type="email" placeholder="Email" required/>
+        <div class="auth-select-container">
+          <font-awesome-icon icon="fa-solid fa-globe" class="auth-select-container-icon"/>
+          <FuzzySelect
+            class="auth-select-container-select"
+            :options="languages"
+            v-model="language"
+            :optionLabel="(lang) => lang.name"
+            optionPlaceholder="Language"
+            searchPlaceholder="Search..."
+          />
+        </div>
+        <!-- todo ability to see the password -->
+        <input v-model="password" type="password" placeholder="Password" required/>
+        <input v-model="confirmPassword" type="password" placeholder="Confirm Password" required/>
+        <button type="submit">Sign Up</button>
+      </form>
+      <p class="auth-alternative">
+        Already signed up?
+        <router-link to="/login">Login</router-link>
+      </p>
+    </div>
   </div>
 </template>
 

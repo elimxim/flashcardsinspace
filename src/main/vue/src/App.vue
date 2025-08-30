@@ -39,6 +39,7 @@
 </template>
 
 <script setup lang="ts">
+import '@/assets/css/theme.css'
 import '@/assets/main.css'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { useAuthStore } from '@/stores/auth-store.ts'
@@ -74,9 +75,10 @@ onMounted(() => {
   justify-content: space-between;
   background-color: #707070;
   padding: 1vh;
-  min-height: 6vh;
-  height: 6vh;
-  max-height: 6vh;
+  height: var(--navbar-height);
+  min-height: var(--navbar-height);
+  max-height: var(--navbar-height);
+  box-sizing: border-box;
 }
 
 .nav-items {

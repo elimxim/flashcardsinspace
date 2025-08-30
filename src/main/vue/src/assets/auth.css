@@ -1,11 +1,19 @@
 @import "@/assets/css/theme.css";
 
+.page-center-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - var(--navbar-height));
+  max-height: calc(100vh - var(--navbar-height));
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
 .auth-container {
-  min-width: 40vh;
-  width: 40vh;
-  max-width: 80vh;
-  margin: 5rem auto;
-  padding: 2rem;
+  padding: clamp(1rem, 2vw, 2rem);
+  width: clamp(20rem, 20vw, 40rem);
   background-color: var(--auth-form--background-color);
   border-radius: 8px;
   box-shadow: var(--auth-form--box-shadow);
@@ -15,17 +23,13 @@
 .auth-container form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: clamp(1vh, 1.5vh, 2vh);
 }
 
-.auth-container input {
-  padding: 0.75rem;
-  font-size: 1rem;
-}
-
+.auth-container input,
 .auth-container button {
-  padding: 0.75rem;
-  font-size: 1rem;
+  padding: clamp(0.5rem, 0.75rem, 1.25rem);
+  font-size: clamp(1rem, 1vw, 1.1rem);
 }
 
 .auth-select-container {
@@ -46,8 +50,8 @@
   border: var(--input--border);
   border-radius: var(--border-radius);
   background-color: var(--input-background-color);
-  padding: 0.75rem;
-  font-size: 1rem;
+  padding: clamp(0.5rem, 0.75rem, 1.25rem);
+  font-size: clamp(1rem, 1vw, 1.1rem);
   --drop-down--border-color: var(--input_focus--border-color);
   --drop-down--hover--background-color: rgb(from var(--input_focus--border-color) r g b / 0.1);
   --drop-down_scrollbar--color: rgb(from var(--input_focus--border-color) r g b / 0.6);
@@ -62,7 +66,6 @@
 
 .auth-alternative {
   font-family: var(--main-font-family);
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
   color: var(--navigation--text--color);
 }
