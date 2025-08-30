@@ -1,12 +1,14 @@
+@import "@/assets/css/theme.css";
+
 .auth-container {
   min-width: 40vh;
   width: 40vh;
   max-width: 80vh;
   margin: 5rem auto;
   padding: 2rem;
-  background-color: #f9f9f9;
+  background-color: var(--auth-form--background-color);
   border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--auth-form--box-shadow);
   text-align: center;
 }
 
@@ -18,24 +20,12 @@
 
 .auth-container input {
   padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
   font-size: 1rem;
 }
 
 .auth-container button {
   padding: 0.75rem;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
   font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-}
-
-.auth-container button:hover {
-  background-color: #0056b3;
 }
 
 .auth-select-container {
@@ -48,27 +38,31 @@
 .auth-select-container-icon {
   flex: 1;
   font-size: 2rem;
-  color: #007bff;
+  color: var(--icon--fa-globe--color);
 }
 
 .auth-select-container-select {
   flex: 10;
-  border: 2px solid #ddd;
-  border-radius: 4px;
+  border: var(--input--border);
+  border-radius: var(--border-radius);
+  background-color: var(--input-background-color);
   padding: 0.75rem;
   font-size: 1rem;
+  --drop-down--border-color: var(--input_focus--border-color);
+  --drop-down--hover--background-color: rgb(from var(--input_focus--border-color) r g b / 0.1);
+  --drop-down_scrollbar--color: rgb(from var(--input_focus--border-color) r g b / 0.6);
+  --drop-down_scrollbar_hover-collor: rgb(from var(--input_focus--border-color) r g b / 0.8);
+  --drop-down--color: var(--input--color);
+}
+
+.auth-select-container-select:focus-within {
+  border: var(--input_focus--border);
+  outline: none;
 }
 
 .auth-alternative {
+  font-family: var(--main-font-family);
   margin-top: 1.5rem;
   font-size: 0.9rem;
-}
-
-.auth-alternative a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.auth-alternative a:hover {
-  text-decoration: underline;
+  color: var(--navigation--text--color);
 }

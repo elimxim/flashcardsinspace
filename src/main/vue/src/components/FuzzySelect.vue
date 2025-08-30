@@ -9,6 +9,7 @@
       :value="selectedOptionLabel"
       :placeholder="optionPlaceholder"
       style="pointer-events: none;"
+      disabled
     />
     <input
       type="text"
@@ -207,9 +208,16 @@ function handleClickOutside(event: MouseEvent) {
   z-index: 1000;
 }
 
+.fuzzy-select ul:focus{
+  outline: none;
+  border-width: 2px;
+}
+
 .fuzzy-select ul li {
   padding: 10px;
   cursor: pointer;
+  color: var(--drop-down--color, rgba(0, 0, 0, 0.8));
+  transition: background-color 0.1s ease-in-out;
 }
 
 .fuzzy-select ul li:hover,
@@ -226,11 +234,11 @@ function handleClickOutside(event: MouseEvent) {
 }
 
 .fuzzy-select ul::-webkit-scrollbar-thumb {
-  background-color: rgba(170, 170, 170, 0.6);
+  background-color: var(--drop-down_scrollbar--color, rgba(170, 170, 170, 0.6));
   border-radius: 4px;
 }
 
 .fuzzy-select ul::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(170, 170, 170, 0.8);
+  background-color: var(--drop-down_scrollbar_hover-collor, rgba(170, 170, 170, 0.8));
 }
 </style>

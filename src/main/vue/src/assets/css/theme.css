@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
+
+:root {
+  /* global */
+  --border-radius: 4px;
+  --main-font-family: 'Inter', sans-serif; /* Poppins, Roboto, Montserrat, Lato */
+
+  /* inputs */
+  --input--color: #45454a;
+  --input--placeholder-color: #b8c4d6;
+  --input-background-color: #f9f9f9;
+  --input--border-color: #b8c4d6;
+  --input--border: 2px solid var(--input--border-color);
+  --input_focus--border-color: #007bff;
+  --input_focus--border: 2px solid var(--input_focus--border-color);
+
+  /* buttons */
+  --button--color: #007bff;
+  --button_focus--color: #0056b3;
+  --icon--fa-globe--color: #007bff;
+
+  /* text */
+  --navigation--text--color: #474757;
+
+  /* hyper-links */
+  --a--color: #007bff;
+
+  /* components */
+  --auth-form--background-color: #f9f9f9;
+  --auth-form--box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+input {
+  font-family: var(--main-font-family);
+  color: var(--input--color);
+  background-color: var(--input-background-color);
+  border: var(--input--border);
+  border-radius: var(--border-radius);
+  transition: border-color 0.2s ease-in-out;
+}
+
+input::placeholder {
+  font-family: var(--main-font-family);
+  color: var(--input--placeholder-color);
+}
+
+input:hover,
+input:focus {
+  outline: none;
+  border: var(--input_focus--border);
+}
+
+button {
+  font-family: var(--main-font-family);
+  color: white;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--border-radius);
+  background-color: var(--button--color);
+  transition: background-color 0.2s ease-in-out;
+}
+
+button:hover,
+button:focus {
+  outline: none;
+  background-color: var(--button_focus--color);
+}
+
+a {
+  font-family: var(--main-font-family);
+  color: var(--a--color);
+  text-decoration: none;
+}
+
+a:hover,
+a:focus {
+  outline: none;
+  text-decoration: underline;
+}
