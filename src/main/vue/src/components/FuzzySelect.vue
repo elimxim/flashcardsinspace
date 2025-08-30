@@ -52,6 +52,7 @@ const optionsList = ref<HTMLUListElement>()
 const isOpen = ref(false)
 const searchQuery = ref('')
 const highlightedIndex = ref(-1)
+const borderRadius = ref('0 4px 4px 4px')
 
 const optionLabel = (option: T): string => {
   if (option) {
@@ -81,9 +82,25 @@ async function toggleDropdown() {
   isOpen.value = !isOpen.value
   if (isOpen.value) {
     await nextTick()
+    adjustDropDownStyles()
     searchInput.value?.focus()
   } else {
     closeDropdown()
+  }
+}
+
+function adjustDropDownStyles() {
+  if (selectContainer.value) {
+    const computedStyles = getComputedStyle(selectContainer.value)
+    const topValue = computedStyles.getPropertyValue('--drop-down--right').trim()
+    const radiusValue = computedStyles.getPropertyValue('--drop-down--border-radius').trim()
+    if (topValue && radiusValue) {
+      if (parseInt(topValue) === 0) {
+        borderRadius.value = `0 0 ${radiusValue} ${radiusValue}`
+      } else {
+        borderRadius.value = `0 ${radiusValue} ${radiusValue} ${radiusValue}`
+      }
+    }
   }
 }
 
@@ -177,9 +194,9 @@ function handleClickOutside(event: MouseEvent) {
   position: absolute;
   top: 102%;
   left: 0;
-  right: -1rem;
-  border: 1px solid #ccc;
-  border-radius: 0 4px 4px 4px;
+  right: var(--drop-down--right, -1rem);
+  border: 1px solid var(--drop-down--border-color, rgba(205, 205, 205, 0.8));
+  border-radius: v-bind(borderRadius);
   list-style: none;
   padding: 0;
   margin: 0;
@@ -197,7 +214,7 @@ function handleClickOutside(event: MouseEvent) {
 
 .fuzzy-select ul li:hover,
 .fuzzy-select ul li.highlighted {
-  background-color: rgba(170, 170, 170, 0.4);
+  background-color: var(--drop-down--hover--background-color, rgba(213, 213, 213, 0.5));
 }
 
 .fuzzy-select ul::-webkit-scrollbar {
