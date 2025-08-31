@@ -1,12 +1,15 @@
 <template>
   <div class="page-center-container">
-    <div class="rocket-container">
-      <img
-        ref="lilrocket"
-        class="lilrocket non-selectable non-draggable"
-        alt="Lilrocket"/>
-    </div>
-    <div class="auth-container" style="margin-top: 0;">
+    <img
+      ref="lilrocket"
+      class="lilrocket non-selectable non-draggable"
+      :class="{ 'initial-bounce': isBouncing }"
+      alt="Lilrocket"
+      @mousedown="onMouseDown"
+      @mouseup="onMouseUp"
+      @mouseleave="onMouseUp"
+    />
+    <div class="auth-container">
       <form @submit.prevent="handleLogin">
         <input v-model="email" type="email" placeholder="Email" required/>
         <SecretInput v-model="password" placeholder="Password" required/>
@@ -24,13 +27,14 @@
 import '@/assets/css/shared.css'
 import '@/assets/css/auth-container.css'
 import SecretInput from '@/components/SecretInput.vue'
-import { onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"
 import { routeNames } from "@/router/index.js"
 
 const router = useRouter()
 const authStore = useAuthStore()
+const isBouncing = ref(true)
 
 // todo validate inputs and show errors
 const email = ref('')
@@ -62,22 +66,70 @@ const rockets = [
   clayImg,
   crochetImg,
   originalImg,
-  clayImg,
   toyImg,
-  crochetImg
 ]
 
 const lilrocket = ref<HTMLImageElement>()
+const currRocketIdx = ref(0)
+let pressTimer: number | undefined
 
 function setRandomLilrocket() {
-  if (lilrocket.value) {
-    const idx = Math.floor(Math.random() * rockets.length)
-    lilrocket.value.src = rockets[idx]
+  if (!lilrocket.value) return
+  const idx = Math.floor(Math.random() * rockets.length)
+  currRocketIdx.value = idx
+  lilrocket.value.src = rockets[idx]
+}
+
+function setNextLilrocket() {
+  if (!lilrocket.value) return
+  let nextIdx = currRocketIdx.value + 1
+  if (nextIdx >= rockets.length) {
+    nextIdx = 0
   }
+  currRocketIdx.value = nextIdx
+  lilrocket.value.src = rockets[nextIdx]
+}
+
+function onMouseDown() {
+  if (lilrocket.value) {
+    lilrocket.value.classList.add('powering-up')
+  }
+
+  pressTimer = window.setTimeout(() => {
+    if (!lilrocket.value) return
+
+    lilrocket.value.classList.remove('powering-up')
+    lilrocket.value.classList.add('fly-away')
+
+    setTimeout(() => {
+      if (lilrocket.value) {
+        lilrocket.value.classList.remove('fly-away')
+      }
+      nextTick(() => {
+        setNextLilrocket()
+        setBouncingTimeout()
+      })
+    }, 1200) // Corresponds to the 1.2s duration of fly-away
+  }, 800)
+}
+
+function onMouseUp() {
+  if (lilrocket.value) {
+    lilrocket.value.classList.remove('powering-up')
+  }
+  clearTimeout(pressTimer)
+}
+
+function setBouncingTimeout() {
+  isBouncing.value = true
+  setTimeout(() => {
+    isBouncing.value = false
+  }, 1000)
 }
 
 onMounted(() => {
   setRandomLilrocket()
+  setBouncingTimeout()
 })
 
 // <lilrocket
@@ -85,18 +137,16 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.rocket-container {
-  align-items: center;
-  text-align: center;
-  justify-content: center;
-}
-
+/* Base class has only the continuous shake animation */
 .lilrocket {
   height: 8em;
-  margin-top: 5rem;
-  animation: bounce-in 1s,
-  shake 4s infinite 1s;
+  animation: shake 4s infinite ease-in-out;
   cursor: pointer;
+}
+
+.lilrocket.initial-bounce {
+  animation: bounce-in 1s ease-in-out,
+  shake 4s infinite 1s ease-in-out;
 }
 
 @keyframes bounce-in {
@@ -112,7 +162,7 @@ onMounted(() => {
 }
 
 .lilrocket:hover {
-  animation: shake 1s infinite;
+  animation: powering-up 1s infinite ease-in-out;
 }
 
 @keyframes shake {
@@ -151,8 +201,62 @@ onMounted(() => {
   }
 }
 
-.lilrocket:active {
-  animation: shake 0.3s infinite;
-
+.lilrocket.powering-up {
+  animation: powering-up 0.2s infinite;
 }
+
+@keyframes powering-up {
+  0% {
+    transform: translate(1px, 1px) rotate(0deg) scale(1.0);
+  }
+  10% {
+    transform: translate(-1px, -2px) rotate(-1deg) scale(1.02);
+  }
+  20% {
+    transform: translate(-3px, 0px) rotate(1deg) scale(1.04);
+  }
+  30% {
+    transform: translate(3px, 2px) rotate(0deg) scale(1.06);
+  }
+  40% {
+    transform: translate(1px, -1px) rotate(1deg) scale(1.08);
+  }
+  50% {
+    transform: translate(-1px, 2px) rotate(-1deg) scale(1.1);
+  }
+  60% {
+    transform: translate(-3px, 1px) rotate(0deg) scale(1.08);
+  }
+  70% {
+    transform: translate(3px, 1px) rotate(-1deg) scale(1.06);
+  }
+  80% {
+    transform: translate(-1px, -1px) rotate(1deg) scale(1.04);
+  }
+  90% {
+    transform: translate(1px, 2px) rotate(0deg) scale(1.02);
+  }
+  100% {
+    transform: translate(1px, -2px) rotate(-1deg) scale(1.0);
+  }
+}
+
+.lilrocket.fly-away {
+  animation: fly-away 1.2s ease-in forwards;
+}
+
+@keyframes fly-away {
+  0% {
+    transform: translate(3px, 2px) rotate(0deg) scale(1.2);
+    opacity: 1;
+  }
+  10% {
+    transform: translateY(-10vh) translateX(5vw) rotate(10deg) scale(1.1);
+  }
+  100% {
+    transform: translateY(-200vh) translateX(20vw) rotate(180deg) scale(0);
+    opacity: 0;
+  }
+}
+
 </style>
