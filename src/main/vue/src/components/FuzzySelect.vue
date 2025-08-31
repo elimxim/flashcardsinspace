@@ -182,6 +182,7 @@ function handleClickOutside(event: MouseEvent) {
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* Edge */
   user-select: none; /* Standard */
+  box-sizing: border-box;
 }
 
 .fuzzy-select input {

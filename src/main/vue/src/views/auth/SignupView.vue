@@ -4,32 +4,33 @@
       <form @submit.prevent="signup">
         <input v-model="name" type="text" placeholder="Name" required/>
         <input v-model="email" type="email" placeholder="Email" required/>
-        <div class="auth-select-container">
-          <font-awesome-icon icon="fa-solid fa-globe" class="auth-select-container-icon"/>
+        <AwesomeContainer icon="fa-solid fa-globe" class="awesome-container">
           <FuzzySelect
-            class="auth-select-container-select"
+            class="awesome-fuzzy-select"
             :options="languages"
             v-model="language"
             :optionLabel="(lang) => lang.name"
             optionPlaceholder="Language"
             searchPlaceholder="Search..."
           />
-        </div>
+        </AwesomeContainer>
         <!-- todo ability to see the password -->
         <input v-model="password" type="password" placeholder="Password" required/>
         <input v-model="confirmPassword" type="password" placeholder="Confirm Password" required/>
         <button type="submit">Sign Up</button>
+        <p class="auth-alternative">
+          Already signed up?
+          <router-link to="/login">Login</router-link>
+        </p>
       </form>
-      <p class="auth-alternative">
-        Already signed up?
-        <router-link to="/login">Login</router-link>
-      </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import FuzzySelect from '@/components/FuzzySelect.vue'
+import AwesomeContainer from '@/components/AwesomeContainer.vue'
+import '@/assets/css/container.css'
 import '@/assets/auth.css'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
