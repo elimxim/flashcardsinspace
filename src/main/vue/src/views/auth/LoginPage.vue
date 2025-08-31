@@ -10,7 +10,7 @@
       <form @submit.prevent="handleLogin">
         <input v-model="email" type="email" placeholder="Email" required/>
         <!-- todo ability to see the password -->
-        <input v-model="password" type="password" placeholder="Password" required/>
+        <SecretInput v-model="password" placeholder="Password" required/>
         <button type="submit">Log In</button>
       </form>
     </div>
@@ -20,6 +20,7 @@
 <script setup lang="ts">
 import '@/assets/css/shared.css'
 import '@/assets/css/auth-container.css'
+import SecretInput from '@/components/SecretInput.vue'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"

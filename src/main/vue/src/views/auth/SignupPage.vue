@@ -15,8 +15,8 @@
           />
         </AwesomeContainer>
         <!-- todo ability to see the password -->
-        <input v-model="password" type="password" placeholder="Password" required/>
-        <input v-model="confirmPassword" type="password" placeholder="Confirm Password" required/>
+        <SecretInput v-model="password" placeholder="Password" required/>
+        <SecretInput v-model="confirmPassword" placeholder="Confirm Password" required/>
         <button type="submit">Sign Up</button>
         <p class="auth-alternative">
           Already signed up?
@@ -28,10 +28,11 @@
 </template>
 
 <script setup lang="ts">
-import FuzzySelect from '@/components/FuzzySelect.vue'
-import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import '@/assets/css/container.css'
 import '@/assets/css/auth-container.css'
+import FuzzySelect from '@/components/FuzzySelect.vue'
+import AwesomeContainer from '@/components/AwesomeContainer.vue'
+import SecretInput from '@/components/SecretInput.vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"

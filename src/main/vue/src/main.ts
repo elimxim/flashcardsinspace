@@ -19,7 +19,9 @@ import { faPenToSquare } from '@fortawesome/free-solid-svg-icons'
 import { faAngleLeft } from '@fortawesome/free-solid-svg-icons'
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
 import { faCircleUser } from '@fortawesome/free-solid-svg-icons'
-import { useAuthStore } from '@/stores/auth-store.ts';
+import { faEye } from '@fortawesome/free-solid-svg-icons'
+import { faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+import { useAuthStore } from '@/stores/auth-store.ts'
 
 library.add(faGear)
 library.add(faBox)
@@ -33,6 +35,8 @@ library.add(faPenToSquare)
 library.add(faAngleLeft)
 library.add(faAngleRight)
 library.add(faCircleUser)
+library.add(faEye)
+library.add(faEyeSlash)
 
 const app = createApp(App)
 app.component('font-awesome-icon', FontAwesomeIcon)

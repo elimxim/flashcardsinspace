@@ -6,12 +6,9 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
-  icon: {
-    type: String,
-    required: true,
-  }
-})
+defineProps<{
+  icon: string,
+}>()
 </script>
 
 <style scoped>

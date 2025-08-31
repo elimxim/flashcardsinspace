@@ -12,9 +12,9 @@ import SupportView from '@/views/SupportView.vue'
 // @ts-ignore
 import UserView from '@/views/UserView.vue'
 // @ts-ignore
-import SignupView from '@/views/auth/SignupView.vue'
+import SignupPage from '@/views/auth/SignupPage.vue'
 // @ts-ignore
-import LoginView from '@/views/auth/LoginView.vue'
+import LoginPage from '@/views/auth/LoginPage.vue'
 // @ts-ignore
 import LogoutView from '@/views/auth/LogoutView.vue'
 // @ts-ignore
@@ -73,12 +73,12 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/signup',
     name: routeNames.signup,
-    component: SignupView,
+    component: SignupPage,
   },
   {
     path: '/login',
     name: routeNames.login,
-    component: LoginView,
+    component: LoginPage,
   },
   {
     path: '/logout',
