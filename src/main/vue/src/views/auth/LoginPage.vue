@@ -91,14 +91,9 @@ function setNextLilrocket() {
 }
 
 function onMouseDown() {
-  if (lilrocket.value) {
-    lilrocket.value.classList.add('powering-up')
-  }
-
   pressTimer = window.setTimeout(() => {
     if (!lilrocket.value) return
 
-    lilrocket.value.classList.remove('powering-up')
     lilrocket.value.classList.add('fly-away')
 
     setTimeout(() => {
@@ -109,8 +104,8 @@ function onMouseDown() {
         setNextLilrocket()
         setBouncingTimeout()
       })
-    }, 1200) // Corresponds to the 1.2s duration of fly-away
-  }, 800)
+    }, 4000)
+  }, 500)
 }
 
 function onMouseUp() {
@@ -162,7 +157,7 @@ onMounted(() => {
 }
 
 .lilrocket:hover {
-  animation: powering-up 1s infinite ease-in-out;
+  animation: none ease-in-out;
 }
 
 @keyframes shake {
@@ -201,61 +196,77 @@ onMounted(() => {
   }
 }
 
-.lilrocket.powering-up {
-  animation: powering-up 0.2s infinite;
-}
-
-@keyframes powering-up {
-  0% {
-    transform: translate(1px, 1px) rotate(0deg) scale(1.0);
-  }
-  10% {
-    transform: translate(-1px, -2px) rotate(-1deg) scale(1.02);
-  }
-  20% {
-    transform: translate(-3px, 0px) rotate(1deg) scale(1.04);
-  }
-  30% {
-    transform: translate(3px, 2px) rotate(0deg) scale(1.06);
-  }
-  40% {
-    transform: translate(1px, -1px) rotate(1deg) scale(1.08);
-  }
-  50% {
-    transform: translate(-1px, 2px) rotate(-1deg) scale(1.1);
-  }
-  60% {
-    transform: translate(-3px, 1px) rotate(0deg) scale(1.08);
-  }
-  70% {
-    transform: translate(3px, 1px) rotate(-1deg) scale(1.06);
-  }
-  80% {
-    transform: translate(-1px, -1px) rotate(1deg) scale(1.04);
-  }
-  90% {
-    transform: translate(1px, 2px) rotate(0deg) scale(1.02);
-  }
-  100% {
-    transform: translate(1px, -2px) rotate(-1deg) scale(1.0);
-  }
-}
-
 .lilrocket.fly-away {
-  animation: fly-away 1.2s ease-in forwards;
+  animation: fly-away 4s ease-in-out forwards;
 }
 
 @keyframes fly-away {
+  /* 1. Smoothly goes to the vertical position */
   0% {
-    transform: translate(3px, 2px) rotate(0deg) scale(1.2);
-    opacity: 1;
+    transform: rotate(0deg);
   }
   10% {
-    transform: translateY(-10vh) translateX(5vw) rotate(10deg) scale(1.1);
+    transform: rotate(70deg);
+  }
+
+  /* 2. Powering-up */
+  12% {
+    transform: translate(1px, 1px) rotate(71deg) scale(1.0);
+  }
+  14% {
+    transform: translate(-1px, -2px) rotate(69deg) scale(1.02);
+  }
+  16% {
+    transform: translate(-3px, 0px) rotate(71deg) scale(1.04);
+  }
+  18% {
+    transform: translate(3px, 2px) rotate(70deg) scale(1.06);
+  }
+  20% {
+    transform: translate(1px, -1px) rotate(71deg) scale(1.08);
+  }
+  22% {
+    transform: translate(-1px, 2px) rotate(69deg) scale(1.1);
+  }
+  24% {
+    transform: translate(-3px, 1px) rotate(70deg) scale(1.08);
+  }
+  26% {
+    transform: translate(3px, 1px) rotate(69deg) scale(1.06);
+  }
+  28% {
+    transform: translate(-1px, -1px) rotate(71deg) scale(1.04);
+  }
+  30% {
+    transform: translate(1px, 2px) rotate(70deg) scale(1.02);
+  }
+  32% {
+    transform: translate(1px, -2px) rotate(69deg) scale(1.0);
+  }
+  34% {
+    transform: translate(3px, 1px) rotate(69deg) scale(1.06);
+  }
+  36% {
+    transform: translate(-1px, -1px) rotate(71deg) scale(1.04);
+  }
+  38% {
+    transform: translate(1px, 2px) rotate(69deg) scale(1.02);
+  }
+  40% {
+    transform: translate(1px, -2px) rotate(70deg) scale(1.0);
+  }
+
+  /* 3. Flies to the top of the screen */
+  49.9% {
+    transform: translateY(-55vh) rotate(70deg) scale(0.8);
+  }
+
+  /* 4. Flies from the right to the left */
+  50% {
+    transform: translateX(65vw) translateY(0vh) rotate(-20deg) scale(0.8);
   }
   100% {
-    transform: translateY(-200vh) translateX(20vw) rotate(180deg) scale(0);
-    opacity: 0;
+    transform: translateX(-65vw) rotate(-20deg) scale(1.2);
   }
 }
 
