@@ -14,12 +14,11 @@
             searchPlaceholder="Search..."
           />
         </AwesomeContainer>
-        <!-- todo ability to see the password -->
         <SecretInput v-model="password" placeholder="Password" required/>
         <SecretInput v-model="confirmPassword" placeholder="Confirm Password" required/>
         <button type="submit">Sign Up</button>
-        <p class="auth-alternative">
-          Already signed up?
+        <p>
+          Been abducted by us before?
           <router-link to="/login">Login</router-link>
         </p>
       </form>
@@ -52,7 +51,7 @@ const name = ref('')
 const email = ref('')
 const language = ref(null as Language | null)
 const password = ref('')
-// todo validate if the inputs have the same email
+// todo validate if the inputs have the same password
 const confirmPassword = ref('')
 
 // todo password strength

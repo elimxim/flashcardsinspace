@@ -9,9 +9,12 @@
     <div class="auth-container" style="margin-top: 0;">
       <form @submit.prevent="handleLogin">
         <input v-model="email" type="email" placeholder="Email" required/>
-        <!-- todo ability to see the password -->
         <SecretInput v-model="password" placeholder="Password" required/>
         <button type="submit">Log In</button>
+        <p>
+          New to the galaxy?
+          <router-link to="/signup">Signup</router-link>
+        </p>
       </form>
     </div>
   </div>

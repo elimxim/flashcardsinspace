@@ -6,7 +6,6 @@
   - Responsive UI
   - Indexable for robots (searchable improvements)
   - Light and Dark themes
-  - Link from Login in page to Signing up page
   - Link from Login page to Password reset page
   - Password reset functionality (sending emails)
   - Password matching
@@ -17,7 +16,6 @@
     - changing password, email, username
     - showing username, email, registration date
   - Sending emails with a confirmation link
-  - Custom select
   - Icons for Apple and Android
 - Tech debt:
   - Requests validation on the backend
