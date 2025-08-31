@@ -258,15 +258,15 @@ onMounted(() => {
 
   /* 3. Flies to the top of the screen */
   49.9% {
-    transform: translateY(-55vh) rotate(70deg) scale(0.8);
+    transform: translateY(-55vh) rotate(70deg) scale(1.0);
   }
 
   /* 4. Flies from the right to the left */
   50% {
-    transform: translateX(65vw) translateY(0vh) rotate(-20deg) scale(0.8);
+    transform: translateX(65vw) translateY(0vh) rotate(-20deg) scale(1.0);
   }
   100% {
-    transform: translateX(-65vw) rotate(-20deg) scale(1.2);
+    transform: translateX(-65vw) rotate(-20deg) scale(1.0);
   }
 }
 
