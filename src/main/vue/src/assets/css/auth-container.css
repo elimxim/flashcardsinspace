@@ -1,0 +1,29 @@
+@import "@/assets/css/theme.css";
+
+.auth-container {
+  padding: clamp(1rem, 2vw, 2rem);
+  width: clamp(20rem, 20vw, 40rem);
+  background-color: var(--auth-form--background-color);
+  border-radius: 8px;
+  box-shadow: var(--auth-form--box-shadow);
+  text-align: center;
+}
+
+.auth-container form {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1vh, 1.5vh, 2vh);
+}
+
+.auth-container input,
+.auth-container button {
+  padding: clamp(0.5rem, 0.75rem, 1.25rem);
+  font-size: clamp(1rem, 1vw, 1.1rem);
+}
+
+.auth-alternative {
+  font-family: var(--main-font-family);
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  color: var(--navigation--text--color);
+  margin: 0;
+}

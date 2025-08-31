@@ -1,0 +1,13 @@
+.non-selectable {
+  user-select: none;         /* Standard */
+  -webkit-user-select: none; /* Safari, Chrome */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* Edge */
+}
+
+.non-draggable {
+  user-drag: none;           /* Standard */
+  -webkit-user-drag: none;   /* Safari, Chrome */
+  -moz-user-drag: none;      /* Firefox */
+  -ms-user-drag: none;       /* Edge */
+}

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fuzzy-select"
+    class="fuzzy-select non-selectable"
     ref="selectContainer"
     @click="toggleDropdown">
     <input
@@ -34,6 +34,7 @@
 </template>
 
 <script setup lang="ts" generic="T extends object">
+import '@/assets/css/shared.css'
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 
 const props = defineProps<{
@@ -178,10 +179,6 @@ function handleClickOutside(event: MouseEvent) {
   width: 100%;
   cursor: pointer;
   outline: none;
-  -webkit-user-select: none; /* Safari, Chrome */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* Edge */
-  user-select: none; /* Standard */
   box-sizing: border-box;
 }
 

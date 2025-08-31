@@ -31,7 +31,7 @@
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import '@/assets/css/container.css'
-import '@/assets/auth.css'
+import '@/assets/css/auth-container.css'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"
@@ -73,4 +73,25 @@ async function signup() {
 </script>
 
 <style scoped>
+.awesome-container {
+  --icon-color: var(--icon--fa-globe--color);
+}
+
+.awesome-fuzzy-select {
+  border: var(--input--border);
+  border-radius: var(--border-radius);
+  background-color: var(--input-background-color);
+  padding: clamp(0.5rem, 0.75rem, 1.25rem);
+  font-size: clamp(1rem, 1vw, 1.1rem);
+  --drop-down--border-color: var(--input_focus--border-color);
+  --drop-down--hover--background-color: rgb(from var(--input_focus--border-color) r g b / 0.1);
+  --drop-down_scrollbar--color: rgb(from var(--input_focus--border-color) r g b / 0.6);
+  --drop-down_scrollbar_hover-collor: rgb(from var(--input_focus--border-color) r g b / 0.8);
+  --drop-down--color: var(--input--color);
+}
+
+.awesome-fuzzy-select:focus-within {
+  border: var(--input_focus--border);
+  outline: none;
+}
 </style>
