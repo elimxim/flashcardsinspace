@@ -17,7 +17,7 @@
         <SecretInput v-model="password" placeholder="Password" required/>
         <SecretInput v-model="confirmPassword" placeholder="Confirm Password" required/>
         <button type="submit">Sign Up</button>
-        <p>
+        <p class="auth-link">
           Been abducted by us before?
           <router-link to="/login">Login</router-link>
         </p>

@@ -9,6 +9,7 @@
   --navbar-height: 8vh;
   --border-radius: 4px;
   --main-font-family: 'Inter', sans-serif; /* Poppins, Roboto, Montserrat, Lato */
+  --error-font-family: 'Montserrat', sans-serif;
 
   /* inputs */
   --input--color: #45454a;
@@ -25,7 +26,8 @@
   --icon--fa-globe--color: #007bff;
 
   /* text */
-  --navigation--text--color: #474757;
+  --link--color: #474757;
+  --error--color: #a12632;
 
   /* hyper-links */
   --a--color: #007bff;

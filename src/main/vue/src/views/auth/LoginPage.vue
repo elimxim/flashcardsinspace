@@ -10,11 +10,19 @@
       @mouseleave="onMouseUp"
     />
     <div class="auth-container">
-      <form @submit.prevent="handleLogin">
-        <input v-model="email" type="email" placeholder="Email" required/>
-        <SecretInput v-model="password" placeholder="Password" required/>
+      <form @submit.prevent="login">
+        <input v-model="userEmail" placeholder="Email"/>
+        <p class="error-message" v-for="error of $v.userEmail.$errors" :key="error.$uid">
+          <span v-if="error.$validator === 'required'">What's your call sign? We need an email to proceed</span>
+          <span v-else-if="error.$validator === 'email'">This email seems to be lost in a cosmic dust cloud. Please check the format</span>
+        </p>
+        <SecretInput v-model="userPassword" placeholder="Password"/>
+        <p class="error-message" v-for="error of $v.userPassword.$errors" :key="error.$uid">
+          <span v-if="error.$validator === 'required'">You can't board the ship without the secret code</span>
+          <span v-else-if="error.$validator === 'minLength'">Your password must be stronger than a piece of space junk. Please use at least 6 characters to keep it safe</span>
+        </p>
         <button type="submit">Log In</button>
-        <p>
+        <p class="auth-link">
           New to the galaxy?
           <router-link to="/signup">Signup</router-link>
         </p>
@@ -27,22 +35,53 @@
 import '@/assets/css/shared.css'
 import '@/assets/css/auth-container.css'
 import SecretInput from '@/components/SecretInput.vue'
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref, watch } from 'vue'
+import { useVuelidate } from '@vuelidate/core'
+import { required, email, minLength } from '@vuelidate/validators'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"
 import { routeNames } from "@/router/index.js"
+import clayImg from '@/assets/rocket/clay.png'
+import crochetImg from '@/assets/rocket/crochet.png'
+import originalImg from '@/assets/rocket/original.png'
+import toyImg from '@/assets/rocket/toy.png'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const isBouncing = ref(true)
 
-// todo validate inputs and show errors
-const email = ref('')
-const password = ref('')
+const userEmail = ref<string>()
+const userPassword = ref<string>()
 
-async function handleLogin() {
+const $v = useVuelidate({
+  userEmail: { required, email },
+  userPassword: { required, minLength: minLength(6) }
+}, {
+  userEmail: userEmail,
+  userPassword: userPassword,
+})
+
+watch(userEmail, () => {
+  if ($v.value.userEmail.$invalid) {
+    $v.value.userEmail.$reset()
+  }
+})
+
+watch(userPassword, () => {
+  if ($v.value.userPassword.$invalid) {
+    $v.value.userPassword.$reset()
+  }
+})
+
+async function login() {
+  $v.value.$touch()
+  if ($v.value.$invalid) {
+    console.log('Invalid form')
+    return
+  }
+
   try {
-    await authStore.login(email.value, password.value)
+    await authStore.login(userEmail.value!, userPassword.value!)
     console.log('Successfully logged in: ', authStore.user?.id)
     await router.push({ name: routeNames.flashcards })
   } catch (error) {
@@ -52,15 +91,6 @@ async function handleLogin() {
 }
 
 // lilrocket>
-
-// @ts-ignore
-import clayImg from '@/assets/rocket/clay.png'
-// @ts-ignore
-import crochetImg from '@/assets/rocket/crochet.png'
-// @ts-ignore
-import originalImg from '@/assets/rocket/original.png'
-// @ts-ignore
-import toyImg from '@/assets/rocket/toy.png'
 
 const rockets = [
   clayImg,

@@ -9,7 +9,7 @@
                v-model="flashcardSetName"/>
         <span class="modal-error-text" v-if="$v.flashcardSetName.$errors.length">
             Please don't forget to fill this out
-          </span>
+        </span>
       </div>
       <div class="modal-vertical-group">
         <div class="modal-horizontal-group">

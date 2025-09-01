@@ -18,7 +18,7 @@
 import { ref } from 'vue'
 
 defineProps<{
-  modelValue: string,
+  modelValue: string | undefined,
   placeholder: string,
 }>()
 
