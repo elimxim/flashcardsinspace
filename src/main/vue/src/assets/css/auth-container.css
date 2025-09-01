@@ -1,8 +1,8 @@
 @import "@/assets/css/theme.css";
 
 .auth-container {
-  padding: clamp(1rem, 2vw, 2rem);
   width: clamp(20rem, 20vw, 40rem);
+  padding: clamp(1rem, 2vw, 2rem);
   background-color: var(--auth-form--background-color);
   border-radius: 8px;
   box-shadow: var(--auth-form--box-shadow);
@@ -13,6 +13,10 @@
   display: flex;
   flex-direction: column;
   gap: clamp(1vh, 1.5vh, 2vh);
+}
+
+.auth-container--error {
+  border-top: 0.5rem solid var(--input-error--border-color);
 }
 
 .auth-container input,

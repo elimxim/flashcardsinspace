@@ -1,38 +1,44 @@
 <template>
   <div class="page-center-container">
-    <div class="auth-container">
+    <div
+      class="auth-container"
+      :class="{ 'auth-container--error': signupFailed }">
       <form @submit.prevent="signup">
-        <input v-model="username" placeholder="Name"/>
-        <p class="error-message" v-for="error of $v.username.$errors" :key="error.$uid">
-          <span v-if="error.$validator === 'required'">Please enter your name to begin your journey</span>
-        </p>
-        <input v-model="userEmail" placeholder="Email"/>
+        <input
+          v-model="username"
+          :class="{ 'input-error': usernameRequired }"
+          :placeholder="usernameRequired ? 'Name is required' : 'Name'"/>
+        <input
+          v-model="userEmail"
+          :class="{ 'input-error': userEmailInvalid }"
+          :placeholder="userEmailRequired ? 'Email is required' : 'Email'"/>
         <p class="error-message" v-for="error of $v.userEmail.$errors" :key="error.$uid">
-          <span v-if="error.$validator === 'required'">We'll send mission updates to this email</span>
-          <span v-else-if="error.$validator === 'email'">This email seems to be lost in a cosmic dust cloud. Please check the format</span>
+          <span v-if="error.$validator === 'email'">This email seems to be lost in a cosmic dust cloud. Please check the format</span>
         </p>
         <AwesomeContainer icon="fa-solid fa-globe" class="awesome-container">
           <FuzzySelect
             class="awesome-fuzzy-select"
+            :class="{ 'input-error': languageRequired }"
             :options="languages"
             v-model="language"
             :optionLabel="(lang) => lang.name"
-            optionPlaceholder="Language"
+            :optionPlaceholder="languageRequired ? 'Language is required' : 'Language'"
             searchPlaceholder="Search..."
           />
         </AwesomeContainer>
-        <p class="error-message" v-for="error of $v.language.$errors" :key="error.$uid">
-          <span v-if="error.$validator === 'required'">What language do they speak on your homeworld?</span>
-        </p>
-        <SecretInput v-model="userPassword" placeholder="Password"/>
+        <SecretInput
+          v-model="userPassword"
+          :class="{ 'input-error': userPasswordInvalid }"
+          :placeholder="userPasswordRequired ? 'Password is required' : 'Password'"/>
         <p class="error-message" v-for="error of $v.userPassword.$errors" :key="error.$uid">
-          <span v-if="error.$validator === 'required'">Your account needs a password to prevent unauthorized access</span>
-          <span v-else-if="error.$validator === 'minLength'">Your password must be stronger than a piece of space junk. Please use 6 or more characters</span>
+          <span v-if="error.$validator === 'minLength'">Your password must be stronger than a piece of space junk. Please use 6 or more characters</span>
         </p>
-        <SecretInput v-model="confirmedPassword" placeholder="Confirm Password"/>
+        <SecretInput
+          v-model="confirmedPassword"
+          :class="{ 'input-error': confirmPasswordInvalid }"
+          :placeholder="confirmPasswordRequired ? 'Password confirmation is required' : 'Confirm Password'"/>
         <p class="error-message" v-for="error of $v.confirmPassword.$errors" :key="error.$uid">
-          <span v-if="error.$validator === 'required'">Please type your password again to ensure it's correct</span>
-          <span v-else-if="error.$validator === 'passwordConfirmed'">The passwords do not align. Please try again</span>
+          <span v-if="error.$validator === 'passwordConfirmed'">The passwords do not align. Please try again</span>
         </p>
         <button type="submit">Sign Up</button>
         <p class="auth-link">
@@ -50,7 +56,7 @@ import '@/assets/css/auth-container.css'
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import SecretInput from '@/components/SecretInput.vue'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"
 import { routeNames } from "@/router/index.js"
@@ -59,6 +65,7 @@ import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'
 import { useVuelidate } from '@vuelidate/core'
 import { required, email, minLength, helpers } from '@vuelidate/validators'
+import { sendSignupRequest } from '@/api/auth-client.ts';
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -71,6 +78,7 @@ const userEmail = ref('')
 const language = ref<Language>()
 const userPassword = ref('')
 const confirmedPassword = ref('')
+const signupFailed = ref(false)
 
 const passwordConfirmed = helpers.withParams(
   { type: 'confirmed' },
@@ -94,54 +102,87 @@ const $v = useVuelidate({
   confirmPassword: confirmedPassword,
 })
 
+const usernameInvalid = computed(() => $v.value.username.$errors.length > 0)
+const usernameRequired = computed(() =>
+  $v.value.username.$errors.find(v => v.$validator === 'required') !== undefined
+)
+const userEmailInvalid = computed(() => $v.value.userEmail.$errors.length > 0)
+const userEmailRequired = computed(() =>
+  $v.value.userEmail.$errors.find(v => v.$validator === 'required') !== undefined
+)
+const languageInvalid = computed(() => $v.value.language.$errors.length > 0)
+const languageRequired = computed(() =>
+  $v.value.language.$errors.find(v => v.$validator === 'required') !== undefined
+)
+const userPasswordInvalid = computed(() => $v.value.userPassword.$errors.length > 0)
+const userPasswordRequired = computed(() =>
+  $v.value.userPassword.$errors.find(v => v.$validator === 'required') !== undefined
+)
+const confirmPasswordInvalid = computed(() => $v.value.confirmPassword.$errors.length > 0)
+const confirmPasswordRequired = computed(() =>
+  $v.value.confirmPassword.$errors.find(v => v.$validator === 'required') !== undefined
+)
+
 watch(username, () => {
-  if ($v.value.username.$invalid) {
+  signupFailed.value = false
+  if (usernameInvalid.value) {
     $v.value.username.$reset()
   }
 })
 
 watch(userEmail, () => {
-  if ($v.value.userEmail.$invalid) {
+  signupFailed.value = false
+  if (userEmailInvalid.value) {
     $v.value.userEmail.$reset()
   }
 })
 
 watch(language, () => {
-  if ($v.value.language.$invalid) {
+  signupFailed.value = false
+  if (languageInvalid.value) {
     $v.value.language.$reset()
   }
 })
 
 watch(userPassword, () => {
-  if ($v.value.userPassword.$invalid) {
+  signupFailed.value = false
+  if (usernameInvalid.value) {
     $v.value.userPassword.$reset()
   }
-  if ($v.value.confirmPassword.$invalid) {
+  if (confirmPasswordInvalid.value) {
     $v.value.confirmPassword.$reset()
   }
 })
 
 watch(confirmedPassword, () => {
-  if ($v.value.confirmPassword.$invalid) {
+  signupFailed.value = false
+  if (confirmPasswordInvalid.value) {
     $v.value.confirmPassword.$reset()
   }
 })
 
 async function signup() {
+  signupFailed.value = false
   $v.value.$touch()
   if ($v.value.$invalid) {
     console.log('Invalid form')
     return
   }
 
-  try {
-    await authStore.signup(username.value, userEmail.value, userPassword.value, language.value?.id)
+  await sendSignupRequest(
+    username.value,
+    userEmail.value,
+    userPassword.value,
+    language.value?.id
+  ).then(async (response) => {
     console.log('Successfully signed up: ', authStore.user?.id)
+    authStore.setUser(response.data.user)
     await router.push({ name: routeNames.flashcards })
-  } catch (error) {
-    // todo show the error to the user
+  }).catch(error => {
+    signupFailed.value = true
+    // todo show a toast with the error
     console.error('Failed to sign up: ', error)
-  }
+  })
 }
 </script>
 

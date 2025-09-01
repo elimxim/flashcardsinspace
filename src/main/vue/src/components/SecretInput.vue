@@ -5,9 +5,11 @@
       :type="showPassword ? 'text' : 'password'"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       v-bind="$attrs"
+      :placeholder="placeholder"
     />
     <button
       type="button"
+      ref="showPasswordButton"
       @click="toggleShowPassword">
       <font-awesome-icon :icon="showPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"/>
     </button>
@@ -17,6 +19,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+defineOptions({
+  inheritAttrs: false
+})
+
 defineProps<{
   modelValue: string | undefined,
   placeholder: string,
@@ -25,9 +31,11 @@ defineProps<{
 defineEmits(['update:modelValue'])
 
 const showPassword = ref(false)
+const showPasswordButton = ref<HTMLButtonElement>()
 
 function toggleShowPassword() {
   showPassword.value = !showPassword.value
+  showPasswordButton.value?.blur()
 }
 </script>
 

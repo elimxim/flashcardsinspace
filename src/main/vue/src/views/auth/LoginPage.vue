@@ -9,17 +9,20 @@
       @mouseup="onMouseUp"
       @mouseleave="onMouseUp"
     />
-    <div class="auth-container">
+    <div
+      class="auth-container"
+      :class="{ 'auth-container--error': loginFailed }">
       <form @submit.prevent="login">
-        <input v-model="userEmail" placeholder="Email"/>
+        <input v-model="userEmail"
+               :class="{ 'input-error': userEmailInvalid }"
+               :placeholder="userEmailRequired ? 'Email is required' : 'Email'"/>
         <p class="error-message" v-for="error of $v.userEmail.$errors" :key="error.$uid">
-          <span v-if="error.$validator === 'required'">What's your call sign? We need an email to proceed</span>
-          <span v-else-if="error.$validator === 'email'">This email seems to be lost in a cosmic dust cloud. Please check the format</span>
+          <span v-if="error.$validator === 'email'">This email seems to be lost in a cosmic dust cloud. Please check the format</span>
         </p>
-        <SecretInput v-model="userPassword" placeholder="Password"/>
-        <p class="error-message" v-for="error of $v.userPassword.$errors" :key="error.$uid">
-          <span v-if="error.$validator === 'required'">A secret code is required for docking</span>
-        </p>
+        <SecretInput
+          v-model="userPassword"
+          :class="{ 'input-error': userPasswordInvalid }"
+          :placeholder="userPasswordRequired ? 'Password is required' : 'Password'"/>
         <button type="submit">Log In</button>
         <p class="auth-link">
           New to the galaxy?
@@ -31,10 +34,11 @@
 </template>
 
 <script setup lang="ts">
+import '@/assets/css/theme.css'
 import '@/assets/css/shared.css'
 import '@/assets/css/auth-container.css'
 import SecretInput from '@/components/SecretInput.vue'
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { required, email } from '@vuelidate/validators'
 import { useRouter } from 'vue-router'
@@ -48,9 +52,9 @@ import toyImg from '@/assets/rocket/toy.png'
 const router = useRouter()
 const authStore = useAuthStore()
 const isBouncing = ref(true)
-
 const userEmail = ref<string>()
 const userPassword = ref<string>()
+const loginFailed = ref(false)
 
 const $v = useVuelidate({
   userEmail: { required, email },
@@ -60,19 +64,31 @@ const $v = useVuelidate({
   userPassword: userPassword,
 })
 
+const userEmailInvalid = computed(() => $v.value.userEmail.$errors.length > 0)
+const userEmailRequired = computed(() =>
+  $v.value.userEmail.$errors.find(v => v.$validator === 'required') !== undefined
+)
+const userPasswordInvalid = computed(() => $v.value.userPassword.$errors.length > 0)
+const userPasswordRequired = computed(() =>
+  $v.value.userPassword.$errors.find(v => v.$validator === 'required') !== undefined
+)
+
 watch(userEmail, () => {
-  if ($v.value.userEmail.$invalid) {
+  loginFailed.value = false
+  if (userEmailInvalid.value) {
     $v.value.userEmail.$reset()
   }
 })
 
 watch(userPassword, () => {
-  if ($v.value.userPassword.$invalid) {
+  loginFailed.value = false
+  if (userPasswordInvalid.value) {
     $v.value.userPassword.$reset()
   }
 })
 
 async function login() {
+  loginFailed.value = false
   $v.value.$touch()
   if ($v.value.$invalid) {
     console.log('Invalid form')
