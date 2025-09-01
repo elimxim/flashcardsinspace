@@ -1,10 +1,10 @@
 <template>
   <div class="page-center-container">
     <img
+      alt="Lilrocket"
       ref="lilrocket"
       class="lilrocket non-selectable non-draggable"
       :class="{ 'initial-bounce': isBouncing }"
-      alt="Lilrocket"
       @mousedown="onMouseDown"
       @mouseup="onMouseUp"
       @mouseleave="onMouseUp"
