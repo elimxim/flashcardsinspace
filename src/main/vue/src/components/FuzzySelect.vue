@@ -39,7 +39,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 
 const props = defineProps<{
   options: T[]
-  modelValue: T | null
+  modelValue: T | undefined
   optionLabel: (option: T) => string
   optionPlaceholder?: string
   searchPlaceholder?: string

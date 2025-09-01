@@ -23,7 +23,7 @@ export const useAuthStore = defineStore('auth', {
     setUser(user: User | null) {
       this.user = user
     },
-    async signup(name: string, email: string, password: string, languageId: number) {
+    async signup(name: string, email: string, password: string, languageId: number | undefined) {
       const response = await authClient.post<UserGetResponse>('/signup', {
         email: email,
         secret: password,

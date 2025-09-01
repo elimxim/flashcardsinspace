@@ -18,8 +18,7 @@
         </p>
         <SecretInput v-model="userPassword" placeholder="Password"/>
         <p class="error-message" v-for="error of $v.userPassword.$errors" :key="error.$uid">
-          <span v-if="error.$validator === 'required'">You can't board the ship without the secret code</span>
-          <span v-else-if="error.$validator === 'minLength'">Your password must be stronger than a piece of space junk. Please use at least 6 characters to keep it safe</span>
+          <span v-if="error.$validator === 'required'">A secret code is required for docking</span>
         </p>
         <button type="submit">Log In</button>
         <p class="auth-link">
@@ -37,7 +36,7 @@ import '@/assets/css/auth-container.css'
 import SecretInput from '@/components/SecretInput.vue'
 import { nextTick, onMounted, ref, watch } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
-import { required, email, minLength } from '@vuelidate/validators'
+import { required, email } from '@vuelidate/validators'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"
 import { routeNames } from "@/router/index.js"
@@ -55,7 +54,7 @@ const userPassword = ref<string>()
 
 const $v = useVuelidate({
   userEmail: { required, email },
-  userPassword: { required, minLength: minLength(6) }
+  userPassword: { required }
 }, {
   userEmail: userEmail,
   userPassword: userPassword,
