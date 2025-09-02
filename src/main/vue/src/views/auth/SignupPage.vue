@@ -65,7 +65,7 @@ import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'
 import { useVuelidate } from '@vuelidate/core'
 import { required, email, minLength, helpers } from '@vuelidate/validators'
-import { sendSignupRequest } from '@/api/auth-client.ts';
+import { sendSignupRequest } from '@/api/auth-client.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()

@@ -7,19 +7,20 @@
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { routeNames } from '@/router/index.ts'
+import { sendLogoutRequest } from '@/api/auth-client.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-try {
-  authStore.logout()
+sendLogoutRequest().then(() => {
+  console.error('Successfully logged out')
+  authStore.setUser(null)
   router.push({ name: routeNames.login })
-} catch (error) {
+}).catch(error => {
   console.error('Failed to log out: ', error)
   router.push({ name: routeNames.login })
-}
+})
 
-// router.push({ name: routeNames.login })
 </script>
 
 <style scoped>

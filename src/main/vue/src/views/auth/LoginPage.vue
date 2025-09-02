@@ -48,12 +48,13 @@ import clayImg from '@/assets/rocket/clay.png'
 import crochetImg from '@/assets/rocket/crochet.png'
 import originalImg from '@/assets/rocket/original.png'
 import toyImg from '@/assets/rocket/toy.png'
+import { sendLoginRequest } from '@/api/auth-client.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const userEmail = ref('')
+const userPassword = ref('')
 const isBouncing = ref(true)
-const userEmail = ref<string>()
-const userPassword = ref<string>()
 const loginFailed = ref(false)
 
 const $v = useVuelidate({
@@ -95,14 +96,15 @@ async function login() {
     return
   }
 
-  try {
-    await authStore.login(userEmail.value!, userPassword.value!)
+  await sendLoginRequest(userEmail.value, userPassword.value).then(async (response) => {
     console.log('Successfully logged in: ', authStore.user?.id)
+    authStore.setUser(response.data.user)
     await router.push({ name: routeNames.flashcards })
-  } catch (error) {
-    // todo show the error to the user
-    console.log('Failed to log in: ', error)
-  }
+  }).catch(error => {
+    loginFailed.value = true
+    // todo show the error
+    console.error('Failed to log in: ', error)
+  })
 }
 
 // lilrocket>
@@ -138,9 +140,7 @@ function setNextLilrocket() {
 function onMouseDown() {
   pressTimer = window.setTimeout(() => {
     if (!lilrocket.value) return
-
     lilrocket.value.classList.add('fly-away')
-
     setTimeout(() => {
       if (lilrocket.value) {
         lilrocket.value.classList.remove('fly-away')

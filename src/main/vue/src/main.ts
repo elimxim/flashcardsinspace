@@ -22,6 +22,7 @@ import { faCircleUser } from '@fortawesome/free-solid-svg-icons'
 import { faEye } from '@fortawesome/free-solid-svg-icons'
 import { faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { useAuthStore } from '@/stores/auth-store.ts'
+import { sendWhoAmIRequest } from '@/api/auth-client.ts'
 
 library.add(faGear)
 library.add(faBox)
@@ -44,7 +45,15 @@ app.use(createPinia())
 
 const authStore = useAuthStore()
 
-authStore.updateJwt().then(() => {
+sendWhoAmIRequest().then(response => {
+  if (response.status === 200) {
+    console.log('Who Am I: ', response.data.user)
+    authStore.setUser(response.data.user)
+  } else {
+    console.log('Who Am I: ', response.status)
+    authStore.setUser(null)
+  }
+}).then(() => {
   app.use(router)
   app.mount('#app')
 })
