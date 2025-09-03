@@ -30,7 +30,7 @@
 
   /* text */
   --link--color: #474757;
-  --error--color: #a12632;
+  --error--color: #c80f0f;
 
   /* hyper-links */
   --a--color: #007bff;
@@ -40,6 +40,8 @@
   --auth-form--box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   --secret-toggler--color: var(--input--placeholder-color);
   --secret-toggler_hover--color: var(--input_focus--border-color);
+  --toast--background-color: #c80f0f;
+  --toast--color: white;
 }
 
 input {

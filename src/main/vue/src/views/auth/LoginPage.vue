@@ -31,6 +31,8 @@
       </form>
     </div>
   </div>
+
+  <Toast/>
 </template>
 
 <script setup lang="ts">
@@ -38,6 +40,7 @@ import '@/assets/css/theme.css'
 import '@/assets/css/shared.css'
 import '@/assets/css/auth-container.css'
 import SecretInput from '@/components/SecretInput.vue'
+import Toast from '@/components/Toast.vue'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { required, email } from '@vuelidate/validators'
@@ -49,9 +52,12 @@ import crochetImg from '@/assets/rocket/crochet.png'
 import originalImg from '@/assets/rocket/original.png'
 import toyImg from '@/assets/rocket/toy.png'
 import { sendLoginRequest } from '@/api/auth-client.ts'
+import { useToastStore } from '@/stores/toast-store.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const toastStore = useToastStore()
+
 const userEmail = ref('')
 const userPassword = ref('')
 const isBouncing = ref(true)
@@ -89,6 +95,7 @@ watch(userPassword, () => {
 })
 
 async function login() {
+  toastStore.hideToast()
   loginFailed.value = false
   $v.value.$touch()
   if ($v.value.$invalid) {
@@ -102,7 +109,15 @@ async function login() {
     await router.push({ name: routeNames.flashcards })
   }).catch(error => {
     loginFailed.value = true
-    // todo show the error
+
+    if (error.response?.status === 500) {
+      toastStore.showToast('Something went wrong. Please try again. Something went wrong. Please try again. Something went wrong. Please try again.')
+    } else if (error.response?.status === 400) {
+      toastStore.showToast(error.response?.data?.message || 'Invalid credentials')
+    } else {
+      toastStore.showToast('Failed to log in.')
+    }
+
     console.error('Failed to log in: ', error)
   })
 }
