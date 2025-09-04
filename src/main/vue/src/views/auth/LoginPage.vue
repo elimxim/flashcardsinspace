@@ -18,7 +18,7 @@
           :class="{ 'input-error': userEmailInvalid }"
           v-model="userEmail"
           :placeholder="userEmailRequired ? 'Email is required' : 'Email'"/>
-        <p class="error-message" v-for="error of $v.userEmail.$errors" :key="error.$uid">
+        <p class="auth-container__p--error" v-for="error of $v.userEmail.$errors" :key="error.$uid">
           <span v-if="error.$validator === 'email'">This email seems to be lost in a cosmic dust cloud. Please check the format</span>
         </p>
         <SecretInput
@@ -30,7 +30,7 @@
           class="button button--login transition--bg-color">
           Log In
         </button>
-        <p class="auth-link">
+        <p class="auth-container__p--link">
           New to the galaxy?
           <router-link to="/signup">Signup</router-link>
         </p>

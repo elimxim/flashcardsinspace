@@ -1,0 +1,55 @@
+@import "@/assets/css/base/themes.css";
+
+.auth-container {
+  width: clamp(20rem, 20vw, 40rem);
+  padding: clamp(1rem, 4vh, 2rem) clamp(1rem, 2vw, 2rem);
+  background-color: var(--auth-form--background-color);
+  border-radius: 8px;
+  box-shadow: var(--auth-form--box-shadow);
+  text-align: center;
+}
+
+.auth-container--error {
+  border-top: 0.5rem solid var(--input--border-color--error);
+}
+
+.auth-container form {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1vh, 1.5vh, 2vh);
+}
+
+.auth-container input,
+.auth-container button {
+  padding: clamp(0.75rem, 1.5vh, 1.25rem) clamp(0.75rem, 1vw, 1.25rem);
+  font-size: clamp(0.9rem, 2vh, 1rem);
+  margin: 0;
+}
+
+.auth-container__p--error {
+  font-family: var(--error-font-family);
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  color: var(--text--error--color);
+  margin: 0;
+  padding: 0;
+}
+
+.auth-container__p--link {
+  font-family: var(--main-font-family);
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  color: var(--link--color);
+  margin: 0;
+  padding: 0;
+}
+
+.auth-container__p--link a {
+  font-family: var(--main-font-family);
+  color: var(--a--color);
+  text-decoration: none;
+}
+
+.auth-container__p--link a:hover,
+.auth-container__p--link a:focus {
+  outline: none;
+  text-decoration: underline;
+}

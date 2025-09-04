@@ -14,7 +14,7 @@
           v-model="userEmail"
           :class="{ 'input-error': userEmailInvalid }"
           :placeholder="userEmailRequired ? 'Email is required' : 'Email'"/>
-        <p class="error-message" v-for="error of $v.userEmail.$errors" :key="error.$uid">
+        <p class="auth-container__p--error" v-for="error of $v.userEmail.$errors" :key="error.$uid">
           <span v-if="error.$validator === 'email'">This email seems to be lost in a cosmic dust cloud. Please check the format</span>
         </p>
         <AwesomeContainer icon="fa-solid fa-globe" class="awesome-container">
@@ -32,18 +32,18 @@
           v-model="userPassword"
           :class="{ 'input-error': userPasswordInvalid }"
           :placeholder="userPasswordRequired ? 'Password is required' : 'Password'"/>
-        <p class="error-message" v-for="error of $v.userPassword.$errors" :key="error.$uid">
+        <p class="auth-container__p--error" v-for="error of $v.userPassword.$errors" :key="error.$uid">
           <span v-if="error.$validator === 'minLength'">Your password must be stronger than a piece of space junk. Please use 6 or more characters</span>
         </p>
         <SecretInput
           v-model="confirmedPassword"
           :class="{ 'input-error': confirmPasswordInvalid }"
           :placeholder="confirmPasswordRequired ? 'Password confirmation is required' : 'Confirm Password'"/>
-        <p class="error-message" v-for="error of $v.confirmPassword.$errors" :key="error.$uid">
+        <p class="auth-container__p--error" v-for="error of $v.confirmPassword.$errors" :key="error.$uid">
           <span v-if="error.$validator === 'passwordConfirmed'">The passwords do not align. Please try again</span>
         </p>
         <button type="submit" class="button button--sign-up">Sign Up</button>
-        <p class="auth-link">
+        <p class="auth-container__p--link">
           Been abducted by us before?
           <router-link to="/login">Login</router-link>
         </p>
