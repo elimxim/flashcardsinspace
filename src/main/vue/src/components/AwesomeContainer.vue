@@ -1,6 +1,6 @@
 <template>
   <div class="awesome-container">
-    <font-awesome-icon :icon="icon" class="awesome-icon"/>
+    <font-awesome-icon :icon="icon" class="awesome-container__icon"/>
     <slot></slot>
   </div>
 </template>
@@ -20,8 +20,8 @@ defineProps<{
   gap: 1rem;
 }
 
-.awesome-icon {
-  font-size: var(--icon-size, 12cqi);
-  color: var(--icon-color, #c3c3c3);
+.awesome-container__icon {
+  font-size: var(--awesome-container__icon--font-size, 12cqi);
+  color: var(--awesome-container__icon--color, #c3c3c3);
 }
 </style>

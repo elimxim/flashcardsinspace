@@ -51,7 +51,6 @@
 </template>
 
 <script setup lang="ts">
-import '@/assets/modal.css'
 import ModalForm from '@/components/modal/ModalForm.vue'
 import { defineEmits, defineProps, onMounted, onUnmounted, type Ref, ref } from 'vue'
 import { useFlashcardDataStore } from '@/stores/flashcard-data-store.ts'

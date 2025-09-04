@@ -1,0 +1,36 @@
+.input {
+  font-family: var(--main-font-family);
+  color: var(--input--color);
+  background-color: var(--input--bg-color);
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--input--border-color);
+  border-radius: var(--border-radius);
+}
+
+.input::placeholder {
+  font-family: var(--main-font-family);
+  color: var(--input__placeholder-color);
+}
+
+/* Hide the default password reveal eye icon in Microsoft Edge */
+input[type="password"]::-ms-reveal {
+  display: none;
+}
+
+.input:hover,
+.input:focus,
+.secret-input:hover input,
+.secret-input:focus-within input {
+  outline: none;
+  border-color: var(--input--border-color--focus);
+}
+
+.input-error {
+  border-color: var(--input--border-color--error);
+}
+
+.input-error::placeholder,
+.input-error input::placeholder {
+  color: var(--text--error--color);
+}

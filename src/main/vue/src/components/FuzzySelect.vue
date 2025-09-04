@@ -1,40 +1,44 @@
 <template>
   <div
-    class="fuzzy-select non-selectable"
+    class="fuzzy-select non-selectable transition--border-color"
     ref="selectContainer"
+    @blur="handleBlur"
     @click="toggleDropdown">
     <input
       type="text"
+      class="input fuzzy-select__input"
+      style="pointer-events: none;"
       v-if="!isOpen"
       :value="selectedOptionLabel"
       :placeholder="optionPlaceholder"
-      style="pointer-events: none;"
-      disabled
-    />
+      @focus="toggleDropdown"
+      />
     <input
       type="text"
+      class="input fuzzy-select__input"
       ref="searchInput"
       v-if="isOpen"
       v-model="searchQuery"
       :placeholder="searchPlaceholder"
-      @keydown="handleKeydown"
-    />
-    <ul v-if="isOpen" class="options-list" ref="optionsList">
+      @keydown="handleKeydown"/>
+    <ul v-if="isOpen" class="fuzzy-select__drop-down" ref="dropDownList">
       <li
+        v-if="filteredOptions.length > 0"
         v-for="(option, index) in filteredOptions"
         :key="index"
         :class="{ 'highlighted': index === highlightedIndex }"
         @click.stop="selectOption(option)"
-        @mouseover="highlightedIndex = index"
-      >
+        @mouseover="highlightedIndex = index">
         {{ optionLabel(option) }}
+      </li>
+      <li v-if="filteredOptions.length === 0">
+        No signal from this language
       </li>
     </ul>
   </div>
 </template>
 
 <script setup lang="ts" generic="T extends object">
-import '@/assets/css/shared.css'
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 
 const props = defineProps<{
@@ -49,7 +53,7 @@ const emit = defineEmits(['update:modelValue'])
 
 const selectContainer = ref<HTMLElement>()
 const searchInput = ref<HTMLInputElement>()
-const optionsList = ref<HTMLUListElement>()
+const dropDownList = ref<HTMLUListElement>()
 
 const isOpen = ref(false)
 const searchQuery = ref('')
@@ -94,8 +98,10 @@ async function toggleDropdown() {
 function adjustDropDownStyles() {
   if (selectContainer.value) {
     const computedStyles = getComputedStyle(selectContainer.value)
-    const topValue = computedStyles.getPropertyValue('--drop-down--right').trim()
-    const radiusValue = computedStyles.getPropertyValue('--drop-down--border-radius').trim()
+    const topValue = computedStyles
+      .getPropertyValue('--fuzzy-select__drop-down--right').trim()
+    const radiusValue = computedStyles
+      .getPropertyValue('--fuzzy-select__drop-down--border-radius').trim()
     if (topValue && radiusValue) {
       if (parseInt(topValue) === 0) {
         borderRadius.value = `0 0 ${radiusValue} ${radiusValue}`
@@ -150,10 +156,16 @@ function handleKeydown(event: KeyboardEvent) {
   }
 }
 
+function handleBlur(event: FocusEvent) {
+  if (selectContainer.value && !selectContainer.value.contains(event.relatedTarget as Node)) {
+    closeDropdown()
+  }
+}
+
 function scrollHighlightedOptionIntoView() {
   if (highlightedIndex.value === -1) return
   nextTick(() => {
-    const highlightedElement = optionsList.value?.children[highlightedIndex.value]
+    const highlightedElement = dropDownList.value?.children[highlightedIndex.value]
     highlightedElement?.scrollIntoView({ block: 'nearest' })
   })
 }
@@ -179,22 +191,21 @@ function handleClickOutside(event: MouseEvent) {
   width: 100%;
   cursor: pointer;
   outline: none;
-  box-sizing: border-box;
 }
 
-.fuzzy-select input {
+.fuzzy-select__input {
   border: none;
   outline: none;
   width: 100%;
   padding: 0;
 }
 
-.fuzzy-select ul {
+.fuzzy-select__drop-down {
   position: absolute;
   top: 102%;
   left: 0;
-  right: var(--drop-down--right, -1rem);
-  border: 1px solid var(--drop-down--border-color, rgba(205, 205, 205, 0.8));
+  right: var(--fuzzy-select__drop-down--right, -1rem);
+  border: 1px solid var(--fuzzy-select__drop-down--border-color, rgba(205, 205, 205, 0.8));
   border-radius: v-bind(borderRadius);
   list-style: none;
   padding: 0;
@@ -206,37 +217,37 @@ function handleClickOutside(event: MouseEvent) {
   z-index: 1000;
 }
 
-.fuzzy-select ul:focus{
+.fuzzy-select__drop-down:focus{
   outline: none;
   border-width: 2px;
 }
 
-.fuzzy-select ul li {
+.fuzzy-select__drop-down li {
   padding: 10px;
   cursor: pointer;
-  color: var(--drop-down--color, rgba(0, 0, 0, 0.8));
+  color: var(--fuzzy-select__drop-down--color, rgba(0, 0, 0, 0.8));
   transition: background-color 0.1s ease-in-out;
 }
 
-.fuzzy-select ul li:hover,
-.fuzzy-select ul li.highlighted {
-  background-color: var(--drop-down--hover--background-color, rgba(213, 213, 213, 0.5));
+.fuzzy-select__drop-down li:hover,
+.fuzzy-select__drop-down li.highlighted {
+  background-color: var(--fuzzy-select__drop-down--hover--bg-color, rgba(213, 213, 213, 0.5));
 }
 
-.fuzzy-select ul::-webkit-scrollbar {
+.fuzzy-select__drop-down::-webkit-scrollbar {
   width: 8px;
 }
 
-.fuzzy-select ul::-webkit-scrollbar-track {
+.fuzzy-select__drop-down::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.fuzzy-select ul::-webkit-scrollbar-thumb {
-  background-color: var(--drop-down_scrollbar--color, rgba(170, 170, 170, 0.6));
+.fuzzy-select__drop-down::-webkit-scrollbar-thumb {
+  background-color: var(--fuzzy-select__drop-down__scrollbar--color, rgba(170, 170, 170, 0.6));
   border-radius: 4px;
 }
 
-.fuzzy-select ul::-webkit-scrollbar-thumb:hover {
-  background-color: var(--drop-down_scrollbar_hover-collor, rgba(170, 170, 170, 0.8));
+.fuzzy-select__drop-down::-webkit-scrollbar-thumb:hover {
+  background-color: var(--fuzzy-select__drop-down__scrollbar--hover--color, rgba(170, 170, 170, 0.8));
 }
 </style>

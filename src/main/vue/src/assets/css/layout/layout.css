@@ -6,6 +6,5 @@
   min-height: calc(100vh - var(--navbar-height));
   max-height: calc(100vh - var(--navbar-height));
   padding: 1rem;
-  box-sizing: border-box;
   overflow: hidden;
 }

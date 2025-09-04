@@ -1,4 +1,4 @@
-import './assets/modal.css'
+import '@/assets/css/index.css'
 
 // @ts-ignore
 import App from '@/App.vue'

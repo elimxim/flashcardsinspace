@@ -5,10 +5,12 @@
       :class="{ 'auth-container--error': signupFailed }">
       <form @submit.prevent="signup">
         <input
+          class="input transition--border-color"
           v-model="username"
           :class="{ 'input-error': usernameRequired }"
           :placeholder="usernameRequired ? 'Name is required' : 'Name'"/>
         <input
+          class="input transition--border-color"
           v-model="userEmail"
           :class="{ 'input-error': userEmailInvalid }"
           :placeholder="userEmailRequired ? 'Email is required' : 'Email'"/>
@@ -40,7 +42,7 @@
         <p class="error-message" v-for="error of $v.confirmPassword.$errors" :key="error.$uid">
           <span v-if="error.$validator === 'passwordConfirmed'">The passwords do not align. Please try again</span>
         </p>
-        <button type="submit">Sign Up</button>
+        <button type="submit" class="button button--sign-up">Sign Up</button>
         <p class="auth-link">
           Been abducted by us before?
           <router-link to="/login">Login</router-link>
@@ -51,8 +53,6 @@
 </template>
 
 <script setup lang="ts">
-import '@/assets/css/container.css'
-import '@/assets/css/auth-container.css'
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import SecretInput from '@/components/SecretInput.vue'
@@ -188,24 +188,22 @@ async function signup() {
 
 <style scoped>
 .awesome-container {
-  --icon-color: var(--icon--fa-globe--color);
+  --awesome-container__icon--color: var(--fa-icon--color--globe);
 }
 
 .awesome-fuzzy-select {
-  border: var(--input--border);
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--input--border-color);
   border-radius: var(--border-radius);
-  background-color: var(--input-background-color);
+  background-color: var(--input--bg-color);
   padding: clamp(0.5rem, 0.75rem, 1.25rem);
   font-size: clamp(1rem, 1vw, 1.1rem);
-  --drop-down--border-color: var(--input_focus--border-color);
-  --drop-down--hover--background-color: rgb(from var(--input_focus--border-color) r g b / 0.1);
-  --drop-down_scrollbar--color: rgb(from var(--input_focus--border-color) r g b / 0.6);
-  --drop-down_scrollbar_hover-collor: rgb(from var(--input_focus--border-color) r g b / 0.8);
-  --drop-down--color: var(--input--color);
 }
 
+.awesome-fuzzy-select:hover,
 .awesome-fuzzy-select:focus-within {
-  border: var(--input_focus--border);
+  border-color: var(--input--border-color--focus);
   outline: none;
 }
 </style>

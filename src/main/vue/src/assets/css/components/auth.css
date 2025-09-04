@@ -1,4 +1,4 @@
-@import "@/assets/css/theme.css";
+@import "@/assets/css/base/themes.css";
 
 .auth-container {
   width: clamp(20rem, 20vw, 40rem);
@@ -16,7 +16,7 @@
 }
 
 .auth-container--error {
-  border-top: 0.5rem solid var(--input-error--border-color);
+  border-top: 0.5rem solid var(--input--border-color--error);
 }
 
 .auth-container input,
@@ -37,7 +37,7 @@
 .error-message {
   font-family: var(--error-font-family);
   font-size: clamp(0.75rem, 1vw, 0.9rem);
-  color: var(--error--color);
+  color: var(--text--error--color);
   margin: 0;
   padding: 0;
 }

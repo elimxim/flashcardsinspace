@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
+
+:root {
+  /* global */
+  --navbar-height: 8vh;
+  --border-radius: 4px;
+
+  /* fonts */
+  --main-font-family: 'Inter', sans-serif;
+  --error-font-family: 'Montserrat', sans-serif;
+
+  /* inputs */
+  --input--color: #45454a;
+  --input--bg-color: #f9f9f9;
+  --input__placeholder-color: #b8c4d6;
+  --input--border-color: #b8c4d6;
+  --input--border-color--focus: #007bff;
+  --input--border-color--error: #c80f0f;
+
+  /* buttons */
+  --button--color: white;
+  --button--bg-color--action: #007bff;
+  --button--bg-color--action--focus: #0056b3;
+
+  /* icons */
+  --fa-icon--color--globe: #007bff;
+
+  /* text */
+  --text--error--color: #c80f0f;
+
+  /* hyper-links */
+  --link--color: #474757;
+  --a--color: #007bff;
+
+  /* components */
+  --auth-form--background-color: #f9f9f9;
+  --auth-form--box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+  /* toast */
+  --toast--color: white;
+  --toast--bg-color: #c80f0f;
+
+  /* secret-input */
+  --secret-input__button--color: #b8c4d6;
+  --secret-input__button--hover--color: #007bff;
+
+  /* fuzzy-select */
+  --fuzzy-select__input--color: #45454a;
+  --fuzzy-select__drop-down--border-color: #007bff;
+  --fuzzy-select__drop-down--color: var(--fuzzy-select__input--color);
+  --fuzzy-select__drop-down--hover--bg-color: rgb(from var(--fuzzy-select__drop-down--border-color) r g b / 0.1);
+  --fuzzy-select__drop-down__scrollbar--color: rgb(from var(--fuzzy-select__drop-down--border-color) r g b / 0.6);
+  --fuzzy-select__drop-down__scrollbar--hover--color: rgb(from var(--fuzzy-select__drop-down--border-color) r g b / 0.8);
+}

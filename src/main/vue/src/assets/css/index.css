@@ -1,0 +1,12 @@
+@layer base, layout, components, utilities
+
+@import '@/assets/css/base/main.css' layer(base);
+@import '@/assets/css/base/themes.css' layer(base);
+@import '@/assets/css/layout/layout.css' layer(layout);
+@import '@/assets/css/components/modal.css' layer(components);
+@import '@/assets/css/components/buttons.css' layer(components);
+@import '@/assets/css/components/inputs.css' layer(components);
+@import '@/assets/css/components/auth.css' layer(components);
+@import '@/assets/css/components/links.css' layer(components);
+@import '@/assets/css/utilities/abilities.css' layer(utilities);
+@import '@/assets/css/utilities/transitions.css' layer(utilities);

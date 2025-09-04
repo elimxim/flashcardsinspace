@@ -37,7 +37,6 @@ class AuthController(
         @Valid @RequestBody request: LoginRequest,
         response: HttpServletResponse,
     ): ResponseEntity<UserResponse> {
-        throw IllegalArgumentException("test exception")
         val user = authService.login(request)
         jwtService.setCookies(user, response)
         return ResponseEntity.ok(UserResponse(user.toDto()))

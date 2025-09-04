@@ -1,0 +1,11 @@
+a {
+  font-family: var(--main-font-family);
+  color: var(--a--color);
+  text-decoration: none;
+}
+
+a:hover,
+a:focus {
+  outline: none;
+  text-decoration: underline;
+}

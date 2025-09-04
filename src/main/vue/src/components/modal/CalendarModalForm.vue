@@ -55,7 +55,6 @@
 </template>
 
 <script setup lang="ts">
-import '@/assets/modal.css'
 import ModalForm from '@/components/modal/ModalForm.vue'
 import { computed, defineEmits, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useChronoStore } from '@/stores/chrono-store.ts'
@@ -255,7 +254,6 @@ function handleKeydown(event: KeyboardEvent) {
   border-color: #884393;
   border-style: solid;
   border-width: 1px;
-  box-sizing: border-box;
 }
 
 .calendar-off-day {

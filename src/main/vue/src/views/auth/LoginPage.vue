@@ -13,9 +13,11 @@
       class="auth-container"
       :class="{ 'auth-container--error': loginFailed }">
       <form @submit.prevent="login">
-        <input v-model="userEmail"
-               :class="{ 'input-error': userEmailInvalid }"
-               :placeholder="userEmailRequired ? 'Email is required' : 'Email'"/>
+        <input
+          class="input transition--border-color"
+          :class="{ 'input-error': userEmailInvalid }"
+          v-model="userEmail"
+          :placeholder="userEmailRequired ? 'Email is required' : 'Email'"/>
         <p class="error-message" v-for="error of $v.userEmail.$errors" :key="error.$uid">
           <span v-if="error.$validator === 'email'">This email seems to be lost in a cosmic dust cloud. Please check the format</span>
         </p>
@@ -23,7 +25,11 @@
           v-model="userPassword"
           :class="{ 'input-error': userPasswordInvalid }"
           :placeholder="userPasswordRequired ? 'Password is required' : 'Password'"/>
-        <button type="submit">Log In</button>
+        <button
+          type="submit"
+          class="button button--login transition--bg-color">
+          Log In
+        </button>
         <p class="auth-link">
           New to the galaxy?
           <router-link to="/signup">Signup</router-link>
@@ -36,9 +42,6 @@
 </template>
 
 <script setup lang="ts">
-import '@/assets/css/theme.css'
-import '@/assets/css/shared.css'
-import '@/assets/css/auth-container.css'
 import SecretInput from '@/components/SecretInput.vue'
 import Toast from '@/components/Toast.vue'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
@@ -192,7 +195,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Base class has only the continuous shake animation */
 .lilrocket {
   height: 8em;
   animation: shake 4s infinite ease-in-out;

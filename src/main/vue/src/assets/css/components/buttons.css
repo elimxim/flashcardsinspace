@@ -1,0 +1,46 @@
+.button {
+  font-family: var(--main-font-family);
+  color: var(--button--color);
+  border-radius: var(--border-radius);
+  border: none;
+  cursor: pointer;
+}
+
+.button:hover,
+.button:focus {
+  outline: none;
+}
+
+.button--update,
+.button--sign-up,
+.button--login {
+  background-color: var(--button--bg-color--action);
+}
+
+.button--update:hover,
+.button--sign-up:hover,
+.button--login:hover,
+.button--update:focus-within,
+.button--sign-up:focus-within,
+.button--login:focus-within {
+  background-color: var(--button--bg-color--action--focus);
+}
+
+.button--delete,
+.button--no {
+
+}
+
+.button--create,
+.button--start,
+.button--yes {
+
+}
+
+.button--cancel {
+
+}
+
+.button--reset {
+
+}

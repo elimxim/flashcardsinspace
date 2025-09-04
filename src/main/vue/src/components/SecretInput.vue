@@ -1,6 +1,7 @@
 <template>
   <div class="secret-input">
     <input
+      class="input secret-input__input transition--border-color"
       :value="modelValue"
       :type="showPassword ? 'text' : 'password'"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
@@ -9,7 +10,9 @@
     />
     <button
       type="button"
+      class="button secret-input__button transition--color"
       ref="showPasswordButton"
+      tabindex="-1"
       @click="toggleShowPassword">
       <font-awesome-icon :icon="showPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"/>
     </button>
@@ -45,12 +48,11 @@ function toggleShowPassword() {
   width: 100%;
 }
 
-.secret-input input {
+.secret-input__input {
   width: 100%;
-  box-sizing: border-box;
 }
 
-.secret-input button {
+.secret-input__button {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -60,17 +62,11 @@ function toggleShowPassword() {
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--secret-toggler--color, rgba(140, 140, 140, 0.5));
+  color: var(--secret-input__button--color, rgba(140, 140, 140, 0.5));
 }
 
-.secret-input button:hover {
-  color: var(--secret-toggler_hover--color, rgba(140, 140, 140, 0.8));
+.secret-input__button:hover {
+  color: var(--secret-input__button--hover--color, rgba(140, 140, 140, 0.8));
 }
 
-/* Hide the default password reveal eye icon in Microsoft Edge */
-input[type="password"]::-ms-reveal {
-  display: none;
-}
 </style>

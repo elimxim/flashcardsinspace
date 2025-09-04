@@ -62,7 +62,6 @@
 </template>
 
 <script setup lang="ts">
-import '@/assets/modal.css'
 import ModalForm from '@/components/modal/ModalForm.vue'
 import {
   computed,
