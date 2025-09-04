@@ -1,45 +1,41 @@
 <template>
   <div
-    class="fuzzy-select non-selectable transition--border-color"
+    class="fuzzy-select non-selectable"
     ref="selectContainer"
-    @blur="handleBlur"
-    @click="toggleDropdown">
+    tabindex="0"
+    @focus="openDropdown"
+    @focusout="handleFocusOut">
     <input
-      type="text"
-      class="input fuzzy-select__input"
-      style="pointer-events: none;"
       v-if="!isOpen"
+      type="text"
+      class="input fuzzy-select__input transition--border-color"
       :value="selectedOptionLabel"
       :placeholder="optionPlaceholder"
-      @focus="toggleDropdown"
-      />
+      style="pointer-events: none;"/>
     <input
-      type="text"
-      class="input fuzzy-select__input"
-      ref="searchInput"
       v-if="isOpen"
+      type="text"
+      class="input fuzzy-select__input transition--border-color"
+      ref="searchInput"
       v-model="searchQuery"
       :placeholder="searchPlaceholder"
       @keydown="handleKeydown"/>
     <ul v-if="isOpen" class="fuzzy-select__drop-down" ref="dropDownList">
       <li
-        v-if="filteredOptions.length > 0"
         v-for="(option, index) in filteredOptions"
         :key="index"
         :class="{ 'highlighted': index === highlightedIndex }"
         @click.stop="selectOption(option)"
-        @mouseover="highlightedIndex = index">
+        @mouseover="highlightedIndex = index"
+      >
         {{ optionLabel(option) }}
-      </li>
-      <li v-if="filteredOptions.length === 0">
-        No signal from this language
       </li>
     </ul>
   </div>
 </template>
 
 <script setup lang="ts" generic="T extends object">
-import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import { ref, computed, nextTick, watch } from 'vue'
 
 const props = defineProps<{
   options: T[]
@@ -84,15 +80,12 @@ const selectedOptionLabel = computed(() => {
   return optionLabel(props.modelValue)
 })
 
-async function toggleDropdown() {
-  isOpen.value = !isOpen.value
-  if (isOpen.value) {
-    await nextTick()
-    adjustDropDownStyles()
-    searchInput.value?.focus()
-  } else {
-    closeDropdown()
-  }
+async function openDropdown() {
+  if (isOpen.value) return
+  isOpen.value = true
+  await nextTick()
+  adjustDropDownStyles()
+  searchInput.value?.focus()
 }
 
 function adjustDropDownStyles() {
@@ -156,7 +149,7 @@ function handleKeydown(event: KeyboardEvent) {
   }
 }
 
-function handleBlur(event: FocusEvent) {
+function handleFocusOut(event: FocusEvent) {
   if (selectContainer.value && !selectContainer.value.contains(event.relatedTarget as Node)) {
     closeDropdown()
   }
@@ -168,20 +161,6 @@ function scrollHighlightedOptionIntoView() {
     const highlightedElement = dropDownList.value?.children[highlightedIndex.value]
     highlightedElement?.scrollIntoView({ block: 'nearest' })
   })
-}
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
-
-function handleClickOutside(event: MouseEvent) {
-  if (selectContainer.value && !selectContainer.value.contains(event.target as Node)) {
-    closeDropdown()
-  }
 }
 </script>
 
