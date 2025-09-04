@@ -36,9 +36,9 @@
   --link--color: #474757;
   --a--color: #007bff;
 
-  /* components */
-  --auth-form--background-color: #f9f9f9;
-  --auth-form--box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  /* auth */
+  --auth-container--bg-color: #f9f9f9;
+  --auth-container--box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 
   /* toast */
   --toast--color: white;

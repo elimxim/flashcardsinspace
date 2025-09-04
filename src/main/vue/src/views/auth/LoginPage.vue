@@ -10,7 +10,7 @@
       @mouseleave="onMouseUp"
     />
     <div
-      class="auth-container"
+      class="auth-container transition--border-color"
       :class="{ 'auth-container--error': loginFailed }">
       <form @submit.prevent="login">
         <input

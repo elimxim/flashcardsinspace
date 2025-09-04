@@ -3,14 +3,22 @@
 .auth-container {
   width: clamp(20rem, 20vw, 40rem);
   padding: clamp(1rem, 4vh, 2rem) clamp(1rem, 2vw, 2rem);
-  background-color: var(--auth-form--background-color);
+  background-color: var(--auth-container--bg-color);
   border-radius: 8px;
-  box-shadow: var(--auth-form--box-shadow);
+  border-top: 0.5rem solid transparent;
+  box-shadow: var(--auth-container--box-shadow);
   text-align: center;
 }
 
 .auth-container--error {
-  border-top: 0.5rem solid var(--input--border-color--error);
+  border-top-color: var(--input--border-color--error);
+  animation: pop-error 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pop-error {
+  50% {
+    transform: scale(1.03);
+  }
 }
 
 .auth-container form {

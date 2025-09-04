@@ -1,7 +1,7 @@
 <template>
   <div class="page-center-container">
     <div
-      class="auth-container"
+      class="auth-container transition--border-color"
       :class="{ 'auth-container--error': signupFailed }">
       <form @submit.prevent="signup">
         <input
