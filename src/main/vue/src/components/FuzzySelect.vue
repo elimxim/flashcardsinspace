@@ -22,13 +22,16 @@
       @keydown="handleKeydown"/>
     <ul v-if="isOpen" class="fuzzy-select__drop-down" ref="dropDownList">
       <li
+        v-if="filteredOptions.length > 0"
         v-for="(option, index) in filteredOptions"
         :key="index"
         :class="{ 'highlighted': index === highlightedIndex }"
         @click.stop="selectOption(option)"
-        @mouseover="highlightedIndex = index"
-      >
+        @mouseover="highlightedIndex = index">
         {{ optionLabel(option) }}
+      </li>
+      <li v-if="filteredOptions.length === 0">
+        No signal from this language
       </li>
     </ul>
   </div>
