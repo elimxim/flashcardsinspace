@@ -1,12 +1,10 @@
 <template>
-  <div class="space-container space-toast-theme"
-       :toast-type="toast?.type">
+  <div class="space-container">
     <transition name="toast-transition">
-
-
     <div
       v-if="show"
-      class="space-toast"
+      class="space-toast space-toast-theme"
+      :toast-type="toast?.type"
       @mouseenter="toaster.pause()"
       @mouseleave="toaster.resume()"
     >
@@ -14,7 +12,11 @@
       <div class="space-toast__mixin"/>
       <div class="space-toast__content">
         <div class="space-toast__content__icon-box">
-          <font-awesome-icon icon="fa-solid fa-box"/>
+          <font-awesome-icon v-if="toast?.type === ToastType.SUCCESS" icon="fa-solid fa-circle-check"/>
+          <font-awesome-icon v-else-if="toast?.type === ToastType.ERROR" icon="fa-solid fa-circle-exclamation"/>
+          <font-awesome-icon v-else-if="toast?.type === ToastType.INFO" icon="fa-solid fa-info-circle"/>
+          <font-awesome-icon v-else-if="toast?.type === ToastType.WARNING" icon="fa-solid fa-triangle-exclamation"/>
+          <font-awesome-icon v-else icon="fa-solid fa-circle-question"/>
         </div>
         <div class="tb-body">
           <div class="space-toast__content__title">
@@ -45,7 +47,7 @@ import Starfield from './Starfield.vue'
 import Progressbar from '@/components/Progressbar.vue'
 import { onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useSpaceToaster } from '@/stores/toast-store.ts'
+import { ToastType, useSpaceToaster } from '@/stores/toast-store.ts'
 
 const toaster = useSpaceToaster()
 const { toast, show, paused } = storeToRefs(toaster)
@@ -54,6 +56,22 @@ onUnmounted(() => toaster.reset())
 </script>
 
 <style scoped>
+.space-container {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(100vh - var(--navbar-height));
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 1rem;
+  z-index: 1000;
+  pointer-events: none;
+}
+
 .space-toast-theme {
   --default-color-from: #000000;
   --default-color-via: #000000;
@@ -142,22 +160,6 @@ onUnmounted(() => toaster.reset())
   --button--hover--bg: var(--space-toast--button--hover--bg, var(--default-button--hover--bg));
   --progressbar--bg-color: var(--space-toast--progressbar--bg-color, var(--default-progressbar--bg-color));
   --starfield__star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
-}
-
-.space-container {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: calc(100vh - var(--navbar-height));
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1rem;
-  padding: 1rem;
-  z-index: 1000;
-  pointer-events: none;
 }
 
 .space-toast {
