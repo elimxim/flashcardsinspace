@@ -16,7 +16,7 @@
     - changing password, email, username
     - showing username, email, registration date
   - Sending emails with a confirmation link
-  - Icons for Apple and Android
+  - Mobile friendly
 - Tech debt:
   - Requests validation on the backend
   - Errors handling (frontend & backend)

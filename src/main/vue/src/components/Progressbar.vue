@@ -21,8 +21,10 @@ const props = withDefaults(defineProps<{
   paused?: boolean
   /** Height */
   height?: string
-  /** Round the ends */
-  rounded?: boolean
+  /** Rounds the ends of the track */
+  trackRounded?: boolean
+  /** Rounds the ends of the bar */
+  barRounded?: boolean
   /** Right-to-left fill */
   reverse?: boolean
   /** Indeterminate visual */
@@ -35,7 +37,8 @@ const props = withDefaults(defineProps<{
   autoStart: true,
   paused: false,
   height: '8px',
-  rounded: false,
+  trackRounded: false,
+  barRounded: false,
   reverse: false,
   indeterminate: false,
   delay: 0,
@@ -130,7 +133,8 @@ const barWidthPercent = computed(() => {
 })
 
 const trackHeight = computed(() => props.height)
-const borderRadius = computed(() => props.rounded ? `${props.height}` : '0')
+const trackBorderRadius = computed(() => props.trackRounded ? `${props.height}` : '0')
+const barBorderRadius = computed(() => props.barRounded ? `${props.height}` : '0')
 const barWidth = computed(() => `${Math.round(barWidthPercent.value * 10000) / 100}%`)
 const barLeft = computed(() => props.reverse ? 'auto' : '0')
 const barRight = computed(() => props.reverse ? '0' : 'auto')
@@ -147,7 +151,7 @@ const barRight = computed(() => props.reverse ? '0' : 'auto')
   position: relative;
   width: 100%;
   height: v-bind(trackHeight);
-  border-radius: v-bind(borderRadius);
+  border-radius: v-bind(trackBorderRadius);
   background-color: var(--progressbar--bg-color, rgba(255, 255, 255, 0.10));
   overflow: hidden;
 }
@@ -159,7 +163,7 @@ const barRight = computed(() => props.reverse ? '0' : 'auto')
   width: v-bind(barWidth);
   left: v-bind(barLeft);
   right: v-bind(barRight);
-  border-radius: v-bind(borderRadius);
+  border-radius: v-bind(barBorderRadius);
   background-image: linear-gradient(
     90deg,
     var(--progressbar--from, #9f9f9f),

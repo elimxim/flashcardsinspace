@@ -8,7 +8,8 @@
         <Progressbar
           :progress="progress"
           height="0.5rem"
-          rounded
+          trackRounded
+          barRounded
         />
       </span>
       <button class="corner-button"
