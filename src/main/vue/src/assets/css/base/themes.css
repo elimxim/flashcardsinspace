@@ -56,11 +56,29 @@
   --fuzzy-select__drop-down__scrollbar--color: rgb(from var(--fuzzy-select__drop-down--border-color) r g b / 0.6);
   --fuzzy-select__drop-down__scrollbar--hover--color: rgb(from var(--fuzzy-select__drop-down--border-color) r g b / 0.8);
 
-  /* progressbar */
-  --toast-progressbar--from: #60a5fa;
-  --toast-progressbar--via: #3b82f6;
-  --toast-progressbar--to: #2563eb;
-  --toast-progressbar--bg-color: rgba(255, 255, 255, 0.1);
+  /* toasts & progressbars */
+  --toast__progressbar--bg-color: rgba(255, 255, 255, 0.1);
+  --toast__starfield__star--color: rgba(255, 255, 255, 0.9);
+
+  --success-toast__progressbar--from: #34d399;
+  --success-toast__progressbar--via: #6ee7b7;
+  --success-toast__progressbar--to: #10b981;
+  --success-toast-glow: rgba(52, 211, 153, .30);
+
+  --error-toast__progressbar--from: #fb7185;
+  --error-toast__progressbar--via: #fda4af;
+  --error-toast__progressbar--to: #f43f5e;
+  --error-toast-glow: rgba(251, 113, 133, .30);
+
+  --info-toast__progressbar--from: #38bdf8;
+  --info-toast__progressbar--via: #7dd3fc;
+  --info-toast__progressbar--to: #0ea5e9;
+  --info-toast-glow: rgba(56, 189, 248, .30);
+
+  --warning-toast__progressbar--from: #fbbf24;
+  --warning-toast__progressbar--via: #fcd34d;
+  --warning-toast__progressbar--to: #f59e0b;
+  --warning-toast-glow: rgba(251, 191, 36, .30);
 
   --review-progressbar--from: #60a5fa;
   --review-progressbar--via: #3b82f6;

@@ -1,22 +1,32 @@
 <template>
   <transition name="toast-fade">
-    <div v-if="toast.show" class="toast">
+    <div v-if="toaster.show" class="toast">
+      <Starfield class="toast__starfield" :density="24"/>
       <span class="toast-message">
-        {{ toast.message }}
+        {{ toaster.toast?.message }}
       </span>
-      <button
-        class="toast-close-btn"
-        @click="toast.hideToast">
-        <font-awesome-icon icon="fa-solid fa-xmark"/>
-      </button>
+<!--      <button-->
+<!--        class="toast-close-btn"-->
+<!--        @click="toast.hideToast">-->
+<!--        <font-awesome-icon icon="fa-solid fa-xmark"/>-->
+<!--      </button>-->
+      <span class="toast__progressbar">
+        <Progressbar
+          :duration="10000"
+          height="0.5rem"
+          rounded
+        />
+      </span>
     </div>
   </transition>
 </template>
 
 <script setup lang="ts">
-import { useToastStore } from '@/stores/toast-store'
+import Starfield from '@/components/Starfield.vue'
+import Progressbar from '@/components/Progressbar.vue'
+import { useSpaceToaster } from '@/stores/toast-store'
 
-const toast = useToastStore()
+const toaster = useSpaceToaster()
 </script>
 
 <style scoped>
@@ -25,7 +35,7 @@ const toast = useToastStore()
   top: calc(var(--navbar-height) + 1rem);
   right: 1rem;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   width: fit-content;
   max-width: 350px;
   padding: 1rem;
@@ -54,6 +64,17 @@ const toast = useToastStore()
   overflow-wrap: break-word;
   font-family: var(--error-font-family);
   font-size: 0.9rem;
+}
+
+.toast__starfield {
+  --starfield__star--color: var(--toast__starfield__star--color);
+}
+
+.toast__progressbar {
+  --progressbar--from: var(--success-toast__progressbar--from);
+  --progressbar--via: var(--success-toast__progressbar--via);
+  --progressbar--to: var(--success-toast__progressbar--to);
+  --progressbar--bg-color: var(--toast__progressbar--bg-color);
 }
 
 /* Close button styling */
