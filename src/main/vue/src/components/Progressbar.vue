@@ -1,8 +1,8 @@
 <template>
-  <div class="progressbar">
-    <div class="progressbar__track">
-      <div v-if="!indeterminate" class="progressbar__bar"/>
-      <div v-else class="progressbar__bar progressbar__bar--indeterminate"/>
+  <div class="progress">
+    <div class="progress__track">
+      <div v-if="!indeterminate" class="progress__bar"/>
+      <div v-else class="progress__bar progress__bar--indeterminate"/>
     </div>
   </div>
 </template>
@@ -55,9 +55,7 @@ function start() {
   if (!props.duration || props.duration <= 0) {
     localProgress.value = 1
     emit('done')
-    return
-  }
-  if (props.delay && props.delay > 0) {
+  } else if (props.delay && props.delay > 0) {
     delayTimeout = window.setTimeout(() => {
       delayTimeout && window.clearTimeout(delayTimeout);
       delayTimeout = null;
@@ -124,8 +122,11 @@ onMounted(() => {
 onBeforeUnmount(cancel)
 
 const barWidthPercent = computed(() => {
-  if (isControlled.value) return Math.max(0, Math.min(1, Number(props.progress)))
-  return localProgress.value
+  if (isControlled.value) {
+    return Math.max(0, Math.min(1, Number(props.progress)))
+  } else {
+    return localProgress.value
+  }
 })
 
 const trackHeight = computed(() => props.height)
@@ -137,21 +138,21 @@ const barRight = computed(() => props.reverse ? '0' : 'auto')
 </script>
 
 <style scoped>
-.progressbar {
+.progress {
   position: relative;
   pointer-events: none;
 }
 
-.progressbar__track {
+.progress__track {
   position: relative;
   width: 100%;
   height: v-bind(trackHeight);
   border-radius: v-bind(borderRadius);
-  background-color: var(--progressbar__track--bg-color, rgba(255, 255, 255, 0.10));
+  background-color: var(--progressbar--bg-color, rgba(255, 255, 255, 0.10));
   overflow: hidden;
 }
 
-.progressbar__bar {
+.progress__bar {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -161,13 +162,13 @@ const barRight = computed(() => props.reverse ? '0' : 'auto')
   border-radius: v-bind(borderRadius);
   background-image: linear-gradient(
     90deg,
-    var(--progressbar__track--bg-image--from, #9f9f9f),
-    var(--progressbar__track--bg-image--via, #c1c1c1),
-    var(--progressbar__track--bg-image--to, #6e6e6e)
+    var(--progressbar--from, #9f9f9f),
+    var(--progressbar--via, #c1c1c1),
+    var(--progressbar--to, #6e6e6e)
   );
 }
 
-.progressbar__bar--indeterminate {
+.progress__bar--indeterminate {
   left: 0;
   right: 0;
   width: 30%;

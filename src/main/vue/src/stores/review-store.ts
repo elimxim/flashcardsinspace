@@ -53,6 +53,9 @@ export const useReviewStore = defineStore('review', {
     reviewFinished(): boolean {
       return this.currFlashcard === null
     },
+    flashcardsRunningTotal(): number {
+      return this.reviewQueue.runningTotal()
+    }
   },
   actions: {
     startReview() {

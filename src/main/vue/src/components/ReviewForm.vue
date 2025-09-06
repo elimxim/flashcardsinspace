@@ -1,9 +1,16 @@
 <template>
   <div class="main-area" v-if="started">
     <div class="top-row">
-        <span class="corner-text">
-          {{ settings.topic }}
-        </span>
+      <span class="corner-text">
+        {{ settings.topic }}
+      </span>
+      <span class="flashcard-progressbar">
+        <Progressbar
+          :progress="progress"
+          height="0.5rem"
+          rounded
+        />
+      </span>
       <button class="corner-button"
               ref="escapeButton"
               @click="finishReview">
@@ -17,10 +24,9 @@
              ref="flashcardButton"
              @click="flipFlashcard">
           <div class="top-row">
-              <span class="corner-text"
-                    :hidden="reviewFinished">
-                {{ currFlashcard?.stage }}
-              </span>
+            <span class="corner-text">
+              {{ currFlashcard?.stage }}
+            </span>
             <button id="flashcard-edit-button"
                     class="corner-button"
                     ref="flashcardEditButton"
@@ -102,6 +108,7 @@
 </template>
 
 <script setup lang="ts">
+import Progressbar from '@/components/Progressbar.vue'
 import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -125,7 +132,8 @@ const {
   isFrontSide,
   currFlashcard,
   editFormWasOpened,
-  reviewFinished
+  reviewFinished,
+  flashcardsRunningTotal,
 } = storeToRefs(reviewStore)
 
 const currFlashcardText = computed(() => {
@@ -138,6 +146,10 @@ const currFlashcardText = computed(() => {
   }
 })
 
+const progress = computed(() =>
+  Math.max(0, Math.min(1, (flashcardsTotal.value - flashcardsRunningTotal.value) / flashcardsTotal.value))
+)
+
 const escapeButton = ref<HTMLButtonElement>()
 const flashcardButton = ref<HTMLDivElement>()
 const stageDownButton = ref<HTMLButtonElement>()
@@ -146,8 +158,10 @@ const prevButton = ref<HTMLButtonElement>()
 const nextButton = ref<HTMLButtonElement>()
 const moveBackButton = ref<HTMLButtonElement>()
 const flashcardEditButton = ref<HTMLButtonElement>()
+const flashcardsTotal = ref(flashcardsRunningTotal.value);
 
 function finishReview() {
+  flashcardsTotal.value = 0
   if (reviewFinished.value && flashcardSet.value !== null) {
     chronoStore.markLastDaysAsCompleted(flashcardSet.value)
   }
@@ -308,6 +322,7 @@ function handleKeydown(event: KeyboardEvent) {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
 }
 
 .flashcard-text {
@@ -392,6 +407,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .corner-button {
+  flex: 1;
   border: none;
   outline: none;
   background: none;
@@ -404,7 +420,16 @@ function handleKeydown(event: KeyboardEvent) {
   color: #9f9f9f;
 }
 
+.flashcard-progressbar {
+  flex: 98;
+  --progressbar--from: var(--review-progressbar--from);
+  --progressbar--via: var(--review-progressbar--via);
+  --progressbar--to: var(--review-progressbar--to);
+  --progressbar--bg-color: var(--review-progressbar--bg-color);
+}
+
 .corner-text {
+  flex: 1;
   background: none;
   color: #9f9f9f;
   font-size: 1.2em;

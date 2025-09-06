@@ -55,4 +55,15 @@
   --fuzzy-select__drop-down--hover--bg-color: rgb(from var(--fuzzy-select__drop-down--border-color) r g b / 0.1);
   --fuzzy-select__drop-down__scrollbar--color: rgb(from var(--fuzzy-select__drop-down--border-color) r g b / 0.6);
   --fuzzy-select__drop-down__scrollbar--hover--color: rgb(from var(--fuzzy-select__drop-down--border-color) r g b / 0.8);
+
+  /* progressbar */
+  --toast-progressbar--from: #60a5fa;
+  --toast-progressbar--via: #3b82f6;
+  --toast-progressbar--to: #2563eb;
+  --toast-progressbar--bg-color: rgba(255, 255, 255, 0.1);
+
+  --review-progressbar--from: #60a5fa;
+  --review-progressbar--via: #3b82f6;
+  --review-progressbar--to: #2563eb;
+  --review-progressbar--bg-color: rgba(0, 0, 0, 0.1);
 }
