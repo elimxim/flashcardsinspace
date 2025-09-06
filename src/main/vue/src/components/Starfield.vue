@@ -84,7 +84,7 @@ function starStyle(s: Star) {
   position: absolute;
   opacity: 1;
   border-radius: 9999px;
-  background-color: var(--starfield__star-color, rgba(255, 255, 255, 0.9));
+  background-color: var(--starfield__star--color, rgba(255, 255, 255, 0.9));
   will-change: opacity, transform;
   animation-name: twinkle, verticalDrift;
   animation-timing-function: ease-in-out, ease-in-out;
