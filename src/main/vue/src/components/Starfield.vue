@@ -1,5 +1,5 @@
 <template>
-  <div class="starfield" aria-hidden="true">
+  <div class="starfield">
     <span v-for="s in stars" :key="s.id" class="starfield__star" :style="starStyle(s)"/>
     <slot/>
   </div>

@@ -1,41 +1,42 @@
 <template>
-  <div
-    v-if="show"
-    class="tb pointer-events-auto"
-    role="status"
-    aria-live="polite"
-    :data-variant="toast?.type"
-    :data-persistent="toast?.persistent ? 'true' : 'false'"
-    :style="{ '--dur': toast?.duration + 'ms' }"
-    @mouseenter="toaster.pause()"
-    @mouseleave="toaster.resume()"
-  >
-    <div class="tb-card">
-      <div class="tb-ring"/>
+  <div class="space-container space-toast-theme"
+       :toast-type="toast?.type">
+    <transition name="toast-transition">
+
+
+    <div
+      v-if="show"
+      class="space-toast"
+      @mouseenter="toaster.pause()"
+      @mouseleave="toaster.resume()"
+    >
       <Starfield twinkle verticalDrift="2px"/>
-      <div class="tb-content">
-        <div class="tb-icon">
+      <div class="space-toast__mixin"/>
+      <div class="space-toast__content">
+        <div class="space-toast__content__icon-box">
+          <font-awesome-icon icon="fa-solid fa-box"/>
         </div>
-
         <div class="tb-body">
-          <div class="tb-title">{{ toast?.title }}</div>
-          <div class="tb-msg">{{ toast?.message }}</div>
+          <div class="space-toast__content__title">
+            {{ toast?.title }}
+          </div>
+          <div class="space-toast__content__msg">
+            {{ toast?.message }}
+          </div>
         </div>
-
-        <button class="btn-icon" aria-label="Dismiss" @click="toaster.dismiss()">
+        <button class="space-toast__content__button" @click="toaster.dismiss()">
+          <font-awesome-icon icon="fa-solid fa-xmark"/>
         </button>
       </div>
-
-      <div v-if="toast !== null && !toast.persistent"
-        class="tb-progress-track">
+      <div v-if="toast !== null && !toast.persistent" class="space-toast__progress">
         <Progressbar
-          height="6px"
+          height="8px"
           :duration="toast?.duration"
           :paused="paused"
-          trackRounded
         />
       </div>
     </div>
+  </transition>
   </div>
 </template>
 
@@ -53,157 +54,223 @@ onUnmounted(() => toaster.reset())
 </script>
 
 <style scoped>
-
-:root {
-  --tb-from: #60a5fa;
-  --tb-via: #3b82f6;
-  --tb-to: #2563eb;
-  --tb-glow: rgba(96, 165, 250, .30);
+.space-toast-theme {
+  --default-color-from: #000000;
+  --default-color-via: #000000;
+  --default-color-to: #000000;
+  --default-color-glow: rgba(0, 0, 0, 0.3);
+  --default-toast--bg: rgba(0, 0, 0, 0.8);
+  --default-icon-box--color: rgba(255, 255, 255, 0.8);
+  --default-icon-box--bg: rgba(0, 0, 0, 0.1);
+  --default-icon-box--glow: rgba(255, 255, 255, 0.10);
+  --default-title--color: rgba(0, 0, 0, 0.9);
+  --default-msg--color: rgba(226, 232, 240, 0.9);
+  --default-button--color: rgba(0, 0, 0, 0.9);
+  --default-button--hover--color: white;
+  --default-button--hover--bg: rgba(255, 255, 255, 0.1);
+  --default-progressbar--bg-color: none;
+  --default-starfield__star--color: white;
 }
 
-.tb[data-variant="success"] {
-  --tb-from: #34d399;
-  --tb-via: #6ee7b7;
-  --tb-to: #10b981;
-  --tb-glow: rgba(52, 211, 153, .30);
+.space-toast-theme[toast-type="success"] {
+  --color-from: var(--success-toast--from, var(--default-color-from));
+  --color-via: var(--success-toast--via, var(--default-color-via));
+  --color-to: var(--success-toast--to, var(--default-color-to));
+  --color-glow: var(--success-toast--glow, var(--default-color-glow));
+  --toast--bg: var(--space-toast--bg, var(--default-toast--bg));
+  --icon-box--color: var(--space-toast--icon-box--color, var(--default-icon-box--color));
+  --icon-box--bg: var(--space-toast--icon-box--bg, var(--default-icon-box--bg));
+  --icon-box--glow: var(--space-toast--icon-box--glow, var(--default-icon-box--glow));
+  --title--color: var(--space-toast--title--color, var(--default-title--color));
+  --msg--color: var(--space-toast--msg--color, var(--default-msg--color));
+  --button--color: var(--space-toast--button--color, var(--default-button--color));
+  --button--hover--color: var(--space-toast--button--hover--color, var(--default-button--hover--color));
+  --button--hover--bg: var(--space-toast--button--hover--bg, var(--default-button--hover--bg));
+  --progressbar--bg-color: var(--space-toast--progressbar--bg-color, var(--default-progressbar--bg-color));
+  --starfield__star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
 }
 
-.tb[data-variant="error"] {
-  --tb-from: #fb7185;
-  --tb-via: #fda4af;
-  --tb-to: #f43f5e;
-  --tb-glow: rgba(251, 113, 133, .30);
+.space-toast-theme[toast-type="error"] {
+  --color-from: var(--error-toast--from);
+  --color-via: var(--error-toast--via);
+  --color-to: var(--error-toast--to);
+  --color-glow: var(--error-toast--glow);
+  --toast--bg: var(--space-toast--bg, var(--default-toast--bg));
+  --icon-box--color: var(--space-toast--icon-box--color, var(--default-icon-box--color));
+  --icon-box--bg: var(--space-toast--icon-box--bg, var(--default-icon-box--bg));
+  --icon-box--glow: var(--space-toast--icon-box--glow, var(--default-icon-box--glow));
+  --title--color: var(--space-toast--title--color, var(--default-title--color));
+  --msg--color: var(--space-toast--msg--color, var(--default-msg--color));
+  --button--color: var(--space-toast--button--color, var(--default-button--color));
+  --button--hover--color: var(--space-toast--button--hover--color, var(--default-button--hover--color));
+  --button--hover--bg: var(--space-toast--button--hover--bg, var(--default-button--hover--bg));
+  --progressbar--bg-color: var(--space-toast--progressbar--bg-color, var(--default-progressbar--bg-color));
+  --starfield__star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
 }
 
-.tb[data-variant="info"] {
-  --tb-from: #38bdf8;
-  --tb-via: #7dd3fc;
-  --tb-to: #0ea5e9;
-  --tb-glow: rgba(56, 189, 248, .30);
+.space-toast-theme[toast-type="info"] {
+  --color-from: var(--info-toast--from);
+  --color-via: var(--info-toast--via);
+  --color-to: var(--info-toast--to);
+  --color-glow: var(--info-toast--glow);
+  --toast--bg: var(--space-toast--bg, var(--default-toast--bg));
+  --icon-box--color: var(--space-toast--icon-box--color, var(--default-icon-box--color));
+  --icon-box--bg: var(--space-toast--icon-box--bg, var(--default-icon-box--bg));
+  --icon-box--glow: var(--space-toast--icon-box--glow, var(--default-icon-box--glow));
+  --title--color: var(--space-toast--title--color, var(--default-title--color));
+  --msg--color: var(--space-toast--msg--color, var(--default-msg--color));
+  --button--color: var(--space-toast--button--color, var(--default-button--color));
+  --button--hover--color: var(--space-toast--button--hover--color, var(--default-button--hover--color));
+  --button--hover--bg: var(--space-toast--button--hover--bg, var(--default-button--hover--bg));
+  --progressbar--bg-color: var(--space-toast--progressbar--bg-color, var(--default-progressbar--bg-color));
+  --starfield__star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
 }
 
-.tb[data-variant="warning"] {
-  --tb-from: #fbbf24;
-  --tb-via: #fcd34d;
-  --tb-to: #f59e0b;
-  --tb-glow: rgba(251, 191, 36, .30);
+.space-toast-theme[toast-type="warning"] {
+  --color-from: var(--warning-toast--from);
+  --color-via: var(--warning-toast--via);
+  --color-to: var(--warning-toast--to);
+  --color-glow: var(--warning-toast--glow);
+  --toast--bg: var(--space-toast--bg, var(--default-toast--bg));
+  --icon-box--color: var(--space-toast--icon-box--color, var(--default-icon-box--color));
+  --icon-box--bg: var(--space-toast--icon-box--bg, var(--default-icon-box--bg));
+  --icon-box--glow: var(--space-toast--icon-box--glow, var(--default-icon-box--glow));
+  --title--color: var(--space-toast--title--color, var(--default-title--color));
+  --msg--color: var(--space-toast--msg--color, var(--default-msg--color));
+  --button--color: var(--space-toast--button--color, var(--default-button--color));
+  --button--hover--color: var(--space-toast--button--hover--color, var(--default-button--hover--color));
+  --button--hover--bg: var(--space-toast--button--hover--bg, var(--default-button--hover--bg));
+  --progressbar--bg-color: var(--space-toast--progressbar--bg-color, var(--default-progressbar--bg-color));
+  --starfield__star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
 }
 
+.space-container {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(100vh - var(--navbar-height));
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 1rem;
+  z-index: 1000;
+  pointer-events: none;
+}
 
-.tb {
+.space-toast {
   position: relative;
   width: 360px;
-  max-width: 90vw;
   border-radius: 1rem;
-  padding: 1px;
-  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.05), transparent);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 0 0 0 var(--tb-glow);
-}
-
-.tb-card {
-  position: relative;
-  border-radius: 1rem;
-  padding: 12px 12px;
-  background: rgba(11, 16, 32, 0.80);
   overflow: hidden;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  background: var(--toast--bg);
+  box-shadow: 0 0 0 0 var(--color-glow);
+  pointer-events: auto;
 }
 
-.tb-ring {
+.space-toast__mixin {
   position: absolute;
   inset: -1px;
   border-radius: 1rem;
-  opacity: 0.20;
+  opacity: 0.40;
   pointer-events: none;
   background-image: linear-gradient(
     45deg,
-    var(--tb-from),
-    var(--tb-via),
-    var(--tb-to)
+    var(--color-from),
+    var(--color-via),
+    var(--color-to)
   );
 }
 
-.tb-content {
+.space-toast__content {
   position: relative;
-  z-index: 10;
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
+  margin: 1rem;
+  z-index: 10;
 }
 
-.tb-icon {
-  display: grid;
-  place-items: center;
-  height: 36px;
-  width: 36px;
-  border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.10);
-  color: white;
-}
-
-.icon {
-  display: none;
-  width: 20px;
-  height: 20px;
-}
-
-.tb-title {
-  font-weight: 600;
-  line-height: 1.5;
-}
-
-.tb-msg {
-  color: rgba(226, 232, 240, 0.9);
-  line-height: 1.5;
-}
-
-.tb-msg:empty {
-  display: none;
-}
-
-.btn-ghost {
-  margin-top: .5rem;
-  display: inline-flex;
+.space-toast__content__icon-box {
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: .25rem;
-  padding: .375rem .625rem;
-  font-size: .75rem;
+  min-height: 36px;
+  max-height: 36px;
+  min-width: 36px;
+  max-width: 36px;
+  font-size: 1.25rem;
+  border-radius: 10px;
+  color: var(--icon-box--color);
+  background: var(--icon-box--bg);
+  box-shadow: inset 0 0 0 1px var(--icon-box--glow);
+}
+
+.space-toast__content__title {
+  color: var(--title--color);
   font-weight: 600;
-  border-radius: .5rem;
-  border: 1px solid rgba(255, 255, 255, .2);
-  background: rgba(255, 255, 255, .1);
-  color: white;
+  line-height: 1.5;
 }
 
-.btn-ghost:hover {
-  background: rgba(255, 255, 255, .15);
+.space-toast__content__msg {
+  color: var(--msg--color);
+  line-height: 1.5;
 }
 
-/* hide button entirely when no action label provided */
-.tb[data-has-action="false"] .btn-ghost {
+.space-toast__content__msg:empty {
   display: none;
 }
 
-.btn-icon {
-  border-radius: .5rem;
-  padding: .375rem;
-  color: rgba(226, 232, 240, .8);
+.space-toast__content__button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 24px;
+  max-height: 24px;
+  min-width: 24px;
+  max-width: 24px;
+  border-radius: 9999px;
+  padding: 0.375rem;
+  font-size: 0.9rem;
+  color: var(--button--color);
+  opacity: 1;
+  background: transparent;
+  border: none;
 }
 
-.btn-icon:hover {
-  color: white;
-  background: rgba(255, 255, 255, .1);
+.space-toast__content__button:hover {
+  color: var(--button--hover--color);
+  background: var(--button--hover--bg);
 }
 
-.tb-progress-track {
+.space-toast__progress {
   position: relative;
   margin-top: 0.75rem;
-  --progressbar--from: var(--tb-from);
-  --progressbar--via: var(--tb-via);
-  --progressbar--to: var(--tb-to);
-  --progressbar--bg-color: var(--toast__progressbar--bg-color);
+  --progressbar--from: var(--color-from);
+  --progressbar--via: var(--color-via);
+  --progressbar--to: var(--color-to);
+  --progressbar--bg-color: var(--default-progressbar--bg-color);
 }
+
+/* transition> */
+
+.toast-transition-enter-active {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.toast-transition-leave-active {
+  transition: all 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+}
+
+.toast-transition-enter-from,
+.toast-transition-leave-to {
+  transform: translateX(calc(100% + 1rem)) scale(0.9);
+}
+
+/* <transition */
 
 </style>
