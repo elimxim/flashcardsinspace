@@ -109,10 +109,10 @@ onUnmounted(() => toaster.reset())
 }
 
 .space-toast-theme[toast-type="error"] {
-  --color-from: var(--error-toast--from);
-  --color-via: var(--error-toast--via);
-  --color-to: var(--error-toast--to);
-  --color-glow: var(--error-toast--glow);
+  --color-from: var(--error-toast--from, var(--default-color-from));
+  --color-via: var(--error-toast--via, var(--default-color-via));
+  --color-to: var(--error-toast--to, var(--default-color-to));
+  --color-glow: var(--error-toast--glow, var(--default-color-glow));
   --toast--bg: var(--space-toast--bg, var(--default-toast--bg));
   --icon-box--color: var(--space-toast--icon-box--color, var(--default-icon-box--color));
   --icon-box--bg: var(--space-toast--icon-box--bg, var(--default-icon-box--bg));
@@ -127,10 +127,10 @@ onUnmounted(() => toaster.reset())
 }
 
 .space-toast-theme[toast-type="info"] {
-  --color-from: var(--info-toast--from);
-  --color-via: var(--info-toast--via);
-  --color-to: var(--info-toast--to);
-  --color-glow: var(--info-toast--glow);
+  --color-from: var(--info-toast--from, var(--default-color-from));
+  --color-via: var(--info-toast--via, var(--default-color-via));
+  --color-to: var(--info-toast--to, var(--default-color-to));
+  --color-glow: var(--info-toast--glow, var(--default-color-glow));
   --toast--bg: var(--space-toast--bg, var(--default-toast--bg));
   --icon-box--color: var(--space-toast--icon-box--color, var(--default-icon-box--color));
   --icon-box--bg: var(--space-toast--icon-box--bg, var(--default-icon-box--bg));
@@ -145,10 +145,10 @@ onUnmounted(() => toaster.reset())
 }
 
 .space-toast-theme[toast-type="warning"] {
-  --color-from: var(--warning-toast--from);
-  --color-via: var(--warning-toast--via);
-  --color-to: var(--warning-toast--to);
-  --color-glow: var(--warning-toast--glow);
+  --color-from: var(--warning-toast--from, var(--default-color-from));
+  --color-via: var(--warning-toast--via, var(--default-color-via));
+  --color-to: var(--warning-toast--to, var(--default-color-to));
+  --color-glow: var(--warning-toast--glow, var(--default-color-glow));
   --toast--bg: var(--space-toast--bg, var(--default-toast--bg));
   --icon-box--color: var(--space-toast--icon-box--color, var(--default-icon-box--color));
   --icon-box--bg: var(--space-toast--icon-box--bg, var(--default-icon-box--bg));
