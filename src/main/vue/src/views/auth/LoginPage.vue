@@ -115,8 +115,8 @@ async function login() {
     if (error.response?.status === 500) {
       toaster.bake({
         type: ToastType.ERROR,
-        title: 'Something went wrong',
-        message: '. Please try again. Please try again. Please try again.',
+        title: 'The main server is not filling OK. Please contact the team',
+        message: error.response?.data?.message,
         duration: 10000,
       })
     } else if (error.response?.status === 400) {

@@ -1,6 +1,7 @@
 package com.github.elimxim.flashcardsinspace.web.exception
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -23,66 +24,69 @@ class GlobalExceptionHandler {
     @ExceptionHandler(Exception::class)
     fun handleUnexpectedException(ex: Exception, request: WebRequest): ResponseEntity<ErrorResponseBody> {
         log.error("UNEXPECTED exception occurred", ex)
-        val response = ErrorResponseBody.from(
+        val body = ErrorResponseBody.from(
             status = HttpStatus.INTERNAL_SERVER_ERROR,
             path = request.getDescription(false),
         )
 
-        return ResponseEntity(response, HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity(body, body.status)
     }
 
     @ExceptionHandler(InternalServerErrorException::class)
     fun handleInternalServerErrorException(e: InternalServerErrorException, request: WebRequest): ResponseEntity<ErrorResponseBody> {
         log.error("INTERNAL_SERVER_ERROR exception occurred", e)
-        val response = ErrorResponseBody.from(
+        val body = ErrorResponseBody.from(
             status = HttpStatus.INTERNAL_SERVER_ERROR,
             path = request.getDescription(false),
             e = e,
         )
 
-        return ResponseEntity(response, HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity(body, body.status)
     }
 
     @ExceptionHandler(NotFoundException::class)
     fun handleNotFoundException(e: NotFoundException, request: WebRequest): ResponseEntity<ErrorResponseBody> {
         log.info("NOT_FOUND exception occurred: ${e.message}")
-        val response = ErrorResponseBody.from(
+        val body = ErrorResponseBody.from(
             status = HttpStatus.NOT_FOUND,
             path = request.getDescription(false),
             e = e,
         )
 
-        return ResponseEntity(response, HttpStatus.NOT_FOUND)
+        return ResponseEntity(body, body.status)
     }
 
     @ExceptionHandler(BadRequestException::class)
-    fun handleBadRequestException(ex: BadRequestException, request: WebRequest): ResponseEntity<ErrorResponseBody> {
-        log.info("BAD_REQUEST exception occurred: ${ex.message}")
-        val response = ErrorResponseBody.from(
+    fun handleBadRequestException(e: BadRequestException, request: WebRequest): ResponseEntity<ErrorResponseBody> {
+        log.info("BAD_REQUEST exception occurred: ${e.message}")
+        val body = ErrorResponseBody.from(
             status = HttpStatus.BAD_REQUEST,
             path = request.getDescription(false),
-            e = ex,
+            e = e,
         )
 
-        return ResponseEntity(response, HttpStatus.BAD_REQUEST)
+        return ResponseEntity(body, body.status)
     }
 }
 
 data class ErrorResponseBody(
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     val timestamp: LocalDateTime,
-    val status: Int,
+    @JsonIgnore
+    val status: HttpStatus,
+    val statusCode: Int,
     val error: String,
-    val message: String,
+    val errorCode: String,
     val path: String,
 ) {
     companion object {
-        fun from(status: HttpStatus, path: String, e: Exception? = null): ErrorResponseBody {
+        fun from(status: HttpStatus, path: String, e: WebException? = null): ErrorResponseBody {
             return ErrorResponseBody(
                 timestamp = LocalDateTime.now(),
-                status = status.value(),
+                status = status,
+                statusCode = status.value(),
                 error = status.reasonPhrase,
-                message = e?.message ?: "N/A",
+                errorCode = e?.code ?: "#!NA!#",
                 path = path,
             )
         }

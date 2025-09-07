@@ -15,21 +15,14 @@ class AuthController(
     private val authService: AuthService,
     private val jwtService: JwtService,
 ) {
-    // todo log every request to the requests.log
-
     @PostMapping("/signup")
     fun signup(
-        @Valid @RequestBody request: SignUpRequest, // todo unified error handler instead of @Valid
+        @RequestBody request: SignUpRequest,
         response: HttpServletResponse,
     ): ResponseEntity<UserResponse> {
-        return try {
-            val user = authService.signUp(request)
-            jwtService.setCookies(user, response)
-            ResponseEntity.ok(UserResponse(user.toDto()))
-        } catch (e: IllegalArgumentException) { // todo use specific exception class
-            // todo send an error
-            ResponseEntity.badRequest().build()
-        }
+        val user = authService.signUp(request)
+        jwtService.setCookies(user, response)
+        return ResponseEntity.ok(UserResponse(user.toDto()))
     }
 
     @PostMapping("/login")

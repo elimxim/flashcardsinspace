@@ -1,11 +1,11 @@
 package com.github.elimxim.flashcardsinspace.security
 
-import com.github.elimxim.flashcardsinspace.entity.Language
 import com.github.elimxim.flashcardsinspace.entity.User
-import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
-import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
 import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
 import com.github.elimxim.flashcardsinspace.service.LanguageService
+import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
+import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
+import com.github.elimxim.flashcardsinspace.web.exception.EmailIsAlreadyTakenException
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -25,16 +25,15 @@ class AuthService(
     private val jwtService: JwtService,
     private val languageService: LanguageService,
 ) {
-
-    // todo SignUpResponse with errors instead of throwing exceptions
     // todo signup journal
-    // todo more logs
     @Transactional
     fun signUp(request: SignUpRequest): User {
-        // todo validate request fields
+        // todo validate the request
+        // todo sanitize the request
+
         if (userRepository.findByEmail(request.email).isPresent) {
-            log.error("Email {} is already taken", request.email)
-            throw IllegalArgumentException("Email already exists")
+            log.info("Email {} is already taken", request.email)
+            throw EmailIsAlreadyTakenException("Email '${request.email}' is already exists")
         }
 
         val language = languageService.getLanguage(request.languageId) // fixme
