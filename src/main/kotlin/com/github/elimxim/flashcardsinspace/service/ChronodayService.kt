@@ -207,9 +207,8 @@ class ChronodayService(
                 if (prevChronoday != null && prevChronoday.chronodate == chronoday.chronodate) {
                     throw CorruptedChronoStateException(
                         """
-                        Same chronoday dates in flashcard set with 
-                        id=${chronoday.flashcardSet.id} and 
-                        dates=${chronoday.chronodate}
+                        Duplicated dates ${chronoday.chronodate} were detected
+                        in flashcard set with id=${chronoday.flashcardSet.id}
                         """.trimIndent()
                     )
                 }
