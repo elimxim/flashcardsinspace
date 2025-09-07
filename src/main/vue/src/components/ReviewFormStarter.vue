@@ -10,13 +10,10 @@
 </template>
 
 <script setup lang="ts">
-import { useGlobalStore } from '@/stores/global-store.ts'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
-import { onMounted, onUnmounted } from 'vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 
-const globalStore = useGlobalStore()
 const reviewStore = useReviewStore()
 const flashcardSetStore = useFlashcardSetStore()
 
@@ -27,23 +24,6 @@ function startReview() {
   reviewStore.startReview()
 }
 
-onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
-})
-
-function handleKeydown(event: KeyboardEvent) {
-  if (globalStore.isAnyModalFormOpen()) {
-    return
-  }
-
-  if (event.key == 'Enter' && !started.value) {
-    startReview()
-  }
-}
 </script>
 
 <style scoped>

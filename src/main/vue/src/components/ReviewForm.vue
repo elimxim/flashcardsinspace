@@ -1,5 +1,5 @@
 <template>
-  <div class="main-area" v-if="started">
+  <div v-if="started" class="review-main-area">
     <div class="top-row">
       <span class="corner-text">
         {{ settings.topic }}
@@ -25,11 +25,10 @@
              ref="flashcardButton"
              @click="flipFlashcard">
           <div class="top-row">
-            <span class="corner-text">
+            <span class="corner-text" style="flex: 100">
               {{ currFlashcard?.stage }}
             </span>
-            <button id="flashcard-edit-button"
-                    class="corner-button"
+            <button class="corner-button"
                     ref="flashcardEditButton"
                     @click.stop="globalStore.toggleFlashcardEditModalForm()"
                     :disabled="reviewFinished"
@@ -249,21 +248,19 @@ onUnmounted(() => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
-  if (globalStore.isAnyModalFormOpen()) {
-    return
-  }
-
-  if (event.key == 'Escape') {
-    escapeButton.value?.click()
-  } else if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
+  if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
+    event.stopPropagation()
     flashcardButton.value?.click()
   } else if (event.key === 'ArrowLeft') {
+    event.stopPropagation()
     stageDownButton.value?.click()
     prevButton.value?.click()
   } else if (event.key === 'ArrowRight') {
+    event.stopPropagation()
     stageUpButton.value?.click()
     nextButton.value?.click()
   } else if (event.shiftKey && (event.key === 'e' || event.key === 'E')) {
+    event.stopPropagation()
     flashcardEditButton.value?.click()
   }
 }
@@ -271,7 +268,7 @@ function handleKeydown(event: KeyboardEvent) {
 </script>
 
 <style scoped>
-.main-area {
+.review-main-area {
   flex: 1;
   display: flex;
   flex-direction: column;

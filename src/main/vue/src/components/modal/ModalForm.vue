@@ -1,8 +1,15 @@
 <template>
-  <div class="modal-overlay" role="dialog" tabindex="-1" v-if="visible">
+  <div
+    v-if="visible"
+    ref="modalOverlay"
+    class="modal-overlay"
+    role="dialog"
+    tabindex="-1"
+    @keydown="handleKeydown"
+  >
     <div class="modal-window">
       <div class="modal-top-nav">
-        <button @click="exit">
+        <button @click="onPressExit">
           <font-awesome-icon icon="fa-solid fa-xmark"/>
         </button>
       </div>
@@ -15,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits, onMounted, onUnmounted } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 
 const props = defineProps({
   visible: {
@@ -27,34 +34,61 @@ const props = defineProps({
     required: false,
     default: null,
   },
-  onExit: {
+  onPressExit: {
     type: Function,
     required: false,
-    default: () => {}
+    default: () => {
+    },
+  },
+  onPressEnter: {
+    type: Function,
+    required: false,
+    default: () => {
+    },
+  },
+  onPressDelete: {
+    type: Function,
+    required: false,
+    default: () => {
+    },
   }
 })
 
-const emit = defineEmits([
-  'update:visible',
-])
-
-function exit() {
-  props.onExit()
-  emit('update:visible', false)
+function onPressExit() {
+  props.onPressExit()
 }
 
-onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-})
+function onPressEnter() {
+  props.onPressEnter()
+}
 
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
+function onPressDelete() {
+  props.onPressDelete()
+}
+
+const modalOverlay = ref<HTMLElement>()
+
+watch(() => props.visible, (newValue) => {
+  if (newValue) {
+    nextTick(() => {
+      modalOverlay.value?.focus()
+    })
+  }
 })
 
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') {
+    event.preventDefault()
     event.stopPropagation()
-    props.onExit()
+    onPressExit()
+  } else if (event.key === 'Enter') {
+    event.preventDefault()
+    event.stopPropagation()
+    onPressEnter()
+  } else if (event.key === 'Delete') {
+    event.preventDefault()
+    event.stopPropagation()
+    onPressDelete()
   }
 }
 

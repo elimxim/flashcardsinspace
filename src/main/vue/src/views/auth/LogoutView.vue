@@ -13,7 +13,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 sendLogoutRequest().then(() => {
-  console.error('Successfully logged out')
+  console.info('Successfully logged out')
   authStore.setUser(null)
   router.push({ name: routeNames.login })
 }).catch(error => {

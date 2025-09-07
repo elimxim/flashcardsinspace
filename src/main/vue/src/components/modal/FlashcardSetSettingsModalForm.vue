@@ -1,7 +1,11 @@
 <template>
-  <ModalForm :visible="visible"
-             :onExit="cancel"
-             title="Settings">
+  <ModalForm
+    :visible="visible"
+    :onPressExit="cancel"
+    :onPressEnter="update"
+    :onPressDelete="remove"
+    title="Settings"
+  >
     <div class="form-body">
       <div class="modal-vertical-group">
         <input class="modal-input"
@@ -41,18 +45,15 @@
     </div>
     <div class="modal-bottom">
       <button class="modal-button modal-cancel-button"
-              ref="cancelButton"
               @click="cancel">
         Cancel
       </button>
       <button class="modal-button modal-remove-button"
-              ref="removeButton"
               @click="remove">
         Remove
       </button>
       <button class="modal-button modal-update-button"
               :class="{ 'modal-button-disabled': !stateChanged }"
-              ref="updateButton"
               :disabled="!stateChanged"
               @click="update">
         Update
@@ -67,8 +68,6 @@ import {
   computed,
   defineEmits,
   defineProps,
-  onMounted,
-  onUnmounted,
   ref,
   watch
 } from 'vue'
@@ -140,10 +139,6 @@ function resetState() {
 
 // <state
 
-const cancelButton = ref<HTMLButtonElement>()
-const removeButton = ref<HTMLButtonElement>()
-const updateButton = ref<HTMLButtonElement>()
-
 function cancel() {
   resetState()
   globalStore.toggleFlashcardSetSettingsModalForm()
@@ -188,24 +183,6 @@ function removeFlashcardSet() {
 
 function updateFlashcardSet() {
   flashcardSetStore.updateFlashcardSet(flashcardSetName.value, flashcardSetDefault.value)
-}
-
-onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
-})
-
-function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') {
-    cancelButton.value?.click()
-  } else if (event.key === 'Enter') {
-    updateButton.value?.click()
-  } else if (event.key === 'Delete') {
-    removeButton.value?.click()
-  }
 }
 
 </script>

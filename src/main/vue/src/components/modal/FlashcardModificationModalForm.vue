@@ -1,7 +1,11 @@
 <template>
-  <ModalForm :visible="visible"
-             :onExit="cancel"
-             :title="editMode ? 'Edit flashcard' : 'New flashcard'">
+  <ModalForm
+    :visible="visible"
+    :onPressExit="cancel"
+    :onPressDelete="props.editMode ? update : remove"
+    :onPressEnter="create"
+    :title="editMode ? 'Edit flashcard' : 'New flashcard'"
+  >
     <div class="form-body">
       <div class="modal-vertical-group">
           <textarea id="frontSide"
@@ -68,8 +72,6 @@ import {
   computed,
   defineEmits,
   defineProps,
-  onMounted,
-  onUnmounted,
   type PropType,
   ref,
   watch
@@ -248,25 +250,6 @@ function toggleModalForm() {
     globalStore.toggleFlashcardEditModalForm()
   } else {
     globalStore.toggleFlashcardCreationModalForm()
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
-})
-
-function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') {
-    cancelButton.value?.click()
-  } else if (event.key === 'Enter') {
-    createButton.value?.click()
-    updateButton.value?.click()
-  } else if (event.key === 'Delete') {
-    removeButton.value?.click()
   }
 }
 

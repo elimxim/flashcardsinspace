@@ -1,7 +1,10 @@
 <template>
-  <ModalForm :visible="visible"
-             :onExit="cancel"
-             title="New flashcard set">
+  <ModalForm
+    :visible="visible"
+    :onPressExit="cancel"
+    :onPressEnter="create"
+    title="New flashcard set"
+  >
     <div class="form-body">
       <div class="modal-vertical-group">
         <input class="modal-input"
@@ -52,7 +55,7 @@
 
 <script setup lang="ts">
 import ModalForm from '@/components/modal/ModalForm.vue'
-import { defineEmits, defineProps, onMounted, onUnmounted, type Ref, ref } from 'vue'
+import { defineEmits, defineProps, type Ref, ref } from 'vue'
 import { useFlashcardDataStore } from '@/stores/flashcard-data-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { required } from '@vuelidate/validators'
@@ -111,8 +114,6 @@ const createButton = ref<HTMLButtonElement>()
 function cancel() {
   resetState()
   globalStore.toggleFlashcardSetCreationModalForm()
-  emit('update:visible', false)
-  cancelButton.value?.blur()
 }
 
 function create() {
@@ -141,22 +142,6 @@ function createNewFlashcardSet() {
       })
     }
   })
-}
-
-onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
-})
-
-function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') {
-    cancelButton.value?.click()
-  } else if (event.key === 'Enter') {
-    createButton.value?.click()
-  }
 }
 
 </script>
