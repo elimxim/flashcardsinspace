@@ -1,14 +1,15 @@
 <template>
   <ModalForm
     :visible="visible"
+    :focusable="false"
     :onPressExit="cancel"
-    :onPressDelete="props.editMode ? update : remove"
-    :onPressEnter="create"
+    :onPressDelete="remove"
+    :onPressEnter="props.editMode ? update : create"
     :title="editMode ? 'Edit flashcard' : 'New flashcard'"
   >
     <div class="form-body">
       <div class="modal-vertical-group">
-          <textarea id="frontSide"
+          <textarea ref="frontSide"
                     class="modal-input"
                     rows="6"
                     placeholder="Front side"
@@ -71,7 +72,7 @@ import ModalForm from '@/components/modal/ModalForm.vue'
 import {
   computed,
   defineEmits,
-  defineProps,
+  defineProps, nextTick,
   type PropType,
   ref,
   watch
@@ -133,6 +134,9 @@ function resetState() {
   flashcardBackSide.value = props.flashcard?.backSide ?? ''
   removeConfirmation.value = false
   $v.value.$reset()
+  nextTick(() => {
+    frontSide.value?.focus()
+  })
 }
 
 watch(flashcardFrontSide, (_) => {
@@ -159,6 +163,15 @@ const cancelButton = ref<HTMLButtonElement>()
 const removeButton = ref<HTMLButtonElement>()
 const createButton = ref<HTMLButtonElement>()
 const updateButton = ref<HTMLButtonElement>()
+const frontSide = ref<HTMLTextAreaElement>()
+
+watch(() => props.visible, (newValue) => {
+  if (newValue) {
+    nextTick(() => {
+      frontSide.value?.focus()
+    })
+  }
+})
 
 function cancel() {
   resetState()
@@ -185,8 +198,9 @@ function create() {
   if (!$v.value.$invalid) {
     addNewFlashcard()
     resetState()
-    toggleModalForm()
-    emit('update:visible', false)
+    // fixme infinite loop
+    // toggleModalForm()
+    // emit('update:visible', false)
   }
   createButton.value?.blur()
 }

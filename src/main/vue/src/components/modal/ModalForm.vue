@@ -29,6 +29,11 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  focusable: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
   title: {
     type: String,
     required: false,
@@ -69,7 +74,7 @@ function onPressDelete() {
 const modalOverlay = ref<HTMLElement>()
 
 watch(() => props.visible, (newValue) => {
-  if (newValue) {
+  if (props.focusable && newValue) {
     nextTick(() => {
       modalOverlay.value?.focus()
     })
