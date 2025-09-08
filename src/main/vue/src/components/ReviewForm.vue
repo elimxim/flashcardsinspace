@@ -127,14 +127,15 @@ const globalStore = useGlobalStore()
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 const { flashcardEditModalFormOpen } = storeToRefs(globalStore)
 const {
-  settings,
-  started,
-  isFrontSide,
-  currFlashcard,
-  editFormWasOpened,
-  reviewFinished,
+    settings,
+    started,
+    isFrontSide,
+    currFlashcard,
+    editFormWasOpened,
+    reviewFinished,,
   flashcardsRunningTotal,
-} = storeToRefs(reviewStore)
+  }
+= storeToRefs(reviewStore)
 
 const currFlashcardText = computed(() => {
   if (reviewFinished.value) {
@@ -162,7 +163,10 @@ const flashcardsTotal = ref(flashcardsRunningTotal.value);
 
 function finishReview() {
   flashcardsTotal.value = 0
-  if (reviewFinished.value && flashcardSet.value !== null) {
+  if (reviewFinished.value
+    && settings.value.mode === ReviewMode.LEITNER
+    && flashcardSet.value !== null
+  ) {
     chronoStore.markLastDaysAsCompleted(flashcardSet.value)
   }
   reviewStore.finishReview()
