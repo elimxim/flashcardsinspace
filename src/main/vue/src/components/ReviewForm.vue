@@ -127,15 +127,14 @@ const globalStore = useGlobalStore()
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 const { flashcardEditModalFormOpen } = storeToRefs(globalStore)
 const {
-    settings,
-    started,
-    isFrontSide,
-    currFlashcard,
-    editFormWasOpened,
-    reviewFinished,,
+  settings,
+  started,
+  isFrontSide,
+  currFlashcard,
+  editFormWasOpened,
+  reviewFinished,
   flashcardsRunningTotal,
-  }
-= storeToRefs(reviewStore)
+} = storeToRefs(reviewStore)
 
 const currFlashcardText = computed(() => {
   if (reviewFinished.value) {
