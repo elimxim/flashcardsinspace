@@ -1,5 +1,8 @@
 <template>
-  <ModalForm :visible="visible" :onExit="exit">
+  <ModalForm
+    :visible="visible"
+    :onPressExit="exit"
+  >
     <div class="calendar">
       <div class="calendar-month">
         <button class="calendar-nav-button"
