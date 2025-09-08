@@ -1,17 +1,26 @@
 package com.github.elimxim.flashcardsinspace.web.exception
 
-// todo check if the codes are unique
+import org.springframework.http.HttpStatus
 
-open class WebException(val code: String, message: String) : Exception(message)
+annotation class ExceptionHttpStatus(val value: HttpStatus)
+annotation class ExceptionID(val value: String)
 
-open class NotFoundException(code: String, message: String) : WebException(code, message)
-class FlashcardSetNotFoundException(message: String) : NotFoundException(code = "RHR917", message)
+abstract class HttpException(message: String) : Exception(message)
+abstract class Http4xxException(message: String) : HttpException(message)
+abstract class Http5xxException(message: String) : HttpException(message)
 
-open class BadRequestException(code: String, message: String) : WebException(code, message)
-class FlashcardsSetAlreadyInitializedException(message: String) : BadRequestException(code = "2SP0RI", message)
-class EmailIsAlreadyTakenException(message: String) : BadRequestException(code = "PI4SP6", message)
+@ExceptionHttpStatus(HttpStatus.BAD_REQUEST)
+abstract class BadRequestException(message: String) : Http4xxException(message)
+@ExceptionHttpStatus(HttpStatus.NOT_FOUND)
+abstract class NotFoundException(message: String) : Http4xxException(message)
+@ExceptionHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+abstract class InternalServerErrorException(message: String) : Http5xxException(message)
 
-open class InternalServerErrorException(code: String, message: String) : WebException(code, message)
-class CorruptedChronoStateException(message: String) : InternalServerErrorException(code = "N7S44T", message)
-
-
+@ExceptionID("JFK90J")
+class FlashcardSetNotFoundException(message: String) : NotFoundException(message)
+@ExceptionID("2SP0RI")
+class FlashcardsSetAlreadyInitializedException(message: String) : BadRequestException(message)
+@ExceptionID("PI4SP6")
+class EmailIsAlreadyTakenException(message: String) : BadRequestException(message)
+@ExceptionID("N7S44T")
+class CorruptedChronoStateException(message: String) : InternalServerErrorException(message)
