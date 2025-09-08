@@ -79,7 +79,7 @@ data class ErrorResponseBody(
                 httpStatus = status,
                 statusCode = status.value(),
                 statusError = status.reasonPhrase,
-                errorId = e?.let { getExceptionId(e) } ?: "#N/A#",
+                errorId = e?.let { getExceptionId(e) } ?: "######",
                 path = path,
             )
         }
@@ -87,20 +87,20 @@ data class ErrorResponseBody(
 }
 
 private fun getExceptionHttpStatus(e: HttpException): HttpStatus {
-    return findAnnotationInCLassHierarchy<ExceptionHttpStatus>(e::class)?.value
+    return findAnnotationInClassHierarchy<ExceptionHttpStatus>(e::class)?.value
         ?: throw IllegalStateException(
             "Couldn't extract exception status from ${e::class.simpleName}"
         )
 }
 
 private fun getExceptionId(e: HttpException): String {
-    return findAnnotationInCLassHierarchy<ExceptionID>(e::class)?.value
+    return findAnnotationInClassHierarchy<ExceptionID>(e::class)?.value
         ?: throw IllegalStateException(
             "Couldn't extract exception id from ${e::class.simpleName}"
         )
 }
 
-private inline fun <reified T : Annotation> findAnnotationInCLassHierarchy(kClass: KClass<*>?): T? {
+private inline fun <reified T : Annotation> findAnnotationInClassHierarchy(kClass: KClass<*>?): T? {
     var currentClass = kClass
     while (currentClass != null) {
         val anno = currentClass.findAnnotation<T>()

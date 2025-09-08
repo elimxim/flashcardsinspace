@@ -8,7 +8,7 @@ import org.springframework.core.type.filter.AssignableTypeFilter
 import org.springframework.stereotype.Component
 
 @Component
-class WebExceptionsValidator : ApplicationRunner {
+class HttpExceptionsValidator : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
         val resolver = PathMatchingResourcePatternResolver()
         val metadataFactory = SimpleMetadataReaderFactory()
@@ -31,7 +31,7 @@ class WebExceptionsValidator : ApplicationRunner {
                 if (!codes.add(code)) {
                     throw IllegalStateException(
                         """
-                            Class ${exceptionClass.simpleName} has duplicated exception ID '$code'.
+                            Class ${exceptionClass.simpleName} has duplicate exception ID '$code'.
                             Exception IDs must be unique.
                         """.trimIndent()
                     )
