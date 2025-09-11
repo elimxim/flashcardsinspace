@@ -2,11 +2,6 @@ import type { Language } from '@/model/language.ts'
 import type { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 
-// todo UserPostResponse
-// todo UserLoginRequest
-// todo UserSignUpRequest
-// todo remove duplicated requests and responses
-
 export interface LanguageGetResponse {
   languages: Language[]
 }

@@ -15,18 +15,20 @@ fun String.escapeJava(): String {
 fun String.normalize(): String = this.trim()
 fun Secret.normalize() = Secret(this.unmasked().normalize())
 fun Secret.escapeJava() = Secret(this.unmasked().escapeJava())
+fun Password.normalize() = Password(this.unmasked().normalize())
+fun Password.escapeJava() = Password(this.unmasked().escapeJava())
 
 fun SignUpRequest.normalize() = SignUpRequest(
-    email = email.normalize().lowercase(),
-    name = name.normalize(),
-    secret = secret.normalize(),
+    email = email?.normalize()?.lowercase(),
+    name = name?.normalize(),
+    secret = secret?.normalize(),
     languageId = languageId
 )
 
 fun SignUpRequest.escapeJava() = SignUpRequest(
-    email = email.escapeJava(),
-    name = name.escapeJava(),
-    secret = secret.escapeJava(),
+    email = email?.escapeJava(),
+    name = name?.escapeJava(),
+    secret = secret?.escapeJava(),
     languageId = languageId,
 )
 
