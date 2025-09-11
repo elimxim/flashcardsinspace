@@ -48,9 +48,12 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
     implementation("org.liquibase:liquibase-core")
 
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
+
     runtimeOnly("org.postgresql:postgresql")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation(kotlin("test"))
+    testImplementation("io.mockk:mockk:1.13.11")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
 

@@ -3,24 +3,61 @@ package com.github.elimxim.flashcardsinspace.web.exception
 import org.springframework.http.HttpStatus
 
 annotation class ExceptionHttpStatus(val value: HttpStatus)
-annotation class ExceptionID(val value: String)
+annotation class ErrorCode(val value: String)
+annotation class UserMessageCode(val value: String)
 
-abstract class HttpException(message: String) : Exception(message)
-abstract class Http4xxException(message: String) : HttpException(message)
-abstract class Http5xxException(message: String) : HttpException(message)
+sealed class HttpException(val args: List<Any>, msg: String, cause: Exception?) : Exception(msg, cause)
+sealed class Http4xxException(args: List<Any>, msg: String, cause: Exception?) : HttpException(args, msg, cause)
+sealed class Http5xxException(args: List<Any>, msg: String, cause: Exception?) : HttpException(args, msg, cause)
 
 @ExceptionHttpStatus(HttpStatus.BAD_REQUEST)
-abstract class BadRequestException(message: String) : Http4xxException(message)
-@ExceptionHttpStatus(HttpStatus.NOT_FOUND)
-abstract class NotFoundException(message: String) : Http4xxException(message)
-@ExceptionHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-abstract class InternalServerErrorException(message: String) : Http5xxException(message)
+sealed class BadRequestException(
+    msg: String, args: List<Any> = emptyList<Any>(), cause: Exception? = null
+) : Http4xxException(args, msg, cause)
 
-@ExceptionID("JFK90J")
-class FlashcardSetNotFoundException(message: String) : NotFoundException(message)
-@ExceptionID("2SP0RI")
-class FlashcardsSetAlreadyInitializedException(message: String) : BadRequestException(message)
-@ExceptionID("PI4SP6")
-class EmailIsAlreadyTakenException(message: String) : BadRequestException(message)
-@ExceptionID("N7S44T")
-class CorruptedChronoStateException(message: String) : InternalServerErrorException(message)
+@ExceptionHttpStatus(HttpStatus.UNAUTHORIZED)
+sealed class UnauthorizedException(
+    msg: String, args: List<Any> = emptyList<Any>(), cause: Exception? = null
+) : Http4xxException(args, msg, cause)
+
+@ExceptionHttpStatus(HttpStatus.NOT_FOUND)
+sealed class NotFoundException(
+    msg: String, args: List<Any> = emptyList<Any>(), cause: Exception? = null
+) : Http4xxException(args, msg, cause)
+
+@ExceptionHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+sealed class InternalServerErrorException(
+    msg: String, args: List<Any> = emptyList<Any>(), cause: Exception? = null
+) : Http5xxException(args, msg, cause)
+
+@ErrorCode("VIJ6NK")
+@UserMessageCode("user.message.error.auth.failed")
+class AuthenticationFailedException(msg: String, cause: Exception) : UnauthorizedException(msg, cause = cause)
+
+@ErrorCode("HC28C8")
+@UserMessageCode("user.message.error.auth.notFound")
+class UserNotFoundException(msg: String) : NotFoundException(msg)
+
+@ErrorCode("7FO2VL")
+@UserMessageCode("user.message.error.request.fields.invalid")
+class InvalidRequestFieldsException(msg: String, fields: String) : BadRequestException(msg, listOf(fields))
+
+@ErrorCode("JFK90J")
+@UserMessageCode("user.message.error.flashcardSet.notFound")
+class FlashcardSetNotFoundException(msg: String) : BadRequestException(msg)
+
+@ErrorCode("Q4SG3F")
+@UserMessageCode("user.message.error.language.notFound")
+class LanguageNotFoundException(msg: String) : BadRequestException(msg)
+
+@ErrorCode("2SP0RI")
+@UserMessageCode("user.message.error.chronodays.notEmpty")
+class FlashcardsSetAlreadyInitializedException(msg: String) : BadRequestException(msg)
+
+@ErrorCode("PI4SP6")
+@UserMessageCode("user.message.error.signup.email.alreadyTaken")
+class EmailIsAlreadyTakenException(msg: String) : BadRequestException(msg)
+
+@ErrorCode("N7S44T")
+@UserMessageCode("user.message.error.chronodays.corrupted")
+class CorruptedChronoStateException(msg: String) : InternalServerErrorException(msg)

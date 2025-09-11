@@ -1,24 +1,49 @@
 package com.github.elimxim.flashcardsinspace.web.dto
 
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
+import com.github.elimxim.flashcardsinspace.security.Password
+import com.github.elimxim.flashcardsinspace.security.ValidConfidential
+import jakarta.validation.constraints.*
 import java.time.ZonedDateTime
 
-// todo kotlin way for jakarta annotations?
-data class SignUpRequest(
-    @field:NotBlank val email: String,
-    @field:NotBlank val secret: String,
-    @field:NotBlank val name: String,
-    @field:NotNull val languageId: Long,
+class SignUpRequest(
+    @field:NotNull
+    @field:Email
+    var email: String?,
+    @field:NotNull
+    @field:NotBlank
+    @field:Size(max = 64)
+    @field:Pattern(regexp="^[A-Za-z0-9_-]+$")
+    var name: String?,
+    @field:NotNull
+    @field:ValidConfidential
+    var secret: Password?,
+    @field:NotNull
+    @field:PositiveOrZero
+    var languageId: Long?,
 )
 
-data class LoginRequest(
-    @field:NotBlank val email: String,
-    @field:NotBlank val secret: String
+data class ValidSignUpRequest(
+    val email: String,
+    val name: String,
+    val secret: Password,
+    val languageId: Long,
+)
+
+class LoginRequest(
+    @field:NotNull
+    @field:Email
+    var email: String?,
+    @field:NotNull
+    @field:ValidConfidential
+    var secret: Password?
+)
+
+data class ValidLoginRequest(
+    val email: String,
+    val secret: Password,
 )
 
 // fixme
-data class UserResponse(val user: UserDto)
 data class LanguagesGetResponse(val languages: List<LanguageDto>)
 data class FlashcardSetsGetResponse(val flashcardSets: List<FlashcardSetDto>)
 data class FlashcardSetsPostRequest(val flashcardSet: FlashcardSetDto)

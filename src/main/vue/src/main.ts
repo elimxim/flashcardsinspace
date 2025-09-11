@@ -20,8 +20,8 @@ const authStore = useAuthStore()
 
 sendWhoAmIRequest().then(response => {
   if (response.status === 200) {
-    console.log('Who Am I: ', response.data.user)
-    authStore.setUser(response.data.user)
+    console.log('Who Am I: ', response.data)
+    authStore.setUser(response.data)
   } else {
     console.log('Who Am I: ', response.status)
     authStore.setUser(null)

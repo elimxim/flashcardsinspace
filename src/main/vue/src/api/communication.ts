@@ -1,4 +1,3 @@
-import type { User } from '@/model/user.ts'
 import type { Language } from '@/model/language.ts'
 import type { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import type { Chronoday } from '@/model/chrono.ts'
@@ -7,9 +6,6 @@ import type { Chronoday } from '@/model/chrono.ts'
 // todo UserLoginRequest
 // todo UserSignUpRequest
 // todo remove duplicated requests and responses
-export interface UserGetResponse {
-  user: User
-}
 
 export interface LanguageGetResponse {
   languages: Language[]

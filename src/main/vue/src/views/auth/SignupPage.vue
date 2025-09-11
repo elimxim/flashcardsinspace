@@ -176,7 +176,7 @@ async function signup() {
     language.value?.id
   ).then(async (response) => {
     console.log('Successfully signed up: ', authStore.user?.id)
-    authStore.setUser(response.data.user)
+    authStore.setUser(response.data)
     await router.push({ name: routeNames.flashcards })
   }).catch(error => {
     signupFailed.value = true

@@ -4,6 +4,7 @@ import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
 import com.github.elimxim.flashcardsinspace.web.filter.RequestLoggingFilter
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
 import org.springframework.boot.actuate.health.HealthEndpoint
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -25,6 +26,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
+@ConditionalOnBooleanProperty("app.security.enabled", matchIfMissing = true)
 @EnableConfigurationProperties(SecurityProperties::class)
 class SecurityConfig(
     private val env: Environment,

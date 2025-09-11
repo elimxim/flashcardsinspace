@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty
 
 @ConfigurationProperties(prefix = "app.security")
 data class SecurityProperties(
+    val enabled: Boolean = true,
     @NestedConfigurationProperty
     val jwt: JwtProperties,
     @NestedConfigurationProperty

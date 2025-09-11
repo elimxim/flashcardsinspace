@@ -1,42 +1,84 @@
 package com.github.elimxim.flashcardsinspace.web.exception
 
+import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver
-import org.springframework.core.type.classreading.SimpleMetadataReaderFactory
-import org.springframework.core.type.filter.AssignableTypeFilter
 import org.springframework.stereotype.Component
+import kotlin.reflect.KClass
+import kotlin.reflect.full.findAnnotation
+
+private val log = LoggerFactory.getLogger(HttpExceptionsValidator::class.java)
 
 @Component
 class HttpExceptionsValidator : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
-        val resolver = PathMatchingResourcePatternResolver()
-        val metadataFactory = SimpleMetadataReaderFactory()
-        val typeFilter = AssignableTypeFilter(HttpException::class.java)
-        val resources = resolver.getResources(
-            "classpath*:com/github/elimxim/flashcardsinspace/web/exception/**/*.class"
-        )
-
         val codes = mutableSetOf<String>()
-        for (resource in resources) {
-            val metadataReader = metadataFactory.getMetadataReader(resource)
-            if (!typeFilter.match(metadataReader, metadataFactory)) {
-                continue
-            }
-
-            val exceptionClass = Class.forName(metadataReader.classMetadata.className)
-            val exceptionIdAnnotation = exceptionClass.getAnnotation(ExceptionID::class.java)
-            if (exceptionIdAnnotation != null) {
-                val code = exceptionIdAnnotation.value
-                if (!codes.add(code)) {
-                    throw IllegalStateException(
-                        """
-                            Class ${exceptionClass.simpleName} has duplicate exception ID '$code'.
-                            Exception IDs must be unique.
-                        """.trimIndent()
-                    )
+        HttpException::class.sealedSubclasses.forEach { httpGroupException ->
+            log.info("Scanning exception class ${httpGroupException.simpleName}")
+            httpGroupException::class.sealedSubclasses.forEach { httpCodeException ->
+                log.info("Checking ${httpCodeException.simpleName}")
+                checkExceptionHttpStatus(httpCodeException)
+                httpCodeException::class.sealedSubclasses.forEach { httpUserException ->
+                    log.info("Checking ${httpUserException.simpleName}")
+                    checkErrorCode(httpUserException, codes)
+                    checkExceptionUserMessageCode(httpCodeException)
                 }
             }
         }
+    }
+
+    private fun checkExceptionHttpStatus(kClass: KClass<*>) {
+        kClass.findAnnotation<ExceptionHttpStatus>()
+            ?: throw IllegalStateException(
+                """
+                    Class ${kClass.simpleName} doesn't have defined ${ExceptionHttpStatus::class.simpleName}.
+                    ${ExceptionHttpStatus::class.simpleName} must be defined.
+                    """.trimIndent()
+            )
+    }
+}
+
+private fun checkErrorCode(kClass: KClass<*>, codes: MutableSet<String>) {
+    val anno = kClass.findAnnotation<ErrorCode>()
+        ?: throw IllegalStateException(
+            """
+                Class ${kClass.simpleName} doesn't have defined ${ErrorCode::class.simpleName}.
+                ${ErrorCode::class.simpleName} must be defined.
+                """.trimIndent()
+        )
+
+    if (anno.value.isBlank()) {
+        throw IllegalStateException(
+            """
+                Class ${kClass.simpleName} has blank ${ErrorCode::class.simpleName}.
+                ${ErrorCode::class.simpleName} must have non-blank value.
+                """
+        )
+    } else if (!codes.add(anno.value)) {
+        throw IllegalStateException(
+            """
+                Class ${kClass.simpleName} has duplicate ${ErrorCode::class.simpleName}='${anno.value}'.
+                ${ErrorCode::class.simpleName} must be unique.
+                """.trimIndent()
+        )
+    }
+}
+
+private fun checkExceptionUserMessageCode(kClass: KClass<*>) {
+    val anno = kClass.findAnnotation<UserMessageCode>()
+        ?: throw IllegalStateException(
+            """
+                Class ${kClass.simpleName} doesn't have defined ${UserMessageCode::class.simpleName}.
+                ${UserMessageCode::class.simpleName} must be defined.
+                """.trimIndent()
+        )
+
+    if (anno.value.isBlank()) {
+        throw IllegalStateException(
+            """
+                Class ${kClass.simpleName} has blank ${UserMessageCode::class.simpleName}.
+                ${UserMessageCode::class.simpleName} must have non-blank value.
+                """
+        )
     }
 }

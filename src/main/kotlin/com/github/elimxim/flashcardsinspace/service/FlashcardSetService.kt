@@ -29,7 +29,7 @@ class FlashcardSetService(
     fun createNew(user: User, dto: FlashcardSetDto): FlashcardSetDto {
         // todo check duplicates
         // todo check language
-        val language = languageService.getLanguage(dto.languageId)
+        val language = languageService.getEntity(dto.languageId)
         // todo validate
         val flashcardSet = FlashcardSet(
             name = dto.name,
@@ -67,7 +67,7 @@ class FlashcardSetService(
         }
         if (flashcardSet.language.id != dto.languageId) {
             // todo check for existence
-            val language = languageService.getLanguage(dto.languageId)
+            val language = languageService.getEntity(dto.languageId)
             flashcardSet.language = language
             changed = true
         }

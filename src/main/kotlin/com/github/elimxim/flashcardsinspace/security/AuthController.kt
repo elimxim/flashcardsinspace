@@ -2,10 +2,9 @@ package com.github.elimxim.flashcardsinspace.security
 
 import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
 import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
-import com.github.elimxim.flashcardsinspace.web.dto.UserResponse
+import com.github.elimxim.flashcardsinspace.web.dto.UserDto
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
 import jakarta.servlet.http.HttpServletResponse
-import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -19,23 +18,21 @@ class AuthController(
     fun signup(
         @RequestBody request: SignUpRequest,
         response: HttpServletResponse,
-    ): ResponseEntity<UserResponse> {
-        val user = authService.signUp(request)
+    ): ResponseEntity<UserDto> {
+        val user = authService.signUp(request.normalize())
         jwtService.setCookies(user, response)
-        return ResponseEntity.ok(UserResponse(user.toDto()))
+        return ResponseEntity.ok(user.toDto())
     }
 
     @PostMapping("/login")
     fun login(
-        @Valid @RequestBody request: LoginRequest,
+        @RequestBody request: LoginRequest,
         response: HttpServletResponse,
-    ): ResponseEntity<UserResponse> {
-        val user = authService.login(request)
+    ): ResponseEntity<UserDto> {
+        val user = authService.login(request.normalize())
         jwtService.setCookies(user, response)
-        return ResponseEntity.ok(UserResponse(user.toDto()))
+        return ResponseEntity.ok(user.toDto())
     }
-
-    // todo password reset
 
     @PostMapping("/logout")
     fun logout(response: HttpServletResponse): ResponseEntity<Unit> {
@@ -48,9 +45,9 @@ class AuthController(
     fun refresh(
         @CookieValue(name = "refreshToken") refreshToken: String,
         response: HttpServletResponse,
-    ): ResponseEntity<UserResponse> {
+    ): ResponseEntity<UserDto> {
         val user = authService.refreshToken(refreshToken)
         jwtService.setCookies(user, response)
-        return ResponseEntity.ok(UserResponse(user.toDto()))
+        return ResponseEntity.ok(user.toDto())
     }
 }

@@ -1,0 +1,14 @@
+app:
+  security:
+    enabled: false
+    jwt:
+      secret: "ZHVtbXlzZWNyZXRmb3Jqd3RzYW1wbGVhcHBsaWNhdGlvbg=="
+      access-token-expiration-ms: 3600000
+      refresh-token-expiration-ms: 36000000
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    enabled: false

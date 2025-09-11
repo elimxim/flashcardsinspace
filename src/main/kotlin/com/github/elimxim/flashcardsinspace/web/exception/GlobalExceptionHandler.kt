@@ -2,6 +2,7 @@ package com.github.elimxim.flashcardsinspace.web.exception
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.github.elimxim.flashcardsinspace.security.escapeHtml
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -10,9 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.resource.NoResourceFoundException
 import java.time.LocalDateTime
-import kotlin.reflect.KClass
-import kotlin.reflect.full.findAnnotation
-import kotlin.reflect.full.superclasses
 
 private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
@@ -29,7 +27,7 @@ class GlobalExceptionHandler {
         log.error("UNEXPECTED exception occurred", ex)
         val body = ErrorResponseBody.from(
             status = HttpStatus.INTERNAL_SERVER_ERROR,
-            path = request.getDescription(false),
+            path = request.getDescription(false).escapeHtml(),
         )
 
         return ResponseEntity(body, body.httpStatus)
@@ -37,11 +35,11 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(Http5xxException::class)
     fun handle5xxException(e: Http5xxException, request: WebRequest): ResponseEntity<ErrorResponseBody> {
-        val httpStatus = getExceptionHttpStatus(e)
+        val httpStatus = getHttpStatus(e)
         log.error("${httpStatus.name} exception occurred", e)
         val body = ErrorResponseBody.from(
             status = httpStatus,
-            path = request.getDescription(false),
+            path = request.getDescription(false).escapeHtml(),
             e = e,
         )
 
@@ -50,11 +48,12 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(Http4xxException::class)
     fun handle4xxException(e: Http4xxException, request: WebRequest): ResponseEntity<ErrorResponseBody> {
-        val httpStatus = getExceptionHttpStatus(e)
-        log.info("${httpStatus.name} exception occurred: ${e.message}")
+        val httpStatus = getHttpStatus(e)
+        log.info("${httpStatus.name} exception occurred: ${e.message}", e.cause)
+
         val body = ErrorResponseBody.from(
             status = httpStatus,
-            path = request.getDescription(false),
+            path = request.getDescription(false).escapeHtml(),
             e = e,
         )
 
@@ -63,13 +62,14 @@ class GlobalExceptionHandler {
 }
 
 data class ErrorResponseBody(
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @field:JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     val timestamp: LocalDateTime,
-    @JsonIgnore
+    @field:JsonIgnore
     val httpStatus: HttpStatus,
     val statusCode: Int,
     val statusError: String,
-    val errorId: String,
+    val errorCode: String,
+    val message: String?,
     val path: String,
 ) {
     companion object {
@@ -79,33 +79,10 @@ data class ErrorResponseBody(
                 httpStatus = status,
                 statusCode = status.value(),
                 statusError = status.reasonPhrase,
-                errorId = e?.let { getExceptionId(e) } ?: "######",
+                errorCode = getErrorCode(e),
+                message = getUserMessage(e),
                 path = path,
             )
         }
     }
-}
-
-private fun getExceptionHttpStatus(e: HttpException): HttpStatus {
-    return findAnnotationInClassHierarchy<ExceptionHttpStatus>(e::class)?.value
-        ?: throw IllegalStateException(
-            "Couldn't extract exception status from ${e::class.simpleName}"
-        )
-}
-
-private fun getExceptionId(e: HttpException): String {
-    return findAnnotationInClassHierarchy<ExceptionID>(e::class)?.value
-        ?: throw IllegalStateException(
-            "Couldn't extract exception id from ${e::class.simpleName}"
-        )
-}
-
-private inline fun <reified T : Annotation> findAnnotationInClassHierarchy(kClass: KClass<*>?): T? {
-    var currentClass = kClass
-    while (currentClass != null) {
-        val anno = currentClass.findAnnotation<T>()
-        if (anno != null) return anno
-        currentClass = currentClass.superclasses.firstOrNull()
-    }
-    return null
 }

@@ -23,9 +23,11 @@
   - Adding logging to help investigating bugs
   - Including User.id in the logging context
   - Tests
-- Project:
-  - README.md
 - DevOps:
   - Notifications if the app is down
   - Notifications on errors in logs
   - CI + test coverage
+- Security:
+  - auth journal (for login and signup attempts)
+  - auth journal analysis
+  - ROLE-based access control

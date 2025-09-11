@@ -3,9 +3,14 @@ package com.github.elimxim.flashcardsinspace.security
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
 import com.github.elimxim.flashcardsinspace.service.LanguageService
+import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
 import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
+import com.github.elimxim.flashcardsinspace.web.dto.ValidLoginRequest
+import com.github.elimxim.flashcardsinspace.web.dto.ValidSignUpRequest
+import com.github.elimxim.flashcardsinspace.web.exception.AuthenticationFailedException
 import com.github.elimxim.flashcardsinspace.web.exception.EmailIsAlreadyTakenException
+import com.github.elimxim.flashcardsinspace.web.exception.UserNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -24,45 +29,57 @@ class AuthService(
     private val authenticationManager: AuthenticationManager,
     private val jwtService: JwtService,
     private val languageService: LanguageService,
+    private val requestValidator: RequestValidator,
 ) {
-    // todo signup journal
     @Transactional
     fun signUp(request: SignUpRequest): User {
-        // todo validate the request
-        // todo sanitize the request
+        log.info("Sign up attempt: ${request.email?.escapeJava()}")
+        return signUp(requestValidator.validate(request))
+    }
 
+    @Transactional
+    fun signUp(request: ValidSignUpRequest): User {
         if (userRepository.findByEmail(request.email).isPresent) {
             log.info("Email {} is already taken", request.email)
             throw EmailIsAlreadyTakenException("Email '${request.email}' is already exists")
         }
 
-        val language = languageService.getLanguage(request.languageId) // fixme
+        val language = languageService.getEntity(request.languageId)
 
         val user = User(
             email = request.email,
             name = request.name,
-            secret = passwordEncoder.encode(request.secret),
+            secret = passwordEncoder.encode(request.secret.unmasked()),
             language = language,
-            roles = "ASTRONAUT", // todo role model
+            roles = "ASTRONAUT",
             registeredAt = ZonedDateTime.now(),
         )
 
         val savedUser = userRepository.save(user)
-        // todo emailService.sendWelcomeEmail(savedUser)
+        log.info("Signup successful: ${user.email} => ${user.id}")
+
         return savedUser
     }
 
-    // todo LoginResponse with errors instead of throwing exceptions
-    // todo login journal
-    // todo more logs
     @Transactional
     fun login(request: LoginRequest): User {
-        val token = UsernamePasswordAuthenticationToken(request.email, request.secret)
-        authenticationManager.authenticate(token)
+        log.info("Login attempt: ${request.email?.escapeJava()}")
+        return login(requestValidator.validate(request))
+    }
+
+    @Transactional
+    fun login(request: ValidLoginRequest): User {
+        try {
+            val token = UsernamePasswordAuthenticationToken(request.email, request.secret)
+            authenticationManager.authenticate(token)
+        } catch (e: Exception) {
+            throw AuthenticationFailedException("Failed to authenticate user: ${request.email.escapeJava()}", e)
+        }
 
         val user = userRepository.findByEmail(request.email)
-            .orElseThrow { UsernameNotFoundException("User not found") }
+            .orElseThrow { UserNotFoundException("User not found: ${request.email.escapeJava()}") }
 
+        log.info("Login successful: ${user.email} => ${user.id}")
         return user
     }
 
@@ -71,8 +88,6 @@ class AuthService(
         // todo log
     }
 
-    // todo RefreshTokenResponse with errors
-    // todo more logs
     @Transactional
     fun refreshToken(refreshToken: String): User {
         val email = jwtService.extractUsername(refreshToken)

@@ -107,7 +107,7 @@ async function login() {
 
   await sendLoginRequest(userEmail.value, userPassword.value).then(async (response) => {
     console.log('Successfully logged in: ', authStore.user?.id)
-    authStore.setUser(response.data.user)
+    authStore.setUser(response.data)
     await router.push({ name: routeNames.flashcards })
   }).catch(error => {
     loginFailed.value = true
