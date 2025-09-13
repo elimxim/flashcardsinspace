@@ -9,16 +9,16 @@ import kotlin.test.Test
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class SecretValidatorTest {
+class ConfidentialLengthValidatorTest {
     @Autowired
     lateinit var validator: Validator
 
     @Test
-    fun `Secret should pass validation if it's valid`() {
+    fun `should pass validation if it's null or blank`() {
         // given:
         val validationContainer = object {
-            @RequiredConfidential
-            val secret: Secret = Secret("1234")
+            @ConfidentialLength(min = 0, max = 42)
+            val secret: Secret? = null
         }
 
         // when:
@@ -29,11 +29,11 @@ class SecretValidatorTest {
     }
 
     @Test
-    fun `Secret should be not empty`() {
+    fun `should not pass if the length is less than min`() {
         // given:
         val validationContainer = object {
-            @RequiredConfidential
-            val secret: Secret = Secret("")
+            @ConfidentialLength(min = 10)
+            val secret: Secret = Secret("0".repeat(8))
         }
 
         // when:
@@ -44,15 +44,15 @@ class SecretValidatorTest {
 
         val violation = violations.first()
         assertThat(violation.propertyPath.toString()).isEqualTo("secret")
-        assertThat(violation.invalidValue).isEqualTo("")
+        assertThat(violation.invalidValue).isEqualTo("0".repeat(8))
     }
 
     @Test
-    fun `Secret should have length between 0 and 64`() {
+    fun `should not pass if the length is grater than max`() {
         // given:
         val validationContainer = object {
-            @RequiredConfidential
-            val secret: Secret = Secret("0".repeat(65))
+            @ConfidentialLength(max = 10)
+            val secret: Secret = Secret("0".repeat(12))
         }
 
         // when:
@@ -63,15 +63,15 @@ class SecretValidatorTest {
 
         val violation = violations.first()
         assertThat(violation.propertyPath.toString()).isEqualTo("secret")
-        assertThat(violation.invalidValue).isEqualTo("0".repeat(65))
+        assertThat(violation.invalidValue).isEqualTo("0".repeat(12))
     }
 
     @Test
-    fun `Secret should pass validation if it's null`() {
+    fun `should pass if the length is between min and max`() {
         // given:
         val validationContainer = object {
-            @RequiredConfidential
-            val secret: Secret? = null
+            @ConfidentialLength(min = 10, max = 20)
+            val secret: Secret = Secret("0".repeat(15))
         }
 
         // when:
