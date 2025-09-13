@@ -37,7 +37,7 @@
 
 .auth-container__form__error {
   font-family: var(--error-font-family);
-  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  font-size: clamp(0.75rem, 2vh, 0.9rem);
   color: var(--text--error--color);
   margin: 0;
   padding: 0;
@@ -45,7 +45,7 @@
 
 .auth-container__form__link {
   font-family: var(--main-font-family);
-  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  font-size: clamp(0.75rem, 2vh, 0.9rem);
   color: var(--link--color);
   margin: 0;
   padding: 0;

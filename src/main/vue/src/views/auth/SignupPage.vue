@@ -9,6 +9,8 @@
           class="input auth-container__form__input transition--border-color"
           v-model="username"
           :class="{ 'input--error': usernameRequired }"
+          name="name"
+          autocomplete="nickname"
           :placeholder="usernameRequired ? 'Name is required' : 'Name'"
         />
         <span v-if="usernameRegex" class="auth-container__form__error">
@@ -20,6 +22,9 @@
         <input
           class="input auth-container__form__input transition--border-color"
           v-model="userEmail"
+          type="email"
+          name="username"
+          autocomplete="username"
           :class="{ 'input--error': userEmailInvalid }"
           :placeholder="userEmailRequired ? 'Email is required' : 'Email'"
         />
@@ -44,6 +49,8 @@
           v-model="userPassword"
           class="auth-container__form__input"
           :class="{ 'input--error': userPasswordInvalid }"
+          name="new-password"
+          autocomplete="new-password"
           :placeholder="userPasswordRequired ? 'Password is required' : 'Password'"
         />
         <span v-if="userPasswordMinLength" class="auth-container__form__error">
@@ -56,6 +63,8 @@
           v-model="confirmedPassword"
           class="auth-container__form__input"
           :class="{ 'input--error': confirmPasswordInvalid }"
+          name="confirm-password"
+          autocomplete="new-password"
           :placeholder="confirmPasswordRequired ? 'Password confirmation is required' : 'Confirm Password'"
         />
         <span v-if="confirmPasswordConfirmed" class="auth-container__form__error">

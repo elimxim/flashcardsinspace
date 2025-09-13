@@ -18,6 +18,9 @@
           class="input auth-container__form__input transition--border-color"
           :class="{ 'input--error': userEmailInvalid }"
           v-model="userEmail"
+          type="email"
+          name="username"
+          autocomplete="username"
           :placeholder="userEmailRequired ? 'Email is required' : 'Email'"
         />
         <span v-if="userEmailInvalidPattern" class="auth-container__form__error">
@@ -27,6 +30,8 @@
           v-model="userPassword"
           class="auth-container__form__input"
           :class="{ 'input--error': userPasswordInvalid }"
+          name="password"
+          automoplete="current-password"
           :placeholder="userPasswordRequired ? 'Password is required' : 'Password'"
         />
         <span v-if="userPasswordMaxLengthExceeded" class="auth-container__form__error transition--opacity">
