@@ -1,6 +1,5 @@
 package com.github.elimxim.flashcardsinspace.web.exception
 
-import com.github.elimxim.flashcardsinspace.Messages
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus
 import kotlin.reflect.KClass
@@ -25,13 +24,7 @@ fun getErrorCode(e: HttpException?): String {
     return anno?.value ?: "######"
 }
 
-fun getUserMessage(e: HttpException?): String? {
-    if (e == null) return null
-    val anno = findAnnotationInClassHierarchy<UserMessageCode>(e::class)
-    return anno?.let { Messages.getMessage(anno.value, e.args) }
-}
-
-private inline fun <reified T : Annotation> findAnnotationInClassHierarchy(kClass: KClass<*>): T? {
+inline fun <reified T : Annotation> findAnnotationInClassHierarchy(kClass: KClass<*>): T? {
     val classHierarchy = mutableListOf(kClass)
     var currentClass: KClass<*>? = kClass
     while (currentClass != null) {
@@ -40,8 +33,5 @@ private inline fun <reified T : Annotation> findAnnotationInClassHierarchy(kClas
         currentClass = currentClass.superclasses.firstOrNull()
         currentClass?.let { classHierarchy.add(it) }
     }
-
-    val classHierarchyStr = classHierarchy.mapNotNull { it.simpleName }.joinToString(" -> ")
-    log.error("Couldn't find ${UserMessageCode::class.simpleName} in class hierarchy $classHierarchyStr")
     return null
 }

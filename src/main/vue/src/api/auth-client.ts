@@ -19,7 +19,7 @@ export async function sendSignupRequest(name: string, email: string, password: s
 }
 
 export async function sendLoginRequest(email: string, password: string) {
-  return await authClient.post<User>('/login', {
+  return authClient.post<User>('/login', {
     email: email,
     secret: password,
   })

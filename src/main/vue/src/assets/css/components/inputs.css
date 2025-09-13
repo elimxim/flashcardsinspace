@@ -26,11 +26,11 @@ input[type="password"]::-ms-reveal {
   border-color: var(--input--border-color--focus);
 }
 
-.input-error {
+.input--error {
   border-color: var(--input--border-color--error);
 }
 
-.input-error::placeholder,
-.input-error input::placeholder {
+.input--error::placeholder,
+.input--error input::placeholder {
   color: var(--text--error--color);
 }

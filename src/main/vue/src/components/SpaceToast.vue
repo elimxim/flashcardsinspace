@@ -18,11 +18,11 @@
           <font-awesome-icon v-else-if="toast?.type === ToastType.WARNING" icon="fa-solid fa-triangle-exclamation"/>
           <font-awesome-icon v-else icon="fa-solid fa-circle-question"/>
         </div>
-        <div class="tb-body">
-          <div class="space-toast__content__title">
+        <div class="space-toast__content__body">
+          <div class="space-toast__content__body__title">
             {{ toast?.title }}
           </div>
-          <div class="space-toast__content__msg">
+          <div class="space-toast__content__body__msg">
             {{ toast?.message }}
           </div>
         </div>
@@ -212,18 +212,24 @@ onUnmounted(() => toaster.reset())
   box-shadow: inset 0 0 0 1px var(--icon-box--glow);
 }
 
-.space-toast__content__title {
+.space-toast__content__body {
+  flex: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.space-toast__content__body__title {
   color: var(--title--color);
   font-weight: 600;
   line-height: 1.5;
 }
 
-.space-toast__content__msg {
+.space-toast__content__body__msg {
   color: var(--msg--color);
   line-height: 1.5;
 }
 
-.space-toast__content__msg:empty {
+.space-toast__content__body__msg:empty {
   display: none;
 }
 

@@ -11,26 +11,37 @@
     />
     <div
       class="auth-container transition--border-color"
-      :class="{ 'auth-container--error': loginFailed }">
-      <form @submit.prevent="login">
+      :class="{ 'auth-container--error': loginFailed }"
+    >
+      <form @submit.prevent="login" class="auth-container__form">
         <input
-          class="input transition--border-color"
-          :class="{ 'input-error': userEmailInvalid }"
+          class="input auth-container__form__input transition--border-color"
+          :class="{ 'input--error': userEmailInvalid }"
           v-model="userEmail"
-          :placeholder="userEmailRequired ? 'Email is required' : 'Email'"/>
-        <p class="auth-container__p--error" v-for="error of $v.userEmail.$errors" :key="error.$uid">
-          <span v-if="error.$validator === 'email'">This email seems to be lost in a cosmic dust cloud. Please check the format</span>
-        </p>
+          :placeholder="userEmailRequired ? 'Email is required' : 'Email'"
+        />
+        <span v-if="userEmailInvalidPattern" class="auth-container__form__error">
+          This email seems to be lost in a cosmic dust cloud. Please check the format
+        </span>
         <SecretInput
           v-model="userPassword"
-          :class="{ 'input-error': userPasswordInvalid }"
-          :placeholder="userPasswordRequired ? 'Password is required' : 'Password'"/>
+          class="auth-container__form__input"
+          :class="{ 'input--error': userPasswordInvalid }"
+          :placeholder="userPasswordRequired ? 'Password is required' : 'Password'"
+        />
+        <span v-if="userPasswordMaxLengthExceeded" class="auth-container__form__error transition--opacity">
+          This secret is expanding faster than the universe! Please keep it under 64 characters
+        </span>
         <button
+          ref="loginButton"
           type="submit"
-          class="button button--login transition--bg-color">
+          class="button button--login auth-container__form__button transition--bg-color"
+          :disabled="formInvalid"
+          :class="{ 'button--disabled': formInvalid }"
+        >
           Log In
         </button>
-        <p class="auth-container__p--link">
+        <p class="auth-container__form__link">
           New to the galaxy?
           <router-link to="/signup">Signup</router-link>
         </p>
@@ -41,11 +52,11 @@
 </template>
 
 <script setup lang="ts">
-import SpaceToast from '@/components/SpaceToast.vue'
 import SecretInput from '@/components/SecretInput.vue'
+import SpaceToast from '@/components/SpaceToast.vue'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
-import { email, required } from '@vuelidate/validators'
+import { email, maxLength, required } from '@vuelidate/validators'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"
 import { routeNames } from "@/router/index.js"
@@ -65,21 +76,31 @@ const userPassword = ref('')
 const isBouncing = ref(true)
 const loginFailed = ref(false)
 
+const loginButton = ref<HTMLButtonElement>()
+
 const $v = useVuelidate({
   userEmail: { required, email },
-  userPassword: { required }
+  userPassword: { required, maxLength: maxLength(64) }
 }, {
   userEmail: userEmail,
   userPassword: userPassword,
 })
 
+const formInvalid = computed(() => $v.value.$errors.length > 0)
+
 const userEmailInvalid = computed(() => $v.value.userEmail.$errors.length > 0)
 const userEmailRequired = computed(() =>
   $v.value.userEmail.$errors.find(v => v.$validator === 'required') !== undefined
 )
+const userEmailInvalidPattern = computed(() =>
+  $v.value.userEmail.$errors.find(v => v.$validator === 'email') !== undefined
+)
 const userPasswordInvalid = computed(() => $v.value.userPassword.$errors.length > 0)
 const userPasswordRequired = computed(() =>
   $v.value.userPassword.$errors.find(v => v.$validator === 'required') !== undefined
+)
+const userPasswordMaxLengthExceeded = computed(() =>
+  $v.value.userPassword.$errors.find(v => v.$validator === 'maxLength') !== undefined
 )
 
 watch(userEmail, () => {
@@ -101,7 +122,8 @@ async function login() {
   loginFailed.value = false
   $v.value.$touch()
   if ($v.value.$invalid) {
-    console.log('Invalid form')
+    console.log('Form is invalid')
+    loginButton.value?.blur()
     return
   }
 
@@ -112,25 +134,33 @@ async function login() {
   }).catch(error => {
     loginFailed.value = true
 
-    if (error.response?.status === 500) {
+    if (error.response?.status === 400) {
       toaster.bake({
         type: ToastType.ERROR,
-        title: 'The main server is not filling OK. Please contact the team',
+        title: 'We have an anomaly',
         message: error.response?.data?.message,
-        duration: 10000,
+        duration: 8000,
       })
-    } else if (error.response?.status === 400) {
+    } else if (error.response?.status === 401) {
       toaster.bake({
         type: ToastType.ERROR,
-        title: 'Invalid credentials',
+        title: 'We couldn\'t recognize you',
         message: error.response?.data?.message,
-        duration: 10000,
+        duration: 8000,
+      })
+    } else if (error.response?.status === 404) {
+      toaster.bake({
+        type: ToastType.ERROR,
+        title: 'We couldn\'t find you in our system',
+        message: error.response?.data?.message,
+        duration: 8000,
       })
     } else {
       toaster.bake({
         type: ToastType.ERROR,
-        title: 'Failed to log in.',
-        duration: 10000,
+        title: 'System error',
+        message: error.response?.data?.message,
+        duration: 8000,
       })
     }
 

@@ -23,8 +23,10 @@
 
   /* buttons */
   --button--color: white;
+  --button--color--disabled: #cacaca;
   --button--bg-color--action: #007bff;
   --button--bg-color--action--focus: #0056b3;
+  --button--bg-color--disabled: #ededed;
 
   /* icons */
   --fa-icon--color--globe: #007bff;

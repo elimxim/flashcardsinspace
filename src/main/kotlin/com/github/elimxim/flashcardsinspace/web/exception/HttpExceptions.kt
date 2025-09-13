@@ -35,7 +35,7 @@ sealed class InternalServerErrorException(
 class AuthenticationFailedException(msg: String, cause: Exception) : UnauthorizedException(msg, cause = cause)
 
 @ErrorCode("HC28C8")
-@UserMessageCode("user.message.error.auth.notFound")
+@UserMessageCode("user.message.error.auth.user.notFound")
 class UserNotFoundException(msg: String) : NotFoundException(msg)
 
 @ErrorCode("7FO2VL")
@@ -55,7 +55,7 @@ class LanguageNotFoundException(msg: String) : BadRequestException(msg)
 class FlashcardsSetAlreadyInitializedException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("PI4SP6")
-@UserMessageCode("user.message.error.signup.email.alreadyTaken")
+@UserMessageCode("user.message.error.auth.email.alreadyTaken")
 class EmailIsAlreadyTakenException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("N7S44T")

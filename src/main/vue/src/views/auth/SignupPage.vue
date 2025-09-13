@@ -2,25 +2,37 @@
   <div class="page-center-container">
     <div
       class="auth-container transition--border-color"
-      :class="{ 'auth-container--error': signupFailed }">
-      <form @submit.prevent="signup">
+      :class="{ 'auth-container--error': signupFailed }"
+    >
+      <form @submit.prevent="signup" class="auth-container__form">
         <input
-          class="input transition--border-color"
+          class="input auth-container__form__input transition--border-color"
           v-model="username"
-          :class="{ 'input-error': usernameRequired }"
-          :placeholder="usernameRequired ? 'Name is required' : 'Name'"/>
+          :class="{ 'input--error': usernameRequired }"
+          :placeholder="usernameRequired ? 'Name is required' : 'Name'"
+        />
+        <span v-if="usernameRegex" class="auth-container__form__error">
+          Please use only letters, numbers, dashes, and underscores
+        </span>
+        <span v-else-if="usernameMaxLength" class="auth-container__form__error">
+            This username is expanding faster than the universe! Please keep it under 64 characters
+        </span>
         <input
-          class="input transition--border-color"
+          class="input auth-container__form__input transition--border-color"
           v-model="userEmail"
-          :class="{ 'input-error': userEmailInvalid }"
-          :placeholder="userEmailRequired ? 'Email is required' : 'Email'"/>
-        <p class="auth-container__p--error" v-for="error of $v.userEmail.$errors" :key="error.$uid">
-          <span v-if="error.$validator === 'email'">This email seems to be lost in a cosmic dust cloud. Please check the format</span>
-        </p>
-        <AwesomeContainer icon="fa-solid fa-globe" class="awesome-container">
+          :class="{ 'input--error': userEmailInvalid }"
+          :placeholder="userEmailRequired ? 'Email is required' : 'Email'"
+        />
+        <span v-if="userEmailPattern" class="auth-container__form__error">
+          This email seems to be lost in a cosmic dust cloud. Please check the format
+        </span>
+        <AwesomeContainer
+          icon="fa-solid fa-globe"
+          class="awesome-container"
+        >
           <FuzzySelect
-            class="awesome-fuzzy-select"
-            :class="{ 'input-error': languageRequired }"
+            class="fuzzy-select"
+            :class="{ 'input--error fuzzy-select--error': languageRequired }"
             :options="languages"
             v-model="language"
             :optionLabel="(lang) => lang.name"
@@ -30,32 +42,49 @@
         </AwesomeContainer>
         <SecretInput
           v-model="userPassword"
-          :class="{ 'input-error': userPasswordInvalid }"
-          :placeholder="userPasswordRequired ? 'Password is required' : 'Password'"/>
-        <p class="auth-container__p--error" v-for="error of $v.userPassword.$errors" :key="error.$uid">
-          <span v-if="error.$validator === 'minLength'">Your password must be stronger than a piece of space junk. Please use 6 or more characters</span>
-        </p>
+          class="auth-container__form__input"
+          :class="{ 'input--error': userPasswordInvalid }"
+          :placeholder="userPasswordRequired ? 'Password is required' : 'Password'"
+        />
+        <span v-if="userPasswordMinLength" class="auth-container__form__error">
+          Your password must be stronger than a piece of space junk. Please use 6 or more characters
+        </span>
+        <span v-else-if="userPasswordMaxLength" class="auth-container__form__error">
+          This secret is expanding faster than the universe! Please keep it under 64 characters
+        </span>
         <SecretInput
           v-model="confirmedPassword"
-          :class="{ 'input-error': confirmPasswordInvalid }"
-          :placeholder="confirmPasswordRequired ? 'Password confirmation is required' : 'Confirm Password'"/>
-        <p class="auth-container__p--error" v-for="error of $v.confirmPassword.$errors" :key="error.$uid">
-          <span v-if="error.$validator === 'passwordConfirmed'">The passwords do not align. Please try again</span>
-        </p>
-        <button type="submit" class="button button--sign-up">Sign Up</button>
-        <p class="auth-container__p--link">
+          class="auth-container__form__input"
+          :class="{ 'input--error': confirmPasswordInvalid }"
+          :placeholder="confirmPasswordRequired ? 'Password confirmation is required' : 'Confirm Password'"
+        />
+        <span v-if="confirmPasswordConfirmed" class="auth-container__form__error">
+          The passwords do not align. Please try again
+        </span>
+        <button
+          ref="signUpButton"
+          type="submit"
+          class="button button--sign-up auth-container__form__button transition--bg-color"
+          :disabled="formInvalid"
+          :class="{ 'button--disabled': formInvalid }"
+        >
+          Sign Up
+        </button>
+        <p class="auth-container__form__link">
           Been abducted by us before?
           <router-link to="/login">Login</router-link>
         </p>
       </form>
     </div>
   </div>
+  <SpaceToast/>
 </template>
 
 <script setup lang="ts">
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import SecretInput from '@/components/SecretInput.vue'
+import SpaceToast from '@/components/SpaceToast.vue'
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"
@@ -64,12 +93,14 @@ import type { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'
 import { useVuelidate } from '@vuelidate/core'
-import { required, email, minLength, helpers } from '@vuelidate/validators'
+import { required, email, minLength, helpers, maxLength } from '@vuelidate/validators'
 import { sendSignupRequest } from '@/api/auth-client.ts'
+import { ToastType, useSpaceToaster } from '@/stores/toast-store.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const languageStore = useLanguageStore()
+const toaster = useSpaceToaster()
 
 const { languages } = storeToRefs(languageStore)
 
@@ -80,6 +111,8 @@ const userPassword = ref('')
 const confirmedPassword = ref('')
 const signupFailed = ref(false)
 
+const signUpButton = ref<HTMLButtonElement>()
+
 const passwordConfirmed = helpers.withParams(
   { type: 'confirmed' },
   (value) => {
@@ -89,10 +122,10 @@ const passwordConfirmed = helpers.withParams(
 )
 
 const $v = useVuelidate({
-  username: { required },
+  username: { required, regex: /^[A-Za-z0-9_-]+$/, maxLength: maxLength(64) },
   userEmail: { required, email },
   language: { required },
-  userPassword: { required, minLength: minLength(6) },
+  userPassword: { required, minLength: minLength(6), maxLength: maxLength(64) },
   confirmPassword: { required, passwordConfirmed },
 }, {
   username: username,
@@ -102,13 +135,24 @@ const $v = useVuelidate({
   confirmPassword: confirmedPassword,
 })
 
+const formInvalid = computed(() => $v.value.$errors.length > 0)
+
 const usernameInvalid = computed(() => $v.value.username.$errors.length > 0)
 const usernameRequired = computed(() =>
   $v.value.username.$errors.find(v => v.$validator === 'required') !== undefined
 )
+const usernameRegex = computed(() =>
+  $v.value.username.$errors.find(v => v.$validator === 'regex') !== undefined
+)
+const usernameMaxLength = computed(() =>
+  $v.value.username.$errors.find(v => v.$validator === 'maxLength') !== undefined
+)
 const userEmailInvalid = computed(() => $v.value.userEmail.$errors.length > 0)
 const userEmailRequired = computed(() =>
   $v.value.userEmail.$errors.find(v => v.$validator === 'required') !== undefined
+)
+const userEmailPattern = computed(() =>
+  $v.value.userEmail.$errors.find(v => v.$validator === 'email') !== undefined
 )
 const languageInvalid = computed(() => $v.value.language.$errors.length > 0)
 const languageRequired = computed(() =>
@@ -118,9 +162,18 @@ const userPasswordInvalid = computed(() => $v.value.userPassword.$errors.length 
 const userPasswordRequired = computed(() =>
   $v.value.userPassword.$errors.find(v => v.$validator === 'required') !== undefined
 )
+const userPasswordMinLength = computed(() =>
+  $v.value.userPassword.$errors.find(v => v.$validator === 'minLength') !== undefined
+)
+const userPasswordMaxLength = computed(() =>
+  $v.value.userPassword.$errors.find(v => v.$validator === 'maxLength') !== undefined
+)
 const confirmPasswordInvalid = computed(() => $v.value.confirmPassword.$errors.length > 0)
 const confirmPasswordRequired = computed(() =>
   $v.value.confirmPassword.$errors.find(v => v.$validator === 'required') !== undefined
+)
+const confirmPasswordConfirmed = computed(() =>
+  $v.value.confirmPassword.$errors.find(v => v.$validator === 'confirmed') !== undefined
 )
 
 watch(username, () => {
@@ -166,6 +219,7 @@ async function signup() {
   $v.value.$touch()
   if ($v.value.$invalid) {
     console.log('Invalid form')
+    signUpButton.value?.blur()
     return
   }
 
@@ -180,7 +234,16 @@ async function signup() {
     await router.push({ name: routeNames.flashcards })
   }).catch(error => {
     signupFailed.value = true
-    // todo show a toast with the error
+
+    if (error.response?.status === 400) {
+      toaster.bake({
+        type: ToastType.ERROR,
+        title: 'We have an anomaly',
+        message: error.response?.data?.message,
+        duration: 8000,
+      })
+    }
+
     console.error('Failed to sign up: ', error)
   })
 }
@@ -191,19 +254,24 @@ async function signup() {
   --awesome-container__icon--color: var(--fa-icon--color--globe);
 }
 
-.awesome-fuzzy-select {
+.fuzzy-select {
   border-style: solid;
   border-width: 2px;
   border-color: var(--input--border-color);
   border-radius: var(--border-radius);
   background-color: var(--input--bg-color);
   padding: clamp(0.5rem, 0.75rem, 1.25rem);
-  font-size: clamp(1rem, 1vw, 1.1rem);
+  --fuzzy-select--font-size: clamp(0.9rem, 2vh, 1rem);
 }
 
-.awesome-fuzzy-select:hover,
-.awesome-fuzzy-select:focus-within {
+.fuzzy-select:hover,
+.fuzzy-select:focus-within {
   border-color: var(--input--border-color--focus);
   outline: none;
 }
+
+.fuzzy-select--error {
+  border-color: var(--input--border-color--error);
+}
+
 </style>

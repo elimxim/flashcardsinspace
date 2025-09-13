@@ -17,12 +17,12 @@
   background-color: var(--button--bg-color--action);
 }
 
-.button--update:hover,
-.button--sign-up:hover,
-.button--login:hover,
-.button--update:focus-within,
-.button--sign-up:focus-within,
-.button--login:focus-within {
+.button--update:not(.button--disabled):hover,
+.button--sign-up:not(.button--disabled):hover,
+.button--login:not(.button--disabled):hover,
+.button--update:not(.button--disabled):focus-within,
+.button--sign-up:not(.button--disabled):focus-within,
+.button--login:not(.button--disabled):focus-within {
   background-color: var(--button--bg-color--action--focus);
 }
 
@@ -43,4 +43,10 @@
 
 .button--reset {
 
+}
+
+.button--disabled {
+  background-color: var(--button--bg-color--disabled);
+  color: var(--button--color--disabled);
+  cursor: default;
 }

@@ -12,6 +12,7 @@ import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 import jakarta.validation.Payload
+import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
 interface Confidential {
@@ -111,16 +112,47 @@ class PasswordDeserializer : JsonDeserializer<Password>() {
     AnnotationTarget.VALUE_PARAMETER
 )
 @Retention(AnnotationRetention.RUNTIME)
-@Constraint(validatedBy = [ConfidentialValidator::class])
-annotation class ValidConfidential(
-    val message: String = "{jakarta.validation.constraints.invalidConfidential.message}",
+@Constraint(validatedBy = [ConfidentialRequiredValidator::class])
+annotation class RequiredConfidential(
+    val message: String = "{jakarta.validation.constraints.confidential.isBlank.message}",
     val groups: Array<KClass<*>> = [],
     val payload: Array<KClass<out Payload>> = [],
 )
 
-class ConfidentialValidator : ConstraintValidator<ValidConfidential, Confidential> {
+class ConfidentialRequiredValidator : ConstraintValidator<RequiredConfidential, Confidential> {
     override fun isValid(value: Confidential?, context: ConstraintValidatorContext?): Boolean {
         if (value == null) return true
-        return value.unmasked().isNotBlank() && value.unmasked().length <= 64
+        return value.unmasked().isNotBlank()
     }
 }
+
+@Target(
+    AnnotationTarget.FIELD,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.VALUE_PARAMETER
+)
+@Retention(AnnotationRetention.RUNTIME)
+@Constraint(validatedBy = [ConfidentialLengthValidator::class])
+annotation class ConfidentialLength(
+    val min: Int = 0,
+    val max: Int = Int.MAX_VALUE,
+    val message: String = "{jakarta.validation.constraints.confidential.lengthLimitExceeded}",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = [],
+)
+
+class ConfidentialLengthValidator : ConstraintValidator<ConfidentialLength, Confidential> {
+    var min by Delegates.notNull<Int>()
+    var max by Delegates.notNull<Int>()
+
+    override fun initialize(parameters: ConfidentialLength) {
+        min = parameters.min
+        max = parameters.max
+    }
+
+    override fun isValid(value: Confidential?, context: ConstraintValidatorContext?): Boolean {
+        if (value == null || value.unmasked().isBlank()) return true
+        return value.unmasked().length in min..max
+    }
+}
+

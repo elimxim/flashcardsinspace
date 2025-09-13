@@ -1,7 +1,8 @@
 package com.github.elimxim.flashcardsinspace.web.dto
 
+import com.github.elimxim.flashcardsinspace.security.ConfidentialLength
 import com.github.elimxim.flashcardsinspace.security.Password
-import com.github.elimxim.flashcardsinspace.security.ValidConfidential
+import com.github.elimxim.flashcardsinspace.security.RequiredConfidential
 import jakarta.validation.constraints.*
 import java.time.ZonedDateTime
 
@@ -15,7 +16,8 @@ class SignUpRequest(
     @field:Pattern(regexp="^[A-Za-z0-9_-]+$")
     var name: String?,
     @field:NotNull
-    @field:ValidConfidential
+    @field:RequiredConfidential
+    @field:ConfidentialLength(min = 6, max = 64)
     var secret: Password?,
     @field:NotNull
     @field:PositiveOrZero
@@ -34,7 +36,7 @@ class LoginRequest(
     @field:Email
     var email: String?,
     @field:NotNull
-    @field:ValidConfidential
+    @field:RequiredConfidential
     var secret: Password?
 )
 

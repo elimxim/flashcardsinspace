@@ -4,14 +4,16 @@
     ref="selectContainer"
     tabindex="0"
     @focus="openDropdown"
-    @focusout="handleFocusOut">
+    @focusout="handleFocusOut"
+  >
     <input
       v-if="!isOpen"
       type="text"
       class="input fuzzy-select__input transition--border-color"
       :value="selectedOptionLabel"
       :placeholder="optionPlaceholder"
-      style="pointer-events: none;"/>
+      style="pointer-events: none;"
+    />
     <input
       v-if="isOpen"
       type="text"
@@ -19,7 +21,8 @@
       ref="searchInput"
       v-model="searchQuery"
       :placeholder="searchPlaceholder"
-      @keydown="handleKeydown"/>
+      @keydown="handleKeydown"
+    />
     <ul v-if="isOpen" class="fuzzy-select__drop-down" ref="dropDownList">
       <li
         v-if="filteredOptions.length > 0"
@@ -180,6 +183,7 @@ function scrollHighlightedOptionIntoView() {
   outline: none;
   width: 100%;
   padding: 0;
+  font-size: var(--fuzzy-select--font-size, 1rem)
 }
 
 .fuzzy-select__drop-down {

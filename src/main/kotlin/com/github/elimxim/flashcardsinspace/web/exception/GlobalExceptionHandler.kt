@@ -2,6 +2,7 @@ package com.github.elimxim.flashcardsinspace.web.exception
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.github.elimxim.flashcardsinspace.Messages
 import com.github.elimxim.flashcardsinspace.security.escapeHtml
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -15,7 +16,7 @@ import java.time.LocalDateTime
 private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
 @ControllerAdvice
-class GlobalExceptionHandler {
+class GlobalExceptionHandler(private val messages: Messages) {
     @ExceptionHandler(NoResourceFoundException::class)
     fun handleNoResourceFoundException(e: NoResourceFoundException, request: WebRequest): ResponseEntity<Any> {
         log.warn("Resource not found for request {}: {}", request.getDescription(false), e.message)
@@ -25,7 +26,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(Exception::class)
     fun handleUnexpectedException(ex: Exception, request: WebRequest): ResponseEntity<ErrorResponseBody> {
         log.error("UNEXPECTED exception occurred", ex)
-        val body = ErrorResponseBody.from(
+        val body = errorBody(
             status = HttpStatus.INTERNAL_SERVER_ERROR,
             path = request.getDescription(false).escapeHtml(),
         )
@@ -37,7 +38,7 @@ class GlobalExceptionHandler {
     fun handle5xxException(e: Http5xxException, request: WebRequest): ResponseEntity<ErrorResponseBody> {
         val httpStatus = getHttpStatus(e)
         log.error("${httpStatus.name} exception occurred", e)
-        val body = ErrorResponseBody.from(
+        val body = errorBody(
             status = httpStatus,
             path = request.getDescription(false).escapeHtml(),
             e = e,
@@ -51,7 +52,7 @@ class GlobalExceptionHandler {
         val httpStatus = getHttpStatus(e)
         log.info("${httpStatus.name} exception occurred: ${e.message}", e.cause)
 
-        val body = ErrorResponseBody.from(
+        val body = errorBody(
             status = httpStatus,
             path = request.getDescription(false).escapeHtml(),
             e = e,
@@ -59,6 +60,23 @@ class GlobalExceptionHandler {
 
         return ResponseEntity(body, httpStatus)
     }
+
+    fun errorBody(
+        status: HttpStatus,
+        path: String,
+        e: HttpException? = null
+    ): ErrorResponseBody {
+        return ErrorResponseBody(
+            timestamp = LocalDateTime.now(),
+            httpStatus = status,
+            statusCode = status.value(),
+            statusError = status.reasonPhrase,
+            errorCode = getErrorCode(e),
+            message = messages.getMessage(e),
+            path = path,
+        )
+    }
+
 }
 
 data class ErrorResponseBody(
@@ -71,18 +89,4 @@ data class ErrorResponseBody(
     val errorCode: String,
     val message: String?,
     val path: String,
-) {
-    companion object {
-        fun from(status: HttpStatus, path: String, e: HttpException? = null): ErrorResponseBody {
-            return ErrorResponseBody(
-                timestamp = LocalDateTime.now(),
-                httpStatus = status,
-                statusCode = status.value(),
-                statusError = status.reasonPhrase,
-                errorCode = getErrorCode(e),
-                message = getUserMessage(e),
-                path = path,
-            )
-        }
-    }
-}
+)

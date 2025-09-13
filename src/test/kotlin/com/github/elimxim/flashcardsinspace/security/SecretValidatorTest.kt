@@ -17,7 +17,7 @@ class SecretValidatorTest {
     fun `Secret should pass validation if it's valid`() {
         // given:
         val validationContainer = object {
-            @ValidConfidential
+            @RequiredConfidential
             val secret: Secret = Secret("1234")
         }
 
@@ -32,7 +32,7 @@ class SecretValidatorTest {
     fun `Secret should be not empty`() {
         // given:
         val validationContainer = object {
-            @ValidConfidential
+            @RequiredConfidential
             val secret: Secret = Secret("")
         }
 
@@ -51,7 +51,7 @@ class SecretValidatorTest {
     fun `Secret should have length between 0 and 64`() {
         // given:
         val validationContainer = object {
-            @ValidConfidential
+            @RequiredConfidential
             val secret: Secret = Secret("0".repeat(65))
         }
 
@@ -70,7 +70,7 @@ class SecretValidatorTest {
     fun `Secret should pass validation if it's null`() {
         // given:
         val validationContainer = object {
-            @ValidConfidential
+            @RequiredConfidential
             val secret: Secret? = null
         }
 
