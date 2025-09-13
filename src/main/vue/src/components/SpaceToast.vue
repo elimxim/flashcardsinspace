@@ -1,44 +1,51 @@
 <template>
   <div class="space-container">
     <transition name="toast-transition">
-    <div
-      v-if="show"
-      class="space-toast space-toast-theme"
-      :toast-type="toast?.type"
-      @mouseenter="toaster.pause()"
-      @mouseleave="toaster.resume()"
-    >
-      <Starfield twinkle verticalDrift="2px"/>
-      <div class="space-toast__mixin"/>
-      <div class="space-toast__content">
-        <div class="space-toast__content__icon-box">
-          <font-awesome-icon v-if="toast?.type === ToastType.SUCCESS" icon="fa-solid fa-circle-check"/>
-          <font-awesome-icon v-else-if="toast?.type === ToastType.ERROR" icon="fa-solid fa-circle-exclamation"/>
-          <font-awesome-icon v-else-if="toast?.type === ToastType.INFO" icon="fa-solid fa-info-circle"/>
-          <font-awesome-icon v-else-if="toast?.type === ToastType.WARNING" icon="fa-solid fa-triangle-exclamation"/>
-          <font-awesome-icon v-else icon="fa-solid fa-circle-question"/>
-        </div>
-        <div class="space-toast__content__body">
-          <div class="space-toast__content__body__title">
-            {{ toast?.title }}
+      <div
+        v-if="show"
+        class="space-toast space-toast-theme"
+        :toast-type="toast?.type"
+        @mouseenter="toaster.pause()"
+        @mouseleave="toaster.resume()"
+      >
+        <Starfield twinkle verticalDrift="2px"/>
+        <div class="space-toast__mixin"/>
+        <div class="space-toast__content">
+          <div class="space-toast__content__icon__box">
+            <font-awesome-icon v-if="toast?.type === ToastType.SUCCESS"
+                               icon="fa-solid fa-circle-check"/>
+            <font-awesome-icon v-else-if="toast?.type === ToastType.ERROR"
+                               icon="fa-solid fa-circle-exclamation"/>
+            <font-awesome-icon v-else-if="toast?.type === ToastType.INFO"
+                               icon="fa-solid fa-info-circle"/>
+            <font-awesome-icon v-else-if="toast?.type === ToastType.WARNING"
+                               icon="fa-solid fa-triangle-exclamation"/>
+            <font-awesome-icon v-else icon="fa-solid fa-circle-question"/>
           </div>
-          <div class="space-toast__content__body__msg">
-            {{ toast?.message }}
+          <div class="space-toast__content__body">
+            <div class="space-toast__content__body__title">
+              {{ toast?.title }}
+            </div>
+            <div v-if="toast?.message" class="space-toast__content__body__msg">
+              {{ toast?.message }}
+            </div>
           </div>
+          <button class="space-toast__content__button" @click="toaster.dismiss()">
+            <font-awesome-icon icon="fa-solid fa-xmark"/>
+          </button>
         </div>
-        <button class="space-toast__content__button" @click="toaster.dismiss()">
-          <font-awesome-icon icon="fa-solid fa-xmark"/>
-        </button>
+        <div v-if="toast?.footer" class="space-toast__footer">
+          {{ toast?.footer }}
+        </div>
+        <div v-if="toast !== null && !toast.persistent" class="space-toast__progress">
+          <Progressbar
+            height="8px"
+            :duration="toast?.duration"
+            :paused="paused"
+          />
+        </div>
       </div>
-      <div v-if="toast !== null && !toast.persistent" class="space-toast__progress">
-        <Progressbar
-          height="8px"
-          :duration="toast?.duration"
-          :paused="paused"
-        />
-      </div>
-    </div>
-  </transition>
+    </transition>
   </div>
 </template>
 
@@ -171,6 +178,7 @@ onUnmounted(() => toaster.reset())
   -webkit-backdrop-filter: blur(6px);
   background: var(--toast--bg);
   box-shadow: 0 0 0 0 var(--color-glow);
+  font-family: var(--toast--font-family);
   pointer-events: auto;
 }
 
@@ -193,11 +201,12 @@ onUnmounted(() => toaster.reset())
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  margin: 1rem;
+  padding: 1rem;
   z-index: 10;
 }
 
-.space-toast__content__icon-box {
+.space-toast__content__icon__box {
+  flex: 99;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -216,21 +225,16 @@ onUnmounted(() => toaster.reset())
   flex: 100;
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
 }
 
 .space-toast__content__body__title {
   color: var(--title--color);
   font-weight: 600;
-  line-height: 1.5;
 }
 
 .space-toast__content__body__msg {
   color: var(--msg--color);
-  line-height: 1.5;
-}
-
-.space-toast__content__body__msg:empty {
-  display: none;
 }
 
 .space-toast__content__button {
@@ -255,9 +259,17 @@ onUnmounted(() => toaster.reset())
   background: var(--button--hover--bg);
 }
 
+.space-toast__footer {
+  position: relative;
+  text-align: right;
+  color: var(--msg--color);
+  opacity: 0.75;
+  padding: 0 1rem 0 1rem;
+  font-size: 0.65rem;
+}
+
 .space-toast__progress {
   position: relative;
-  margin-top: 0.75rem;
   --progressbar--from: var(--color-from);
   --progressbar--via: var(--color-via);
   --progressbar--to: var(--color-to);

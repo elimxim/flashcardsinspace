@@ -13,7 +13,7 @@
       class="auth-container transition--border-color"
       :class="{ 'auth-container--error': loginFailed }"
     >
-      <form @submit.prevent="login" class="auth-container__form">
+      <form @submit.prevent="login" class="auth-container__form" novalidate>
         <input
           class="input auth-container__form__input transition--border-color"
           :class="{ 'input--error': userEmailInvalid }"
@@ -21,9 +21,9 @@
           type="email"
           name="username"
           autocomplete="username"
-          :placeholder="userEmailRequired ? 'Email is required' : 'Email'"
+          :placeholder="userEmailNotSet ? 'Email is required' : 'Email'"
         />
-        <span v-if="userEmailInvalidPattern" class="auth-container__form__error">
+        <span v-if="userEmailFormatWrong" class="auth-container__form__error">
           This email seems to be lost in a cosmic dust cloud. Please check the format
         </span>
         <SecretInput
@@ -32,9 +32,9 @@
           :class="{ 'input--error': userPasswordInvalid }"
           name="password"
           automoplete="current-password"
-          :placeholder="userPasswordRequired ? 'Password is required' : 'Password'"
+          :placeholder="userPasswordNotSet ? 'Password is required' : 'Password'"
         />
-        <span v-if="userPasswordMaxLengthExceeded" class="auth-container__form__error transition--opacity">
+        <span v-if="userPasswordMaxLengthInvalid" class="auth-container__form__error transition--opacity">
           This secret is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <button
@@ -70,7 +70,7 @@ import crochetImg from '@/assets/rocket/crochet.png'
 import originalImg from '@/assets/rocket/original.png'
 import toyImg from '@/assets/rocket/toy.png'
 import { sendLoginRequest } from '@/api/auth-client.ts'
-import { ToastType, useSpaceToaster } from '@/stores/toast-store.ts'
+import { useSpaceToaster } from '@/stores/toast-store.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -94,17 +94,17 @@ const $v = useVuelidate({
 const formInvalid = computed(() => $v.value.$errors.length > 0)
 
 const userEmailInvalid = computed(() => $v.value.userEmail.$errors.length > 0)
-const userEmailRequired = computed(() =>
+const userEmailNotSet = computed(() =>
   $v.value.userEmail.$errors.find(v => v.$validator === 'required') !== undefined
 )
-const userEmailInvalidPattern = computed(() =>
+const userEmailFormatWrong = computed(() =>
   $v.value.userEmail.$errors.find(v => v.$validator === 'email') !== undefined
 )
 const userPasswordInvalid = computed(() => $v.value.userPassword.$errors.length > 0)
-const userPasswordRequired = computed(() =>
+const userPasswordNotSet = computed(() =>
   $v.value.userPassword.$errors.find(v => v.$validator === 'required') !== undefined
 )
-const userPasswordMaxLengthExceeded = computed(() =>
+const userPasswordMaxLengthInvalid = computed(() =>
   $v.value.userPassword.$errors.find(v => v.$validator === 'maxLength') !== undefined
 )
 
@@ -123,6 +123,7 @@ watch(userPassword, () => {
 })
 
 async function login() {
+  console.log('Logging in...')
   toaster.dismiss()
   loginFailed.value = false
   $v.value.$touch()
@@ -140,33 +141,13 @@ async function login() {
     loginFailed.value = true
 
     if (error.response?.status === 400) {
-      toaster.bake({
-        type: ToastType.ERROR,
-        title: 'We have an anomaly',
-        message: error.response?.data?.message,
-        duration: 8000,
-      })
+      toaster.bakeError('Anomaly detected', error.response?.data)
     } else if (error.response?.status === 401) {
-      toaster.bake({
-        type: ToastType.ERROR,
-        title: 'We couldn\'t recognize you',
-        message: error.response?.data?.message,
-        duration: 8000,
-      })
+      toaster.bakeError('We couldn\'t recognize you', error.response?.data)
     } else if (error.response?.status === 404) {
-      toaster.bake({
-        type: ToastType.ERROR,
-        title: 'We couldn\'t find you in our system',
-        message: error.response?.data?.message,
-        duration: 8000,
-      })
+      toaster.bakeError('We couldn\'t find you in our system', error.response?.data)
     } else {
-      toaster.bake({
-        type: ToastType.ERROR,
-        title: 'System error',
-        message: error.response?.data?.message,
-        duration: 8000,
-      })
+      toaster.bakeError('System error', error.response?.data)
     }
 
     console.error('Failed to log in: ', error)

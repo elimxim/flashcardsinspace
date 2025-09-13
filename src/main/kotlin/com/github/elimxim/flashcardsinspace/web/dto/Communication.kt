@@ -8,20 +8,20 @@ import java.time.ZonedDateTime
 
 class SignUpRequest(
     @field:NotNull
+    @field:NotBlank
     @field:Email
-    var email: String?,
+    var email: String? = null,
     @field:NotNull
     @field:NotBlank
     @field:Size(max = 64)
     @field:Pattern(regexp="^[A-Za-z0-9_-]+$")
-    var name: String?,
-    @field:NotNull
+    var name: String? = null,
     @field:RequiredConfidential
     @field:ConfidentialLength(min = 6, max = 64)
-    var secret: Password?,
+    var secret: Password? = null,
     @field:NotNull
     @field:PositiveOrZero
-    var languageId: Long?,
+    var languageId: Long? = null,
 )
 
 data class ValidSignUpRequest(
@@ -33,11 +33,11 @@ data class ValidSignUpRequest(
 
 class LoginRequest(
     @field:NotNull
+    @field:NotBlank
     @field:Email
-    var email: String?,
-    @field:NotNull
+    var email: String? = null,
     @field:RequiredConfidential
-    var secret: Password?
+    var secret: Password? = null,
 )
 
 data class ValidLoginRequest(

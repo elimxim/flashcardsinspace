@@ -121,8 +121,7 @@ annotation class RequiredConfidential(
 
 class ConfidentialRequiredValidator : ConstraintValidator<RequiredConfidential, Confidential> {
     override fun isValid(value: Confidential?, context: ConstraintValidatorContext?): Boolean {
-        if (value == null) return true
-        return value.unmasked().isNotBlank()
+        return value != null && value.unmasked().isNotBlank()
     }
 }
 

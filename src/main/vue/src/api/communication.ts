@@ -2,6 +2,15 @@ import type { Language } from '@/model/language.ts'
 import type { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 
+export interface ErrorResponseBody {
+  timestamp: Date
+  statusCode: number
+  statusError: string,
+  errorCode: string,
+  message: string | undefined,
+  path: string,
+}
+
 export interface LanguageGetResponse {
   languages: Language[]
 }

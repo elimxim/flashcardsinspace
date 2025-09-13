@@ -10,8 +10,9 @@
   --border-radius: 4px;
 
   /* fonts */
-  --main-font-family: 'Inter', sans-serif;
-  --error-font-family: 'Montserrat', sans-serif;
+  --main-font-family: Inter, sans-serif;
+  --error-font-family: Montserrat, sans-serif;
+  --toast--font-family: Lato, sans-serif;
 
   /* inputs */
   --input--color: #45454a;

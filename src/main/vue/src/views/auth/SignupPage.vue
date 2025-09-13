@@ -4,19 +4,19 @@
       class="auth-container transition--border-color"
       :class="{ 'auth-container--error': signupFailed }"
     >
-      <form @submit.prevent="signup" class="auth-container__form">
+      <form @submit.prevent="signup" class="auth-container__form" novalidate>
         <input
           class="input auth-container__form__input transition--border-color"
           v-model="username"
-          :class="{ 'input--error': usernameRequired }"
+          :class="{ 'input--error': usernameNotSet }"
           name="name"
           autocomplete="nickname"
-          :placeholder="usernameRequired ? 'Name is required' : 'Name'"
+          :placeholder="usernameNotSet ? 'Name is required' : 'Name'"
         />
-        <span v-if="usernameRegex" class="auth-container__form__error">
+        <span v-if="usernameRegexMismatch" class="auth-container__form__error">
           Please use only letters, numbers, dashes, and underscores
         </span>
-        <span v-else-if="usernameMaxLength" class="auth-container__form__error">
+        <span v-else-if="usernameMaxLengthInvalid" class="auth-container__form__error">
             This username is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <input
@@ -26,22 +26,19 @@
           name="username"
           autocomplete="username"
           :class="{ 'input--error': userEmailInvalid }"
-          :placeholder="userEmailRequired ? 'Email is required' : 'Email'"
+          :placeholder="userEmailNotSet ? 'Email is required' : 'Email'"
         />
-        <span v-if="userEmailPattern" class="auth-container__form__error">
+        <span v-if="userEmailWrongFormat" class="auth-container__form__error">
           This email seems to be lost in a cosmic dust cloud. Please check the format
         </span>
-        <AwesomeContainer
-          icon="fa-solid fa-globe"
-          class="awesome-container"
-        >
+        <AwesomeContainer icon="fa-solid fa-globe" class="awesome-container">
           <FuzzySelect
             class="fuzzy-select"
-            :class="{ 'input--error fuzzy-select--error': languageRequired }"
+            :class="{ 'input--error fuzzy-select--error': languageNotSet }"
             :options="languages"
             v-model="language"
             :optionLabel="(lang) => lang.name"
-            :optionPlaceholder="languageRequired ? 'Language is required' : 'Language'"
+            :optionPlaceholder="languageNotSet ? 'Language is required' : 'Language'"
             searchPlaceholder="Search..."
           />
         </AwesomeContainer>
@@ -51,12 +48,12 @@
           :class="{ 'input--error': userPasswordInvalid }"
           name="new-password"
           autocomplete="new-password"
-          :placeholder="userPasswordRequired ? 'Password is required' : 'Password'"
+          :placeholder="userPasswordNotSet ? 'Password is required' : 'Password'"
         />
-        <span v-if="userPasswordMinLength" class="auth-container__form__error">
+        <span v-if="userPasswordMinLengthInvalid" class="auth-container__form__error">
           Your password must be stronger than a piece of space junk. Please use 6 or more characters
         </span>
-        <span v-else-if="userPasswordMaxLength" class="auth-container__form__error">
+        <span v-else-if="userPasswordMaxLengthInvalid" class="auth-container__form__error">
           This secret is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <SecretInput
@@ -65,10 +62,10 @@
           :class="{ 'input--error': confirmPasswordInvalid }"
           name="confirm-password"
           autocomplete="new-password"
-          :placeholder="confirmPasswordRequired ? 'Password confirmation is required' : 'Confirm Password'"
+          :placeholder="confirmPasswordNotSet ? 'Password confirmation is required' : 'Confirm Password'"
         />
-        <span v-if="confirmPasswordConfirmed" class="auth-container__form__error">
-          The passwords do not align. Please try again
+        <span v-if="confirmPasswordMismatch" class="auth-container__form__error">
+          The passwords do not match. Please try again
         </span>
         <button
           ref="signUpButton"
@@ -104,7 +101,7 @@ import { storeToRefs } from 'pinia'
 import { useVuelidate } from '@vuelidate/core'
 import { required, email, minLength, helpers, maxLength } from '@vuelidate/validators'
 import { sendSignupRequest } from '@/api/auth-client.ts'
-import { ToastType, useSpaceToaster } from '@/stores/toast-store.ts'
+import { useSpaceToaster } from '@/stores/toast-store.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -147,42 +144,42 @@ const $v = useVuelidate({
 const formInvalid = computed(() => $v.value.$errors.length > 0)
 
 const usernameInvalid = computed(() => $v.value.username.$errors.length > 0)
-const usernameRequired = computed(() =>
+const usernameNotSet = computed(() =>
   $v.value.username.$errors.find(v => v.$validator === 'required') !== undefined
 )
-const usernameRegex = computed(() =>
+const usernameRegexMismatch = computed(() =>
   $v.value.username.$errors.find(v => v.$validator === 'regex') !== undefined
 )
-const usernameMaxLength = computed(() =>
+const usernameMaxLengthInvalid = computed(() =>
   $v.value.username.$errors.find(v => v.$validator === 'maxLength') !== undefined
 )
 const userEmailInvalid = computed(() => $v.value.userEmail.$errors.length > 0)
-const userEmailRequired = computed(() =>
+const userEmailNotSet = computed(() =>
   $v.value.userEmail.$errors.find(v => v.$validator === 'required') !== undefined
 )
-const userEmailPattern = computed(() =>
+const userEmailWrongFormat = computed(() =>
   $v.value.userEmail.$errors.find(v => v.$validator === 'email') !== undefined
 )
 const languageInvalid = computed(() => $v.value.language.$errors.length > 0)
-const languageRequired = computed(() =>
+const languageNotSet = computed(() =>
   $v.value.language.$errors.find(v => v.$validator === 'required') !== undefined
 )
 const userPasswordInvalid = computed(() => $v.value.userPassword.$errors.length > 0)
-const userPasswordRequired = computed(() =>
+const userPasswordNotSet = computed(() =>
   $v.value.userPassword.$errors.find(v => v.$validator === 'required') !== undefined
 )
-const userPasswordMinLength = computed(() =>
+const userPasswordMinLengthInvalid = computed(() =>
   $v.value.userPassword.$errors.find(v => v.$validator === 'minLength') !== undefined
 )
-const userPasswordMaxLength = computed(() =>
+const userPasswordMaxLengthInvalid = computed(() =>
   $v.value.userPassword.$errors.find(v => v.$validator === 'maxLength') !== undefined
 )
 const confirmPasswordInvalid = computed(() => $v.value.confirmPassword.$errors.length > 0)
-const confirmPasswordRequired = computed(() =>
+const confirmPasswordNotSet = computed(() =>
   $v.value.confirmPassword.$errors.find(v => v.$validator === 'required') !== undefined
 )
-const confirmPasswordConfirmed = computed(() =>
-  $v.value.confirmPassword.$errors.find(v => v.$validator === 'confirmed') !== undefined
+const confirmPasswordMismatch = computed(() =>
+  $v.value.confirmPassword.$errors.find(v => v.$validator === 'passwordConfirmed') !== undefined
 )
 
 watch(username, () => {
@@ -224,10 +221,11 @@ watch(confirmedPassword, () => {
 })
 
 async function signup() {
+  console.log('Signing up...')
   signupFailed.value = false
   $v.value.$touch()
   if ($v.value.$invalid) {
-    console.log('Invalid form')
+    console.error('The form is invalid')
     signUpButton.value?.blur()
     return
   }
@@ -245,12 +243,9 @@ async function signup() {
     signupFailed.value = true
 
     if (error.response?.status === 400) {
-      toaster.bake({
-        type: ToastType.ERROR,
-        title: 'We have an anomaly',
-        message: error.response?.data?.message,
-        duration: 8000,
-      })
+      toaster.bakeError('Anomaly detected', error.response?.data)
+    } else {
+      toaster.bakeError('System error', error.response?.data)
     }
 
     console.error('Failed to sign up: ', error)

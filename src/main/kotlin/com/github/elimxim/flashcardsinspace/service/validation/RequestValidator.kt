@@ -56,9 +56,9 @@ class RequestValidator(private val validator: Validator) {
 }
 
 private data class Violation(
-    val field: String,
-    val message: String,
-    val invalidValue: Any,
+    val field: String?,
+    val message: String?,
+    val invalidValue: Any?,
 )
 
 private fun <T> ConstraintViolation<T>.toViolation(): Violation {
@@ -69,5 +69,8 @@ private fun <T> ConstraintViolation<T>.toViolation(): Violation {
     )
 }
 
-private fun formatted(violations: List<Violation>) =
-    violations.joinToString(separator = "', '", prefix = "'", postfix = "'") { it.field }
+private fun formatted(violations: List<Violation>) = violations
+    .filter { !it.field.isNullOrBlank() }
+    .joinToString(separator = "', '", prefix = "'", postfix = "'") {
+        it.field.toString()
+    }

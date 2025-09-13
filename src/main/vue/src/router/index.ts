@@ -16,7 +16,7 @@ import SignupPage from '@/views/auth/SignupPage.vue'
 // @ts-ignore
 import LoginPage from '@/views/auth/LoginPage.vue'
 // @ts-ignore
-import LogoutView from '@/views/auth/LogoutView.vue'
+import LogoutPage from '@/views/auth/LogoutPage.vue'
 // @ts-ignore
 import PasswordResetView from '@/views/auth/PasswordResetView.vue'
 
@@ -83,7 +83,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/logout',
     name: routeNames.logout,
-    component: LogoutView,
+    component: LogoutPage,
   },
   {
     path: '/password-reset',
