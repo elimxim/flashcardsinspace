@@ -1,13 +1,17 @@
 <template>
   <div class="page-center-container">
-    <img
+    <SmartPicture
       alt="Lilrocket"
-      ref="lilrocket"
+      :base="currRocketImg"
+      :formats="['webp']"
+      fallbackExt="png"
+      :dimensions="{width: 128, height: 128}"
       class="lilrocket non-selectable non-draggable"
       :class="{ 'initial-bounce': isBouncing }"
       @mousedown="onMouseDown"
       @mouseup="onMouseUp"
       @mouseleave="onMouseUp"
+      dpr
     />
     <div
       class="auth-container transition--border-color"
@@ -59,16 +63,13 @@
 <script setup lang="ts">
 import SecretInput from '@/components/SecretInput.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
+import SmartPicture from '@/components/SmartPicture.vue'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { email, maxLength, required } from '@vuelidate/validators'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"
 import { routeNames } from "@/router/index.js"
-import clayImg from '@/assets/rocket/clay.png'
-import crochetImg from '@/assets/rocket/crochet.png'
-import originalImg from '@/assets/rocket/original.png'
-import toyImg from '@/assets/rocket/toy.png'
 import { sendLoginRequest } from '@/api/auth-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 
@@ -157,31 +158,27 @@ async function login() {
 // lilrocket>
 
 const rockets = [
-  clayImg,
-  crochetImg,
-  originalImg,
-  toyImg,
+  "clay",
+  "crochet",
+  "original",
+  "toy",
 ]
 
-const lilrocket = ref<HTMLImageElement>()
+const lilrocket = ref<HTMLElement>()
 const currRocketIdx = ref(0)
+const currRocketImg = computed(() => `/assets/rocket/${rockets[currRocketIdx.value]}`)
 let pressTimer: number | undefined
 
 function setRandomLilrocket() {
-  if (!lilrocket.value) return
-  const idx = Math.floor(Math.random() * rockets.length)
-  currRocketIdx.value = idx
-  lilrocket.value.src = rockets[idx]
+  currRocketIdx.value = Math.floor(Math.random() * rockets.length)
 }
 
 function setNextLilrocket() {
-  if (!lilrocket.value) return
   let nextIdx = currRocketIdx.value + 1
   if (nextIdx >= rockets.length) {
     nextIdx = 0
   }
   currRocketIdx.value = nextIdx
-  lilrocket.value.src = rockets[nextIdx]
 }
 
 function onMouseDown() {
@@ -225,10 +222,9 @@ onMounted(() => {
 
 <style scoped>
 .lilrocket {
-  height: 8em;
-  animation: shake 4s infinite ease-in-out;
   cursor: pointer;
-  z-index: 100;
+  animation: shake 4s infinite ease-in-out;
+  z-index: 1010;
 }
 
 .lilrocket.initial-bounce {
