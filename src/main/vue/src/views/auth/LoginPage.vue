@@ -1,18 +1,22 @@
 <template>
   <div class="page-center-container">
-    <SmartPicture
-      alt="Lilrocket"
-      :base="currRocketImg"
-      :formats="['webp']"
-      fallbackExt="png"
-      :dimensions="{width: 128, height: 128}"
+    <div
+      ref="lilrocket"
       class="lilrocket non-selectable non-draggable"
       :class="{ 'initial-bounce': isBouncing }"
       @mousedown="onMouseDown"
       @mouseup="onMouseUp"
       @mouseleave="onMouseUp"
-      dpr
-    />
+    >
+      <SmartPicture
+        alt="Lilrocket"
+        :base="currRocketImg"
+        :formats="['webp']"
+        fallbackExt="png"
+        :dimensions="{width: 128, height: 128}"
+        dpr
+      />
+    </div>
     <div
       class="auth-container transition--border-color"
       :class="{ 'auth-container--error': loginFailed }"
@@ -38,7 +42,8 @@
           automoplete="current-password"
           :placeholder="userPasswordNotSet ? 'Password is required' : 'Password'"
         />
-        <span v-if="userPasswordMaxLengthInvalid" class="auth-container__form__error transition--opacity">
+        <span v-if="userPasswordMaxLengthInvalid"
+              class="auth-container__form__error transition--opacity">
           This secret is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <button
@@ -82,7 +87,7 @@ const userPassword = ref('')
 const isBouncing = ref(true)
 const loginFailed = ref(false)
 
-const loginButton = ref<HTMLButtonElement>()
+const loginButton = ref<HTMLDivElement>()
 
 const $v = useVuelidate({
   userEmail: { required, email },
@@ -222,6 +227,9 @@ onMounted(() => {
 
 <style scoped>
 .lilrocket {
+  position: relative;
+  width: fit-content;
+  height: fit-content;
   cursor: pointer;
   animation: shake 4s infinite ease-in-out;
   z-index: 1010;
