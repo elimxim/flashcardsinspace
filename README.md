@@ -2,27 +2,23 @@
 
 ## TODOS
 
+- Functionality:
+  - Flashcard creation loop (enabled by default -> enable if it's asked to)
 - UX:
   - Responsive UI
   - Indexable for robots (searchable improvements)
   - Light and Dark themes
   - Link from Login page to Password reset page
   - Password reset functionality (sending emails)
-  - Password matching
   - New design of Menu bar
   - Remember if signed up using cookie (on/off refreshing JWT)
-  - Refreshing JWT support on the frontend
+  - JWT refresh
   - User page functionality: 
     - changing password, email, username
     - showing username, email, registration date
-  - Sending emails with a confirmation link
+  - Welcoming emails after signing up
   - Mobile friendly
-- Tech debt:
-  - Requests validation on the backend
-  - Errors handling (frontend & backend)
-  - Adding logging to help investigating bugs
-  - Including User.id in the logging context
-  - Tests
+  - Include User.id in the logging context
 - DevOps:
   - Notifications if the app is down
   - Notifications on errors in logs
