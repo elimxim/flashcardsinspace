@@ -14,7 +14,7 @@
         :formats="['webp']"
         fallbackExt="png"
         :dimensions="{width: 128, height: 128}"
-        crystalic
+        nonInteractive
         dpr
       />
     </div>

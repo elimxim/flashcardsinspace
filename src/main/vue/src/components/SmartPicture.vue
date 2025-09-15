@@ -1,9 +1,9 @@
 <template>
   <picture
-    :class="[{ 'crystalic': crystalic }]"
-    @selectstart.prevent="crystalic"
-    @dragstart.prevent="crystalic"
-    @contextmenu.prevent="crystalic"
+    :class="{ 'non-interactive': nonInteractive }"
+    @selectstart.prevent="onSelectStart"
+    @dragstart.prevent="onDragStart"
+    @contextmenu.prevent="onContextMenu"
   >
     <!-- Modern formats first -->
     <source
@@ -25,8 +25,8 @@
       :decoding="imgDecoding"
       :fetchpriority="imgFetchPriority"
       v-bind="$attrs"
-      :draggable="!crystalic"
-      :class="[{ 'crystalic': crystalic }]"
+      :draggable="!nonInteractive"
+      :class="{ 'non-interactive': nonInteractive }"
     />
   </picture>
 </template>
@@ -60,7 +60,7 @@ const props = withDefaults(defineProps<{
   /** LCP (Largest Contentful Paint) hero mode */
   hero?: boolean
   /** Makes <img> non-selectable, non-draggable, non-context-interactive */
-  crystalic?: boolean
+  nonInteractive?: boolean
 }>(), {
   alt: 'No image available',
   fallbackExt: 'jpg',
@@ -74,7 +74,7 @@ const props = withDefaults(defineProps<{
   containerMaxPx: 1200,
   dpr: false,
   hero: false,
-  crystalic: false,
+  nonInteractive: false,
 })
 
 const imgLoading = computed(() => props.hero ? 'eager' : 'lazy')
@@ -92,6 +92,10 @@ const imgSizes = computed(() => {
   return parts.join(', ')
 })
 
+function typeFor(fmt: Format) {
+  return `image/${fmt === 'jpg' ? 'jpeg' : fmt}`
+}
+
 function srcsetFor(format: Format) {
   if (props.dpr) {
     const x1 = `${props.base}@1x.${format}`
@@ -102,6 +106,7 @@ function srcsetFor(format: Format) {
   return props.widths.map(w => `${props.base}-${w}.${format} ${w}w`).join(', ')
 }
 
+const fallbackImgSrcset = computed(() => srcsetFor(props.fallbackExt))
 const fallbackImgSrc = computed(() => {
   if (props.dpr) return `${props.base}.${props.fallbackExt}`
   // choosing a reasonable default (2nd width) to avoid huge initial fetch
@@ -109,14 +114,20 @@ const fallbackImgSrc = computed(() => {
   return `${props.base}-${props.widths[index]}.${props.fallbackExt}`
 })
 
-const fallbackImgSrcset = computed(() => srcsetFor(props.fallbackExt))
-
-const typeFor = (fmt: Format) => `image/${fmt === 'jpg' ? 'jpeg' : fmt}`
+const onSelectStart = (e: Event) => {
+  if (props.nonInteractive) e.preventDefault()
+}
+const onDragStart = (e: DragEvent) => {
+  if (props.nonInteractive) e.preventDefault()
+}
+const onContextMenu = (e: MouseEvent) => {
+  if (props.nonInteractive) e.preventDefault()
+}
 </script>
 
 <style scoped>
-.crystalic,
-.crystalic * {
+.non-interactive,
+.non-interactive * {
   user-select: none;         /* Standard */
   -webkit-user-select: none; /* Safari, Chrome */
   -webkit-user-drag: none;   /* Safari, Chrome */
