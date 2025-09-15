@@ -70,7 +70,7 @@ class AuthService(
     @Transactional
     fun login(request: ValidLoginRequest): User {
         try {
-            val token = UsernamePasswordAuthenticationToken(request.email, request.secret)
+            val token = UsernamePasswordAuthenticationToken(request.email, request.secret.unmasked())
             authenticationManager.authenticate(token)
         } catch (e: Exception) {
             throw AuthenticationFailedException("Failed to authenticate user: ${request.email.escapeJava()}", e)
