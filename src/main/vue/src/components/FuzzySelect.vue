@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fuzzy-select non-selectable"
+    class="fuzzy-select select-none"
     ref="selectContainer"
     tabindex="0"
     @focus="openDropdown"

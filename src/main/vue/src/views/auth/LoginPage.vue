@@ -2,7 +2,7 @@
   <div class="page-center-container">
     <div
       ref="lilrocket"
-      class="lilrocket non-selectable non-draggable"
+      class="lilrocket"
       :class="{ 'initial-bounce': isBouncing }"
       @mousedown="onMouseDown"
       @mouseup="onMouseUp"
@@ -14,6 +14,7 @@
         :formats="['webp']"
         fallbackExt="png"
         :dimensions="{width: 128, height: 128}"
+        crystalic
         dpr
       />
     </div>

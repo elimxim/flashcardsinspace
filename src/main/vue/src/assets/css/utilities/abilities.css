@@ -1,13 +1,19 @@
-.non-selectable {
+.select-none {
   user-select: none;         /* Standard */
   -webkit-user-select: none; /* Safari, Chrome */
   -moz-user-select: none;    /* Firefox */
   -ms-user-select: none;     /* Edge */
 }
 
-.non-draggable {
+/* Stops image drag ghosting */
+.drag-none {
   user-drag: none;           /* Standard */
   -webkit-user-drag: none;   /* Safari, Chrome */
   -moz-user-drag: none;      /* Firefox */
   -ms-user-drag: none;       /* Edge */
+}
+
+/* Prevents “Save Image” callout on long press */
+.touch-callout-none {
+  -webkit-touch-callout: none;
 }

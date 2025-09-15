@@ -1,5 +1,10 @@
 <template>
-  <picture>
+  <picture
+    :class="[{ 'crystalic': crystalic }]"
+    @selectstart.prevent="crystalic"
+    @dragstart.prevent="crystalic"
+    @contextmenu.prevent="crystalic"
+  >
     <!-- Modern formats first -->
     <source
       v-for="format in formats"
@@ -20,6 +25,8 @@
       :decoding="imgDecoding"
       :fetchpriority="imgFetchPriority"
       v-bind="$attrs"
+      :draggable="!crystalic"
+      :class="[{ 'crystalic': crystalic }]"
     />
   </picture>
 </template>
@@ -52,6 +59,8 @@ const props = withDefaults(defineProps<{
   dpr?: boolean
   /** LCP (Largest Contentful Paint) hero mode */
   hero?: boolean
+  /** Makes <img> non-selectable, non-draggable, non-context-interactive */
+  crystalic?: boolean
 }>(), {
   alt: 'No image available',
   fallbackExt: 'jpg',
@@ -65,6 +74,7 @@ const props = withDefaults(defineProps<{
   containerMaxPx: 1200,
   dpr: false,
   hero: false,
+  crystalic: false,
 })
 
 const imgLoading = computed(() => props.hero ? 'eager' : 'lazy')
@@ -105,4 +115,18 @@ const typeFor = (fmt: Format) => `image/${fmt === 'jpg' ? 'jpeg' : fmt}`
 </script>
 
 <style scoped>
+.crystalic,
+.crystalic * {
+  user-select: none;         /* Standard */
+  -webkit-user-select: none; /* Safari, Chrome */
+  -webkit-user-drag: none;   /* Safari, Chrome */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* Edge */
+  -webkit-touch-callout: none;
+}
+
+/* Reduces 300ms tap delay & some gesture defaults without blocking clicks */
+:where(picture, img) {
+  touch-action: manipulation;
+}
 </style>
