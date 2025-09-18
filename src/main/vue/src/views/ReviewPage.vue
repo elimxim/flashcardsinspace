@@ -20,27 +20,7 @@
     </div>
     <div class="review-body">
       <div class="flashcard-container">
-        <div class="flashcard"
-             :class="{ 'flashcard-no-background': reviewFinished }"
-             ref="flashcardButton"
-             @click="flipFlashcard">
-          <div class="top-row">
-            <span class="corner-text" style="flex: 100">
-              {{ currFlashcard?.stage }}
-            </span>
-            <button class="corner-button"
-                    ref="flashcardEditButton"
-                    @click.stop="globalStore.toggleFlashcardEditModalForm()"
-                    :disabled="reviewFinished"
-                    :hidden="reviewFinished">
-              <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
-            </button>
-          </div>
-          <div class="flashcard-text"
-               :class="{ 'flashcard-text-color-dark': !reviewFinished, 'flashcard-text-color-light': reviewFinished }">
-            {{ currFlashcardText }}
-          </div>
-        </div>
+        <Flashcard/>
         <div class="flashcard-nav" v-if="settings.mode === ReviewMode.LIGHTSPEED">
           <button class="nav-button nav-red-button"
                   :disabled="reviewFinished"
@@ -98,23 +78,15 @@
       </div>
     </div>
   </div>
-
-
-  <FlashcardModificationModalForm
-    editMode
-    v-model:visible="flashcardEditModalFormOpen"
-    v-model:flashcard="currFlashcard"
-    v-model:removed="flashcardWasRemoved"/>
 </template>
 
 <script setup lang="ts">
 import Progressbar from '@/components/Progressbar.vue'
-import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
+import Flashcard from '@/components/Flashcard.vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useReviewStore } from '@/stores/review-store.ts'
-import { useGlobalStore } from '@/stores/global-store.ts'
 import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { nextStage, prevStage, Stage, stages } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
@@ -127,17 +99,14 @@ const props = defineProps<{
   stage?: Stage,
 }>()
 
-const globalStore = useGlobalStore()
 const chronoStore = useChronoStore()
 const reviewStore = useReviewStore()
 const flashcardSetStore = useFlashcardSetStore()
 
 const router = useRouter()
 const { flashcardSet } = storeToRefs(flashcardSetStore)
-const { flashcardEditModalFormOpen } = storeToRefs(globalStore)
 const {
   settings,
-  isFrontSide,
   currFlashcard,
   editFormWasOpened,
   reviewFinished,
@@ -155,25 +124,13 @@ const progress = computed(() => {
 })
 
 const escapeButton = ref<HTMLButtonElement>()
-const flashcardButton = ref<HTMLDivElement>()
 const stageDownButton = ref<HTMLButtonElement>()
 const stageUpButton = ref<HTMLButtonElement>()
 const prevButton = ref<HTMLButtonElement>()
 const nextButton = ref<HTMLButtonElement>()
 const moveBackButton = ref<HTMLButtonElement>()
+const flashcardButton = ref<HTMLDivElement>()
 const flashcardEditButton = ref<HTMLButtonElement>()
-
-const flashcardWasRemoved = ref(false)
-
-const currFlashcardText = computed(() => {
-  if (reviewFinished.value) {
-    return 'No more cards for review'
-  } else if (isFrontSide.value) {
-    return currFlashcard.value?.frontSide
-  } else {
-    return currFlashcard.value?.backSide
-  }
-})
 
 function finishReview() {
   flashcardsTotal.value = 0
@@ -185,10 +142,6 @@ function finishReview() {
   }
   reviewStore.finishReview()
   router.push({ name: routeNames.flashcards })
-}
-
-function flipFlashcard() {
-  reviewStore.flipFlashcard()
 }
 
 async function stageDown() {
@@ -246,15 +199,6 @@ function moveBack() {
   }
   moveBackButton.value?.blur()
 }
-
-watch(flashcardWasRemoved, (newValue) => {
-  if (newValue) {
-    reviewStore.setEditFormWasOpened(false)
-    reviewStore.setFrontSide(true)
-    reviewStore.nextFlashcard()
-    flashcardWasRemoved.value = false
-  }
-})
 
 async function loadReviewState() {
   console.log('Loading review state...')
