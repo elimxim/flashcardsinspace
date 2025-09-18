@@ -1,5 +1,5 @@
 <template>
-  <div class="page-center-container">
+  <div class="page-center-container page-padding-min">
     <div class="top-row">
       <span class="corner-text">
         {{ settings.topic }}
@@ -145,9 +145,14 @@ const {
 } = storeToRefs(reviewStore)
 
 const flashcardsTotal = ref(0);
-const progress = computed(() =>
-  Math.max(0, Math.min(1, (flashcardsTotal.value - flashcardsRunningTotal.value) / flashcardsTotal.value))
-)
+const progress = computed(() => {
+  const total = flashcardsTotal.value
+  const running = flashcardsRunningTotal.value
+  if (!total || total <= 0) return 0
+  const going = (total - running) / total
+  const safeGoing = Number.isFinite(going) ? going : 0
+  return Math.max(0, Math.min(1, safeGoing))
+})
 
 const escapeButton = ref<HTMLButtonElement>()
 const flashcardButton = ref<HTMLDivElement>()
@@ -377,6 +382,7 @@ function handleKeydown(event: KeyboardEvent) {
 
 .top-row {
   flex: 1;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -465,7 +471,6 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .corner-button {
-  flex: 1;
   border: none;
   outline: none;
   background: none;
@@ -479,7 +484,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .flashcard-progressbar {
-  flex: 98;
+  flex: 1;
   --progressbar--from: var(--review-progressbar--from);
   --progressbar--via: var(--review-progressbar--via);
   --progressbar--to: var(--review-progressbar--to);
@@ -487,10 +492,8 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .corner-text {
-  flex: 1;
   background: none;
   color: #9f9f9f;
   font-size: 1.2em;
-  padding: 8px;
 }
 </style>
