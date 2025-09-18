@@ -88,8 +88,7 @@ import { truncate } from '@/utils/string.ts'
 import { allStages, type Stage, specialStageSet } from '@/core-logic/stage-logic.ts'
 import { countFlashcards } from '@/core-logic/review-logic.ts'
 import router, { routeNames } from '@/router';
-import { saveSelectedSetId } from '@/cookies/cookies.ts';
-import { set } from 'js-cookie';
+import { saveSelectedSetId } from '@/cookies/cookies.ts'
 
 const globalStore = useGlobalStore()
 const flashcardSetsStore = useFlashcardSetsStore()
