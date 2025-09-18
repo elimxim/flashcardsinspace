@@ -1,10 +1,10 @@
 import { type Flashcard } from '@/model/flashcard.ts'
 import {
-  type Stage,
   getStage,
-  stages,
   specialStages,
+  type Stage,
   stageOrderMap,
+  stages,
 } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import type { Chronoday } from '@/model/chrono.ts'
@@ -13,7 +13,26 @@ import { shuffle } from '@/utils/array.ts'
 import {
   isCompleteAvailable,
   selectConsecutiveDaysBeforeIncluding
-} from '@/core-logic/chrono-logic.ts';
+} from '@/core-logic/chrono-logic.ts'
+
+export enum ReviewMode {
+  LIGHTSPEED = 'LIGHTSPEED',
+  SPECIAL = 'SPECIAL',
+  SPACE = 'SPACE',
+}
+
+export function toReviewMode(stage: Stage | undefined) {
+  if (stage === specialStages.UNKNOWN) {
+    return ReviewMode.SPECIAL
+  }
+  if (stage === specialStages.ATTEMPTED) {
+    return ReviewMode.SPECIAL
+  }
+  if (stage === specialStages.OUTER_SPACE) {
+    return ReviewMode.SPACE
+  }
+  return ReviewMode.LIGHTSPEED
+}
 
 export interface ReviewQueue {
   shuffle(): void

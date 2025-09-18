@@ -86,9 +86,9 @@ import {
   newFlashcard,
   updateFlashcardSides
 } from '@/core-logic/flashcard-logic.ts'
-import { useChronoStore } from '@/stores/chrono-store.ts';
-import { storeToRefs } from 'pinia';
-import { useFlashcardDataStore } from '@/stores/flashcard-data-store.ts';
+import { useChronoStore } from '@/stores/chrono-store.ts'
+import { useFlashcardSetsStore } from '@/stores/flashcard-data-store.ts'
+import { storeToRefs } from 'pinia'
 
 const props = defineProps({
   visible: Boolean,
@@ -107,7 +107,7 @@ const emit = defineEmits([
 
 const globalStore = useGlobalStore()
 const chronoStore = useChronoStore()
-const flashcardDataStore = useFlashcardDataStore()
+const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
 
 const { flashcardSet, isStarted } = storeToRefs(flashcardSetStore)
@@ -238,7 +238,7 @@ async function addNewFlashcard() {
         .then(async () => {
           await flashcardSetStore.syncFlashcardSet().then(async () => {
             if (flashcardSet.value != null) {
-              flashcardDataStore.overrideFlashcardSet(flashcardSet.value)
+              flashcardSetsStore.overrideFlashcardSet(flashcardSet.value)
             }
           })
         })

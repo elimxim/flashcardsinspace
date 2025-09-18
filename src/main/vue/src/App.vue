@@ -53,7 +53,7 @@ const languageStore = useLanguageStore()
 const { isAuthenticated } = storeToRefs(authStore)
 
 onMounted(() => {
-  languageStore.loadData()
+  languageStore.loadLanguages()
 })
 
 </script>

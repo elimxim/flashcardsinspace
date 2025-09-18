@@ -1,24 +1,17 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { storeToRefs } from 'pinia'
-// @ts-ignore
 import HomeView from '@/views/HomeView.vue'
-// @ts-ignore
 import FlashcardsView from '@/views/FlashcardsView.vue'
-// @ts-ignore
 import LeitnerView from '@/views/LeitnerView.vue'
-// @ts-ignore
 import SupportView from '@/views/SupportView.vue'
-// @ts-ignore
 import UserView from '@/views/UserView.vue'
-// @ts-ignore
 import SignupPage from '@/views/auth/SignupPage.vue'
-// @ts-ignore
 import LoginPage from '@/views/auth/LoginPage.vue'
-// @ts-ignore
 import LogoutPage from '@/views/auth/LogoutPage.vue'
-// @ts-ignore
 import PasswordResetView from '@/views/auth/PasswordResetView.vue'
+import ReviewPage from '@/views/ReviewPage.vue'
+import { toStage } from '@/core-logic/stage-logic.ts'
 
 export const routeNames = {
   base: 'base',
@@ -31,6 +24,7 @@ export const routeNames = {
   login: 'login',
   logout: 'logout',
   passwordReset: 'passwordReset',
+  review: 'review',
 }
 
 const routes: RouteRecordRaw[] = [
@@ -89,6 +83,17 @@ const routes: RouteRecordRaw[] = [
     path: '/password-reset',
     name: routeNames.passwordReset,
     component: PasswordResetView,
+  },
+  {
+    path: '/review',
+    name: routeNames.review,
+    component: ReviewPage,
+    props: (route) => ({
+      stage: toStage(route.query.stage),
+    }),
+    meta: {
+      requiresAuth: true,
+    },
   },
 ]
 

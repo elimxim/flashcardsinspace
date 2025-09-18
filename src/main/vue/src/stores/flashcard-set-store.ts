@@ -18,6 +18,7 @@ import { flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
 export interface FlashcardSetState {
   flashcardSet: FlashcardSet | null
   flashcardMap: Map<number, Flashcard>
+  loaded: boolean
 }
 
 export const useFlashcardSetStore = defineStore('flashcard-set', {
@@ -25,6 +26,7 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     return {
       flashcardSet: null,
       flashcardMap: new Map(),
+      loaded: false,
     }
   },
   getters: {
@@ -54,27 +56,33 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     },
   },
   actions: {
+    async loadFlashcardsFor(flashcardSet: FlashcardSet) {
+      this.resetState()
+      this.flashcardSet = flashcardSet
+      await this.loadFlashcards()
+    },
     async syncFlashcardSet(): Promise<void> {
       if (this.flashcardSet !== null) {
-        await apiClient.get<FlashcardSetGetResponse>('/flashcard-sets/' + this.flashcardSet.id).then(response => {
-          this.flashcardSet = response.data.flashcardSet
+        return this.loadFlashcardSet(this.flashcardSet.id)
+      }
+    },
+    async loadFlashcardSet(id: number): Promise<void> {
+      await apiClient.get<FlashcardSetGetResponse>('/flashcard-sets/' + id).then(response => {
+        this.flashcardSet = response.data.flashcardSet
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+    async loadFlashcards(): Promise<void> {
+      if (this.flashcardSet !== null) {
+        await apiClient.get<FlashcardsGetResponse>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards').then(response => {
+          this.flashcardMap = new Map(response.data.flashcards.map(v => [v.id, v]))
+          this.loaded = true
         }).catch(error => {
-          console.log(error)
+          console.error(error)
         })
       }
     },
-    async loadData(flashcardSet: FlashcardSet) {
-      this.flashcardSet = flashcardSet
-      await apiClient.get<FlashcardsGetResponse>('/flashcard-sets/' + flashcardSet.id + '/flashcards').then(response => {
-        this.flashcardMap = new Map(response.data.flashcards.map(v => [v.id, v]))
-      })
-      // todo handle errors
-    },
-    resetState() {
-      this.flashcardSet = null
-      this.flashcardMap = new Map()
-    },
-    // accept an update request instead of specific fields
     updateFlashcardSet(name: string | null, first: boolean | null) {
       if (this.flashcardSet !== null) {
         const request: FlashcardSetPutRequest = {
@@ -149,6 +157,11 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       } else {
         throw new Error(`Can't remove flashcard with id=${id}: flashcard set is null`)
       }
+    },
+    resetState() {
+      this.flashcardSet = null
+      this.flashcardMap = new Map()
+      this.loaded = false
     },
   }
 })

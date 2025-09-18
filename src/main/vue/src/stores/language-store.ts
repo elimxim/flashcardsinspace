@@ -4,13 +4,15 @@ import type { LanguageGetResponse } from '@/api/communication.ts'
 import publicApiClient from '@/api/public-api-client.ts'
 
 export interface LanguageState {
-  languageMap: Map<number, Language>,
+  languageMap: Map<number, Language>
+  loaded: boolean
 }
 
 export const useLanguageStore = defineStore('language', {
   state: (): LanguageState => {
     return {
-      languageMap: new Map()
+      languageMap: new Map(),
+      loaded: false,
     }
   },
   getters: {
@@ -19,16 +21,22 @@ export const useLanguageStore = defineStore('language', {
     }
   },
   actions: {
-    loadData() {
+    loadLanguages() {
       publicApiClient.get<LanguageGetResponse>('/languages')
         .then(response => {
+          this.resetState()
           this.languageMap = new Map(response.data.languages.map(v => [v.id, v]))
+          this.loaded = true
         })
       // todo deal with error
     },
     getLanguage(id: number): Language | null {
       return this.languageMap.get(id) ?? null
     },
+    resetState() {
+      this.languageMap = new Map()
+      this.loaded = false
+    }
   }
 })
 

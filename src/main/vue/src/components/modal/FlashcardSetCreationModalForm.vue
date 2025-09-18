@@ -56,7 +56,7 @@
 <script setup lang="ts">
 import ModalForm from '@/components/modal/ModalForm.vue'
 import { defineEmits, defineProps, type Ref, ref } from 'vue'
-import { useFlashcardDataStore } from '@/stores/flashcard-data-store.ts'
+import { useFlashcardSetsStore } from '@/stores/flashcard-data-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
@@ -75,14 +75,14 @@ defineProps({
 const emit = defineEmits(['update:visible'])
 
 const globalStore = useGlobalStore()
-const flashcardDataStore = useFlashcardDataStore()
+const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
 const chronoStore = useChronoStore()
 const reviewStore = useReviewStore()
 const languageStore = useLanguageStore()
 
 const { languages } = storeToRefs(languageStore)
-const { lastFlashcardSet } = storeToRefs(flashcardDataStore)
+const { lastFlashcardSet } = storeToRefs(flashcardSetsStore)
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 
 // state>
@@ -133,11 +133,11 @@ function createNewFlashcardSet() {
     throw new Error('Can\'t a new flashcard set because language is not set')
   }
   const newSet = createFlashcardSet(flashcardSetName.value, flashcardSetLanguage.value)
-  flashcardDataStore.addFlashcardSet(newSet).then(() => {
+  flashcardSetsStore.addFlashcardSet(newSet).then(() => {
     if (lastFlashcardSet.value !== null) {
-      flashcardSetStore.loadData(lastFlashcardSet.value).then(() => {
+      flashcardSetStore.loadFlashcardsFor(lastFlashcardSet.value).then(() => {
         if (flashcardSet.value !== null) {
-          chronoStore.loadData(flashcardSet.value)
+          chronoStore.loadChronodays(flashcardSet.value)
         }
       })
     }

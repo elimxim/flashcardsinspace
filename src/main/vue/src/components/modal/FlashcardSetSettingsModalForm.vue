@@ -73,7 +73,7 @@ import {
 } from 'vue'
 import { required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
-import { useFlashcardDataStore } from '@/stores/flashcard-data-store.ts'
+import { useFlashcardSetsStore } from '@/stores/flashcard-data-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { storeToRefs } from 'pinia'
 import { useReviewStore } from '@/stores/review-store.ts'
@@ -87,10 +87,10 @@ defineProps({
 
 const globalStore = useGlobalStore()
 const reviewStore = useReviewStore()
-const flashcardDataStore = useFlashcardDataStore()
+const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
 
-const { firstFlashcardSet } = storeToRefs(flashcardDataStore)
+const { firstFlashcardSet } = storeToRefs(flashcardSetsStore)
 const { flashcardSet, language } = storeToRefs(flashcardSetStore)
 
 // state>
@@ -170,10 +170,10 @@ function update() {
 
 function removeFlashcardSet() {
   if (flashcardSet.value !== null) {
-    flashcardDataStore.removeFlashcardSet(flashcardSet.value).then(() => {
+    flashcardSetsStore.removeFlashcardSet(flashcardSet.value).then(() => {
       reviewStore.finishReview()
       if (firstFlashcardSet.value !== null) {
-        flashcardSetStore.loadData(firstFlashcardSet.value)
+        flashcardSetStore.loadFlashcardsFor(firstFlashcardSet.value)
       } else {
         flashcardSetStore.resetState()
       }

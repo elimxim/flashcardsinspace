@@ -77,7 +77,7 @@ import FlashcardSetSettingsModalForm from '@/components/modal/FlashcardSetSettin
 import FlashcardSetCreationModalForm from '@/components/modal/FlashcardSetCreationModalForm.vue'
 import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
 import CalendarModalForm from '@/components/modal/CalendarModalForm.vue'
-import { useFlashcardDataStore } from '@/stores/flashcard-data-store.ts'
+import { useFlashcardSetsStore } from '@/stores/flashcard-data-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
@@ -87,14 +87,17 @@ import { useGlobalStore } from '@/stores/global-store.ts'
 import { truncate } from '@/utils/string.ts'
 import { allStages, type Stage, specialStageSet } from '@/core-logic/stage-logic.ts'
 import { countFlashcards } from '@/core-logic/review-logic.ts'
+import router, { routeNames } from '@/router';
+import { saveSelectedSetId } from '@/cookies/cookies.ts';
+import { set } from 'js-cookie';
 
 const globalStore = useGlobalStore()
-const flashcardDataStore = useFlashcardDataStore()
+const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
 const reviewStore = useReviewStore()
 const chronoStore = useChronoStore()
 
-const { flashcardSets, isEmpty: isNoFlashcardSets } = storeToRefs(flashcardDataStore)
+const { flashcardSets, isEmpty: isNoFlashcardSets } = storeToRefs(flashcardSetsStore)
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 const { currDay } = storeToRefs(chronoStore)
 const { started: reviewStarted } = storeToRefs(reviewStore)
@@ -133,11 +136,18 @@ function flashcardNumberByStage(stage: Stage): number {
 // <buckets
 
 const selectedFlashcardSet = computed({
-  get: () => flashcardSetStore.flashcardSet,
-  set: (newValue) => {
-    if (newValue !== null) {
-      flashcardSetStore.loadData(newValue)
-        .then(() => chronoStore.loadData(newValue))
+  get: () => {
+    const set = flashcardSetStore.flashcardSet
+    if (set !== null) {
+      saveSelectedSetId(set.id)
+    }
+    return set
+  },
+  set: (set) => {
+    if (set !== null) {
+      saveSelectedSetId(set.id)
+      flashcardSetStore.loadFlashcardsFor(set)
+        .then(() => chronoStore.loadChronodays(set))
         .then(() => reviewStore.finishReview())
     }
   }
@@ -168,7 +178,7 @@ function onCalendarClick() {
 }
 
 function startStageReview(stage: Stage) {
-  reviewStore.startSpecialReview(stage)
+  router.push({ name: routeNames.review, query: { stage: stage.name } })
 }
 
 onMounted(() => {

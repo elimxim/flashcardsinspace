@@ -124,3 +124,10 @@ export function getStage(name: string): Stage {
   }
   return stage
 }
+
+export function toStage(value: unknown): Stage | undefined {
+  if (typeof value === 'string') {
+    const str = String(value).trim().toUpperCase()
+    return stageNameMap.get(str)
+  }
+}

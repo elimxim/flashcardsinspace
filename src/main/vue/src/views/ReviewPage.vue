@@ -1,5 +1,5 @@
 <template>
-  <div v-if="started" class="review-main-area">
+  <div class="page-center-container">
     <div class="top-row">
       <span class="corner-text">
         {{ settings.topic }}
@@ -41,7 +41,7 @@
             {{ currFlashcardText }}
           </div>
         </div>
-        <div class="flashcard-nav" v-if="settings.mode === ReviewMode.LEITNER">
+        <div class="flashcard-nav" v-if="settings.mode === ReviewMode.LIGHTSPEED">
           <button class="nav-button nav-red-button"
                   :disabled="reviewFinished"
                   :hidden="reviewFinished"
@@ -113,22 +113,30 @@ import FlashcardModificationModalForm from '@/components/modal/FlashcardModifica
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { ReviewMode, useReviewStore } from '@/stores/review-store.ts'
+import { useReviewStore } from '@/stores/review-store.ts'
 import { useGlobalStore } from '@/stores/global-store.ts'
 import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
-import { nextStage, prevStage, stages } from '@/core-logic/stage-logic.ts'
+import { nextStage, prevStage, Stage, stages } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
+import { ReviewMode } from '@/core-logic/review-logic.ts'
+import { routeNames } from '@/router'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
+import { loadSelectedSetId } from '@/cookies/cookies.ts'
 
-const flashcardSetStore = useFlashcardSetStore()
+const props = defineProps<{
+  stage?: Stage,
+}>()
+
+const globalStore = useGlobalStore()
 const chronoStore = useChronoStore()
 const reviewStore = useReviewStore()
-const globalStore = useGlobalStore()
+const flashcardSetStore = useFlashcardSetStore()
 
+const router = useRouter()
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 const { flashcardEditModalFormOpen } = storeToRefs(globalStore)
 const {
   settings,
-  started,
   isFrontSide,
   currFlashcard,
   editFormWasOpened,
@@ -136,16 +144,7 @@ const {
   flashcardsRunningTotal,
 } = storeToRefs(reviewStore)
 
-const currFlashcardText = computed(() => {
-  if (reviewFinished.value) {
-    return 'No more cards for review'
-  } else if (isFrontSide.value) {
-    return currFlashcard.value?.frontSide
-  } else {
-    return currFlashcard.value?.backSide
-  }
-})
-
+const flashcardsTotal = ref(0);
 const progress = computed(() =>
   Math.max(0, Math.min(1, (flashcardsTotal.value - flashcardsRunningTotal.value) / flashcardsTotal.value))
 )
@@ -158,17 +157,29 @@ const prevButton = ref<HTMLButtonElement>()
 const nextButton = ref<HTMLButtonElement>()
 const moveBackButton = ref<HTMLButtonElement>()
 const flashcardEditButton = ref<HTMLButtonElement>()
-const flashcardsTotal = ref(flashcardsRunningTotal.value);
+
+const flashcardWasRemoved = ref(false)
+
+const currFlashcardText = computed(() => {
+  if (reviewFinished.value) {
+    return 'No more cards for review'
+  } else if (isFrontSide.value) {
+    return currFlashcard.value?.frontSide
+  } else {
+    return currFlashcard.value?.backSide
+  }
+})
 
 function finishReview() {
   flashcardsTotal.value = 0
   if (reviewFinished.value
-    && settings.value.mode === ReviewMode.LEITNER
+    && settings.value.mode === ReviewMode.LIGHTSPEED
     && flashcardSet.value !== null
   ) {
     chronoStore.markLastDaysAsCompleted(flashcardSet.value)
   }
   reviewStore.finishReview()
+  router.push({ name: routeNames.flashcards })
 }
 
 function flipFlashcard() {
@@ -180,12 +191,12 @@ async function stageDown() {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, prevStage(flashcard.stage))
     flashcardSetStore.updateFlashcard(flashcard)
-    if (settings.value.mode === ReviewMode.LEITNER) {
+    if (settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
     reviewStore.setEditFormWasOpened(false)
     reviewStore.setFrontSide(true)
-    if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LEITNER) {
+    if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
     }
   }
@@ -197,11 +208,11 @@ async function stageUp() {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, nextStage(flashcard.stage))
     flashcardSetStore.updateFlashcard(flashcard)
-    if (settings.value.mode === ReviewMode.LEITNER) {
+    if (settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
     reviewStore.setFrontSide(true)
-    if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LEITNER) {
+    if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
     }
   }
@@ -231,8 +242,6 @@ function moveBack() {
   moveBackButton.value?.blur()
 }
 
-const flashcardWasRemoved = ref(false)
-
 watch(flashcardWasRemoved, (newValue) => {
   if (newValue) {
     reviewStore.setEditFormWasOpened(false)
@@ -242,16 +251,74 @@ watch(flashcardWasRemoved, (newValue) => {
   }
 })
 
-onMounted(() => {
+async function loadReviewState() {
+  console.log('Loading review state...')
+  if (!reviewStore.loaded) {
+    console.log('reviewStore.loaded:', reviewStore.loaded)
+    if (!flashcardSetStore.loaded) {
+      console.log('flashcardSetStore.loaded:', flashcardSetStore.loaded)
+      const selectedSetId = loadSelectedSetId()
+      if (selectedSetId) {
+        console.log('Loading flashcard set', selectedSetId, '...')
+        await flashcardSetStore.loadFlashcardSet(selectedSetId)
+          .then(async () => {
+            console.log('Loading flashcards for set', selectedSetId, '...')
+            await flashcardSetStore.loadFlashcards()
+          })
+          .then(async () => {
+            if (!chronoStore.loaded) {
+              console.log('chronoStore.loaded:', chronoStore.loaded)
+              if (flashcardSet.value !== null) {
+                console.log('Loading chronodays...')
+                await chronoStore.loadChronodays(flashcardSet.value)
+              } else {
+                console.log('Flashcard set not found')
+              }
+            }
+          })
+      }
+    }
+    console.log('Starting review...')
+    console.log('flashcardSetStore.flashcards:', flashcardSetStore.flashcards.length)
+    reviewStore.startReview(flashcardSetStore.flashcards, props.stage)
+    flashcardsTotal.value = flashcardsRunningTotal.value;
+  } else {
+    reviewStore.startReview([], props.stage)
+    flashcardsTotal.value = 0
+  }
+}
+
+onMounted(async () => {
+  await loadReviewState()
+  console.log('Started review',
+    props.stage ? `on stage: ${props.stage}` : 'on default stage',
+    ', flashcards TOTAL: ', flashcardsTotal.value,
+  )
   document.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
+  console.log('Finishing review...',
+    props.stage ? ` on stage: ${props.stage}` : '',
+  )
+  flashcardsTotal.value = 0
+  reviewStore.finishReview()
   document.removeEventListener('keydown', handleKeydown)
 })
 
+onBeforeRouteLeave(() => {
+  console.log('Finishing review...',
+    props.stage ? ` on stage: ${props.stage}` : '',
+  )
+  flashcardsTotal.value = 0
+  reviewStore.finishReview()
+})
+
 function handleKeydown(event: KeyboardEvent) {
-  if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
+  if (event.key === 'Escape') {
+    event.stopPropagation()
+    escapeButton.value?.click()
+  } else if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
     event.stopPropagation()
     flashcardButton.value?.click()
   } else if (event.key === 'ArrowLeft') {
@@ -262,7 +329,7 @@ function handleKeydown(event: KeyboardEvent) {
     event.stopPropagation()
     stageUpButton.value?.click()
     nextButton.value?.click()
-  } else if (event.shiftKey && (event.key === 'e' || event.key === 'E')) {
+  } else if (event.key === 'e' || event.key === 'E') {
     event.stopPropagation()
     flashcardEditButton.value?.click()
   }
@@ -271,16 +338,6 @@ function handleKeydown(event: KeyboardEvent) {
 </script>
 
 <style scoped>
-.review-main-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  padding: 0;
-  margin: 0;
-}
-
 .review-body {
   flex: 100;
   display: flex;

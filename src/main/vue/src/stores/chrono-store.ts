@@ -22,6 +22,7 @@ import {
 export interface ChronoState {
   chronodays: Chronoday[]
   currDay: Chronoday
+  loaded: boolean
 }
 
 export const useChronoStore = defineStore('chrono', {
@@ -29,6 +30,7 @@ export const useChronoStore = defineStore('chrono', {
     return {
       chronodays: [],
       currDay: defaultCurrDay(),
+      loaded: false,
     }
   },
   getters: {
@@ -37,15 +39,8 @@ export const useChronoStore = defineStore('chrono', {
     },
   },
   actions: {
-    async loadData(flashcardSet: FlashcardSet): Promise<void> {
-      this.resetState()
-      await this.loadChronodays(flashcardSet)
-    },
-    resetState() {
-      this.chronodays = []
-      this.currDay = defaultCurrDay()
-    },
     async loadChronodays(flashcardSet: FlashcardSet): Promise<void> {
+      this.resetState()
       const chronodaysRequest: ChronodaysGetParams = {
         clientDatetime: new Date().toISOString()
       }
@@ -54,6 +49,7 @@ export const useChronoStore = defineStore('chrono', {
         .then(response => {
           this.chronodays = response.data.chronodays
           this.currDay = response.data.currDay
+          this.loaded = true
         })
       // todo catch errors
     },
@@ -65,7 +61,7 @@ export const useChronoStore = defineStore('chrono', {
         })
         // todo catch errors
         .then(async () => {
-          await this.loadData(flashcardSet)
+          await this.loadChronodays(flashcardSet)
           console.log(`Reloaded chrono data for flashcard set ${flashcardSet.id}`)
         })
     },
@@ -148,7 +144,12 @@ export const useChronoStore = defineStore('chrono', {
           this.loadChronodays(flashcardSet)
         )
       // todo handle errors
-    }
+    },
+    resetState() {
+      this.chronodays = []
+      this.currDay = defaultCurrDay()
+      this.loaded = false
+    },
   }
 })
 

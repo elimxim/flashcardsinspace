@@ -7,14 +7,16 @@ import type {
   FlashcardSetsGetResponse
 } from '@/api/communication.ts'
 
-export interface FlashcardDataState {
+export interface FlashcardSetsState {
   flashcardSets: FlashcardSet[]
+  loaded: boolean
 }
 
-export const useFlashcardDataStore = defineStore('flashcard-data', {
-  state: (): FlashcardDataState => {
+export const useFlashcardSetsStore = defineStore('flashcard-sets', {
+  state: (): FlashcardSetsState => {
     return {
       flashcardSets: [],
+      loaded: false,
     }
   },
   getters: {
@@ -29,7 +31,7 @@ export const useFlashcardDataStore = defineStore('flashcard-data', {
     },
   },
   actions: {
-    async loadData(): Promise<void> {
+    async loadFlashcardSets(): Promise<void> {
       await apiClient.get<FlashcardSetsGetResponse>('/flashcard-sets').then(response => {
         this.flashcardSets = response.data.flashcardSets.sort((a, b) => {
           if (a.default && !b.default) return -1
@@ -37,6 +39,7 @@ export const useFlashcardDataStore = defineStore('flashcard-data', {
 
           return a.name.localeCompare(b.name)
         })
+        this.loaded = true
       })
       // todo handle errors
     },
