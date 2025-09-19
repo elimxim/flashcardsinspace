@@ -1,32 +1,33 @@
 <template>
   <div
     class="flashcard"
-    :class="{ 'flashcard-no-background': reviewFinished }"
+    :class="{
+      'flashcard--bg-none': reviewFinished,
+      'flashcard--bg-front': isFrontSide,
+      'flashcard--bg-back': !isFrontSide,
+    }"
     ref="flashcardButton"
     @click="flipFlashcard"
   >
-    <div class="top-row">
-      <span class="corner-text" style="flex: 100">
+    <div v-if="!reviewFinished" class="flashcard__top">
+      <span class="flashcard__corner-text">
         {{ currFlashcard?.stage }}
       </span>
       <button
-        class="corner-button"
-        ref="flashcardEditButton"
+        class="flashcard__edit-button"
         @click.stop="globalStore.toggleFlashcardEditModalForm()"
-        :disabled="reviewFinished"
-        :hidden="reviewFinished"
       >
         <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
       </button>
     </div>
-    <div
-      class="flashcard-text"
-      :class="{
-        'flashcard-text-color-dark': !reviewFinished,
-        'flashcard-text-color-light': reviewFinished
-      }"
-    >
+    <div class="flashcard__body">
       {{ currFlashcardText }}
+    </div>
+    <div v-if="!reviewFinished" class="flashcard__bottom">
+      <span>
+        <font-awesome-icon icon="fa-regular fa-eye"/>
+        {{ viewedTimes }}
+      </span>
     </div>
   </div>
 
@@ -55,6 +56,9 @@ const {
   currFlashcard,
 } = storeToRefs(reviewStore)
 
+const flashcardWasRemoved = ref(false)
+const flashcardButton = ref<HTMLDivElement>()
+
 const currFlashcardText = computed(() => {
   if (reviewFinished.value) {
     return 'No more cards for review'
@@ -65,10 +69,9 @@ const currFlashcardText = computed(() => {
   }
 })
 
-const flashcardWasRemoved = ref(false)
-
-const flashcardButton = ref<HTMLDivElement>()
-const flashcardEditButton = ref<HTMLButtonElement>()
+const viewedTimes = computed(() => {
+  return (currFlashcard.value?.reviewCount ?? 0) + 1
+})
 
 function flipFlashcard() {
   reviewStore.flipFlashcard()
@@ -96,10 +99,6 @@ function handleKeydown(event: KeyboardEvent) {
     event.stopPropagation()
     flashcardButton.value?.click()
   }
-  if (event.key === 'e' || event.key === 'E') {
-    event.stopPropagation()
-    flashcardEditButton.value?.click()
-  }
 }
 
 </script>
@@ -109,58 +108,76 @@ function handleKeydown(event: KeyboardEvent) {
   position: relative;
   width: clamp(200px, 90vw, 600px);
   height: clamp(250px, 50vh, 450px);
-  background-color: #f0f0f0;
-  border-radius: 8px;
+  border-radius: 16px;
   overflow: hidden;
   overflow-wrap: break-word;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
 }
 
-.flashcard-no-background {
+.flashcard--bg-front {
+  background-color: #f0f0f0;
+}
+
+.flashcard--bg-back {
+  background-color: #dddddd;
+}
+
+.flashcard--bg-none {
   background: none;
+  cursor: default;
 }
 
-.top-row {
-  flex: 1;
-  width: 100%;
+.flashcard__top {
+  height: clamp(1.5rem, 4vh, 2rem);
+  font-size: clamp(01rem, 4vw, 1.2rem);
+  color: #cdcdcd;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
 
-
-.corner-text {
-  background: none;
-  color: #9f9f9f;
-  font-size: 1.2em;
+.flashcard__body {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  color: #686868;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.corner-button {
+.flashcard__bottom {
+  height: clamp(1.5rem, 4vh, 2rem);
+  font-size: clamp(01rem, 4vw, 1.2rem);
+  color: #9f9f9f;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.flashcard__corner-text {
+  background: none;
+  font-size: inherit;
+  color: inherit;
+}
+
+.flashcard__edit-button {
   border: none;
   outline: none;
   background: none;
   cursor: pointer;
-  font-size: 1.5em;
-  color: #c5c5c5;
+  font-size: inherit;
+  color: inherit;
 }
 
-.corner-button:hover {
+.flashcard__edit-button:hover {
   color: #9f9f9f;
-}
-
-.flashcard-text {
-  flex: 100;
-  font-size: 1.8em;
-  text-align: center;
-  align-content: center;
-}
-
-.flashcard-text-color-dark {
-  color: #686868;
-}
-
-.flashcard-text-color-light {
-  color: #aeaeae;
 }
 </style>

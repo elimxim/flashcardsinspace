@@ -7,7 +7,7 @@
     ]"
   >
     <div class="top-row">
-      <span class="corner-text">
+      <span class="flashcard__corner-text">
         {{ settings.topic }}
       </span>
       <span class="flashcard-progressbar">
@@ -18,7 +18,7 @@
           barRounded
         />
       </span>
-      <button class="corner-button"
+      <button class="flashcard__edit-button"
               ref="escapeButton"
               @click="finishReview">
         <font-awesome-icon icon="fa-solid fa-xmark"/>
@@ -308,7 +308,6 @@ function handleKeydown(event: KeyboardEvent) {
   width: fit-content;
   gap: 20px;
   overflow: hidden;
-  background: pink;
 }
 
 .flashcard-nav {
@@ -316,6 +315,7 @@ function handleKeydown(event: KeyboardEvent) {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  height: 2rem;
   gap: 20px;
 }
 
@@ -371,7 +371,7 @@ function handleKeydown(event: KeyboardEvent) {
   cursor: default;
 }
 
-.corner-button {
+.flashcard__edit-button {
   border: none;
   outline: none;
   background: none;
@@ -380,7 +380,7 @@ function handleKeydown(event: KeyboardEvent) {
   color: #c5c5c5;
 }
 
-.corner-button:hover {
+.flashcard__edit-button:hover {
   color: #9f9f9f;
 }
 
@@ -392,7 +392,7 @@ function handleKeydown(event: KeyboardEvent) {
   --progressbar--bg-color: var(--review-progressbar--bg-color);
 }
 
-.corner-text {
+.flashcard__corner-text {
   background: none;
   color: #9f9f9f;
   font-size: 1.2em;
