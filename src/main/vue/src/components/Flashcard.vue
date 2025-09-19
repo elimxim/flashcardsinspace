@@ -131,6 +131,12 @@ function handleKeydown(event: KeyboardEvent) {
   flex-direction: column;
   perspective: 1000px;
   background-color: transparent;
+  transition: transform 0.2s ease-out;
+  will-change: transform;
+}
+
+.flashcard:not(.flashcard--none):hover {
+  transform: scale(1.02);
 }
 
 .flashcard-flipped .flashcard__flipper {
@@ -139,7 +145,7 @@ function handleKeydown(event: KeyboardEvent) {
 
 .flashcard__flipper {
   flex: 1;
-  transition: transform 0.6s ease-in-out;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
   transform-style: preserve-3d;
   position: relative;
   will-change: transform;
@@ -156,14 +162,17 @@ function handleKeydown(event: KeyboardEvent) {
   border-radius: 24px;
   overflow: hidden;
   overflow-wrap: break-word;
+  box-shadow: 0 8px 24px hsla(0, 0%, 0%, 0.15);
 }
 
 .flashcard__front {
-  background-color: #f0f0f0;
+  background-color: #fdfdfd;
+  background-image: linear-gradient(0deg, rgba(34, 34, 34, 0.15) 1px, transparent 1px);
+  background-size: 100% 28px;
 }
 
 .flashcard__back {
-  background-color: #dddddd;
+  background-color: #fdfdfd;
   transform: rotateY(180deg);
 }
 
@@ -176,7 +185,7 @@ function handleKeydown(event: KeyboardEvent) {
 .flashcard__strip {
   height: fit-content;
   font-size: clamp(1rem, 2vw, 1.2rem);
-  color: #cdcdcd;
+  color: #9f9f9f;
   display: flex;
   justify-content: space-between;
   padding-left: 4px;
@@ -212,6 +221,6 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .flashcard__edit-button:hover {
-  color: #9f9f9f;
+  color: #686868;
 }
 </style>
