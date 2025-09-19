@@ -2,32 +2,60 @@
   <div
     class="flashcard"
     :class="{
-      'flashcard--bg-none': reviewFinished,
-      'flashcard--bg-front': isFrontSide,
-      'flashcard--bg-back': !isFrontSide,
+      'flashcard--none': reviewFinished,
+      'flashcard-flipped': !isFrontSide && !reviewFinished,
     }"
     ref="flashcardButton"
     @click="flipFlashcard"
   >
-    <div v-if="!reviewFinished" class="flashcard__top">
-      <span class="flashcard__corner-text">
-        {{ currFlashcard?.stage }}
-      </span>
-      <button
-        class="flashcard__edit-button"
-        @click.stop="globalStore.toggleFlashcardEditModalForm()"
-      >
-        <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
-      </button>
+    <div v-if="reviewFinished" class="flashcard__body">
+      {{ 'No more cards for review' }}
     </div>
-    <div class="flashcard__body">
-      {{ currFlashcardText }}
-    </div>
-    <div v-if="!reviewFinished" class="flashcard__bottom">
-      <span>
-        <font-awesome-icon icon="fa-regular fa-eye"/>
-        {{ viewedTimes }}
-      </span>
+    <div v-else class="flashcard__flipper">
+      <div class="flashcard__face flashcard__front">
+        <div class="flashcard__strip">
+          <span class="flashcard__corner-text">
+            {{ currFlashcard?.stage }}
+          </span>
+          <button
+            class="flashcard__edit-button"
+            @click.stop="globalStore.toggleFlashcardEditModalForm()"
+          >
+            <font-awesome-icon icon="fa-solid fa-pen-to-square" />
+          </button>
+        </div>
+        <div class="flashcard__body">
+          {{ currFlashcard?.frontSide }}
+        </div>
+        <div class="flashcard__strip">
+          <span>
+            <font-awesome-icon icon="fa-regular fa-eye" />
+            {{ viewedTimes }}
+          </span>
+        </div>
+      </div>
+      <div class="flashcard__face flashcard__back">
+        <div class="flashcard__strip">
+          <span class="flashcard__corner-text">
+            {{ currFlashcard?.stage }}
+          </span>
+          <button
+            class="flashcard__edit-button"
+            @click.stop="globalStore.toggleFlashcardEditModalForm()"
+          >
+            <font-awesome-icon icon="fa-solid fa-pen-to-square" />
+          </button>
+        </div>
+        <div class="flashcard__body">
+          {{ currFlashcard?.backSide }}
+        </div>
+        <div class="flashcard__strip">
+          <span>
+            <font-awesome-icon icon="fa-regular fa-eye" />
+            {{ viewedTimes }}
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -58,16 +86,6 @@ const {
 
 const flashcardWasRemoved = ref(false)
 const flashcardButton = ref<HTMLDivElement>()
-
-const currFlashcardText = computed(() => {
-  if (reviewFinished.value) {
-    return 'No more cards for review'
-  } else if (isFrontSide.value) {
-    return currFlashcard.value?.frontSide
-  } else {
-    return currFlashcard.value?.backSide
-  }
-})
 
 const viewedTimes = computed(() => {
   return (currFlashcard.value?.reviewCount ?? 0) + 1
@@ -108,35 +126,61 @@ function handleKeydown(event: KeyboardEvent) {
   position: relative;
   width: clamp(200px, 90vw, 600px);
   height: clamp(250px, 50vh, 450px);
-  border-radius: 16px;
-  overflow: hidden;
-  overflow-wrap: break-word;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  padding: 0.5rem;
+  perspective: 1000px;
+  background-color: transparent;
 }
 
-.flashcard--bg-front {
+.flashcard-flipped .flashcard__flipper {
+  transform: rotateY(180deg);
+}
+
+.flashcard__flipper {
+  flex: 1;
+  transition: transform 0.6s ease-in-out;
+  transform-style: preserve-3d;
+  position: relative;
+  will-change: transform;
+}
+
+.flashcard__face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  padding: 0.4rem;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  border-radius: 24px;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+
+.flashcard__front {
   background-color: #f0f0f0;
 }
 
-.flashcard--bg-back {
+.flashcard__back {
   background-color: #dddddd;
+  transform: rotateY(180deg);
 }
 
-.flashcard--bg-none {
+.flashcard--none {
   background: none;
   cursor: default;
+  perspective: none;
 }
 
-.flashcard__top {
-  height: clamp(1.5rem, 4vh, 2rem);
-  font-size: clamp(01rem, 4vw, 1.2rem);
+.flashcard__strip {
+  height: fit-content;
+  font-size: clamp(1rem, 2vw, 1.2rem);
   color: #cdcdcd;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  padding-left: 4px;
+  padding-right: 4px;
   gap: 10px;
 }
 
@@ -150,16 +194,6 @@ function handleKeydown(event: KeyboardEvent) {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.flashcard__bottom {
-  height: clamp(1.5rem, 4vh, 2rem);
-  font-size: clamp(01rem, 4vw, 1.2rem);
-  color: #9f9f9f;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
 }
 
 .flashcard__corner-text {

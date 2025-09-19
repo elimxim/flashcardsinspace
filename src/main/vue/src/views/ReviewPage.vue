@@ -307,7 +307,6 @@ function handleKeydown(event: KeyboardEvent) {
   justify-content: center;
   width: fit-content;
   gap: 20px;
-  overflow: hidden;
 }
 
 .flashcard-nav {
