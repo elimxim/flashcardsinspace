@@ -1,5 +1,11 @@
 <template>
-  <div class="page-center-container logout-container">
+  <div
+    :class="[
+      'page',
+      'logout-container',
+      'page--auto-padded',
+    ]"
+  >
     <Progressbar
       class="logout-progressbar"
       :duration="redirectDelay"

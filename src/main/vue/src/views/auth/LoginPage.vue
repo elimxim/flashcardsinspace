@@ -1,5 +1,12 @@
 <template>
-  <div class="page-center-container">
+  <div
+    :class="[
+      'page',
+      'page--x-centered',
+      'page--y-centered',
+      'page--auto-padded',
+    ]"
+  >
     <div
       ref="lilrocket"
       class="lilrocket"
@@ -237,7 +244,8 @@ onMounted(() => {
   height: fit-content;
   cursor: pointer;
   animation: shake 4s infinite ease-in-out;
-  z-index: 1010;
+  margin: 0 auto;
+  z-index: 100;
 }
 
 .lilrocket.initial-bounce {

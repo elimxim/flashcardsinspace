@@ -1,5 +1,12 @@
 <template>
-  <div class="page-center-container">
+  <div
+    :class="[
+      'page',
+      'page--x-centered',
+      'page--y-centered',
+      'page--auto-padded',
+    ]"
+  >
     <div
       class="auth-container transition--border-color"
       :class="{ 'auth-container--error': signupFailed }"

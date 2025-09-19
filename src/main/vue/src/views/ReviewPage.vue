@@ -1,5 +1,11 @@
 <template>
-  <div class="page-center-container page-padding-min">
+  <div
+    :class="[
+      'page',
+      'page--x-centered',
+      'page--min-padded',
+    ]"
+  >
     <div class="top-row">
       <span class="corner-text">
         {{ settings.topic }}
@@ -19,62 +25,60 @@
       </button>
     </div>
     <div class="review-body">
-      <div class="flashcard-container">
-        <Flashcard/>
-        <div class="flashcard-nav" v-if="settings.mode === ReviewMode.LIGHTSPEED">
-          <button class="nav-button nav-red-button"
-                  :disabled="reviewFinished"
-                  :hidden="reviewFinished"
-                  ref="stageDownButton"
-                  @click="stageDown">
-            Don't know
-          </button>
-          <button class="nav-button nav-green-button"
-                  :class="{ 'nav-button-disabled': editFormWasOpened }"
-                  :disabled="editFormWasOpened || reviewFinished"
-                  :hidden="reviewFinished"
-                  ref="stageUpButton"
-                  @click="stageUp">
-            Know
-          </button>
-        </div>
-        <div class="flashcard-nav" v-if="settings.mode === ReviewMode.SPECIAL">
-          <button class="nav-button nav-blue-button"
-                  :hidden="reviewFinished"
-                  ref="prevButton"
-                  @click="prev">
-            Prev
-          </button>
-          <button class="nav-button nav-blue-button"
-                  :disabled="reviewFinished"
-                  :hidden="reviewFinished"
-                  ref="nextButton"
-                  @click="next">
-            Next
-          </button>
-        </div>
-        <div class="flashcard-nav" v-if="settings.mode === ReviewMode.SPACE">
-          <button class="nav-button nav-blue-button"
-                  :hidden="reviewFinished"
-                  ref="prevButton"
-                  @click="prev">
-            Prev
-          </button>
-          <button class="nav-button nav-black-button"
-                  :disabled="reviewFinished"
-                  :hidden="reviewFinished"
-                  ref="moveBackButton"
-                  @click="moveBack">
-            Move back
-          </button>
-          <button class="nav-button nav-blue-button"
-                  :disabled="reviewFinished"
-                  :hidden="reviewFinished"
-                  ref="nextButton"
-                  @click="next">
-            Next
-          </button>
-        </div>
+      <Flashcard/>
+      <div class="flashcard-nav" v-if="settings.mode === ReviewMode.LIGHTSPEED">
+        <button class="nav-button nav-red-button"
+                :disabled="reviewFinished"
+                :hidden="reviewFinished"
+                ref="stageDownButton"
+                @click="stageDown">
+          Don't know
+        </button>
+        <button class="nav-button nav-green-button"
+                :class="{ 'nav-button-disabled': editFormWasOpened }"
+                :disabled="editFormWasOpened || reviewFinished"
+                :hidden="reviewFinished"
+                ref="stageUpButton"
+                @click="stageUp">
+          Know
+        </button>
+      </div>
+      <div class="flashcard-nav" v-if="settings.mode === ReviewMode.SPECIAL">
+        <button class="nav-button nav-blue-button"
+                :hidden="reviewFinished"
+                ref="prevButton"
+                @click="prev">
+          Prev
+        </button>
+        <button class="nav-button nav-blue-button"
+                :disabled="reviewFinished"
+                :hidden="reviewFinished"
+                ref="nextButton"
+                @click="next">
+          Next
+        </button>
+      </div>
+      <div class="flashcard-nav" v-if="settings.mode === ReviewMode.SPACE">
+        <button class="nav-button nav-blue-button"
+                :hidden="reviewFinished"
+                ref="prevButton"
+                @click="prev">
+          Prev
+        </button>
+        <button class="nav-button nav-black-button"
+                :disabled="reviewFinished"
+                :hidden="reviewFinished"
+                ref="moveBackButton"
+                @click="moveBack">
+          Move back
+        </button>
+        <button class="nav-button nav-blue-button"
+                :disabled="reviewFinished"
+                :hidden="reviewFinished"
+                ref="nextButton"
+                @click="next">
+          Next
+        </button>
       </div>
     </div>
   </div>
@@ -287,79 +291,32 @@ function handleKeydown(event: KeyboardEvent) {
 </script>
 
 <style scoped>
-.review-body {
-  flex: 100;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.flashcard-container {
-  flex: 10;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 20px;
-  min-width: 600px;
-  max-width: 600px;
-  min-height: 400px;
-  max-height: 400px;
-  margin-bottom: 5%;
-}
-
-.flashcard {
-  flex: 100;
-  display: flex;
-  flex-direction: column;
-  background-color: #f0f0f0;
-  border-radius: 8px;
-  overflow: hidden;
-  overflow-wrap: break-word;
-  user-select: none;
-  cursor: pointer;
-}
-
-.flashcard-no-background {
-  background: none;
-}
-
 .top-row {
-  flex: 1;
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   gap: 10px;
 }
 
-.flashcard-text {
-  flex: 100;
-  font-size: 1.8em;
-  text-align: center;
-  align-content: center;
-}
-
-.flashcard-text-color-dark {
-  color: #686868;
-}
-
-.flashcard-text-color-light {
-  color: #aeaeae;
+.review-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  gap: 20px;
+  overflow: hidden;
+  background: pink;
 }
 
 .flashcard-nav {
-  flex: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.flashcard-nav-single {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
+  gap: 20px;
 }
 
 .nav-button {

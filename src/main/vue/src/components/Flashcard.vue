@@ -106,15 +106,18 @@ function handleKeydown(event: KeyboardEvent) {
 
 <style scoped>
 .flashcard {
-  flex: 100;
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  width: clamp(200px, 90vw, 600px);
+  height: clamp(250px, 50vh, 450px);
   background-color: #f0f0f0;
   border-radius: 8px;
   overflow: hidden;
   overflow-wrap: break-word;
-  user-select: none;
   cursor: pointer;
+}
+
+.flashcard-no-background {
+  background: none;
 }
 
 .top-row {
@@ -126,9 +129,6 @@ function handleKeydown(event: KeyboardEvent) {
   gap: 10px;
 }
 
-.flashcard-no-background {
-  background: none;
-}
 
 .corner-text {
   background: none;
