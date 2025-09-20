@@ -26,8 +26,8 @@
     </div>
     <div class="review-body">
       <div class="flashcard-wrapper">
-        <transition :name="flashcardTransition">
-          <Flashcard :key="currFlashcard ? currFlashcard.id : 'no-card'"/>
+        <transition :name="!deckReady || reviewFinished ? '' : flashcardTransition">
+          <Flashcard :key="currFlashcard ? currFlashcard.id : 0"/>
         </transition>
       </div>
       <div class="flashcard-nav" v-if="settings.mode === ReviewMode.LIGHTSPEED">
@@ -133,6 +133,7 @@ const progress = computed(() => {
 })
 
 const flashcardTransition = ref('slide-next')
+const deckReady = ref(false)
 
 const escapeButton = ref<HTMLButtonElement>()
 const stageDownButton = ref<HTMLButtonElement>()
@@ -265,6 +266,7 @@ async function loadReviewState() {
 
 onMounted(async () => {
   await loadReviewState()
+  deckReady.value = true
   console.log('Started review',
     props.stage ? `on stage: ${props.stage}` : 'on default stage',
     ', flashcards TOTAL: ', flashcardsTotal.value,
@@ -423,7 +425,7 @@ function handleKeydown(event: KeyboardEvent) {
   perspective: 100px;
 }
 
-.flashcard-wrapper :deep(.flashcard) {
+.flashcard-wrapper >>> .flashcard {
   grid-area: 1 / 1;
 }
 
