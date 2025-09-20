@@ -1,70 +1,71 @@
 <template>
-  <div
-    class="flashcard"
-    :class="{
+  <div class="flashcard">
+    <div
+      class="flashcard__content"
+      :class="{
       'flashcard--none': reviewFinished,
       'flashcard-flipped': !isFrontSide && !reviewFinished,
     }"
-    ref="flashcardButton"
-    @click="flipFlashcard"
-  >
-    <div v-if="reviewFinished" class="flashcard__body">
-      {{ 'No more cards for review' }}
-    </div>
-    <div v-else class="flashcard__flipper">
-      <div class="flashcard__face flashcard__front">
-        <div class="flashcard__strip">
+      ref="flashcardButton"
+      @click="flipFlashcard"
+    >
+      <div v-if="reviewFinished" class="flashcard__body">
+        {{ 'No more cards for review' }}
+      </div>
+      <div v-else class="flashcard__flipper">
+        <div class="flashcard__face flashcard__front">
+          <div class="flashcard__strip">
           <span class="flashcard__corner-text">
             {{ currFlashcard?.stage }}
           </span>
-          <button
-            class="flashcard__edit-button"
-            @click.stop="globalStore.toggleFlashcardEditModalForm()"
-          >
-            <font-awesome-icon icon="fa-solid fa-pen-to-square" />
-          </button>
-        </div>
-        <div class="flashcard__body">
-          {{ currFlashcard?.frontSide }}
-        </div>
-        <div class="flashcard__strip">
+            <button
+              class="flashcard__edit-button"
+              @click.stop="globalStore.toggleFlashcardEditModalForm()"
+            >
+              <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
+            </button>
+          </div>
+          <div class="flashcard__body">
+            {{ currFlashcard?.frontSide }}
+          </div>
+          <div class="flashcard__strip">
           <span>
-            <font-awesome-icon icon="fa-regular fa-eye" />
+            <font-awesome-icon icon="fa-regular fa-eye"/>
             {{ viewedTimes }}
           </span>
+          </div>
         </div>
-      </div>
-      <div class="flashcard__face flashcard__back">
-        <div class="flashcard__strip">
+        <div class="flashcard__face flashcard__back">
+          <div class="flashcard__strip">
           <span class="flashcard__corner-text">
             {{ currFlashcard?.stage }}
           </span>
-          <button
-            class="flashcard__edit-button"
-            @click.stop="globalStore.toggleFlashcardEditModalForm()"
-          >
-            <font-awesome-icon icon="fa-solid fa-pen-to-square" />
-          </button>
-        </div>
-        <div class="flashcard__body">
-          {{ currFlashcard?.backSide }}
-        </div>
-        <div class="flashcard__strip">
+            <button
+              class="flashcard__edit-button"
+              @click.stop="globalStore.toggleFlashcardEditModalForm()"
+            >
+              <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
+            </button>
+          </div>
+          <div class="flashcard__body">
+            {{ currFlashcard?.backSide }}
+          </div>
+          <div class="flashcard__strip">
           <span>
-            <font-awesome-icon icon="fa-regular fa-eye" />
+            <font-awesome-icon icon="fa-regular fa-eye"/>
             {{ viewedTimes }}
           </span>
+          </div>
         </div>
       </div>
     </div>
+    <FlashcardModificationModalForm
+      editMode
+      v-model:visible="flashcardEditModalFormOpen"
+      v-model:flashcard="currFlashcard"
+      v-model:removed="flashcardWasRemoved"
+    />
   </div>
-
-  <FlashcardModificationModalForm
-    editMode
-    v-model:visible="flashcardEditModalFormOpen"
-    v-model:flashcard="currFlashcard"
-    v-model:removed="flashcardWasRemoved"
-  />
 </template>
 
 <script setup lang="ts">
@@ -126,17 +127,19 @@ function handleKeydown(event: KeyboardEvent) {
   position: relative;
   width: clamp(200px, 90vw, 600px);
   height: clamp(250px, 50vh, 450px);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
   perspective: 1000px;
   background-color: transparent;
-  transition: transform 0.2s ease-out;
-  will-change: transform;
 }
 
-.flashcard:not(.flashcard--none):hover {
-  transform: scale(1.02);
+.flashcard__content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  will-change: transform;
+  transform-style: preserve-3d;
 }
 
 .flashcard-flipped .flashcard__flipper {
@@ -203,6 +206,8 @@ function handleKeydown(event: KeyboardEvent) {
   display: flex;
   align-items: center;
   justify-content: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .flashcard__corner-text {

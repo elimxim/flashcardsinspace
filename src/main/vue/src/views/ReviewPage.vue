@@ -25,7 +25,11 @@
       </button>
     </div>
     <div class="review-body">
-      <Flashcard/>
+      <div class="flashcard-wrapper">
+        <transition :name="flashcardTransition">
+          <Flashcard :key="currFlashcard ? currFlashcard.id : 'no-card'"/>
+        </transition>
+      </div>
       <div class="flashcard-nav" v-if="settings.mode === ReviewMode.LIGHTSPEED">
         <button class="nav-button nav-red-button"
                 :disabled="reviewFinished"
@@ -111,6 +115,7 @@ const router = useRouter()
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 const {
   settings,
+  isFrontSide,
   currFlashcard,
   editFormWasOpened,
   reviewFinished,
@@ -127,6 +132,8 @@ const progress = computed(() => {
   return Math.max(0, Math.min(1, safeGoing))
 })
 
+const flashcardTransition = ref('slide-next')
+
 const escapeButton = ref<HTMLButtonElement>()
 const stageDownButton = ref<HTMLButtonElement>()
 const stageUpButton = ref<HTMLButtonElement>()
@@ -134,7 +141,6 @@ const prevButton = ref<HTMLButtonElement>()
 const nextButton = ref<HTMLButtonElement>()
 const moveBackButton = ref<HTMLButtonElement>()
 const flashcardButton = ref<HTMLDivElement>()
-const flashcardEditButton = ref<HTMLButtonElement>()
 
 function finishReview() {
   flashcardsTotal.value = 0
@@ -149,6 +155,7 @@ function finishReview() {
 }
 
 async function stageDown() {
+  flashcardTransition.value = 'slide-prev'
   if (flashcardSet.value !== null && currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, prevStage(flashcard.stage))
@@ -157,7 +164,7 @@ async function stageDown() {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
     reviewStore.setEditFormWasOpened(false)
-    reviewStore.setFrontSide(true)
+    await flipFlashcardToFront()
     if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
     }
@@ -166,6 +173,7 @@ async function stageDown() {
 }
 
 async function stageUp() {
+  flashcardTransition.value = 'slide-next'
   if (flashcardSet.value !== null && currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, nextStage(flashcard.stage))
@@ -173,7 +181,7 @@ async function stageUp() {
     if (settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
-    reviewStore.setFrontSide(true)
+    await flipFlashcardToFront()
     if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
     }
@@ -181,27 +189,41 @@ async function stageUp() {
   stageUpButton.value?.blur()
 }
 
-function prev() {
-  reviewStore.setFrontSide(true)
+async function prev() {
+  flashcardTransition.value = 'slide-prev'
+  await flipFlashcardToFront()
   reviewStore.prevFlashcard()
   prevButton.value?.blur()
 }
 
-function next() {
-  reviewStore.setFrontSide(true)
+async function next() {
+  flashcardTransition.value = 'slide-next'
+  await flipFlashcardToFront()
   reviewStore.nextFlashcard()
   nextButton.value?.blur()
 }
 
-function moveBack() {
+async function moveBack() {
+  flashcardTransition.value = 'slide-prev'
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, stages.S1)
     flashcardSetStore.updateFlashcard(flashcard)
-    reviewStore.setFrontSide(true)
+    await flipFlashcardToFront()
     reviewStore.nextFlashcard()
   }
   moveBackButton.value?.blur()
+}
+
+async function flipFlashcardToFront(): Promise<void> {
+  return new Promise((resolve) => {
+    if (!isFrontSide.value) {
+      reviewStore.setFrontSide(true)
+      setTimeout(() => resolve(void 0), 500)
+    } else {
+      resolve(void 0)
+    }
+  })
 }
 
 async function loadReviewState() {
@@ -282,9 +304,6 @@ function handleKeydown(event: KeyboardEvent) {
     event.stopPropagation()
     stageUpButton.value?.click()
     nextButton.value?.click()
-  } else if (event.key === 'e' || event.key === 'E') {
-    event.stopPropagation()
-    flashcardEditButton.value?.click()
   }
 }
 
@@ -396,4 +415,46 @@ function handleKeydown(event: KeyboardEvent) {
   color: #9f9f9f;
   font-size: 1.2em;
 }
+
+/* flashcard switching animation> */
+
+.flashcard-wrapper {
+  display: grid;
+  perspective: 100px;
+}
+
+.flashcard-wrapper :deep(.flashcard) {
+  grid-area: 1 / 1;
+}
+
+.flashcard-wrapper :deep(.slide-next-enter-active),
+.flashcard-wrapper :deep(.slide-next-leave-active),
+.flashcard-wrapper :deep(.slide-prev-enter-active),
+.flashcard-wrapper :deep(.slide-prev-leave-active) {
+  transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.flashcard-wrapper :deep(.slide-next-leave-active),
+.flashcard-wrapper :deep(.slide-prev-leave-active) {
+  z-index: 1;
+}
+
+.flashcard-wrapper :deep(.slide-next-enter-from),
+.flashcard-wrapper :deep(.slide-prev-enter-from) {
+  transform: scale(0.90);
+  opacity: 0;
+}
+
+.flashcard-wrapper :deep(.slide-next-leave-to) {
+  transform: translateX(200%) rotate(10deg);
+  opacity: 0;
+}
+
+.flashcard-wrapper :deep(.slide-prev-leave-to) {
+  transform: translateX(-200%) rotate(-10deg);
+  opacity: 0;
+}
+
+/* <flashcard switching animation */
+
 </style>
