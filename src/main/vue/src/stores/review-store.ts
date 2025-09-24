@@ -18,7 +18,6 @@ export interface ReviewSettings {
 export interface ReviewState {
   settings: ReviewSettings
   started: boolean
-  isFrontSide: boolean
   reviewQueue: ReviewQueue
   currFlashcard: Flashcard | null
   editFormWasOpened: boolean
@@ -33,7 +32,6 @@ export const useReviewStore = defineStore('review', {
         mode: ReviewMode.LIGHTSPEED,
       },
       started: false,
-      isFrontSide: true,
       reviewQueue: new EmptyReviewQueue(),
       currFlashcard: null,
       editFormWasOpened: false,
@@ -60,7 +58,6 @@ export const useReviewStore = defineStore('review', {
       this.settings.topic = stage !== undefined ? stage.displayName : 'Lightspeed'
       this.settings.mode = toReviewMode(stage)
       this.started = true
-      this.isFrontSide = true
       if (stage !== undefined) {
         this.initStageReviewQueue(flashcards, stage)
       } else {
@@ -86,12 +83,6 @@ export const useReviewStore = defineStore('review', {
       this.currFlashcard = this.reviewQueue.next()
       return this.currFlashcard !== null
     },
-    flipFlashcard() {
-      this.isFrontSide = !this.isFrontSide
-    },
-    setFrontSide(value: boolean) {
-      this.isFrontSide = value
-    },
     setEditFormWasOpened(value: boolean) {
       this.editFormWasOpened = value
     },
@@ -99,7 +90,6 @@ export const useReviewStore = defineStore('review', {
       this.settings.topic = ''
       this.settings.mode = ReviewMode.LIGHTSPEED
       this.started = false
-      this.isFrontSide = true
       this.reviewQueue = new EmptyReviewQueue()
       this.currFlashcard = null
       this.editFormWasOpened = false

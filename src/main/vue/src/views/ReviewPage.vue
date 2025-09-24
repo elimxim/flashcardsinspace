@@ -98,11 +98,13 @@ import { ReviewMode } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { loadSelectedSetId } from '@/cookies/cookies.ts'
+import { useGlobalStore } from '@/stores/global-store.ts'
 
 const props = defineProps<{
   stage?: Stage,
 }>()
 
+const globalStore = useGlobalStore()
 const chronoStore = useChronoStore()
 const reviewStore = useReviewStore()
 const flashcardSetStore = useFlashcardSetStore()
@@ -112,7 +114,6 @@ const { flashcardSet } = storeToRefs(flashcardSetStore)
 const {
   loaded,
   settings,
-  isFrontSide,
   currFlashcard,
   editFormWasOpened,
   reviewFinished,
@@ -150,7 +151,6 @@ function finishReview() {
 }
 
 async function stageDown() {
-  flashcardDeck.value?.preparePrev()
   if (flashcardSet.value !== null && currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, prevStage(flashcard.stage))
@@ -159,7 +159,7 @@ async function stageDown() {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
     reviewStore.setEditFormWasOpened(false)
-    await flipFlashcardToFront()
+    await flashcardDeck.value?.preparePrev()
     if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
     }
@@ -168,7 +168,6 @@ async function stageDown() {
 }
 
 async function stageUp() {
-  flashcardDeck.value?.prepareNext()
   if (flashcardSet.value !== null && currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, nextStage(flashcard.stage))
@@ -176,7 +175,7 @@ async function stageUp() {
     if (settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
-    await flipFlashcardToFront()
+    await flashcardDeck.value?.prepareNext()
     if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
     }
@@ -185,40 +184,26 @@ async function stageUp() {
 }
 
 async function prev() {
-  flashcardDeck.value?.preparePrev()
-  await flipFlashcardToFront()
+  await flashcardDeck.value?.preparePrev()
   reviewStore.prevFlashcard()
   prevButton.value?.blur()
 }
 
 async function next() {
-  flashcardDeck.value?.prepareNext()
-  await flipFlashcardToFront()
+  await flashcardDeck.value?.prepareNext()
   reviewStore.nextFlashcard()
   nextButton.value?.blur()
 }
 
 async function moveBack() {
-  flashcardDeck.value?.preparePrev()
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, stages.S1)
     flashcardSetStore.updateFlashcard(flashcard)
-    await flipFlashcardToFront()
+    await flashcardDeck.value?.preparePrev()
     reviewStore.nextFlashcard()
   }
   moveBackButton.value?.blur()
-}
-
-async function flipFlashcardToFront(): Promise<void> {
-  return new Promise((resolve) => {
-    if (!isFrontSide.value) {
-      reviewStore.setFrontSide(true)
-      setTimeout(() => resolve(void 0), 500)
-    } else {
-      resolve(void 0)
-    }
-  })
 }
 
 async function loadReviewState() {
@@ -263,14 +248,14 @@ onMounted(async () => {
   flashcardDeck.value?.toggleDeckReady()
   console.log('Started review',
     props.stage ? `on stage: ${props.stage.displayName}` : 'on default stage',
-    'flashcards TOTAL: ', flashcardsTotal.value,
+    'flashcards TOTAL:', flashcardsTotal.value,
   )
   document.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
-  console.log('Finishing review...',
-    props.stage ? ` on stage: ${props.stage}` : '',
+  console.log('Finishing review',
+    props.stage ? `on stage: ${props.stage}` : 'on default stage',
   )
   flashcardsTotal.value = 0
   reviewStore.finishReview()
@@ -286,6 +271,8 @@ onBeforeRouteLeave(() => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
+  if (globalStore.isAnyModalFormOpen()) return
+
   if (event.key === 'Escape') {
     event.stopPropagation()
     escapeButton.value?.click()
