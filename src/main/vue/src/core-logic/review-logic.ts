@@ -144,7 +144,7 @@ export class MonoStageReviewQueue implements ReviewQueue {
   }
 
   public runningTotal(): number {
-    return this.flashcards.length - (this.index + 1)
+    return this.flashcards.length - this.index
   }
 }
 

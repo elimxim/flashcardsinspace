@@ -7,7 +7,7 @@
     ]"
   >
     <div class="top-row">
-      <span class="flashcard__corner-text">
+      <span class="corner-text">
         {{ settings.topic }}
       </span>
       <span class="flashcard-progressbar">
@@ -18,18 +18,14 @@
           barRounded
         />
       </span>
-      <button class="flashcard__edit-button"
+      <button class="escape-button"
               ref="escapeButton"
               @click="finishReview">
         <font-awesome-icon icon="fa-solid fa-xmark"/>
       </button>
     </div>
     <div class="review-body">
-      <div class="flashcard-wrapper">
-        <transition :name="!deckReady || reviewFinished ? '' : flashcardTransition">
-          <Flashcard :key="currFlashcard ? currFlashcard.id : 0"/>
-        </transition>
-      </div>
+      <FlashcardDeck v-if="loaded" ref="flashcardDeck"/>
       <div class="flashcard-nav" v-if="settings.mode === ReviewMode.LIGHTSPEED">
         <button class="nav-button nav-red-button"
                 :disabled="reviewFinished"
@@ -90,7 +86,7 @@
 
 <script setup lang="ts">
 import Progressbar from '@/components/Progressbar.vue'
-import Flashcard from '@/components/Flashcard.vue'
+import FlashcardDeck from '@/components/FlashcardDeck.vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -114,6 +110,7 @@ const flashcardSetStore = useFlashcardSetStore()
 const router = useRouter()
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 const {
+  loaded,
   settings,
   isFrontSide,
   currFlashcard,
@@ -126,14 +123,11 @@ const flashcardsTotal = ref(0);
 const progress = computed(() => {
   const total = flashcardsTotal.value
   const running = flashcardsRunningTotal.value
-  if (!total || total <= 0) return 0
   const going = (total - running) / total
-  const safeGoing = Number.isFinite(going) ? going : 0
-  return Math.max(0, Math.min(1, safeGoing))
+  return Math.max(0, Math.min(1, going))
 })
 
-const flashcardTransition = ref('slide-next')
-const deckReady = ref(false)
+const flashcardDeck = ref<InstanceType<typeof FlashcardDeck>>()
 
 const escapeButton = ref<HTMLButtonElement>()
 const stageDownButton = ref<HTMLButtonElement>()
@@ -156,7 +150,7 @@ function finishReview() {
 }
 
 async function stageDown() {
-  flashcardTransition.value = 'slide-prev'
+  flashcardDeck.value?.preparePrev()
   if (flashcardSet.value !== null && currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, prevStage(flashcard.stage))
@@ -174,7 +168,7 @@ async function stageDown() {
 }
 
 async function stageUp() {
-  flashcardTransition.value = 'slide-next'
+  flashcardDeck.value?.prepareNext()
   if (flashcardSet.value !== null && currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, nextStage(flashcard.stage))
@@ -191,21 +185,21 @@ async function stageUp() {
 }
 
 async function prev() {
-  flashcardTransition.value = 'slide-prev'
+  flashcardDeck.value?.preparePrev()
   await flipFlashcardToFront()
   reviewStore.prevFlashcard()
   prevButton.value?.blur()
 }
 
 async function next() {
-  flashcardTransition.value = 'slide-next'
+  flashcardDeck.value?.prepareNext()
   await flipFlashcardToFront()
   reviewStore.nextFlashcard()
   nextButton.value?.blur()
 }
 
 async function moveBack() {
-  flashcardTransition.value = 'slide-prev'
+  flashcardDeck.value?.preparePrev()
   if (currFlashcard.value !== null) {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, stages.S1)
@@ -266,10 +260,10 @@ async function loadReviewState() {
 
 onMounted(async () => {
   await loadReviewState()
-  deckReady.value = true
+  flashcardDeck.value?.toggleDeckReady()
   console.log('Started review',
-    props.stage ? `on stage: ${props.stage}` : 'on default stage',
-    ', flashcards TOTAL: ', flashcardsTotal.value,
+    props.stage ? `on stage: ${props.stage.displayName}` : 'on default stage',
+    'flashcards TOTAL: ', flashcardsTotal.value,
   )
   document.addEventListener('keydown', handleKeydown)
 })
@@ -391,7 +385,7 @@ function handleKeydown(event: KeyboardEvent) {
   cursor: default;
 }
 
-.flashcard__edit-button {
+.escape-button {
   border: none;
   outline: none;
   background: none;
@@ -400,7 +394,7 @@ function handleKeydown(event: KeyboardEvent) {
   color: #c5c5c5;
 }
 
-.flashcard__edit-button:hover {
+.escape-button:hover {
   color: #9f9f9f;
 }
 
@@ -412,51 +406,10 @@ function handleKeydown(event: KeyboardEvent) {
   --progressbar--bg-color: var(--review-progressbar--bg-color);
 }
 
-.flashcard__corner-text {
+.corner-text {
   background: none;
   color: #9f9f9f;
   font-size: 1.2em;
 }
-
-/* flashcard switching animation> */
-
-.flashcard-wrapper {
-  display: grid;
-  perspective: 100px;
-}
-
-.flashcard-wrapper >>> .flashcard {
-  grid-area: 1 / 1;
-}
-
-.flashcard-wrapper :deep(.slide-next-enter-active),
-.flashcard-wrapper :deep(.slide-next-leave-active),
-.flashcard-wrapper :deep(.slide-prev-enter-active),
-.flashcard-wrapper :deep(.slide-prev-leave-active) {
-  transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.flashcard-wrapper :deep(.slide-next-leave-active),
-.flashcard-wrapper :deep(.slide-prev-leave-active) {
-  z-index: 1;
-}
-
-.flashcard-wrapper :deep(.slide-next-enter-from),
-.flashcard-wrapper :deep(.slide-prev-enter-from) {
-  transform: scale(0.90);
-  opacity: 0;
-}
-
-.flashcard-wrapper :deep(.slide-next-leave-to) {
-  transform: translateX(200%) rotate(10deg);
-  opacity: 0;
-}
-
-.flashcard-wrapper :deep(.slide-prev-leave-to) {
-  transform: translateX(-200%) rotate(-10deg);
-  opacity: 0;
-}
-
-/* <flashcard switching animation */
 
 </style>

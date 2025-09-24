@@ -1,91 +1,81 @@
 <template>
-  <div class="flashcard">
-    <div
-      class="flashcard__content"
-      :class="{
+  <div
+    class="flashcard"
+    :class="{
       'flashcard--none': reviewFinished,
-      'flashcard-flipped': !isFrontSide && !reviewFinished,
+      'flashcard--flipped': !isFrontSide && !reviewFinished,
     }"
-      ref="flashcardButton"
-      @click="flipFlashcard"
-    >
-      <div v-if="reviewFinished" class="flashcard__body">
-        {{ 'No more cards for review' }}
-      </div>
-      <div v-else class="flashcard__flipper">
-        <div class="flashcard__face flashcard__front">
-          <div class="flashcard__strip">
+    ref="flashcardButton"
+    @click="flipFlashcard"
+  >
+    <div v-if="reviewFinished" class="flashcard__body">
+      {{ 'No more cards for review' }}
+    </div>
+    <div v-else class="flashcard__flipper">
+      <div class="flashcard__face flashcard__front">
+        <div class="flashcard__strip">
           <span class="flashcard__corner-text">
             {{ currFlashcard?.stage }}
           </span>
-            <button
-              class="flashcard__edit-button"
-              @click.stop="globalStore.toggleFlashcardEditModalForm()"
-            >
-              <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
-            </button>
-          </div>
-          <div class="flashcard__body">
-            {{ currFlashcard?.frontSide }}
-          </div>
-          <div class="flashcard__strip">
-          <span>
-            <font-awesome-icon icon="fa-regular fa-eye"/>
-            {{ viewedTimes }}
-          </span>
-          </div>
+          <button
+            class="flashcard__edit-button"
+            @click.stop="globalStore.toggleFlashcardEditModalForm()"
+          >
+            <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
+          </button>
         </div>
-        <div class="flashcard__face flashcard__back">
-          <div class="flashcard__strip">
-          <span class="flashcard__corner-text">
-            {{ currFlashcard?.stage }}
-          </span>
-            <button
-              class="flashcard__edit-button"
-              @click.stop="globalStore.toggleFlashcardEditModalForm()"
-            >
-              <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
-            </button>
-          </div>
-          <div class="flashcard__body">
-            {{ currFlashcard?.backSide }}
-          </div>
-          <div class="flashcard__strip">
+        <div class="flashcard__body">
+          {{ currFlashcard?.frontSide }}
+        </div>
+        <div class="flashcard__strip">
           <span>
             <font-awesome-icon icon="fa-regular fa-eye"/>
             {{ viewedTimes }}
           </span>
-          </div>
+        </div>
+      </div>
+      <div class="flashcard__face flashcard__back">
+        <div class="flashcard__strip">
+          <span class="flashcard__corner-text">
+            {{ currFlashcard?.stage }}
+          </span>
+          <button
+            class="flashcard__edit-button"
+            @click.stop="globalStore.toggleFlashcardEditModalForm()"
+          >
+            <font-awesome-icon icon="fa-solid fa-pen-to-square"/>
+          </button>
+        </div>
+        <div class="flashcard__body">
+          {{ currFlashcard?.backSide }}
+        </div>
+        <div class="flashcard__strip">
+          <span>
+            <font-awesome-icon icon="fa-regular fa-eye"/>
+            {{ viewedTimes }}
+          </span>
         </div>
       </div>
     </div>
-    <FlashcardModificationModalForm
-      editMode
-      v-model:visible="flashcardEditModalFormOpen"
-      v-model:flashcard="currFlashcard"
-      v-model:removed="flashcardWasRemoved"
-    />
   </div>
+
 </template>
 
 <script setup lang="ts">
-import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
 import { storeToRefs } from 'pinia'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { useGlobalStore } from '@/stores/global-store.ts'
 
 const globalStore = useGlobalStore()
 const reviewStore = useReviewStore()
 
-const { flashcardEditModalFormOpen } = storeToRefs(globalStore)
 const {
   isFrontSide,
   reviewFinished,
   currFlashcard,
 } = storeToRefs(reviewStore)
 
-const flashcardWasRemoved = ref(false)
 const flashcardButton = ref<HTMLDivElement>()
 
 const viewedTimes = computed(() => {
@@ -95,15 +85,6 @@ const viewedTimes = computed(() => {
 function flipFlashcard() {
   reviewStore.flipFlashcard()
 }
-
-watch(flashcardWasRemoved, (newValue) => {
-  if (newValue) {
-    reviewStore.setEditFormWasOpened(false)
-    reviewStore.setFrontSide(true)
-    reviewStore.nextFlashcard()
-    flashcardWasRemoved.value = false
-  }
-})
 
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown)
@@ -125,14 +106,6 @@ function handleKeydown(event: KeyboardEvent) {
 <style scoped>
 .flashcard {
   position: relative;
-  width: clamp(200px, 90vw, 600px);
-  height: clamp(250px, 50vh, 450px);
-  perspective: 1000px;
-  background-color: transparent;
-}
-
-.flashcard__content {
-  position: relative;
   width: 100%;
   height: 100%;
   display: flex;
@@ -142,7 +115,13 @@ function handleKeydown(event: KeyboardEvent) {
   transform-style: preserve-3d;
 }
 
-.flashcard-flipped .flashcard__flipper {
+.flashcard--none {
+  background: none;
+  cursor: default;
+  perspective: none;
+}
+
+.flashcard--flipped .flashcard__flipper {
   transform: rotateY(180deg);
 }
 
@@ -163,7 +142,6 @@ function handleKeydown(event: KeyboardEvent) {
   display: flex;
   flex-direction: column;
   border-radius: 24px;
-  overflow: hidden;
   overflow-wrap: break-word;
   box-shadow: 0 8px 24px hsla(0, 0%, 0%, 0.15);
 }
@@ -177,12 +155,6 @@ function handleKeydown(event: KeyboardEvent) {
 .flashcard__back {
   background-color: #fdfdfd;
   transform: rotateY(180deg);
-}
-
-.flashcard--none {
-  background: none;
-  cursor: default;
-  perspective: none;
 }
 
 .flashcard__strip {
