@@ -106,12 +106,12 @@
   --flashcard__front--bg-color: #fdfdfd;
   --flashcard__front--bg-image: linear-gradient(0deg, rgba(34, 34, 34, 0.15) 1px, transparent 1px);
   --flashcard__front--bg-size: 100% 28px;
-  --flashcard__front--box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   --flashcard__back--bg-color: #fdfdfd;
   --flashcard__back--bg-image: none;
   --flashcard__back--bg-size: none;
-  --flashcard__back--box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   --flashcard--color: #686868;
   --flashcard--color--strip: #9f9f9f;
   --flashcard--color--strip--hover: #686868;
+  --flashcard--box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+  --flashcard--box-shadow--hover: 0 12px 16px rgba(0, 0, 0, 0.2);
 }

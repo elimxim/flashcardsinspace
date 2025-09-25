@@ -141,12 +141,12 @@ defineExpose({
 
 .flashcard--theme {
   --default-flashcard__front--bg-color: white;
-  --default-flashcard__front--box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   --default-flashcard__back--bg-color: white;
-  --default-flashcard__back--box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   --default-flashcard--color: #686868;
   --default-flashcard--color--strip: #9f9f9f;
   --default-flashcard--color--strip--hover: #686868;
+  --default-flashcard--box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+  --default-flashcard--box-shadow--hover: 0 12px 16px rgba(0, 0, 0, 0.2);
 }
 
 .flashcard--flipped .flashcard__flipper {
@@ -185,12 +185,19 @@ defineExpose({
   background-color: var(--flashcard__front--bg-color, var(--default-flashcard__front--bg-color));
   background-image: var(--flashcard__front--bg-image);
   background-size: var(--flashcard__front--bg-size);
-  box-shadow: var(--flashcard__front--box-shadow, var(--default-flashcard__front--box-shadow));
+  box-shadow: var(--flashcard--box-shadow, var(--default-flashcard--box-shadow));
+  transition: box-shadow 0.2s ease-in-out;
 }
 
 .flashcard__face--back--style {
   background-color: var(--flashcard__back--bg-color, var(--default-flashcard__back--bg-color));
-  box-shadow: var(--flashcard__back--box-shadow, var(--default-flashcard__back--box-shadow));
+  box-shadow: var(--flashcard--box-shadow, var(--default-flashcard--box-shadow));
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.flashcard:hover .flashcard__face--front--style,
+.flashcard:hover .flashcard__face--back--style {
+  box-shadow: var(--flashcard--box-shadow--hover, var(--default-flashcard--box-shadow--hover));
 }
 
 .flashcard__face--transparent {
