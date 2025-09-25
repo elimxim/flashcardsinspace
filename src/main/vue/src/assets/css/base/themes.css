@@ -43,10 +43,6 @@
   --auth-container--bg-color: #f9f9f9;
   --auth-container--box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 
-  /* toast */
-  --toast--color: white;
-  --toast--bg-color: #c80f0f;
-
   /* secret-input */
   --secret-input__button--color: #b8c4d6;
   --secret-input__button--hover--color: #007bff;
@@ -59,9 +55,8 @@
   --fuzzy-select__drop-down__scrollbar--color: rgb(from var(--fuzzy-select__drop-down--border-color) r g b / 0.6);
   --fuzzy-select__drop-down__scrollbar--hover--color: rgb(from var(--fuzzy-select__drop-down--border-color) r g b / 0.8);
 
-  /* toasts & progressbars */
+  /* toasts */
 
-  /* using defaults */
   /*--space-toast--bg: ;*/
   /*--space-toast--icon-box--color: ;*/
   /*--space-toast--icon-box--bg: ;*/
@@ -94,8 +89,29 @@
   --warning-toast--to: #f59e0b;
   --warning-toast--glow: rgba(251, 191, 36, 0.3);
 
+  /* progress bars */
+
   --review-progressbar--from: #60a5fa;
   --review-progressbar--via: #3b82f6;
   --review-progressbar--to: #2563eb;
   --review-progressbar--bg-color: rgba(0, 0, 0, 0.1);
+
+  --logout-progressbar--from: #60a5fa;
+  --logout-progressbar--via: #3b82f6;
+  --logout-progressbar--to: #2563eb;
+  --logout-progressbar--bg-color: rgba(0, 0, 0, 0.1);
+
+  /* flashcard */
+
+  --flashcard__front--bg-color: #fdfdfd;
+  --flashcard__front--bg-image: linear-gradient(0deg, rgba(34, 34, 34, 0.15) 1px, transparent 1px);
+  --flashcard__front--bg-size: 100% 28px;
+  --flashcard__front--box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --flashcard__back--bg-color: #fdfdfd;
+  --flashcard__back--bg-image: none;
+  --flashcard__back--bg-size: none;
+  --flashcard__back--box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --flashcard--color: #686868;
+  --flashcard--color--strip: #9f9f9f;
+  --flashcard--color--strip--hover: #686868;
 }

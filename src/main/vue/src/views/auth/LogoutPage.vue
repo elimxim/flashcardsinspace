@@ -100,10 +100,10 @@ onBeforeUnmount(clearTimers)
 .logout-progressbar {
   flex: 1;
   width: 100%;
-  --progressbar--from: var(--review-progressbar--from);
-  --progressbar--via: var(--review-progressbar--via);
-  --progressbar--to: var(--review-progressbar--to);
-  --progressbar--bg-color: var(--review-progressbar--bg-color);
+  --progressbar--from: var(--logout-progressbar--from);
+  --progressbar--via: var(--logout-progressbar--via);
+  --progressbar--to: var(--logout-progressbar--to);
+  --progressbar--bg-color: var(--logout-progressbar--bg-color);
 }
 
 .logout-card {

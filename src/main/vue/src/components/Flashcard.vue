@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flashcard"
+    class="flashcard flashcard--theme"
     :class="{ 'flashcard--flipped': flipped }"
     @click="flip"
   >
@@ -139,6 +139,16 @@ defineExpose({
   perspective: 1000px;
 }
 
+.flashcard--theme {
+  --default-flashcard__front--bg-color: white;
+  --default-flashcard__front--box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --default-flashcard__back--bg-color: white;
+  --default-flashcard__back--box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --default-flashcard--color: #686868;
+  --default-flashcard--color--strip: #9f9f9f;
+  --default-flashcard--color--strip--hover: #686868;
+}
+
 .flashcard--flipped .flashcard__flipper {
   transform: rotateY(180deg);
 }
@@ -172,15 +182,15 @@ defineExpose({
 }
 
 .flashcard__face--front--style {
-  background-color: #fdfdfd;
-  background-image: linear-gradient(0deg, rgba(34, 34, 34, 0.15) 1px, transparent 1px);
-  background-size: 100% 28px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  background-color: var(--flashcard__front--bg-color, var(--default-flashcard__front--bg-color));
+  background-image: var(--flashcard__front--bg-image);
+  background-size: var(--flashcard__front--bg-size);
+  box-shadow: var(--flashcard__front--box-shadow, var(--default-flashcard__front--box-shadow));
 }
 
 .flashcard__face--back--style {
-  background-color: #fdfdfd;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  background-color: var(--flashcard__back--bg-color, var(--default-flashcard__back--bg-color));
+  box-shadow: var(--flashcard__back--box-shadow, var(--default-flashcard__back--box-shadow));
 }
 
 .flashcard__face--transparent {
@@ -192,7 +202,7 @@ defineExpose({
 .flashcard__strip {
   height: fit-content;
   font-size: clamp(1rem, 2vw, 1.2rem);
-  color: #9f9f9f;
+  color: var(--flashcard--color--strip, var(--default-flashcard--color--strip));
   display: flex;
   justify-content: space-between;
   padding-left: 4px;
@@ -205,7 +215,7 @@ defineExpose({
   width: 100%;
   height: 100%;
   font-size: clamp(1.2rem, 2vw, 1.8rem);
-  color: #686868;
+  color: var(--flashcard--color, var(--default-flashcard--color));
   text-align: center;
   display: flex;
   align-items: center;
@@ -230,6 +240,6 @@ defineExpose({
 }
 
 .flashcard__edit-button:hover {
-  color: #686868;
+  color: var(--flashcard--color--strip--hover, var(--default-flashcard--color--strip--hover));
 }
 </style>
