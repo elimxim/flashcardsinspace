@@ -171,6 +171,9 @@ defineExpose({
   flex-direction: column;
   border-radius: 24px;
   overflow-wrap: break-word;
+  border-color: var(--flashcard--border-color);
+  border-style: solid;
+  border-width: 1px;
 }
 
 .flashcard__face--front {

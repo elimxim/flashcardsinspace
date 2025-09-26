@@ -104,14 +104,15 @@
   /* flashcard */
 
   --flashcard__front--bg-color: #fdfdfd;
-  --flashcard__front--bg-image: linear-gradient(0deg, rgba(34, 34, 34, 0.15) 1px, transparent 1px);
-  --flashcard__front--bg-size: 100% 28px;
+  --flashcard__front--bg-image: linear-gradient(0deg, transparent 5px, rgba(34, 34, 34, 0.15) 5px, rgba(34, 34, 34, 0.15) 6px, transparent 5px);
+  --flashcard__front--bg-size: 100% 30px;
   --flashcard__back--bg-color: #fdfdfd;
   --flashcard__back--bg-image: none;
   --flashcard__back--bg-size: none;
   --flashcard--color: #686868;
   --flashcard--color--strip: #9f9f9f;
   --flashcard--color--strip--hover: #686868;
+  --flashcard--border-color: rgba(0, 0, 0, 0.05);
   --flashcard--box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
   --flashcard--box-shadow--hover: 0 12px 16px rgba(0, 0, 0, 0.2);
 }
