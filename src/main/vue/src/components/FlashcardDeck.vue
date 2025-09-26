@@ -3,6 +3,7 @@
     <div v-if="!reviewFinished" class="flashcard-deck">
       <transition :name="flashcardTransition">
         <Flashcard
+          v-if="showFlashcard"
           ref="flashcard"
           :key="currFlashcard ? currFlashcard.id : 0"
           :stage="currFlashcard?.stage"
@@ -50,6 +51,7 @@ const {
 } = storeToRefs(reviewStore)
 
 const deckReady = ref(false)
+const showFlashcard = ref(false)
 const flashcard = ref<InstanceType<typeof Flashcard>>()
 const flashcardWasRemoved = ref(false)
 const flashcardTransition = ref('slide-next')
@@ -61,6 +63,10 @@ const viewedTimes = computed(() => {
 function toggleDeckReady() {
   console.log(`FlashcardDeck.ready: ${deckReady.value} => ${!deckReady.value}`)
   deckReady.value = !deckReady.value
+  if (deckReady.value) {
+    flashcardTransition.value = 'drop-down'
+    showFlashcard.value = true
+  }
 }
 
 async function preparePrev() {
@@ -129,8 +135,6 @@ function handleKeydown(event: KeyboardEvent) {
   background-color: transparent;
 }
 
-/* sliding animation> */
-
 .slide-next-enter-active,
 .slide-next-leave-active,
 .slide-prev-enter-active,
@@ -157,6 +161,29 @@ function handleKeydown(event: KeyboardEvent) {
   transform: translateX(-200%) rotate(-10deg);
 }
 
-/* <sliding animation */
+.drop-down-enter-active {
+  animation: drop-and-bounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: absolute;
+}
+
+@keyframes drop-and-bounce {
+  0% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(1.01);
+  }
+  90% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.99);
+  }
+}
 
 </style>
