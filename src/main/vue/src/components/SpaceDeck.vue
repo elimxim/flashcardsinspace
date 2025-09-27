@@ -1,21 +1,21 @@
 <template>
-  <div class="flashcard-wrapper">
-    <div v-if="!reviewFinished" class="flashcard-deck">
-      <transition :name="flashcardTransition">
-        <Flashcard
-          v-if="showFlashcard"
-          ref="flashcard"
-          :key="currFlashcard ? currFlashcard.id : 0"
-          :stage="currFlashcard?.stage"
-          :frontSide="currFlashcard?.frontSide"
-          :backSide="currFlashcard?.backSide"
+  <div class="space-deck">
+    <div v-if="flashcard" class="flashcard-deck">
+      <transition :name="cardTransition">
+        <SpaceCard
+          v-if="deckReady"
+          ref="spaceCard"
+          :key="flashcard ? flashcard.id : 0"
+          :stage="flashcard?.stage"
+          :frontSide="flashcard?.frontSide"
+          :backSide="flashcard?.backSide"
           :viewedTimes="viewedTimes"
-          :onEdit="toggleFlashcardEditModal"
+          :onEdit="() => flashcardWasEdited = true"
         />
       </transition>
     </div>
     <div v-else class="flashcard-deck">
-      <Flashcard
+      <SpaceCard
         frontSide="No more flashcards for review"
         unflippable
         textOnly
@@ -24,84 +24,87 @@
     </div>
   </div>
   <FlashcardModificationModalForm
-    editMode
-    v-model:visible="flashcardEditModalFormOpen"
-    v-model:flashcard="currFlashcard"
+    v-model:flashcard="flashcard"
     v-model:removed="flashcardWasRemoved"
+    editMode
   />
 </template>
 
 <script setup lang="ts">
-import Flashcard from '@/components/Flashcard.vue'
+import SpaceCard from '@/components/SpaceCard.vue'
 import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useReviewStore } from '@/stores/review-store.ts'
 import { useGlobalStore } from '@/stores/global-store.ts'
+import { type Flashcard } from '@/model/flashcard.ts'
 
-const globalStore = useGlobalStore()
-const reviewStore = useReviewStore()
+const flashcard = defineModel<Flashcard | null>('flashcard', { default: null })
 
-const { flashcardEditModalFormOpen } = storeToRefs(globalStore)
-const {
-  currFlashcard,
-  reviewFinished,
-} = storeToRefs(reviewStore)
-
-const deckReady = ref(false)
-const showFlashcard = ref(false)
-const flashcard = ref<InstanceType<typeof Flashcard>>()
-const flashcardWasRemoved = ref(false)
-const flashcardTransition = ref('slide-next')
-
-const viewedTimes = computed(() => {
-  return (currFlashcard.value?.reviewCount ?? 0) + 1
+const props = withDefaults(defineProps<{
+  onFlashcardRemoved?: () => void
+  onFlashcardEdited?: () => void
+}>(), {
+  flashcard: null,
+  onFlashcardRemoved: () => {
+  },
+  onFlashcardEdited: () => {
+  },
 })
 
-function toggleFlashcardEditModal() {
-  globalStore.toggleFlashcardEditModalForm()
-  reviewStore.setEditFormWasOpened(true)
-}
+const globalStore = useGlobalStore()
 
-function toggleDeckReady() {
-  console.log(`FlashcardDeck.ready: ${deckReady.value} => ${!deckReady.value}`)
-  deckReady.value = !deckReady.value
+const deckReady = ref(false)
+const flashcardWasRemoved = ref(false)
+const flashcardWasEdited = ref(false)
+const spaceCard = ref<InstanceType<typeof SpaceCard>>()
+const cardTransition = ref('slide-next')
+
+const viewedTimes = computed(() => (flashcard.value?.reviewCount ?? 0) + 1)
+
+function setDeckReady() {
+  console.log(`FlashcardDeck.ready`)
+  deckReady.value = true
   if (deckReady.value) {
-    flashcardTransition.value = 'drop-down'
-    showFlashcard.value = true
+    cardTransition.value = 'drop-down'
   }
 }
 
 async function preparePrev() {
-  await flashcard.value?.flipToFrontAndWait()
-  if (!deckReady.value || reviewFinished.value) {
-    flashcardTransition.value = ''
+  await spaceCard.value?.flipToFrontAndWait()
+  if (!deckReady.value || !flashcard.value) {
+    cardTransition.value = ''
   } else {
-    flashcardTransition.value = 'slide-prev'
+    cardTransition.value = 'slide-prev'
   }
 }
 
 async function prepareNext() {
-  await flashcard.value?.flipToFrontAndWait()
-  if (!deckReady.value || reviewFinished.value) {
-    flashcardTransition.value = ''
+  await spaceCard.value?.flipToFrontAndWait()
+  if (!deckReady.value || !flashcard.value) {
+    cardTransition.value = ''
   } else {
-    flashcardTransition.value = 'slide-next'
+    cardTransition.value = 'slide-next'
   }
 }
 
 defineExpose({
-  toggleDeckReady,
+  setDeckReady,
   preparePrev,
-  prepareNext
+  prepareNext,
 })
 
-watch(flashcardWasRemoved, (newValue) => {
-  if (newValue) {
-    reviewStore.setEditFormWasOpened(false)
-    flashcard.value?.flipToFront()
-    reviewStore.nextFlashcard()
+watch(flashcardWasRemoved, (newVal) => {
+  if (newVal) {
+    spaceCard.value?.flipToFront()
+    props.onFlashcardRemoved()
     flashcardWasRemoved.value = false
+  }
+})
+
+watch(flashcardWasEdited, (newVal) => {
+  if (newVal) {
+    globalStore.toggleFlashcardEditModalForm()
+    props.onFlashcardEdited()
+    flashcardWasEdited.value = false
   }
 })
 
@@ -115,17 +118,16 @@ onUnmounted(() => {
 
 function handleKeydown(event: KeyboardEvent) {
   if (globalStore.isAnyModalFormOpen()) return
-
   if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
     event.stopPropagation()
-    flashcard.value?.flip()
+    spaceCard.value?.flip()
   }
 }
 
 </script>
 
 <style scoped>
-.flashcard-wrapper {
+.space-deck {
   display: grid;
   place-items: center;
 }

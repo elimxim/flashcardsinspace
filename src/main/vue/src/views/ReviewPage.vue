@@ -25,7 +25,12 @@
       </button>
     </div>
     <div class="review-body">
-      <FlashcardDeck v-if="loaded" ref="flashcardDeck"/>
+      <SpaceDeck
+        v-if="loaded"
+        v-model:flashcard="currFlashcard"
+        :onFlashcardRemoved="onFlashcardRemoved"
+        ref="spaceDeck"
+      />
       <div class="flashcard-nav" v-if="settings.mode === ReviewMode.LIGHTSPEED">
         <button class="nav-button nav-red-button"
                 :disabled="reviewFinished"
@@ -86,7 +91,7 @@
 
 <script setup lang="ts">
 import Progressbar from '@/components/Progressbar.vue'
-import FlashcardDeck from '@/components/FlashcardDeck.vue'
+import SpaceDeck from '@/components/SpaceDeck.vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -128,7 +133,7 @@ const progress = computed(() => {
   return Math.max(0, Math.min(1, going))
 })
 
-const flashcardDeck = ref<InstanceType<typeof FlashcardDeck>>()
+const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 const escapeButton = ref<HTMLButtonElement>()
 const stageDownButton = ref<HTMLButtonElement>()
@@ -159,7 +164,7 @@ async function stageDown() {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
     reviewStore.setEditFormWasOpened(false)
-    await flashcardDeck.value?.preparePrev()
+    await spaceDeck.value?.preparePrev()
     if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
     }
@@ -176,7 +181,7 @@ async function stageUp() {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
     reviewStore.setEditFormWasOpened(false)
-    await flashcardDeck.value?.prepareNext()
+    await spaceDeck.value?.prepareNext()
     if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
     }
@@ -185,13 +190,13 @@ async function stageUp() {
 }
 
 async function prev() {
-  await flashcardDeck.value?.preparePrev()
+  await spaceDeck.value?.preparePrev()
   reviewStore.prevFlashcard()
   prevButton.value?.blur()
 }
 
 async function next() {
-  await flashcardDeck.value?.prepareNext()
+  await spaceDeck.value?.prepareNext()
   reviewStore.nextFlashcard()
   nextButton.value?.blur()
 }
@@ -201,10 +206,15 @@ async function moveBack() {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, stages.S1)
     flashcardSetStore.updateFlashcard(flashcard)
-    await flashcardDeck.value?.preparePrev()
+    await spaceDeck.value?.preparePrev()
     reviewStore.nextFlashcard()
   }
   moveBackButton.value?.blur()
+}
+
+function onFlashcardRemoved() {
+  reviewStore.setEditFormWasOpened(false)
+  reviewStore.nextFlashcard()
 }
 
 async function loadReviewState() {
@@ -246,7 +256,7 @@ async function loadReviewState() {
 
 onMounted(async () => {
   await loadReviewState()
-  flashcardDeck.value?.toggleDeckReady()
+  spaceDeck.value?.setDeckReady()
   console.log('Started review',
     props.stage ? `on stage: ${props.stage.displayName}` : 'on default stage',
     'flashcards TOTAL:', flashcardsTotal.value,

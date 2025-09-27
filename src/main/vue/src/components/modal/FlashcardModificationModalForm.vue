@@ -1,6 +1,6 @@
 <template>
   <ModalForm
-    :visible="visible"
+    :visible="flashcardEditModalFormOpen"
     :focusable="false"
     :onPressExit="cancel"
     :onPressDelete="remove"
@@ -71,9 +71,8 @@
 import ModalForm from '@/components/modal/ModalForm.vue'
 import {
   computed,
-  defineEmits,
-  defineProps, nextTick,
-  type PropType,
+  defineProps,
+  nextTick,
   ref,
   watch
 } from 'vue'
@@ -91,20 +90,14 @@ import { useFlashcardSetsStore } from '@/stores/flashcard-data-store.ts'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
 
-const props = defineProps({
-  visible: Boolean,
-  editMode: Boolean,
-  removed: Boolean,
-  flashcard: {
-    type: Object as PropType<Flashcard | null>,
-    required: false,
-  },
-})
+const flashcard = defineModel<Flashcard | null>('flashcard', { default: null })
+const removed = defineModel<boolean>('removed', { default: false })
 
-const emit = defineEmits([
-  'update:visible',
-  'update:removed',
-])
+const props = withDefaults(defineProps<{
+  editMode?: boolean,
+}>(), {
+  editMode: false,
+})
 
 const globalStore = useGlobalStore()
 const chronoStore = useChronoStore()
@@ -113,11 +106,15 @@ const flashcardSetStore = useFlashcardSetStore()
 const reviewStore = useReviewStore()
 
 const { flashcardSet, isStarted } = storeToRefs(flashcardSetStore)
+const {
+  flashcardEditModalFormOpen,
+  flashcardCreationModalFormOpen,
+} = storeToRefs(globalStore)
 
 // state>
 
-const flashcardFrontSide = ref(props.flashcard?.frontSide ?? '')
-const flashcardBackSide = ref(props.flashcard?.backSide ?? '')
+const flashcardFrontSide = ref(flashcard.value?.frontSide ?? '')
+const flashcardBackSide = ref(flashcard.value?.backSide ?? '')
 
 const validationRules = {
   frontSide: { required },
@@ -132,8 +129,8 @@ const $v = useVuelidate(validationRules, {
 const removeConfirmation = ref(false)
 
 function resetState() {
-  flashcardFrontSide.value = props.flashcard?.frontSide ?? ''
-  flashcardBackSide.value = props.flashcard?.backSide ?? ''
+  flashcardFrontSide.value = flashcard.value?.frontSide ?? ''
+  flashcardBackSide.value = flashcard.value?.backSide ?? ''
   removeConfirmation.value = false
   $v.value.$reset()
   nextTick(() => {
@@ -149,14 +146,14 @@ watch(flashcardBackSide, (_) => {
   removeConfirmation.value = false
 })
 
-watch(() => props.flashcard, (newValue, _) => {
-  flashcardFrontSide.value = newValue?.frontSide ?? ''
-  flashcardBackSide.value = newValue?.backSide ?? ''
+watch(flashcard, (newVal) => {
+  flashcardFrontSide.value = newVal?.frontSide ?? ''
+  flashcardBackSide.value = newVal?.backSide ?? ''
 })
 
 const stateChanged = computed(() => {
-  return props.flashcard?.frontSide !== flashcardFrontSide.value
-    || props.flashcard?.backSide !== flashcardBackSide.value
+  return flashcard.value?.frontSide !== flashcardFrontSide.value
+    || flashcard.value?.backSide !== flashcardBackSide.value
 })
 
 // <state
@@ -167,7 +164,15 @@ const createButton = ref<HTMLButtonElement>()
 const updateButton = ref<HTMLButtonElement>()
 const frontSide = ref<HTMLTextAreaElement>()
 
-watch(() => props.visible, (newValue) => {
+watch(flashcardEditModalFormOpen, (newValue) => {
+  if (newValue) {
+    nextTick(() => {
+      frontSide.value?.focus()
+    })
+  }
+})
+
+watch(flashcardCreationModalFormOpen, (newValue) => {
   if (newValue) {
     nextTick(() => {
       frontSide.value?.focus()
@@ -177,8 +182,8 @@ watch(() => props.visible, (newValue) => {
 
 function cancel() {
   resetState()
-  emit('update:visible', false)
-  emit('update:removed', false)
+  toggleModalForm()
+  removed.value = false
   cancelButton.value?.blur()
 }
 
@@ -187,8 +192,7 @@ function remove() {
     removeFlashcard()
     resetState()
     toggleModalForm()
-    emit('update:visible', false)
-    emit('update:removed', true)
+    removed.value = false
   } else {
     removeConfirmation.value = true
   }
@@ -202,7 +206,6 @@ function create() {
     resetState()
     // fixme infinite loop
     // toggleModalForm()
-    // emit('update:visible', false)
   }
   createButton.value?.blur()
 }
@@ -214,15 +217,14 @@ function update() {
       updateFlashcard()
       resetState()
       toggleModalForm()
-      emit('update:visible', false)
     }
   }
   updateButton.value?.blur()
 }
 
 function removeFlashcard() {
-  if (props.flashcard !== null && props.flashcard !== undefined) {
-    flashcardSetStore.removeFlashcard(props.flashcard?.id)
+  if (flashcard.value) {
+    flashcardSetStore.removeFlashcard(flashcard.value.id)
   } else {
     console.error("can't remove an undefined flashcard")
   }
@@ -249,13 +251,13 @@ async function addNewFlashcard() {
 }
 
 function updateFlashcard() {
-  if (props.flashcard !== null && props.flashcard !== undefined) {
-    const flashcard = updateFlashcardSides(
-      props.flashcard,
+  if (flashcard.value) {
+    const updatedFlashcard = updateFlashcardSides(
+      flashcard.value,
       flashcardFrontSide.value,
       flashcardBackSide.value
     )
-    flashcardSetStore.updateFlashcard(flashcard)
+    flashcardSetStore.updateFlashcard(updatedFlashcard)
   } else {
     console.error("can't update an undefined flashcard")
   }
