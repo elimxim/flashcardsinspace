@@ -78,7 +78,6 @@ const props = withDefaults(defineProps<{
   textOnly?: boolean
   unflippable?: boolean
   transparent?: boolean
-  editFormWasOpened?: boolean
   onEdit?: Function
 }>(), {
   stage: undefined,
@@ -88,7 +87,6 @@ const props = withDefaults(defineProps<{
   textOnly: false,
   unflippable: false,
   transparent: false,
-  editFormWasOpened: false,
   onEdit: () => {
   },
 })

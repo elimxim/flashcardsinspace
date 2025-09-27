@@ -10,8 +10,7 @@
           :frontSide="currFlashcard?.frontSide"
           :backSide="currFlashcard?.backSide"
           :viewedTimes="viewedTimes"
-          :editFormWasOpened="editFormWasOpened"
-          :onEdit="globalStore.toggleFlashcardEditModalForm"
+          :onEdit="toggleFlashcardEditModal"
         />
       </transition>
     </div>
@@ -47,7 +46,6 @@ const { flashcardEditModalFormOpen } = storeToRefs(globalStore)
 const {
   currFlashcard,
   reviewFinished,
-  editFormWasOpened,
 } = storeToRefs(reviewStore)
 
 const deckReady = ref(false)
@@ -59,6 +57,11 @@ const flashcardTransition = ref('slide-next')
 const viewedTimes = computed(() => {
   return (currFlashcard.value?.reviewCount ?? 0) + 1
 })
+
+function toggleFlashcardEditModal() {
+  globalStore.toggleFlashcardEditModalForm()
+  reviewStore.setEditFormWasOpened(true)
+}
 
 function toggleDeckReady() {
   console.log(`FlashcardDeck.ready: ${deckReady.value} => ${!deckReady.value}`)

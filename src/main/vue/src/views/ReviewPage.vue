@@ -175,6 +175,7 @@ async function stageUp() {
     if (settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
+    reviewStore.setEditFormWasOpened(false)
     await flashcardDeck.value?.prepareNext()
     if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsCompleted(flashcardSet.value)

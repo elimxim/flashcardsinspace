@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { useReviewStore } from '@/stores/review-store.ts'
 
 export interface GlobalState {
   flashcardSetSettingsModalFormOpen: boolean
@@ -31,8 +30,6 @@ export const useGlobalStore = defineStore('global', {
     },
     toggleFlashcardEditModalForm() {
       this.flashcardEditModalFormOpen = !this.flashcardEditModalFormOpen
-      const reviewStore = useReviewStore()
-      reviewStore.setEditFormWasOpened(true)
     },
     toggleCalendarModalForm() {
       this.calendarModalFormOpen = !this.calendarModalFormOpen

@@ -88,6 +88,7 @@ import {
 } from '@/core-logic/flashcard-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useFlashcardSetsStore } from '@/stores/flashcard-data-store.ts'
+import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
 
 const props = defineProps({
@@ -109,6 +110,7 @@ const globalStore = useGlobalStore()
 const chronoStore = useChronoStore()
 const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
+const reviewStore = useReviewStore()
 
 const { flashcardSet, isStarted } = storeToRefs(flashcardSetStore)
 
@@ -262,6 +264,7 @@ function updateFlashcard() {
 function toggleModalForm() {
   if (props.editMode) {
     globalStore.toggleFlashcardEditModalForm()
+    reviewStore.setEditFormWasOpened(true)
   } else {
     globalStore.toggleFlashcardCreationModalForm()
   }
