@@ -10,6 +10,7 @@
     - Delete button
     - Front & back styles customization
     - Removing animation
+    - Dynamic font size depending on the amount of text
   - Auth
     - Password reset functionality (sending emails)
     - Link from Login page to Password reset page
