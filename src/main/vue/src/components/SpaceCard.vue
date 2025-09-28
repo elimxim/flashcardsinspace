@@ -12,7 +12,7 @@
           'flashcard__face--transparent': transparent,
         }"
       >
-        <div class="flashcard__strip">
+        <div class="flashcard__strip select-none">
           <span v-if="!textOnly" class="flashcard__corner-text">
             {{ stage }}
           </span>
@@ -27,7 +27,7 @@
         <div class="flashcard__body">
           {{ frontSide }}
         </div>
-        <div class="flashcard__strip">
+        <div class="flashcard__strip select-none">
           <span v-if="!textOnly">
             <font-awesome-icon icon="fa-regular fa-eye"/>
             {{ viewedTimes }}
@@ -41,7 +41,7 @@
           'flashcard__face--transparent': transparent,
         }"
       >
-        <div class="flashcard__strip">
+        <div class="flashcard__strip select-none">
           <span v-if="!textOnly" class="flashcard__corner-text">
             {{ stage }}
           </span>
@@ -56,7 +56,7 @@
         <div class="flashcard__body">
           {{ backSide }}
         </div>
-        <div class="flashcard__strip">
+        <div class="flashcard__strip select-none">
           <span v-if="!textOnly">
             <font-awesome-icon icon="fa-regular fa-eye"/>
             {{ viewedTimes }}
@@ -203,6 +203,7 @@ defineExpose({
 
 .flashcard__face--transparent {
   background: none;
+  border: none;
   cursor: default;
   perspective: none;
 }
