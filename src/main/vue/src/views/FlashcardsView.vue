@@ -15,7 +15,7 @@ import MainMenu from '@/components/MainMenu.vue'
 import ReviewFormStarter from '@/components/ReviewFormStarter.vue'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
-import { useFlashcardSetsStore } from '@/stores/flashcard-data-store.ts'
+import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 

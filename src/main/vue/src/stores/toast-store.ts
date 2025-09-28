@@ -47,6 +47,24 @@ export const useSpaceToaster = defineStore('space-toaster', {
         duration: 8000,
       })
     },
+    bakeSuccess(title: string, message: string, delay?: number) {
+      const toast: Toast = {
+        type: ToastType.SUCCESS,
+        title: title,
+        message: message,
+        duration: 2000,
+      }
+      if (delay) {
+        this.bakeWithDelay(toast, delay)
+      } else {
+        this.bake(toast)
+      }
+    },
+    bakeWithDelay(toast: Toast, delay: number) {
+      setTimeout(() => {
+        this.bake(toast)
+      }, delay)
+    },
     bake(toast: Toast) {
       this.reset()
       this.toast = toast

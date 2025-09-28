@@ -77,7 +77,7 @@ import FlashcardSetSettingsModalForm from '@/components/modal/FlashcardSetSettin
 import FlashcardSetCreationModalForm from '@/components/modal/FlashcardSetCreationModalForm.vue'
 import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
 import CalendarModalForm from '@/components/modal/CalendarModalForm.vue'
-import { useFlashcardSetsStore } from '@/stores/flashcard-data-store.ts'
+import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'

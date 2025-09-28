@@ -149,14 +149,7 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       }
     },
     removeFlashcard(id: number) {
-      if (this.flashcardSet !== null) {
-        apiClient.delete('/flashcard-sets/' + this.flashcardSet.id + '/flashcards/' + id).then(_ => {
-          this.flashcardMap.delete(id)
-        })
-        // todo handle errors
-      } else {
-        throw new Error(`Can't remove flashcard with id=${id}: flashcard set is null`)
-      }
+      this.flashcardMap.delete(id)
     },
     resetState() {
       this.flashcardSet = null

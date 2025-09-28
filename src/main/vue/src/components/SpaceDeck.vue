@@ -24,6 +24,7 @@
     </div>
   </div>
   <FlashcardModificationModalForm
+    v-model:visible="flashcardEditModalFormOpen"
     v-model:flashcard="flashcard"
     v-model:removed="flashcardWasRemoved"
     editMode
@@ -36,6 +37,7 @@ import FlashcardModificationModalForm from '@/components/modal/FlashcardModifica
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useGlobalStore } from '@/stores/global-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
+import { storeToRefs } from 'pinia'
 
 const flashcard = defineModel<Flashcard | null>('flashcard', { default: null })
 
@@ -51,6 +53,10 @@ const props = withDefaults(defineProps<{
 })
 
 const globalStore = useGlobalStore()
+
+const {
+  flashcardEditModalFormOpen
+} = storeToRefs(globalStore)
 
 const deckReady = ref(false)
 const flashcardWasRemoved = ref(false)

@@ -210,7 +210,7 @@ defineExpose({
 
 .flashcard__strip {
   height: fit-content;
-  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-size: clamp(1.1rem, 2vw, 1.2rem);
   color: var(--flashcard--color--strip, var(--default-flashcard--color--strip));
   display: flex;
   justify-content: space-between;
@@ -223,9 +223,11 @@ defineExpose({
   flex: 1;
   width: 100%;
   height: 100%;
-  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  font-size: clamp(1.4rem, 2vw, 1.8rem);
   color: var(--flashcard--color, var(--default-flashcard--color));
   text-align: center;
+  white-space: pre-wrap;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;

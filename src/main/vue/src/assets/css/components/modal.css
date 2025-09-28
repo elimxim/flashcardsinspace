@@ -20,10 +20,11 @@
   border: 1px solid #ccc;
 }
 
-.modal-error-text {
-  color: red;
-  font-size: 0.9em;
-  margin-top: 5px;
+.modal-error-text2 {
+  color: var(--text--error--color);
+  font-size: clamp(0.75rem, 1.6vh, 0.9rem);
+  margin: 0;
+  padding: 0;
 }
 
 .modal-message-group {

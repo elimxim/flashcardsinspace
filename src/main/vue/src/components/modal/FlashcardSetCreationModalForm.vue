@@ -5,8 +5,8 @@
     :onPressEnter="create"
     title="New flashcard set"
   >
-    <div class="form-body">
-      <div class="modal-vertical-group">
+    <div class="modal-main-area">
+      <div class="modal-main-area--inner">
         <input class="modal-input"
                v-model="flashcardSetName"
                placeholder="Flashcard set name"/>
@@ -14,7 +14,7 @@
             Please don't forget to fill this out
           </span>
       </div>
-      <div class="modal-vertical-group">
+      <div class="modal-main-area--inner">
         <div class="modal-horizontal-group">
             <span class="modal-icon modal-globe-icon">
               <font-awesome-icon icon="fa-solid fa-globe"/>
@@ -38,7 +38,7 @@
           </span>
       </div>
     </div>
-    <div class="modal-bottom">
+    <div class="modal-main-area--inner">
       <button class="modal-button modal-cancel-button"
               ref="cancelButton"
               @click="cancel">
@@ -56,7 +56,7 @@
 <script setup lang="ts">
 import ModalForm from '@/components/modal/ModalForm.vue'
 import { defineEmits, defineProps, type Ref, ref } from 'vue'
-import { useFlashcardSetsStore } from '@/stores/flashcard-data-store.ts'
+import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'

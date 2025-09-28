@@ -8,55 +8,43 @@
     @keydown="handleKeydown"
   >
     <div class="modal-window">
-      <div class="modal-top-nav">
-        <button @click="onPressExit">
-          <font-awesome-icon icon="fa-solid fa-xmark"/>
-        </button>
+      <div class="modal-top-control">
+        <slot name="control"/>
+        <AwesomeButton
+          icon="fa-solid fa-circle-xmark"
+          :onClick="onPressExit"
+        />
       </div>
-      <div class="modal-title" v-if="title !== null">{{ title }}</div>
-      <div class="modal-content">
-        <slot></slot>
+      <div class="modal-title" v-if="title">
+        {{ title }}
+      </div>
+      <div class="modal-body">
+        <slot ref="slot"/>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import AwesomeButton from '@/components/AwesomeButton.vue'
 import { nextTick, ref, watch } from 'vue'
 
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    required: true,
+const props = withDefaults(defineProps<{
+  visible: boolean
+  title?: string
+  focusable?: boolean
+  onPressExit?: () => void
+  onPressEnter?: () => void
+  onPressDelete?: () => void
+}>(), {
+  title: '',
+  focusable: false,
+  onPressExit: () => {
   },
-  focusable: {
-    type: Boolean,
-    required: false,
-    default: true,
+  onPressEnter: () => {
   },
-  title: {
-    type: String,
-    required: false,
-    default: null,
+  onPressDelete: () => {
   },
-  onPressExit: {
-    type: Function,
-    required: false,
-    default: () => {
-    },
-  },
-  onPressEnter: {
-    type: Function,
-    required: false,
-    default: () => {
-    },
-  },
-  onPressDelete: {
-    type: Function,
-    required: false,
-    default: () => {
-    },
-  }
 })
 
 function onPressExit() {
@@ -71,12 +59,12 @@ function onPressDelete() {
   props.onPressDelete()
 }
 
-const modalOverlay = ref<HTMLElement>()
+const slot = ref<HTMLElement>()
 
-watch(() => props.visible, (newValue) => {
-  if (props.focusable && newValue) {
-    nextTick(() => {
-      modalOverlay.value?.focus()
+watch(() => props.visible, (newVal) => {
+  if (props.focusable && newVal) {
+    nextTick().then(() => {
+      slot.value?.focus()
     })
   }
 })
@@ -86,7 +74,13 @@ function handleKeydown(event: KeyboardEvent) {
     event.preventDefault()
     event.stopPropagation()
     onPressExit()
-  } else if (event.key === 'Enter') {
+  } else if (event.key === 'Enter' && !event.ctrlKey) {
+    if (event.target !instanceof HTMLInputElement) {
+      event.preventDefault()
+      event.stopPropagation()
+      onPressEnter()
+    }
+  } else if (event.key === 'Enter' && event.ctrlKey) {
     event.preventDefault()
     event.stopPropagation()
     onPressEnter()
@@ -101,72 +95,86 @@ function handleKeydown(event: KeyboardEvent) {
 
 <style scoped>
 .modal-overlay {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  display: grid;
+  place-items: center;
   width: 100vw;
   height: 100vh;
+  overflow: hidden;
+  z-index: 900;
 }
 
 .modal-window {
   background: #fff;
-  border-radius: 8px;
-  margin-bottom: 10%;
   display: flex;
   flex-direction: column;
-  padding: 2px;
-  resize: both;
-  max-width: 90vw;
-  width: fit-content;
-  min-width: fit-content;
-  max-height: 90vh;
-  height: fit-content;
-  min-height: fit-content;
-  overflow: auto;
+  border-radius: 8px;
+  width: clamp(240px, 92vw, 540px);
+  min-width: 240px;
+  height: clamp(360px, 90vh, 480px);
+  min-height: 360px;
+  padding: 10px;
+  margin: 10px 10px clamp(10px, 10vh, 100px);
   user-select: none;
+  resize: none;
+  overflow: hidden;
 }
 
-.modal-top-nav {
-  flex: 1;
+.modal-top-control {
   display: flex;
   align-items: center;
   justify-content: right;
-}
-
-.modal-top-nav button {
-  border: none;
-  outline: none;
-  background: none;
-  cursor: pointer;
-  font-size: 1.5em;
-  color: #c5c5c5;
-}
-
-.modal-top-nav button:hover {
-  color: #737373;
+  gap: 8px;
 }
 
 .modal-title {
-  flex: 1;
   text-align: center;
   font-size: 1.5em;
   font-weight: bold;
-  padding-left: 20px;
-  padding-right: 20px;
 }
 
-.modal-content {
-  flex: 100;
+.modal-body {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  justify-content: center;
+  overflow: hidden;
+  gap: 10px;
+}
+</style>
+
+<style>
+.modal-main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
 }
 
+.modal-main-area--inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-error-text {
+  color: var(--text--error--color);
+  font-size: clamp(0.8rem, 1.6vw, 0.9rem);
+  margin: 0;
+  padding: 0;
+}
+
+.modal-control-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+}
 </style>

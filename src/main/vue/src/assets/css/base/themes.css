@@ -29,6 +29,27 @@
   --button--bg-color--action--focus: #0056b3;
   --button--bg-color--disabled: #ededed;
 
+  --smart-button--font-family: var(--main-font-family);
+  /*--smart-button--color: white;*/
+  /*--smart-button--border-color: transparent;*/
+  /*--smart-button--border-width: 0;*/
+  /*--smart-button-border-radius: 3px;*/
+
+  --smart-button--color--disabled: #a3a3a3;
+  --smart-button--bg-color--disabled: #C8C8C8FF;
+
+  --cancel-button--bg-color: #4e4e4e;
+  --cancel-button--bg-color--hover: #7e7e7e;
+
+  --remove-button--bg-color: #830000;
+  --remove-button--bg-color--hover: #aa0000;
+
+  --update-button--bg-color: #004883;
+  --update-button--bg-color--hover: #0070bd;
+
+  --create-button--bg-color: #118300;
+  --create-button--bg-color--hover: #00bd10;
+
   /* icons */
   --fa-icon--color--globe: #007bff;
 
