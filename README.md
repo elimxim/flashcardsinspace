@@ -2,8 +2,6 @@
 
 ## TODOS
 
-- Functionality:
-  - Flashcard creation loop (enabled by default -> enable if it's asked to)
 - UX:
   - Flashcard
     - Copy button
@@ -11,6 +9,7 @@
     - Front & back styles customization
     - Removing animation
     - Dynamic font size depending on the amount of text
+    - Pronunciation of the word
   - Auth
     - Password reset functionality (sending emails)
     - Link from Login page to Password reset page
