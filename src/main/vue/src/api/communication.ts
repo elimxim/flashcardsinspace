@@ -1,4 +1,3 @@
-import type { Language } from '@/model/language.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 
 export interface ErrorResponseBody {
@@ -10,28 +9,25 @@ export interface ErrorResponseBody {
   path: string,
 }
 
-export interface LanguageGetResponse {
-  languages: Language[]
-}
-
 export interface FlashcardSetUpdateRequest {
   name: string | null,
   default: boolean | null,
 }
 
-export interface ChronodaysGetParams {
+export interface ChronoSyncRequest {
   clientDatetime: string,
 }
 
-export interface ChronodaysGetResponse {
+export interface ChronoSyncResponse {
   chronodays: Chronoday[]
   currDay: Chronoday,
 }
 
-export interface ChronodaysResponse {
-  chronoday: Chronoday,
+export interface ChronoBulkUpdateRequest {
+  ids: ChronodayId[],
+  status: string,
 }
 
-export interface ChronodaysPutRequest {
-  status: string,
+export interface ChronodayId {
+  id: number
 }

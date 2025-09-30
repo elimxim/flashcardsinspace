@@ -5,10 +5,9 @@ import {
 import { asIsoDateStr } from '@/utils/date.ts'
 import apiClient from '@/api/api-client.ts'
 import type {
-  ChronodaysGetParams,
-  ChronodaysGetResponse,
-  ChronodaysResponse,
-  ChronodaysPutRequest,
+  ChronoSyncRequest,
+  ChronoSyncResponse,
+  ChronoBulkUpdateRequest, ChronodayId,
 } from '@/api/communication.ts'
 import type { FlashcardSet } from '@/model/flashcard.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
@@ -41,11 +40,11 @@ export const useChronoStore = defineStore('chrono', {
   actions: {
     async loadChronodays(flashcardSet: FlashcardSet): Promise<void> {
       this.resetState()
-      const chronodaysRequest: ChronodaysGetParams = {
+      const chronodaysRequest: ChronoSyncRequest = {
         clientDatetime: new Date().toISOString()
       }
 
-      await apiClient.put<ChronodaysGetResponse>('/flashcard-sets/' + flashcardSet.id + '/chronodays', chronodaysRequest)
+      await apiClient.put<ChronoSyncResponse>('/flashcard-sets/' + flashcardSet.id + '/chronodays', chronodaysRequest)
         .then(response => {
           this.chronodays = response.data.chronodays
           this.currDay = response.data.currDay
@@ -55,9 +54,9 @@ export const useChronoStore = defineStore('chrono', {
     },
     async addInitialChronoday(flashcardSet: FlashcardSet): Promise<void> {
       console.log(`Adding initial chronoday for flashcard set ${flashcardSet.id}`)
-      await apiClient.post<ChronodaysResponse>('/flashcard-sets/' + flashcardSet.id + '/chronodays?initial=true')
+      await apiClient.post<Chronoday>('/flashcard-sets/' + flashcardSet.id + '/chronodays?initial=true')
         .then(response => {
-          console.log(`Added initial chronoday ${response.data.chronoday.chronodate} for flashcard set ${flashcardSet.id}`)
+          console.log(`Added initial chronoday ${response.data.chronodate} for flashcard set ${flashcardSet.id}`)
         })
         // todo catch errors
         .then(async () => {
@@ -91,7 +90,7 @@ export const useChronoStore = defineStore('chrono', {
       if (flashcardSet !== null) {
         const next = this.chronodays[this.currDay.seqNumber] as Chronoday | undefined
         if (next !== undefined) {
-          apiClient.post<ChronodaysResponse>('/flashcard-sets/' + flashcardSet.id + '/chronodays')
+          apiClient.post<Chronoday>('/flashcard-sets/' + flashcardSet.id + '/chronodays')
             // todo log response
             .then(() =>
               this.loadChronodays(flashcardSet)
@@ -119,9 +118,6 @@ export const useChronoStore = defineStore('chrono', {
       status: string,
       daysFilter: (chronoday: Chronoday) => boolean,
     ) {
-      const request: ChronodaysPutRequest = {
-        status: status
-      }
       const days = selectConsecutiveDaysBeforeIncluding(
         this.chronodays, this.currDay, daysFilter
       )
@@ -131,16 +127,14 @@ export const useChronoStore = defineStore('chrono', {
         return
       }
 
-      const idsStr = days.map(v => v.id).join(',')
-      await apiClient.put<ChronodaysResponse>('/flashcard-sets/' + flashcardSet.id + '/chronodays/bulk',
-        request,
-        {
-          params: {
-            ids: idsStr,
-          },
-        })
-        // todo log response
+      const request: ChronoBulkUpdateRequest = {
+        ids: days.map((v): ChronodayId => ({ id: v.id })),
+        status: status
+      }
+
+      await apiClient.put<Chronoday>('/flashcard-sets/' + flashcardSet.id + '/chronodays/bulk', request)
         .then(() =>
+          // todo log response
           this.loadChronodays(flashcardSet)
         )
       // todo handle errors

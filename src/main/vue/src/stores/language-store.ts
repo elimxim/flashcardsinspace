@@ -1,6 +1,5 @@
 import type { Language } from '@/model/language.ts'
 import { defineStore } from 'pinia'
-import type { LanguageGetResponse } from '@/api/communication.ts'
 import publicApiClient from '@/api/public-api-client.ts'
 
 export interface LanguageState {
@@ -22,10 +21,10 @@ export const useLanguageStore = defineStore('language', {
   },
   actions: {
     loadLanguages() {
-      publicApiClient.get<LanguageGetResponse>('/languages')
+      publicApiClient.get<Language[]>('/languages')
         .then(response => {
           this.resetState()
-          this.languageMap = new Map(response.data.languages.map(v => [v.id, v]))
+          this.languageMap = new Map(response.data.map(v => [v.id, v]))
           this.loaded = true
         })
       // todo deal with error
