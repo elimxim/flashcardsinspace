@@ -24,7 +24,6 @@ class FlashcardSetUpdateRequestValidatorTest {
         val validRequest = validator.validate(request)
 
         // then:
-        assertThat(validRequest.id).isEqualTo(1L)
         assertThat(validRequest.name).isEqualTo("Updated Set Name")
         assertThat(validRequest.first).isTrue()
         assertThat(validRequest.status).isEqualTo(FlashcardSetStatus.ACTIVE)
@@ -46,51 +45,6 @@ class FlashcardSetUpdateRequestValidatorTest {
         // then:
         assertThat(validRequest.first).isNull()
         assertThat(validRequest.startedAt).isNull()
-    }
-
-    @Test
-    fun `should fail validation if id is null`() {
-        // given:
-        val request = validRequest().apply {
-            id = null
-        }
-
-        // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
-            validator.validate(request) }
-
-        // then:
-        assertThat(exception.fields).containsExactly("id")
-    }
-
-    @Test
-    fun `should fail validation if id is not a number`() {
-        // given:
-        val request = validRequest().apply {
-            id = "abc"
-        }
-
-        // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
-            validator.validate(request) }
-
-        // then:
-        assertThat(exception.fields).containsExactly("id")
-    }
-
-    @Test
-    fun `should fail validation if name is blank`() {
-        // given:
-        val request = validRequest().apply {
-            name = " "
-        }
-
-        // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
-            validator.validate(request) }
-
-        // then:
-        assertThat(exception.fields).containsExactly("name")
     }
 
     @Test
@@ -136,21 +90,6 @@ class FlashcardSetUpdateRequestValidatorTest {
 
         // then:
         assertThat(exception.fields).containsExactly("default")
-    }
-
-    @Test
-    fun `should fail validation if status is null`() {
-        // given:
-        val request = validRequest().apply {
-            status = null
-        }
-
-        // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
-            validator.validate(request) }
-
-        // then:
-        assertThat(exception.fields).containsExactly("status")
     }
 
     @Test
@@ -202,7 +141,6 @@ class FlashcardSetUpdateRequestValidatorTest {
     fun `should fail validation if multiple fields are invalid`() {
         // given:
         val request = FlashcardSetUpdateRequest().apply {
-            id = "abc"
             name = "!"
             default = "1"
             status = "invalid"
@@ -217,7 +155,6 @@ class FlashcardSetUpdateRequestValidatorTest {
         // then:
         assertThat(exception.fields).containsExactlyInAnyOrder(
             "default",
-            "id",
             "languageId",
             "name",
             "startedAt",
@@ -227,7 +164,6 @@ class FlashcardSetUpdateRequestValidatorTest {
 
     private fun validRequest(): FlashcardSetUpdateRequest {
         return FlashcardSetUpdateRequest().apply {
-            id = "1"
             name = "Updated Set Name"
             default = "true"
             status = "ACTIVE"

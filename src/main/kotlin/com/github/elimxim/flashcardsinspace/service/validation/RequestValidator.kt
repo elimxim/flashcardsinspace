@@ -132,20 +132,21 @@ fun FlashcardCreationRequest.toValidRequest() = ValidFlashcardCreationRequest(
 )
 
 fun FlashcardUpdateRequest.toValidRequest() = ValidFlashcardUpdateRequest(
-    id = id!!.toLong(),
-    frontSide = frontSide!!,
-    backSide = backSide!!,
-    stage = FlashcardStage.valueOf(stage!!),
-    timesReviewed = reviewCount!!.toInt(),
-    reviewHistory = ValidFlashcardUpdateRequest.ReviewHistory(
-        history = reviewHistory!!.history.map {
-            ValidFlashcardUpdateRequest.ReviewInfo(
-                stage = FlashcardStage.valueOf(it.stage!!),
-                reviewDate = LocalDate.parse(it.reviewedAt!!, DateTimeFormatter.ISO_LOCAL_DATE),
-            )
-        }
-    ),
-    lastReviewDate = LocalDate.parse(reviewedAt!!, DateTimeFormatter.ISO_LOCAL_DATE),
+    frontSide = frontSide,
+    backSide = backSide,
+    stage = stage?.let { FlashcardStage.valueOf(it) },
+    timesReviewed = reviewCount?.toInt(),
+    reviewHistory = reviewHistory?.let {
+        ValidFlashcardUpdateRequest.ReviewHistory(
+            history = it.history.map { info ->
+                ValidFlashcardUpdateRequest.ReviewInfo(
+                    stage = FlashcardStage.valueOf(info.stage!!),
+                    reviewDate = LocalDate.parse(info.reviewedAt!!, DateTimeFormatter.ISO_LOCAL_DATE),
+                )
+            }
+        )
+    },
+    lastReviewDate = reviewedAt?.let { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) },
 )
 
 fun FlashcardSetCreationRequest.toValidRequest() = ValidFlashcardSetCreationRequest(
@@ -154,10 +155,9 @@ fun FlashcardSetCreationRequest.toValidRequest() = ValidFlashcardSetCreationRequ
 )
 
 fun FlashcardSetUpdateRequest.toValidRequest() = ValidFlashcardSetUpdateRequest(
-    id = id!!.toLong(),
-    name = name!!,
+    name = name,
     first = default?.toBooleanStrict(),
-    status = FlashcardSetStatus.valueOf(status!!),
-    languageId = languageId!!.toLong(),
+    status = status?.let { FlashcardSetStatus.valueOf(it) },
+    languageId = languageId?.toLong(),
     startedAt = startedAt?.let { ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }
 )

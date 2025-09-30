@@ -24,63 +24,14 @@ class FlashcardUpdateRequestValidatorTest {
         val validRequest = validator.validate(request)
 
         // then:
-        assertThat(validRequest.id).isEqualTo(123L)
         assertThat(validRequest.frontSide).isEqualTo("Updated front")
         assertThat(validRequest.backSide).isEqualTo("Updated back")
         assertThat(validRequest.stage).isEqualTo(FlashcardStage.S1)
         assertThat(validRequest.timesReviewed).isEqualTo(5)
         assertThat(validRequest.lastReviewDate).isEqualTo(LocalDate.of(2025, 9, 15))
-        assertThat(validRequest.reviewHistory.history).hasSize(1)
-        assertThat(validRequest.reviewHistory.history[0].stage).isEqualTo(FlashcardStage.S1)
-        assertThat(validRequest.reviewHistory.history[0].reviewDate).isEqualTo(LocalDate.of(2025, 9, 1))
-    }
-
-    @Test
-    fun `should fail validation if id is null`() {
-        // given:
-        val request = validRequest().apply {
-            id = null
-        }
-
-        // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
-            validator.validate(request)
-        }
-
-        // then:
-        assertThat(exception.fields).containsExactly("id")
-    }
-
-    @Test
-    fun `should fail validation if id is not a number`() {
-        // given:
-        val request = validRequest().apply {
-            id = "abc"
-        }
-
-        // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
-            validator.validate(request)
-        }
-
-        // then:
-        assertThat(exception.fields).containsExactly("id")
-    }
-
-    @Test
-    fun `should fail validation if frontSide is null`() {
-        // given:
-        val request = validRequest().apply {
-            frontSide = null
-        }
-
-        // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
-            validator.validate(request)
-        }
-
-        // then:
-        assertThat(exception.fields).containsExactly("frontSide")
+        assertThat(validRequest.reviewHistory?.history).hasSize(1)
+        assertThat(validRequest.reviewHistory?.history[0]?.stage).isEqualTo(FlashcardStage.S1)
+        assertThat(validRequest.reviewHistory?.history[0]?.reviewDate).isEqualTo(LocalDate.of(2025, 9, 1))
     }
 
     @Test
@@ -97,22 +48,6 @@ class FlashcardUpdateRequestValidatorTest {
 
         // then:
         assertThat(exception.fields).containsExactly("frontSide")
-    }
-
-    @Test
-    fun `should fail validation if backSide is blank`() {
-        // given:
-        val request = validRequest().apply {
-            backSide = "   "
-        }
-
-        // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
-            validator.validate(request)
-        }
-
-        // then:
-        assertThat(exception.fields).containsExactly("backSide")
     }
 
     @Test
@@ -174,35 +109,6 @@ class FlashcardUpdateRequestValidatorTest {
     }
 
     @Test
-    fun `should fail validation if reviewHistory is null`() {
-        // given:
-        val request = validRequest().apply { reviewHistory = null }
-
-        // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
-            validator.validate(request)
-        }
-
-        // then:
-        assertThat(exception.fields).containsExactly("reviewHistory")
-    }
-
-    @Test
-    fun `should fail validation if reviewHistory history is empty`() {
-        // given:
-        val request =
-            validRequest().apply { reviewHistory = FlashcardUpdateRequest.ReviewHistory(history = emptyList()) }
-
-        // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
-            validator.validate(request)
-        }
-
-        // then:
-        assertThat(exception.fields).containsExactly("history")
-    }
-
-    @Test
     fun `should fail validation if reviewHistory contains invalid stage`() {
         // given:
         val invalidReviewInfo = FlashcardUpdateRequest.ReviewInfo().apply {
@@ -246,9 +152,8 @@ class FlashcardUpdateRequestValidatorTest {
     fun `should fail validation with multiple invalid fields`() {
         // given:
         val request = validRequest().apply {
-            id = "abc"
-            frontSide = " ".repeat(513)
-            reviewCount = null
+            frontSide = "a".repeat(513)
+            reviewCount = "abc"
             reviewedAt = "2025-13-01"
         }
 
@@ -258,9 +163,8 @@ class FlashcardUpdateRequestValidatorTest {
         }
 
         // then:
-        assertThat(exception.fields).containsExactlyInAnyOrder("id", "frontSide", "reviewCount", "reviewedAt")
+        assertThat(exception.fields).containsExactlyInAnyOrder("frontSide", "reviewCount", "reviewedAt")
     }
-
 
     private fun validRequest(): FlashcardUpdateRequest {
         val reviewInfo = FlashcardUpdateRequest.ReviewInfo().apply {
@@ -271,7 +175,6 @@ class FlashcardUpdateRequestValidatorTest {
             history = listOf(reviewInfo)
         }
         return FlashcardUpdateRequest().apply {
-            id = "123"
             frontSide = "Updated front"
             backSide = "Updated back"
             stage = "S1"

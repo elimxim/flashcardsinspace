@@ -82,20 +82,19 @@ class FlashcardSetService(
 
     private fun mergeFlashcardSet(flashcardSet: FlashcardSet, request: ValidFlashcardSetUpdateRequest): Boolean {
         var changed = false
-        if (flashcardSet.name != request.name) {
+        if (request.name != null && request.name != flashcardSet.name) {
             flashcardSet.name = request.name
             changed = true
         }
-        if (flashcardSet.status != request.status) {
-            val newStatus = request.status
-            flashcardSet.status = newStatus
+        if (request.status!= null && request.status != flashcardSet.status) {
+            flashcardSet.status = request.status
             changed = true
         }
         if (request.first != null && request.first != flashcardSet.first) {
             flashcardSet.first = request.first
             changed = true
         }
-        if (flashcardSet.language.id != request.languageId) {
+        if (request.languageId != null && request.languageId != flashcardSet.language.id) {
             val language = languageService.getEntity(request.languageId)
             flashcardSet.language = language
             changed = true

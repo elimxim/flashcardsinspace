@@ -81,37 +81,21 @@ data class ValidFlashcardCreationRequest(
 )
 
 class FlashcardUpdateRequest(
-    @field:NotNull
-    @field:NotBlank
-    @field:Pattern(regexp="^\\d+$")
-    var id: String? = null,
-    @field:NotNull
-    @field:NotBlank
     @field:Size(max = 512)
     var frontSide: String? = null,
-    @field:NotNull
-    @field:NotBlank
     @field:Size(max = 512)
     var backSide: String? = null,
-    @field:NotNull
-    @field:NotBlank
     @field:ValidFlashcardStage
     var stage: String? = null,
-    @field:NotNull
-    @field:NotBlank
     @field:Pattern(regexp="^\\d+$")
     var reviewCount: String? = null, // fixme timesReviewed
-    @field:NotNull
     @field:Valid
     var reviewHistory: ReviewHistory? = null,
-    @field:NotNull
-    @field:NotBlank
     @field:IsoLocalDate
     var reviewedAt: String? = null, // fixme lastReviewDate
 ) {
     class ReviewHistory(
         @field:Valid
-        @field:Size(min = 1)
         var history: List<ReviewInfo> = emptyList()
     )
 
@@ -128,12 +112,11 @@ class FlashcardUpdateRequest(
 }
 
 data class ValidFlashcardUpdateRequest(
-    val id: Long,
-    val frontSide: String,
-    val backSide: String,
-    val stage: FlashcardStage,
-    val timesReviewed: Int,
-    val reviewHistory: ReviewHistory,
+    val frontSide: String? = null,
+    val backSide: String? = null,
+    val stage: FlashcardStage? = null,
+    val timesReviewed: Int? = null,
+    val reviewHistory: ReviewHistory? = null,
     val lastReviewDate: LocalDate? = null,
 ) {
     data class ReviewHistory(val history: List<ReviewInfo>)
@@ -158,23 +141,13 @@ data class ValidFlashcardSetCreationRequest(
 )
 
 class FlashcardSetUpdateRequest(
-    @field:NotNull
-    @field:NotBlank
-    @field:Pattern(regexp="^\\d+$")
-    var id: String? = null,
-    @field:NotNull
-    @field:NotBlank
     @field:Size(max = 64)
     @field:Pattern(regexp="^[A-Za-z0-9 _-]+$")
     var name: String? = null,
     @field:Pattern(regexp="^(true|false)$")
     var default: String? = null, // fixme first
-    @field:NotNull
-    @field:NotBlank
     @field:ValidFlashcardSetStatus
     var status: String? = null,
-    @field:NotNull
-    @field:NotBlank
     @field:Pattern(regexp="^\\d+$")
     var languageId: String? = null,
     @field:IsoZonedDateTime
@@ -182,11 +155,10 @@ class FlashcardSetUpdateRequest(
 )
 
 class ValidFlashcardSetUpdateRequest(
-    val id: Long,
-    val name: String,
+    val name: String? = null,
     val first: Boolean? = null,
-    val status: FlashcardSetStatus,
-    val languageId: Long,
+    val status: FlashcardSetStatus? = null,
+    val languageId: Long? = null,
     val startedAt: ZonedDateTime? = null,
 )
 

@@ -56,7 +56,6 @@ fun FlashcardCreationRequest.escapeJava() = FlashcardCreationRequest(
 )
 
 fun FlashcardUpdateRequest.normalize() = FlashcardUpdateRequest(
-    id = id?.normalize(),
     frontSide = frontSide?.normalize(),
     backSide = backSide?.normalize(),
     stage = stage?.normalize(),
@@ -73,7 +72,6 @@ fun FlashcardUpdateRequest.normalize() = FlashcardUpdateRequest(
 )
 
 fun FlashcardUpdateRequest.escapeJava() = FlashcardUpdateRequest(
-    id = id?.escapeJava(),
     frontSide = frontSide?.escapeJava(),
     backSide = backSide?.escapeJava(),
     stage = stage?.escapeJava(),
@@ -100,7 +98,6 @@ fun FlashcardSetCreationRequest.escapeJava() = FlashcardSetCreationRequest(
 )
 
 fun FlashcardSetUpdateRequest.normalize() = FlashcardSetUpdateRequest(
-    id = id?.normalize(),
     name = name?.normalize(),
     default = default?.normalize(),
     status = status?.normalize(),
@@ -109,7 +106,6 @@ fun FlashcardSetUpdateRequest.normalize() = FlashcardSetUpdateRequest(
 )
 
 fun FlashcardSetUpdateRequest.escapeJava() = FlashcardSetUpdateRequest(
-    id = id?.escapeJava(),
     name = name?.escapeJava(),
     default = default?.escapeJava(),
     status = status?.escapeJava(),

@@ -75,23 +75,23 @@ class FlashcardService(
 
     private fun mergeFlashcard(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Boolean {
         var changed = false
-        if (flashcard.frontSide != request.frontSide) {
+        if (request.frontSide != null && request.frontSide != flashcard.frontSide) {
             flashcard.frontSide = request.frontSide
             changed = true
         }
-        if (flashcard.backSide != request.backSide) {
+        if (request.backSide != null && request.backSide != flashcard.backSide) {
             flashcard.backSide = request.backSide
             changed = true
         }
-        if (flashcard.stage != request.stage) {
+        if (request.stage != null && request.stage != flashcard.stage) {
             flashcard.stage = request.stage
             changed = true
         }
-        if (flashcard.timesReviewed != request.timesReviewed) {
+        if (request.timesReviewed != null && request.timesReviewed != flashcard.timesReviewed) {
             flashcard.timesReviewed = request.timesReviewed
             changed = true
         }
-        if (flashcard.reviewHistory.history.size != request.reviewHistory.history.size) {
+        if (request.reviewHistory != null && request.reviewHistory.history.size != flashcard.reviewHistory.history.size) {
             flashcard.reviewHistory = ReviewHistory(
                 history = request.reviewHistory.history.map {
                     ReviewInfo(
@@ -102,7 +102,7 @@ class FlashcardService(
             )
             changed = true
         }
-        if (flashcard.lastReviewDate?.isEqual(request.lastReviewDate) == false) {
+        if (request.lastReviewDate != null && !request.lastReviewDate.isEqual(flashcard.lastReviewDate)) {
             flashcard.lastReviewDate = request.lastReviewDate
             changed = true
         }
