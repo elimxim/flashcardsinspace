@@ -3,13 +3,16 @@
 ## TODOS
 
 - UX:
+  - Control Panel (instead of Main Menu)
+    - Showing duplicated flashcards
   - Flashcard
     - Copy button
     - Delete button
     - Front & back styles customization
     - Removing animation
-    - Dynamic font size depending on the amount of text
+    - Dynamic font size depending on the amount of the text
     - Pronunciation of the word
+    - Zooming in and zooming out the text
   - Auth
     - Password reset functionality (sending emails)
     - Link from Login page to Password reset page
@@ -18,12 +21,22 @@
     - Welcoming emails after signing up
   - Responsive UI
   - Indexable for robots (searchable improvements)
-  - Light and Dark themes
-  - New design of Menu bar
+  - Themes
+    - Dark mode
+    - Space mode
   - User page functionality: 
-    - changing password, email, username
-    - showing username, email, registration date
+    - show
+      - username
+      - email
+      - registration date
+      - devices
+    - change
+      - password
+      - email
+      - username
   - Mobile friendly
+  - Low internet connection friendly
+- Logging
   - Include User.id in the logging context
 - DevOps:
   - Notifications if the app is down
