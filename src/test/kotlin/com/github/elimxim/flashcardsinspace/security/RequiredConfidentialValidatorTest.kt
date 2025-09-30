@@ -3,12 +3,10 @@ package com.github.elimxim.flashcardsinspace.security
 import jakarta.validation.Validator
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import kotlin.test.Test
 
 @SpringBootTest
-@AutoConfigureMockMvc
 class RequiredConfidentialValidatorTest {
     @Autowired
     lateinit var validator: Validator

@@ -12,8 +12,6 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.crypto.password.PasswordEncoder
 
 @Configuration
 @EnableAutoConfiguration(
@@ -27,12 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 )
 @EnableConfigurationProperties(SecurityProperties::class)
 class TestConfigurationContext {
-    @Bean
-    fun passwordEncoder() = mockk<PasswordEncoder>()
-
-    @Bean
-    fun authenticationManager() = mockk<AuthenticationManager>()
-
     @Bean
     fun userRepository() = mockk<UserRepository>()
 
