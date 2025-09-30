@@ -113,3 +113,20 @@ fun FlashcardSetUpdateRequest.escapeJava() = FlashcardSetUpdateRequest(
     startedAt = startedAt?.escapeJava(),
 )
 
+fun ChronoSyncRequest.normalize() = ChronoSyncRequest(
+    clientDatetime = clientDatetime?.normalize(),
+)
+
+fun ChronoSyncRequest.escapeJava() = ChronoSyncRequest(
+    clientDatetime = clientDatetime?.escapeJava(),
+)
+
+fun ChronoBulkUpdateRequest.normalize() = ChronoBulkUpdateRequest(
+    ids = ids.map { ChronoBulkUpdateRequest.ChronodayId(it.id?.normalize()) },
+    status = status?.normalize(),
+)
+
+fun ChronoBulkUpdateRequest.escapeJava() = ChronoBulkUpdateRequest(
+    ids = ids.map { ChronoBulkUpdateRequest.ChronodayId(it.id?.escapeJava()) },
+    status = status?.escapeJava(),
+)

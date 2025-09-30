@@ -1,14 +1,12 @@
 package com.github.elimxim.flashcardsinspace.web.dto
 
+import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
 import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
 import com.github.elimxim.flashcardsinspace.security.ConfidentialLength
 import com.github.elimxim.flashcardsinspace.security.Password
 import com.github.elimxim.flashcardsinspace.security.RequiredConfidential
-import com.github.elimxim.flashcardsinspace.service.validation.IsoLocalDate
-import com.github.elimxim.flashcardsinspace.service.validation.IsoZonedDateTime
-import com.github.elimxim.flashcardsinspace.service.validation.ValidFlashcardSetStatus
-import com.github.elimxim.flashcardsinspace.service.validation.ValidFlashcardStage
+import com.github.elimxim.flashcardsinspace.service.validation.*
 import jakarta.validation.Valid
 import jakarta.validation.constraints.*
 import java.time.LocalDate
@@ -162,11 +160,39 @@ class ValidFlashcardSetUpdateRequest(
     val startedAt: ZonedDateTime? = null,
 )
 
-// fixme
-data class LanguagesGetResponse(val languages: List<LanguageDto>)
-data class ChronodayResponse(val chronoday: ChronodayDto)
-data class ChronodaysPutRequest(val clientDatetime: ZonedDateTime)
-data class ChronodaysPutResponse(val currDay: ChronodayDto, val chronodays: List<ChronodayDto>)
-sealed class RequestBodyContainer {
-    data class ChronodayStatus(val status: String) : RequestBodyContainer()
+class ChronoSyncRequest(
+    @field:NotNull
+    @field:NotBlank
+    @field:IsoZonedDateTime
+    var clientDatetime: String? = null,
+)
+
+data class ValidChronoSyncRequest(
+    val clientDatetime: ZonedDateTime,
+)
+
+data class ChronoSyncResponse(
+    val currDay: ChronodayDto,
+    val chronodays: List<ChronodayDto>,
+)
+
+class ChronoBulkUpdateRequest(
+    @field:NotNull
+    @field:Size(min = 1)
+    @field:Valid
+    var ids: List<ChronodayId> = emptyList(),
+    @field:NotNull
+    @field:ValidChronodayStatus
+    var status: String? = null,
+) {
+    class ChronodayId(
+        @field:NotNull
+        @field:Pattern(regexp="^\\d+$")
+        var id: String? = null,
+    )
 }
+
+data class ValidChronoBulkUpdateRequest(
+    val ids: List<Long>,
+    val status: ChronodayStatus,
+)

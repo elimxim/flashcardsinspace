@@ -1,5 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service.validation
 
+import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
 import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
 import jakarta.validation.Constraint
@@ -105,6 +106,31 @@ class FlashcardSetStatusValidator : ConstraintValidator<ValidFlashcardSetStatus,
         if (value == null) return true
         try {
             FlashcardSetStatus.valueOf(value)
+            return true
+        } catch (_: IllegalArgumentException) {
+            return false
+        }
+    }
+}
+
+@Target(
+    AnnotationTarget.FIELD,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.VALUE_PARAMETER
+)
+@Retention(AnnotationRetention.RUNTIME)
+@Constraint(validatedBy = [ChronodayStatusValidator::class])
+annotation class ValidChronodayStatus(
+    val message: String = "{jakarta.validation.constraints.chronoday.status.invalid.message}",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = [],
+)
+
+class ChronodayStatusValidator : ConstraintValidator<ValidChronodayStatus, String> {
+    override fun isValid(value: String?, context: ConstraintValidatorContext?): Boolean {
+        if (value == null) return true
+        try {
+            ChronodayStatus.valueOf(value)
             return true
         } catch (_: IllegalArgumentException) {
             return false

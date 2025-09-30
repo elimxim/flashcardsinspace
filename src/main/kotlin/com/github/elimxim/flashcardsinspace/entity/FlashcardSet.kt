@@ -58,4 +58,4 @@ enum class FlashcardSetStatus {
 }
 
 fun FlashcardSet.lastChronoday(): Chronoday? =
-    chronodays.maxByOrNull { it.chronodate } // fixme can't be null
+    chronodays.maxByOrNull { it.chronodate }

@@ -1,15 +1,15 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.Chronoday
-import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
-import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
-import com.github.elimxim.flashcardsinspace.entity.lastChronoday
+import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
-import com.github.elimxim.flashcardsinspace.schedule.LightspeedSchedule
+import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
+import com.github.elimxim.flashcardsinspace.util.trimOneLine
+import com.github.elimxim.flashcardsinspace.web.dto.ChronoBulkUpdateRequest
+import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
-import com.github.elimxim.flashcardsinspace.web.exception.CorruptedChronoStateException
-import com.github.elimxim.flashcardsinspace.web.exception.FlashcardsSetAlreadyInitializedException
+import com.github.elimxim.flashcardsinspace.web.dto.ValidChronoBulkUpdateRequest
+import com.github.elimxim.flashcardsinspace.web.exception.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,15 +22,26 @@ class ChronodayService(
     private val flashcardSetService: FlashcardSetService,
     private val flashcardSetRepository: FlashcardSetRepository,
     private val chronodayRepository: ChronodayRepository,
+    private val lightspeedService: LightspeedService,
+    private val requestValidator: RequestValidator,
 ) {
     @Transactional
-    fun getChronodays(flashcardSetId: Long, clientDatetime: ZonedDateTime): Pair<ChronodayDto, List<ChronodayDto>> {
-        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
+    fun sync(user: User, setId: Long, request: ChronoSyncRequest): Pair<ChronodayDto, List<ChronodayDto>> {
+        log.info("User ${user.id}: syncing chronodays for flashcard set $setId")
+        flashcardSetService.verifyUserHasAccess(user, setId)
+        return sync(setId, requestValidator.validate(request).clientDatetime)
+    }
+
+    @Transactional
+    fun sync(setId: Long, clientDatetime: ZonedDateTime): Pair<ChronodayDto, List<ChronodayDto>> {
+        val flashcardSet = flashcardSetService.getEntity(setId)
         if (flashcardSet.chronodays.isEmpty()) {
-            val schedule = applyLightspeedSchedule(clientDatetime)
+            val schedule = lightspeedService.createSchedule(startDatetime = clientDatetime)
             val currDayStr = clientDatetime.toLocalDate().toString()
             val currDay = schedule.find { it.chronodate == currDayStr }
-                ?: throw IllegalArgumentException("Can't find current day in schedule") // fixme
+                ?: throw CorruptedChronoStateException(
+                    "Can't find current day $currDayStr in schedule"
+                )
             return currDay to schedule
         }
 
@@ -54,18 +65,28 @@ class ChronodayService(
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
-        val schedule = applyLightspeedSchedule(updatedFlashcardSet.chronodays)
+        val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays)
         val lastChronoDateStr = flashcardSet.lastChronoday()?.chronodate?.toString()
         val currDay = schedule.find { it.chronodate == lastChronoDateStr }
-            ?: throw IllegalArgumentException("Can't find current day in schedule") // fixme
+            ?: throw CorruptedChronoStateException(
+                """
+                    Can't find last chrono day $lastChronoDateStr 
+                    in schedule for flashcard set $setId
+                    """.trimOneLine()
+            )
         return currDay to schedule
     }
 
     @Transactional
-    fun addInitialChronoday(flashcardSetId: Long): ChronodayDto {
-        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
+    fun addInitial(user: User, setId: Long): ChronodayDto {
+        log.info("User ${user.id}: adding initial chronoday for flashcard set $setId")
+        flashcardSetService.verifyUserHasAccess(user, setId)
+
+        val flashcardSet = flashcardSetService.getEntity(setId)
         if (flashcardSet.chronodays.isNotEmpty()) {
-            throw FlashcardsSetAlreadyInitializedException("FlashcardSet id=$flashcardSetId is already initialized")
+            throw FlashcardsSetAlreadyInitializedException(
+                "Flashcard set $setId is already initialized"
+            )
         }
 
         val now = ZonedDateTime.now()
@@ -79,19 +100,26 @@ class ChronodayService(
 
         flashcardSet.chronodays.add(initial)
         val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
-        val schedule = applyLightspeedSchedule(updatedFlashcardSet.chronodays)
+        val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays)
         return schedule.last()
     }
 
     @Transactional
-    fun addChronoday(flashcardSetId: Long): ChronodayDto {
-        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
+    fun addNext(user: User, setId: Long): ChronodayDto {
+        log.info("User ${user.id}: adding next chronoday for flashcard set $setId")
+        flashcardSetService.verifyUserHasAccess(user, setId)
+
+        val flashcardSet = flashcardSetService.getEntity(setId)
         if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
-            throw IllegalArgumentException("FlashcardSet is suspended") // fixme
+            throw FlashcardSetSuspendedException(
+                "Flashcard set $setId is suspended"
+            )
         }
 
         val lastChronoday = flashcardSet.lastChronoday()
-            ?: throw IllegalArgumentException("FlashcardSet is not started") // fixme
+            ?: throw FlashcardSetNotStartedException(
+                "Flashcard set $setId is not started"
+            )
 
         val chronoday = Chronoday(
             chronodate = lastChronoday.chronodate.plusDays(1),
@@ -101,21 +129,30 @@ class ChronodayService(
 
         flashcardSet.chronodays.add(chronoday)
         val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
-        val schedule = applyLightspeedSchedule(updatedFlashcardSet.chronodays)
+        val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays)
         return schedule.last()
     }
 
     @Transactional
-    fun updateChronodays(flashcardSetId: Long, chronodayIds: List<Long>, status: String): List<ChronodayDto> {
-        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
+    fun bulkUpdate(user: User, setId: Long, request: ChronoBulkUpdateRequest): List<ChronodayDto> {
+        log.info("User ${user.id}: bulk updating chronodays for flashcard set $setId")
+        flashcardSetService.verifyUserHasAccess(user, setId)
+        return bulkUpdate(setId, requestValidator.validate(request))
+    }
+
+    @Transactional
+    fun bulkUpdate(setId: Long, request: ValidChronoBulkUpdateRequest): List<ChronodayDto> {
+        val flashcardSet = flashcardSetService.getEntity(setId)
         if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
-            throw IllegalArgumentException("FlashcardSet is suspended") // fixme
+            throw FlashcardSetSuspendedException(
+                "Flashcard set $setId is suspended"
+            )
         }
 
         var changed = false
         flashcardSet.chronodays.forEach { chronoday ->
-            if (chronoday.id in chronodayIds) {
-                chronoday.status = ChronodayStatus.valueOf(status)
+            if (chronoday.id in request.ids) {
+                chronoday.status = request.status
                 changed = true
             }
         }
@@ -124,125 +161,58 @@ class ChronodayService(
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
-        val chronodays = updateFlashcardSet.chronodays.filter { it.id in chronodayIds }
-        val schedule = applyLightspeedSchedule(chronodays, daysAhead = 0)
+        val chronodays = updateFlashcardSet.chronodays.filter { it.id in request.ids }
+        val schedule = lightspeedService.createSchedule(chronodays, daysAhead = 0)
         return schedule
     }
 
     @Transactional
-    fun removeChronoday(flashcardSetId: Long, chronodayId: Long) {
-        // todo check for existence
-        // todo check if it's last
-        // todo check flashcard set for existence
-        val chronoday = chronodayRepository.getReferenceById(chronodayId) // fixme
+    fun remove(user: User, setId: Long, id: Long) {
+        log.info("User ${user.id}: removing chronoday $id from set $setId")
+        flashcardSetService.verifyUserHasAccess(user, setId)
+        verifyUserOperation(user, setId, id)
+
+        val chronoday = getEntity(id)
+        val lastChronoday = chronoday.flashcardSet.lastChronoday()
+        if (!chronoday.chronodate.isEqual(lastChronoday?.chronodate)) {
+            throw NotRemovableChronodayException(
+                "Chronoday $id is not the last one in set $setId"
+            )
+        }
 
         if (chronoday.flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
-            throw IllegalArgumentException("FlashcardSet is suspended") // fixme
+            throw FlashcardSetSuspendedException(
+                "Flashcard set $setId is suspended"
+            )
         }
 
         val isNotRemovable = chronoday.flashcardSet.flashcards
             .any { it.lastReviewDate != null && !chronoday.chronodate.isAfter(it.lastReviewDate) }
 
         if (isNotRemovable) {
-            throw IllegalArgumentException("Can't remove chronoday with flashcards get reviewed on this date") // fixme
-        }
-
-        chronodayRepository.deleteById(chronodayId)
-    }
-
-    private fun applyLightspeedSchedule(
-        startDatetime: ZonedDateTime,
-        capacity: Int = 200,
-    ): List<ChronodayDto> {
-        val scheduleDays = LightspeedSchedule(capacity).days()
-        val startDate = startDatetime.toLocalDate()
-        val result = mutableListOf<ChronodayDto>()
-        for (i in 1..scheduleDays.size) {
-            val date = startDate.plusDays(i.toLong())
-            val scheduleDay = scheduleDays[i - 1]
-
-            result.add(
-                ChronodayDto(
-                    id = 0,
-                    chronodate = date.toString(),
-                    seqNumber = scheduleDay.number,
-                    status = ChronodayStatus.NOT_STARTED.name,
-                    stages = scheduleDay.stages.map { it.name }
-                )
+            throw NotRemovableChronodayException(
+                "Can't remove chronoday $id from flashcard set $setId with flashcards get reviewed on this date"
             )
         }
 
-        result.addFirst(
-            ChronodayDto(
-                id = 0,
-                chronodate = startDate.toString(),
-                seqNumber = 0,
-                status = ChronodayStatus.INITIAL.name,
-                stages = listOf()
-            )
-        )
-
-        return result.toList()
+        chronodayRepository.delete(chronoday)
     }
 
-    private fun applyLightspeedSchedule(
-        chronodays: List<Chronoday>,
-        daysAhead: Int = 200,
-    ): List<ChronodayDto> {
-        if (chronodays.isEmpty()) return listOf()
-
-        val scheduleDays = LightspeedSchedule(chronodays.size + daysAhead).days()
-        val chronodays = chronodays.sortedBy { it.chronodate }
-        val initialChronoday = chronodays.first()
-        val startDate = initialChronoday.chronodate
-
-        var prevChronoday: Chronoday? = initialChronoday
-        val result = mutableListOf<ChronodayDto>()
-        for (i in 1..scheduleDays.size) {
-            val date = startDate.plusDays(i.toLong())
-            val scheduleDay = scheduleDays[i - 1]
-            val chronoday = chronodays.getOrElse(i) { null }
-
-            if (chronoday != null) {
-                if (prevChronoday != null && prevChronoday.chronodate == chronoday.chronodate) {
-                    throw CorruptedChronoStateException(
-                        """
-                        Duplicated dates ${chronoday.chronodate} were detected
-                        in flashcard set with id=${chronoday.flashcardSet.id}
-                        """.trimIndent()
-                    )
-                }
-                // todo check if chronodays have inconsistent statuses:
-                // todo prevStatus = IN_PROGRESS && currStatus = COMPLETED || INITIAL
-                // todo prevStatus = NOT_STARTED && currStatus = IN_PROGRESS || COMPLETED || INITIAL
-                // todo prevStatus = INITIAL && currStatus = INITIAL
-                // todo prevStatus = COMPLETED && currStatus = INITIAL
-            }
-
-            result.add(
-                ChronodayDto(
-                    id = chronoday?.id ?: 0,
-                    chronodate = date.toString(),
-                    seqNumber = scheduleDay.number,
-                    status = chronoday?.status?.name ?: ChronodayStatus.NOT_STARTED.name,
-                    stages = scheduleDay.stages.map { it.name }
-                )
-            )
-
-            prevChronoday = chronoday
+    @Transactional
+    fun getEntity(id: Long): Chronoday =
+        chronodayRepository.findById(id).orElseThrow {
+            ChronodayNotFoundException("Chronoday with id $id not found")
         }
 
-        result.addFirst(
-            ChronodayDto(
-                id = initialChronoday.id,
-                chronodate = initialChronoday.chronodate.toString(),
-                seqNumber = 0,
-                status = initialChronoday.status.name,
-                stages = listOf()
+    @Transactional
+    fun verifyUserOperation(user: User, setId: Long, id: Long) {
+        if (getEntity(id).flashcardSet.id != setId) {
+            throw UnmatchedFlashcardSetIdException(
+                """
+                    User ${user.id} requested chronoday $id 
+                    doesn't belong to the requested set $setId
+                    """.trimOneLine()
             )
-        )
-
-        return result.toList()
+        }
     }
-
 }

@@ -83,7 +83,6 @@ class AuthService(
         return user
     }
 
-    @Transactional
     fun logout() {
         // todo log
     }

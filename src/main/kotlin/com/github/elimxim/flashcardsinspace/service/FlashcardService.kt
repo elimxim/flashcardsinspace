@@ -102,7 +102,10 @@ class FlashcardService(
             )
             changed = true
         }
-        if (request.lastReviewDate != null && !request.lastReviewDate.isEqual(flashcard.lastReviewDate)) {
+        if (request.lastReviewDate != null
+            && flashcard.lastReviewDate != null
+            && !request.lastReviewDate.isEqual(flashcard.lastReviewDate)
+        ) {
             flashcard.lastReviewDate = request.lastReviewDate
             changed = true
         }
@@ -130,7 +133,12 @@ class FlashcardService(
     @Transactional
     fun verifyUserOperation(user: User, setId: Long, id: Long) {
         if (getEntity(id).flashcardSet.id != setId) {
-            throw UnmatchedFlashcardSetIdException("User ${user.id} requested flashcard $id doesn't belong to the requested set $setId")
+            throw UnmatchedFlashcardSetIdException(
+                """
+                    User ${user.id} requested flashcard $id 
+                    doesn't belong to the requested set $setId
+                    """.trimIndent()
+            )
         }
     }
 

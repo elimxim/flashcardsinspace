@@ -1,5 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service.validation
 
+import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
 import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
 import com.github.elimxim.flashcardsinspace.security.escapeJava
@@ -80,6 +81,28 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
+    fun validate(request: ChronoSyncRequest): ValidChronoSyncRequest {
+        validateRequest<ChronoSyncRequest>(request) { violations ->
+            throw InvalidRequestFieldsException(
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+                fields(violations)
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
+    fun validate(request: ChronoBulkUpdateRequest): ValidChronoBulkUpdateRequest {
+        validateRequest<ChronoBulkUpdateRequest>(request) { violations ->
+            throw InvalidRequestFieldsException(
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+                fields(violations)
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
     private inline fun <reified T> validateRequest(request: T, ifInvalid: (List<Violation>) -> Unit) {
         val constraintViolations = validator.validate(request)
         if (constraintViolations.isNotEmpty()) {
@@ -103,7 +126,7 @@ private fun <T> ConstraintViolation<T>.toViolation(): Violation {
     return Violation(
         field = propertyPath.last().name,
         message = message,
-        invalidValue = invalidValue
+        invalidValue = invalidValue,
     )
 }
 
@@ -114,7 +137,7 @@ private fun fields(violations: List<Violation>) = violations
 
 fun LoginRequest.toValidRequest() = ValidLoginRequest(
     email = email!!,
-    secret = secret!!
+    secret = secret!!,
 )
 
 fun SignUpRequest.toValidRequest() = ValidSignUpRequest(
@@ -128,7 +151,7 @@ fun FlashcardCreationRequest.toValidRequest() = ValidFlashcardCreationRequest(
     frontSide = frontSide!!,
     backSide = backSide!!,
     stage = FlashcardStage.valueOf(stage!!),
-    creationDate = LocalDate.parse(createdAt!!, DateTimeFormatter.ISO_LOCAL_DATE)
+    creationDate = LocalDate.parse(createdAt!!, DateTimeFormatter.ISO_LOCAL_DATE),
 )
 
 fun FlashcardUpdateRequest.toValidRequest() = ValidFlashcardUpdateRequest(
@@ -159,5 +182,15 @@ fun FlashcardSetUpdateRequest.toValidRequest() = ValidFlashcardSetUpdateRequest(
     first = default?.toBooleanStrict(),
     status = status?.let { FlashcardSetStatus.valueOf(it) },
     languageId = languageId?.toLong(),
-    startedAt = startedAt?.let { ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) }
+    startedAt = startedAt?.let { ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) },
 )
+
+fun ChronoSyncRequest.toValidRequest() = ValidChronoSyncRequest(
+    clientDatetime = ZonedDateTime.parse(clientDatetime!!, DateTimeFormatter.ISO_ZONED_DATE_TIME),
+)
+
+fun ChronoBulkUpdateRequest.toValidRequest() = ValidChronoBulkUpdateRequest(
+    ids = ids.map { it.id!!.toLong() },
+    status = ChronodayStatus.valueOf(status!!),
+)
+

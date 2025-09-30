@@ -112,7 +112,7 @@ class FlashcardSetService(
             flashcardSet.status = FlashcardSetStatus.DELETED
             flashcardSetRepository.save(flashcardSet)
         } else {
-            flashcardSetRepository.deleteById(id)
+            flashcardSetRepository.delete(flashcardSet)
         }
     }
 

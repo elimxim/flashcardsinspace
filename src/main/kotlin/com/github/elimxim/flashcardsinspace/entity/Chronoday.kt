@@ -11,7 +11,7 @@ class Chronoday(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @field:JsonFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false)
     var chronodate: LocalDate,
 

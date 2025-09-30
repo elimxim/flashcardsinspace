@@ -1,51 +1,63 @@
 package com.github.elimxim.flashcardsinspace.web
 
+import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.ChronodayService
-import com.github.elimxim.flashcardsinspace.web.dto.*
+import com.github.elimxim.flashcardsinspace.web.dto.ChronoBulkUpdateRequest
+import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncRequest
+import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncResponse
+import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 
 @Controller
-@RequestMapping("/api/flashcard-sets/{setId}/chronodays")
+@RequestMapping("/api/flashcard-sets/{setId:\\d+}/chronodays")
 class ChronodayController(
     private val chronodayService: ChronodayService,
 ) {
     @PutMapping
-    fun get(
+    fun synchronizeChronodays(
+        @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
-        @RequestBody request: ChronodaysPutRequest,
-    ): ResponseEntity<ChronodaysPutResponse> {
-        val (currDay, chronodays) = chronodayService.getChronodays(setId, request.clientDatetime)
-        return ResponseEntity.ok(ChronodaysPutResponse(currDay, chronodays))
+        @RequestBody request: ChronoSyncRequest,
+    ): ResponseEntity<ChronoSyncResponse> {
+        val (currDay, chronodays) = chronodayService.sync(user, setId, request.normalize())
+        return ResponseEntity.ok(ChronoSyncResponse(currDay, chronodays))
     }
 
     @PostMapping
-    fun add(
+    fun addChronoday(
+        @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @RequestParam initial: Boolean = false,
-    ): ResponseEntity<ChronodayResponse> {
-        val chronoday = if (initial) {
-            chronodayService.addInitialChronoday(setId)
+    ): ResponseEntity<ChronodayDto> {
+        val dto = if (initial) {
+            chronodayService.addInitial(user, setId)
         } else {
-            chronodayService.addChronoday(setId)
+            chronodayService.addNext(user, setId)
         }
-        return ResponseEntity.ok(ChronodayResponse(chronoday))
+        return ResponseEntity.ok(dto)
     }
 
     @PutMapping("/bulk")
-    fun bulkUpdate(
+    fun bulkUpdateChronodays(
+        @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
-        @RequestParam ids: List<Long>,
-        @RequestBody request: RequestBodyContainer.ChronodayStatus,
+        @RequestBody request: ChronoBulkUpdateRequest,
     ): ResponseEntity<List<ChronodayDto>> {
-        val chronodays = chronodayService.updateChronodays(setId, ids, request.status)
+        val chronodays = chronodayService.bulkUpdate(user, setId, request.normalize())
         return ResponseEntity.ok(chronodays)
     }
 
-    @DeleteMapping("/{id}")
-    fun delete(@PathVariable setId: Long, @PathVariable id: Long): ResponseEntity<Unit> {
-        chronodayService.removeChronoday(setId, id)
+    @DeleteMapping("/{id:\\d+}")
+    fun removeChronoday(
+        @AuthenticationPrincipal user: User,
+        @PathVariable setId: Long,
+        @PathVariable id: Long
+    ): ResponseEntity<Unit> {
+        chronodayService.remove(user, setId, id)
         return ResponseEntity.ok().build()
     }
 
