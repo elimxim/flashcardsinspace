@@ -2,14 +2,7 @@ import { type Flashcard, type FlashcardSet } from '@/model/flashcard.ts'
 import { defineStore } from 'pinia'
 import apiClient from '@/api/api-client.ts'
 import type {
-  FlashcardSetGetResponse,
-  FlashcardPutRequest,
-  FlashcardPutResponse,
-  FlashcardSetPutRequest,
-  FlashcardSetPutResponse,
-  FlashcardsGetResponse,
-  FlashcardsPostRequest,
-  FlashcardsPostResponse,
+  FlashcardSetUpdateRequest,
 } from '@/api/communication.ts'
 import type { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
@@ -67,16 +60,16 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       }
     },
     async loadFlashcardSet(id: number): Promise<void> {
-      await apiClient.get<FlashcardSetGetResponse>('/flashcard-sets/' + id).then(response => {
-        this.flashcardSet = response.data.flashcardSet
+      await apiClient.get<FlashcardSet>('/flashcard-sets/' + id).then(response => {
+        this.flashcardSet = response.data
       }).catch(error => {
         console.log(error)
       })
     },
     async loadFlashcards(): Promise<void> {
       if (this.flashcardSet !== null) {
-        await apiClient.get<FlashcardsGetResponse>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards').then(response => {
-          this.flashcardMap = new Map(response.data.flashcards.map(v => [v.id, v]))
+        await apiClient.get<Flashcard[]>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards').then(response => {
+          this.flashcardMap = new Map(response.data.map(v => [v.id, v]))
           this.loaded = true
         }).catch(error => {
           console.error(error)
@@ -85,24 +78,15 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     },
     updateFlashcardSet(name: string | null, first: boolean | null) {
       if (this.flashcardSet !== null) {
-        const request: FlashcardSetPutRequest = {
-          flashcardSet: this.flashcardSet,
-        }
-
-        let changed = false
-        if (name !== null) {
-          request.flashcardSet.name = name
-          changed = true
-        }
-        if (first !== null) {
-          request.flashcardSet.default = first
-          changed = true
-        }
-
+        let changed = this.flashcardSet.name != name || this.flashcardSet.default != first
         if (changed) {
-          apiClient.put<FlashcardSetPutResponse>('/flashcard-sets/' + this.flashcardSet.id, request).then(response => {
+          const request: FlashcardSetUpdateRequest = {
+            name: name,
+            default: first,
+          }
+          apiClient.put<FlashcardSet>('/flashcard-sets/' + this.flashcardSet.id, request).then(response => {
             if (this.flashcardSet !== null) {
-              this.flashcardSet.name = response.data.flashcardSet.name
+              this.flashcardSet = response.data
             }
           })
           // todo handle errors
@@ -113,39 +97,31 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     },
     async addFlashcard(flashcard: Flashcard): Promise<void> {
       if (this.flashcardSet !== null) {
-        const request: FlashcardsPostRequest = {
-          flashcard: flashcard,
-        }
-
-        await apiClient.post<FlashcardsPostResponse>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards', request).then(response => {
-          console.log(`Added flashcard ${response.data.flashcard.id}`)
-          this.flashcardMap.set(response.data.flashcard.id, response.data.flashcard)
+        await apiClient.post<Flashcard>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards', flashcard).then(response => {
+          console.log(`Added flashcard ${response.data.id}`)
+          this.flashcardMap.set(response.data.id, response.data)
         })
         // todo handle errors
       } else {
         console.error(`Can't add flashcard ${flashcard}: flashcard set is null`)
       }
     },
-    updateFlashcard(value: Flashcard) {
+    updateFlashcard(updateFlashcard: Flashcard) {
       if (this.flashcardSet !== null) {
-        const request: FlashcardPutRequest = {
-          flashcard: value,
-        }
-
-        apiClient.put<FlashcardPutResponse>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards/' + value.id, request).then(response => {
-          const flashcard = this.flashcardMap.get(value.id) as Flashcard | undefined
-          if (flashcard !== undefined) {
-            flashcard.frontSide = response.data.flashcard.frontSide
-            flashcard.backSide = response.data.flashcard.backSide
-            flashcard.stage = response.data.flashcard.stage
-            flashcard.reviewCount = response.data.flashcard.reviewCount
-            flashcard.reviewHistory = response.data.flashcard.reviewHistory
-            flashcard.lastUpdatedAt = response.data.flashcard.lastUpdatedAt
+        apiClient.put<Flashcard>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards/' + updateFlashcard.id, updateFlashcard).then(response => {
+          const currFlashcard = this.flashcardMap.get(updateFlashcard.id) as Flashcard | undefined
+          if (currFlashcard !== undefined) {
+            currFlashcard.frontSide = response.data.frontSide
+            currFlashcard.backSide = response.data.backSide
+            currFlashcard.stage = response.data.stage
+            currFlashcard.reviewCount = response.data.reviewCount
+            currFlashcard.reviewHistory = response.data.reviewHistory
+            currFlashcard.lastUpdatedAt = response.data.lastUpdatedAt
           }
         })
         // todo handle errors
       } else {
-        throw new Error(`Can't update flashcard=${value}: flashcard set is null`)
+        throw new Error(`Can't update flashcard=${updateFlashcard}: flashcard set is null`)
       }
     },
     removeFlashcard(id: number) {

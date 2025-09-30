@@ -1,11 +1,6 @@
 import { type FlashcardSet } from '@/model/flashcard.ts'
 import { defineStore } from 'pinia'
 import apiClient from '@/api/api-client.ts'
-import type {
-  FlashcardSetsPostRequest,
-  FlashcardSetsPostResponse,
-  FlashcardSetsGetResponse
-} from '@/api/communication.ts'
 
 export interface FlashcardSetsState {
   flashcardSets: FlashcardSet[]
@@ -32,8 +27,8 @@ export const useFlashcardSetsStore = defineStore('flashcard-sets', {
   },
   actions: {
     async loadFlashcardSets(): Promise<void> {
-      await apiClient.get<FlashcardSetsGetResponse>('/flashcard-sets').then(response => {
-        this.flashcardSets = response.data.flashcardSets.sort((a, b) => {
+      await apiClient.get<FlashcardSet[]>('/flashcard-sets').then(response => {
+        this.flashcardSets = response.data.sort((a, b) => {
           if (a.default && !b.default) return -1
           if (!a.default && b.default) return 1
 
@@ -44,13 +39,9 @@ export const useFlashcardSetsStore = defineStore('flashcard-sets', {
       // todo handle errors
     },
     async addFlashcardSet(flashcardSet: FlashcardSet): Promise<void> {
-      const request: FlashcardSetsPostRequest = {
-        flashcardSet: flashcardSet,
-      }
-
       try {
-        const response = await apiClient.post<FlashcardSetsPostResponse>('/flashcard-sets', request)
-        this.flashcardSets.push(response.data.flashcardSet)
+        const response = await apiClient.post<FlashcardSet>('/flashcard-sets', flashcardSet)
+        this.flashcardSets.push(response.data)
       } catch (error) {
         // todo handle errors
       }
