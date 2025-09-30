@@ -111,12 +111,13 @@ class FlashcardUpdateRequestValidatorTest {
     @Test
     fun `should fail validation if reviewHistory contains invalid stage`() {
         // given:
-        val invalidReviewInfo = FlashcardUpdateRequest.ReviewInfo().apply {
-            stage = "INVALID"
-            reviewedAt = "2025-09-01"
-        }
         val request = validRequest().apply {
-            reviewHistory?.history = listOf(invalidReviewInfo)
+            reviewHistory?.history = listOf(
+                FlashcardUpdateRequest.ReviewInfo().apply {
+                    stage = "INVALID"
+                    reviewedAt = "2025-09-01"
+                }
+            )
         }
 
         // when:
@@ -131,12 +132,13 @@ class FlashcardUpdateRequestValidatorTest {
     @Test
     fun `should fail validation if reviewHistory contains invalid date`() {
         // given:
-        val invalidReviewInfo = FlashcardUpdateRequest.ReviewInfo().apply {
-            stage = "S1"
-            reviewedAt = "invalid-date"
-        }
         val request = validRequest().apply {
-            reviewHistory?.history = listOf(invalidReviewInfo)
+            reviewHistory = FlashcardUpdateRequest.ReviewHistory(
+                history = listOf(FlashcardUpdateRequest.ReviewInfo().apply {
+                    stage = "S1"
+                    reviewedAt = "invalid_date"
+                })
+            )
         }
 
         // when:
