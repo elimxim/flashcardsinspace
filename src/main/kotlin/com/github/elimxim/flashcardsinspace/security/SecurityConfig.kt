@@ -4,7 +4,6 @@ import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
 import com.github.elimxim.flashcardsinspace.web.filter.RequestLoggingFilter
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
 import org.springframework.boot.actuate.health.HealthEndpoint
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -26,7 +25,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
-@ConditionalOnBooleanProperty("app.security.enabled", matchIfMissing = true)
 @EnableConfigurationProperties(SecurityProperties::class)
 class SecurityConfig(
     private val env: Environment,
@@ -58,40 +56,50 @@ class SecurityConfig(
     fun apiSecurityFilterChain(
         http: HttpSecurity,
         jwtAuthFilter: JwtAuthFilter,
-    ): SecurityFilterChain {
-        if (env.activeProfiles.none { it == "dev" }) {
-            http.requiresChannel { channel ->
-                channel
-                    .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).requiresInsecure()
-                    .anyRequest().requiresSecure()
+    ): SecurityFilterChain =
+        if (securityProperties.enabled) {
+            // resolve HTTP -> HTTPS redirect loop when run in dev mode
+            if (env.activeProfiles.none { it == "dev" }) {
+                http.requiresChannel { channel ->
+                    channel
+                        .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).requiresInsecure()
+                        .anyRequest().requiresSecure()
+                }
             }
+
+            http
+                .cors { it.configurationSource(corsConfigurationSource()) }
+                .csrf { it.disable() }
+                .logout { it.disable() }
+                .authorizeHttpRequests { auth ->
+                    auth
+                        .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).permitAll()
+                        .requestMatchers("/api/**").authenticated()
+                        .requestMatchers("/api-public/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
+                        .anyRequest().permitAll()
+                }
+                .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
+                .addFilterAfter(requestLoggingFilter, UsernamePasswordAuthenticationFilter::class.java)
+                .headers { headers ->
+                    headers
+                        .xssProtection { xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK) }
+                        .contentSecurityPolicy { csp -> csp.policyDirectives("script-src 'self'") }
+                }
+                .build()
+        } else {
+            http
+                .cors { it.disable() }
+                .csrf { it.disable() }
+                .logout { it.disable() }
+                .authorizeHttpRequests { auth ->
+                    auth.anyRequest().permitAll()
+                }
+                .build()
         }
 
-        return http
-            .cors { it.configurationSource(corsConfigurationSource()) }
-            .csrf { it.disable() }
-            .logout { it.disable() }
-            .authorizeHttpRequests { auth ->
-                auth
-                    .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).permitAll()
-                    .requestMatchers("/api/**").authenticated()
-                    .requestMatchers("/api-public/**").permitAll()
-                    .requestMatchers("/auth/**").permitAll()
-                    .anyRequest().permitAll()
-            }
-            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
-            .addFilterAfter(requestLoggingFilter, UsernamePasswordAuthenticationFilter::class.java)
-            .headers { headers ->
-                headers
-                    .xssProtection { xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK) }
-                    .contentSecurityPolicy { csp -> csp.policyDirectives("script-src 'self'") }
-            }
-            .build()
-    }
-
-    @Bean
-    fun corsConfigurationSource() = UrlBasedCorsConfigurationSource().apply {
+    private fun corsConfigurationSource() = UrlBasedCorsConfigurationSource().apply {
         val configuration = CorsConfiguration()
         configuration.allowedOrigins = securityProperties.cors.allowedOrigins
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")

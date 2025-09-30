@@ -20,6 +20,11 @@ sealed class UnauthorizedException(
     msg: String, args: List<Any> = emptyList<Any>(), cause: Exception? = null
 ) : Http4xxException(args, msg, cause)
 
+@ExceptionHttpStatus(HttpStatus.FORBIDDEN)
+sealed class ForbiddenException(
+    msg: String, args: List<Any> = emptyList<Any>(), cause: Exception? = null
+) : Http4xxException(args, msg, cause)
+
 @ExceptionHttpStatus(HttpStatus.NOT_FOUND)
 sealed class NotFoundException(
     msg: String, args: List<Any> = emptyList<Any>(), cause: Exception? = null
@@ -34,17 +39,26 @@ sealed class InternalServerErrorException(
 @UserMessageCode("user.message.error.auth.failed")
 class AuthenticationFailedException(msg: String, cause: Exception) : UnauthorizedException(msg, cause = cause)
 
+@ErrorCode("283J29")
+@UserMessageCode("user.message.error.auth.forbidden")
+class UserOperationNotAllowedException(msg: String) : UnauthorizedException(msg)
+
 @ErrorCode("HC28C8")
 @UserMessageCode("user.message.error.auth.user.notFound")
 class UserNotFoundException(msg: String) : NotFoundException(msg)
 
 @ErrorCode("7FO2VL")
 @UserMessageCode("user.message.error.request.fields.invalid")
-class InvalidRequestFieldsException(msg: String, fields: String) : BadRequestException(msg, listOf(fields))
+class InvalidRequestFieldsException(msg: String, val fields: List<String>) :
+    BadRequestException(msg, listOf(fields.joinToString(separator = "', '", prefix = "'", postfix = "'")))
 
 @ErrorCode("JFK90J")
 @UserMessageCode("user.message.error.flashcardSet.notFound")
 class FlashcardSetNotFoundException(msg: String) : BadRequestException(msg)
+
+@ErrorCode("JFO09E")
+@UserMessageCode("user.message.error.flashcard.notFound")
+class FlashcardNotFoundException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("Q4SG3F")
 @UserMessageCode("user.message.error.language.notFound")
@@ -61,3 +75,7 @@ class EmailIsAlreadyTakenException(msg: String) : BadRequestException(msg)
 @ErrorCode("N7S44T")
 @UserMessageCode("user.message.error.chronodays.corrupted")
 class CorruptedChronoStateException(msg: String) : InternalServerErrorException(msg)
+
+@ErrorCode("89023F")
+@UserMessageCode("user.message.error.flashcard.setId.unmatched")
+class UnmatchedFlashcardSetIdException(msg: String) : BadRequestException(msg)

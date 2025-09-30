@@ -135,7 +135,7 @@ class ConfidentialRequiredValidator : ConstraintValidator<RequiredConfidential, 
 annotation class ConfidentialLength(
     val min: Int = 0,
     val max: Int = Int.MAX_VALUE,
-    val message: String = "{jakarta.validation.constraints.confidential.lengthLimitExceeded}",
+    val message: String = "{jakarta.validation.constraints.confidential.lengthLimitExceeded.message}",
     val groups: Array<KClass<*>> = [],
     val payload: Array<KClass<out Payload>> = [],
 )

@@ -1,57 +1,58 @@
 package com.github.elimxim.flashcardsinspace.web
 
+import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.FlashcardService
-import com.github.elimxim.flashcardsinspace.web.dto.FlashcardPutRequest
-import com.github.elimxim.flashcardsinspace.web.dto.FlashcardPutResponse
-import com.github.elimxim.flashcardsinspace.web.dto.FlashcardsGetResponse
-import com.github.elimxim.flashcardsinspace.web.dto.FlashcardsPostRequest
-import com.github.elimxim.flashcardsinspace.web.dto.FlashcardsPostResponse
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardCreationRequest
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardDto
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardUpdateRequest
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.*
 
 @Controller
-@RequestMapping("/api/flashcard-sets/{setId}/flashcards")
+@RequestMapping("/api/flashcard-sets/{setId:\\d+}/flashcards")
 class FlashcardController(
     private val flashcardService: FlashcardService,
 ) {
     @GetMapping
-    fun getFlashcards(@PathVariable setId: Long): ResponseEntity<FlashcardsGetResponse> {
-        val flashcards = flashcardService.getFlashcards(setId)
-        return ResponseEntity.ok(FlashcardsGetResponse(flashcards))
+    fun getFlashcards(
+        @AuthenticationPrincipal user: User,
+        @PathVariable setId: Long,
+    ): ResponseEntity<List<FlashcardDto>> {
+        val result = flashcardService.get(user, setId)
+        return ResponseEntity.ok(result)
     }
 
     @PostMapping
     fun addFlashcard(
+        @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
-        @RequestBody request: FlashcardsPostRequest,
-    ): ResponseEntity<FlashcardsPostResponse> {
-        val savedFlashcard = flashcardService.addFlashcard(setId, request.flashcard)
-        return ResponseEntity.ok(FlashcardsPostResponse(savedFlashcard))
+        @RequestBody request: FlashcardCreationRequest,
+    ): ResponseEntity<FlashcardDto> {
+        val dto = flashcardService.add(user, setId, request.normalize())
+        return ResponseEntity.ok(dto)
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id:\\d+}")
     fun updateFlashcard(
+        @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @PathVariable id: Long,
-        @RequestBody request: FlashcardPutRequest,
-    ): ResponseEntity<FlashcardPutResponse> {
-        val updatedFlashcard = flashcardService.updateFlashcard(setId, id, request.flashcard)
-        return ResponseEntity.ok(FlashcardPutResponse(updatedFlashcard))
+        @RequestBody request: FlashcardUpdateRequest,
+    ): ResponseEntity<FlashcardDto> {
+        val dto = flashcardService.update(user, setId, id, request.normalize())
+        return ResponseEntity.ok(dto)
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     fun removeFlashcard(
+        @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @PathVariable id: Long,
     ): ResponseEntity<Unit> {
-        flashcardService.removeFlashcard(setId, id)
+        flashcardService.remove(user, setId, id)
         return ResponseEntity.ok().build()
     }
 }

@@ -1,8 +1,11 @@
 package com.github.elimxim.flashcardsinspace.web
 
 import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.FlashcardSetService
-import com.github.elimxim.flashcardsinspace.web.dto.*
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetCreationRequest
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetDto
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetUpdateRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
@@ -16,49 +19,45 @@ class FlashcardSetController(
     @GetMapping
     fun getFlashcardSets(
         @AuthenticationPrincipal user: User,
-    ): ResponseEntity<FlashcardSetsGetResponse> {
-        val flashcardSets = flashcardSetService.findAll(user)
-        return ResponseEntity.ok(FlashcardSetsGetResponse(flashcardSets))
+    ): ResponseEntity<List<FlashcardSetDto>> {
+        val result = flashcardSetService.getAll(user)
+        return ResponseEntity.ok(result)
+    }
+
+    @GetMapping("/{id:\\d+}")
+    fun getFlashcardSet(
+        @AuthenticationPrincipal user: User,
+        @PathVariable id: Long,
+    ): ResponseEntity<FlashcardSetDto> {
+        val dto = flashcardSetService.get(user, id)
+        return ResponseEntity.ok(dto)
     }
 
     @PostMapping
     fun addFlashcardSet(
         @AuthenticationPrincipal user: User,
-        @RequestBody request: FlashcardSetsPostRequest,
-    ): ResponseEntity<FlashcardSetsPostResponse> {
-        val savedFlashcardSet = flashcardSetService.createNew(user, request.flashcardSet)
-        return ResponseEntity.ok(FlashcardSetsPostResponse(savedFlashcardSet))
+        @RequestBody request: FlashcardSetCreationRequest,
+    ): ResponseEntity<FlashcardSetDto> {
+        val dto = flashcardSetService.create(user, request.normalize())
+        return ResponseEntity.ok(dto)
     }
 
-    @GetMapping("/{id}")
-    fun getFlashcardSet(
-        @AuthenticationPrincipal user: User,
-        @PathVariable id: Long,
-    ): ResponseEntity<FlashcardSetGetResponse> {
-        val flashcardSet = flashcardSetService.get(id)
-        return ResponseEntity.ok(
-            FlashcardSetGetResponse(flashcardSet)
-        )
-    }
-
-    @PutMapping("/{id}")
+    @PutMapping("/{id:\\d+}")
     fun updateFlashcardSet(
         @AuthenticationPrincipal user: User,
         @PathVariable id: Long,
-        @RequestBody request: FlashcardSetPutRequest,
-    ): ResponseEntity<FlashcardSetPutResponse> {
-        val updatedFlashcardSet = flashcardSetService.update(id, request.flashcardSet)
-        return ResponseEntity.ok(
-            FlashcardSetPutResponse(updatedFlashcardSet)
-        )
+        @RequestBody request: FlashcardSetUpdateRequest,
+    ): ResponseEntity<FlashcardSetDto> {
+        val dto = flashcardSetService.update(user, id, request.normalize())
+        return ResponseEntity.ok(dto)
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     fun removeFlashcardSet(
         @AuthenticationPrincipal user: User,
         @PathVariable id: Long,
     ): ResponseEntity<Unit> {
-        flashcardSetService.remove(id)
+        flashcardSetService.remove(user, id)
         return ResponseEntity.ok().build()
     }
 

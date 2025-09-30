@@ -15,7 +15,7 @@ class PublicApiController(
 ) {
     @GetMapping("/languages")
     fun getLanguages(): ResponseEntity<LanguagesGetResponse> {
-        val languages = languageService.getAllLanguages().map { it.toDto() }
-        return ResponseEntity.ok(LanguagesGetResponse(languages))
+        val result = languageService.getAllLanguages().map { it.toDto() }
+        return ResponseEntity.ok(LanguagesGetResponse(result))
     }
 }

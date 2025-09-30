@@ -1,7 +1,6 @@
 package com.github.elimxim.flashcardsinspace.security
 
-import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
-import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
+import com.github.elimxim.flashcardsinspace.web.dto.*
 import org.apache.commons.text.StringEscapeUtils
 
 fun String.escapeHtml(): String {
@@ -22,22 +21,99 @@ fun SignUpRequest.normalize() = SignUpRequest(
     email = email?.normalize()?.lowercase(),
     name = name?.normalize(),
     secret = secret?.normalize(),
-    languageId = languageId
+    languageId = languageId?.normalize(),
 )
 
 fun SignUpRequest.escapeJava() = SignUpRequest(
     email = email?.escapeJava(),
     name = name?.escapeJava(),
     secret = secret?.escapeJava(),
-    languageId = languageId,
+    languageId = languageId?.escapeJava(),
 )
 
 fun LoginRequest.normalize() = LoginRequest(
     email = email?.normalize()?.lowercase(),
-    secret = secret?.normalize()
+    secret = secret?.normalize(),
 )
 
 fun LoginRequest.escapeJava() = LoginRequest(
     email = email?.escapeJava(),
-    secret = secret?.escapeJava()
+    secret = secret?.escapeJava(),
 )
+
+fun FlashcardCreationRequest.normalize() = FlashcardCreationRequest(
+    frontSide = frontSide?.normalize(),
+    backSide = backSide?.normalize(),
+    stage = stage?.normalize(),
+    createdAt = createdAt?.normalize(),
+)
+
+fun FlashcardCreationRequest.escapeJava() = FlashcardCreationRequest(
+    frontSide = frontSide?.escapeJava(),
+    backSide = backSide?.escapeJava(),
+    stage = stage?.escapeJava(),
+    createdAt = createdAt?.escapeJava(),
+)
+
+fun FlashcardUpdateRequest.normalize() = FlashcardUpdateRequest(
+    id = id?.normalize(),
+    frontSide = frontSide?.normalize(),
+    backSide = backSide?.normalize(),
+    stage = stage?.normalize(),
+    reviewCount = reviewCount?.normalize(),
+    reviewHistory = FlashcardUpdateRequest.ReviewHistory(
+        history = reviewHistory?.history.orEmpty().map {
+            FlashcardUpdateRequest.ReviewInfo(
+                stage = it.stage?.normalize(),
+                reviewedAt = it.reviewedAt?.normalize(),
+            )
+        }
+    ),
+    reviewedAt = reviewedAt?.normalize(),
+)
+
+fun FlashcardUpdateRequest.escapeJava() = FlashcardUpdateRequest(
+    id = id?.escapeJava(),
+    frontSide = frontSide?.escapeJava(),
+    backSide = backSide?.escapeJava(),
+    stage = stage?.escapeJava(),
+    reviewCount = reviewCount?.escapeJava(),
+    reviewHistory = FlashcardUpdateRequest.ReviewHistory(
+        history = reviewHistory?.history.orEmpty().map {
+            FlashcardUpdateRequest.ReviewInfo(
+                stage = it.stage?.escapeJava(),
+                reviewedAt = it.reviewedAt?.escapeJava(),
+            )
+        }
+    ),
+    reviewedAt = reviewedAt?.escapeJava(),
+)
+
+fun FlashcardSetCreationRequest.normalize() = FlashcardSetCreationRequest(
+    name = name?.normalize(),
+    languageId = languageId?.normalize(),
+)
+
+fun FlashcardSetCreationRequest.escapeJava() = FlashcardSetCreationRequest(
+    name = name?.escapeJava(),
+    languageId = languageId?.escapeJava(),
+)
+
+fun FlashcardSetUpdateRequest.normalize() = FlashcardSetUpdateRequest(
+    id = id?.normalize(),
+    name = name?.normalize(),
+    default = default?.normalize(),
+    status = status?.normalize(),
+    languageId = languageId?.normalize(),
+    startedAt = startedAt?.normalize(),
+)
+
+fun FlashcardSetUpdateRequest.escapeJava() = FlashcardSetUpdateRequest(
+    id = id?.escapeJava(),
+    name = name?.escapeJava(),
+    default = default?.escapeJava(),
+    status = status?.escapeJava(),
+    languageId = languageId?.escapeJava(),
+    startedAt = startedAt?.escapeJava(),
+)
+

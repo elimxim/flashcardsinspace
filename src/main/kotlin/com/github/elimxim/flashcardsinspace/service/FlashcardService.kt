@@ -1,43 +1,51 @@
 package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.Flashcard
-import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
 import com.github.elimxim.flashcardsinspace.entity.ReviewHistory
 import com.github.elimxim.flashcardsinspace.entity.ReviewInfo
+import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
-import com.github.elimxim.flashcardsinspace.web.dto.FlashcardDto
-import com.github.elimxim.flashcardsinspace.web.dto.toDto
+import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
+import com.github.elimxim.flashcardsinspace.web.dto.*
+import com.github.elimxim.flashcardsinspace.web.exception.FlashcardNotFoundException
+import com.github.elimxim.flashcardsinspace.web.exception.UnmatchedFlashcardSetIdException
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 import java.time.ZonedDateTime
+
+private val log = LoggerFactory.getLogger(FlashcardService::class.java)
 
 @Service
 class FlashcardService(
     private val flashcardSetService: FlashcardSetService,
     private val flashcardRepository: FlashcardRepository,
+    private val requestValidator: RequestValidator,
 ) {
     @Transactional
-    fun getFlashcards(flashcardSetId: Long): List<FlashcardDto> {
-        // todo check for existence
-        return flashcardSetService.getEntity(flashcardSetId).flashcards.map { it.toDto() }
-    }
-
-    fun getFlashcard(id: Long): Flashcard {
-        return flashcardRepository.getReferenceById(id) // fixme
+    fun get(user: User, setId: Long): List<FlashcardDto> {
+        log.info("User ${user.id}: retrieving flashcards from set $setId")
+        flashcardSetService.verifyUserHasAccess(user, setId)
+        return flashcardSetService.getEntity(setId)
+            .flashcards.map { it.toDto() }
     }
 
     @Transactional
-    fun addFlashcard(flashcardSetId: Long, dto: FlashcardDto): FlashcardDto {
-        // todo validate
-        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
-        // todo check for existence
+    fun add(user: User, setId: Long, request: FlashcardCreationRequest): FlashcardDto {
+        log.info("User ${user.id}: adding a new flashcard to set $setId")
+        flashcardSetService.verifyUserHasAccess(user, setId)
+        return add(setId, requestValidator.validate(request))
+    }
+
+    @Transactional
+    fun add(setId: Long, request: ValidFlashcardCreationRequest): FlashcardDto {
+        val flashcardSet = flashcardSetService.getEntity(setId)
         val flashcard = Flashcard(
-            frontSide = dto.frontSide,
-            backSide = dto.backSide,
-            stage = FlashcardStage.valueOf(dto.stage),
-            timesReviewed = dto.reviewCount,
-            creationDate = LocalDate.parse(dto.createdAt),
+            frontSide = request.frontSide,
+            backSide = request.backSide,
+            stage = request.stage,
+            timesReviewed = 0,
+            creationDate = request.creationDate,
             flashcardSet = flashcardSet,
         )
 
@@ -46,63 +54,84 @@ class FlashcardService(
     }
 
     @Transactional
-    fun updateFlashcard(flashcardSetId: Long, id: Long, dto: FlashcardDto): FlashcardDto {
-        // todo validate
-        // todo check for existence
-        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
-        // todo check for existence
-        val flashcard = getFlashcard(id)
-        // todo move merge to a separate method
+    fun update(user: User, setId: Long, id: Long, request: FlashcardUpdateRequest): FlashcardDto {
+        log.info("User ${user.id}: updating flashcard $id in set $setId")
+        flashcardSetService.verifyUserHasAccess(user, setId)
+        verifyUserOperation(user, setId, id)
+        return update(setId, id, requestValidator.validate(request))
+    }
+
+    @Transactional
+    fun update(setId: Long, id: Long, request: ValidFlashcardUpdateRequest): FlashcardDto {
+        flashcardSetService.getEntity(setId)
+        val flashcard = getEntity(id)
+        if (mergeFlashcard(flashcard, request)) {
+            flashcard.lastUpdatedAt = ZonedDateTime.now()
+            return flashcardRepository.save(flashcard).toDto()
+        } else {
+            return flashcard.toDto()
+        }
+    }
+
+    private fun mergeFlashcard(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Boolean {
         var changed = false
-        if (flashcard.frontSide != dto.frontSide) {
-            flashcard.frontSide = dto.frontSide
+        if (flashcard.frontSide != request.frontSide) {
+            flashcard.frontSide = request.frontSide
             changed = true
         }
-        if (flashcard.backSide != dto.backSide) {
-            flashcard.backSide = dto.backSide
+        if (flashcard.backSide != request.backSide) {
+            flashcard.backSide = request.backSide
             changed = true
         }
-        val stage = FlashcardStage.valueOf(dto.stage)
-        if (flashcard.stage != stage) {
-            flashcard.stage = stage
+        if (flashcard.stage != request.stage) {
+            flashcard.stage = request.stage
             changed = true
         }
-        if (flashcard.timesReviewed != dto.reviewCount) {
-            flashcard.timesReviewed = dto.reviewCount
+        if (flashcard.timesReviewed != request.timesReviewed) {
+            flashcard.timesReviewed = request.timesReviewed
             changed = true
         }
-        if (flashcard.reviewHistory.history.size != dto.reviewHistory.history.size) {
+        if (flashcard.reviewHistory.history.size != request.reviewHistory.history.size) {
             flashcard.reviewHistory = ReviewHistory(
-                history = dto.reviewHistory.history.map {
+                history = request.reviewHistory.history.map {
                     ReviewInfo(
-                        stage = FlashcardStage.valueOf(it.stage),
-                        reviewDate = LocalDate.parse(it.reviewedAt)
+                        stage = it.stage,
+                        reviewDate = it.reviewDate
                     )
                 }.toMutableList()
             )
             changed = true
         }
-        if (flashcard.lastReviewDate?.toString() != dto.reviewedAt) {
-            flashcard.lastReviewDate = dto.reviewedAt?.let { LocalDate.parse(it) }
+        if (flashcard.lastReviewDate?.isEqual(request.lastReviewDate) == false) {
+            flashcard.lastReviewDate = request.lastReviewDate
+            changed = true
         }
 
-        if (changed) {
-            flashcard.lastUpdatedAt = ZonedDateTime.now()
-            return flashcardRepository.save(flashcard).toDto()
-        } else {
-            // todo log
-            return dto
-        }
+        return changed
     }
 
     @Transactional
-    fun removeFlashcard(flashcardSetId: Long, id: Long) {
-        // check for existence
-        val flashcardSet = flashcardSetService.getEntity(flashcardSetId)
-        // check for existence
-        val flashcard = getFlashcard(id)
+    fun remove(user: User, setId: Long, id: Long) {
+        log.info("User ${user.id}: removing flashcard $id from set $setId")
+        flashcardSetService.verifyUserHasAccess(user, setId)
+        verifyUserOperation(user, setId, id)
+        val flashcardSet = flashcardSetService.getEntity(setId)
+        val flashcard = getEntity(id)
         flashcardSet.flashcards.remove(flashcard)
         flashcardRepository.delete(flashcard)
+    }
+
+    @Transactional
+    fun getEntity(id: Long): Flashcard =
+        flashcardRepository.findById(id).orElseThrow {
+            FlashcardNotFoundException("Flashcard with id $id not found")
+        }
+
+    @Transactional
+    fun verifyUserOperation(user: User, setId: Long, id: Long) {
+        if (getEntity(id).flashcardSet.id != setId) {
+            throw UnmatchedFlashcardSetIdException("User ${user.id} requested flashcard $id doesn't belong to the requested set $setId")
+        }
     }
 
 }
