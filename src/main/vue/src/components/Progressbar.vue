@@ -1,5 +1,5 @@
 <template>
-  <div class="progress">
+  <div class="progress progress--theme">
     <div class="progress__track">
       <div v-if="!indeterminate" class="progress__bar"/>
       <div v-else class="progress__bar progress__bar--indeterminate"/>
@@ -142,6 +142,13 @@ const barRight = computed(() => props.reverse ? '0' : 'auto')
 </script>
 
 <style scoped>
+.progress--theme {
+  --bar--from: var(--progressbar--from, #9f9f9f);
+  --bar--via: var(--progressbar--via, #c1c1c1);
+  --bar--to: var(--progressbar--to, #6e6e6e);
+  --track--bg-color: var(--progressbar--bg-color, rgba(255, 255, 255, 0.10));
+}
+
 .progress {
   position: relative;
   pointer-events: none;
@@ -152,7 +159,7 @@ const barRight = computed(() => props.reverse ? '0' : 'auto')
   width: 100%;
   height: v-bind(trackHeight);
   border-radius: v-bind(trackBorderRadius);
-  background-color: var(--progressbar--bg-color, rgba(255, 255, 255, 0.10));
+  background-color: var(--track--bg-color);
   overflow: hidden;
 }
 
@@ -166,9 +173,9 @@ const barRight = computed(() => props.reverse ? '0' : 'auto')
   border-radius: v-bind(barBorderRadius);
   background-image: linear-gradient(
     90deg,
-    var(--progressbar--from, #9f9f9f),
-    var(--progressbar--via, #c1c1c1),
-    var(--progressbar--to, #6e6e6e)
+    var(--bar--from, #9f9f9f),
+    var(--bar--via, #c1c1c1),
+    var(--bar--to, #6e6e6e)
   );
 }
 
