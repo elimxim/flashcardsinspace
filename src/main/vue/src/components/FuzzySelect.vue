@@ -1,7 +1,7 @@
 <template>
   <div
-    class="fuzzy-select select-none"
-    ref="selectContainer"
+    class="fuzzy-select fuzzy-select--theme transition--border-color select-none"
+    ref="fuzzyContainer"
     tabindex="0"
     @focus="openDropdown"
     @focusout="handleFocusOut"
@@ -9,7 +9,7 @@
     <input
       v-if="!isOpen"
       type="text"
-      class="input fuzzy-select__input transition--border-color"
+      class="input fuzzy-select__input"
       :value="selectedOptionLabel"
       :placeholder="optionPlaceholder"
       style="pointer-events: none;"
@@ -17,7 +17,7 @@
     <input
       v-if="isOpen"
       type="text"
-      class="input fuzzy-select__input transition--border-color"
+      class="input fuzzy-select__input"
       ref="searchInput"
       v-model="searchQuery"
       :placeholder="searchPlaceholder"
@@ -43,17 +43,16 @@
 <script setup lang="ts" generic="T extends object">
 import { ref, computed, nextTick, watch } from 'vue'
 
+const model = defineModel<T>({ default: null })
+
 const props = defineProps<{
   options: T[]
-  modelValue: T | undefined
   optionLabel: (option: T) => string
   optionPlaceholder?: string
   searchPlaceholder?: string
 }>()
 
-const emit = defineEmits(['update:modelValue'])
-
-const selectContainer = ref<HTMLElement>()
+const fuzzyContainer = ref<HTMLElement>()
 const searchInput = ref<HTMLInputElement>()
 const dropDownList = ref<HTMLUListElement>()
 
@@ -82,8 +81,8 @@ watch(filteredOptions, () => {
 })
 
 const selectedOptionLabel = computed(() => {
-  if (!props.modelValue) return ''
-  return optionLabel(props.modelValue)
+  if (!model.value) return ''
+  return optionLabel(model.value)
 })
 
 async function openDropdown() {
@@ -95,8 +94,8 @@ async function openDropdown() {
 }
 
 function adjustDropDownStyles() {
-  if (selectContainer.value) {
-    const computedStyles = getComputedStyle(selectContainer.value)
+  if (fuzzyContainer.value) {
+    const computedStyles = getComputedStyle(fuzzyContainer.value)
     const topValue = computedStyles
       .getPropertyValue('--fuzzy-select__drop-down--right').trim()
     const radiusValue = computedStyles
@@ -112,7 +111,7 @@ function adjustDropDownStyles() {
 }
 
 function selectOption(option: T) {
-  emit('update:modelValue', option)
+  model.value = option
   searchQuery.value = ''
   closeDropdown()
 }
@@ -120,6 +119,7 @@ function selectOption(option: T) {
 function closeDropdown() {
   isOpen.value = false
   highlightedIndex.value = -1
+  fuzzyContainer.value?.blur()
 }
 
 function handleKeydown(event: KeyboardEvent) {
@@ -156,7 +156,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 function handleFocusOut(event: FocusEvent) {
-  if (selectContainer.value && !selectContainer.value.contains(event.relatedTarget as Node)) {
+  if (fuzzyContainer.value && !fuzzyContainer.value.contains(event.relatedTarget as Node)) {
     closeDropdown()
   }
 }
@@ -171,6 +171,16 @@ function scrollHighlightedOptionIntoView() {
 </script>
 
 <style scoped>
+.fuzzy-select--theme {
+  --slct--font-size: var(--fuzzy-select--font-size, 1rem);
+  --slct--drop-down--color: var(--fuzzy-select__drop-down--color, rgba(0, 0, 0, 0.8));
+  --slct--drop-down--border-color: var(--fuzzy-select__drop-down--border-color, rgba(205, 205, 205, 0.8));
+  --slct--drop-down--right: var(--fuzzy-select__drop-down--right, -1rem);
+  --slct--drop-down--bg-color--hover: var(--fuzzy-select__drop-down--hover--bg-color, rgba(213, 213, 213, 0.5));
+  --slct--scrollbar--color: var(--fuzzy-select__drop-down__scrollbar--color, rgba(170, 170, 170, 0.6));
+  --slct--scrollbar--color--hover: var(--fuzzy-select__drop-down__scrollbar--hover--color, rgba(170, 170, 170, 0.8));
+}
+
 .fuzzy-select {
   position: relative;
   width: 100%;
@@ -183,15 +193,15 @@ function scrollHighlightedOptionIntoView() {
   outline: none;
   width: 100%;
   padding: 0;
-  font-size: var(--fuzzy-select--font-size, 1rem)
+  font-size: var(--slct--font-size)
 }
 
 .fuzzy-select__drop-down {
   position: absolute;
   top: 102%;
   left: 0;
-  right: var(--fuzzy-select__drop-down--right, -1rem);
-  border: 1px solid var(--fuzzy-select__drop-down--border-color, rgba(205, 205, 205, 0.8));
+  right: var(--slct--drop-down--right);
+  border: 1px solid var(--slct--drop-down--border-color);
   border-radius: v-bind(borderRadius);
   list-style: none;
   padding: 0;
@@ -203,7 +213,7 @@ function scrollHighlightedOptionIntoView() {
   z-index: 1000;
 }
 
-.fuzzy-select__drop-down:focus{
+.fuzzy-select__drop-down:focus {
   outline: none;
   border-width: 2px;
 }
@@ -211,13 +221,13 @@ function scrollHighlightedOptionIntoView() {
 .fuzzy-select__drop-down li {
   padding: 10px;
   cursor: pointer;
-  color: var(--fuzzy-select__drop-down--color, rgba(0, 0, 0, 0.8));
+  color: var(--slct--drop-down--color);
   transition: background-color 0.1s ease-in-out;
 }
 
 .fuzzy-select__drop-down li:hover,
 .fuzzy-select__drop-down li.highlighted {
-  background-color: var(--fuzzy-select__drop-down--hover--bg-color, rgba(213, 213, 213, 0.5));
+  background-color: var(--slct--drop-down--bg-color--hover);
 }
 
 .fuzzy-select__drop-down::-webkit-scrollbar {
@@ -229,11 +239,11 @@ function scrollHighlightedOptionIntoView() {
 }
 
 .fuzzy-select__drop-down::-webkit-scrollbar-thumb {
-  background-color: var(--fuzzy-select__drop-down__scrollbar--color, rgba(170, 170, 170, 0.6));
+  background-color: var(--slct--scrollbar--color);
   border-radius: 4px;
 }
 
 .fuzzy-select__drop-down::-webkit-scrollbar-thumb:hover {
-  background-color: var(--fuzzy-select__drop-down__scrollbar--hover--color, rgba(170, 170, 170, 0.8));
+  background-color: var(--slct--scrollbar--color--hover);
 }
 </style>
