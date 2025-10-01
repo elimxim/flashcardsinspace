@@ -3,9 +3,6 @@
 ## TODOS
 
 - Refactoring
-  - SmartInput component
-    - font size
-    - colorscheme
   - Communication fields renaming
   - ReviewPage refactoring
   - Modals refactoring
