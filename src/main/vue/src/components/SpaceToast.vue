@@ -112,7 +112,7 @@ onUnmounted(() => toaster.reset())
   --button--hover--color: var(--space-toast--button--hover--color, var(--default-button--hover--color));
   --button--hover--bg: var(--space-toast--button--hover--bg, var(--default-button--hover--bg));
   --progressbar--bg-color: var(--space-toast--progressbar--bg-color, var(--default-progressbar--bg-color));
-  --starfield__star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
+  --starfield--star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
 }
 
 .space-toast-theme[toast-type="error"] {
@@ -130,7 +130,7 @@ onUnmounted(() => toaster.reset())
   --button--hover--color: var(--space-toast--button--hover--color, var(--default-button--hover--color));
   --button--hover--bg: var(--space-toast--button--hover--bg, var(--default-button--hover--bg));
   --progressbar--bg-color: var(--space-toast--progressbar--bg-color, var(--default-progressbar--bg-color));
-  --starfield__star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
+  --starfield--star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
 }
 
 .space-toast-theme[toast-type="info"] {
@@ -148,7 +148,7 @@ onUnmounted(() => toaster.reset())
   --button--hover--color: var(--space-toast--button--hover--color, var(--default-button--hover--color));
   --button--hover--bg: var(--space-toast--button--hover--bg, var(--default-button--hover--bg));
   --progressbar--bg-color: var(--space-toast--progressbar--bg-color, var(--default-progressbar--bg-color));
-  --starfield__star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
+  --starfield--star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
 }
 
 .space-toast-theme[toast-type="warning"] {
@@ -166,7 +166,7 @@ onUnmounted(() => toaster.reset())
   --button--hover--color: var(--space-toast--button--hover--color, var(--default-button--hover--color));
   --button--hover--bg: var(--space-toast--button--hover--bg, var(--default-button--hover--bg));
   --progressbar--bg-color: var(--space-toast--progressbar--bg-color, var(--default-progressbar--bg-color));
-  --starfield__star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
+  --starfield--star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
 }
 
 .space-toast {

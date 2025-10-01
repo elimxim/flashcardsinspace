@@ -1,5 +1,5 @@
 <template>
-  <div class="starfield">
+  <div class="starfield starfield--theme">
     <span v-for="s in stars" :key="s.id" class="starfield__star" :style="starStyle(s)"/>
     <slot/>
   </div>
@@ -69,6 +69,10 @@ function starStyle(s: Star) {
 </script>
 
 <style scoped>
+.starfield--theme {
+  --star-color: var(--starfield--star--color, rgba(255, 255, 255, 0.9))
+}
+
 .starfield {
   position: absolute;
   overflow: hidden;
@@ -84,7 +88,7 @@ function starStyle(s: Star) {
   position: absolute;
   opacity: 1;
   border-radius: 9999px;
-  background-color: var(--starfield__star--color, rgba(255, 255, 255, 0.9));
+  background-color: var(--star-color);
   will-change: opacity, transform;
   animation-name: twinkle, verticalDrift;
   animation-timing-function: ease-in-out, ease-in-out;
