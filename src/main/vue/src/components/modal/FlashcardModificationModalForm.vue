@@ -176,7 +176,7 @@ async function remove() {
   if (done) {
     resetState()
     toggleModalForm()
-    removed.value = false
+    removed.value = true
   }
 }
 
