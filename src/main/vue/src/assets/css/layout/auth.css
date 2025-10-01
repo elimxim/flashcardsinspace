@@ -22,13 +22,13 @@
   }
 }
 
-.auth-container__form {
+.auth-form {
   display: flex;
   flex-direction: column;
   gap: clamp(1vh, 1.5vh, 2vh);
 }
 
-.auth-container__form__error {
+.auth-form-error {
   font-family: var(--error-font-family);
   font-size: clamp(0.75rem, 1.6vh, 0.9rem);
   color: var(--text--error--color);
@@ -36,7 +36,7 @@
   padding: 0;
 }
 
-.auth-container__form__link {
+.auth-link {
   font-family: var(--main-font-family);
   font-size: clamp(0.75rem, 2vh, 0.9rem);
   color: var(--link--color);
@@ -44,14 +44,14 @@
   padding: 0;
 }
 
-.auth-container__form__link a {
+.auth-link a {
   font-family: var(--main-font-family);
   color: var(--a--color);
   text-decoration: none;
 }
 
-.auth-container__form__link a:hover,
-.auth-container__form__link a:focus {
+.auth-link a:hover,
+.auth-link a:focus {
   outline: none;
   text-decoration: underline;
 }

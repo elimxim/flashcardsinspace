@@ -29,7 +29,7 @@
       class="auth-container transition--border-color"
       :class="{ 'auth-container--error': loginFailed }"
     >
-      <form @submit.prevent="login" class="auth-container__form" novalidate>
+      <form @submit.prevent="login" class="auth-form" novalidate>
         <SmartInput
           v-model="userEmail"
           type="email"
@@ -38,7 +38,7 @@
           :invalid="userEmailInvalid"
           :placeholder="userEmailNotSet ? 'Email is required' : 'Email'"
         />
-        <span v-if="userEmailFormatWrong" class="auth-container__form__error">
+        <span v-if="userEmailFormatWrong" class="auth-form-error">
           This email seems to be lost in a cosmic dust cloud. Please check the format
         </span>
         <SmartInput
@@ -50,7 +50,7 @@
           :placeholder="userPasswordNotSet ? 'Password is required' : 'Password'"
         />
         <span v-if="userPasswordMaxLengthInvalid"
-              class="auth-container__form__error transition--opacity">
+              class="auth-form-error transition--opacity">
           This secret is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <SmartButton
@@ -61,7 +61,7 @@
           autoBlur
           fillWidth
         />
-        <p class="auth-container__form__link">
+        <p class="auth-link">
           New to the galaxy?
           <router-link to="/signup">Signup</router-link>
         </p>

@@ -11,7 +11,7 @@
       class="auth-container transition--border-color"
       :class="{ 'auth-container--error': signupFailed }"
     >
-      <form @submit.prevent="signup" class="auth-container__form" novalidate>
+      <form @submit.prevent="signup" class="auth-form" novalidate>
         <SmartInput
           v-model="username"
           type="text"
@@ -20,10 +20,10 @@
           :invalid="usernameNotSet"
           :placeholder="usernameNotSet ? 'Name is required' : 'Name'"
         />
-        <span v-if="usernameRegexMismatch" class="auth-container__form__error">
+        <span v-if="usernameRegexMismatch" class="auth-form-error">
           Please use only letters, numbers, dashes, and underscores
         </span>
-        <span v-else-if="usernameMaxLengthInvalid" class="auth-container__form__error">
+        <span v-else-if="usernameMaxLengthInvalid" class="auth-form-error">
             This username is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <SmartInput
@@ -34,7 +34,7 @@
           :invalid="userEmailInvalid"
           :placeholder="userEmailNotSet ? 'Email is required' : 'Email'"
         />
-        <span v-if="userEmailWrongFormat" class="auth-container__form__error">
+        <span v-if="userEmailWrongFormat" class="auth-form-error">
           This email seems to be lost in a cosmic dust cloud. Please check the format
         </span>
         <AwesomeContainer icon="fa-solid fa-globe" class="awesome-container">
@@ -55,10 +55,10 @@
           :invalid="userPasswordInvalid"
           :placeholder="userPasswordNotSet ? 'Password is required' : 'Password'"
         />
-        <span v-if="userPasswordMinLengthInvalid" class="auth-container__form__error">
+        <span v-if="userPasswordMinLengthInvalid" class="auth-form-error">
           Your password must be stronger than a piece of space junk. Please use 6 or more characters
         </span>
-        <span v-else-if="userPasswordMaxLengthInvalid" class="auth-container__form__error">
+        <span v-else-if="userPasswordMaxLengthInvalid" class="auth-form-error">
           This secret is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <SmartInput
@@ -69,7 +69,7 @@
           :invalid="confirmPasswordInvalid"
           :placeholder="confirmPasswordNotSet ? 'Password confirmation is required' : 'Confirm Password'"
         />
-        <span v-if="confirmPasswordMismatch" class="auth-container__form__error">
+        <span v-if="confirmPasswordMismatch" class="auth-form-error">
           The passwords do not match. Please try again
         </span>
         <SmartButton
@@ -80,7 +80,7 @@
           autoBlur
           fillWidth
         />
-        <p class="auth-container__form__link">
+        <p class="auth-link">
           Been abducted by us before?
           <router-link to="/login">Login</router-link>
         </p>
