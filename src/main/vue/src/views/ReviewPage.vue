@@ -93,7 +93,7 @@
 import Progressbar from '@/components/Progressbar.vue'
 import SpaceDeck from '@/components/SpaceDeck.vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
@@ -122,16 +122,11 @@ const {
   currFlashcard,
   editFormWasOpened,
   reviewFinished,
-  flashcardsRunningTotal,
+  remainingFlashcards,
 } = storeToRefs(reviewStore)
 
-const flashcardsTotal = ref(0);
-const progress = computed(() => {
-  const total = flashcardsTotal.value
-  const running = flashcardsRunningTotal.value
-  const going = (total - running) / total
-  return Math.max(0, Math.min(1, going))
-})
+const flashcardsTotal = ref(0)
+const progress = ref(0)
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
@@ -142,6 +137,13 @@ const prevButton = ref<HTMLButtonElement>()
 const nextButton = ref<HTMLButtonElement>()
 const moveBackButton = ref<HTMLButtonElement>()
 const flashcardButton = ref<HTMLDivElement>()
+
+function calcProgress() {
+  const total = flashcardsTotal.value
+  const remaining = remainingFlashcards.value
+  const completionRate = (total - remaining) / total
+  progress.value = Math.max(0, Math.min(1, completionRate))
+}
 
 function finishReview() {
   flashcardsTotal.value = 0
@@ -165,8 +167,13 @@ async function stageDown() {
     }
     reviewStore.setEditFormWasOpened(false)
     await spaceDeck.value?.preparePrev()
-    if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LIGHTSPEED) {
-      await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
+    if (!reviewStore.nextFlashcard()) {
+      progress.value = 1
+      if (settings.value.mode === ReviewMode.LIGHTSPEED) {
+        await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
+      }
+    } else {
+      calcProgress()
     }
   }
   stageDownButton.value?.blur()
@@ -182,8 +189,13 @@ async function stageUp() {
     }
     reviewStore.setEditFormWasOpened(false)
     await spaceDeck.value?.prepareNext()
-    if (!reviewStore.nextFlashcard() && settings.value.mode === ReviewMode.LIGHTSPEED) {
-      await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
+    if (!reviewStore.nextFlashcard()) {
+      progress.value = 1
+      if (settings.value.mode === ReviewMode.LIGHTSPEED) {
+        await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
+      }
+    } else {
+      calcProgress()
     }
   }
   stageUpButton.value?.blur()
@@ -191,13 +203,21 @@ async function stageUp() {
 
 async function prev() {
   await spaceDeck.value?.preparePrev()
-  reviewStore.prevFlashcard()
+  if (reviewStore.prevFlashcard()) {
+    calcProgress()
+  } else {
+    progress.value = 1
+  }
   prevButton.value?.blur()
 }
 
 async function next() {
   await spaceDeck.value?.prepareNext()
-  reviewStore.nextFlashcard()
+  if (reviewStore.nextFlashcard()) {
+    calcProgress()
+  } else {
+    progress.value = 1
+  }
   nextButton.value?.blur()
 }
 
@@ -207,14 +227,22 @@ async function moveBack() {
     updateFlashcard(flashcard, stages.S1)
     flashcardSetStore.updateFlashcard(flashcard)
     await spaceDeck.value?.preparePrev()
-    reviewStore.nextFlashcard()
+    if (reviewStore.nextFlashcard()) {
+      calcProgress()
+    } else {
+      progress.value = 1
+    }
   }
   moveBackButton.value?.blur()
 }
 
 function onFlashcardRemoved() {
   reviewStore.setEditFormWasOpened(false)
-  reviewStore.nextFlashcard()
+  if (reviewStore.nextFlashcard()) {
+    calcProgress()
+  } else {
+    progress.value = 1
+  }
 }
 
 async function loadReviewState() {
@@ -247,10 +275,12 @@ async function loadReviewState() {
     console.log('Starting review...')
     console.log('flashcardSetStore.flashcards:', flashcardSetStore.flashcards.length)
     reviewStore.startReview(flashcardSetStore.flashcards, props.stage)
-    flashcardsTotal.value = flashcardsRunningTotal.value;
+    flashcardsTotal.value = remainingFlashcards.value;
+    calcProgress()
   } else {
     reviewStore.startReview([], props.stage)
     flashcardsTotal.value = 0
+    calcProgress()
   }
 }
 

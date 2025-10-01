@@ -48,8 +48,8 @@ export const useReviewStore = defineStore('review', {
     reviewFinished(): boolean {
       return this.currFlashcard === null
     },
-    flashcardsRunningTotal(): number {
-      return this.reviewQueue.runningTotal()
+    remainingFlashcards(): number {
+      return this.reviewQueue.remaining() + 1
     }
   },
   actions: {

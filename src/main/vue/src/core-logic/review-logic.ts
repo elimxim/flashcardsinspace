@@ -41,7 +41,7 @@ export interface ReviewQueue {
 
   next(): Flashcard | null
 
-  runningTotal(): number
+  remaining(): number
 }
 
 export class EmptyReviewQueue implements ReviewQueue {
@@ -56,7 +56,7 @@ export class EmptyReviewQueue implements ReviewQueue {
     return null
   }
 
-  public runningTotal(): number {
+  public remaining(): number {
     return 0
   }
 }
@@ -110,7 +110,7 @@ export class MultiStageReviewQueue implements ReviewQueue {
     return null
   }
 
-  public runningTotal(): number {
+  public remaining(): number {
     let total = 0
     this.flashcardMap.forEach((flashcards, _) => {
       total += flashcards.length
@@ -143,8 +143,9 @@ export class MonoStageReviewQueue implements ReviewQueue {
     return this.flashcards[++this.index] ?? null
   }
 
-  public runningTotal(): number {
-    return this.flashcards.length - this.index
+  public remaining(): number {
+    if (this.index >= this.flashcards.length) return 0
+    return this.flashcards.length - (this.index + 1)
   }
 }
 
