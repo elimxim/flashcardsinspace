@@ -6,3 +6,8 @@ body {
 * {
   box-sizing: border-box;
 }
+
+/* Hide the default password reveal eye icon in Microsoft Edge */
+input[type="password"]::-ms-reveal {
+  display: none;
+}
