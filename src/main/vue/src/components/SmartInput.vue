@@ -6,18 +6,26 @@
     <textarea
       v-if="area"
       v-model="model"
+      ref="textArea"
       :type="inputType"
       class="transition--border-color"
       :toast-type="$props.type"
-      :placeholder="$props.placeholder"
+      v-bind="$attrs"
+    />
+    <input
+      v-else-if="readonly"
+      :value="value"
+      ref="readonlyInput"
+      class="transition--border-color"
+      :type="inputType"
       v-bind="$attrs"
     />
     <input
       v-else
       v-model="model"
+      ref="input"
       class="transition--border-color"
       :type="inputType"
-      :placeholder="$props.placeholder"
       v-bind="$attrs"
     />
     <button
@@ -36,22 +44,29 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-type Type = 'text' | 'password' | 'email' | 'search' | 'image'
+type Type = 'text' | 'password' | 'email'
 
-const model = defineModel<string>()
+const model = defineModel<string>({ default: '' })
 
 const props = withDefaults(defineProps<{
   type: Type
-  placeholder: string
   area?: boolean
   invalid?: boolean
+  readonly?: boolean
+  value?: string
 }>(), {
   area: false,
   invalid: false,
+  readonly: false,
+  value: '',
 })
 
 const isPassword = computed(() => props.type === 'password')
 const showPassword = ref(false)
+
+const textArea = ref<HTMLTextAreaElement>()
+const readonlyInput = ref<HTMLInputElement>()
+const input = ref<HTMLInputElement>()
 const secretButton = ref<HTMLButtonElement>()
 
 const inputType = computed(() => {
@@ -66,6 +81,20 @@ function toggleShowPassword() {
   showPassword.value = !showPassword.value
   secretButton.value?.blur()
 }
+
+function focus() {
+  if (props.area) {
+    textArea.value?.focus()
+  } else if (props.readonly) {
+    readonlyInput.value?.focus()
+  } else {
+    input.value?.focus()
+  }
+}
+
+defineExpose({
+  focus
+})
 
 </script>
 
@@ -88,12 +117,15 @@ function toggleShowPassword() {
 }
 
 .smart-input {
+  flex: 1;
   position: relative;
+  display: flex;
   width: 100%;
 }
 
 .smart-input textarea,
 .smart-input input {
+  flex: 1;
   width: 100%;
   font-family: var(--inpt--font-family);
   font-size: var(--inpt--font-size);
@@ -102,9 +134,9 @@ function toggleShowPassword() {
   border-color: var(--inpt--border-color);
   border-radius: var(--inpt--border-radius);
   padding: clamp(0.75rem, 1.5vh, 1.25rem) clamp(0.75rem, 1vw, 1.25rem);
+  margin: 0;
   border-style: solid;
   border-width: 2px;
-  margin: 0;
   resize: none;
 }
 
