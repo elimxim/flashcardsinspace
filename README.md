@@ -2,6 +2,13 @@
 
 ## TODOS
 
+- Refactoring
+  - SmartInput component
+    - font size
+    - colorscheme
+  - Communication fields renaming
+  - ReviewPage refactoring
+  - Modals refactoring
 - UX:
   - Control Panel (instead of Main Menu)
     - Showing duplicated flashcards
