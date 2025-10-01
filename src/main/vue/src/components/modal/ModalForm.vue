@@ -136,6 +136,7 @@ function handleKeydown(event: KeyboardEvent) {
   text-align: center;
   font-size: 1.5em;
   font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .modal-body {
@@ -178,7 +179,4 @@ function handleKeydown(event: KeyboardEvent) {
   gap: 10px;
 }
 
-.modal-input {
-  font-size: clamp(0.9rem, 2vh, 1rem);
-}
 </style>

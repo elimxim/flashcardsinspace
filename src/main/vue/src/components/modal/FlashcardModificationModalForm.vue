@@ -17,23 +17,25 @@
 
     <div class="modal-main-area">
       <div class="modal-main-area--inner">
-        <textarea
+        <SmartInput
           ref="frontSideTextArea"
           v-model="flashcardFrontSide"
-          class="input modal-input"
-          :class="{ 'input--error': frontSideInvalid }"
+          type="text"
+          :invalid="frontSideInvalid"
           :placeholder="frontSideNotSet ? 'Front side cannot be empty' : 'Front side'"
+          area
         />
         <span class="modal-error-text" v-if="frontSideMaxLengthInvalid">
           Your text has its own gravity! Maximum 512 characters.
         </span>
       </div>
       <div class="modal-main-area--inner">
-        <textarea
+        <SmartInput
           v-model="flashcardBackSide"
-          class="input modal-input"
-          :class="{ 'input--error': backSideInvalid }"
+          type="text"
+          :invalid="backSideInvalid"
           :placeholder="backSideNotSet ? 'Back side cannot be empty' : 'Back side'"
+          area
         />
         <span class="modal-error-text" v-if="backSideMaxLengthInvalid">
           Your text has its own gravity! Maximum 512 characters.
@@ -79,6 +81,7 @@
 <script setup lang="ts">
 import ModalForm from '@/components/modal/ModalForm.vue'
 import SmartButton from '@/components/SmartButton.vue'
+import SmartInput from '@/components/SmartInput.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import {
@@ -130,7 +133,7 @@ const {
 const flashcardFrontSide = ref(flashcard.value?.frontSide ?? '')
 const flashcardBackSide = ref(flashcard.value?.backSide ?? '')
 const infiniteLoopButton = ref<InstanceType<typeof AwesomeButton>>()
-const frontSideTextArea = ref<HTMLTextAreaElement>()
+const frontSideTextArea = ref<InstanceType<typeof SmartInput>>()
 
 const stateChanged = computed(() => {
   return flashcard.value?.frontSide !== flashcardFrontSide.value
