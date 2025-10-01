@@ -177,4 +177,8 @@ function handleKeydown(event: KeyboardEvent) {
   justify-content: space-between;
   gap: 10px;
 }
+
+.modal-input {
+  font-size: clamp(0.9rem, 2vh, 1rem);
+}
 </style>

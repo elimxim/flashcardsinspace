@@ -20,7 +20,7 @@
         <textarea
           ref="frontSideTextArea"
           v-model="flashcardFrontSide"
-          class="input"
+          class="input modal-input"
           :class="{ 'input--error': frontSideInvalid }"
           :placeholder="frontSideNotSet ? 'Front side cannot be empty' : 'Front side'"
         />
@@ -31,7 +31,7 @@
       <div class="modal-main-area--inner">
         <textarea
           v-model="flashcardBackSide"
-          class="input"
+          class="input modal-input"
           :class="{ 'input--error': backSideInvalid }"
           :placeholder="backSideNotSet ? 'Back side cannot be empty' : 'Back side'"
         />
