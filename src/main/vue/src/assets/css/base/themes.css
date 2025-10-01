@@ -87,12 +87,11 @@
   --secret-input__button--hover--color: #007bff;
 
   /* fuzzy-select */
-  --fuzzy-select__input--color: #45454a;
-  --fuzzy-select__drop-down--border-color: #007bff;
-  --fuzzy-select__drop-down--color: var(--fuzzy-select__input--color);
-  --fuzzy-select__drop-down--hover--bg-color: rgb(from var(--fuzzy-select__drop-down--border-color) r g b / 0.1);
-  --fuzzy-select__drop-down__scrollbar--color: rgb(from var(--fuzzy-select__drop-down--border-color) r g b / 0.6);
-  --fuzzy-select__drop-down__scrollbar--hover--color: rgb(from var(--fuzzy-select__drop-down--border-color) r g b / 0.8);
+  --fuzzy-select--drop-down--color: #45454a;
+  --fuzzy-select--drop-down--border-color: #007bff;
+  --fuzzy-select--drop-down--bg-color--hover: rgb(from var(--fuzzy-select--drop-down--border-color) r g b / 0.1);
+  --fuzzy-select--scrollbar--color: rgb(from var(--fuzzy-select--drop-down--border-color) r g b / 0.6);
+  --fuzzy-select--scrollbar--color--hover: rgb(from var(--fuzzy-select--drop-down--border-color) r g b / 0.8);
 
   /* toasts */
 

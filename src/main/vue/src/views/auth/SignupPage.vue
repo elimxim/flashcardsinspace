@@ -39,11 +39,10 @@
         </span>
         <AwesomeContainer icon="fa-solid fa-globe" class="awesome-container">
           <FuzzySelect
-            class="fuzzy-select"
-            :class="{ 'input--error fuzzy-select--error': languageNotSet }"
             :options="languages"
             v-model="language"
             :optionLabel="(lang) => lang.name"
+            :invalid="languageNotSet"
             :optionPlaceholder="languageNotSet ? 'Language is required' : 'Language'"
             searchPlaceholder="Search..."
           />
@@ -259,26 +258,6 @@ async function signup() {
 <style scoped>
 .awesome-container {
   --awesome-container__icon--color: var(--fa-icon--color--globe);
-}
-
-.fuzzy-select {
-  border-style: solid;
-  border-width: 2px;
-  border-color: var(--input--border-color);
-  border-radius: var(--border-radius);
-  background-color: var(--input--bg-color);
-  padding: clamp(0.5rem, 0.75rem, 1.25rem);
-  --fuzzy-select--font-size: clamp(0.9rem, 2vh, 1rem);
-}
-
-.fuzzy-select:hover,
-.fuzzy-select:focus-within {
-  border-color: var(--input--border-color--focus);
-  outline: none;
-}
-
-.fuzzy-select--error {
-  border-color: var(--input--border-color--error);
 }
 
 </style>
