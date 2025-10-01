@@ -102,9 +102,8 @@ class FlashcardService(
             )
             changed = true
         }
-        if (request.lastReviewDate != null
-            && flashcard.lastReviewDate != null
-            && !request.lastReviewDate.isEqual(flashcard.lastReviewDate)
+        if (request.lastReviewDate != null &&
+            (flashcard.lastReviewDate == null || !request.lastReviewDate.isEqual(flashcard.lastReviewDate))
         ) {
             flashcard.lastReviewDate = request.lastReviewDate
             changed = true
