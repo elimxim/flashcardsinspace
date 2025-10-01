@@ -98,10 +98,10 @@ onUnmounted(() => toaster.reset())
 }
 
 .space-toast-theme[toast-type="success"] {
-  --color-from: var(--success-toast--from, var(--default-color-from));
-  --color-via: var(--success-toast--via, var(--default-color-via));
-  --color-to: var(--success-toast--to, var(--default-color-to));
-  --color-glow: var(--success-toast--glow, var(--default-color-glow));
+  --color--from: var(--success-toast--from, var(--default-color-from));
+  --color--via: var(--success-toast--via, var(--default-color-via));
+  --color--to: var(--success-toast--to, var(--default-color-to));
+  --color--glow: var(--success-toast--glow, var(--default-color-glow));
   --toast--bg: var(--space-toast--bg, var(--default-toast--bg));
   --icon-box--color: var(--space-toast--icon-box--color, var(--default-icon-box--color));
   --icon-box--bg: var(--space-toast--icon-box--bg, var(--default-icon-box--bg));
@@ -116,10 +116,10 @@ onUnmounted(() => toaster.reset())
 }
 
 .space-toast-theme[toast-type="error"] {
-  --color-from: var(--error-toast--from, var(--default-color-from));
-  --color-via: var(--error-toast--via, var(--default-color-via));
-  --color-to: var(--error-toast--to, var(--default-color-to));
-  --color-glow: var(--error-toast--glow, var(--default-color-glow));
+  --color--from: var(--error-toast--from, var(--default-color-from));
+  --color--via: var(--error-toast--via, var(--default-color-via));
+  --color--to: var(--error-toast--to, var(--default-color-to));
+  --color--glow: var(--error-toast--glow, var(--default-color-glow));
   --toast--bg: var(--space-toast--bg, var(--default-toast--bg));
   --icon-box--color: var(--space-toast--icon-box--color, var(--default-icon-box--color));
   --icon-box--bg: var(--space-toast--icon-box--bg, var(--default-icon-box--bg));
@@ -134,10 +134,10 @@ onUnmounted(() => toaster.reset())
 }
 
 .space-toast-theme[toast-type="info"] {
-  --color-from: var(--info-toast--from, var(--default-color-from));
-  --color-via: var(--info-toast--via, var(--default-color-via));
-  --color-to: var(--info-toast--to, var(--default-color-to));
-  --color-glow: var(--info-toast--glow, var(--default-color-glow));
+  --color--from: var(--info-toast--from, var(--default-color-from));
+  --color--via: var(--info-toast--via, var(--default-color-via));
+  --color--to: var(--info-toast--to, var(--default-color-to));
+  --color--glow: var(--info-toast--glow, var(--default-color-glow));
   --toast--bg: var(--space-toast--bg, var(--default-toast--bg));
   --icon-box--color: var(--space-toast--icon-box--color, var(--default-icon-box--color));
   --icon-box--bg: var(--space-toast--icon-box--bg, var(--default-icon-box--bg));
@@ -152,10 +152,10 @@ onUnmounted(() => toaster.reset())
 }
 
 .space-toast-theme[toast-type="warning"] {
-  --color-from: var(--warning-toast--from, var(--default-color-from));
-  --color-via: var(--warning-toast--via, var(--default-color-via));
-  --color-to: var(--warning-toast--to, var(--default-color-to));
-  --color-glow: var(--warning-toast--glow, var(--default-color-glow));
+  --color--from: var(--warning-toast--from, var(--default-color-from));
+  --color--via: var(--warning-toast--via, var(--default-color-via));
+  --color--to: var(--warning-toast--to, var(--default-color-to));
+  --color--glow: var(--warning-toast--glow, var(--default-color-glow));
   --toast--bg: var(--space-toast--bg, var(--default-toast--bg));
   --icon-box--color: var(--space-toast--icon-box--color, var(--default-icon-box--color));
   --icon-box--bg: var(--space-toast--icon-box--bg, var(--default-icon-box--bg));
@@ -177,7 +177,7 @@ onUnmounted(() => toaster.reset())
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   background: var(--toast--bg);
-  box-shadow: 0 0 0 0 var(--color-glow);
+  box-shadow: 0 0 0 0 var(--color--glow);
   font-family: var(--toast--font-family);
   pointer-events: auto;
 }
@@ -190,9 +190,9 @@ onUnmounted(() => toaster.reset())
   pointer-events: none;
   background-image: linear-gradient(
     45deg,
-    var(--color-from),
-    var(--color-via),
-    var(--color-to)
+    var(--color--from),
+    var(--color--via),
+    var(--color--to)
   );
 }
 
@@ -270,9 +270,9 @@ onUnmounted(() => toaster.reset())
 
 .space-toast__progress {
   position: relative;
-  --progressbar--from: var(--color-from);
-  --progressbar--via: var(--color-via);
-  --progressbar--to: var(--color-to);
+  --progressbar--from: var(--color--from);
+  --progressbar--via: var(--color--via);
+  --progressbar--to: var(--color--to);
   --progressbar--bg-color: var(--default-progressbar--bg-color);
 }
 
