@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import SpaceCard from '@/components/SpaceCard.vue'
-import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
+import FlashcardModificationModalForm from '@/views/modal/FlashcardModificationModalForm.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useGlobalStore } from '@/stores/global-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'

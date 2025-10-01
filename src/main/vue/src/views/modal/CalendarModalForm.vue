@@ -1,5 +1,5 @@
 <template>
-  <ModalForm
+  <Modal
     :visible="visible"
     :onPressExit="exit"
   >
@@ -54,11 +54,11 @@
         Next
       </button>
     </div>
-  </ModalForm>
+  </Modal>
 </template>
 
 <script setup lang="ts">
-import ModalForm from '@/components/modal/ModalForm.vue'
+import Modal from '@/components/Modal.vue'
 import { computed, defineEmits, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'

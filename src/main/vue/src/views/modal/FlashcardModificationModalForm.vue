@@ -1,5 +1,5 @@
 <template>
-  <ModalForm
+  <Modal
     :visible="visible"
     :onPressExit="cancel"
     :onPressEnter="props.editMode ? update : create"
@@ -74,12 +74,12 @@
         autoBlur
       />
     </div>
-  </ModalForm>
+  </Modal>
   <SpaceToast/>
 </template>
 
 <script setup lang="ts">
-import ModalForm from '@/components/modal/ModalForm.vue'
+import Modal from '@/components/Modal.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import SmartInput from '@/components/SmartInput.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'

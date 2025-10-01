@@ -73,10 +73,10 @@
 </template>
 
 <script setup lang="ts">
-import FlashcardSetSettingsModalForm from '@/components/modal/FlashcardSetSettingsModalForm.vue'
-import FlashcardSetCreationModalForm from '@/components/modal/FlashcardSetCreationModalForm.vue'
-import FlashcardModificationModalForm from '@/components/modal/FlashcardModificationModalForm.vue'
-import CalendarModalForm from '@/components/modal/CalendarModalForm.vue'
+import FlashcardSetSettingsModalForm from '@/views/modal/FlashcardSetSettingsModalForm.vue'
+import FlashcardSetCreationModalForm from '@/views/modal/FlashcardSetCreationModalForm.vue'
+import FlashcardModificationModalForm from '@/views/modal/FlashcardModificationModalForm.vue'
+import CalendarModalForm from '@/views/modal/CalendarModalForm.vue'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'

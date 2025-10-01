@@ -1,5 +1,5 @@
 <template>
-  <ModalForm
+  <Modal
     :visible="visible"
     :onPressExit="cancel"
     :onPressEnter="create"
@@ -50,11 +50,11 @@
         Create
       </button>
     </div>
-  </ModalForm>
+  </Modal>
 </template>
 
 <script setup lang="ts">
-import ModalForm from '@/components/modal/ModalForm.vue'
+import Modal from '@/components/Modal.vue'
 import { defineEmits, defineProps, type Ref, ref } from 'vue'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'

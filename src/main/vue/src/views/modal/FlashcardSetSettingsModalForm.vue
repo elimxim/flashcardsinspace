@@ -1,5 +1,5 @@
 <template>
-  <ModalForm
+  <Modal
     :visible="visible"
     :onPressExit="cancel"
     :onPressEnter="update"
@@ -59,11 +59,11 @@
         Update
       </button>
     </div>
-  </ModalForm>
+  </Modal>
 </template>
 
 <script setup lang="ts">
-import ModalForm from '@/components/modal/ModalForm.vue'
+import Modal from '@/components/Modal.vue'
 import {
   computed,
   defineEmits,
