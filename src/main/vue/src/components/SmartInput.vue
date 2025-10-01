@@ -21,7 +21,7 @@
       v-bind="$attrs"
     />
     <button
-      v-if="!area && $props.type === 'password'"
+      v-if="!area && isPassword"
       class="secret-button transition--color"
       type="button"
       ref="secretButton"
@@ -50,11 +50,12 @@ const props = withDefaults(defineProps<{
   invalid: false,
 })
 
+const isPassword = computed(() => props.type === 'password')
 const showPassword = ref(false)
 const secretButton = ref<HTMLButtonElement>()
 
 const inputType = computed(() => {
-  if (!props.area && props.type === 'password') {
+  if (!props.area && isPassword.value) {
     return showPassword.value ? 'text' : 'password'
   } else {
     return props.type
