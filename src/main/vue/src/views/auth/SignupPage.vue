@@ -12,12 +12,12 @@
       :class="{ 'auth-container--error': signupFailed }"
     >
       <form @submit.prevent="signup" class="auth-container__form" novalidate>
-        <input
-          class="input auth-container__form__input transition--border-color"
+        <SmartInput
           v-model="username"
-          :class="{ 'input--error': usernameNotSet }"
+          type="text"
           name="name"
           autocomplete="nickname"
+          :invalid="usernameNotSet"
           :placeholder="usernameNotSet ? 'Name is required' : 'Name'"
         />
         <span v-if="usernameRegexMismatch" class="auth-container__form__error">
@@ -26,13 +26,12 @@
         <span v-else-if="usernameMaxLengthInvalid" class="auth-container__form__error">
             This username is expanding faster than the universe! Please keep it under 64 characters
         </span>
-        <input
-          class="input auth-container__form__input transition--border-color"
+        <SmartInput
           v-model="userEmail"
           type="email"
           name="username"
           autocomplete="username"
-          :class="{ 'input--error': userEmailInvalid }"
+          :invalid="userEmailInvalid"
           :placeholder="userEmailNotSet ? 'Email is required' : 'Email'"
         />
         <span v-if="userEmailWrongFormat" class="auth-container__form__error">
@@ -49,12 +48,12 @@
             searchPlaceholder="Search..."
           />
         </AwesomeContainer>
-        <SecretInput
+        <SmartInput
           v-model="userPassword"
-          class="auth-container__form__input"
-          :class="{ 'input--error': userPasswordInvalid }"
+          type="password"
           name="new-password"
           autocomplete="new-password"
+          :invalid="userPasswordInvalid"
           :placeholder="userPasswordNotSet ? 'Password is required' : 'Password'"
         />
         <span v-if="userPasswordMinLengthInvalid" class="auth-container__form__error">
@@ -63,26 +62,25 @@
         <span v-else-if="userPasswordMaxLengthInvalid" class="auth-container__form__error">
           This secret is expanding faster than the universe! Please keep it under 64 characters
         </span>
-        <SecretInput
+        <SmartInput
           v-model="confirmedPassword"
-          class="auth-container__form__input"
-          :class="{ 'input--error': confirmPasswordInvalid }"
+          type="password"
           name="confirm-password"
           autocomplete="new-password"
+          :invalid="confirmPasswordInvalid"
           :placeholder="confirmPasswordNotSet ? 'Password confirmation is required' : 'Confirm Password'"
         />
         <span v-if="confirmPasswordMismatch" class="auth-container__form__error">
           The passwords do not match. Please try again
         </span>
-        <button
-          ref="signUpButton"
+        <SmartButton
+          class="auth-button"
+          text="Sign Up"
           type="submit"
-          class="button button--sign-up auth-container__form__button transition--bg-color"
           :disabled="formInvalid"
-          :class="{ 'button--disabled': formInvalid }"
-        >
-          Sign Up
-        </button>
+          autoBlur
+          fillWidth
+        />
         <p class="auth-container__form__link">
           Been abducted by us before?
           <router-link to="/login">Login</router-link>
@@ -96,7 +94,8 @@
 <script setup lang="ts">
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
-import SecretInput from '@/components/SecretInput.vue'
+import SmartInput from '@/components/SmartInput.vue'
+import SmartButton from '@/components/SmartButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -123,8 +122,6 @@ const language = ref<Language>()
 const userPassword = ref('')
 const confirmedPassword = ref('')
 const signupFailed = ref(false)
-
-const signUpButton = ref<HTMLButtonElement>()
 
 const passwordConfirmed = helpers.withParams(
   { type: 'confirmed' },
@@ -233,7 +230,6 @@ async function signup() {
   $v.value.$touch()
   if ($v.value.$invalid) {
     console.error('The form is invalid')
-    signUpButton.value?.blur()
     return
   }
 

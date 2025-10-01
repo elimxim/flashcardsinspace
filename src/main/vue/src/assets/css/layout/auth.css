@@ -28,13 +28,6 @@
   gap: clamp(1vh, 1.5vh, 2vh);
 }
 
-.auth-container__form__input,
-.auth-container__form__button {
-  padding: clamp(0.75rem, 1.5vh, 1.25rem) clamp(0.75rem, 1vw, 1.25rem);
-  font-size: clamp(0.9rem, 2vh, 1rem);
-  margin: 0;
-}
-
 .auth-container__form__error {
   font-family: var(--error-font-family);
   font-size: clamp(0.75rem, 1.6vh, 0.9rem);

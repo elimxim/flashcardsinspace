@@ -30,39 +30,37 @@
       :class="{ 'auth-container--error': loginFailed }"
     >
       <form @submit.prevent="login" class="auth-container__form" novalidate>
-        <input
-          class="input auth-container__form__input transition--border-color"
-          :class="{ 'input--error': userEmailInvalid }"
+        <SmartInput
           v-model="userEmail"
           type="email"
           name="username"
           autocomplete="username"
+          :invalid="userEmailInvalid"
           :placeholder="userEmailNotSet ? 'Email is required' : 'Email'"
         />
         <span v-if="userEmailFormatWrong" class="auth-container__form__error">
           This email seems to be lost in a cosmic dust cloud. Please check the format
         </span>
-        <SecretInput
+        <SmartInput
           v-model="userPassword"
-          class="auth-container__form__input"
-          :class="{ 'input--error': userPasswordInvalid }"
+          type="password"
           name="password"
           automoplete="current-password"
+          :invalid="userPasswordInvalid"
           :placeholder="userPasswordNotSet ? 'Password is required' : 'Password'"
         />
         <span v-if="userPasswordMaxLengthInvalid"
               class="auth-container__form__error transition--opacity">
           This secret is expanding faster than the universe! Please keep it under 64 characters
         </span>
-        <button
-          ref="loginButton"
+        <SmartButton
+          class="auth-button"
+          text="Log in"
           type="submit"
-          class="button button--login auth-container__form__button transition--bg-color"
           :disabled="formInvalid"
-          :class="{ 'button--disabled': formInvalid }"
-        >
-          Log In
-        </button>
+          autoBlur
+          fillWidth
+        />
         <p class="auth-container__form__link">
           New to the galaxy?
           <router-link to="/signup">Signup</router-link>
@@ -74,7 +72,8 @@
 </template>
 
 <script setup lang="ts">
-import SecretInput from '@/components/SecretInput.vue'
+import SmartInput from '@/components/SmartInput.vue'
+import SmartButton from '@/components/SmartButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import SmartPicture from '@/components/SmartPicture.vue'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
@@ -94,8 +93,6 @@ const userEmail = ref('')
 const userPassword = ref('')
 const isBouncing = ref(true)
 const loginFailed = ref(false)
-
-const loginButton = ref<HTMLDivElement>()
 
 const $v = useVuelidate({
   userEmail: { required, email },
@@ -143,7 +140,6 @@ async function login() {
   $v.value.$touch()
   if ($v.value.$invalid) {
     console.log('Form is invalid')
-    loginButton.value?.blur()
     return
   }
 

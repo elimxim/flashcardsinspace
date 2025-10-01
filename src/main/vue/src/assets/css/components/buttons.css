@@ -18,55 +18,7 @@
   --smart-button--bg-color--hover: var(--create-button--bg-color--hover)
 }
 
-.button {
-  font-family: var(--main-font-family);
-  color: var(--button--color);
-  border-radius: var(--border-radius);
-  border: none;
-  cursor: pointer;
-}
-
-.button:hover,
-.button:focus {
-  outline: none;
-}
-
-.button--update,
-.button--sign-up,
-.button--login {
-  background-color: var(--button--bg-color--action);
-}
-
-.button--update:not(.button--disabled):hover,
-.button--sign-up:not(.button--disabled):hover,
-.button--login:not(.button--disabled):hover,
-.button--update:not(.button--disabled):focus-within,
-.button--sign-up:not(.button--disabled):focus-within,
-.button--login:not(.button--disabled):focus-within {
-  background-color: var(--button--bg-color--action--focus);
-}
-
-.button--delete,
-.button--no {
-
-}
-
-.button--create,
-.button--start,
-.button--yes {
-
-}
-
-.button--cancel {
-
-}
-
-.button--reset {
-
-}
-
-.button--disabled {
-  background-color: var(--button--bg-color--disabled);
-  color: var(--button--color--disabled);
-  cursor: default;
+.auth-button {
+  --smart-button--bg-color: var(--auth-button--bg-color);
+  --smart-button--bg-color--hover: var(--auth-button--bg-color--hover);
 }
