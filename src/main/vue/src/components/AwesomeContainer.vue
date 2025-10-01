@@ -1,5 +1,5 @@
 <template>
-  <div class="awesome-container">
+  <div class="awesome-container awesome-container--theme">
     <font-awesome-icon :icon="icon" class="awesome-container__icon"/>
     <slot></slot>
   </div>
@@ -12,6 +12,11 @@ defineProps<{
 </script>
 
 <style scoped>
+.awesome-container--theme {
+  --icon--font-size: var(--awesome-container--icon--font-size, 12cqi);
+  --icon--color: var(--awesome-container--icon--color, #c3c3c3);
+}
+
 .awesome-container {
   container-type: inline-size;
   display: grid;
@@ -21,7 +26,7 @@ defineProps<{
 }
 
 .awesome-container__icon {
-  font-size: var(--awesome-container__icon--font-size, 12cqi);
-  color: var(--awesome-container__icon--color, #c3c3c3);
+  font-size: var(--icon--font-size);
+  color: var(--icon--color);
 }
 </style>

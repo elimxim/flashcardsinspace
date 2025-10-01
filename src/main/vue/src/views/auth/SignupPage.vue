@@ -257,7 +257,7 @@ async function signup() {
 
 <style scoped>
 .awesome-container {
-  --awesome-container__icon--color: var(--fa-icon--color--globe);
+  --awesome-container--icon--color: var(--fa-icon--color--globe);
 }
 
 </style>
