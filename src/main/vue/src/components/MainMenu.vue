@@ -62,21 +62,21 @@
     </ul>
   </div>
 
-  <FlashcardSetSettingsModalForm
+  <FlashcardSetSettingsModal
     v-model:visible="flashcardSetSettingsModalFormOpen"/>
-  <FlashcardSetCreationModalForm
+  <FlashcardSetCreationModal
     v-model:visible="flashcardSetCreationModalFormOpen"/>
-  <FlashcardModificationModalForm
+  <FlashcardModificationModal
     v-model:visible="flashcardCreationModalFormOpen"/>
-  <CalendarModalForm
+  <CalendarModal
     v-model:visible="calendarModalFormOpen"/>
 </template>
 
 <script setup lang="ts">
-import FlashcardSetSettingsModalForm from '@/views/modal/FlashcardSetSettingsModalForm.vue'
-import FlashcardSetCreationModalForm from '@/views/modal/FlashcardSetCreationModalForm.vue'
-import FlashcardModificationModalForm from '@/views/modal/FlashcardModificationModalForm.vue'
-import CalendarModalForm from '@/views/modal/CalendarModalForm.vue'
+import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
+import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.vue'
+import FlashcardModificationModal from '@/views/modal/FlashcardModificationModal.vue'
+import CalendarModal from '@/views/modal/CalendarModal.vue'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'

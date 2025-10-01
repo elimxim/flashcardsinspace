@@ -23,7 +23,7 @@
       />
     </div>
   </div>
-  <FlashcardModificationModalForm
+  <FlashcardModificationModal
     v-model:visible="flashcardEditModalFormOpen"
     v-model:flashcard="flashcard"
     v-model:removed="flashcardWasRemoved"
@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import SpaceCard from '@/components/SpaceCard.vue'
-import FlashcardModificationModalForm from '@/views/modal/FlashcardModificationModalForm.vue'
+import FlashcardModificationModal from '@/views/modal/FlashcardModificationModal.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useGlobalStore } from '@/stores/global-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
