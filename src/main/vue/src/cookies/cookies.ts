@@ -7,12 +7,12 @@ export function saveSelectedSetId(value: number) {
     secure: true,
     path: '/', // valid for the entire site
   })
-  console.log('Cookie.selectedSetId <=', value)
+  console.log( `${value} => Cookie.selectedSetId`)
 }
 
 export function loadSelectedSetId(): number | undefined {
   const value = Cookies.get('selectedSetId')
-  console.log('Cookie.selectedSetId =>', value)
+  console.log(`Cookie.selectedSetId => ${value}`)
   if (value) {
     return parseInt(value)
   }
