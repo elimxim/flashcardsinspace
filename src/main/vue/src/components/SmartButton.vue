@@ -1,6 +1,6 @@
 <template>
   <button
-    class="smart-button smart-button--theme"
+    class="smart-button smart-button--theme transition--bg-color"
     :class="{ 'smart-button--disabled': disabled }"
     ref="button"
     :disabled="disabled"
@@ -25,12 +25,14 @@ const props = withDefaults(defineProps<{
   rounded?: boolean
   holdTime?: number
   autoBlur?: boolean
-  onClick: () => void
+  fillWidth?: boolean
+  onClick?: () => void
 }>(), {
   disabled: false,
   rounded: false,
   holdTime: 0,
   autoBlur: false,
+  fillWidth: false,
   onClick: () => {
   },
 })
@@ -41,6 +43,13 @@ let pressStartTime: number | null = null
 
 const button = ref<HTMLButtonElement>()
 const progress = ref(0)
+const width = computed(() => {
+  if (props.fillWidth) {
+    return '100%'
+  } else {
+    return '100px'
+  }
+})
 const progressPercentage = computed(() => `${progress.value * 100}%`)
 
 function click() {
@@ -119,7 +128,7 @@ function updateProgress() {
   background-color: var(--btn--bg-color);
   position: relative;
   font-size: 16px;
-  width: 100px;
+  width: v-bind(width);
   height: 40px;
   cursor: pointer;
   z-index: 1;
