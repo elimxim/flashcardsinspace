@@ -50,3 +50,4 @@
   - auth journal (for login and signup attempts)
   - auth journal analysis
   - ROLE-based access control
+  - Rate limiting
