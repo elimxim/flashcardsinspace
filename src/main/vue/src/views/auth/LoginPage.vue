@@ -32,6 +32,7 @@
       <form @submit.prevent="login" class="auth-form" novalidate>
         <SmartInput
           v-model="userEmail"
+          id="username"
           type="email"
           name="username"
           autocomplete="username"
@@ -43,6 +44,7 @@
         </span>
         <SmartInput
           v-model="userPassword"
+          id="password"
           type="password"
           name="password"
           automoplete="current-password"

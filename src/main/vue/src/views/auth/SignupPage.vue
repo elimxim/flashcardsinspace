@@ -14,9 +14,10 @@
       <form @submit.prevent="signup" class="auth-form" novalidate>
         <SmartInput
           v-model="username"
+          id="name"
           type="text"
           name="name"
-          autocomplete="nickname"
+          autocomplete="name"
           :invalid="usernameNotSet"
           :placeholder="usernameNotSet ? 'Name is required' : 'Name'"
         />
@@ -28,6 +29,7 @@
         </span>
         <SmartInput
           v-model="userEmail"
+          id="username"
           type="email"
           name="username"
           autocomplete="username"
@@ -41,6 +43,7 @@
           <FuzzySelect
             :options="languages"
             v-model="language"
+            id="language"
             :optionLabel="(lang) => lang.name"
             :invalid="languageNotSet"
             :optionPlaceholder="languageNotSet ? 'Language is required' : 'Language'"
@@ -49,6 +52,7 @@
         </AwesomeContainer>
         <SmartInput
           v-model="userPassword"
+          id="password"
           type="password"
           name="new-password"
           autocomplete="new-password"
@@ -63,6 +67,7 @@
         </span>
         <SmartInput
           v-model="confirmedPassword"
+          id="confirm-password"
           type="password"
           name="confirm-password"
           autocomplete="new-password"
