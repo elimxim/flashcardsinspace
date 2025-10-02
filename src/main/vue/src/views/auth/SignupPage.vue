@@ -39,7 +39,7 @@
         <span v-if="userEmailWrongFormat" class="text-error">
           This email seems to be lost in a cosmic dust cloud. Please check the format
         </span>
-        <AwesomeContainer icon="fa-solid fa-globe" class="awesome-container">
+        <AwesomeContainer icon="fa-solid fa-globe" class="awesome-globe">
           <FuzzySelect
             :options="languages"
             v-model="language"
@@ -272,8 +272,4 @@ async function signup() {
 </script>
 
 <style scoped>
-.awesome-container {
-  --awesome-container--icon--color: var(--fa-icon--color--globe);
-}
-
 </style>
