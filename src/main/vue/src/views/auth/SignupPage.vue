@@ -21,10 +21,10 @@
           :invalid="usernameNotSet"
           :placeholder="usernameNotSet ? 'Name is required' : 'Name'"
         />
-        <span v-if="usernameRegexMismatch" class="auth-form-error">
+        <span v-if="usernameRegexMismatch" class="text-error">
           Please use only letters, numbers, dashes, underscores, and spaces
         </span>
-        <span v-else-if="usernameMaxLengthInvalid" class="auth-form-error">
+        <span v-else-if="usernameMaxLengthInvalid" class="text-error">
             This username is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <SmartInput
@@ -36,7 +36,7 @@
           :invalid="userEmailInvalid"
           :placeholder="userEmailNotSet ? 'Email is required' : 'Email'"
         />
-        <span v-if="userEmailWrongFormat" class="auth-form-error">
+        <span v-if="userEmailWrongFormat" class="text-error">
           This email seems to be lost in a cosmic dust cloud. Please check the format
         </span>
         <AwesomeContainer icon="fa-solid fa-globe" class="awesome-container">
@@ -59,10 +59,10 @@
           :invalid="userPasswordInvalid"
           :placeholder="userPasswordNotSet ? 'Password is required' : 'Password'"
         />
-        <span v-if="userPasswordMinLengthInvalid" class="auth-form-error">
+        <span v-if="userPasswordMinLengthInvalid" class="text-error">
           Your password must be stronger than a piece of space junk. Please use 6 or more characters
         </span>
-        <span v-else-if="userPasswordMaxLengthInvalid" class="auth-form-error">
+        <span v-else-if="userPasswordMaxLengthInvalid" class="text-error">
           This secret is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <SmartInput
@@ -74,7 +74,7 @@
           :invalid="confirmPasswordInvalid"
           :placeholder="confirmPasswordNotSet ? 'Password confirmation is required' : 'Confirm Password'"
         />
-        <span v-if="confirmPasswordMismatch" class="auth-form-error">
+        <span v-if="confirmPasswordMismatch" class="text-error">
           The passwords do not match. Please try again
         </span>
         <SmartButton

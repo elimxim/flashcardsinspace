@@ -39,7 +39,7 @@
           :invalid="userEmailInvalid"
           :placeholder="userEmailNotSet ? 'Email is required' : 'Email'"
         />
-        <span v-if="userEmailFormatWrong" class="auth-form-error">
+        <span v-if="userEmailFormatWrong" class="text-error">
           This email seems to be lost in a cosmic dust cloud. Please check the format
         </span>
         <SmartInput
@@ -52,7 +52,7 @@
           :placeholder="userPasswordNotSet ? 'Password is required' : 'Password'"
         />
         <span v-if="userPasswordMaxLengthInvalid"
-              class="auth-form-error transition--opacity">
+              class="text-error transition--opacity">
           This secret is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <SmartButton

@@ -25,7 +25,7 @@
           :placeholder="frontSideNotSet ? 'Front side cannot be empty' : 'Front side'"
           area
         />
-        <span class="modal-error-text" v-if="frontSideMaxLengthInvalid">
+        <span class="text-error" v-if="frontSideMaxLengthInvalid">
           Your text has its own gravity! Maximum 512 characters.
         </span>
       </div>
@@ -37,7 +37,7 @@
           :placeholder="backSideNotSet ? 'Back side cannot be empty' : 'Back side'"
           area
         />
-        <span class="modal-error-text" v-if="backSideMaxLengthInvalid">
+        <span class="text-error" v-if="backSideMaxLengthInvalid">
           Your text has its own gravity! Maximum 512 characters.
         </span>
       </div>

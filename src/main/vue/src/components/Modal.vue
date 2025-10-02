@@ -165,13 +165,6 @@ function handleKeydown(event: KeyboardEvent) {
   gap: 4px;
 }
 
-.modal-error-text {
-  color: var(--text--error--color);
-  font-size: clamp(0.8rem, 1.6vw, 0.9rem);
-  margin: 0;
-  padding: 0;
-}
-
 .modal-control-buttons {
   display: flex;
   flex-direction: row;
