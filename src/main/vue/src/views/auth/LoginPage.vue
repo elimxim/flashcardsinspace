@@ -98,7 +98,10 @@ const loginFailed = ref(false)
 
 const $v = useVuelidate({
   userEmail: { required, email },
-  userPassword: { required, maxLength: maxLength(64) }
+  userPassword: {
+    required,
+    maxLength: maxLength(64),
+  }
 }, {
   userEmail: userEmail,
   userPassword: userPassword,

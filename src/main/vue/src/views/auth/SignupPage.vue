@@ -22,7 +22,7 @@
           :placeholder="usernameNotSet ? 'Name is required' : 'Name'"
         />
         <span v-if="usernameRegexMismatch" class="auth-form-error">
-          Please use only letters, numbers, dashes, and underscores
+          Please use only letters, numbers, dashes, underscores, and spaces
         </span>
         <span v-else-if="usernameMaxLengthInvalid" class="auth-form-error">
             This username is expanding faster than the universe! Please keep it under 64 characters
@@ -69,7 +69,7 @@
           v-model="confirmedPassword"
           id="confirm-password"
           type="password"
-          name="confirm-password"
+          name="new-password"
           autocomplete="new-password"
           :invalid="confirmPasswordInvalid"
           :placeholder="confirmPasswordNotSet ? 'Password confirmation is required' : 'Confirm Password'"
@@ -136,10 +136,18 @@ const passwordConfirmed = helpers.withParams(
 )
 
 const $v = useVuelidate({
-  username: { required, regex: /^[A-Za-z0-9_-]+$/, maxLength: maxLength(64) },
+  username: {
+    required,
+    maxLength: maxLength(64),
+    regex: helpers.regex(/^[A-Za-z0-9 _-]+$/),
+  },
   userEmail: { required, email },
   language: { required },
-  userPassword: { required, minLength: minLength(6), maxLength: maxLength(64) },
+  userPassword: {
+    required,
+    minLength: minLength(6),
+    maxLength: maxLength(64),
+  },
   confirmPassword: { required, passwordConfirmed },
 }, {
   username: username,
@@ -213,6 +221,9 @@ watch(language, () => {
 
 watch(userPassword, () => {
   signupFailed.value = false
+  if (userPasswordInvalid.value) {
+    $v.value.userPassword.$reset()
+  }
   if (usernameInvalid.value) {
     $v.value.userPassword.$reset()
   }
