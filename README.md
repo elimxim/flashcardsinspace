@@ -2,11 +2,20 @@
 
 ## TODOS
 
+- README
+  - Describe the project
 - Refactoring
   - Communication fields renaming
   - ReviewPage refactoring
+    - Routing: URL should include the flashcard id
+    - When going back on stage review, the flashcard animation should be shown
+    - Missing animation on the last flashcard
   - Modals refactoring
 - UX:
+  - Home page
+  - Lightspeed page
+  - Footer
+  - Bugreport form
   - Control Panel (instead of Main Menu)
     - Showing duplicated flashcards
   - Flashcard
@@ -16,7 +25,9 @@
     - Removing animation
     - Dynamic font size depending on the amount of the text
     - Pronunciation of the word
-    - Zooming in and zooming out the text
+    - Zooming in and out the text
+  - Flashcard Set
+    - Suspend/Resume the flashcard set
   - Auth
     - Password reset functionality (sending emails)
     - Link from Login page to Password reset page
@@ -38,7 +49,12 @@
       - password
       - email
       - username
+  - Showing information by navigation to an element
+  - First time user experience
   - Mobile friendly
+    - Modals => pages
+    - Don't know/Know the flashcard by swiping to the left of to the right
+    - Flipping the flashcard on touch
   - Low internet connection friendly
 - Logging
   - Include User.id in the logging context
