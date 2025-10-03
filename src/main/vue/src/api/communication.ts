@@ -5,13 +5,14 @@ export interface ErrorResponseBody {
   statusCode: number
   statusError: string,
   errorCode: string,
-  message: string | undefined,
+  message?: string,
   path: string,
 }
 
 export interface FlashcardSetUpdateRequest {
-  name: string | null,
-  default: boolean | null,
+  name?: string,
+  languageId?: number,
+  default?: boolean,
 }
 
 export interface ChronoSyncRequest {

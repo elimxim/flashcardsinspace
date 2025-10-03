@@ -4,174 +4,178 @@
     :onPressExit="cancel"
     :onPressEnter="update"
     :onPressDelete="remove"
-    title="Settings"
+    :focusOn="curNameInput"
+    title="Flashcard Set Settings"
   >
-    <div class="form-body">
-      <div class="modal-vertical-group">
-        <input class="modal-input"
-               placeholder="Flashcard set name"
-               v-model="flashcardSetName"/>
-        <span class="modal-error-text" v-if="$v.flashcardSetName.$errors.length">
-            Please don't forget to fill this out
+    <div class="modal-main-area">
+      <div class="modal-main-area--inner">
+        <SmartInput
+          v-model="curName"
+          ref="curNameInput"
+          type="text"
+          :invalid="curNameInvalid"
+          :placeholder="curNameNotSet ? 'Name is required' : 'Name'"
+        />
+        <span class="text-error" v-if="curNameMaxLengthInvalid">
+          Too long. Maximum 64 characters
+        </span>
+        <span class=text-error v-else-if="curNameRegexMismatch">
+          Please use only letters, numbers, dashes, underscores, and spaces
         </span>
       </div>
-      <div class="modal-vertical-group">
-        <div class="modal-horizontal-group">
-            <span class="modal-icon modal-globe-icon">
-              <font-awesome-icon icon="fa-solid fa-globe"/>
-            </span>
-          <input class="modal-input" v-model="flashcardSetLanguage" disabled/>
-        </div>
+      <div class="modal-main-area--inner">
+        <AwesomeContainer icon="fa-solid fa-globe" class="awesome-globe">
+          <FuzzySelect
+            :options="languages"
+            v-model="curLanguage"
+            id="language"
+            :optionLabel="(lang) => lang.name"
+            :invalid="curLanguageInvalid"
+            :optionPlaceholder="curLanguageNotSet ? 'Language is required' : 'Language'"
+            searchPlaceholder="Search..."
+          />
+        </AwesomeContainer>
       </div>
-      <div class="modal-vertical-group">
+      <div class="modal-main-area--inner">
         <label>
-          <input type="checkbox" v-model="flashcardSetDefault"/>
+          <input type="checkbox" v-model="curFirst"/>
           {{
-            flashcardSetDefault
+            curFirst
               ? "This flashcard set is set as the default"
-              : "Set this flashcard set as the default (it will appear first if you have more than one)"
+              : "Set this flashcard set as the default"
           }}
         </label>
       </div>
-      <!-- todo suspend calendar -->
-      <div class="modal-message-group modal-warning"
-           v-if="removeConfirmation">
-          <span class="modal-icon">
-            <font-awesome-icon icon="fa-solid fa-triangle-exclamation"/></span>
-        <span class="modal-message-text">
-            Are you sure you want to remove '{{ flashcardSet?.name }}'? All progress and flash cards will disappear
-          </span>
-      </div>
     </div>
-    <div class="modal-bottom">
-      <button class="modal-button modal-cancel-button"
-              @click="cancel">
-        Cancel
-      </button>
-      <button class="modal-button modal-remove-button"
-              @click="remove">
-        Remove
-      </button>
-      <button class="modal-button modal-update-button"
-              :class="{ 'modal-button-disabled': !stateChanged }"
-              :disabled="!stateChanged"
-              @click="update">
-        Update
-      </button>
+    <div class="modal-control-buttons">
+      <SmartButton
+        class="cancel-button"
+        text="Cancel"
+        :onClick="cancel"
+        autoBlur
+      />
+      <SmartButton
+        class="remove-button"
+        text="Remove"
+        :holdTime="4"
+        :onClick="remove"
+        autoBlur
+      />
+      <SmartButton
+        class="update-button"
+        text="Update"
+        :onClick="update"
+        :disabled="!stateChanged || formInvalid"
+        autoBlur
+      />
     </div>
   </Modal>
 </template>
 
 <script setup lang="ts">
 import Modal from '@/components/Modal.vue'
-import {
-  computed,
-  defineEmits,
-  defineProps,
-  ref,
-  watch
-} from 'vue'
-import { required } from '@vuelidate/validators'
+import SmartInput from '@/components/SmartInput.vue'
+import SmartButton from '@/components/SmartButton.vue'
+import FuzzySelect from '@/components/FuzzySelect.vue'
+import AwesomeContainer from '@/components/AwesomeContainer.vue'
+import { computed, ref, watch } from 'vue'
+import { helpers, maxLength, required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { storeToRefs } from 'pinia'
-import { useReviewStore } from '@/stores/review-store.ts'
 import { useGlobalStore } from '@/stores/global-store.ts'
+import { Language } from '@/model/language.ts'
+import { useLanguageStore } from '@/stores/language-store.ts'
 
-const emit = defineEmits(['update:visible'])
-
-defineProps({
-  visible: Boolean,
-})
+const visible = defineModel<boolean>('visible', { default: false })
 
 const globalStore = useGlobalStore()
-const reviewStore = useReviewStore()
+const languageStore = useLanguageStore()
 const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
 
+const { languages } = storeToRefs(languageStore)
 const { firstFlashcardSet } = storeToRefs(flashcardSetsStore)
 const { flashcardSet, language } = storeToRefs(flashcardSetStore)
 
-// state>
-
-const flashcardSetName = ref(flashcardSet.value?.name ?? null)
-const flashcardSetLanguage = ref(language.value?.name ?? null)
-const flashcardSetDefault = ref(flashcardSet.value?.default ?? null)
+const curName = ref<string | undefined>(flashcardSet.value?.name)
+const curNameInput = ref<HTMLElement>()
+const curLanguage = ref<Language | null>(language.value)
+const curFirst = ref<boolean | undefined>(flashcardSet.value?.default)
 
 const stateChanged = computed(() => {
-  return flashcardSet.value?.name !== flashcardSetName.value
-    || flashcardSet.value?.default !== flashcardSetDefault.value
-})
-
-const removeConfirmation = ref(false)
-
-watch(language, (newValue) => {
-  flashcardSetLanguage.value = newValue?.name ?? null
-})
-
-watch(flashcardSetName, (_) => {
-  removeConfirmation.value = false
-})
-
-watch(flashcardSetDefault, (_) => {
-  removeConfirmation.value = false
-})
-
-flashcardSetStore.$subscribe((_, newState) => {
-  flashcardSetName.value = newState.flashcardSet?.name ?? null
-  flashcardSetDefault.value = newState.flashcardSet?.default ?? null
+  return flashcardSet.value?.name !== curName.value
+    || flashcardSet.value?.default !== curFirst.value
+    || language.value !== curLanguage.value
 })
 
 const validationRules = {
-  flashcardSetName: { required },
+  name: {
+    required,
+    maxLength: maxLength(64),
+    regex: helpers.regex(/^[A-Za-z0-9 _-]+$/),
+  },
+  language: { required },
 }
 
-const $v = useVuelidate(validationRules, { flashcardSetName: flashcardSetName })
+const $v = useVuelidate(validationRules, {
+  name: curName,
+  language: curLanguage,
+})
 
-function resetState() {
-  $v.value.$reset()
-  flashcardSetName.value = flashcardSet.value?.name ?? null
-  flashcardSetLanguage.value = language.value?.name ?? null
-  flashcardSetDefault.value = flashcardSet.value?.default ?? null
-  removeConfirmation.value = false
-}
-
-// <state
+const formInvalid = computed(() => $v.value.$errors.length > 0)
+const curNameInvalid = computed(() =>
+  $v.value.name.$errors.length > 0
+)
+const curNameNotSet = computed(() =>
+  $v.value.name.$errors.find(v => v.$validator === 'required') !== undefined
+)
+const curNameMaxLengthInvalid = computed(() =>
+  $v.value.name.$errors.find(v => v.$validator === 'maxLength') !== undefined
+)
+const curNameRegexMismatch = computed(() =>
+  $v.value.name.$errors.find(v => v.$validator === 'regex') !== undefined
+)
+const curLanguageInvalid = computed(() =>
+  $v.value.language.$errors.length > 0
+)
+const curLanguageNotSet = computed(() =>
+  $v.value.language.$errors.find(v => v.$validator === 'required') !== undefined
+)
 
 function cancel() {
   resetState()
   globalStore.toggleFlashcardSetSettingsModalForm()
-  emit('update:visible', false)
 }
 
-function remove() {
-  if (removeConfirmation.value) {
-    removeFlashcardSet()
-    resetState()
-    globalStore.toggleFlashcardSetSettingsModalForm()
-    emit('update:visible', false)
-  } else {
-    removeConfirmation.value = true
-  }
+async function remove() {
+  await removeFlashcardSet()
+  resetState()
+  globalStore.toggleFlashcardSetSettingsModalForm()
 }
 
 function update() {
   if (stateChanged.value) {
     $v.value.$touch()
-    if (!$v.value.$invalid) {
+    if (!formInvalid.value) {
       updateFlashcardSet()
       resetState()
       globalStore.toggleFlashcardSetSettingsModalForm()
-      emit('update:visible', false)
     }
   }
 }
 
-function removeFlashcardSet() {
+function resetState() {
+  $v.value.$reset()
+  curName.value = flashcardSet.value?.name
+  curLanguage.value = language.value
+  curFirst.value = flashcardSet.value?.default
+}
+
+async function removeFlashcardSet() {
   if (flashcardSet.value !== null) {
     flashcardSetsStore.removeFlashcardSet(flashcardSet.value).then(() => {
-      reviewStore.finishReview()
       if (firstFlashcardSet.value !== null) {
         flashcardSetStore.loadFlashcardsFor(firstFlashcardSet.value)
       } else {
@@ -182,18 +186,51 @@ function removeFlashcardSet() {
 }
 
 function updateFlashcardSet() {
-  flashcardSetStore.updateFlashcardSet(flashcardSetName.value, flashcardSetDefault.value)
+  flashcardSetStore.updateFlashcardSet(curName.value, curLanguage.value, curFirst.value)
 }
+
+watch(flashcardSet, (newVal) => {
+  curName.value = newVal?.name
+  curFirst.value = newVal?.default
+})
+
+watch(language, (newVal) => {
+  curLanguage.value = newVal
+})
+
+watch(curName, () => {
+  if (curNameInvalid.value) {
+    $v.value.name.$reset()
+  }
+})
+
+watch(curLanguage, () => {
+  if (curLanguageInvalid.value) {
+    $v.value.language.$reset()
+  }
+})
 
 </script>
 
 <style scoped>
-.form-body {
+.modal-main-area {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: start;
   gap: 10px;
-  margin-bottom: 20px;
-  min-width: 30vw;
-  width: 30vw;
+}
+
+.modal-main-area--inner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-control-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
 }
 </style>

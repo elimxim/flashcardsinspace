@@ -108,7 +108,6 @@ const $v = useVuelidate({
 })
 
 const formInvalid = computed(() => $v.value.$errors.length > 0)
-
 const userEmailInvalid = computed(() => $v.value.userEmail.$errors.length > 0)
 const userEmailNotSet = computed(() =>
   $v.value.userEmail.$errors.find(v => v.$validator === 'required') !== undefined
@@ -143,7 +142,7 @@ async function login() {
   toaster.dismiss()
   loginFailed.value = false
   $v.value.$touch()
-  if ($v.value.$invalid) {
+  if (formInvalid.value) {
     console.log('Form is invalid')
     return
   }

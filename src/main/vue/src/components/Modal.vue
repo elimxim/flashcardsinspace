@@ -19,7 +19,7 @@
         {{ title }}
       </div>
       <div class="modal-body">
-        <slot ref="slot"/>
+        <slot/>
       </div>
     </div>
   </div>
@@ -27,18 +27,18 @@
 
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, watch } from 'vue'
 
 const props = withDefaults(defineProps<{
   visible: boolean
   title?: string
-  focusable?: boolean
+  focusOn?: HTMLElement
   onPressExit?: () => void
   onPressEnter?: () => void
   onPressDelete?: () => void
 }>(), {
   title: '',
-  focusable: false,
+  focusOn: undefined,
   onPressExit: () => {
   },
   onPressEnter: () => {
@@ -59,12 +59,10 @@ function onPressDelete() {
   props.onPressDelete()
 }
 
-const slot = ref<HTMLElement>()
-
 watch(() => props.visible, (newVal) => {
-  if (props.focusable && newVal) {
+  if (newVal) {
     nextTick().then(() => {
-      slot.value?.focus()
+      props.focusOn?.focus()
     })
   }
 })
@@ -75,7 +73,7 @@ function handleKeydown(event: KeyboardEvent) {
     event.stopPropagation()
     onPressExit()
   } else if (event.key === 'Enter' && !event.ctrlKey) {
-    if (event.target !instanceof HTMLInputElement) {
+    if (event.target ! instanceof HTMLInputElement) {
       event.preventDefault()
       event.stopPropagation()
       onPressEnter()
@@ -110,6 +108,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .modal-window {
+  position: relative;
   background: #fff;
   display: flex;
   flex-direction: column;
@@ -122,7 +121,6 @@ function handleKeydown(event: KeyboardEvent) {
   margin: 10px 10px clamp(10px, 10vh, 100px);
   user-select: none;
   resize: none;
-  overflow: hidden;
 }
 
 .modal-top-control {
@@ -144,32 +142,6 @@ function handleKeydown(event: KeyboardEvent) {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow: hidden;
   gap: 10px;
 }
-</style>
-
-<style>
-.modal-main-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-}
-
-.modal-main-area--inner {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.modal-control-buttons {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 10px;
-}
-
 </style>

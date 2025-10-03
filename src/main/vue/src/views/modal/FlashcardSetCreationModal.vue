@@ -1,64 +1,70 @@
-<template>
+<template xmlns="http://www.w3.org/1999/html">
   <Modal
     :visible="visible"
     :onPressExit="cancel"
     :onPressEnter="create"
-    title="New flashcard set"
+    :focusOn="nameInput"
+    title="New Flashcard Set"
+    focusable
   >
     <div class="modal-main-area">
       <div class="modal-main-area--inner">
-        <input class="modal-input"
-               v-model="flashcardSetName"
-               placeholder="Flashcard set name"/>
-        <span class="modal-error-text" v-if="$v.flashcardSetName.$errors.length">
-            Please don't forget to fill this out
-          </span>
+        <SmartInput
+          v-model="name"
+          ref="nameInput"
+          type="text"
+          :invalid="nameInvalid"
+          :placeholder="nameNotSet ? 'Name is required' : 'Name'"
+        />
+        <span class="text-error" v-if="nameMaxLengthInvalid">
+          Too long. Maximum 64 characters
+        </span>
+        <span class=text-error v-else-if="nameRegexMismatch">
+          Please use only letters, numbers, dashes, underscores, and spaces
+        </span>
       </div>
       <div class="modal-main-area--inner">
-        <div class="modal-horizontal-group">
-            <span class="modal-icon modal-globe-icon">
-              <font-awesome-icon icon="fa-solid fa-globe"/>
-            </span>
-          <select class="modal-select" v-model="flashcardSetLanguage">
-            <option v-for="i in languages" :key="i.id" :value="i">
-              {{ i.name }}
-            </option>
-          </select>
-        </div>
-        <span class="modal-error-text" v-if="$v.selectedLanguage.$errors.length">
-              Please choose one of the languages
-          </span>
-      </div>
-      <div class="modal-message-group modal-info">
-            <span class="modal-icon">
-              <font-awesome-icon icon="fa-solid fa-circle-info"/>
-            </span>
-        <span class="modal-message-text">
-              Please be careful. You will not be able to change the language in the future
-          </span>
+        <AwesomeContainer icon="fa-solid fa-globe" class="awesome-globe">
+          <FuzzySelect
+            :options="languages"
+            v-model="language"
+            id="language"
+            :optionLabel="(lang) => lang.name"
+            :invalid="languageInvalid"
+            :optionPlaceholder="languageNotSet ? 'Language is required' : 'Language'"
+            searchPlaceholder="Search..."
+          />
+        </AwesomeContainer>
       </div>
     </div>
-    <div class="modal-main-area--inner">
-      <button class="modal-button modal-cancel-button"
-              ref="cancelButton"
-              @click="cancel">
-        Cancel
-      </button>
-      <button class="modal-button modal-create-button"
-              ref="createButton"
-              @click="create">
-        Create
-      </button>
+    <div class="modal-control-buttons">
+      <SmartButton
+        class="cancel-button"
+        text="Cancel"
+        :onClick="cancel"
+        autoBlur
+      />
+      <SmartButton
+        class="create-button"
+        text="Create"
+        :onClick="create"
+        :disabled="formInvalid"
+        autoBlur
+      />
     </div>
   </Modal>
 </template>
 
 <script setup lang="ts">
 import Modal from '@/components/Modal.vue'
-import { defineEmits, defineProps, type Ref, ref } from 'vue'
+import SmartInput from '@/components/SmartInput.vue'
+import SmartButton from '@/components/SmartButton.vue'
+import FuzzySelect from '@/components/FuzzySelect.vue'
+import AwesomeContainer from '@/components/AwesomeContainer.vue'
+import { computed, defineEmits, ref, watch } from 'vue'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
-import { required } from '@vuelidate/validators'
+import { helpers, maxLength, required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
 import type { Language } from '@/model/language.ts'
 import { storeToRefs } from 'pinia'
@@ -68,11 +74,7 @@ import { useGlobalStore } from '@/stores/global-store.ts'
 import { createFlashcardSet } from '@/core-logic/flashcard-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 
-defineProps({
-  visible: Boolean,
-})
-
-const emit = defineEmits(['update:visible'])
+const visible = defineModel<boolean>('visible', { default: false })
 
 const globalStore = useGlobalStore()
 const flashcardSetsStore = useFlashcardSetsStore()
@@ -85,31 +87,43 @@ const { languages } = storeToRefs(languageStore)
 const { lastFlashcardSet } = storeToRefs(flashcardSetsStore)
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 
-// state>
-
-const flashcardSetName = ref('')
-const flashcardSetLanguage: Ref<Language | null> = ref(null)
+const name = ref('')
+const nameInput = ref<HTMLElement>()
+const language = ref<Language>()
 
 const validationRules = {
-  flashcardSetName: { required, blank: false },
-  selectedLanguage: { required },
+  name: {
+    required,
+    maxLength: maxLength(64),
+    regex: helpers.regex(/^[A-Za-z0-9 _-]+$/),
+  },
+  language: { required },
 }
 
 const $v = useVuelidate(validationRules, {
-  flashcardSetName: flashcardSetName,
-  selectedLanguage: flashcardSetLanguage,
+  name: name,
+  language: language,
 })
 
-function resetState() {
-  flashcardSetName.value = ''
-  flashcardSetLanguage.value = null
-  $v.value.$reset()
-}
-
-// <state
-
-const cancelButton = ref<HTMLButtonElement>()
-const createButton = ref<HTMLButtonElement>()
+const formInvalid = computed(() => $v.value.$errors.length > 0)
+const nameInvalid = computed(() =>
+  $v.value.name.$errors.length > 0
+)
+const nameNotSet = computed(() =>
+  $v.value.name.$errors.find(v => v.$validator === 'required') !== undefined
+)
+const nameMaxLengthInvalid = computed(() =>
+  $v.value.name.$errors.find(v => v.$validator === 'maxLength') !== undefined
+)
+const nameRegexMismatch = computed(() =>
+  $v.value.name.$errors.find(v => v.$validator === 'regex') !== undefined
+)
+const languageInvalid = computed(() =>
+  $v.value.language.$errors.length > 0
+)
+const languageNotSet = computed(() =>
+  $v.value.language.$errors.find(v => v.$validator === 'required') !== undefined
+)
 
 function cancel() {
   resetState()
@@ -118,41 +132,68 @@ function cancel() {
 
 function create() {
   $v.value.$touch()
-  if (!$v.value.$invalid) {
+  if (!formInvalid.value) {
     createNewFlashcardSet()
     reviewStore.finishReview()
     resetState()
     globalStore.toggleFlashcardSetCreationModalForm()
-    emit('update:visible', false)
   }
-  createButton.value?.blur()
+}
+
+function resetState() {
+  name.value = ''
+  language.value = undefined
+  $v.value.$reset()
 }
 
 function createNewFlashcardSet() {
-  if (flashcardSetLanguage.value === null) {
-    throw new Error('Can\'t a new flashcard set because language is not set')
+  if (name.value && language.value) {
+    const newSet = createFlashcardSet(name.value, language.value)
+    flashcardSetsStore.addFlashcardSet(newSet).then(() => {
+      if (lastFlashcardSet.value !== null) {
+        flashcardSetStore.loadFlashcardsFor(lastFlashcardSet.value).then(() => {
+          if (flashcardSet.value !== null) {
+            chronoStore.loadChronodays(flashcardSet.value)
+          }
+        })
+      }
+    })
   }
-  const newSet = createFlashcardSet(flashcardSetName.value, flashcardSetLanguage.value)
-  flashcardSetsStore.addFlashcardSet(newSet).then(() => {
-    if (lastFlashcardSet.value !== null) {
-      flashcardSetStore.loadFlashcardsFor(lastFlashcardSet.value).then(() => {
-        if (flashcardSet.value !== null) {
-          chronoStore.loadChronodays(flashcardSet.value)
-        }
-      })
-    }
-  })
 }
+
+watch(name, () => {
+  if (nameInvalid.value) {
+    $v.value.setName.$reset()
+  }
+})
+
+watch(language, () => {
+  if (languageInvalid.value) {
+    $v.value.setLanguage.$reset()
+  }
+})
 
 </script>
 
 <style scoped>
-.form-body {
+.modal-main-area {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: start;
   gap: 10px;
-  margin-bottom: 20px;
-  min-width: 30vw;
-  width: 30vw;
+}
+
+.modal-main-area--inner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-control-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
 }
 </style>

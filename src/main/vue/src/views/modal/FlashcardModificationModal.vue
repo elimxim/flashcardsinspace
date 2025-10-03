@@ -4,7 +4,8 @@
     :onPressExit="cancel"
     :onPressEnter="props.editMode ? update : create"
     :onPressDelete="remove"
-    :title="editMode ? 'Edit flashcard' : 'New flashcard'"
+    :focusOn="frontSideTextArea"
+    :title="editMode ? 'Edit Flashcard' : 'New Flashcard'"
   >
     <template #control v-if="!editMode">
       <AwesomeButton
@@ -19,7 +20,7 @@
       <div class="modal-main-area--inner">
         <SmartInput
           ref="frontSideTextArea"
-          v-model="flashcardFrontSide"
+          v-model="frontSide"
           type="text"
           :invalid="frontSideInvalid"
           :placeholder="frontSideNotSet ? 'Front side cannot be empty' : 'Front side'"
@@ -31,7 +32,7 @@
       </div>
       <div class="modal-main-area--inner">
         <SmartInput
-          v-model="flashcardBackSide"
+          v-model="backSide"
           type="text"
           :invalid="backSideInvalid"
           :placeholder="backSideNotSet ? 'Back side cannot be empty' : 'Back side'"
@@ -53,7 +54,7 @@
         v-if="editMode"
         class="remove-button"
         text="Remove"
-        :holdTime="1.4"
+        :holdTime="1.2"
         :onClick="remove"
         autoBlur
       />
@@ -125,19 +126,15 @@ const reviewStore = useReviewStore()
 const toaster = useSpaceToaster()
 
 const { flashcardSet, isStarted } = storeToRefs(flashcardSetStore)
-const {
-  flashcardEditModalFormOpen,
-  flashcardCreationModalFormOpen,
-} = storeToRefs(globalStore)
 
-const flashcardFrontSide = ref(flashcard.value?.frontSide ?? '')
-const flashcardBackSide = ref(flashcard.value?.backSide ?? '')
+const frontSide = ref(flashcard.value?.frontSide ?? '')
+const frontSideTextArea = ref<HTMLElement>()
+const backSide = ref(flashcard.value?.backSide ?? '')
 const infiniteLoopButton = ref<InstanceType<typeof AwesomeButton>>()
-const frontSideTextArea = ref<InstanceType<typeof SmartInput>>()
 
 const stateChanged = computed(() => {
-  return flashcard.value?.frontSide !== flashcardFrontSide.value
-    || flashcard.value?.backSide !== flashcardBackSide.value
+  return flashcard.value?.frontSide !== frontSide.value
+    || flashcard.value?.backSide !== backSide.value
 })
 
 const validationRules = {
@@ -146,13 +143,11 @@ const validationRules = {
 }
 
 const $v = useVuelidate(validationRules, {
-  frontSide: flashcardFrontSide,
-  backSide: flashcardBackSide,
+  frontSide: frontSide,
+  backSide: backSide,
 })
 
-const formInvalid = computed(() =>
-  frontSideInvalid.value || backSideInvalid.value
-)
+const formInvalid = computed(() => $v.value.$errors.length > 0)
 const frontSideInvalid = computed(() => $v.value.frontSide.$errors.length > 0)
 const frontSideNotSet = computed(() =>
   $v.value.frontSide.$errors.find(v => v.$validator === 'required') !== undefined
@@ -185,7 +180,7 @@ async function remove() {
 
 function create() {
   $v.value.$touch()
-  if (!$v.value.$invalid) {
+  if (!formInvalid.value) {
     addNewFlashcard()
     if (!infiniteLoopButton.value?.isPressed()) {
       toggleModalForm()
@@ -197,7 +192,7 @@ function create() {
 function update() {
   if (stateChanged.value) {
     $v.value.$touch()
-    if (!$v.value.$invalid) {
+    if (!formInvalid.value) {
       updateFlashcard()
       resetState()
       toggleModalForm()
@@ -225,8 +220,8 @@ async function removeFlashcard(): Promise<boolean> {
 async function addNewFlashcard() {
   await flashcardSetStore.addFlashcard(
     newFlashcard(
-      flashcardFrontSide.value,
-      flashcardBackSide.value,
+      frontSide.value,
+      backSide.value,
     )
   ).then(async () => {
     if (flashcardSet.value !== null && !isStarted.value) {
@@ -246,8 +241,8 @@ function updateFlashcard() {
   if (flashcard.value) {
     const updatedFlashcard = updateFlashcardSides(
       flashcard.value,
-      flashcardFrontSide.value,
-      flashcardBackSide.value
+      frontSide.value,
+      backSide.value
     )
     flashcardSetStore.updateFlashcard(updatedFlashcard)
   } else {
@@ -265,8 +260,8 @@ function toggleModalForm() {
 }
 
 function resetState() {
-  flashcardFrontSide.value = flashcard.value?.frontSide ?? ''
-  flashcardBackSide.value = flashcard.value?.backSide ?? ''
+  frontSide.value = flashcard.value?.frontSide ?? ''
+  backSide.value = flashcard.value?.backSide ?? ''
   $v.value.$reset()
   nextTick().then(() => {
     frontSideTextArea.value?.focus()
@@ -274,31 +269,44 @@ function resetState() {
 }
 
 watch(flashcard, (newVal) => {
-  flashcardFrontSide.value = newVal?.frontSide ?? ''
-  flashcardBackSide.value = newVal?.backSide ?? ''
+  frontSide.value = newVal?.frontSide ?? ''
+  backSide.value = newVal?.backSide ?? ''
 })
 
-watch(flashcardEditModalFormOpen, (newVal) => {
-  if (newVal) {
-    nextTick(() => {
-      frontSideTextArea.value?.focus()
-    })
+watch(frontSide, () => {
+  if (frontSideInvalid.value) {
+    $v.value.frontSide.$reset()
   }
 })
 
-watch(flashcardCreationModalFormOpen, (newVal) => {
-  if (newVal) {
-    nextTick(() => {
-      frontSideTextArea.value?.focus()
-    })
+watch(backSide, () => {
+  if (backSideInvalid.value) {
+    $v.value.backSide.$reset()
   }
 })
 
 </script>
 
 <style scoped>
-.modal-main-area--inner textarea {
+.modal-main-area {
   flex: 1;
-  resize: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.modal-main-area--inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-control-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
 }
 </style>

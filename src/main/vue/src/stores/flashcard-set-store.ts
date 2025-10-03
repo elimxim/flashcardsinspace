@@ -76,21 +76,19 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
         })
       }
     },
-    updateFlashcardSet(name: string | null, first: boolean | null) {
+    updateFlashcardSet(name?: string, language?: Language, first?: boolean) {
       if (this.flashcardSet !== null) {
-        let changed = this.flashcardSet.name != name || this.flashcardSet.default != first
-        if (changed) {
-          const request: FlashcardSetUpdateRequest = {
-            name: name,
-            default: first,
-          }
-          apiClient.put<FlashcardSet>('/flashcard-sets/' + this.flashcardSet.id, request).then(response => {
-            if (this.flashcardSet !== null) {
-              this.flashcardSet = response.data
-            }
-          })
-          // todo handle errors
+        const request: FlashcardSetUpdateRequest = {
+          name: name,
+          languageId: language?.id,
+          default: first,
         }
+        apiClient.put<FlashcardSet>('/flashcard-sets/' + this.flashcardSet.id, request).then(response => {
+          if (this.flashcardSet !== null) {
+            this.flashcardSet = response.data
+          }
+        })
+        // todo handle errors
       } else {
         throw new Error(`Can't update flashcard set: it is null`)
       }

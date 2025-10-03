@@ -158,7 +158,6 @@ const $v = useVuelidate({
 })
 
 const formInvalid = computed(() => $v.value.$errors.length > 0)
-
 const usernameInvalid = computed(() => $v.value.username.$errors.length > 0)
 const usernameNotSet = computed(() =>
   $v.value.username.$errors.find(v => v.$validator === 'required') !== undefined
@@ -243,7 +242,7 @@ async function signup() {
   console.log('Signing up...')
   signupFailed.value = false
   $v.value.$touch()
-  if ($v.value.$invalid) {
+  if (formInvalid.value) {
     console.error('The form is invalid')
     return
   }
