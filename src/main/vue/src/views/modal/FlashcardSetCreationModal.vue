@@ -1,4 +1,4 @@
-<template xmlns="http://www.w3.org/1999/html">
+<template>
   <Modal
     :visible="visible"
     :onPressExit="cancel"
@@ -61,7 +61,7 @@ import SmartInput from '@/components/SmartInput.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
-import { computed, defineEmits, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { helpers, maxLength, required } from '@vuelidate/validators'
