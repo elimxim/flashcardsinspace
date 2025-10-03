@@ -30,12 +30,10 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
         return []
       }
     },
-    language(): Language | null {
+    language(): Language | undefined {
       if (this.flashcardSet !== null) {
         const languageStore = useLanguageStore()
         return languageStore.getLanguage(this.flashcardSet.languageId)
-      } else {
-        return null
       }
     },
     isEmpty(): boolean {

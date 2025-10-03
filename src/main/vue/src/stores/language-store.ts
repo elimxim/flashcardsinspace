@@ -29,8 +29,8 @@ export const useLanguageStore = defineStore('language', {
         })
       // todo deal with error
     },
-    getLanguage(id: number): Language | null {
-      return this.languageMap.get(id) ?? null
+    getLanguage(id: number): Language | undefined {
+      return this.languageMap.get(id)
     },
     resetState() {
       this.languageMap = new Map()

@@ -101,7 +101,7 @@ const { flashcardSet, language } = storeToRefs(flashcardSetStore)
 
 const curName = ref<string | undefined>(flashcardSet.value?.name)
 const curNameInput = ref<HTMLElement>()
-const curLanguage = ref<Language | null>(language.value)
+const curLanguage = ref<Language | undefined>(language.value)
 const curFirst = ref<boolean | undefined>(flashcardSet.value?.default)
 
 const stateChanged = computed(() => {
