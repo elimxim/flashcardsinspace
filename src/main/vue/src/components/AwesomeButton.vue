@@ -6,7 +6,7 @@
     v-bind="$attrs"
     @click.stop="press"
   >
-    <font-awesome-icon v-if="pressed && spin" :icon="spinIcon || icon" spin/>
+    <font-awesome-icon v-if="pressed && spinnable" :icon="spinIcon || icon" spin/>
     <font-awesome-icon v-else :icon="icon"/>
   </button>
 </template>
@@ -16,12 +16,12 @@ import { ref } from 'vue'
 
 const props = withDefaults(defineProps<{
   icon: string
-  spin?: boolean
+  spinnable?: boolean
   spinIcon?: string
   disabled?: boolean
   onClick?: () => void
 }>(), {
-  spin: false,
+  spinnable: false,
   spinIcon: undefined,
   disabled: false,
   onClick: () => {

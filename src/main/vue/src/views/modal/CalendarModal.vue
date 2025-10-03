@@ -3,68 +3,70 @@
     :visible="visible"
     :on-press-exit="exit"
   >
-    <div class="calendar">
-      <div class="calendar-month">
-        <button
-          ref="prevMonthButton"
-          class="calendar-nav-button"
-          @click="navigate(MonthNav.PREV)">
-          <font-awesome-icon icon="fa-solid fa-angle-left"/>
-        </button>
-        <span>{{ formattedCurrMonth }}</span>
-        <button
-          ref="nextMonthButton"
-          class="calendar-nav-button"
-          @click="navigate(MonthNav.NEXT)">
-          <font-awesome-icon icon="fa-solid fa-angle-right"/>
-        </button>
-      </div>
-      <div class="calendar-weekdays">
-        <div
-          v-for="day in weekdays"
-          :key="day"
-          class="calendar-weekday">
-          {{ day }}
+    <div class="modal-main-area">
+      <div class="calendar">
+        <div class="calendar-month">
+          <AwesomeButton
+            ref="prevMonthButton"
+            icon="fa-solid fa-angle-left"
+            :on-click="navigatePrevMonth"
+          />
+          <span>{{ formattedCurrMonth }}</span>
+          <AwesomeButton
+            ref="nextMonthButton"
+            icon="fa-solid fa-angle-right"
+            :on-click="navigateNextMonth"
+          />
         </div>
-      </div>
-      <div class="calendar-dates">
-        <div
-          v-for="day in calendarPage"
-          :key="day.date"
-          class="calendar-day"
-          :class="cellClasses(day)">
-          <div class="calendar-day-number">
-            {{ day.number }}
+        <div class="calendar-weekdays">
+          <div
+            v-for="day in weekdays"
+            :key="day"
+            class="calendar-weekday"
+          >
+            {{ day }}
           </div>
-          <div v-if="day.isCurrMonth && day.stages !== null" class="calendar-day-stages">
-            {{ day.stages }}
+        </div>
+        <div class="calendar-dates">
+          <div
+            v-for="day in calendarPage"
+            :key="day.date"
+            class="calendar-day"
+            :class="cellClasses(day)"
+          >
+            <div class="calendar-day-number">
+              {{ day.number }}
+            </div>
+            <div v-if="day.isCurrMonth && day.stages !== null" class="calendar-day-stages">
+              {{ day.stages }}
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="calendar-bottom-nav">
-      <button
-        ref="updateButton"
-        class="modal-button modal-danger-button"
-        :class="{ 'modal-button-disabled': !isDaySwitchPossible }"
+    <div class="modal-control-buttons">
+      <SmartButton
+        class="calendar-button"
+        text="Prev"
+        :on-click="switchToPrevDay"
         :disabled="!isDaySwitchPossible"
-        @click="switchToPrevDay">
-        Prev
-      </button>
-      <button
-        ref="updateButton"
-        class="modal-button modal-danger-button"
-        :class="{ 'modal-button-disabled': !isDaySwitchPossible }"
+        auto-blur
+      />
+      <SmartButton
+        class="calendar-button"
+        text="Next"
+        :on-click="switchToNextDay"
         :disabled="!isDaySwitchPossible"
-        @click="switchToNextDay">
-        Next
-      </button>
+        auto-blur
+      />
     </div>
   </Modal>
 </template>
 
 <script setup lang="ts">
 import Modal from '@/components/Modal.vue'
+import SmartButton from '@/components/SmartButton.vue'
+import AwesomeButton from '@/components/AwesomeButton.vue'
 import { computed, defineEmits, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
@@ -74,29 +76,22 @@ import {
   chronodayStatuses
 } from '@/core-logic/chrono-logic.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
+import { useGlobalStore } from '@/stores/global-store.ts'
 
-defineProps({
-  visible: Boolean
-})
+const visible = defineModel<boolean>('visible', { default: false })
 
-const emit = defineEmits([
-  'update:visible',
-])
-
-const flashcardSetStore = useFlashcardSetStore()
+const globalStore = useGlobalStore()
 const chronoStore = useChronoStore()
+const flashcardSetStore = useFlashcardSetStore()
 
 const { isStarted, isSuspended } = storeToRefs(flashcardSetStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
 
-// calendar>
+const prevMonthButton = ref<HTMLButtonElement>()
+const nextMonthButton = ref<HTMLButtonElement>()
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const currMonth = ref(new Date(currDay.value.chronodate))
-
-watch(currDay, (newValue) => {
-  currMonth.value = new Date(newValue.chronodate)
-})
 
 const calendarPage = computed(() =>
   calcCalendarPage(currMonth.value, currDay.value, chronodays.value)
@@ -107,15 +102,15 @@ const formattedCurrMonth = computed(() => {
   return userDateFormatter.format(currMonth.value)
 })
 
-enum MonthNav { NEXT, PREV }
-
-function navigate(direction: MonthNav) {
+function navigatePrevMonth() {
   const newMonth = new Date(currMonth.value)
-  if (direction === MonthNav.PREV) {
-    newMonth.setMonth(currMonth.value.getMonth() - 1)
-  } else {
-    newMonth.setMonth(currMonth.value.getMonth() + 1)
-  }
+  newMonth.setMonth(currMonth.value.getMonth() - 1)
+  currMonth.value = newMonth
+}
+
+function navigateNextMonth() {
+  const newMonth = new Date(currMonth.value)
+  newMonth.setMonth(currMonth.value.getMonth() + 1)
   currMonth.value = newMonth
 }
 
@@ -153,11 +148,9 @@ function cellClasses(day: CalendarDay): string {
   return result.join(" ")
 }
 
-// <calendar
-
 function exit() {
-  emit('update:visible', false)
   currMonth.value = new Date(currDay.value.chronodate)
+  globalStore.toggleCalendarModalForm()
 }
 
 function switchToPrevDay() {
@@ -174,8 +167,9 @@ const isDaySwitchPossible = computed(() =>
   isStarted.value && !isSuspended.value
 )
 
-const prevMonthButton = ref<HTMLButtonElement>()
-const nextMonthButton = ref<HTMLButtonElement>()
+watch(currDay, (newValue) => {
+  currMonth.value = new Date(newValue.chronodate)
+})
 
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown)
@@ -187,9 +181,9 @@ onUnmounted(() => {
 
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'ArrowLeft') {
-    prevMonthButton.value?.click()
+    navigatePrevMonth()
   } else if (event.key === 'ArrowRight') {
-    nextMonthButton.value?.click()
+    navigateNextMonth()
   }
 }
 
@@ -197,7 +191,7 @@ function handleKeydown(event: KeyboardEvent) {
 
 <style scoped>
 .calendar {
-  flex: 100;
+  flex: 1;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 2px;
@@ -210,19 +204,6 @@ function handleKeydown(event: KeyboardEvent) {
   align-items: center;
   padding: 0.5em;
   font-size: 1.2em;
-}
-
-.calendar-nav-button {
-  color: #ccc;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1em;
-  outline: none;
-}
-
-.calendar-nav-button:hover {
-  color: #535353;
 }
 
 .calendar-weekdays, .calendar-dates {
@@ -291,12 +272,10 @@ function handleKeydown(event: KeyboardEvent) {
   font-size: 0.8em;
 }
 
-.calendar-bottom-nav {
-  flex: 1;
+.modal-control-buttons {
   display: flex;
+  flex-direction: row;
   justify-content: center;
-  gap: 0.5em;
-  align-items: center;
-  margin-top: 1em;
+  gap: 10px;
 }
 </style>

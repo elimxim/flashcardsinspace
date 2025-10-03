@@ -68,6 +68,9 @@
   --auth-button--bg-color: #0056b3;
   --auth-button--bg-color--hover: #0070e6;
 
+  --calendar-button--bg-color: #3f0083;
+  --calendar-button--bg-color--hover: #5b00bd;
+
   /* icons */
   --fa-icon--color--globe: #007bff;
 

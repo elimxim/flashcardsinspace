@@ -7,7 +7,7 @@
     tabindex="-1"
     @keydown="handleKeydown"
   >
-    <div class="modal-window">
+    <div ref="modalWindow" class="modal-window" tabindex="-1">
       <div class="modal-top-control">
         <slot name="control"/>
         <AwesomeButton
@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import { nextTick, watch } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 
 const props = withDefaults(defineProps<{
   visible: boolean
@@ -47,6 +47,8 @@ const props = withDefaults(defineProps<{
   },
 })
 
+const modalWindow = ref<HTMLDivElement>()
+
 function pressExit() {
   props.onPressExit()
 }
@@ -62,7 +64,11 @@ function pressDelete() {
 watch(() => props.visible, (newVal) => {
   if (newVal) {
     nextTick().then(() => {
-      props.focusOn?.focus()
+      if (props.focusOn) {
+        props.focusOn.focus()
+      } else {
+        modalWindow.value?.focus()
+      }
     })
   }
 })
@@ -121,6 +127,7 @@ function handleKeydown(event: KeyboardEvent) {
   margin: 10px 10px clamp(10px, 10vh, 100px);
   user-select: none;
   resize: none;
+  outline: none;
 }
 
 .modal-top-control {
