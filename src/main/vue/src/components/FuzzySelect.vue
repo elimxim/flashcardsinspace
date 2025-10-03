@@ -180,7 +180,7 @@ async function scrollHighlightedOptionIntoView() {
   position: absolute;
   top: 99%;
   left: 2px;
-  right: -8px;
+  right: -4px;
   border: 1px solid var(--drop-down--border-color);
   border-radius: 0 4px 4px 4px;
   list-style: none;
