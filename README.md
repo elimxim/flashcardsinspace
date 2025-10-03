@@ -63,7 +63,7 @@
   - Notifications if the app is down
   - Notifications on errors in logs
   - CI + test coverage
-  - Add "npm run tslint" and "npm run type-check" to gradle build script
+  - Add "npm run lint" and "npm run type-check" to gradle build script
 - Security:
   - auth journal (for login and signup attempts)
   - auth journal analysis
