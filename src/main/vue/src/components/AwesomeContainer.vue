@@ -13,7 +13,7 @@ defineProps<{
 
 <style scoped>
 .awesome-container--theme {
-  --icon--font-size: var(--awesome-container--icon--font-size, 12cqi);
+  --icon--font-size: var(--awesome-container--icon--font-size, 36px);
   --icon--color: var(--awesome-container--icon--color, #c3c3c3);
 }
 
