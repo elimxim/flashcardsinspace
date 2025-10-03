@@ -163,13 +163,13 @@ function createNewFlashcardSet() {
 
 watch(name, () => {
   if (nameInvalid.value) {
-    $v.value.setName.$reset()
+    $v.value.name.$reset()
   }
 })
 
 watch(language, () => {
   if (languageInvalid.value) {
-    $v.value.setLanguage.$reset()
+    $v.value.language.$reset()
   }
 })
 
