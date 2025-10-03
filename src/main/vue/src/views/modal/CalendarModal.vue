@@ -1,34 +1,38 @@
 <template>
   <Modal
     :visible="visible"
-    :onPressExit="exit"
+    :on-press-exit="exit"
   >
     <div class="calendar">
       <div class="calendar-month">
-        <button class="calendar-nav-button"
-                ref="prevMonthButton"
-                @click="navigate(MonthNav.PREV)">
+        <button
+          ref="prevMonthButton"
+          class="calendar-nav-button"
+          @click="navigate(MonthNav.PREV)">
           <font-awesome-icon icon="fa-solid fa-angle-left"/>
         </button>
         <span>{{ formattedCurrMonth }}</span>
-        <button class="calendar-nav-button"
-                ref="nextMonthButton"
-                @click="navigate(MonthNav.NEXT)">
+        <button
+          ref="nextMonthButton"
+          class="calendar-nav-button"
+          @click="navigate(MonthNav.NEXT)">
           <font-awesome-icon icon="fa-solid fa-angle-right"/>
         </button>
       </div>
       <div class="calendar-weekdays">
-        <div class="calendar-weekday"
-             v-for="day in weekdays"
-             :key="day">
+        <div
+          v-for="day in weekdays"
+          :key="day"
+          class="calendar-weekday">
           {{ day }}
         </div>
       </div>
       <div class="calendar-dates">
-        <div class="calendar-day"
-             :class="cellClasses(day)"
-             v-for="day in calendarPage"
-             :key="day.date">
+        <div
+          v-for="day in calendarPage"
+          :key="day.date"
+          class="calendar-day"
+          :class="cellClasses(day)">
           <div class="calendar-day-number">
             {{ day.number }}
           </div>
@@ -39,18 +43,20 @@
       </div>
     </div>
     <div class="calendar-bottom-nav">
-      <button class="modal-button modal-danger-button"
-              :class="{ 'modal-button-disabled': !isDaySwitchPossible }"
-              ref="updateButton"
-              :disabled="!isDaySwitchPossible"
-              @click="switchToPrevDay">
+      <button
+        ref="updateButton"
+        class="modal-button modal-danger-button"
+        :class="{ 'modal-button-disabled': !isDaySwitchPossible }"
+        :disabled="!isDaySwitchPossible"
+        @click="switchToPrevDay">
         Prev
       </button>
-      <button class="modal-button modal-danger-button"
-              :class="{ 'modal-button-disabled': !isDaySwitchPossible }"
-              ref="updateButton"
-              :disabled="!isDaySwitchPossible"
-              @click="switchToNextDay">
+      <button
+        ref="updateButton"
+        class="modal-button modal-danger-button"
+        :class="{ 'modal-button-disabled': !isDaySwitchPossible }"
+        :disabled="!isDaySwitchPossible"
+        @click="switchToNextDay">
         Next
       </button>
     </div>

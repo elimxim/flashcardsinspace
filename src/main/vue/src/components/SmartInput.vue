@@ -5,8 +5,8 @@
   >
     <textarea
       v-if="area"
-      v-model="model"
       ref="textArea"
+      v-model="model"
       :type="inputType"
       class="transition--border-color"
       :toast-type="$props.type"
@@ -14,27 +14,27 @@
     />
     <input
       v-else-if="readonly"
-      :value="value"
       ref="readonlyInput"
+      :value="value"
       class="transition--border-color"
       :type="inputType"
       v-bind="$attrs"
     />
     <input
       v-else
-      v-model="model"
       ref="input"
+      v-model="model"
       class="transition--border-color"
       :type="inputType"
       v-bind="$attrs"
     />
     <button
       v-if="!area && isPassword"
+      ref="secretButton"
       class="secret-button transition--color"
       type="button"
-      ref="secretButton"
-      @click="toggleShowPassword"
       tabindex="-1"
+      @click="toggleShowPassword"
     >
       <font-awesome-icon :icon="showPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"/>
     </button>

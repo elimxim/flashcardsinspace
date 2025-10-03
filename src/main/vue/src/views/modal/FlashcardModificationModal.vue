@@ -1,17 +1,17 @@
 <template>
   <Modal
     :visible="visible"
-    :onPressExit="cancel"
-    :onPressEnter="props.editMode ? update : create"
-    :onPressDelete="remove"
-    :focusOn="frontSideTextArea"
+    :on-press-exit="cancel"
+    :on-press-enter="props.editMode ? update : create"
+    :on-press-delete="remove"
+    :focus-on="frontSideTextArea"
     :title="editMode ? 'Edit Flashcard' : 'New Flashcard'"
   >
-    <template #control v-if="!editMode">
+    <template v-if="!editMode" #control>
       <AwesomeButton
         ref="infiniteLoopButton"
         icon="fa-regular fa-circle"
-        spinIcon="fa-solid fa-arrows-spin"
+        spin-icon="fa-solid fa-arrows-spin"
         spin
       />
     </template>
@@ -26,7 +26,7 @@
           :placeholder="frontSideNotSet ? 'Front side cannot be empty' : 'Front side'"
           area
         />
-        <span class="text-error" v-if="frontSideMaxLengthInvalid">
+        <span v-if="frontSideMaxLengthInvalid" class="text-error">
           Your text has its own gravity! Maximum 512 characters.
         </span>
       </div>
@@ -38,7 +38,7 @@
           :placeholder="backSideNotSet ? 'Back side cannot be empty' : 'Back side'"
           area
         />
-        <span class="text-error" v-if="backSideMaxLengthInvalid">
+        <span v-if="backSideMaxLengthInvalid" class="text-error">
           Your text has its own gravity! Maximum 512 characters.
         </span>
       </div>
@@ -47,32 +47,32 @@
       <SmartButton
         class="cancel-button"
         text="Cancel"
-        :onClick="cancel"
-        autoBlur
+        :on-click="cancel"
+        auto-blur
       />
       <SmartButton
         v-if="editMode"
         class="remove-button"
         text="Remove"
-        :holdTime="1.2"
-        :onClick="remove"
-        autoBlur
+        :hold-time="1.2"
+        :on-click="remove"
+        auto-blur
       />
       <SmartButton
         v-if="editMode"
         class="update-button"
         text="Update"
-        :onClick="update"
+        :on-click="update"
         :disabled="!stateChanged || formInvalid"
-        autoBlur
+        auto-blur
       />
       <SmartButton
         v-if="!editMode"
         class="create-button"
         text="Create"
-        :onClick="create"
+        :on-click="create"
         :disabled="formInvalid"
-        autoBlur
+        auto-blur
       />
     </div>
   </Modal>

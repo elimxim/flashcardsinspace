@@ -74,7 +74,7 @@ export class MultiStageReviewQueue implements ReviewQueue {
   }
 
   public shuffle() {
-    this.flashcardMap.forEach((flashcards, _) => {
+    this.flashcardMap.forEach((flashcards) => {
       shuffle(flashcards)
     })
   }
@@ -112,7 +112,7 @@ export class MultiStageReviewQueue implements ReviewQueue {
 
   public remaining(): number {
     let total = 0
-    this.flashcardMap.forEach((flashcards, _) => {
+    this.flashcardMap.forEach((flashcards) => {
       total += flashcards.length
     })
     return total

@@ -43,7 +43,7 @@ class User(
         cascade = [CascadeType.ALL],
         fetch = FetchType.LAZY,
     )
-    var flashcardSets: List<FlashcardSet> = listOf(),
+    var flashcardSets: MutableList<FlashcardSet> = mutableListOf(),
 ) : UserDetails {
     override fun getAuthorities(): Collection<GrantedAuthority> =
         roles.split(",").map { SimpleGrantedAuthority(it.trim()) }

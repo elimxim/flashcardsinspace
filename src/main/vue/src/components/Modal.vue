@@ -12,10 +12,10 @@
         <slot name="control"/>
         <AwesomeButton
           icon="fa-solid fa-circle-xmark"
-          :onClick="onPressExit"
+          :on-click="pressExit"
         />
       </div>
-      <div class="modal-title" v-if="title">
+      <div v-if="title" class="modal-title">
         {{ title }}
       </div>
       <div class="modal-body">
@@ -47,15 +47,15 @@ const props = withDefaults(defineProps<{
   },
 })
 
-function onPressExit() {
+function pressExit() {
   props.onPressExit()
 }
 
-function onPressEnter() {
+function pressEnter() {
   props.onPressEnter()
 }
 
-function onPressDelete() {
+function pressDelete() {
   props.onPressDelete()
 }
 
@@ -71,21 +71,21 @@ function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') {
     event.preventDefault()
     event.stopPropagation()
-    onPressExit()
+    pressExit()
   } else if (event.key === 'Enter' && !event.ctrlKey) {
-    if (event.target ! instanceof HTMLInputElement) {
+    if (!(event.target instanceof HTMLInputElement)) {
       event.preventDefault()
       event.stopPropagation()
-      onPressEnter()
+      pressEnter()
     }
   } else if (event.key === 'Enter' && event.ctrlKey) {
     event.preventDefault()
     event.stopPropagation()
-    onPressEnter()
+    pressEnter()
   } else if (event.key === 'Delete') {
     event.preventDefault()
     event.stopPropagation()
-    onPressDelete()
+    pressDelete()
   }
 }
 

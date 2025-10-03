@@ -73,14 +73,14 @@ export const specialStageSet = new Set([
   specialStages.OUTER_SPACE,
 ])
 
-export function toSortedOrders(stageNames: String[]) {
+export function toSortedOrders(stageNames: string[]) {
   return stageNames.map(name =>
     stageNameMap.get(name.toString())?.order
   ).filter(order =>
     order !== undefined
   ).sort(
     (a, b) => b - a
-  ) as number[]
+  )
 }
 
 /**
@@ -109,7 +109,7 @@ export function nextStage(name: string): Stage {
  * - Flashcards in "UNKNOWN", "ATTEMPTED", and "OUTER_SPACE" stages cannot move down.
  */
 export function prevStage(name: string): Stage {
-  let stage = getStage(name)
+  const stage = getStage(name)
   if (specialStageSet.has(stage)) {
     return stage
   }

@@ -1,6 +1,5 @@
 import '@/assets/css/index.css'
 
-// @ts-ignore
 import App from '@/App.vue'
 import router from '@/router'
 import { createApp } from 'vue'
@@ -13,7 +12,7 @@ import { applyFaIcons } from '@/fa.ts'
 applyFaIcons()
 
 const app = createApp(App)
-app.component('font-awesome-icon', FontAwesomeIcon)
+app.component('FontAwesomeIcon', FontAwesomeIcon)
 app.use(createPinia())
 
 const authStore = useAuthStore()

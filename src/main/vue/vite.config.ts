@@ -4,7 +4,7 @@ import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd())
+  loadEnv(mode, process.cwd())
   const plugins: PluginOption[] = [vue()]
 
   if (mode !== 'production') {

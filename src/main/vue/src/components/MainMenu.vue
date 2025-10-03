@@ -2,37 +2,43 @@
   <div class="menu-container">
     <ul class="menu-list">
       <li class="menu-item menu-select-item">
-        <select class="menu-select"
-                ref="menuSelect"
-                v-model="selectedFlashcardSet"
-                :disabled="isNoFlashcardSets">
+        <select
+          ref="menuSelect"
+          v-model="selectedFlashcardSet"
+          class="menu-select"
+          :disabled="isNoFlashcardSets">
           <option v-for="s in flashcardSets" :key="s.id" :value="s">
             {{ truncate(s.name, 10) }}
           </option>
         </select>
       </li>
       <li class="menu-buttons-container">
-        <div class="menu-item menu-item-color menu-icon-button"
-             :class="{ 'menu-icon-disabled-button': isNoFlashcardSets || reviewStarted }"
-             @click="onFlashcardSetSettingsClick">
+        <div
+          class="menu-item menu-item-color menu-icon-button"
+          :class="{ 'menu-icon-disabled-button': isNoFlashcardSets || reviewStarted }"
+          @click="onFlashcardSetSettingsClick">
           <font-awesome-icon icon="fa-solid fa-gear"/>
         </div>
-        <div class="menu-item menu-item-color menu-icon-button"
-             :class="{ 'menu-icon-disabled-button': reviewStarted }"
-             @click="onFlashcardSetCreationClick">
+        <div
+          class="menu-item menu-item-color menu-icon-button"
+          :class="{ 'menu-icon-disabled-button': reviewStarted }"
+          @click="onFlashcardSetCreationClick">
           <font-awesome-icon icon="fa-solid fa-box"/>
         </div>
-        <div class="menu-item menu-item-color menu-icon-button"
-             :class="{ 'menu-icon-disabled-button': isNoFlashcardSets || reviewStarted }"
-             @click="onFlashcardCreationClick">
+        <div
+          class="menu-item menu-item-color menu-icon-button"
+          :class="{ 'menu-icon-disabled-button': isNoFlashcardSets || reviewStarted }"
+          @click="onFlashcardCreationClick">
           <font-awesome-icon icon="fa-solid fa-rectangle-list"/>
         </div>
       </li>
-      <li class="menu-buttons-container"
-          v-if="showFlashcardMenuItem">
-        <div class="menu-item menu-item-color menu-icon-button"
-             :class="{ 'menu-icon-disabled-button': reviewStarted }"
-             @click="onCalendarClick">
+      <li
+        v-if="showFlashcardMenuItem"
+        class="menu-buttons-container">
+        <div
+          class="menu-item menu-item-color menu-icon-button"
+          :class="{ 'menu-icon-disabled-button': reviewStarted }"
+          @click="onCalendarClick">
           <font-awesome-icon icon="fa-solid fa-calendar-days"/>
         </div>
         <div class="menu-item menu-item-color">
@@ -42,23 +48,27 @@
           </ul>
         </div>
       </li>
-      <li class="menu-item menu-item-color"
-          v-if="showFlashcardMenuItem">
+      <li
+        v-if="showFlashcardMenuItem"
+        class="menu-item menu-item-color">
         <ul class="menu-composite-item">
           <li class="menu-item-number">{{ totalFlashcardNumber }}</li>
           <li>Total</li>
         </ul>
       </li>
-      <li class="menu-item menu-item-color"
-          v-if="showFlashcardMenuItem"
-          v-for="b in buckets" :key="b.stage.name">
-        <ul class="menu-composite-item"
+      <template v-if="showFlashcardMenuItem">
+        <li
+          v-for="b in buckets"
+          :key="b.stage.name" class="menu-item menu-item-color">
+          <ul
+            class="menu-composite-item"
             :class="{ 'menu-button': b.reviewable }"
             @click="b.reviewable ? startStageReview(b.stage) : null">
-          <li class="menu-item-number">{{ b.flashcardNumber }}</li>
-          <li>{{ b.stage.displayName }}</li>
-        </ul>
-      </li>
+            <li class="menu-item-number">{{ b.flashcardNumber }}</li>
+            <li>{{ b.stage.displayName }}</li>
+          </ul>
+        </li>
+      </template>
     </ul>
   </div>
 

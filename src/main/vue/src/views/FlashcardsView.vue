@@ -4,7 +4,7 @@
       <MainMenu/>
     </div>
 
-    <div class="main-area" v-if="!reviewStarted">
+    <div v-if="!reviewStarted" class="main-area">
       <ReviewFormStarter/>
     </div>
   </div>

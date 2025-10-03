@@ -8,18 +8,22 @@
         @mouseenter="toaster.pause()"
         @mouseleave="toaster.resume()"
       >
-        <Starfield twinkle verticalDrift="2px"/>
+        <Starfield twinkle vertical-drift="2px"/>
         <div class="space-toast__mixin"/>
         <div class="space-toast__content">
           <div class="space-toast__content__icon__box">
-            <font-awesome-icon v-if="toast?.type === ToastType.SUCCESS"
-                               icon="fa-solid fa-circle-check"/>
-            <font-awesome-icon v-else-if="toast?.type === ToastType.ERROR"
-                               icon="fa-solid fa-circle-exclamation"/>
-            <font-awesome-icon v-else-if="toast?.type === ToastType.INFO"
-                               icon="fa-solid fa-info-circle"/>
-            <font-awesome-icon v-else-if="toast?.type === ToastType.WARNING"
-                               icon="fa-solid fa-triangle-exclamation"/>
+            <font-awesome-icon
+              v-if="toast?.type === ToastType.SUCCESS"
+              icon="fa-solid fa-circle-check"/>
+            <font-awesome-icon
+              v-else-if="toast?.type === ToastType.ERROR"
+              icon="fa-solid fa-circle-exclamation"/>
+            <font-awesome-icon
+              v-else-if="toast?.type === ToastType.INFO"
+              icon="fa-solid fa-info-circle"/>
+            <font-awesome-icon
+              v-else-if="toast?.type === ToastType.WARNING"
+              icon="fa-solid fa-triangle-exclamation"/>
             <font-awesome-icon v-else icon="fa-solid fa-circle-question"/>
           </div>
           <div class="space-toast__content__body">

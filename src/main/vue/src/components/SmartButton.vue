@@ -1,16 +1,16 @@
 <template>
   <button
+    ref="button"
     class="smart-button smart-button--theme transition--bg-color"
     :class="{ 'smart-button--disabled': disabled }"
-    ref="button"
     :disabled="disabled"
+    v-bind="$attrs"
     @mousedown="startHold"
     @mouseup="cancelHold"
     @mouseleave="cancelHold"
     @touchstart.prevent="startHold"
     @touchend="cancelHold"
     @click="click"
-    v-bind="$attrs"
   >
     {{ text }}
   </button>

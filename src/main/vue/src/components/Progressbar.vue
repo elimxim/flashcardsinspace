@@ -60,7 +60,7 @@ function start() {
     emit('done')
   } else if (props.delay && props.delay > 0) {
     delayTimeout = window.setTimeout(() => {
-      delayTimeout && window.clearTimeout(delayTimeout);
+      if (delayTimeout) window.clearTimeout(delayTimeout)
       delayTimeout = null;
       begin()
     }, props.delay)

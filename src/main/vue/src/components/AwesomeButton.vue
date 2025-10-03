@@ -3,8 +3,8 @@
     class="awesome-button awesome-button--theme select-none drag-none"
     :class="{ 'awesome-button--disabled': disabled }"
     :disabled="disabled"
-    @click.stop="press"
     v-bind="$attrs"
+    @click.stop="press"
   >
     <font-awesome-icon v-if="pressed && spin" :icon="spinIcon || icon" spin/>
     <font-awesome-icon v-else :icon="icon"/>
@@ -22,6 +22,7 @@ const props = withDefaults(defineProps<{
   onClick?: () => void
 }>(), {
   spin: false,
+  spinIcon: undefined,
   disabled: false,
   onClick: () => {
   },

@@ -1,38 +1,38 @@
 <template>
   <Modal
     :visible="visible"
-    :onPressExit="cancel"
-    :onPressEnter="create"
-    :focusOn="nameInput"
+    :on-press-exit="cancel"
+    :on-press-enter="create"
+    :focus-on="nameInput"
     title="New Flashcard Set"
     focusable
   >
     <div class="modal-main-area">
       <div class="modal-main-area--inner">
         <SmartInput
-          v-model="name"
           ref="nameInput"
+          v-model="name"
           type="text"
           :invalid="nameInvalid"
           :placeholder="nameNotSet ? 'Name is required' : 'Name'"
         />
-        <span class="text-error" v-if="nameMaxLengthInvalid">
+        <span v-if="nameMaxLengthInvalid" class="text-error">
           Too long. Maximum 64 characters
         </span>
-        <span class=text-error v-else-if="nameRegexMismatch">
+        <span v-else-if="nameRegexMismatch" class=text-error>
           Please use only letters, numbers, dashes, underscores, and spaces
         </span>
       </div>
       <div class="modal-main-area--inner">
         <AwesomeContainer icon="fa-solid fa-globe" class="awesome-globe">
           <FuzzySelect
-            :options="languages"
-            v-model="language"
             id="language"
-            :optionLabel="(lang) => lang.name"
+            v-model="language"
+            :options="languages"
+            :option-label="(lang) => lang.name"
             :invalid="languageInvalid"
-            :optionPlaceholder="languageNotSet ? 'Language is required' : 'Language'"
-            searchPlaceholder="Search..."
+            :option-placeholder="languageNotSet ? 'Language is required' : 'Language'"
+            search-placeholder="Search..."
           />
         </AwesomeContainer>
       </div>
@@ -41,15 +41,15 @@
       <SmartButton
         class="cancel-button"
         text="Cancel"
-        :onClick="cancel"
-        autoBlur
+        :on-click="cancel"
+        auto-blur
       />
       <SmartButton
         class="create-button"
         text="Create"
-        :onClick="create"
+        :on-click="create"
         :disabled="formInvalid"
-        autoBlur
+        auto-blur
       />
     </div>
   </Modal>

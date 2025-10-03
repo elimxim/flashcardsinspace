@@ -11,10 +11,10 @@
       class="auth-container transition--border-color"
       :class="{ 'auth-container--error': signupFailed }"
     >
-      <form @submit.prevent="signup" class="auth-form" novalidate>
+      <form class="auth-form" novalidate @submit.prevent="signup">
         <SmartInput
-          v-model="username"
           id="name"
+          v-model="username"
           type="text"
           name="name"
           autocomplete="name"
@@ -28,8 +28,8 @@
             This username is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <SmartInput
-          v-model="userEmail"
           id="username"
+          v-model="userEmail"
           type="email"
           name="username"
           autocomplete="username"
@@ -41,18 +41,18 @@
         </span>
         <AwesomeContainer icon="fa-solid fa-globe" class="awesome-globe">
           <FuzzySelect
-            :options="languages"
-            v-model="language"
             id="language"
-            :optionLabel="(lang) => lang.name"
+            v-model="language"
+            :options="languages"
+            :option-label="(lang) => lang.name"
             :invalid="languageNotSet"
-            :optionPlaceholder="languageNotSet ? 'Language is required' : 'Language'"
-            searchPlaceholder="Search..."
+            :option-placeholder="languageNotSet ? 'Language is required' : 'Language'"
+            search-placeholder="Search..."
           />
         </AwesomeContainer>
         <SmartInput
-          v-model="userPassword"
           id="password"
+          v-model="userPassword"
           type="password"
           name="new-password"
           autocomplete="new-password"
@@ -66,8 +66,8 @@
           This secret is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <SmartInput
-          v-model="confirmedPassword"
           id="confirm-password"
+          v-model="confirmedPassword"
           type="password"
           name="new-password"
           autocomplete="new-password"
@@ -82,8 +82,8 @@
           text="Sign Up"
           type="submit"
           :disabled="formInvalid"
-          autoBlur
-          fillWidth
+          auto-blur
+          fill-width
         />
         <p class="auth-link">
           Been abducted by us before?
@@ -104,7 +104,7 @@ import SpaceToast from '@/components/SpaceToast.vue'
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"
-import { routeNames } from "@/router/index.js"
+import { routeNames } from "@/router"
 import type { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'

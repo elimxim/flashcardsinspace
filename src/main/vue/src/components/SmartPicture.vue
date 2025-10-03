@@ -65,6 +65,7 @@ const props = withDefaults(defineProps<{
   alt: 'No image available',
   fallbackExt: 'jpg',
   widths: () => [640, 960, 1280, 1920],
+  dimensions: undefined,
   formats: () => ['avif', 'webp'],
   fetchPriority: undefined,
   breakpoints: () => ([
@@ -85,7 +86,7 @@ const imgFetchPriority = computed<'high' | 'low' | 'auto'>(() => {
 })
 
 const imgSizes = computed(() => {
-  const parts = props.breakpoints
+  const parts = [...props.breakpoints]
     .sort((a, b) => a.max - b.max)
     .map(b => `(max-width: ${b.max}px) ${Math.min(Math.max(b.vw, 1), 100)}vw`)
   parts.push(`${props.containerMaxPx}px`)

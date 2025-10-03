@@ -16,9 +16,14 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
+
+    /* TS Plugin to fully understand Vue SFC template usage in IDEs */
+    "plugins": [
+      { "name": "@vue/typescript-plugin" }
+    ],
 
     /* Path Aliases */
     "baseUrl": ".",

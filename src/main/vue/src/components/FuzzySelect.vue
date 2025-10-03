@@ -1,7 +1,7 @@
 <template>
   <div
-    class="fuzzy-select fuzzy-select--theme select-none"
     ref="fuzzyContainer"
+    class="fuzzy-select fuzzy-select--theme select-none"
     tabindex="-1"
     @focusout="handleFocusOut"
     @keydown="handleKeydown"
@@ -9,33 +9,34 @@
     <SmartInput
       v-if="!isOpen"
       type="text"
-      @click="openDropdown"
       :value="selectedOptionLabel"
       :placeholder="optionPlaceholder"
       :invalid="invalid"
       v-bind="$attrs"
       readonly
+      @click="openDropdown"
     />
     <SmartInput
       v-if="isOpen"
-      v-model="searchQuery"
       ref="searchInput"
+      v-model="searchQuery"
       type="text"
       :placeholder="searchPlaceholder"
       :invalid="invalid"
       v-bind="$attrs"
     />
-    <ul v-if="isOpen" class="drop-down" ref="dropDownList">
-      <li
-        v-if="filteredOptions.length > 0"
-        v-for="(option, index) in filteredOptions"
-        :key="index"
-        :class="{ 'highlighted': index === highlightedIndex }"
-        @click.stop="selectOption(option)"
-        @mouseover="highlightedIndex = index">
-        {{ optionLabel(option) }}
-      </li>
-      <li v-if="filteredOptions.length === 0">
+    <ul v-if="isOpen" ref="dropDownList" class="drop-down">
+      <template v-if="filteredOptions.length > 0">
+        <li
+          v-for="(option, index) in filteredOptions"
+          :key="index"
+          :class="{ 'highlighted': index === highlightedIndex }"
+          @click.stop="selectOption(option)"
+          @mouseover="highlightedIndex = index">
+          {{ optionLabel(option) }}
+        </li>
+      </template>
+      <li v-else>
         No signal from this language
       </li>
     </ul>

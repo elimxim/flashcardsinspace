@@ -1,9 +1,10 @@
 <template>
-  <div class="review-form-starter" v-if="!started">
-    <button class="review-button review-start-button"
-            :class="{ 'review-start-button-disabled': isEmpty }"
-            :disabled="isEmpty"
-            @click="startReview">
+  <div v-if="!started" class="review-form-starter">
+    <button
+      class="review-button review-start-button"
+      :class="{ 'review-start-button-disabled': isEmpty }"
+      :disabled="isEmpty"
+      @click="startReview">
       Start review
     </button>
   </div>

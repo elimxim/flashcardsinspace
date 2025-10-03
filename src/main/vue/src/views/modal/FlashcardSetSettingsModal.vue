@@ -1,44 +1,44 @@
 <template>
   <Modal
     :visible="visible"
-    :onPressExit="cancel"
-    :onPressEnter="update"
-    :onPressDelete="remove"
-    :focusOn="curNameInput"
+    :on-press-exit="cancel"
+    :on-press-enter="update"
+    :on-press-delete="remove"
+    :focus-on="curNameInput"
     title="Flashcard Set Settings"
   >
     <div class="modal-main-area">
       <div class="modal-main-area--inner">
         <SmartInput
-          v-model="curName"
           ref="curNameInput"
+          v-model="curName"
           type="text"
           :invalid="curNameInvalid"
           :placeholder="curNameNotSet ? 'Name is required' : 'Name'"
         />
-        <span class="text-error" v-if="curNameMaxLengthInvalid">
+        <span v-if="curNameMaxLengthInvalid" class="text-error">
           Too long. Maximum 64 characters
         </span>
-        <span class=text-error v-else-if="curNameRegexMismatch">
+        <span v-else-if="curNameRegexMismatch" class=text-error>
           Please use only letters, numbers, dashes, underscores, and spaces
         </span>
       </div>
       <div class="modal-main-area--inner">
         <AwesomeContainer icon="fa-solid fa-globe" class="awesome-globe">
           <FuzzySelect
-            :options="languages"
-            v-model="curLanguage"
             id="language"
-            :optionLabel="(lang) => lang.name"
+            v-model="curLanguage"
+            :options="languages"
+            :option-label="(lang) => lang.name"
             :invalid="curLanguageInvalid"
-            :optionPlaceholder="curLanguageNotSet ? 'Language is required' : 'Language'"
-            searchPlaceholder="Search..."
+            :option-placeholder="curLanguageNotSet ? 'Language is required' : 'Language'"
+            search-placeholder="Search..."
           />
         </AwesomeContainer>
       </div>
       <div class="modal-main-area--inner">
         <label>
-          <input type="checkbox" v-model="curFirst"/>
+          <input v-model="curFirst" type="checkbox"/>
           {{
             curFirst
               ? "This flashcard set is set as the default"
@@ -51,22 +51,22 @@
       <SmartButton
         class="cancel-button"
         text="Cancel"
-        :onClick="cancel"
-        autoBlur
+        :on-click="cancel"
+        auto-blur
       />
       <SmartButton
         class="remove-button"
         text="Remove"
-        :holdTime="4"
-        :onClick="remove"
-        autoBlur
+        :hold-time="4"
+        :on-click="remove"
+        auto-blur
       />
       <SmartButton
         class="update-button"
         text="Update"
-        :onClick="update"
+        :on-click="update"
         :disabled="!stateChanged || formInvalid"
-        autoBlur
+        auto-blur
       />
     </div>
   </Modal>

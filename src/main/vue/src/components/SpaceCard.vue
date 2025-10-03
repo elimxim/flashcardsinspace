@@ -78,7 +78,7 @@ const props = withDefaults(defineProps<{
   textOnly?: boolean
   unflippable?: boolean
   transparent?: boolean
-  onEdit?: Function
+  onEdit?: () => void
 }>(), {
   stage: undefined,
   frontSide: undefined,

@@ -7,18 +7,18 @@
           ref="spaceCard"
           :key="flashcard ? flashcard.id : 0"
           :stage="flashcard?.stage"
-          :frontSide="flashcard?.frontSide"
-          :backSide="flashcard?.backSide"
-          :viewedTimes="viewedTimes"
-          :onEdit="() => flashcardWasEdited = true"
+          :front-side="flashcard?.frontSide"
+          :back-side="flashcard?.backSide"
+          :viewed-times="viewedTimes"
+          :on-edit="() => flashcardWasEdited = true"
         />
       </transition>
     </div>
     <div v-else class="flashcard-deck">
       <SpaceCard
-        frontSide="No more flashcards for review"
+        front-side="No more flashcards for review"
         unflippable
-        textOnly
+        text-only
         transparent
       />
     </div>
@@ -27,7 +27,7 @@
     v-model:visible="flashcardEditModalFormOpen"
     v-model:flashcard="flashcard"
     v-model:removed="flashcardWasRemoved"
-    editMode
+    edit-mode
   />
 </template>
 

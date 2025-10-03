@@ -14,74 +14,82 @@
         <Progressbar
           :progress="progress"
           height="0.5rem"
-          trackRounded
-          barRounded
+          track-rounded
+          bar-rounded
         />
       </span>
-      <button class="escape-button"
-              ref="escapeButton"
-              @click="finishReview">
+      <button
+        ref="escapeButton"
+        class="escape-button"
+        @click="finishReview">
         <font-awesome-icon icon="fa-solid fa-xmark"/>
       </button>
     </div>
     <div class="review-body">
       <SpaceDeck
         v-if="loaded"
-        v-model:flashcard="currFlashcard"
-        :onFlashcardRemoved="onFlashcardRemoved"
         ref="spaceDeck"
+        v-model:flashcard="currFlashcard"
+        :on-flashcard-removed="onFlashcardRemoved"
       />
-      <div class="flashcard-nav" v-if="settings.mode === ReviewMode.LIGHTSPEED">
-        <button class="nav-button nav-red-button"
-                :disabled="reviewFinished"
-                :hidden="reviewFinished"
-                ref="stageDownButton"
-                @click="stageDown">
+      <div v-if="settings.mode === ReviewMode.LIGHTSPEED" class="flashcard-nav">
+        <button
+          ref="stageDownButton"
+          class="nav-button nav-red-button"
+          :disabled="reviewFinished"
+          :hidden="reviewFinished"
+          @click="stageDown">
           Don't know
         </button>
-        <button class="nav-button nav-green-button"
-                :class="{ 'nav-button-disabled': editFormWasOpened }"
-                :disabled="editFormWasOpened || reviewFinished"
-                :hidden="reviewFinished"
-                ref="stageUpButton"
-                @click="stageUp">
+        <button
+          ref="stageUpButton"
+          class="nav-button nav-green-button"
+          :class="{ 'nav-button-disabled': editFormWasOpened }"
+          :disabled="editFormWasOpened || reviewFinished"
+          :hidden="reviewFinished"
+          @click="stageUp">
           Know
         </button>
       </div>
-      <div class="flashcard-nav" v-if="settings.mode === ReviewMode.SPECIAL">
-        <button class="nav-button nav-blue-button"
-                :hidden="reviewFinished"
-                ref="prevButton"
-                @click="prev">
+      <div v-if="settings.mode === ReviewMode.SPECIAL" class="flashcard-nav">
+        <button
+          ref="prevButton"
+          class="nav-button nav-blue-button"
+          :hidden="reviewFinished"
+          @click="prev">
           Prev
         </button>
-        <button class="nav-button nav-blue-button"
-                :disabled="reviewFinished"
-                :hidden="reviewFinished"
-                ref="nextButton"
-                @click="next">
+        <button
+          ref="nextButton"
+          class="nav-button nav-blue-button"
+          :disabled="reviewFinished"
+          :hidden="reviewFinished"
+          @click="next">
           Next
         </button>
       </div>
-      <div class="flashcard-nav" v-if="settings.mode === ReviewMode.SPACE">
-        <button class="nav-button nav-blue-button"
-                :hidden="reviewFinished"
-                ref="prevButton"
-                @click="prev">
+      <div v-if="settings.mode === ReviewMode.SPACE" class="flashcard-nav">
+        <button
+          ref="prevButton"
+          class="nav-button nav-blue-button"
+          :hidden="reviewFinished"
+          @click="prev">
           Prev
         </button>
-        <button class="nav-button nav-black-button"
-                :disabled="reviewFinished"
-                :hidden="reviewFinished"
-                ref="moveBackButton"
-                @click="moveBack">
+        <button
+          ref="moveBackButton"
+          class="nav-button nav-black-button"
+          :disabled="reviewFinished"
+          :hidden="reviewFinished"
+          @click="moveBack">
           Move back
         </button>
-        <button class="nav-button nav-blue-button"
-                :disabled="reviewFinished"
-                :hidden="reviewFinished"
-                ref="nextButton"
-                @click="next">
+        <button
+          ref="nextButton"
+          class="nav-button nav-blue-button"
+          :disabled="reviewFinished"
+          :hidden="reviewFinished"
+          @click="next">
           Next
         </button>
       </div>

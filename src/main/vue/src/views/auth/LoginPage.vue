@@ -19,9 +19,9 @@
         alt="Lilrocket"
         :base="currRocketImg"
         :formats="['webp']"
-        fallbackExt="png"
+        fallback-ext="png"
         :dimensions="{width: 128, height: 128}"
-        nonInteractive
+        non-interactive
         dpr
       />
     </div>
@@ -29,10 +29,10 @@
       class="auth-container transition--border-color"
       :class="{ 'auth-container--error': loginFailed }"
     >
-      <form @submit.prevent="login" class="auth-form" novalidate>
+      <form class="auth-form" novalidate @submit.prevent="login">
         <SmartInput
-          v-model="userEmail"
           id="username"
+          v-model="userEmail"
           type="email"
           name="username"
           autocomplete="username"
@@ -43,16 +43,17 @@
           This email seems to be lost in a cosmic dust cloud. Please check the format
         </span>
         <SmartInput
-          v-model="userPassword"
           id="password"
+          v-model="userPassword"
           type="password"
           name="password"
-          automoplete="current-password"
+          autocomplete="current-password"
           :invalid="userPasswordInvalid"
           :placeholder="userPasswordNotSet ? 'Password is required' : 'Password'"
         />
-        <span v-if="userPasswordMaxLengthInvalid"
-              class="text-error transition--opacity">
+        <span
+          v-if="userPasswordMaxLengthInvalid"
+          class="text-error transition--opacity">
           This secret is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <SmartButton
@@ -60,8 +61,8 @@
           text="Log in"
           type="submit"
           :disabled="formInvalid"
-          autoBlur
-          fillWidth
+          auto-blur
+          fill-width
         />
         <p class="auth-link">
           New to the galaxy?
@@ -83,7 +84,7 @@ import { useVuelidate } from '@vuelidate/core'
 import { email, maxLength, required } from '@vuelidate/validators'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"
-import { routeNames } from "@/router/index.js"
+import { routeNames } from "@/router"
 import { sendLoginRequest } from '@/api/auth-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 
