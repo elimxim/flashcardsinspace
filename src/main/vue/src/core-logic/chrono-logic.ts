@@ -15,6 +15,7 @@ export interface CalendarDay {
   date: string
   status: string | null
   stages: string | null
+  seqNumber: number | null
   isCurrMonth: boolean
   isCurrDay: boolean
 }
@@ -76,6 +77,7 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
       date: date.toDateString(),
       status: null,
       stages: null,
+      seqNumber: null,
       isCurrMonth: false,
       isCurrDay: false,
     })
@@ -94,6 +96,7 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
       date: date.toDateString(),
       status: chronoday?.status ?? null,
       stages: toSortedOrders(chronoday?.stages ?? []).toString(),
+      seqNumber: chronoday?.seqNumber ?? null,
       isCurrMonth: true,
       isCurrDay: isoDateStr === currDay.chronodate,
     })
@@ -113,6 +116,7 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
       date: date.toDateString(),
       status: null,
       stages: null,
+      seqNumber: null,
       isCurrMonth: false,
       isCurrDay: false,
     })

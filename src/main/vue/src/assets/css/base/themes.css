@@ -71,6 +71,21 @@
   --calendar-button--bg-color: #3f0083;
   --calendar-button--bg-color--hover: #5b00bd;
 
+  /* calendar */
+  --calendar--weekday--color: #6b7280;
+  --calendar--weekday--border-color: rgba(0, 0, 0, 0.06);
+  --calendar--day--border-color: rgba(0, 0, 0, 0.06);
+  --calendar--day--color: #1f2937;
+  --calendar--day--stages--color: #374151;
+  --calendar--day--seq--bg: rgba(0, 0, 0, 0.12);
+  --calendar--checkmark--color: #166534;
+  --calendar--today-ring: #7c3aed;
+  --calendar--initial--bg: #f59e0b;
+  --calendar--completed--bg: #34d399;
+  --calendar--in-progress--bg: #7188bc;
+  --calendar--not-started--bg: #e5e7eb;
+  --calendar--off--bg: #43938a;
+
   /* icons */
   --fa-icon--color--globe: #007bff;
 

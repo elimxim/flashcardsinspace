@@ -65,12 +65,16 @@ export const useChronoStore = defineStore('chrono', {
         })
     },
     switchToPrevDay() {
-      if (this.currDay.seqNumber === 0) return // todo log
+      if (this.currDay.seqNumber === 0) {
+        console.log("can't switch to prev day: no prev day")
+        return
+      }
       const flashcardSetStore = useFlashcardSetStore()
       const flashcardSet = flashcardSetStore.flashcardSet
       if (flashcardSet !== null) {
         const prev = this.chronodays[this.currDay.seqNumber - 1] as Chronoday | undefined
         if (prev !== undefined) {
+          console.log(`Switching to prev day ${prev.chronodate}`)
           apiClient.delete('/flashcard-sets/' + flashcardSet.id + '/chronodays/' + this.currDay.id)
             // todo log response
             .then(() =>
@@ -78,10 +82,10 @@ export const useChronoStore = defineStore('chrono', {
             )
           // todo catch errors
         } else {
-          // todo smth
+          console.log("can't switch to prev day: no prev day")
         }
       } else {
-        // todo smth
+        console.log("can't switch to prev day: flashcard set is null")
       }
     },
     switchToNextDay() {
@@ -90,6 +94,7 @@ export const useChronoStore = defineStore('chrono', {
       if (flashcardSet !== null) {
         const next = this.chronodays[this.currDay.seqNumber] as Chronoday | undefined
         if (next !== undefined) {
+          console.log(`Switching to next day ${next.chronodate}`)
           apiClient.post<Chronoday>('/flashcard-sets/' + flashcardSet.id + '/chronodays')
             // todo log response
             .then(() =>

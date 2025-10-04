@@ -3,43 +3,46 @@
     :visible="visible"
     :on-press-exit="exit"
   >
-    <div class="modal-main-area">
-      <div class="calendar">
-        <div class="calendar-month">
-          <AwesomeButton
-            ref="prevMonthButton"
-            icon="fa-solid fa-angle-left"
-            :on-click="navigatePrevMonth"
-          />
-          <span>{{ formattedCurrMonth }}</span>
-          <AwesomeButton
-            ref="nextMonthButton"
-            icon="fa-solid fa-angle-right"
-            :on-click="navigateNextMonth"
-          />
+    <div class="calendar calendar--theme">
+      <div class="calendar-month">
+        <AwesomeButton
+          ref="prevMonthButton"
+          icon="fa-solid fa-angle-left"
+          :on-click="navigatePrevMonth"
+        />
+        <span>{{ formattedCurrMonth }}</span>
+        <AwesomeButton
+          ref="nextMonthButton"
+          icon="fa-solid fa-angle-right"
+          :on-click="navigateNextMonth"
+        />
+      </div>
+      <div class="calendar-weekdays">
+        <div
+          v-for="day in weekdays"
+          :key="day"
+          class="calendar-weekday"
+        >
+          {{ day }}
         </div>
-        <div class="calendar-weekdays">
-          <div
-            v-for="day in weekdays"
-            :key="day"
-            class="calendar-weekday"
-          >
-            {{ day }}
-          </div>
-        </div>
-        <div class="calendar-dates">
-          <div
-            v-for="day in calendarPage"
-            :key="day.date"
-            class="calendar-day"
-            :class="cellClasses(day)"
-          >
-            <div class="calendar-day-number">
+      </div>
+      <div class="calendar-days">
+        <div
+          v-for="day in calendarPage"
+          :key="day.date"
+          class="calendar-day"
+          :class="cellClasses(day)"
+        >
+          <div class="calendar-day__top">
+            <div class="calendar-day__top__number">
               {{ day.number }}
             </div>
-            <div v-if="day.isCurrMonth && day.stages !== null" class="calendar-day-stages">
-              {{ day.stages }}
+            <div v-if="day.isCurrMonth && day.seqNumber !== null" class="calendar-day__top__seq">
+              {{ day.seqNumber }}
             </div>
+          </div>
+          <div v-if="day.isCurrMonth && day.stages !== null" class="calendar-day__stages">
+            {{ day.stages }}
           </div>
         </div>
       </div>
@@ -116,33 +119,33 @@ function navigateNextMonth() {
 
 function cellClasses(day: CalendarDay): string {
   if (!day.isCurrMonth) {
-    return 'calendar-empty-day'
+    return 'calendar-day--empty'
   }
 
   const result: string[] = []
   switch (day?.status) {
     case chronodayStatuses.INITIAL:
-      result.push('calendar-start-day')
+      result.push('calendar-day--initial')
       break
     case chronodayStatuses.COMPLETED:
-      result.push('calendar-completed-day')
+      result.push('calendar-day--completed')
       break
     case chronodayStatuses.IN_PROGRESS:
-      result.push('calendar-in-progress-day')
+      result.push('calendar-day--in-progress')
       break
     case chronodayStatuses.NOT_STARTED:
-      result.push('calendar-not-started-day')
+      result.push('calendar-day--not-started')
       break
     case chronodayStatuses.OFF:
-      result.push('calendar-off-day')
+      result.push('calendar-day--off')
       break
     default:
-      result.push('calendar-another-day')
+      result.push('calendar-day--empty')
       break
   }
 
   if (day.isCurrDay) {
-    result.push('calendar-current-day')
+    result.push('calendar-day--current')
   }
 
   return result.join(" ")
@@ -190,86 +193,159 @@ function handleKeydown(event: KeyboardEvent) {
 </script>
 
 <style scoped>
+.calendar--theme {
+  --weekday--color: var(--calendar--weekday--color, #6b7280);
+  --weekday--border-color: var(--calendar--weekday--border-color, rgba(0, 0, 0, 0.06));
+  --day--border-color: var(--calendar--day--border-color, rgba(0, 0, 0, 0.06));
+  --day--color: var(--calendar--day--color, #1f2937);
+  --day--stages--color: var(--calendar--day--stages--color, #374151);
+  --day--seq--bg: var(--calendar--day--seq--bg, rgba(0, 0, 0, 0.12));
+  --checkmark--color: var(--calendar--checkmark--color, #166534);
+  --today-ring: var(--calendar--today-ring, #7c3aed);
+  --initial--bg: var(--calendar--initial--bg, #f59e0b);
+  --completed--bg: var(--calendar--completed--bg, #34d399);
+  --in-progress--bg: var(--calendar--in-progress--bg, #7188bc);
+  --not-started--bg: var(--calendar--not-started--bg, #e5e7eb);
+  --off--bg: var(--calendar--off--bg, #43938a);
+}
+
 .calendar {
   flex: 1;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  min-width: 0;
+  min-height: 0;
 }
 
 .calendar-month {
-  grid-column: span 7;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5em;
-  font-size: 1.2em;
+  padding: 4px;
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  font-weight: 600;
+  --awesome-button--font-size: clamp(0.9rem, 2vw, 1.1rem);
 }
 
-.calendar-weekdays, .calendar-dates {
-  display: contents;
-}
-
-.calendar-day {
-  display: flex;
-  flex-direction: column;
-  border-radius: 5px;
-  padding: 1em;
-  text-align: center;
-  min-width: 2em;
-  min-height: 2em;
-}
-
-.calendar-empty-day {
-  background: none;
-}
-
-.calendar-start-day {
-  background-color: #ac7224;
-}
-
-.calendar-completed-day {
-  background-color: #9bbf99;
-}
-
-.calendar-in-progress-day {
-  background-color: #7188bc;
-}
-
-.calendar-not-started-day {
-  background-color: #a5a5a5;
-}
-
-.calendar-current-day {
-  border-color: #884393;
-  border-style: solid;
-  border-width: 1px;
-}
-
-.calendar-off-day {
-  background-color: #43938a;
-}
-
-.calendar-another-day {
-  background-color: #e8e8e8;
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+  text-transform: uppercase;
+  color: var(--weekday--color);
 }
 
 .calendar-weekday {
   display: flex;
   flex-direction: column;
-  padding: 0.5em;
+  padding: 4px;
   text-align: center;
-  min-width: 2em;
-  min-height: 1em;
+  min-width: 0;
+  min-height: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--weekday--color);
 }
 
-.calendar-day-number {
+.calendar-days {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  min-height: 0;
+  gap: 4px;
+}
+
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 4px;
+  padding: 4px;
+  text-align: center;
+  min-width: 0;
+  min-height: 0;
+  background: transparent;
+  color: var(--day--color);
+  border: 1px solid var(--day--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.calendar-day--empty {
+  background: none;
+  opacity: 0.4;
+}
+
+.calendar-day--initial {
+  background-color: var(--initial--bg);
+}
+
+.calendar-day--completed {
+  background-color: var(--completed--bg);
+}
+
+.calendar-day--completed::before {
+  content: "✔";
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--checkmark--color);
+  pointer-events: none;
+}
+
+.calendar-day--in-progress {
+  background-color: var(--in-progress--bg);
+}
+
+.calendar-day--not-started {
+  background-color: var(--not-started--bg);
+}
+
+.calendar-day--current {
+  box-shadow: 0 0 0 2px var(--today-ring) inset
+}
+
+.calendar-day--off {
+  background-color: var(--off--bg);
+}
+
+.calendar-day:hover:not(.calendar-day--empty) {
+  transform: scale(1.08);
+}
+
+.calendar-day__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.calendar-day__top__number {
   font-weight: bold;
-  font-size: 1em;
+  font-size: clamp(0.8rem, 2vw, 1rem);
 }
 
-.calendar-day-stages {
-  font-size: 0.8em;
+.calendar-day__top__seq {
+  font-size: clamp(0.65rem, 1.6vw, 0.85rem);
+  padding: 2px 6px;
+  border-radius: 10px;
+  background-color: var(--day--seq--bg);
+  line-height: 1;
+}
+
+.calendar-day__stages {
+  font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 2px;
+  color: var(--day--stages--color);
 }
 
 .modal-control-buttons {
@@ -278,4 +354,5 @@ function handleKeydown(event: KeyboardEvent) {
   justify-content: center;
   gap: 10px;
 }
+
 </style>

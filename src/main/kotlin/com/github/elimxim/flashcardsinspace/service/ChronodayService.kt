@@ -173,20 +173,21 @@ class ChronodayService(
         verifyUserOperation(user, setId, id)
 
         val chronoday = getEntity(id)
-        val lastChronoday = chronoday.flashcardSet.lastChronoday()
+        val flashcardSet = chronoday.flashcardSet
+        val lastChronoday = flashcardSet.lastChronoday()
         if (!chronoday.chronodate.isEqual(lastChronoday?.chronodate)) {
             throw NotRemovableChronodayException(
                 "Chronoday $id is not the last one in set $setId"
             )
         }
 
-        if (chronoday.flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
+        if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
             throw FlashcardSetSuspendedException(
                 "Flashcard set $setId is suspended"
             )
         }
 
-        val isNotRemovable = chronoday.flashcardSet.flashcards
+        val isNotRemovable = flashcardSet.flashcards
             .any { it.lastReviewDate != null && !chronoday.chronodate.isAfter(it.lastReviewDate) }
 
         if (isNotRemovable) {
@@ -195,6 +196,7 @@ class ChronodayService(
             )
         }
 
+        flashcardSet.chronodays.remove(chronoday)
         chronodayRepository.delete(chronoday)
     }
 
