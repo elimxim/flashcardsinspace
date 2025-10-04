@@ -39,13 +39,12 @@
 </template>
 
 <script setup lang="ts">
-import '@/assets/css/base/themes.css'
-import '@/assets/css/base/reset.css'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { routeNames } from '@/router'
+import { loadLanguages } from '@/api/public-api-client.ts'
 
 const authStore = useAuthStore()
 const languageStore = useLanguageStore()
@@ -53,7 +52,11 @@ const languageStore = useLanguageStore()
 const { isAuthenticated } = storeToRefs(authStore)
 
 onMounted(() => {
-  languageStore.loadLanguages()
+  loadLanguages().then(response => {
+    languageStore.addLanguages(response.data)
+  }).catch(error => {
+    console.error('Error loading languages:', error)
+  })
 })
 
 </script>

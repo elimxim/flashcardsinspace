@@ -1,8 +1,12 @@
 import axios from 'axios'
+import { Language } from '@/model/language.ts'
 
 const publicApiClient = axios.create({
   baseURL: '/api-public',
   withCredentials: false,
 })
 
-export default publicApiClient
+export async function loadLanguages() {
+  console.log('Loading languages...')
+  return await publicApiClient.get<Language[]>('/languages')
+}
