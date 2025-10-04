@@ -200,13 +200,13 @@ function handleKeydown(event: KeyboardEvent) {
   --day--color: var(--calendar--day--color, #1f2937);
   --day--stages--color: var(--calendar--day--stages--color, #374151);
   --day--seq--bg: var(--calendar--day--seq--bg, rgba(0, 0, 0, 0.12));
-  --checkmark--color: var(--calendar--checkmark--color, #166534);
+  --day--checkmark--color: var(--calendar--day--checkmark--color, #166534);
   --today-ring: var(--calendar--today-ring, #7c3aed);
-  --initial--bg: var(--calendar--initial--bg, #f59e0b);
-  --completed--bg: var(--calendar--completed--bg, #34d399);
-  --in-progress--bg: var(--calendar--in-progress--bg, #7188bc);
-  --not-started--bg: var(--calendar--not-started--bg, #e5e7eb);
-  --off--bg: var(--calendar--off--bg, #43938a);
+  --day--initial--bg: var(--calendar--day--initial--bg, #f59e0b);
+  --day--completed--bg: var(--calendar--day--completed--bg, #34d399);
+  --day--in-progress--bg: var(--calendar--day--in-progress--bg, #7188bc);
+  --day--not-started--bg: var(--calendar--day--not-started--bg, #e5e7eb);
+  --day--off--bg: var(--calendar--day--off--bg, #43938a);
 }
 
 .calendar {
@@ -281,11 +281,11 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .calendar-day--initial {
-  background-color: var(--initial--bg);
+  background-color: var(--day--initial--bg);
 }
 
 .calendar-day--completed {
-  background-color: var(--completed--bg);
+  background-color: var(--day--completed--bg);
 }
 
 .calendar-day--completed::before {
@@ -295,16 +295,16 @@ function handleKeydown(event: KeyboardEvent) {
   bottom: 4px;
   font-size: 0.95rem;
   line-height: 1;
-  color: var(--checkmark--color);
+  color: var(--day--checkmark--color);
   pointer-events: none;
 }
 
 .calendar-day--in-progress {
-  background-color: var(--in-progress--bg);
+  background-color: var(--day--in-progress--bg);
 }
 
 .calendar-day--not-started {
-  background-color: var(--not-started--bg);
+  background-color: var(--day--not-started--bg);
 }
 
 .calendar-day--current {
@@ -312,7 +312,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .calendar-day--off {
-  background-color: var(--off--bg);
+  background-color: var(--day--off--bg);
 }
 
 .calendar-day:hover:not(.calendar-day--empty) {

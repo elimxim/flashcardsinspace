@@ -78,13 +78,13 @@
   --calendar--day--color: #1f2937;
   --calendar--day--stages--color: #374151;
   --calendar--day--seq--bg: rgba(0, 0, 0, 0.12);
-  --calendar--checkmark--color: #166534;
+  --calendar--day--checkmark--color: #166534;
   --calendar--today-ring: #7c3aed;
-  --calendar--initial--bg: #f59e0b;
-  --calendar--completed--bg: #34d399;
-  --calendar--in-progress--bg: #7188bc;
-  --calendar--not-started--bg: #e5e7eb;
-  --calendar--off--bg: #43938a;
+  --calendar--day--initial--bg: #f59e0b;
+  --calendar--day--completed--bg: #34d399;
+  --calendar--day--in-progress--bg: #7188bc;
+  --calendar--day--not-started--bg: #e5e7eb;
+  --calendar--day--off--bg: #43938a;
 
   /* icons */
   --fa-icon--color--globe: #007bff;
