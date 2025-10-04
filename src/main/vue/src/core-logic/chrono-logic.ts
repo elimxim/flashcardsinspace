@@ -107,8 +107,9 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
   const nextMonth = month === 11 ? 0 : month + 1
   const nextYear = month === 11 ? year + 1 : year
 
-  // filling empty slots at the end
-  for (let i = 1; i <= 6 - lastWeekDay; i++) {
+  // filling empty slots at the end to complete the last week
+  const endPadding = 6 - lastWeekDay
+  for (let i = 1; i <= endPadding; i++) {
     const date = new Date(nextYear, nextMonth, i)
 
     result.push({
@@ -120,6 +121,24 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
       isCurrMonth: false,
       isCurrDay: false,
     })
+  }
+
+  // ensure exactly 6 rows (42 cells) by filling from the next month
+  const totalCells = 42
+  if (result.length < totalCells) {
+    const extra = totalCells - result.length
+    for (let i = 1; i <= extra; i++) {
+      const date = new Date(nextYear, nextMonth, endPadding + i)
+      result.push({
+        number: date.getDate(),
+        date: date.toDateString(),
+        status: null,
+        stages: null,
+        seqNumber: null,
+        isCurrMonth: false,
+        isCurrDay: false,
+      })
+    }
   }
 
   return result
