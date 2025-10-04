@@ -148,7 +148,8 @@ function handleKeydown(event: KeyboardEvent) {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: 10px;
+  min-height: 0;
+  min-width: 0;
 }
 </style>
