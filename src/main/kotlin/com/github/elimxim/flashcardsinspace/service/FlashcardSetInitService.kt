@@ -1,9 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.Chronoday
-import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
-import com.github.elimxim.flashcardsinspace.entity.Flashcard
-import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
@@ -66,9 +63,9 @@ class FlashcardSetInitService(
         flashcardSet.chronodays.add(initial)
 
         val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
-        val createdFlashcard = flashcardRepository.save(flashcard)
-        val createdChronoday = chronodayRepository.save(initial)
-        val schedule = lightspeedService.createSchedule(chronodays = listOf(createdChronoday))
+        val createdFlashcard = flashcardSet.flashcards.last()
+        val createdInitial = updatedFlashcardSet.lastChronoday()!!
+        val schedule = lightspeedService.createSchedule(chronodays = listOf(createdInitial))
 
         return FlashcardSetInitResponse(
             flashcardSet = updatedFlashcardSet.toDto(),
