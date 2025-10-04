@@ -75,16 +75,25 @@
   --calendar--weekday--color: #6b7280;
   --calendar--weekday--border-color: rgba(0, 0, 0, 0.06);
   --calendar--day--border-color: rgba(0, 0, 0, 0.06);
-  --calendar--day--color: #1f2937;
-  --calendar--day--stages--color: #374151;
+  --calendar--day--color: #3e3e3e;
+  --calendar--day--stages--color: #000000;
   --calendar--day--seq--bg: rgba(0, 0, 0, 0.12);
-  --calendar--day--checkmark--color: #166534;
+  --calendar--day--checkmark--color: #19552d;
   --calendar--today-ring: #7c3aed;
-  --calendar--day--initial--bg: #f59e0b;
-  --calendar--day--completed--bg: #34d399;
-  --calendar--day--in-progress--bg: #7188bc;
-  --calendar--day--not-started--bg: #e5e7eb;
-  --calendar--day--off--bg: #43938a;
+  --calendar--day--empty--bg-color: rgba(142, 142, 142, 0.51);
+  --calendar--day--initial--color: #e5e7eb;
+  --calendar--day--initial--bg-color: rgba(205, 128, 5, 0.66);
+  --calendar--day--initial--stripe-color: rgba(211, 141, 18, 0.55);
+  --calendar--day--completed--color: #e5e7eb;
+  --calendar--day--completed--bg-color: rgba(14, 165, 57, 0.66);
+  --calendar--day--completed--stripe-color: rgba(11, 184, 49, 0.55);
+  --calendar--day--in-progress--color: #e5e7eb;
+  --calendar--day--in-progress--bg-color: rgba(55, 155, 255, 0.78);
+  --calendar--day--in-progress--stripe-color: rgba(36, 109, 255, 0.91);
+  --calendar--day--not-started--color: #e5e7eb;
+  --calendar--day--not-started--bg-color: rgba(57, 110, 131, 0.46);
+  --calendar--day--not-started--stripe-color: rgba(30, 93, 115, 0.26);
+  --calendar--day--off--bg-color: rgba(67, 147, 138, 0.86);
 
   /* icons */
   --fa-icon--color--globe: #007bff;

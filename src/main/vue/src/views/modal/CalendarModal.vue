@@ -31,17 +31,17 @@
           v-for="day in calendarPage"
           :key="day.date"
           class="calendar-day"
-          :class="cellClasses(day)"
+          :class="dayCssClasses(day)"
         >
           <div class="calendar-day__top">
             <div class="calendar-day__top__number">
               {{ day.number }}
             </div>
-            <div v-if="day.isCurrMonth && day.seqNumber !== null" class="calendar-day__top__seq">
+            <div v-if="canShowSeq(day)" class="calendar-day__top__seq">
               {{ day.seqNumber }}
             </div>
           </div>
-          <div v-if="day.isCurrMonth && day.stages !== null" class="calendar-day__stages">
+          <div v-if="canShowStages(day)" class="calendar-day__stages">
             {{ day.stages }}
           </div>
         </div>
@@ -117,9 +117,9 @@ function navigateNextMonth() {
   currMonth.value = newMonth
 }
 
-function cellClasses(day: CalendarDay): string {
+function dayCssClasses(day: CalendarDay): string {
   if (!day.isCurrMonth) {
-    return 'calendar-day--empty'
+    return 'calendar-day--another'
   }
 
   const result: string[] = []
@@ -149,6 +149,14 @@ function cellClasses(day: CalendarDay): string {
   }
 
   return result.join(" ")
+}
+
+function canShowSeq(day: CalendarDay): boolean {
+  return day.isCurrMonth && day.seqNumber !== null && day.seqNumber !== 0
+}
+
+function canShowStages(day: CalendarDay): boolean {
+  return day.isCurrMonth && day.stages !== null
 }
 
 function exit() {
@@ -197,16 +205,25 @@ function handleKeydown(event: KeyboardEvent) {
   --weekday--color: var(--calendar--weekday--color, #6b7280);
   --weekday--border-color: var(--calendar--weekday--border-color, rgba(0, 0, 0, 0.06));
   --day--border-color: var(--calendar--day--border-color, rgba(0, 0, 0, 0.06));
-  --day--color: var(--calendar--day--color, #1f2937);
+  --day--color: var(--calendar--day--color, #454545);
   --day--stages--color: var(--calendar--day--stages--color, #374151);
   --day--seq--bg: var(--calendar--day--seq--bg, rgba(0, 0, 0, 0.12));
   --day--checkmark--color: var(--calendar--day--checkmark--color, #166534);
   --today-ring: var(--calendar--today-ring, #7c3aed);
-  --day--initial--bg: var(--calendar--day--initial--bg, #f59e0b);
-  --day--completed--bg: var(--calendar--day--completed--bg, #34d399);
-  --day--in-progress--bg: var(--calendar--day--in-progress--bg, #7188bc);
-  --day--not-started--bg: var(--calendar--day--not-started--bg, #e5e7eb);
-  --day--off--bg: var(--calendar--day--off--bg, #43938a);
+  --day--empty--bg-color: var(--calendar--day--empty--bg-color, rgba(115, 115, 115, 0.4));
+  --day--initial--color: var(--calendar--day--initial--color, white);
+  --day--initial--bg-color: var(--calendar--day--initial--bg-color, #f59e0b);
+  --day--initial--stripe-color: var(--calendar--day--initial--stripe-color, rgba(245, 158, 11, 0.35));
+  --day--completed--color: var(--calendar--day--completed--color, white);
+  --day--completed--bg-color: var(--calendar--day--completed--bg-color, #34d399);
+  --day--completed--stripe-color: var(--calendar--day--completed--stripe-color, rgba(52, 211, 153, 0.35));
+  --day--in-progress--color: var(--calendar--day--in-progress--color, white);
+  --day--in-progress--bg-color: var(--calendar--day--in-progress--bg-color, #244fac);
+  --day--in-progress--stripe-color: var(--calendar--day--in-progress--stripe-color, rgba(14, 49, 126, 0.35));
+  --day--not-started--color: var(--calendar--day--not-started--color, white);
+  --day--not-started--bg-color: var(--calendar--day--not-started--bg-color, #e5e7eb);
+  --day--not-started--stripe-color: var(--calendar--day--not-started--stripe-color, rgba(115, 115, 115, 0.35));
+  --day--off--bg-color: var(--calendar--day--off--bg-color, #43938a);
 }
 
 .calendar {
@@ -270,22 +287,40 @@ function handleKeydown(event: KeyboardEvent) {
   min-height: 0;
   background: transparent;
   color: var(--day--color);
-  border: 1px solid var(--day--border-color);
+  border: 2px solid var(--day--border-color);
   position: relative;
   overflow: hidden;
+  transition: transform 0.1s ease-in-out;
+}
+
+.calendar-day--another {
+  background: transparent;
+  opacity: 0.4;
 }
 
 .calendar-day--empty {
-  background: none;
+  background-color: var(--day--empty--bg-color);
   opacity: 0.4;
 }
 
 .calendar-day--initial {
-  background-color: var(--day--initial--bg);
+  color: var(--day--initial--color);
+  background-color: var(--day--initial--bg-color);
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--day--initial--stripe-color) 0 10px,
+    transparent 10px 20px
+  );
 }
 
 .calendar-day--completed {
-  background-color: var(--day--completed--bg);
+  color: var(--day--completed--color);
+  background-color: var(--day--completed--bg-color);
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--day--completed--stripe-color) 0 10px,
+    transparent 10px 20px
+  );
 }
 
 .calendar-day--completed::before {
@@ -293,29 +328,41 @@ function handleKeydown(event: KeyboardEvent) {
   position: absolute;
   right: 6px;
   bottom: 4px;
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   line-height: 1;
   color: var(--day--checkmark--color);
   pointer-events: none;
 }
 
 .calendar-day--in-progress {
-  background-color: var(--day--in-progress--bg);
+  color: var(--day--in-progress--color);
+  background-color: var(--day--in-progress--bg-color);
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--day--in-progress--stripe-color) 0 10px,
+    transparent 10px 20px
+  );
 }
 
 .calendar-day--not-started {
-  background-color: var(--day--not-started--bg);
+  color: var(--day--not-started--color);
+  background-color: var(--day--not-started--bg-color);
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--day--not-started--stripe-color) 0 10px,
+    transparent 10px 20px
+  );
 }
 
 .calendar-day--current {
-  box-shadow: 0 0 0 2px var(--today-ring) inset
+  box-shadow: 0 0 0 2px var(--today-ring);
 }
 
 .calendar-day--off {
-  background-color: var(--day--off--bg);
+  background-color: var(--day--off--bg-color);
 }
 
-.calendar-day:hover:not(.calendar-day--empty) {
+.calendar-day:hover:not(.calendar-day--another) {
   transform: scale(1.08);
 }
 
