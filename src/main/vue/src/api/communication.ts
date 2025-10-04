@@ -1,4 +1,5 @@
 import type { Chronoday } from '@/model/chrono.ts'
+import { Flashcard, FlashcardSet } from '@/model/flashcard.ts';
 
 export interface ErrorResponseBody {
   timestamp: Date
@@ -31,4 +32,11 @@ export interface ChronoBulkUpdateRequest {
 
 export interface ChronodayId {
   id: number
+}
+
+export interface FlashcardSetInitResponse {
+  flashcardSet: FlashcardSet,
+  flashcard: Flashcard,
+  currDay: Chronoday,
+  chronodays: Chronoday[],
 }

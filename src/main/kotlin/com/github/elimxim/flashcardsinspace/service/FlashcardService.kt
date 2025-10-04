@@ -34,11 +34,11 @@ class FlashcardService(
     fun add(user: User, setId: Long, request: FlashcardCreationRequest): FlashcardDto {
         log.info("User ${user.id}: adding a new flashcard to set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
-        return add(setId, requestValidator.validate(request))
+        return add(setId, requestValidator.validate(request)).toDto()
     }
 
     @Transactional
-    fun add(setId: Long, request: ValidFlashcardCreationRequest): FlashcardDto {
+    fun add(setId: Long, request: ValidFlashcardCreationRequest): Flashcard {
         val flashcardSet = flashcardSetService.getEntity(setId)
         val flashcard = Flashcard(
             frontSide = request.frontSide,
@@ -50,7 +50,7 @@ class FlashcardService(
         )
 
         flashcardSet.flashcards.add(flashcard)
-        return flashcardRepository.save(flashcard).toDto()
+        return flashcardRepository.save(flashcard)
     }
 
     @Transactional
@@ -58,18 +58,18 @@ class FlashcardService(
         log.info("User ${user.id}: updating flashcard $id in set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         verifyUserOperation(user, setId, id)
-        return update(setId, id, requestValidator.validate(request))
+        return update(setId, id, requestValidator.validate(request)).toDto()
     }
 
     @Transactional
-    fun update(setId: Long, id: Long, request: ValidFlashcardUpdateRequest): FlashcardDto {
+    fun update(setId: Long, id: Long, request: ValidFlashcardUpdateRequest): Flashcard {
         flashcardSetService.getEntity(setId)
         val flashcard = getEntity(id)
         if (mergeFlashcard(flashcard, request)) {
             flashcard.lastUpdatedAt = ZonedDateTime.now()
-            return flashcardRepository.save(flashcard).toDto()
+            return flashcardRepository.save(flashcard)
         } else {
-            return flashcard.toDto()
+            return flashcard
         }
     }
 

@@ -7,6 +7,6 @@ const publicApiClient = axios.create({
 })
 
 export async function loadLanguages() {
-  console.log('Loading languages...')
+  console.log('[GET] request => languages')
   return await publicApiClient.get<Language[]>('/languages')
 }

@@ -196,3 +196,10 @@ data class ValidChronoBulkUpdateRequest(
     val ids: List<Long>,
     val status: ChronodayStatus,
 )
+
+data class FlashcardSetInitResponse(
+    val flashcardSet: FlashcardSetDto,
+    val flashcard: FlashcardDto,
+    val currDay: ChronodayDto,
+    val chronodays: List<ChronodayDto>,
+)

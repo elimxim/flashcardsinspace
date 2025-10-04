@@ -10,7 +10,7 @@ const authClient = axios.create({
 export default authClient
 
 export async function sendSignupRequest(name: string, email: string, password: string, languageId: number | undefined) {
-  console.log('Sending sign up request...')
+  console.log('[POST] request => sign up')
   return await authClient.post<User>('/signup', {
     email: email,
     secret: password,
@@ -20,7 +20,7 @@ export async function sendSignupRequest(name: string, email: string, password: s
 }
 
 export async function sendLoginRequest(email: string, password: string) {
-  console.log('Sending login request...')
+  console.log('[POST] request => login')
   return authClient.post<User>('/login', {
     email: email,
     secret: password,
@@ -28,11 +28,12 @@ export async function sendLoginRequest(email: string, password: string) {
 }
 
 export async function sendLogoutRequest() {
-  console.log('Sending log out request...')
+  console.log('[POST] request => log out')
   return await authClient.post('/logout')
 }
 
 export async function sendWhoAmIRequest() {
+  console.log('[GET] request => who am i')
   return await apiClient.get<User>('/users/me', {
     validateStatus: () => true,
   })

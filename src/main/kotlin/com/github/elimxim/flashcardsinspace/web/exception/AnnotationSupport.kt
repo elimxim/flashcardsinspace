@@ -18,8 +18,7 @@ fun getHttpStatus(e: HttpException): HttpStatus {
     }
 }
 
-fun getErrorCode(e: HttpException?): String {
-    if (e == null) return "######"
+fun getErrorCode(e: HttpException): String {
     val anno = findAnnotationInClassHierarchy<ErrorCode>(e::class)
     return anno?.value ?: "######"
 }

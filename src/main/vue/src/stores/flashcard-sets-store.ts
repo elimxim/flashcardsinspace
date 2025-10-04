@@ -52,9 +52,10 @@ export const useFlashcardSetsStore = defineStore('flashcard-sets', {
       })
       // todo handle errors
     },
-    overrideFlashcardSet(flashcardSet: FlashcardSet) {
-      const idx = this.flashcardSets.findIndex((v) => v.id == flashcardSet.id)
+    putFlashcardSet(flashcardSet: FlashcardSet) {
+      const idx = this.flashcardSets.findIndex((v: FlashcardSet) => v.id == flashcardSet.id)
       if (idx !== -1) {
+        console.log(`Updating flashcard set ${flashcardSet.id}`)
         this.flashcardSets[idx] = flashcardSet
       }
     },

@@ -44,7 +44,7 @@ export const useSpaceToaster = defineStore('space-toaster', {
         title: title,
         message: error?.message,
         footer: error?.errorCode,
-        duration: 8000,
+        duration: 4000,
       })
     },
     bakeSuccess(title: string, message: string, delay?: number) {

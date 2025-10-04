@@ -106,7 +106,13 @@ import {
   updateFlashcardSides
 } from '@/core-logic/flashcard-logic.ts'
 import { storeToRefs } from 'pinia'
-import { sendRemoveFlashcardRequest } from '@/api/api-client.ts'
+import {
+  sendChronoSyncRequest,
+  sendChronodayCreationRequest,
+  sendFlashcardRemovalRequest,
+  sendFlashcardCreationRequest,
+  sendFlashcardSetGetRequest, sendFlashcardSetInitRequest,
+} from '@/api/api-client.ts'
 
 const visible = defineModel<boolean>('visible', { default: false })
 const flashcard = defineModel<Flashcard | null>('flashcard', { default: null })
@@ -178,14 +184,16 @@ async function remove() {
   }
 }
 
-function create() {
+async function create() {
   $v.value.$touch()
   if (!formInvalid.value) {
-    addNewFlashcard()
-    if (!infiniteLoopButton.value?.isPressed()) {
-      toggleModalForm()
+    const added = await addNewFlashcard()
+    if (added) {
+      if (!infiniteLoopButton.value?.isPressed()) {
+        toggleModalForm()
+      }
+      resetState()
     }
-    resetState()
   }
 }
 
@@ -204,7 +212,7 @@ async function removeFlashcard(): Promise<boolean> {
   const setId = flashcardSet.value?.id
   const flashcardId = flashcard.value?.id
   if (setId && flashcardId) {
-    return await sendRemoveFlashcardRequest(setId, flashcardId).then(() => {
+    return await sendFlashcardRemovalRequest(setId, flashcardId).then(() => {
       flashcardSetStore.removeFlashcard(flashcardId)
       toaster.bakeSuccess('Success', 'Flashcard removed', 200)
       return true
@@ -217,24 +225,39 @@ async function removeFlashcard(): Promise<boolean> {
   }
 }
 
-async function addNewFlashcard() {
-  await flashcardSetStore.addFlashcard(
-    newFlashcard(
-      frontSide.value,
-      backSide.value,
-    )
-  ).then(async () => {
-    if (flashcardSet.value !== null && !isStarted.value) {
-      await chronoStore.addInitialChronoday(flashcardSet.value)
-        .then(async () => {
-          await flashcardSetStore.syncFlashcardSet().then(async () => {
-            if (flashcardSet.value != null) {
-              flashcardSetsStore.overrideFlashcardSet(flashcardSet.value)
-            }
-          })
-        })
-    }
-  })
+async function addNewFlashcard(): Promise<boolean> {
+  if (!flashcardSet.value) return false
+  const setId = flashcardSet.value.id
+  const flashcard = newFlashcard(frontSide.value, backSide.value)
+  if (isStarted.value) {
+    return await sendFlashcardCreationRequest(setId, flashcard)
+      .then((response) => {
+        flashcardSetStore.addFlashcard(response.data)
+        return true
+      })
+      .catch((error) => {
+        console.error(`Failed to add a flashcard to set ${setId}`, error.response?.data)
+        toaster.bakeError(`Couldn't add a flashcard`, error.response?.data)
+        return false
+      })
+  } else {
+    return await sendFlashcardSetInitRequest(setId, flashcard)
+      .then((response) => {
+        flashcardSetsStore.putFlashcardSet(response.data.flashcardSet)
+        flashcardSetStore.overrideFlashcardSet(response.data.flashcardSet)
+        flashcardSetStore.addNewFlashcard(flashcard)
+        chronoStore.addChronodays(
+          response.data.chronodays,
+          response.data.currDay
+        )
+        return true
+      })
+      .catch((error) => {
+        console.error(`Failed to init flashcard set ${setId}`, error.response?.data)
+        toaster.bakeError(`Couldn't add a flashcard`, error.response?.data)
+        return false
+      })
+  }
 }
 
 function updateFlashcard() {

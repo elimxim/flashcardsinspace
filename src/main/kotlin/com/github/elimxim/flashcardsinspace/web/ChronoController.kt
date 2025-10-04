@@ -2,7 +2,7 @@ package com.github.elimxim.flashcardsinspace.web
 
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.security.normalize
-import com.github.elimxim.flashcardsinspace.service.ChronodayService
+import com.github.elimxim.flashcardsinspace.service.ChronoService
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoBulkUpdateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncResponse
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*
 
 @Controller
 @RequestMapping("/api/flashcard-sets/{setId:\\d+}/chronodays")
-class ChronodayController(
-    private val chronodayService: ChronodayService,
+class ChronoController(
+    private val chronoService: ChronoService,
 ) {
     @PutMapping
     fun synchronizeChronodays(
@@ -23,7 +23,7 @@ class ChronodayController(
         @PathVariable setId: Long,
         @RequestBody request: ChronoSyncRequest,
     ): ResponseEntity<ChronoSyncResponse> {
-        val (currDay, chronodays) = chronodayService.sync(user, setId, request.normalize())
+        val (currDay, chronodays) = chronoService.sync(user, setId, request.normalize())
         return ResponseEntity.ok(ChronoSyncResponse(currDay, chronodays))
     }
 
@@ -31,13 +31,8 @@ class ChronodayController(
     fun addChronoday(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
-        @RequestParam initial: Boolean = false,
     ): ResponseEntity<ChronodayDto> {
-        val dto = if (initial) {
-            chronodayService.addInitial(user, setId)
-        } else {
-            chronodayService.addNext(user, setId)
-        }
+        val dto = chronoService.addNext(user, setId)
         return ResponseEntity.ok(dto)
     }
 
@@ -47,7 +42,7 @@ class ChronodayController(
         @PathVariable setId: Long,
         @RequestBody request: ChronoBulkUpdateRequest,
     ): ResponseEntity<List<ChronodayDto>> {
-        val chronodays = chronodayService.bulkUpdate(user, setId, request.normalize())
+        val chronodays = chronoService.bulkUpdate(user, setId, request.normalize())
         return ResponseEntity.ok(chronodays)
     }
 
@@ -57,7 +52,7 @@ class ChronodayController(
         @PathVariable setId: Long,
         @PathVariable id: Long
     ): ResponseEntity<Unit> {
-        chronodayService.remove(user, setId, id)
+        chronoService.remove(user, setId, id)
         return ResponseEntity.ok().build()
     }
 

@@ -38,6 +38,12 @@ export const useChronoStore = defineStore('chrono', {
     },
   },
   actions: {
+    addChronodays(chronodays: Chronoday[], currDay: Chronoday) {
+      console.log(`Adding ${chronodays.length} chronodays with curr day ${currDay.chronodate}`)
+      this.chronodays = chronodays
+      this.currDay = currDay
+      this.loaded = true
+    },
     async loadChronodays(flashcardSet: FlashcardSet): Promise<void> {
       this.resetState()
       const chronodaysRequest: ChronoSyncRequest = {

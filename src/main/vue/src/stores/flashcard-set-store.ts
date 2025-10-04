@@ -47,6 +47,10 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     },
   },
   actions: {
+    overrideFlashcardSet(flashcardSet: FlashcardSet) {
+      console.log(`Adding flashcard set ${flashcardSet.id}`)
+      this.flashcardSet = flashcardSet
+    },
     async loadFlashcardsFor(flashcardSet: FlashcardSet) {
       this.resetState()
       this.flashcardSet = flashcardSet
@@ -91,6 +95,11 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
         throw new Error(`Can't update flashcard set: it is null`)
       }
     },
+    addNewFlashcard(flashcard: Flashcard) {
+      console.log(`Adding flashcard ${flashcard.id} to set ${this.flashcardSet?.id}`)
+      this.checkState()
+      this.flashcardMap.set(flashcard.id, flashcard)
+    },
     async addFlashcard(flashcard: Flashcard): Promise<void> {
       if (this.flashcardSet !== null) {
         await apiClient.post<Flashcard>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards', flashcard).then(response => {
@@ -127,6 +136,11 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       this.flashcardSet = null
       this.flashcardMap = new Map()
       this.loaded = false
+    },
+    checkState() {
+      if (!this.flashcardSet) {
+        throw Error('State check: flashcard set must be set')
+      }
     },
   }
 })

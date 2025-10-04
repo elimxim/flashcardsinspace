@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
 
-private val log = LoggerFactory.getLogger(ChronodayService::class.java)
+private val log = LoggerFactory.getLogger(ChronoService::class.java)
 
 @Service
-class ChronodayService(
+class ChronoService(
     private val flashcardSetService: FlashcardSetService,
     private val flashcardSetRepository: FlashcardSetRepository,
     private val chronodayRepository: ChronodayRepository,
@@ -75,33 +75,6 @@ class ChronodayService(
                     """.trimOneLine()
             )
         return currDay to schedule
-    }
-
-    @Transactional
-    fun addInitial(user: User, setId: Long): ChronodayDto {
-        log.info("User ${user.id}: adding initial chronoday for flashcard set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-
-        val flashcardSet = flashcardSetService.getEntity(setId)
-        if (flashcardSet.chronodays.isNotEmpty()) {
-            throw FlashcardsSetAlreadyInitializedException(
-                "Flashcard set $setId is already initialized"
-            )
-        }
-
-        val now = ZonedDateTime.now()
-        flashcardSet.startedAt = now
-
-        val initial = Chronoday(
-            chronodate = now.toLocalDate(),
-            status = ChronodayStatus.INITIAL,
-            flashcardSet = flashcardSet,
-        )
-
-        flashcardSet.chronodays.add(initial)
-        val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
-        val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays)
-        return schedule.last()
     }
 
     @Transactional

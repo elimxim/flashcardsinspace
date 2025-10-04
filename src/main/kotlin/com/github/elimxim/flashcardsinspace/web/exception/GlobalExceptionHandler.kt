@@ -29,6 +29,7 @@ class GlobalExceptionHandler(private val messages: Messages) {
         val body = errorBody(
             status = HttpStatus.INTERNAL_SERVER_ERROR,
             path = request.getDescription(false).escapeHtml(),
+            exception = UnexpectedException("Unexpected error occurred", ex)
         )
 
         return ResponseEntity(body, body.httpStatus)
@@ -41,7 +42,7 @@ class GlobalExceptionHandler(private val messages: Messages) {
         val body = errorBody(
             status = httpStatus,
             path = request.getDescription(false).escapeHtml(),
-            e = e,
+            exception = e,
         )
 
         return ResponseEntity(body, httpStatus)
@@ -55,24 +56,24 @@ class GlobalExceptionHandler(private val messages: Messages) {
         val body = errorBody(
             status = httpStatus,
             path = request.getDescription(false).escapeHtml(),
-            e = e,
+            exception = e,
         )
 
         return ResponseEntity(body, httpStatus)
     }
 
-    fun errorBody(
+    private fun errorBody(
         status: HttpStatus,
         path: String,
-        e: HttpException? = null
+        exception: HttpException
     ): ErrorResponseBody {
         return ErrorResponseBody(
             timestamp = LocalDateTime.now(),
             httpStatus = status,
             statusCode = status.value(),
             statusError = status.reasonPhrase,
-            errorCode = getErrorCode(e),
-            message = messages.getMessage(e),
+            errorCode = getErrorCode(exception),
+            message = messages.getMessage(exception),
             path = path,
         )
     }

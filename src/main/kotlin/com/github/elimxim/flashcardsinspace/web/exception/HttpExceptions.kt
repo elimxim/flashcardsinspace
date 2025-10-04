@@ -1,6 +1,5 @@
 package com.github.elimxim.flashcardsinspace.web.exception
 
-import com.github.elimxim.flashcardsinspace.util.joinWithBraces
 import org.springframework.http.HttpStatus
 
 annotation class ExceptionHttpStatus(val value: HttpStatus)
@@ -36,6 +35,11 @@ sealed class InternalServerErrorException(
     msg: String, args: List<Any> = emptyList<Any>(), cause: Exception? = null
 ) : Http5xxException(args, msg, cause)
 
+
+@ErrorCode("UE00000")
+@UserMessageCode("user.message.error.unexpected")
+class UnexpectedException(msg: String, cause: Exception) : InternalServerErrorException(msg, cause = cause)
+
 @ErrorCode("VIJ6NK")
 @UserMessageCode("user.message.error.auth.failed")
 class AuthenticationFailedException(msg: String, cause: Exception) : UnauthorizedException(msg, cause = cause)
@@ -50,10 +54,9 @@ class UserNotFoundException(msg: String) : NotFoundException(msg)
 
 @ErrorCode("7FO2VL")
 @UserMessageCode("user.message.error.request.fields.invalid")
-class InvalidRequestFieldsException(msg: String, val fields: List<String>) :
-    BadRequestException(msg, listOf(fields.joinWithBraces()))
+class InvalidRequestFieldsException(msg: String, val fields: List<String>) : BadRequestException(msg)
 
-@ErrorCode("JFK90J")
+@ErrorCode("FSNFE1")
 @UserMessageCode("user.message.error.flashcardSet.notFound")
 class FlashcardSetNotFoundException(msg: String) : BadRequestException(msg)
 
@@ -69,7 +72,7 @@ class ChronodayNotFoundException(msg: String) : BadRequestException(msg)
 @UserMessageCode("user.message.error.language.notFound")
 class LanguageNotFoundException(msg: String) : BadRequestException(msg)
 
-@ErrorCode("2SP0RI")
+@ErrorCode("FSAIE1")
 @UserMessageCode("user.message.error.flashcardSet.alreadyInitialized")
 class FlashcardsSetAlreadyInitializedException(msg: String) : BadRequestException(msg)
 
@@ -85,7 +88,7 @@ class FlashcardSetNotStartedException(msg: String) : BadRequestException(msg)
 @UserMessageCode("user.message.error.auth.email.alreadyTaken")
 class EmailIsAlreadyTakenException(msg: String) : BadRequestException(msg)
 
-@ErrorCode("N7S44T")
+@ErrorCode("CCSE01")
 @UserMessageCode("user.message.error.chronodays.corrupted")
 class CorruptedChronoStateException(msg: String) : InternalServerErrorException(msg)
 
