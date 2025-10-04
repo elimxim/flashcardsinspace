@@ -5,7 +5,6 @@
     class="modal-overlay"
     role="dialog"
     tabindex="-1"
-    @keydown="handleKeydown"
   >
     <div ref="modalWindow" class="modal-window" tabindex="-1">
       <div class="modal-top-control">
@@ -27,7 +26,7 @@
 
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, ref, watch, onUnmounted, onMounted } from 'vue'
 
 const props = withDefaults(defineProps<{
   visible: boolean
@@ -73,7 +72,17 @@ watch(() => props.visible, (newVal) => {
   }
 })
 
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
+
 function handleKeydown(event: KeyboardEvent) {
+  if (!props.visible) return
+
   if (event.key === 'Escape') {
     event.preventDefault()
     event.stopPropagation()
