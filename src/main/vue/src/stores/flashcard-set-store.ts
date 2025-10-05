@@ -1,9 +1,6 @@
 import { type Flashcard, type FlashcardSet } from '@/model/flashcard.ts'
 import { defineStore } from 'pinia'
 import apiClient from '@/api/api-client.ts'
-import type {
-  FlashcardSetUpdateRequest,
-} from '@/api/communication.ts'
 import type { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
@@ -86,23 +83,6 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
         }).catch(error => {
           console.error(error)
         })
-      }
-    },
-    updateFlashcardSet(name?: string, language?: Language, first?: boolean) {
-      if (this.flashcardSet !== null) {
-        const request: FlashcardSetUpdateRequest = {
-          name: name,
-          languageId: language?.id,
-          default: first,
-        }
-        apiClient.put<FlashcardSet>('/flashcard-sets/' + this.flashcardSet.id, request).then(response => {
-          if (this.flashcardSet !== null) {
-            this.flashcardSet = response.data
-          }
-        })
-        // todo handle errors
-      } else {
-        throw new Error(`Can't update flashcard set: it is null`)
       }
     },
     addNewFlashcard(flashcard: Flashcard) {

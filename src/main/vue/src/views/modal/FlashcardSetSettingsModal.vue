@@ -80,7 +80,7 @@ import SmartButton from '@/components/SmartButton.vue'
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { helpers, maxLength, required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
@@ -93,7 +93,6 @@ import { FlashcardSet } from '@/model/flashcard.ts'
 import {
   sendFlashcardSetRemovalRequest,
   sendFlashcardSetUpdateRequest,
-  sendFlashcardsGetRequest
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { reloadFlashcardSetStore } from '@/core-logic/flashcard-logic.ts';
@@ -105,7 +104,6 @@ const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
 
 const { languages } = storeToRefs(languageStore)
-const { firstFlashcardSet } = storeToRefs(flashcardSetsStore)
 const { flashcardSet, language } = storeToRefs(flashcardSetStore)
 
 const curName = ref<string | undefined>(flashcardSet.value?.name)

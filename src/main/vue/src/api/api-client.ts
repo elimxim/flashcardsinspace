@@ -2,7 +2,7 @@ import axios from 'axios'
 import {
   ChronoSyncRequest,
   ChronoSyncResponse,
-  FlashcardSetInitResponse, type FlashcardSetUpdateRequest
+  FlashcardSetInitResponse,
 } from '@/api/communication.ts'
 import type { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 
