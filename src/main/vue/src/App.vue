@@ -53,7 +53,7 @@ const { isAuthenticated } = storeToRefs(authStore)
 
 onMounted(() => {
   loadLanguages().then(response => {
-    languageStore.addLanguages(response.data)
+    languageStore.loadState(response.data)
   }).catch(error => {
     console.error('Error loading languages:', error)
   })
