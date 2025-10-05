@@ -1,6 +1,6 @@
 <template>
   <Modal
-    :visible="visible"
+    :visible="modalStore.flashcardSetSettingsOpen"
     :on-press-exit="cancel"
     :on-press-enter="update"
     :on-press-delete="remove"
@@ -84,13 +84,11 @@ import { useVuelidate } from '@vuelidate/core'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { storeToRefs } from 'pinia'
-import { useGlobalStore } from '@/stores/global-store.ts'
+import { useModalStore } from '@/stores/modal-store.ts'
 import { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 
-const visible = defineModel<boolean>('visible', { default: false })
-
-const globalStore = useGlobalStore()
+const modalStore = useModalStore()
 const languageStore = useLanguageStore()
 const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
@@ -146,13 +144,13 @@ const curLanguageNotSet = computed(() =>
 
 function cancel() {
   resetState()
-  globalStore.toggleFlashcardSetSettingsModalForm()
+  modalStore.toggleFlashcardSetSettings()
 }
 
 async function remove() {
   await removeFlashcardSet()
   resetState()
-  globalStore.toggleFlashcardSetSettingsModalForm()
+  modalStore.toggleFlashcardSetSettings()
 }
 
 function update() {
@@ -161,7 +159,7 @@ function update() {
     if (!formInvalid.value) {
       updateFlashcardSet()
       resetState()
-      globalStore.toggleFlashcardSetSettingsModalForm()
+      modalStore.toggleFlashcardSetSettings()
     }
   }
 }

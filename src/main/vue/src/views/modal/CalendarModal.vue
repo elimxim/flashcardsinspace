@@ -1,6 +1,6 @@
 <template>
   <Modal
-    :visible="visible"
+    :visible="modalStore.calendarOpen"
     :on-press-exit="exit"
   >
     <div class="calendar calendar--theme">
@@ -79,11 +79,9 @@ import {
   chronodayStatuses
 } from '@/core-logic/chrono-logic.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
-import { useGlobalStore } from '@/stores/global-store.ts'
+import { useModalStore } from '@/stores/modal-store.ts'
 
-const visible = defineModel<boolean>('visible', { default: false })
-
-const globalStore = useGlobalStore()
+const modalStore = useModalStore()
 const chronoStore = useChronoStore()
 const flashcardSetStore = useFlashcardSetStore()
 
@@ -161,7 +159,7 @@ function canShowStages(day: CalendarDay): boolean {
 
 function exit() {
   currMonth.value = new Date(currDay.value.chronodate)
-  globalStore.toggleCalendarModalForm()
+  modalStore.toggleCalendar()
 }
 
 function switchToPrevDay() {

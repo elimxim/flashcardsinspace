@@ -24,7 +24,6 @@
     </div>
   </div>
   <FlashcardModificationModal
-    v-model:visible="flashcardEditModalFormOpen"
     v-model:flashcard="flashcard"
     v-model:removed="flashcardWasRemoved"
     edit-mode
@@ -35,7 +34,7 @@
 import SpaceCard from '@/components/SpaceCard.vue'
 import FlashcardModificationModal from '@/views/modal/FlashcardModificationModal.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useGlobalStore } from '@/stores/global-store.ts'
+import { useModalStore } from '@/stores/modal-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import { storeToRefs } from 'pinia'
 
@@ -52,11 +51,7 @@ const props = withDefaults(defineProps<{
   },
 })
 
-const globalStore = useGlobalStore()
-
-const {
-  flashcardEditModalFormOpen
-} = storeToRefs(globalStore)
+const modalStore = useModalStore()
 
 const deckReady = ref(false)
 const flashcardWasRemoved = ref(false)
@@ -108,7 +103,7 @@ watch(flashcardWasRemoved, (newVal) => {
 
 watch(flashcardWasEdited, (newVal) => {
   if (newVal) {
-    globalStore.toggleFlashcardEditModalForm()
+    modalStore.toggleFlashcardEdit()
     props.onFlashcardEdited()
     flashcardWasEdited.value = false
   }
@@ -123,7 +118,7 @@ onUnmounted(() => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
-  if (globalStore.isAnyModalFormOpen()) return
+  if (modalStore.isAnyModalOpen()) return
   if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
     event.stopPropagation()
     spaceCard.value?.flip()

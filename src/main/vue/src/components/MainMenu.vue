@@ -72,14 +72,10 @@
     </ul>
   </div>
 
-  <FlashcardSetSettingsModal
-    v-model:visible="flashcardSetSettingsModalFormOpen"/>
-  <FlashcardSetCreationModal
-    v-model:visible="flashcardSetCreationModalFormOpen"/>
-  <FlashcardModificationModal
-    v-model:visible="flashcardCreationModalFormOpen"/>
-  <CalendarModal
-    v-model:visible="calendarModalFormOpen"/>
+  <FlashcardSetSettingsModal/>
+  <FlashcardSetCreationModal/>
+  <FlashcardModificationModal/>
+  <CalendarModal/>
 </template>
 
 <script setup lang="ts">
@@ -93,14 +89,14 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, type ComputedRef, onMounted, ref } from 'vue'
 import { useReviewStore } from '@/stores/review-store.ts'
-import { useGlobalStore } from '@/stores/global-store.ts'
+import { useModalStore } from '@/stores/modal-store.ts'
 import { truncate } from '@/utils/string.ts'
 import { allStages, type Stage, specialStageSet } from '@/core-logic/stage-logic.ts'
 import { countFlashcards } from '@/core-logic/review-logic.ts'
 import router, { routeNames } from '@/router';
 import { saveSelectedSetId } from '@/cookies/cookies.ts'
 
-const globalStore = useGlobalStore()
+const modalStore = useModalStore()
 const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
 const reviewStore = useReviewStore()
@@ -110,12 +106,6 @@ const { flashcardSets, isEmpty: isNoFlashcardSets } = storeToRefs(flashcardSetsS
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 const { currDay } = storeToRefs(chronoStore)
 const { started: reviewStarted } = storeToRefs(reviewStore)
-const {
-  flashcardSetSettingsModalFormOpen,
-  flashcardSetCreationModalFormOpen,
-  flashcardCreationModalFormOpen,
-  calendarModalFormOpen
-} = storeToRefs(globalStore)
 
 const showFlashcardMenuItem = computed(() => flashcardSet.value !== null)
 const menuSelect = ref<HTMLSelectElement>()
@@ -164,25 +154,25 @@ const selectedFlashcardSet = computed({
 
 function onFlashcardSetSettingsClick() {
   if (!isNoFlashcardSets.value && !reviewStarted.value) {
-    globalStore.toggleFlashcardSetSettingsModalForm()
+    modalStore.toggleFlashcardSetSettings()
   }
 }
 
 function onFlashcardSetCreationClick() {
   if (!reviewStarted.value) {
-    globalStore.toggleFlashcardSetCreationModalForm()
+    modalStore.toggleFlashcardSetCreation()
   }
 }
 
 function onFlashcardCreationClick() {
   if (!isNoFlashcardSets.value && !reviewStarted.value) {
-    globalStore.toggleFlashcardCreationModalForm()
+    modalStore.toggleFlashcardCreation()
   }
 }
 
 function onCalendarClick() {
   if (!reviewStarted.value) {
-    globalStore.toggleCalendarModalForm()
+    modalStore.toggleCalendar()
   }
 }
 

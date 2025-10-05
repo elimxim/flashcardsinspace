@@ -111,13 +111,13 @@ import { ReviewMode } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { loadSelectedSetId } from '@/cookies/cookies.ts'
-import { useGlobalStore } from '@/stores/global-store.ts'
+import { useModalStore } from '@/stores/modal-store.ts'
 
 const props = defineProps<{
   stage?: Stage,
 }>()
 
-const globalStore = useGlobalStore()
+const modalStore = useModalStore()
 const chronoStore = useChronoStore()
 const reviewStore = useReviewStore()
 const flashcardSetStore = useFlashcardSetStore()
@@ -320,7 +320,7 @@ onBeforeRouteLeave(() => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
-  if (globalStore.isAnyModalFormOpen()) return
+  if (modalStore.isAnyModalOpen()) return
 
   if (event.key === 'Escape') {
     event.stopPropagation()

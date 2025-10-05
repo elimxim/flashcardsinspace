@@ -1,6 +1,6 @@
 <template>
   <Modal
-    :visible="visible"
+    :visible="modalStore.flashcardSetCreationOpen"
     :on-press-exit="cancel"
     :on-press-enter="create"
     :focus-on="nameInput"
@@ -70,13 +70,11 @@ import type { Language } from '@/model/language.ts'
 import { storeToRefs } from 'pinia'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { useReviewStore } from '@/stores/review-store.ts'
-import { useGlobalStore } from '@/stores/global-store.ts'
+import { useModalStore } from '@/stores/modal-store.ts'
 import { createFlashcardSet } from '@/core-logic/flashcard-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 
-const visible = defineModel<boolean>('visible', { default: false })
-
-const globalStore = useGlobalStore()
+const modalStore = useModalStore()
 const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
 const chronoStore = useChronoStore()
@@ -127,7 +125,7 @@ const languageNotSet = computed(() =>
 
 function cancel() {
   resetState()
-  globalStore.toggleFlashcardSetCreationModalForm()
+  modalStore.toggleFlashcardSetCreation()
 }
 
 function create() {
@@ -136,7 +134,7 @@ function create() {
     createNewFlashcardSet()
     reviewStore.finishReview()
     resetState()
-    globalStore.toggleFlashcardSetCreationModalForm()
+    modalStore.toggleFlashcardSetCreation()
   }
 }
 
