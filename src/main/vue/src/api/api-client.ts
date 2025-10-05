@@ -33,6 +33,11 @@ export async function sendFlashcardSetRemovalRequest(id: number) {
   return apiClient.delete(`/flashcard-sets/${id}`)
 }
 
+export async function sendFlashcardSetCreationRequest(flashcardSet: FlashcardSet) {
+  console.log(`[POST] request => create flashcard set`)
+  return apiClient.post<FlashcardSet>(`/flashcard-sets`, flashcardSet)
+}
+
 export async function sendFlashcardsGetRequest(setId: number) {
   console.log(`[GET] request => flashcards for set ${setId}`)
   return apiClient.get<Flashcard[]>(`/flashcard-sets/${setId}/flashcards`)
@@ -59,7 +64,7 @@ export async function sendChronoSyncRequest(setId: number) {
   }
 
   console.log(`[POST] request => chrono sync for set ${setId}`)
-  return apiClient.put<ChronoSyncResponse>(`/flashcard-sets/${setId}/chrono/sync`, request)
+  return apiClient.post<ChronoSyncResponse>(`/flashcard-sets/${setId}/chrono/sync`, request)
 }
 
 export async function sendChronoSyncNextDay(setId: number) {

@@ -69,16 +69,20 @@ import { useVuelidate } from '@vuelidate/core'
 import type { Language } from '@/model/language.ts'
 import { storeToRefs } from 'pinia'
 import { useLanguageStore } from '@/stores/language-store.ts'
-import { useReviewStore } from '@/stores/review-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { createFlashcardSet } from '@/core-logic/flashcard-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
+import {
+  sendChronoSyncRequest,
+  sendFlashcardSetCreationRequest
+} from '@/api/api-client.ts'
+import { useSpaceToaster } from '@/stores/toast-store.ts'
 
 const modalStore = useModalStore()
+const toaster = useSpaceToaster()
 const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
 const chronoStore = useChronoStore()
-const reviewStore = useReviewStore()
 const languageStore = useLanguageStore()
 
 const { languages } = storeToRefs(languageStore)
@@ -124,18 +128,43 @@ const languageNotSet = computed(() =>
 )
 
 function cancel() {
-  resetState()
   modalStore.toggleFlashcardSetCreation()
+  resetState()
 }
 
-function create() {
+async function create() {
   $v.value.$touch()
   if (!formInvalid.value) {
-    createNewFlashcardSet()
-    reviewStore.finishReview()
-    resetState()
-    modalStore.toggleFlashcardSetCreation()
+    const created = await createNewFlashcardSet()
+    if (created) {
+      modalStore.toggleFlashcardSetCreation()
+      resetState()
+    }
   }
+}
+
+async function createNewFlashcardSet(): Promise<boolean> {
+  if (!name.value || !language.value) return false
+
+  const newSet = createFlashcardSet(name.value, language.value)
+  return await sendFlashcardSetCreationRequest(newSet)
+    .then((response) => {
+      flashcardSetsStore.addSet(response.data)
+      flashcardSetStore.loadState(response.data, [])
+      return sendChronoSyncRequest(response.data.id)
+    })
+    .then((response) => {
+      chronoStore.loadState(
+        response.data.chronodays,
+        response.data.currDay,
+      )
+      return true
+    })
+    .catch((error) => {
+      console.error(`Failed to create flashcard set`, error.response?.data)
+      toaster.bakeError(`Couldn't create a flashcard set`, error.response?.data)
+      return false
+    })
 }
 
 function resetState() {
@@ -144,20 +173,6 @@ function resetState() {
   $v.value.$reset()
 }
 
-function createNewFlashcardSet() {
-  if (name.value && language.value) {
-    const newSet = createFlashcardSet(name.value, language.value)
-    flashcardSetsStore.addFlashcardSet(newSet).then(() => {
-      if (lastFlashcardSet.value !== null) {
-        flashcardSetStore.loadFlashcardsFor(lastFlashcardSet.value).then(() => {
-          if (flashcardSet.value !== null) {
-            chronoStore.loadChronodays(flashcardSet.value)
-          }
-        })
-      }
-    })
-  }
-}
 
 watch(name, () => {
   if (nameInvalid.value) {

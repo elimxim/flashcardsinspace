@@ -176,7 +176,7 @@ async function goPrevDay() {
   if (!chronoStore.canGoPrev()) return
   await sendChronoSyncPrevDay(flashcardSet.value.id)
     .then((response) => {
-      chronoStore.addChronodays(
+      chronoStore.loadState(
         response.data.chronodays,
         response.data.currDay,
       )
@@ -193,7 +193,7 @@ async function switchToNextDay() {
   if (!chronoStore.canGoNext()) return
   await sendChronoSyncNextDay(flashcardSet.value.id)
     .then((response) => {
-      chronoStore.addChronodays(
+      chronoStore.loadState(
         response.data.chronodays,
         response.data.currDay,
       )

@@ -10,7 +10,6 @@
     - Routing: URL should include the flashcard id
     - When going back on stage review, the flashcard animation should be shown
     - Missing animation on the last flashcard
-  - Modals refactoring
   - Inputs change "<> is required" to "<>" if it's required
 - UX:
   - Home page

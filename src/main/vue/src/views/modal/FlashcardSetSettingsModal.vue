@@ -95,7 +95,7 @@ import {
   sendFlashcardSetUpdateRequest,
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { reloadFlashcardSetStore } from '@/core-logic/flashcard-logic.ts';
+import { reloadFlashcardSetStores } from '@/core-logic/flashcard-logic.ts';
 
 const modalStore = useModalStore()
 const toaster = useSpaceToaster()
@@ -159,7 +159,7 @@ function cancel() {
 async function remove() {
   const removed = await removeFlashcardSet()
   if (removed) {
-    await reloadFlashcardSetStore()
+    await reloadFlashcardSetStores()
       .then(() => {
         modalStore.toggleFlashcardSetSettings()
         resetState()
@@ -213,7 +213,7 @@ async function updateFlashcardSet(): Promise<boolean> {
 
   return await sendFlashcardSetUpdateRequest(updatedSet.id, updatedSet)
     .then((response) => {
-      flashcardSetStore.changeFlashcardSet(response.data)
+      flashcardSetStore.changeSet(response.data)
       return true
     })
     .catch((error) => {

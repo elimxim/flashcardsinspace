@@ -241,9 +241,9 @@ async function addNewFlashcard(): Promise<boolean> {
     return await sendFlashcardSetInitRequest(setId, flashcard)
       .then((response) => {
         flashcardSetsStore.updateSet(response.data.flashcardSet)
-        flashcardSetStore.changeFlashcardSet(response.data.flashcardSet)
+        flashcardSetStore.changeSet(response.data.flashcardSet)
         flashcardSetStore.addNewFlashcard(flashcard)
-        chronoStore.addChronodays(
+        chronoStore.loadState(
           response.data.chronodays,
           response.data.currDay
         )

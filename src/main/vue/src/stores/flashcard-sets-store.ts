@@ -38,19 +38,8 @@ export const useFlashcardSetsStore = defineStore('flashcard-sets', {
       })
       // todo handle errors
     },
-    async addFlashcardSet(flashcardSet: FlashcardSet): Promise<void> {
-      const response = await apiClient.post<FlashcardSet>('/flashcard-sets', flashcardSet)
-      this.flashcardSets.push(response.data)
-      // todo handle errors
-    },
-    async removeFlashcardSet(flashcardSet: FlashcardSet): Promise<void> {
-      await apiClient.delete(`/flashcard-sets/${flashcardSet.id}`).then(() => {
-        const idx = this.flashcardSets.indexOf(flashcardSet, 0)
-        if (idx > -1) {
-          this.flashcardSets.splice(idx, 1)
-        }
-      })
-      // todo handle errors
+    addSet(flashcardSet: FlashcardSet) {
+      this.flashcardSets.push(flashcardSet)
     },
     removeSet(flashcardSet: FlashcardSet) {
       const idx = this.flashcardSets.indexOf(flashcardSet, 0)

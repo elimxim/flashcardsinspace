@@ -50,7 +50,7 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       this.flashcardMap = new Map(flashcards.map(v => [v.id, v]))
       this.loaded = true
     },
-    changeFlashcardSet(flashcardSet: FlashcardSet) {
+    changeSet(flashcardSet: FlashcardSet) {
       console.log(`Changing flashcard set ${flashcardSet.id}`)
       this.checkStateLoaded()
       if (this.flashcardSet?.id !== flashcardSet.id) {

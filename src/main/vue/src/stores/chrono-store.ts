@@ -37,8 +37,8 @@ export const useChronoStore = defineStore('chrono', {
     },
   },
   actions: {
-    addChronodays(chronodays: Chronoday[], currDay: Chronoday) {
-      console.log(`Adding ${chronodays.length} chronodays with curr day ${currDay.chronodate}`)
+    loadState(chronodays: Chronoday[], currDay: Chronoday) {
+      console.log(`Loading ${chronodays.length} chronodays with curr day ${currDay.chronodate}`)
       this.chronodays = chronodays
       this.currDay = currDay
       this.loaded = true
@@ -58,7 +58,7 @@ export const useChronoStore = defineStore('chrono', {
       // todo catch errors
     },
     canGoPrev(): boolean {
-      this.checkState()
+      this.checkStateLoaded()
       if (this.currDay.seqNumber === 0) {
         console.log('No prev day: current is initial')
         return false
@@ -73,7 +73,7 @@ export const useChronoStore = defineStore('chrono', {
       }
     },
     canGoNext(): boolean {
-      this.checkState()
+      this.checkStateLoaded()
       return true
     },
     async markLastDaysAsInProgress(flashcardSet: FlashcardSet) {
@@ -112,10 +112,8 @@ export const useChronoStore = defineStore('chrono', {
         )
       // todo handle errors
     },
-    checkState() {
-      if (!this.loaded) {
-        throw Error(`State check: chrono store isn't loaded`)
-      }
+    checkStateLoaded() {
+      if (!this.loaded) throw Error(`State check: chrono store isn't loaded`)
     },
     resetState() {
       this.chronodays = []
