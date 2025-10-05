@@ -50,7 +50,7 @@ export const useChronoStore = defineStore('chrono', {
         clientDatetime: new Date().toISOString()
       }
 
-      await apiClient.put<ChronoSyncResponse>('/flashcard-sets/' + flashcardSet.id + '/chronodays', chronodaysRequest)
+      await apiClient.post<ChronoSyncResponse>('/flashcard-sets/' + flashcardSet.id + '/chrono/sync', chronodaysRequest)
         .then(response => {
           this.chronodays = response.data.chronodays
           this.currDay = response.data.currDay
@@ -58,17 +58,24 @@ export const useChronoStore = defineStore('chrono', {
         })
       // todo catch errors
     },
-    async addInitialChronoday(flashcardSet: FlashcardSet): Promise<void> {
-      console.log(`Adding initial chronoday for flashcard set ${flashcardSet.id}`)
-      await apiClient.post<Chronoday>('/flashcard-sets/' + flashcardSet.id + '/chronodays?initial=true')
-        .then(response => {
-          console.log(`Added initial chronoday ${response.data.chronodate} for flashcard set ${flashcardSet.id}`)
-        })
-        // todo catch errors
-        .then(async () => {
-          await this.loadChronodays(flashcardSet)
-          console.log(`Reloaded chrono data for flashcard set ${flashcardSet.id}`)
-        })
+    canGoPrev(): boolean {
+      this.checkState()
+      if (this.currDay.seqNumber === 0) {
+        console.log('No prev day: current is initial')
+        return false
+      }
+
+      const prevIdx = this.currDay.seqNumber - 1
+      if (!this.chronodays[prevIdx]) {
+        console.log(`No prev day: couldn't find prev ${prevIdx}`)
+        return false
+      }else {
+        return true
+      }
+    },
+    canGoNext(): boolean {
+      this.checkState()
+      return true
     },
     switchToPrevDay() {
       if (this.currDay.seqNumber === 0) {
@@ -81,7 +88,7 @@ export const useChronoStore = defineStore('chrono', {
         const prev = this.chronodays[this.currDay.seqNumber - 1] as Chronoday | undefined
         if (prev !== undefined) {
           console.log(`Switching to prev day ${prev.chronodate}`)
-          apiClient.delete('/flashcard-sets/' + flashcardSet.id + '/chronodays/' + this.currDay.id)
+          apiClient.delete('/flashcard-sets/' + flashcardSet.id + '/chrono/' + this.currDay.id)
             // todo log response
             .then(() =>
               this.loadChronodays(flashcardSet)
@@ -101,7 +108,7 @@ export const useChronoStore = defineStore('chrono', {
         const next = this.chronodays[this.currDay.seqNumber] as Chronoday | undefined
         if (next !== undefined) {
           console.log(`Switching to next day ${next.chronodate}`)
-          apiClient.post<Chronoday>('/flashcard-sets/' + flashcardSet.id + '/chronodays')
+          apiClient.post<Chronoday>('/flashcard-sets/' + flashcardSet.id + '/chrono')
             // todo log response
             .then(() =>
               this.loadChronodays(flashcardSet)
@@ -143,12 +150,17 @@ export const useChronoStore = defineStore('chrono', {
         status: status
       }
 
-      await apiClient.put<Chronoday>('/flashcard-sets/' + flashcardSet.id + '/chronodays/bulk', request)
+      await apiClient.put<Chronoday>('/flashcard-sets/' + flashcardSet.id + '/chrono/bulk', request)
         .then(() =>
           // todo log response
           this.loadChronodays(flashcardSet)
         )
       // todo handle errors
+    },
+    checkState() {
+      if (!this.loaded) {
+        throw Error(`State check: chrono store isn't loaded`)
+      }
     },
     resetState() {
       this.chronodays = []

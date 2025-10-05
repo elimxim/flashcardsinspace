@@ -17,6 +17,8 @@ import java.time.ZonedDateTime
 
 private val log = LoggerFactory.getLogger(ChronoService::class.java)
 
+enum class ChronoSyncDay { NEXT, PREV }
+
 @Service
 class ChronoService(
     private val flashcardSetService: FlashcardSetService,
@@ -65,16 +67,7 @@ class ChronoService(
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
-        val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays)
-        val lastChronoDateStr = flashcardSet.lastChronoday()?.chronodate?.toString()
-        val currDay = schedule.find { it.chronodate == lastChronoDateStr }
-            ?: throw CorruptedChronoStateException(
-                """
-                    Can't find last chrono day $lastChronoDateStr 
-                    in schedule for flashcard set $setId
-                    """.trimOneLine()
-            )
-        return currDay to schedule
+        return applySchedule(updatedFlashcardSet)
     }
 
     @Transactional
@@ -111,6 +104,59 @@ class ChronoService(
         log.info("User ${user.id}: bulk updating chronodays for flashcard set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         return bulkUpdate(setId, requestValidator.validate(request))
+    }
+
+    @Transactional
+    fun syncDay(user: User, setId: Long, day: ChronoSyncDay): Pair<ChronodayDto, List<ChronodayDto>> {
+        log.info("User ${user.id}: chrono step $day for flashcard set $setId")
+        flashcardSetService.verifyUserHasAccess(user, setId)
+        return syncDay(setId, day)
+    }
+
+    @Transactional
+    fun syncDay(setId: Long, day: ChronoSyncDay): Pair<ChronodayDto, List<ChronodayDto>> {
+        val flashcardSet = flashcardSetService.getEntity(setId)
+        if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
+            throw FlashcardSetSuspendedException(
+                "Flashcard set $setId is suspended"
+            )
+        }
+
+        val lastChronoday = flashcardSet.lastChronoday()
+            ?: throw FlashcardSetNotStartedException(
+                "Flashcard set $setId is not started"
+            )
+
+        when (day) {
+            ChronoSyncDay.NEXT -> {
+                val chronoday = Chronoday(
+                    chronodate = lastChronoday.chronodate.plusDays(1),
+                    status = ChronodayStatus.NOT_STARTED,
+                    flashcardSet = flashcardSet,
+                )
+
+                flashcardSet.chronodays.add(chronoday)
+            }
+            ChronoSyncDay.PREV -> {
+                val hasReviews = flashcardSet.flashcards.any {
+                    it.lastReviewDate != null && !lastChronoday.chronodate.isAfter(it.lastReviewDate)
+                }
+
+                if (hasReviews) {
+                    throw NotRemovableChronodayException(
+                        """
+                    Can't remove last chronoday ${lastChronoday.id} from 
+                    flashcard set $setId with flashcards get reviewed on this date
+                    """.trimOneLine()
+                    )
+                }
+
+                flashcardSet.chronodays.remove(lastChronoday)
+            }
+        }
+
+        val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
+        return applySchedule(updatedFlashcardSet)
     }
 
     @Transactional
@@ -189,5 +235,18 @@ class ChronoService(
                     """.trimOneLine()
             )
         }
+    }
+
+    private fun applySchedule(flashcardSet: FlashcardSet): Pair<ChronodayDto, List<ChronodayDto>> {
+        val schedule = lightspeedService.createSchedule(flashcardSet.chronodays)
+        val lastChronoDateStr = flashcardSet.lastChronoday()?.chronodate?.toString()
+        val currDay = schedule.find { it.chronodate == lastChronoDateStr }
+            ?: throw CorruptedChronoStateException(
+                """
+                    Can't find last chrono day $lastChronoDateStr 
+                    in schedule for flashcard set ${flashcardSet.id}
+                    """.trimOneLine()
+            )
+        return currDay to schedule
     }
 }

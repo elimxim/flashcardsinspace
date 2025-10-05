@@ -51,7 +51,7 @@
       <SmartButton
         class="calendar-button"
         text="Prev"
-        :on-click="switchToPrevDay"
+        :on-click="goPrevDay"
         :disabled="!isDaySwitchPossible"
         auto-blur
       />
@@ -64,12 +64,14 @@
       />
     </div>
   </Modal>
+  <SpaceToast/>
 </template>
 
 <script setup lang="ts">
 import Modal from '@/components/Modal.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
+import SpaceToast from '@/components/SpaceToast.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
@@ -80,12 +82,19 @@ import {
 } from '@/core-logic/chrono-logic.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
+import { sendChronoSyncNextDay, sendChronoSyncPrevDay } from '@/api/api-client.ts'
+import { useSpaceToaster } from '@/stores/toast-store.ts';
 
 const modalStore = useModalStore()
+const toaster = useSpaceToaster()
 const chronoStore = useChronoStore()
 const flashcardSetStore = useFlashcardSetStore()
 
-const { isStarted, isSuspended } = storeToRefs(flashcardSetStore)
+const {
+  flashcardSet,
+  isStarted,
+  isSuspended,
+} = storeToRefs(flashcardSetStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
 
 const prevMonthButton = ref<HTMLButtonElement>()
@@ -162,14 +171,38 @@ function exit() {
   modalStore.toggleCalendar()
 }
 
-function switchToPrevDay() {
-  chronoStore.switchToPrevDay()
-  currMonth.value = new Date(currDay.value.chronodate)
+async function goPrevDay() {
+  if (!flashcardSet.value) return
+  if (!chronoStore.canGoPrev()) return
+  await sendChronoSyncPrevDay(flashcardSet.value.id)
+    .then((response) => {
+      chronoStore.addChronodays(
+        response.data.chronodays,
+        response.data.currDay,
+      )
+      currMonth.value = new Date(response.data.currDay.chronodate)
+    })
+    .catch((error) => {
+      console.error('Failed to sync prev day:', error)
+      toaster.bakeError(`Couldn't go to prev day`, error.response?.data)
+    })
 }
 
-function switchToNextDay() {
-  chronoStore.switchToNextDay()
-  currMonth.value = new Date(currDay.value.chronodate)
+async function switchToNextDay() {
+  if (!flashcardSet.value) return
+  if (!chronoStore.canGoNext()) return
+  await sendChronoSyncNextDay(flashcardSet.value.id)
+    .then((response) => {
+      chronoStore.addChronodays(
+        response.data.chronodays,
+        response.data.currDay,
+      )
+      currMonth.value = new Date(response.data.currDay.chronodate)
+    })
+    .catch((error) => {
+      console.error('Failed to sync next day:', error)
+      toaster.bakeError(`Couldn't go to next day`, error.response?.data)
+    })
 }
 
 const isDaySwitchPossible = computed(() =>

@@ -44,11 +44,16 @@ export async function sendChronoSyncRequest(setId: number) {
     clientDatetime: new Date().toISOString()
   }
 
-  console.log(`[PUT] request => sync chronodays for set ${setId}`)
-  return apiClient.put<ChronoSyncResponse>(`/flashcard-sets/${setId}/chronodays`, request)
+  console.log(`[POST] request => chrono sync for set ${setId}`)
+  return apiClient.put<ChronoSyncResponse>(`/flashcard-sets/${setId}/chrono/sync`, request)
 }
 
-export async function sendChronodayCreationRequest(setId: number) {
-  console.log(`[POST] request => add chronoday for set ${setId}`)
-  return apiClient.post<Chronoday>(`/flashcard-sets/${setId}/chronodays`)
+export async function sendChronoSyncNextDay(setId: number) {
+  console.log(`[POST] request => chrono sync next for set ${setId}`)
+  return apiClient.post<ChronoSyncResponse>(`/flashcard-sets/${setId}/chrono/sync/next`)
+}
+
+export async function sendChronoSyncPrevDay(setId: number) {
+  console.log(`[POST] request => chrono sync prev for set ${setId}`)
+  return apiClient.post<ChronoSyncResponse>(`/flashcard-sets/${setId}/chrono/sync/prev`)
 }
