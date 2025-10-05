@@ -86,8 +86,6 @@ const chronoStore = useChronoStore()
 const languageStore = useLanguageStore()
 
 const { languages } = storeToRefs(languageStore)
-const { lastFlashcardSet } = storeToRefs(flashcardSetsStore)
-const { flashcardSet } = storeToRefs(flashcardSetStore)
 
 const name = ref('')
 const nameInput = ref<HTMLElement>()
