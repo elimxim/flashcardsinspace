@@ -18,6 +18,9 @@
   - Bugreport form
   - Control Panel (instead of Main Menu)
     - Showing duplicated flashcards
+    - Uploading/downloading flashcards to/from csv
+    - Showing removed flashcard sets
+    - Showing removed flashcards
   - Flashcard
     - Copy button
     - Delete button
