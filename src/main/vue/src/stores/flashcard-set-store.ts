@@ -56,11 +56,6 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       this.flashcardSet = flashcardSet
       await this.loadFlashcards()
     },
-    async syncFlashcardSet(): Promise<void> {
-      if (this.flashcardSet !== null) {
-        return this.loadFlashcardSet(this.flashcardSet.id)
-      }
-    },
     async loadFlashcardSet(id: number): Promise<void> {
       await apiClient.get<FlashcardSet>('/flashcard-sets/' + id).then(response => {
         this.flashcardSet = response.data
@@ -100,15 +95,19 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       this.checkState()
       this.flashcardMap.set(flashcard.id, flashcard)
     },
-    async addFlashcard(flashcard: Flashcard): Promise<void> {
-      if (this.flashcardSet !== null) {
-        await apiClient.post<Flashcard>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards', flashcard).then(response => {
-          console.log(`Added flashcard ${response.data.id}`)
-          this.flashcardMap.set(response.data.id, response.data)
-        })
-        // todo handle errors
+    changeFlashcard(flashcard: Flashcard) {
+      console.log(`Updating flashcard ${flashcard.id} in set ${this.flashcardSet?.id}`)
+      this.checkState()
+      const currFlashcard = this.flashcardMap.get(flashcard.id) as Flashcard | undefined
+      if (currFlashcard) {
+        currFlashcard.frontSide = flashcard.frontSide
+        currFlashcard.backSide = flashcard.backSide
+        currFlashcard.stage = flashcard.stage
+        currFlashcard.reviewCount = flashcard.reviewCount
+        currFlashcard.reviewHistory = flashcard.reviewHistory
+        currFlashcard.lastUpdatedAt = flashcard.lastUpdatedAt
       } else {
-        console.error(`Can't add flashcard ${flashcard}: flashcard set is null`)
+        console.error(`Couldn't find flashcard ${flashcard.id} in the store to update it`)
       }
     },
     updateFlashcard(updateFlashcard: Flashcard) {
@@ -138,9 +137,8 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       this.loaded = false
     },
     checkState() {
-      if (!this.flashcardSet) {
-        throw Error('State check: flashcard set must be set')
-      }
+      if (!this.flashcardSet) throw Error(`State check: flashcard set must be set`)
+      if (!this.loaded) throw Error(`State check: flashcard set store isn't loaded`)
     },
   }
 })

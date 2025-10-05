@@ -107,11 +107,10 @@ import {
 } from '@/core-logic/flashcard-logic.ts'
 import { storeToRefs } from 'pinia'
 import {
-  sendChronoSyncRequest,
-  sendChronodayCreationRequest,
   sendFlashcardRemovalRequest,
   sendFlashcardCreationRequest,
-  sendFlashcardSetGetRequest, sendFlashcardSetInitRequest,
+  sendFlashcardSetInitRequest, sendFlashcardUpdateRequest,
+
 } from '@/api/api-client.ts'
 
 const visible = defineModel<boolean>('visible', { default: false })
@@ -197,22 +196,24 @@ async function create() {
   }
 }
 
-function update() {
+async function update() {
   if (stateChanged.value) {
     $v.value.$touch()
     if (!formInvalid.value) {
-      updateFlashcard()
-      resetState()
-      toggleModalForm()
+      const updated = await updateFlashcard()
+      if (updated) {
+        toggleModalForm()
+        resetState()
+      }
     }
   }
 }
 
 async function removeFlashcard(): Promise<boolean> {
-  const setId = flashcardSet.value?.id
-  const flashcardId = flashcard.value?.id
-  if (setId && flashcardId) {
-    return await sendFlashcardRemovalRequest(setId, flashcardId).then(() => {
+  if (!flashcardSet.value || !flashcard.value) return false
+  const flashcardId = flashcard.value.id
+  return await sendFlashcardRemovalRequest(flashcardSet.value.id, flashcardId)
+    .then(() => {
       flashcardSetStore.removeFlashcard(flashcardId)
       toaster.bakeSuccess('Success', 'Flashcard removed', 200)
       return true
@@ -220,9 +221,6 @@ async function removeFlashcard(): Promise<boolean> {
       toaster.bakeError('System error', error.response?.data)
       return false
     })
-  } else {
-    return false
-  }
 }
 
 async function addNewFlashcard(): Promise<boolean> {
@@ -232,7 +230,7 @@ async function addNewFlashcard(): Promise<boolean> {
   if (isStarted.value) {
     return await sendFlashcardCreationRequest(setId, flashcard)
       .then((response) => {
-        flashcardSetStore.addFlashcard(response.data)
+        flashcardSetStore.addNewFlashcard(response.data)
         return true
       })
       .catch((error) => {
@@ -260,17 +258,23 @@ async function addNewFlashcard(): Promise<boolean> {
   }
 }
 
-function updateFlashcard() {
-  if (flashcard.value) {
-    const updatedFlashcard = updateFlashcardSides(
-      flashcard.value,
-      frontSide.value,
-      backSide.value
-    )
-    flashcardSetStore.updateFlashcard(updatedFlashcard)
-  } else {
-    console.error("can't update an undefined flashcard")
-  }
+async function updateFlashcard(): Promise<boolean> {
+  if (!flashcardSet.value || !flashcard.value) return false
+  const updatedFlashcard = updateFlashcardSides(
+    flashcard.value,
+    frontSide.value,
+    backSide.value
+  )
+  return await sendFlashcardUpdateRequest(flashcardSet.value.id, updatedFlashcard)
+    .then((response) => {
+      flashcardSetStore.changeFlashcard(response.data)
+      return true
+    })
+    .catch((error) => {
+      console.error(`Failed to update flashcard ${updatedFlashcard.id}`, error.response?.data)
+      toaster.bakeError(`Couldn't change a flashcard`, error.response?.data)
+      return false
+    })
 }
 
 function toggleModalForm() {
