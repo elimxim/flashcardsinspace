@@ -52,11 +52,22 @@ export const useFlashcardSetsStore = defineStore('flashcard-sets', {
       })
       // todo handle errors
     },
-    putFlashcardSet(flashcardSet: FlashcardSet) {
+    removeSet(flashcardSet: FlashcardSet) {
+      const idx = this.flashcardSets.indexOf(flashcardSet, 0)
+      if (idx !== -1) {
+        console.log(`Removing flashcard set ${flashcardSet.id}`)
+        this.flashcardSets.splice(idx, 1)
+      } else {
+        throw Error(`Couldn't find flashcard set ${flashcardSet.id} in the store to remove`)
+      }
+    },
+    updateSet(flashcardSet: FlashcardSet) {
       const idx = this.flashcardSets.findIndex((v: FlashcardSet) => v.id == flashcardSet.id)
       if (idx !== -1) {
         console.log(`Updating flashcard set ${flashcardSet.id}`)
         this.flashcardSets[idx] = flashcardSet
+      } else {
+        throw Error(`Couldn't find flashcard set ${flashcardSet.id} in the store to update`)
       }
     },
   }

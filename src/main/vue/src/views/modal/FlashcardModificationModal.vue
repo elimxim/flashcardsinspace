@@ -240,8 +240,8 @@ async function addNewFlashcard(): Promise<boolean> {
   } else {
     return await sendFlashcardSetInitRequest(setId, flashcard)
       .then((response) => {
-        flashcardSetsStore.putFlashcardSet(response.data.flashcardSet)
-        flashcardSetStore.overrideFlashcardSet(response.data.flashcardSet)
+        flashcardSetsStore.updateSet(response.data.flashcardSet)
+        flashcardSetStore.changeFlashcardSet(response.data.flashcardSet)
         flashcardSetStore.addNewFlashcard(flashcard)
         chronoStore.addChronodays(
           response.data.chronodays,

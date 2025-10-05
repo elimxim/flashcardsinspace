@@ -47,9 +47,24 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     },
   },
   actions: {
-    overrideFlashcardSet(flashcardSet: FlashcardSet) {
-      console.log(`Adding flashcard set ${flashcardSet.id}`)
+    loadState(flashcardSet: FlashcardSet, flashcards: Flashcard[]) {
+      console.log(`Loading flashcard set ${flashcardSet.id} with ${flashcards.length} flashcards`)
       this.flashcardSet = flashcardSet
+      this.flashcardMap = new Map(flashcards.map(v => [v.id, v]))
+      this.loaded = true
+    },
+    changeFlashcardSet(flashcardSet: FlashcardSet) {
+      console.log(`Changing flashcard set ${flashcardSet.id}`)
+      this.checkStateLoaded()
+      if (this.flashcardSet?.id !== flashcardSet.id) {
+        throw Error(`Can't change flashcard set: (current id) ${this.flashcardSet?.id} != ${flashcardSet.id} (new id)`)
+      }
+      this.flashcardSet = flashcardSet
+    },
+    addFlashcards(flashcards: Flashcard[]) {
+      console.log(`Adding ${flashcards.length} flashcards to set ${this.flashcardSet?.id}`)
+      this.checkStateLoaded()
+      this.flashcardMap = new Map(flashcards.map(v => [v.id, v]))
     },
     async loadFlashcardsFor(flashcardSet: FlashcardSet) {
       this.resetState()
@@ -92,12 +107,12 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     },
     addNewFlashcard(flashcard: Flashcard) {
       console.log(`Adding flashcard ${flashcard.id} to set ${this.flashcardSet?.id}`)
-      this.checkState()
+      this.checkStateLoaded()
       this.flashcardMap.set(flashcard.id, flashcard)
     },
     changeFlashcard(flashcard: Flashcard) {
       console.log(`Updating flashcard ${flashcard.id} in set ${this.flashcardSet?.id}`)
-      this.checkState()
+      this.checkStateLoaded()
       const currFlashcard = this.flashcardMap.get(flashcard.id) as Flashcard | undefined
       if (currFlashcard) {
         currFlashcard.frontSide = flashcard.frontSide
@@ -136,7 +151,7 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       this.flashcardMap = new Map()
       this.loaded = false
     },
-    checkState() {
+    checkStateLoaded() {
       if (!this.flashcardSet) throw Error(`State check: flashcard set must be set`)
       if (!this.loaded) throw Error(`State check: flashcard set store isn't loaded`)
     },

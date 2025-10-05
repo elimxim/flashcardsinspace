@@ -70,6 +70,7 @@
       />
     </div>
   </Modal>
+  <SpaceToast/>
 </template>
 
 <script setup lang="ts">
@@ -78,7 +79,8 @@ import SmartInput from '@/components/SmartInput.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
-import { computed, ref, watch } from 'vue'
+import SpaceToast from '@/components/SpaceToast.vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { helpers, maxLength, required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
@@ -87,8 +89,17 @@ import { storeToRefs } from 'pinia'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
+import { FlashcardSet } from '@/model/flashcard.ts'
+import {
+  sendFlashcardSetRemovalRequest,
+  sendFlashcardSetUpdateRequest,
+  sendFlashcardsGetRequest
+} from '@/api/api-client.ts'
+import { useSpaceToaster } from '@/stores/toast-store.ts'
+import { reloadFlashcardSetStore } from '@/core-logic/flashcard-logic.ts';
 
 const modalStore = useModalStore()
+const toaster = useSpaceToaster()
 const languageStore = useLanguageStore()
 const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
@@ -143,23 +154,30 @@ const curLanguageNotSet = computed(() =>
 )
 
 function cancel() {
-  resetState()
   modalStore.toggleFlashcardSetSettings()
+  resetState()
 }
 
 async function remove() {
-  await removeFlashcardSet()
-  resetState()
-  modalStore.toggleFlashcardSetSettings()
+  const removed = await removeFlashcardSet()
+  if (removed) {
+    await reloadFlashcardSetStore()
+      .then(() => {
+        modalStore.toggleFlashcardSetSettings()
+        resetState()
+      })
+  }
 }
 
-function update() {
+async function update() {
   if (stateChanged.value) {
     $v.value.$touch()
     if (!formInvalid.value) {
-      updateFlashcardSet()
-      resetState()
-      modalStore.toggleFlashcardSetSettings()
+      const updated = await updateFlashcardSet()
+      if (updated) {
+        modalStore.toggleFlashcardSetSettings()
+        resetState()
+      }
     }
   }
 }
@@ -171,20 +189,40 @@ function resetState() {
   curFirst.value = flashcardSet.value?.default
 }
 
-async function removeFlashcardSet() {
-  if (flashcardSet.value !== null) {
-    flashcardSetsStore.removeFlashcardSet(flashcardSet.value).then(() => {
-      if (firstFlashcardSet.value !== null) {
-        flashcardSetStore.loadFlashcardsFor(firstFlashcardSet.value)
-      } else {
-        flashcardSetStore.resetState()
-      }
+async function removeFlashcardSet(): Promise<boolean> {
+  if (!flashcardSet.value) return false
+
+  const removedSet = flashcardSet.value
+  return await sendFlashcardSetRemovalRequest(removedSet.id)
+    .then(() => {
+      flashcardSetsStore.removeSet(removedSet)
+      return true
     })
-  }
+    .catch((error) => {
+      console.error(`Failed to remove flashcard set ${removedSet.id}`, error)
+      toaster.bakeError(`Couldn't remove flashcard set`, error.response?.data)
+      return false
+    })
 }
 
-function updateFlashcardSet() {
-  flashcardSetStore.updateFlashcardSet(curName.value, curLanguage.value, curFirst.value)
+async function updateFlashcardSet(): Promise<boolean> {
+  if (!flashcardSet.value) return false
+
+  const updatedSet: FlashcardSet = JSON.parse(JSON.stringify(flashcardSet.value));
+  updatedSet.name = curName.value ?? updatedSet.name
+  updatedSet.languageId = curLanguage.value?.id ?? updatedSet.languageId
+  updatedSet.default = curFirst.value ?? updatedSet.default
+
+  return await sendFlashcardSetUpdateRequest(updatedSet.id, updatedSet)
+    .then((response) => {
+      flashcardSetStore.changeFlashcardSet(response.data)
+      return true
+    })
+    .catch((error) => {
+      console.error(`Failed to update flashcard set ${updatedSet.id}`, error)
+      toaster.bakeError(`Couldn't update flashcard set`, error.response?.data)
+      return false
+    })
 }
 
 watch(flashcardSet, (newVal) => {

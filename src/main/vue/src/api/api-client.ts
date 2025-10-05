@@ -2,7 +2,7 @@ import axios from 'axios'
 import {
   ChronoSyncRequest,
   ChronoSyncResponse,
-  FlashcardSetInitResponse
+  FlashcardSetInitResponse, type FlashcardSetUpdateRequest
 } from '@/api/communication.ts'
 import type { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 
@@ -21,6 +21,21 @@ export async function sendFlashcardSetInitRequest(id: number, flashcard: Flashca
 export async function sendFlashcardSetGetRequest(id: number) {
   console.log(`[GET] request => flashcard set ${id}`)
   return apiClient.get<FlashcardSet>(`/flashcard-sets/${id}`)
+}
+
+export async function sendFlashcardSetUpdateRequest(id: number, flashcardSet: FlashcardSet) {
+  console.log(`[PUT] request => flashcard set ${id}`)
+  return apiClient.put<FlashcardSet>(`/flashcard-sets/${id}`, flashcardSet)
+}
+
+export async function sendFlashcardSetRemovalRequest(id: number) {
+  console.log(`[DELETE] request => flashcard set ${id}`)
+  return apiClient.delete(`/flashcard-sets/${id}`)
+}
+
+export async function sendFlashcardsGetRequest(setId: number) {
+  console.log(`[GET] request => flashcards for set ${setId}`)
+  return apiClient.get<Flashcard[]>(`/flashcard-sets/${setId}/flashcards`)
 }
 
 export async function sendFlashcardCreationRequest(setId: number, flashcard: Flashcard) {
