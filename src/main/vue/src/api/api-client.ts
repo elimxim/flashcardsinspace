@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { Chronoday } from '@/model/chrono.ts'
 import {
   ChronoSyncRequest,
   ChronoSyncResponse,

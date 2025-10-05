@@ -46,15 +46,6 @@ class ChronoController(
         return ResponseEntity.ok(ChronoSyncResponse(currDay, chronodays))
     }
 
-    @PostMapping
-    fun addChronoday(
-        @AuthenticationPrincipal user: User,
-        @PathVariable setId: Long,
-    ): ResponseEntity<ChronodayDto> {
-        val dto = chronoService.addNext(user, setId)
-        return ResponseEntity.ok(dto)
-    }
-
     @PutMapping("/bulk")
     fun bulkUpdateChronodays(
         @AuthenticationPrincipal user: User,
@@ -63,16 +54,6 @@ class ChronoController(
     ): ResponseEntity<List<ChronodayDto>> {
         val chronodays = chronoService.bulkUpdate(user, setId, request.normalize())
         return ResponseEntity.ok(chronodays)
-    }
-
-    @DeleteMapping("/{id:\\d+}")
-    fun removeChronoday(
-        @AuthenticationPrincipal user: User,
-        @PathVariable setId: Long,
-        @PathVariable id: Long
-    ): ResponseEntity<Unit> {
-        chronoService.remove(user, setId, id)
-        return ResponseEntity.ok().build()
     }
 
 }

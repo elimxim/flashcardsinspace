@@ -36,7 +36,6 @@ import FlashcardModificationModal from '@/views/modal/FlashcardModificationModal
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
-import { storeToRefs } from 'pinia'
 
 const flashcard = defineModel<Flashcard | null>('flashcard', { default: null })
 

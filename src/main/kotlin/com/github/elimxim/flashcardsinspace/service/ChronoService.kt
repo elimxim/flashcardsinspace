@@ -71,35 +71,6 @@ class ChronoService(
     }
 
     @Transactional
-    fun addNext(user: User, setId: Long): ChronodayDto {
-        log.info("User ${user.id}: adding next chronoday for flashcard set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-
-        val flashcardSet = flashcardSetService.getEntity(setId)
-        if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
-            throw FlashcardSetSuspendedException(
-                "Flashcard set $setId is suspended"
-            )
-        }
-
-        val lastChronoday = flashcardSet.lastChronoday()
-            ?: throw FlashcardSetNotStartedException(
-                "Flashcard set $setId is not started"
-            )
-
-        val chronoday = Chronoday(
-            chronodate = lastChronoday.chronodate.plusDays(1),
-            status = ChronodayStatus.NOT_STARTED,
-            flashcardSet = flashcardSet,
-        )
-
-        flashcardSet.chronodays.add(chronoday)
-        val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
-        val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays)
-        return schedule.last()
-    }
-
-    @Transactional
     fun bulkUpdate(user: User, setId: Long, request: ChronoBulkUpdateRequest): List<ChronodayDto> {
         log.info("User ${user.id}: bulk updating chronodays for flashcard set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
@@ -183,40 +154,6 @@ class ChronoService(
         val chronodays = updateFlashcardSet.chronodays.filter { it.id in request.ids }
         val schedule = lightspeedService.createSchedule(chronodays, daysAhead = 0)
         return schedule
-    }
-
-    @Transactional
-    fun remove(user: User, setId: Long, id: Long) {
-        log.info("User ${user.id}: removing chronoday $id from set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        verifyUserOperation(user, setId, id)
-
-        val chronoday = getEntity(id)
-        val flashcardSet = chronoday.flashcardSet
-        val lastChronoday = flashcardSet.lastChronoday()
-        if (!chronoday.chronodate.isEqual(lastChronoday?.chronodate)) {
-            throw NotRemovableChronodayException(
-                "Chronoday $id is not the last one in set $setId"
-            )
-        }
-
-        if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
-            throw FlashcardSetSuspendedException(
-                "Flashcard set $setId is suspended"
-            )
-        }
-
-        val isNotRemovable = flashcardSet.flashcards
-            .any { it.lastReviewDate != null && !chronoday.chronodate.isAfter(it.lastReviewDate) }
-
-        if (isNotRemovable) {
-            throw NotRemovableChronodayException(
-                "Can't remove chronoday $id from flashcard set $setId with flashcards get reviewed on this date"
-            )
-        }
-
-        flashcardSet.chronodays.remove(chronoday)
-        chronodayRepository.delete(chronoday)
     }
 
     @Transactional

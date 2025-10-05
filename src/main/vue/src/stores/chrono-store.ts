@@ -10,7 +10,6 @@ import type {
   ChronoBulkUpdateRequest, ChronodayId,
 } from '@/api/communication.ts'
 import type { FlashcardSet } from '@/model/flashcard.ts'
-import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import {
   chronodayStatuses,
   isCompleteAvailable,
@@ -69,57 +68,13 @@ export const useChronoStore = defineStore('chrono', {
       if (!this.chronodays[prevIdx]) {
         console.log(`No prev day: couldn't find prev ${prevIdx}`)
         return false
-      }else {
+      } else {
         return true
       }
     },
     canGoNext(): boolean {
       this.checkState()
       return true
-    },
-    switchToPrevDay() {
-      if (this.currDay.seqNumber === 0) {
-        console.log("can't switch to prev day: no prev day")
-        return
-      }
-      const flashcardSetStore = useFlashcardSetStore()
-      const flashcardSet = flashcardSetStore.flashcardSet
-      if (flashcardSet !== null) {
-        const prev = this.chronodays[this.currDay.seqNumber - 1] as Chronoday | undefined
-        if (prev !== undefined) {
-          console.log(`Switching to prev day ${prev.chronodate}`)
-          apiClient.delete('/flashcard-sets/' + flashcardSet.id + '/chrono/' + this.currDay.id)
-            // todo log response
-            .then(() =>
-              this.loadChronodays(flashcardSet)
-            )
-          // todo catch errors
-        } else {
-          console.log("can't switch to prev day: no prev day")
-        }
-      } else {
-        console.log("can't switch to prev day: flashcard set is null")
-      }
-    },
-    switchToNextDay() {
-      const flashcardSetStore = useFlashcardSetStore()
-      const flashcardSet = flashcardSetStore.flashcardSet
-      if (flashcardSet !== null) {
-        const next = this.chronodays[this.currDay.seqNumber] as Chronoday | undefined
-        if (next !== undefined) {
-          console.log(`Switching to next day ${next.chronodate}`)
-          apiClient.post<Chronoday>('/flashcard-sets/' + flashcardSet.id + '/chrono')
-            // todo log response
-            .then(() =>
-              this.loadChronodays(flashcardSet)
-            )
-          // todo catch errors
-        } else {
-          // todo do smth
-        }
-      } else {
-        // todo smth
-      }
     },
     async markLastDaysAsInProgress(flashcardSet: FlashcardSet) {
       if (isInProgressAvailable(this.currDay)) {
