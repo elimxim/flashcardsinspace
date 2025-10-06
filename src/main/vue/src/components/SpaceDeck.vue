@@ -1,9 +1,9 @@
 <template>
   <div class="space-deck">
-    <div v-if="flashcard" class="flashcard-deck">
+    <div class="flashcard-deck">
       <transition :name="cardTransition">
         <SpaceCard
-          v-if="deckReady"
+          v-if="flashcard && deckReady"
           ref="spaceCard"
           :key="flashcard ? flashcard.id : 0"
           :stage="flashcard?.stage"
@@ -12,15 +12,14 @@
           :viewed-times="viewedTimes"
           :on-edit="() => flashcardWasEdited = true"
         />
+        <SpaceCard
+          v-else
+          front-side="No more flashcards for review"
+          unflippable
+          text-only
+          transparent
+        />
       </transition>
-    </div>
-    <div v-else class="flashcard-deck">
-      <SpaceCard
-        front-side="No more flashcards for review"
-        unflippable
-        text-only
-        transparent
-      />
     </div>
   </div>
   <FlashcardModificationModal
