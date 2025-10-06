@@ -72,6 +72,9 @@
   --calendar-button--bg-color: #3f0083;
   --calendar-button--bg-color--hover: #5b00bd;
 
+  --move-back-button--bg-color: #0d124a;
+  --move-back-button--bg-color--hover: #171e87;
+
   /* calendar */
   --calendar--weekday--color: #6b7280;
   --calendar--weekday--border-color: rgba(0, 0, 0, 0.06);

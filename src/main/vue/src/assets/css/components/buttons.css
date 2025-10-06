@@ -27,3 +27,12 @@
   --smart-button--bg-color: var(--calendar-button--bg-color);
   --smart-button--bg-color--hover: var(--calendar-button--bg-color--hover);
 }
+
+.review-button {
+  --smart-button--width: 120px;
+}
+
+.move-back-button {
+  --smart-button--bg-color: var(--move-back-button--bg-color);
+  --smart-button--bg-color--hover: var(--move-back-button--bg-color--hover);
+}

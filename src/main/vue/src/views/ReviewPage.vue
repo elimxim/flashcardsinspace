@@ -3,6 +3,7 @@
     :class="[
       'page',
       'page--x-centered',
+      'page--y-centered',
       'page--min-padded',
     ]"
   >
@@ -32,66 +33,81 @@
         v-model:flashcard="currFlashcard"
         :on-flashcard-removed="onFlashcardRemoved"
       />
-      <div v-if="settings.mode === ReviewMode.LIGHTSPEED" class="flashcard-nav">
-        <button
+      <div class="flashcard-nav">
+        <SmartButton
+          v-if="settings.mode === ReviewMode.LIGHTSPEED"
           ref="stageDownButton"
-          class="nav-button nav-red-button"
+          text="Don't know"
+          class="review-button remove-button"
           :disabled="reviewFinished"
           :hidden="reviewFinished"
-          @click="stageDown">
-          Don't know
-        </button>
-        <button
+          :on-click="stageDown"
+          auto-blur
+          rounded
+        />
+        <SmartButton
+          v-if="settings.mode === ReviewMode.LIGHTSPEED"
           ref="stageUpButton"
-          class="nav-button nav-green-button"
-          :class="{ 'nav-button-disabled': editFormWasOpened }"
+          text="Know"
+          class="review-button create-button"
           :disabled="editFormWasOpened || reviewFinished"
           :hidden="reviewFinished"
-          @click="stageUp">
-          Know
-        </button>
-      </div>
-      <div v-if="settings.mode === ReviewMode.SPECIAL" class="flashcard-nav">
-        <button
+          :on-click="stageUp"
+          auto-blur
+          rounded
+        />
+        <SmartButton
+          v-if="settings.mode === ReviewMode.SPECIAL"
           ref="prevButton"
-          class="nav-button nav-blue-button"
-          :hidden="reviewFinished"
-          @click="prev">
-          Prev
-        </button>
-        <button
+          class="review-button update-button"
+          text="Prev"
+          :on-click="prev"
+          auto-blur
+          rounded
+        />
+        <SmartButton
+          v-if="settings.mode === ReviewMode.SPECIAL"
           ref="nextButton"
-          class="nav-button nav-blue-button"
+          class="review-button update-button"
+          text="Next"
           :disabled="reviewFinished"
           :hidden="reviewFinished"
-          @click="next">
-          Next
-        </button>
-      </div>
-      <div v-if="settings.mode === ReviewMode.SPACE" class="flashcard-nav">
-        <button
+          :on-click="next"
+          auto-blur
+          rounded
+        />
+        <SmartButton
+          v-if="settings.mode === ReviewMode.SPACE"
           ref="prevButton"
-          class="nav-button nav-blue-button"
-          :hidden="reviewFinished"
-          @click="prev">
-          Prev
-        </button>
-        <button
+          class="review-button update-button"
+          text="Prev"
+          :on-click="prev"
+          auto-blur
+          rounded
+        />
+        <SmartButton
+          v-if="settings.mode === ReviewMode.SPACE"
           ref="moveBackButton"
-          class="nav-button nav-black-button"
+          class="review-button move-back-button"
+          text="Move back"
           :disabled="reviewFinished"
           :hidden="reviewFinished"
-          @click="moveBack">
-          Move back
-        </button>
-        <button
+          :on-click="moveBack"
+          :hold-time="1.2"
+          auto-blur
+          rounded
+        />
+        <SmartButton
+          v-if="settings.mode === ReviewMode.SPACE"
           ref="nextButton"
-          class="nav-button nav-blue-button"
+          class="review-button update-button"
+          text="Next"
           :disabled="reviewFinished"
           :hidden="reviewFinished"
-          @click="next">
-          Next
-        </button>
+          :on-click="next"
+          auto-blur
+          rounded
+        />
       </div>
     </div>
   </div>
@@ -100,6 +116,7 @@
 <script setup lang="ts">
 import Progressbar from '@/components/Progressbar.vue'
 import SpaceDeck from '@/components/SpaceDeck.vue'
+import SmartButton from '@/components/SmartButton.vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -117,12 +134,12 @@ const props = defineProps<{
   stage?: Stage,
 }>()
 
+const router = useRouter()
 const modalStore = useModalStore()
 const chronoStore = useChronoStore()
 const reviewStore = useReviewStore()
 const flashcardSetStore = useFlashcardSetStore()
 
-const router = useRouter()
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 const {
   loaded,
@@ -139,8 +156,8 @@ const progress = ref(0)
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 const escapeButton = ref<HTMLButtonElement>()
-const stageDownButton = ref<HTMLButtonElement>()
-const stageUpButton = ref<HTMLButtonElement>()
+const stageDownButton = ref<InstanceType<typeof SmartButton>>()
+const stageUpButton = ref<InstanceType<typeof SmartButton>>()
 const prevButton = ref<HTMLButtonElement>()
 const nextButton = ref<HTMLButtonElement>()
 const moveBackButton = ref<HTMLButtonElement>()
@@ -184,7 +201,6 @@ async function stageDown() {
       calcProgress()
     }
   }
-  stageDownButton.value?.blur()
 }
 
 async function stageUp() {
@@ -206,7 +222,6 @@ async function stageUp() {
       calcProgress()
     }
   }
-  stageUpButton.value?.blur()
 }
 
 async function prev() {
@@ -365,8 +380,8 @@ function handleKeydown(event: KeyboardEvent) {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 2rem;
-  gap: 20px;
+  height: fit-content;
+  gap: 10px;
 }
 
 .nav-button {
