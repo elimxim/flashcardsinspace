@@ -405,7 +405,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .calendar-day__top__number {
-  font-weight: bold;
+  font-weight: 800;
   font-size: clamp(0.8rem, 2vw, 1rem);
 }
 
@@ -418,7 +418,8 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .calendar-day__stages {
-  font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+  font-weight: 550;
+  font-size: clamp(0.7rem, 1.8vw, 0.8rem);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

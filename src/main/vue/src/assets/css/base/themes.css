@@ -88,11 +88,11 @@
   --calendar--day--completed--bg-color: rgba(14, 165, 57, 0.66);
   --calendar--day--completed--stripe-color: rgba(11, 184, 49, 0.55);
   --calendar--day--in-progress--color: #e5e7eb;
-  --calendar--day--in-progress--bg-color: rgba(55, 155, 255, 0.78);
-  --calendar--day--in-progress--stripe-color: rgba(36, 109, 255, 0.91);
-  --calendar--day--not-started--color: #e5e7eb;
-  --calendar--day--not-started--bg-color: rgba(57, 110, 131, 0.46);
-  --calendar--day--not-started--stripe-color: rgba(30, 93, 115, 0.26);
+  --calendar--day--in-progress--bg-color: rgba(49, 121, 205, 0.55);
+  --calendar--day--in-progress--stripe-color: rgba(64, 111, 204, 0.17);
+  --calendar--day--not-started--color: #5a5a5a;
+  --calendar--day--not-started--bg-color: rgba(0, 79, 104, 0.1);
+  --calendar--day--not-started--stripe-color: rgba(30, 93, 115, 0.04);
   --calendar--day--off--bg-color: rgba(67, 147, 138, 0.86);
 
   /* icons */
