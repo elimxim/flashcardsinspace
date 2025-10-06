@@ -48,7 +48,8 @@
   /*--smart-button--color: white;*/
   /*--smart-button--border-color: transparent;*/
   /*--smart-button--border-width: 0;*/
-  /*--smart-button-border-radius: 3px;*/
+  /*--smart-button--border-radius: 3px;*/
+  /*--smart-button--width: 100px;*/
 
   --smart-button--color--disabled: #a3a3a3;
   --smart-button--bg-color--disabled: #C8C8C8FF;

@@ -2,8 +2,13 @@
   <button
     ref="button"
     class="smart-button smart-button--theme transition--bg-color"
-    :class="{ 'smart-button--disabled': disabled }"
+    :class="{
+      'smart-button--disabled': disabled,
+      'smart-button--rounded': rounded,
+      'smart-button--fill-width': fillWidth,
+    }"
     :disabled="disabled"
+    :hidden="hidden"
     v-bind="$attrs"
     @mousedown="startHold"
     @mouseup="cancelHold"
@@ -22,6 +27,7 @@ import { computed, ref } from 'vue'
 const props = withDefaults(defineProps<{
   text: string,
   disabled?: boolean
+  hidden?: boolean
   rounded?: boolean
   holdTime?: number
   autoBlur?: boolean
@@ -29,6 +35,7 @@ const props = withDefaults(defineProps<{
   onClick?: () => void
 }>(), {
   disabled: false,
+  hidden: false,
   rounded: false,
   holdTime: 0,
   autoBlur: false,
@@ -43,13 +50,6 @@ let pressStartTime: number | null = null
 
 const button = ref<HTMLButtonElement>()
 const progress = ref(0)
-const width = computed(() => {
-  if (props.fillWidth) {
-    return '100%'
-  } else {
-    return '100px'
-  }
-})
 const progressPercentage = computed(() => `${progress.value * 100}%`)
 
 function click() {
@@ -104,6 +104,10 @@ function updateProgress() {
   }
 }
 
+defineExpose({
+  click
+})
+
 </script>
 
 <style scoped>
@@ -112,7 +116,8 @@ function updateProgress() {
   --btn--color: var(--smart-button--color, white);
   --btn--border-color: var(--smart-button--border-color, transparent);
   --btn--border-width: var(--smart-button--border-width, 0);
-  --btn--border-radius: var(--smart-button-border-radius, 3px);
+  --btn--border-radius: var(--smart-button--border-radius, 3px);
+  --btn--width: var(--smart-button--width, 100px);
   --btn--bg-color: var(--smart-button--bg-color, #323232);
   --btn--bg-color--hover: var(--smart-button--bg-color--hover, #515151);
   --btn--color--disabled: var(--smart-button--color--disabled, #a3a3a3);
@@ -124,11 +129,12 @@ function updateProgress() {
   color: var(--btn--color);
   border-color: var(--btn--border-color);
   border-width: var(--btn--border-width);
+  border-style: solid;
   border-radius: var(--btn--border-radius);
   background-color: var(--btn--bg-color);
   position: relative;
   font-size: 16px;
-  width: v-bind(width);
+  width: var(--btn--width);
   height: 40px;
   cursor: pointer;
   z-index: 1;
@@ -157,6 +163,14 @@ function updateProgress() {
   color: var(--btn--color--disabled);
   background-color: var(--btn--bg-color--disabled);
   cursor: default;
+}
+
+.smart-button--rounded {
+  --smart-button--border-radius: 9999px;
+}
+
+.smart-button--fill-width {
+  --smart-button--width: 100%;
 }
 
 </style>
