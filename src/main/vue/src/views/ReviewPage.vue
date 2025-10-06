@@ -87,7 +87,6 @@
         />
         <SmartButton
           v-if="settings.mode === ReviewMode.SPACE"
-          ref="moveBackButton"
           class="review-button move-back-button"
           text="Move back"
           :disabled="reviewFinished"
@@ -154,14 +153,11 @@ const flashcardsTotal = ref(0)
 const progress = ref(0)
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
-
-const escapeButton = ref<HTMLButtonElement>()
+const escapeButton = ref<InstanceType<typeof SmartButton>>()
 const stageDownButton = ref<InstanceType<typeof SmartButton>>()
 const stageUpButton = ref<InstanceType<typeof SmartButton>>()
-const prevButton = ref<HTMLButtonElement>()
-const nextButton = ref<HTMLButtonElement>()
-const moveBackButton = ref<HTMLButtonElement>()
-const flashcardButton = ref<HTMLDivElement>()
+const prevButton = ref<InstanceType<typeof SmartButton>>()
+const nextButton = ref<InstanceType<typeof SmartButton>>()
 
 function calcProgress() {
   const total = flashcardsTotal.value
@@ -191,7 +187,7 @@ async function stageDown() {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
     reviewStore.setEditFormWasOpened(false)
-    await spaceDeck.value?.preparePrev()
+    spaceDeck.value?.willSlideToLeft()
     if (!reviewStore.nextFlashcard()) {
       progress.value = 1
       if (settings.value.mode === ReviewMode.LIGHTSPEED) {
@@ -212,7 +208,7 @@ async function stageUp() {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
     reviewStore.setEditFormWasOpened(false)
-    await spaceDeck.value?.prepareNext()
+    spaceDeck.value?.willSlideToRight()
     if (!reviewStore.nextFlashcard()) {
       progress.value = 1
       if (settings.value.mode === ReviewMode.LIGHTSPEED) {
@@ -225,23 +221,21 @@ async function stageUp() {
 }
 
 async function prev() {
-  await spaceDeck.value?.preparePrev()
+  spaceDeck.value?.willSlideToLeft()
   if (reviewStore.prevFlashcard()) {
     calcProgress()
   } else {
     progress.value = 1
   }
-  prevButton.value?.blur()
 }
 
 async function next() {
-  await spaceDeck.value?.prepareNext()
+  spaceDeck.value?.willSlideToRight()
   if (reviewStore.nextFlashcard()) {
     calcProgress()
   } else {
     progress.value = 1
   }
-  nextButton.value?.blur()
 }
 
 async function moveBack() {
@@ -249,14 +243,13 @@ async function moveBack() {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, stages.S1)
     flashcardSetStore.updateFlashcard(flashcard)
-    await spaceDeck.value?.preparePrev()
+    spaceDeck.value?.willSlideToLeft()
     if (reviewStore.nextFlashcard()) {
       calcProgress()
     } else {
       progress.value = 1
     }
   }
-  moveBackButton.value?.blur()
 }
 
 function onFlashcardRemoved() {
@@ -340,9 +333,6 @@ function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') {
     event.stopPropagation()
     escapeButton.value?.click()
-  } else if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
-    event.stopPropagation()
-    flashcardButton.value?.click()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
     stageDownButton.value?.click()

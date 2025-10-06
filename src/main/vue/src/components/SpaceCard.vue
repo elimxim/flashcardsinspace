@@ -135,6 +135,7 @@ defineExpose({
   will-change: transform;
   transform-style: preserve-3d;
   perspective: 1000px;
+  z-index: 10;
 }
 
 .flashcard--theme {

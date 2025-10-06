@@ -56,7 +56,7 @@ const deckReady = ref(false)
 const flashcardWasRemoved = ref(false)
 const flashcardWasEdited = ref(false)
 const spaceCard = ref<InstanceType<typeof SpaceCard>>()
-const cardTransition = ref('slide-next')
+const cardTransition = ref('')
 
 const viewedTimes = computed(() => (flashcard.value?.reviewCount ?? 0) + 1)
 
@@ -68,28 +68,27 @@ function setDeckReady() {
   }
 }
 
-async function preparePrev() {
-  spaceCard.value?.flipToFront()
-  if (!deckReady.value || !flashcard.value) {
-    cardTransition.value = ''
-  } else {
-    cardTransition.value = 'slide-prev'
-  }
+function willSlideToLeft() {
+  prepareSlideTransition('slide-left')
 }
 
-async function prepareNext() {
+function willSlideToRight() {
+  prepareSlideTransition('slide-right')
+}
+
+function prepareSlideTransition(value: string) {
   spaceCard.value?.flipToFront()
   if (!deckReady.value || !flashcard.value) {
     cardTransition.value = ''
   } else {
-    cardTransition.value = 'slide-next'
+    cardTransition.value = value
   }
 }
 
 defineExpose({
   setDeckReady,
-  preparePrev,
-  prepareNext,
+  willSlideToLeft,
+  willSlideToRight,
 })
 
 watch(flashcardWasRemoved, (newVal) => {
@@ -140,29 +139,29 @@ function handleKeydown(event: KeyboardEvent) {
   background-color: transparent;
 }
 
-.slide-next-enter-active,
-.slide-next-leave-active,
-.slide-prev-enter-active,
-.slide-prev-leave-active {
+.slide-right-enter-active,
+.slide-right-leave-active,
+.slide-left-enter-active,
+.slide-left-leave-active {
   transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   position: absolute;
 }
 
-.slide-next-leave-active,
-.slide-prev-leave-active {
+.slide-right-leave-active,
+.slide-left-leave-active {
   z-index: 1;
 }
 
-.slide-next-enter-from,
-.slide-prev-enter-from {
+.slide-right-enter-from,
+.slide-left-enter-from {
   transform: scale(0.90);
 }
 
-.slide-next-leave-to {
+.slide-right-leave-to {
   transform: translateX(200%) rotate(10deg);
 }
 
-.slide-prev-leave-to {
+.slide-left-leave-to {
   transform: translateX(-200%) rotate(-10deg);
 }
 
