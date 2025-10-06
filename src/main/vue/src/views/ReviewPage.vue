@@ -60,6 +60,7 @@
           ref="prevButton"
           class="review-button update-button"
           text="Prev"
+          :disabled="noPrevAvailable"
           :on-click="prev"
           auto-blur
           rounded
@@ -70,7 +71,6 @@
           class="review-button update-button"
           text="Next"
           :disabled="reviewFinished"
-          :hidden="reviewFinished"
           :on-click="next"
           auto-blur
           rounded
@@ -80,6 +80,7 @@
           ref="prevButton"
           class="review-button update-button"
           text="Prev"
+          :disabled="noPrevAvailable"
           :on-click="prev"
           auto-blur
           rounded
@@ -101,7 +102,6 @@
           class="review-button update-button"
           text="Next"
           :disabled="reviewFinished"
-          :hidden="reviewFinished"
           :on-click="next"
           auto-blur
           rounded
@@ -117,7 +117,7 @@ import SpaceDeck from '@/components/SpaceDeck.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
@@ -158,6 +158,10 @@ const stageDownButton = ref<InstanceType<typeof SmartButton>>()
 const stageUpButton = ref<InstanceType<typeof SmartButton>>()
 const prevButton = ref<InstanceType<typeof SmartButton>>()
 const nextButton = ref<InstanceType<typeof SmartButton>>()
+
+const noPrevAvailable = computed(() => {
+  return remainingFlashcards.value === flashcardsTotal.value
+})
 
 function calcProgress() {
   const total = flashcardsTotal.value
