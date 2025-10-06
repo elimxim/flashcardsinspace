@@ -69,7 +69,7 @@ function setDeckReady() {
 }
 
 async function preparePrev() {
-  await spaceCard.value?.flipToFrontAndWait()
+  spaceCard.value?.flipToFront()
   if (!deckReady.value || !flashcard.value) {
     cardTransition.value = ''
   } else {
@@ -78,7 +78,7 @@ async function preparePrev() {
 }
 
 async function prepareNext() {
-  await spaceCard.value?.flipToFrontAndWait()
+  spaceCard.value?.flipToFront()
   if (!deckReady.value || !flashcard.value) {
     cardTransition.value = ''
   } else {
