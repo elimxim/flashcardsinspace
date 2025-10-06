@@ -68,17 +68,22 @@ function setDeckReady() {
 }
 
 function willSlideToLeft() {
-  prepareSlideTransition('slide-left')
+  prepareSlideTransition('slide-to-left')
 }
 
 function willSlideToRight() {
-  prepareSlideTransition('slide-right')
+  prepareSlideTransition('slide-to-right')
 }
 
 function prepareSlideTransition(value: string) {
   spaceCard.value?.flipToFront()
-  if (!deckReady.value || !flashcard.value) {
+  if (!deckReady.value) {
     cardTransition.value = ''
+    return
+  }
+
+  if (!flashcard.value) {
+    cardTransition.value = 'slide-from-right'
   } else {
     cardTransition.value = value
   }
@@ -138,30 +143,46 @@ function handleKeydown(event: KeyboardEvent) {
   background-color: transparent;
 }
 
-.slide-right-enter-active,
-.slide-right-leave-active,
-.slide-left-enter-active,
-.slide-left-leave-active {
+.slide-to-right-enter-active,
+.slide-to-right-leave-active,
+.slide-to-left-enter-active,
+.slide-to-left-leave-active {
   transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   position: absolute;
 }
 
-.slide-right-leave-active,
-.slide-left-leave-active {
+.slide-from-right-enter-active,
+.slide-from-right-leave-active {
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  position: absolute;
+}
+
+.slide-from-right-leave-active,
+.slide-to-right-leave-active,
+.slide-to-left-leave-active {
   z-index: 1;
 }
 
-.slide-right-enter-from,
-.slide-left-enter-from {
+.slide-to-right-enter-from,
+.slide-to-left-enter-from {
   transform: scale(0.90);
 }
 
-.slide-right-leave-to {
+.slide-to-right-leave-to {
   transform: translateX(200%) rotate(10deg);
 }
 
-.slide-left-leave-to {
+.slide-to-left-leave-to {
   transform: translateX(-200%) rotate(-10deg);
+}
+
+.slide-from-right-enter-from {
+  transform: translateX(200%) rotate(10deg);
+}
+
+.slide-from-right-leave-to {
+  opacity: 0;
+  transform: none;
 }
 
 .drop-down-enter-active {
