@@ -7,11 +7,11 @@
       'page--min-padded',
     ]"
   >
-    <div class="top-row">
+    <div class="review-info">
       <span class="corner-text">
         {{ settings.topic }}
       </span>
-      <span class="flashcard-progressbar">
+      <span class="review-progressbar">
         <Progressbar
           :progress="progress"
           height="0.5rem"
@@ -19,12 +19,11 @@
           bar-rounded
         />
       </span>
-      <button
+      <AwesomeButton
         ref="escapeButton"
-        class="escape-button"
-        @click="finishReview">
-        <font-awesome-icon icon="fa-solid fa-xmark"/>
-      </button>
+        icon="fa-solid fa-xmark"
+        :on-click="finishReview"
+      />
     </div>
     <div class="review-body">
       <SpaceDeck
@@ -33,7 +32,7 @@
         v-model:flashcard="currFlashcard"
         :on-flashcard-removed="onFlashcardRemoved"
       />
-      <div class="flashcard-nav">
+      <div class="review-nav">
         <SmartButton
           v-if="settings.mode === ReviewMode.LIGHTSPEED"
           ref="stageDownButton"
@@ -116,6 +115,7 @@
 import Progressbar from '@/components/Progressbar.vue'
 import SpaceDeck from '@/components/SpaceDeck.vue'
 import SmartButton from '@/components/SmartButton.vue'
+import AwesomeButton from '@/components/AwesomeButton.vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -153,7 +153,7 @@ const flashcardsTotal = ref(0)
 const progress = ref(0)
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
-const escapeButton = ref<InstanceType<typeof SmartButton>>()
+const escapeButton = ref<InstanceType<typeof AwesomeButton>>()
 const stageDownButton = ref<InstanceType<typeof SmartButton>>()
 const stageUpButton = ref<InstanceType<typeof SmartButton>>()
 const prevButton = ref<InstanceType<typeof SmartButton>>()
@@ -332,7 +332,7 @@ function handleKeydown(event: KeyboardEvent) {
 
   if (event.key === 'Escape') {
     event.stopPropagation()
-    escapeButton.value?.click()
+    escapeButton.value?.press()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
     stageDownButton.value?.click()
@@ -347,12 +347,18 @@ function handleKeydown(event: KeyboardEvent) {
 </script>
 
 <style scoped>
-.top-row {
+.review-info {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   gap: 10px;
+}
+
+.corner-text {
+  background: none;
+  color: #9f9f9f;
+  font-size: 1rem;
 }
 
 .review-body {
@@ -365,7 +371,7 @@ function handleKeydown(event: KeyboardEvent) {
   gap: 20px;
 }
 
-.flashcard-nav {
+.review-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -374,83 +380,12 @@ function handleKeydown(event: KeyboardEvent) {
   gap: 10px;
 }
 
-.nav-button {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1em;
-  width: 120px;
-  user-select: none;
-}
-
-.nav-green-button {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.nav-green-button:not(.nav-button-disabled):hover {
-  background-color: #45a049;
-}
-
-.nav-red-button {
-  background-color: #f44336;
-  color: white;
-}
-
-.nav-red-button:not(.nav-button-disabled):hover {
-  background-color: #da4437;
-}
-
-.nav-blue-button {
-  background-color: #2196F3;
-  color: white;
-}
-
-.nav-blue-button:not(.nav-button-disabled):hover {
-  background-color: #1e88e5;
-}
-
-.nav-black-button {
-  background-color: #505050;
-  color: white;
-}
-
-.nav-black-button:not(.nav-button-disabled):hover {
-  background-color: #333333;
-}
-
-.nav-button-disabled {
-  background-color: #ededed;
-  color: #cacaca;
-  cursor: default;
-}
-
-.escape-button {
-  border: none;
-  outline: none;
-  background: none;
-  cursor: pointer;
-  font-size: 1.5em;
-  color: #c5c5c5;
-}
-
-.escape-button:hover {
-  color: #9f9f9f;
-}
-
-.flashcard-progressbar {
+.review-progressbar {
   flex: 1;
   --progressbar--from: var(--review-progressbar--from);
   --progressbar--via: var(--review-progressbar--via);
   --progressbar--to: var(--review-progressbar--to);
   --progressbar--bg-color: var(--review-progressbar--bg-color);
-}
-
-.corner-text {
-  background: none;
-  color: #9f9f9f;
-  font-size: 1.2em;
 }
 
 </style>

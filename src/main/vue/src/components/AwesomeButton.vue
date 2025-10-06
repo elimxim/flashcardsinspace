@@ -41,6 +41,7 @@ function isPressed(): boolean {
 
 defineExpose({
   isPressed,
+  press
 })
 
 </script>
