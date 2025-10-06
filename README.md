@@ -29,6 +29,10 @@
     - Dynamic font size depending on the amount of the text
     - Pronunciation of the word
     - Zooming in and out the text
+  - ReviewPage
+    - Showing the total / review number of flashcards
+    - Showing know / don't know number of flashcards
+    - Showing FlashcardSet's name
   - Flashcard Set
     - Suspend/Resume the flashcard set
   - Auth
