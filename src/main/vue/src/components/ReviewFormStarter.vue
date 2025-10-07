@@ -15,7 +15,7 @@ import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useRouter } from 'vue-router'
-import { routeNames } from '@/router';
+import { routeNames } from '@/router'
 
 const router = useRouter()
 const reviewStore = useReviewStore()

@@ -83,7 +83,7 @@ import {
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { sendChronoSyncNextDay, sendChronoSyncPrevDay } from '@/api/api-client.ts'
-import { useSpaceToaster } from '@/stores/toast-store.ts';
+import { useSpaceToaster } from '@/stores/toast-store.ts'
 
 const modalStore = useModalStore()
 const toaster = useSpaceToaster()

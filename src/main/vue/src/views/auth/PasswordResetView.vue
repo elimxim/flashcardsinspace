@@ -17,9 +17,9 @@ async function handleForgotPassword() {
       email: email.value,
     })
 
-    alert(response.data);
+    alert(response.data)
   } catch (error) {
-    console.log('Failed to send reset email: ', error);
+    console.log('Failed to send reset email: ', error)
   }
 }
 </script>

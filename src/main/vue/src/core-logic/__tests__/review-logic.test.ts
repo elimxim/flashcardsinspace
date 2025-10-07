@@ -101,15 +101,15 @@ describe('MonoStageReviewQueue', () => {
     const queue = new MonoStageReviewQueue(flashcards)
 
     // then:
-    expect(queue.next()).toBe(f11);
-    expect(queue.next()).toBe(f12);
-    expect(queue.next()).toBe(f13);
+    expect(queue.next()).toBe(f11)
+    expect(queue.next()).toBe(f12)
+    expect(queue.next()).toBe(f13)
   })
 
   it('should return null after the last flashcard has been returned', () => {
     // given:
     const f11 = flashcard(1, stages.S1)
-    const flashcards = [f11];
+    const flashcards = [f11]
 
     // when:
     const queue = new MonoStageReviewQueue(flashcards)

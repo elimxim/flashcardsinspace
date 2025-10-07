@@ -61,7 +61,7 @@ function start() {
   } else if (props.delay && props.delay > 0) {
     delayTimeout = window.setTimeout(() => {
       if (delayTimeout) window.clearTimeout(delayTimeout)
-      delayTimeout = null;
+      delayTimeout = null
       begin()
     }, props.delay)
   } else {
@@ -95,11 +95,11 @@ function tick(now: number) {
 
 function cancel() {
   if (animationFrame != null) {
-    cancelAnimationFrame(animationFrame);
+    cancelAnimationFrame(animationFrame)
     animationFrame = null
   }
   if (delayTimeout != null) {
-    window.clearTimeout(delayTimeout);
+    window.clearTimeout(delayTimeout)
     delayTimeout = null
   }
 }

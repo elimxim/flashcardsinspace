@@ -1,5 +1,5 @@
 import type { Chronoday } from '@/model/chrono.ts'
-import { Flashcard, FlashcardSet } from '@/model/flashcard.ts';
+import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 
 export interface ErrorResponseBody {
   timestamp: Date
