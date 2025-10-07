@@ -117,7 +117,7 @@ import SpaceDeck from '@/components/SpaceDeck.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
@@ -140,17 +140,18 @@ const reviewStore = useReviewStore()
 const flashcardSetStore = useFlashcardSetStore()
 
 const { flashcardSet } = storeToRefs(flashcardSetStore)
+const { flashcardEditOpen } = storeToRefs(modalStore)
 const {
   loaded,
   settings,
   currFlashcard,
-  editFormWasOpened,
   reviewFinished,
   remainingFlashcards,
 } = storeToRefs(reviewStore)
 
 const flashcardsTotal = ref(0)
 const progress = ref(0)
+const editFormWasOpened = ref(false)
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 const escapeButton = ref<InstanceType<typeof AwesomeButton>>()
@@ -190,7 +191,7 @@ async function stageDown() {
     if (settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
-    reviewStore.setEditFormWasOpened(false)
+    editFormWasOpened.value = false
     spaceDeck.value?.willSlideToLeft()
     if (!reviewStore.nextFlashcard()) {
       progress.value = 1
@@ -211,7 +212,7 @@ async function stageUp() {
     if (settings.value.mode === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
-    reviewStore.setEditFormWasOpened(false)
+    editFormWasOpened.value = false
     spaceDeck.value?.willSlideToRight()
     if (!reviewStore.nextFlashcard()) {
       progress.value = 1
@@ -257,7 +258,7 @@ async function moveBack() {
 }
 
 function onFlashcardRemoved() {
-  reviewStore.setEditFormWasOpened(false)
+  editFormWasOpened.value = false
   if (reviewStore.nextFlashcard()) {
     calcProgress()
   } else {
@@ -295,7 +296,7 @@ async function loadReviewState() {
     console.log('Starting review...')
     console.log('flashcardSetStore.flashcards:', flashcardSetStore.flashcards.length)
     reviewStore.startReview(flashcardSetStore.flashcards, props.stage)
-    flashcardsTotal.value = remainingFlashcards.value;
+    flashcardsTotal.value = remainingFlashcards.value
     calcProgress()
   } else {
     reviewStore.startReview([], props.stage)
@@ -303,6 +304,12 @@ async function loadReviewState() {
     calcProgress()
   }
 }
+
+watch(flashcardEditOpen, (newVal) => {
+  if (newVal) {
+    editFormWasOpened.value = newVal
+  }
+})
 
 onMounted(async () => {
   await loadReviewState()
@@ -355,6 +362,7 @@ function handleKeydown(event: KeyboardEvent) {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 4px;
   width: 100%;
   gap: 10px;
 }

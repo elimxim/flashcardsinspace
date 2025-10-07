@@ -15,19 +15,18 @@
       <li class="menu-buttons-container">
         <div
           class="menu-item menu-item-color menu-icon-button"
-          :class="{ 'menu-icon-disabled-button': isNoFlashcardSets || reviewStarted }"
+          :class="{ 'menu-icon-disabled-button': isNoFlashcardSets }"
           @click="onFlashcardSetSettingsClick">
           <font-awesome-icon icon="fa-solid fa-gear"/>
         </div>
         <div
           class="menu-item menu-item-color menu-icon-button"
-          :class="{ 'menu-icon-disabled-button': reviewStarted }"
           @click="onFlashcardSetCreationClick">
           <font-awesome-icon icon="fa-solid fa-box"/>
         </div>
         <div
           class="menu-item menu-item-color menu-icon-button"
-          :class="{ 'menu-icon-disabled-button': isNoFlashcardSets || reviewStarted }"
+          :class="{ 'menu-icon-disabled-button': isNoFlashcardSets }"
           @click="onFlashcardCreationClick">
           <font-awesome-icon icon="fa-solid fa-rectangle-list"/>
         </div>
@@ -37,7 +36,6 @@
         class="menu-buttons-container">
         <div
           class="menu-item menu-item-color menu-icon-button"
-          :class="{ 'menu-icon-disabled-button': reviewStarted }"
           @click="onCalendarClick">
           <font-awesome-icon icon="fa-solid fa-calendar-days"/>
         </div>
@@ -88,24 +86,21 @@ import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, type ComputedRef, onMounted, ref } from 'vue'
-import { useReviewStore } from '@/stores/review-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { truncate } from '@/utils/string.ts'
 import { allStages, type Stage, specialStageSet } from '@/core-logic/stage-logic.ts'
 import { countFlashcards } from '@/core-logic/review-logic.ts'
-import router, { routeNames } from '@/router';
+import router, { routeNames } from '@/router'
 import { saveSelectedSetId } from '@/cookies/cookies.ts'
 
 const modalStore = useModalStore()
 const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
-const reviewStore = useReviewStore()
 const chronoStore = useChronoStore()
 
 const { flashcardSets, isEmpty: isNoFlashcardSets } = storeToRefs(flashcardSetsStore)
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 const { currDay } = storeToRefs(chronoStore)
-const { started: reviewStarted } = storeToRefs(reviewStore)
 
 const showFlashcardMenuItem = computed(() => flashcardSet.value !== null)
 const menuSelect = ref<HTMLSelectElement>()
@@ -147,33 +142,28 @@ const selectedFlashcardSet = computed({
       saveSelectedSetId(set.id)
       flashcardSetStore.loadFlashcardsFor(set)
         .then(() => chronoStore.loadChronodays(set))
-        .then(() => reviewStore.finishReview())
     }
   }
 })
 
 function onFlashcardSetSettingsClick() {
-  if (!isNoFlashcardSets.value && !reviewStarted.value) {
+  if (!isNoFlashcardSets.value) {
     modalStore.toggleFlashcardSetSettings()
   }
 }
 
 function onFlashcardSetCreationClick() {
-  if (!reviewStarted.value) {
-    modalStore.toggleFlashcardSetCreation()
-  }
+  modalStore.toggleFlashcardSetCreation()
 }
 
 function onFlashcardCreationClick() {
-  if (!isNoFlashcardSets.value && !reviewStarted.value) {
+  if (!isNoFlashcardSets.value) {
     modalStore.toggleFlashcardCreation()
   }
 }
 
 function onCalendarClick() {
-  if (!reviewStarted.value) {
-    modalStore.toggleCalendar()
-  }
+  modalStore.toggleCalendar()
 }
 
 function startStageReview(stage: Stage) {
@@ -184,7 +174,7 @@ onMounted(() => {
   menuSelect.value?.addEventListener('keydown', function (event) {
     event.preventDefault()
   })
-});
+})
 
 </script>
 

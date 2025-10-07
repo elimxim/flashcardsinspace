@@ -20,7 +20,6 @@ export interface ReviewState {
   started: boolean
   reviewQueue: ReviewQueue
   currFlashcard: Flashcard | null
-  editFormWasOpened: boolean
   loaded: boolean
 }
 
@@ -34,7 +33,6 @@ export const useReviewStore = defineStore('review', {
       started: false,
       reviewQueue: new EmptyReviewQueue(),
       currFlashcard: null,
-      editFormWasOpened: false,
       loaded: false,
     }
   },
@@ -83,16 +81,12 @@ export const useReviewStore = defineStore('review', {
       this.currFlashcard = this.reviewQueue.next()
       return this.currFlashcard !== null
     },
-    setEditFormWasOpened(value: boolean) {
-      this.editFormWasOpened = value
-    },
     resetState() {
       this.settings.topic = ''
       this.settings.mode = ReviewMode.LIGHTSPEED
       this.started = false
       this.reviewQueue = new EmptyReviewQueue()
       this.currFlashcard = null
-      this.editFormWasOpened = false
       this.loaded = false
     },
   }

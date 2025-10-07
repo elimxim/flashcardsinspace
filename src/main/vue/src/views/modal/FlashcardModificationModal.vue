@@ -98,7 +98,6 @@ import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
-import { useReviewStore } from '@/stores/review-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import {
@@ -126,7 +125,6 @@ const modalStore = useModalStore()
 const chronoStore = useChronoStore()
 const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
-const reviewStore = useReviewStore()
 const toaster = useSpaceToaster()
 
 const { flashcardSet, isStarted } = storeToRefs(flashcardSetStore)
@@ -279,7 +277,6 @@ async function updateFlashcard(): Promise<boolean> {
 function toggleModalForm() {
   if (props.editMode) {
     modalStore.toggleFlashcardEdit()
-    reviewStore.setEditFormWasOpened(true)
   } else {
     modalStore.toggleFlashcardCreation()
   }
