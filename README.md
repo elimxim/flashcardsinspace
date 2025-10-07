@@ -14,6 +14,7 @@
   - Lightspeed page
   - Footer
   - Bugreport form
+  - Review Session
   - Control Panel (instead of Main Menu)
     - Showing duplicated flashcards
     - Uploading/downloading flashcards to/from csv
