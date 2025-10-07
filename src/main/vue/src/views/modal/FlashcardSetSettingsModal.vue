@@ -95,7 +95,7 @@ import {
   sendFlashcardSetUpdateRequest,
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { reloadFlashcardSetStores } from '@/core-logic/flashcard-logic.ts'
+import { reloadFlashcardSetStores } from '@/shared/stores.ts'
 
 const modalStore = useModalStore()
 const toaster = useSpaceToaster()

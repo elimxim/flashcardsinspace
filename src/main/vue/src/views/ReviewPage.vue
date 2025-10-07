@@ -126,7 +126,7 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import { ReviewMode } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
-import { loadSelectedSetId } from '@/cookies/cookies.ts'
+import { loadSelectedSetId } from '@/shared/cookies.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 
 const props = defineProps<{

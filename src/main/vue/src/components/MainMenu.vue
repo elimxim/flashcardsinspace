@@ -91,7 +91,7 @@ import { truncate } from '@/utils/string.ts'
 import { allStages, type Stage, specialStageSet } from '@/core-logic/stage-logic.ts'
 import { countFlashcards } from '@/core-logic/review-logic.ts'
 import router, { routeNames } from '@/router'
-import { saveSelectedSetId } from '@/cookies/cookies.ts'
+import { saveSelectedSetId } from '@/shared/cookies.ts'
 
 const modalStore = useModalStore()
 const flashcardSetsStore = useFlashcardSetsStore()
