@@ -4,7 +4,7 @@
       <MainMenu/>
     </div>
 
-    <div v-if="!reviewStarted" class="main-area">
+    <div class="main-area">
       <ReviewFormStarter/>
     </div>
   </div>
@@ -13,7 +13,6 @@
 <script setup lang="ts">
 import MainMenu from '@/components/MainMenu.vue'
 import ReviewFormStarter from '@/components/ReviewFormStarter.vue'
-import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
@@ -22,9 +21,7 @@ import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 const flashcardSetsStore = useFlashcardSetsStore()
 const flashcardSetStore = useFlashcardSetStore()
 const chronoStore = useChronoStore()
-const reviewStore = useReviewStore()
 
-const { started: reviewStarted } = storeToRefs(reviewStore)
 const { firstFlashcardSet } = storeToRefs(flashcardSetsStore)
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 

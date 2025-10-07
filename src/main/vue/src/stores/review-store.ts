@@ -17,7 +17,6 @@ export interface ReviewSettings {
 
 export interface ReviewState {
   settings: ReviewSettings
-  started: boolean
   reviewQueue: ReviewQueue
   currFlashcard: Flashcard | null
   loaded: boolean
@@ -30,7 +29,6 @@ export const useReviewStore = defineStore('review', {
         topic: '',
         mode: ReviewMode.LIGHTSPEED,
       },
-      started: false,
       reviewQueue: new EmptyReviewQueue(),
       currFlashcard: null,
       loaded: false,
@@ -55,7 +53,6 @@ export const useReviewStore = defineStore('review', {
       this.resetState()
       this.settings.topic = stage !== undefined ? stage.displayName : 'Lightspeed'
       this.settings.mode = toReviewMode(stage)
-      this.started = true
       if (stage !== undefined) {
         this.initStageReviewQueue(flashcards, stage)
       } else {
@@ -84,7 +81,6 @@ export const useReviewStore = defineStore('review', {
     resetState() {
       this.settings.topic = ''
       this.settings.mode = ReviewMode.LIGHTSPEED
-      this.started = false
       this.reviewQueue = new EmptyReviewQueue()
       this.currFlashcard = null
       this.loaded = false

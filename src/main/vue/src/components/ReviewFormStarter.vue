@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!started" class="review-form-starter">
+  <div class="review-form-starter">
     <button
       class="review-button review-start-button"
       :class="{ 'review-start-button-disabled': isEmpty }"
@@ -11,17 +11,14 @@
 </template>
 
 <script setup lang="ts">
-import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
 
 const router = useRouter()
-const reviewStore = useReviewStore()
 const flashcardSetStore = useFlashcardSetStore()
 
-const { started } = storeToRefs(reviewStore)
 const { isEmpty } = storeToRefs(flashcardSetStore)
 
 function startReview() {
