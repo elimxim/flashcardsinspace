@@ -8,12 +8,7 @@ import {
 import { type Stage } from '@/core-logic/stage-logic.ts'
 import type { Flashcard } from '@/model/flashcard.ts'
 
-export interface ReviewSettings {
-  topic: string
-}
-
 export interface ReviewState {
-  settings: ReviewSettings
   reviewQueue: ReviewQueue
   currFlashcard: Flashcard | null
   loaded: boolean
@@ -22,9 +17,6 @@ export interface ReviewState {
 export const useReviewStore = defineStore('review', {
   state: (): ReviewState => {
     return {
-      settings: {
-        topic: '',
-      },
       reviewQueue: new EmptyReviewQueue(),
       currFlashcard: null,
       loaded: false,
@@ -41,7 +33,6 @@ export const useReviewStore = defineStore('review', {
   actions: {
     startReview(flashcards: Flashcard[], stage: Stage | undefined) {
       this.resetState()
-      this.settings.topic = stage !== undefined ? stage.displayName : 'Lightspeed'
       if (stage !== undefined) {
         this.reviewQueue = createReviewQueueForStage(flashcards, stage)
       } else {
@@ -62,7 +53,6 @@ export const useReviewStore = defineStore('review', {
       return this.currFlashcard !== null
     },
     resetState() {
-      this.settings.topic = ''
       this.reviewQueue = new EmptyReviewQueue()
       this.currFlashcard = null
       this.loaded = false

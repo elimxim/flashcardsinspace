@@ -9,7 +9,7 @@
   >
     <div class="review-info">
       <span class="corner-text">
-        {{ settings.topic }}
+        {{ reviewTopic }}
       </span>
       <span class="review-progressbar">
         <Progressbar
@@ -143,7 +143,6 @@ const { flashcardSet } = storeToRefs(flashcardSetStore)
 const { flashcardEditOpen } = storeToRefs(modalStore)
 const {
   loaded,
-  settings,
   currFlashcard,
   reviewFinished,
   remainingFlashcards,
@@ -160,6 +159,7 @@ const stageUpButton = ref<InstanceType<typeof SmartButton>>()
 const prevButton = ref<InstanceType<typeof SmartButton>>()
 const nextButton = ref<InstanceType<typeof SmartButton>>()
 
+const reviewTopic = computed(() => props.stage?.displayName ?? 'Lightpseed')
 const reviewMode = computed(() => toReviewMode(props.stage))
 const noPrevAvailable = computed(() => remainingFlashcards.value === flashcardsTotal.value)
 
