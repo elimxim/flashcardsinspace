@@ -37,9 +37,9 @@ export function toReviewMode(stage: Stage | undefined) {
 export interface ReviewQueue {
   shuffle(): void
 
-  prev(): Flashcard | null
+  prev(): Flashcard | undefined
 
-  next(): Flashcard | null
+  next(): Flashcard | undefined
 
   remaining(): number
 }
@@ -48,12 +48,12 @@ export class EmptyReviewQueue implements ReviewQueue {
   public shuffle() {
   }
 
-  public prev(): Flashcard | null {
-    return null
+  public prev(): Flashcard | undefined {
+    return undefined
   }
 
-  public next(): Flashcard | null {
-    return null
+  public next(): Flashcard | undefined {
+    return undefined
   }
 
   public remaining(): number {
@@ -79,21 +79,21 @@ export class MultiStageReviewQueue implements ReviewQueue {
     })
   }
 
-  public prev(): Flashcard | null {
-    return null
+  public prev(): Flashcard | undefined {
+    return undefined
   }
 
-  public next(): Flashcard | null {
+  public next(): Flashcard | undefined {
     const flashcards = this.flashcardMap.get(this.currStage)
     if (flashcards === undefined || flashcards.length === 0) {
       const nextStage = this.nextStage()
       if (nextStage === null) {
-        return null
+        return undefined
       }
       this.currStage = nextStage
       return this.next()
     } else {
-      return flashcards.shift() ?? null
+      return flashcards.shift()
     }
   }
 
@@ -132,15 +132,15 @@ export class MonoStageReviewQueue implements ReviewQueue {
     shuffle(this.flashcards)
   }
 
-  public prev(): Flashcard | null {
-    if (this.index < 0) return null
+  public prev(): Flashcard | undefined {
+    if (this.index < 0) return undefined
     if (this.index === 0) return this.flashcards[0]
-    return this.flashcards[--this.index] ?? null
+    return this.flashcards[--this.index]
   }
 
-  public next(): Flashcard | null {
-    if (this.index >= this.flashcards.length) return null
-    return this.flashcards[++this.index] ?? null
+  public next(): Flashcard | undefined {
+    if (this.index >= this.flashcards.length) return undefined
+    return this.flashcards[++this.index]
   }
 
   public remaining(): number {

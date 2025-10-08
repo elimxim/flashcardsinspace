@@ -23,7 +23,7 @@ describe('MultiStageReviewQueue', () => {
     // then:
     expect(reviewQueue.next()).toBe(f41)
     expect(reviewQueue.next()).toBe(f21)
-    expect(reviewQueue.next()).toBeNull()
+    expect(reviewQueue.next()).toBeUndefined()
   })
 
   it('should return all flashcards from a stage before moving to a lower one', () => {
@@ -44,7 +44,7 @@ describe('MultiStageReviewQueue', () => {
     expect(reviewQueue.next()).toBeOneOf([f51, f52])
     expect(reviewQueue.next()).toBeOneOf([f51, f52])
     expect(reviewQueue.next()).toBe(f21)
-    expect(reviewQueue.next()).toBeNull()
+    expect(reviewQueue.next()).toBeUndefined()
   })
 
   it('should return null when the queue becomes empty', () => {
@@ -57,7 +57,7 @@ describe('MultiStageReviewQueue', () => {
 
     // then:
     expect(reviewQueue.next()).toBe(f11)
-    expect(reviewQueue.next()).toBeNull()
+    expect(reviewQueue.next()).toBeUndefined()
   })
 
   it('should correctly skip empty stages', () => {
@@ -76,7 +76,7 @@ describe('MultiStageReviewQueue', () => {
     // then:
     expect(reviewQueue.next()).toBe(f41)
     expect(reviewQueue.next()).toBe(f11)
-    expect(reviewQueue.next()).toBeNull()
+    expect(reviewQueue.next()).toBeUndefined()
   })
 
   it('should return null if initialized with an empty map', () => {
@@ -85,7 +85,7 @@ describe('MultiStageReviewQueue', () => {
     const reviewQueue = new MultiStageReviewQueue(new Map())
 
     // then:
-    expect(reviewQueue.next()).toBeNull()
+    expect(reviewQueue.next()).toBeUndefined()
   })
 })
 
@@ -116,7 +116,7 @@ describe('MonoStageReviewQueue', () => {
 
     // then:
     expect(queue.next()).toBe(f11)
-    expect(queue.next()).toBeNull()
+    expect(queue.next()).toBeUndefined()
   })
 
   it('should return null if initialized with an empty array', () => {
@@ -125,7 +125,7 @@ describe('MonoStageReviewQueue', () => {
     const queue = new MonoStageReviewQueue([])
 
     // then:
-    expect(queue.next()).toBeNull()
+    expect(queue.next()).toBeUndefined()
   })
 
   it('should not affect the original array passed to the constructor', () => {
@@ -182,11 +182,11 @@ describe('MonoStageReviewQueue', () => {
     const queue = new MonoStageReviewQueue(flashcards)
 
     // then:
-    expect(queue.prev()).toBeNull()
+    expect(queue.prev()).toBeUndefined()
     expect(queue.next()).toBe(f11)
     expect(queue.prev()).toBe(f11)
     expect(queue.next()).toBe(f12)
-    expect(queue.next()).toBeNull()
+    expect(queue.next()).toBeUndefined()
     expect(queue.prev()).toBe(f12)
     expect(queue.prev()).toBe(f11)
   })
@@ -201,7 +201,7 @@ describe('MonoStageReviewQueue', () => {
     const queue = new MonoStageReviewQueue(flashcards)
 
     // then:
-    expect(queue.prev()).toBeNull()
+    expect(queue.prev()).toBeUndefined()
     expect(queue.next()).toBe(f41)
     expect(queue.prev()).toBe(f41)
     expect(queue.prev()).toBe(f41)
@@ -227,7 +227,7 @@ function flashcard(id: number, stage: Stage): Flashcard {
 function queueResult(queue: ReviewQueue): Flashcard[] {
   const array: Flashcard[] = []
   let next
-  while ((next = queue.next()) !== null) {
+  while ((next = queue.next()) !== undefined) {
     array.push(next)
   }
   return array
