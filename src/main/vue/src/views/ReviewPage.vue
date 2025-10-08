@@ -34,7 +34,7 @@
       />
       <div class="review-nav">
         <SmartButton
-          v-if="settings.mode === ReviewMode.LIGHTSPEED"
+          v-if="reviewMode === ReviewMode.LIGHTSPEED"
           ref="stageDownButton"
           text="Don't know"
           class="review-button remove-button"
@@ -45,7 +45,7 @@
           rounded
         />
         <SmartButton
-          v-if="settings.mode === ReviewMode.LIGHTSPEED"
+          v-if="reviewMode === ReviewMode.LIGHTSPEED"
           ref="stageUpButton"
           text="Know"
           class="review-button create-button"
@@ -56,7 +56,7 @@
           rounded
         />
         <SmartButton
-          v-if="settings.mode === ReviewMode.SPECIAL"
+          v-if="reviewMode === ReviewMode.SPECIAL"
           ref="prevButton"
           class="review-button update-button"
           text="Prev"
@@ -66,7 +66,7 @@
           rounded
         />
         <SmartButton
-          v-if="settings.mode === ReviewMode.SPECIAL"
+          v-if="reviewMode === ReviewMode.SPECIAL"
           ref="nextButton"
           class="review-button update-button"
           text="Next"
@@ -76,7 +76,7 @@
           rounded
         />
         <SmartButton
-          v-if="settings.mode === ReviewMode.SPACE"
+          v-if="reviewMode === ReviewMode.SPACE"
           ref="prevButton"
           class="review-button update-button"
           text="Prev"
@@ -86,7 +86,7 @@
           rounded
         />
         <SmartButton
-          v-if="settings.mode === ReviewMode.SPACE"
+          v-if="reviewMode === ReviewMode.SPACE"
           class="review-button move-back-button"
           text="Move back"
           :disabled="reviewFinished"
@@ -97,7 +97,7 @@
           rounded
         />
         <SmartButton
-          v-if="settings.mode === ReviewMode.SPACE"
+          v-if="reviewMode === ReviewMode.SPACE"
           ref="nextButton"
           class="review-button update-button"
           text="Next"
@@ -123,7 +123,7 @@ import { useReviewStore } from '@/stores/review-store.ts'
 import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { nextStage, prevStage, Stage, stages } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
-import { ReviewMode } from '@/core-logic/review-logic.ts'
+import { ReviewMode, toReviewMode } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { loadSelectedSetId } from '@/shared/cookies.ts'
@@ -160,9 +160,8 @@ const stageUpButton = ref<InstanceType<typeof SmartButton>>()
 const prevButton = ref<InstanceType<typeof SmartButton>>()
 const nextButton = ref<InstanceType<typeof SmartButton>>()
 
-const noPrevAvailable = computed(() => {
-  return remainingFlashcards.value === flashcardsTotal.value
-})
+const reviewMode = computed(() => toReviewMode(props.stage))
+const noPrevAvailable = computed(() => remainingFlashcards.value === flashcardsTotal.value)
 
 function calcProgress() {
   const total = flashcardsTotal.value
@@ -174,7 +173,7 @@ function calcProgress() {
 function finishReview() {
   flashcardsTotal.value = 0
   if (reviewFinished.value
-    && settings.value.mode === ReviewMode.LIGHTSPEED
+    && reviewMode.value === ReviewMode.LIGHTSPEED
     && flashcardSet.value !== null
   ) {
     chronoStore.markLastDaysAsCompleted(flashcardSet.value)
@@ -188,14 +187,14 @@ async function stageDown() {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, prevStage(flashcard.stage))
     flashcardSetStore.updateFlashcard(flashcard)
-    if (settings.value.mode === ReviewMode.LIGHTSPEED) {
+    if (reviewMode.value === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
     editFormWasOpened.value = false
     spaceDeck.value?.willSlideToLeft()
     if (!reviewStore.nextFlashcard()) {
       progress.value = 1
-      if (settings.value.mode === ReviewMode.LIGHTSPEED) {
+      if (reviewMode.value === ReviewMode.LIGHTSPEED) {
         await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
       }
     } else {
@@ -209,14 +208,14 @@ async function stageUp() {
     const flashcard = currFlashcard.value
     updateFlashcard(flashcard, nextStage(flashcard.stage))
     flashcardSetStore.updateFlashcard(flashcard)
-    if (settings.value.mode === ReviewMode.LIGHTSPEED) {
+    if (reviewMode.value === ReviewMode.LIGHTSPEED) {
       await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
     }
     editFormWasOpened.value = false
     spaceDeck.value?.willSlideToRight()
     if (!reviewStore.nextFlashcard()) {
       progress.value = 1
-      if (settings.value.mode === ReviewMode.LIGHTSPEED) {
+      if (reviewMode.value === ReviewMode.LIGHTSPEED) {
         await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
       }
     } else {
