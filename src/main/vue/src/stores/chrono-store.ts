@@ -1,21 +1,7 @@
 import { defineStore } from 'pinia'
-import {
-  type Chronoday
-} from '@/model/chrono.ts'
+import { type Chronoday } from '@/model/chrono.ts'
 import { asIsoDateStr } from '@/utils/date.ts'
-import apiClient from '@/api/api-client.ts'
-import type {
-  ChronoSyncRequest,
-  ChronoSyncResponse,
-  ChronoBulkUpdateRequest, ChronodayId,
-} from '@/api/communication.ts'
-import type { FlashcardSet } from '@/model/flashcard.ts'
-import {
-  chronodayStatuses,
-  isCompleteAvailable,
-  isInProgressAvailable,
-  selectConsecutiveDaysBeforeIncluding,
-} from '@/core-logic/chrono-logic.ts'
+import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 
 export interface ChronoState {
   chronodays: Chronoday[]
@@ -39,23 +25,18 @@ export const useChronoStore = defineStore('chrono', {
   actions: {
     loadState(chronodays: Chronoday[], currDay: Chronoday) {
       console.log(`Loading ${chronodays.length} chronodays with curr day ${currDay.chronodate}`)
+      this.resetState()
       this.chronodays = chronodays
       this.currDay = currDay
       this.loaded = true
     },
-    async loadChronodays(flashcardSet: FlashcardSet): Promise<void> {
-      this.resetState()
-      const chronodaysRequest: ChronoSyncRequest = {
-        clientDatetime: new Date().toISOString()
-      }
-
-      await apiClient.post<ChronoSyncResponse>('/flashcard-sets/' + flashcardSet.id + '/chrono/sync', chronodaysRequest)
-        .then(response => {
-          this.chronodays = response.data.chronodays
-          this.currDay = response.data.currDay
-          this.loaded = true
-        })
-      // todo catch errors
+    checkStateLoaded() {
+      if (!this.loaded) throw Error(`State check: chrono store isn't loaded`)
+    },
+    resetState() {
+      this.chronodays = []
+      this.currDay = defaultCurrDay()
+      this.loaded = false
     },
     canGoPrev(): boolean {
       this.checkStateLoaded()
@@ -78,24 +59,17 @@ export const useChronoStore = defineStore('chrono', {
     },
     updateDays(updatedDays: Chronoday[]) {
       updatedDays.forEach(newDay => {
+        if (this.currDay.id === newDay.id) {
+          this.currDay = newDay
+        }
+
         const idx = this.chronodays.findIndex(v => v.id === newDay.id)
         if (idx !== -1) {
           this.chronodays[idx] = newDay
         } else {
           console.error(`Couldn't find day ${newDay.id} in the store to update status to ${newDay.status}`)
         }
-        if (this.currDay.id === newDay.id) {
-          this.currDay = newDay
-        }
       })
-    },
-    checkStateLoaded() {
-      if (!this.loaded) throw Error(`State check: chrono store isn't loaded`)
-    },
-    resetState() {
-      this.chronodays = []
-      this.currDay = defaultCurrDay()
-      this.loaded = false
     },
   }
 })

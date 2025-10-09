@@ -89,14 +89,13 @@ import { storeToRefs } from 'pinia'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
-import { FlashcardSet } from '@/model/flashcard.ts'
 import {
   sendFlashcardSetRemovalRequest,
   sendFlashcardSetUpdateRequest,
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { reloadFlashcardSetStores } from '@/shared/stores.ts'
-import { copyFlashcardSet } from '@/core-logic/flashcard-logic.ts';
+import { copyFlashcardSet } from '@/core-logic/flashcard-logic.ts'
 
 const modalStore = useModalStore()
 const toaster = useSpaceToaster()

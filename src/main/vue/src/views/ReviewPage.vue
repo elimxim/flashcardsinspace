@@ -144,10 +144,12 @@ import {
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import {
-  chronodayStatuses, isCompleteAvailable, isInProgressAvailable,
+  chronodayStatuses,
+  isCompleteAvailable,
+  isInProgressAvailable,
   selectConsecutiveDaysBeforeIncluding
 } from '@/core-logic/chrono-logic.ts'
-import type { Chronoday } from '@/model/chrono.ts';
+import type { Chronoday } from '@/model/chrono.ts'
 
 const props = defineProps<{
   stage?: Stage,
@@ -191,7 +193,12 @@ const progress = computed(() => {
   const completionRate = (total - remaining) / total
   return Math.max(0, Math.min(1, completionRate))
 })
-const noPrevAvailable = computed(() => flashcardsTotal.value === flashcardsRemaining.value + 1)
+const noPrevAvailable = computed(() => {
+  if (flashcardsTotal.value === 1) {
+    return !noNextAvailable.value
+  }
+  return flashcardsTotal.value === flashcardsRemaining.value + 1
+})
 const noNextAvailable = computed(() => currFlashcard.value === undefined)
 
 function prevFlashcard(): boolean {
@@ -216,22 +223,24 @@ function startReview() {
   console.log(`Flashcards TOTAL: ${flashcardsTotal.value}`)
 }
 
-function finishReview() {
+async function finishReview() {
   console.log(`Finishing review on stage: ${props.stage?.displayName ?? 'default'}`)
   reviewQueue.value = new EmptyReviewQueue()
   flashcardsTotal.value = 0
   if (flashcardSet.value) {
     if (noNextAvailable.value && isLightspeedMode.value) {
-      markDaysAsCompleted(flashcardSet.value)
+      await markDaysAsCompleted(flashcardSet.value)
     }
   } else {
     console.error(`Can't gracefully finish review: flashcard set is undefined`)
   }
 }
 
-function finishReviewAndGoToFlashcards() {
-  finishReview()
-  router.push({ name: routeNames.flashcards })
+async function finishReviewAndGoToFlashcards() {
+  await finishReview()
+    .then(() =>
+      router.push({ name: routeNames.flashcards })
+    )
 }
 
 async function stageDown() {
@@ -383,13 +392,13 @@ onMounted(async () => {
   document.addEventListener('keydown', handleKeydown)
 })
 
-onUnmounted(() => {
-  finishReview()
+onUnmounted(async () => {
+  await finishReview()
   document.removeEventListener('keydown', handleKeydown)
 })
 
-onBeforeRouteLeave(() => {
-  finishReview()
+onBeforeRouteLeave(async () => {
+  await finishReview()
 })
 
 function handleKeydown(event: KeyboardEvent) {

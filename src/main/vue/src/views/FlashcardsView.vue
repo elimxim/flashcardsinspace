@@ -8,39 +8,29 @@
       <ReviewFormStarter/>
     </div>
   </div>
+  <SpaceToast/>
 </template>
 
 <script setup lang="ts">
 import MainMenu from '@/components/MainMenu.vue'
 import ReviewFormStarter from '@/components/ReviewFormStarter.vue'
+import SpaceToast from '@/components/SpaceToast.vue'
 import { storeToRefs } from 'pinia'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
-import { useChronoStore } from '@/stores/chrono-store.ts'
-import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
+import {
+  loadFlashcardSetAndChronoStores,
+  loadFlashcardSetsStore,
+} from '@/shared/stores.ts'
 
 const flashcardSetsStore = useFlashcardSetsStore()
-const flashcardSetStore = useFlashcardSetStore()
-const chronoStore = useChronoStore()
-
 const { firstFlashcardSet } = storeToRefs(flashcardSetsStore)
-const { flashcardSet } = storeToRefs(flashcardSetStore)
 
-flashcardSetsStore.loadFlashcardSets().then(async () => {
-  console.log('flashcard data loaded')
-  if (firstFlashcardSet.value !== null) {
-    await flashcardSetStore.loadFlashcardsFor(firstFlashcardSet.value)
-  } else {
-    flashcardSetStore.resetState()
-  }
-}).then(async () => {
-  console.log('flashcard set initialized')
-  if (flashcardSet.value !== null) {
-    await chronoStore.loadChronodays(flashcardSet.value)
-    console.log('chrono data loaded')
-  } else {
-    console.log('flashcard set hasn\'t been initialized')
-  }
-})
+loadFlashcardSetsStore()
+  .then((loaded) => {
+    if (loaded && firstFlashcardSet.value) {
+      loadFlashcardSetAndChronoStores(firstFlashcardSet.value, true)
+    }
+  })
 
 </script>
 

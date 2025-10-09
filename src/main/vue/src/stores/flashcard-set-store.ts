@@ -1,6 +1,5 @@
 import { type Flashcard, type FlashcardSet } from '@/model/flashcard.ts'
 import { defineStore } from 'pinia'
-import apiClient from '@/api/api-client.ts'
 import type { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
@@ -46,9 +45,19 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
   actions: {
     loadState(flashcardSet: FlashcardSet, flashcards: Flashcard[]) {
       console.log(`Loading flashcard set ${flashcardSet.id} with ${flashcards.length} flashcards`)
+      this.resetState()
       this.flashcardSet = flashcardSet
       this.flashcardMap = new Map(flashcards.map(v => [v.id, v]))
       this.loaded = true
+    },
+    checkStateLoaded() {
+      if (!this.flashcardSet) throw Error(`State check: flashcard set must be set`)
+      if (!this.loaded) throw Error(`State check: flashcard set store isn't loaded`)
+    },
+    resetState() {
+      this.flashcardSet = null
+      this.flashcardMap = new Map()
+      this.loaded = false
     },
     changeSet(flashcardSet: FlashcardSet) {
       console.log(`Changing flashcard set ${flashcardSet.id}`)
@@ -62,28 +71,6 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       console.log(`Adding ${flashcards.length} flashcards to set ${this.flashcardSet?.id}`)
       this.checkStateLoaded()
       this.flashcardMap = new Map(flashcards.map(v => [v.id, v]))
-    },
-    async loadFlashcardsFor(flashcardSet: FlashcardSet) {
-      this.resetState()
-      this.flashcardSet = flashcardSet
-      await this.loadFlashcards()
-    },
-    async loadFlashcardSet(id: number): Promise<void> {
-      await apiClient.get<FlashcardSet>('/flashcard-sets/' + id).then(response => {
-        this.flashcardSet = response.data
-      }).catch(error => {
-        console.log(error)
-      })
-    },
-    async loadFlashcards(): Promise<void> {
-      if (this.flashcardSet !== null) {
-        await apiClient.get<Flashcard[]>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards').then(response => {
-          this.flashcardMap = new Map(response.data.map(v => [v.id, v]))
-          this.loaded = true
-        }).catch(error => {
-          console.error(error)
-        })
-      }
     },
     addNewFlashcard(flashcard: Flashcard) {
       console.log(`Adding flashcard ${flashcard.id} to set ${this.flashcardSet?.id}`)
@@ -107,15 +94,6 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     },
     removeFlashcard(id: number) {
       this.flashcardMap.delete(id)
-    },
-    resetState() {
-      this.flashcardSet = null
-      this.flashcardMap = new Map()
-      this.loaded = false
-    },
-    checkStateLoaded() {
-      if (!this.flashcardSet) throw Error(`State check: flashcard set must be set`)
-      if (!this.loaded) throw Error(`State check: flashcard set store isn't loaded`)
     },
   }
 })

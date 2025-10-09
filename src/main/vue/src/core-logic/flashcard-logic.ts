@@ -42,6 +42,15 @@ export function copyFlashcard(value: Flashcard) : Flashcard {
   return JSON.parse(JSON.stringify(value))
 }
 
+export function sortFlashcardSets(flashcardSets: FlashcardSet[]): FlashcardSet[] {
+  return flashcardSets.sort((a, b) => {
+    if (a.default && !b.default) return -1
+    if (!a.default && b.default) return 1
+
+    return a.name.localeCompare(b.name)
+  })
+}
+
 export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
   const chronoStore = useChronoStore()
   const { currDay } = storeToRefs(chronoStore)

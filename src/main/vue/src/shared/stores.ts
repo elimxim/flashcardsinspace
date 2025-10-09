@@ -7,8 +7,10 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
   sendChronoSyncRequest,
   sendFlashcardSetGetRequest,
+  sendFlashcardSetListGetRequest,
   sendFlashcardsGetRequest
 } from '@/api/api-client.ts'
+import { sortFlashcardSets } from '@/core-logic/flashcard-logic.ts'
 
 export async function reloadFlashcardSetStores(forced: boolean = false): Promise<boolean> {
   console.log('Reloading flashcard set stores')
@@ -31,7 +33,7 @@ export async function loadFlashcardSetAndChronoStores(flashcardSet: FlashcardSet
   const flashcardSetStore = useFlashcardSetStore()
   const chronoStore = useChronoStore()
 
-  if (flashcardSetStore.loaded && !forced) {
+  if (flashcardSetStore.loaded && chronoStore.loaded && !forced) {
     console.log(`Flashcard set ${flashcardSet.id} already loaded, skipping`)
     return true
   }
@@ -66,6 +68,23 @@ export async function loadFlashcardSetAndChronoStoresById(setId: number, forced:
     .catch((error) => {
       console.error(`Failed to get flashcard set ${setId}`, error)
       toaster.bakeError(`Flashcard set error`, error.response?.data)
+      return false
+    })
+}
+
+export async function loadFlashcardSetsStore(): Promise<boolean> {
+  console.log('Loading flashcard sets store')
+  const flashcardSetsStore = useFlashcardSetsStore()
+  const toaster = useSpaceToaster()
+
+  return await sendFlashcardSetListGetRequest()
+    .then((response) => {
+      flashcardSetsStore.loadState(sortFlashcardSets(response.data))
+      return true
+    })
+    .catch((error) => {
+      console.error(`Failed to load flashcard sets`, error)
+      toaster.bakeError(`Flashcard sets error`, error.response?.data)
       return false
     })
 }

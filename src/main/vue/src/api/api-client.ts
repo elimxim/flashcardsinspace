@@ -6,7 +6,7 @@ import {
   FlashcardSetInitResponse,
 } from '@/api/communication.ts'
 import type { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
-import { Chronoday } from '@/model/chrono.ts';
+import { Chronoday } from '@/model/chrono.ts'
 
 const apiClient = axios.create({
   baseURL: '/api',
@@ -14,6 +14,11 @@ const apiClient = axios.create({
 })
 
 export default apiClient
+
+export async function sendFlashcardSetListGetRequest() {
+  console.log(`[GET] request => flashcard sets`)
+  return apiClient.get<FlashcardSet[]>('/flashcard-sets')
+}
 
 export async function sendFlashcardSetInitRequest(id: number, flashcard: Flashcard) {
   console.log(`[POST] request => init flashcard set ${id}`)
