@@ -213,6 +213,7 @@ async function updateFlashcardSet(): Promise<boolean> {
 
   return await sendFlashcardSetUpdateRequest(updatedSet.id, updatedSet)
     .then((response) => {
+      flashcardSetsStore.updateSet(response.data)
       flashcardSetStore.changeSet(response.data)
       return true
     })

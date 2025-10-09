@@ -4,10 +4,10 @@
       <li class="menu-item menu-select-item">
         <select
           ref="menuSelect"
-          v-model="selectedFlashcardSet"
+          v-model="selectedFlashcardSetId"
           class="menu-select"
           :disabled="isNoFlashcardSets">
-          <option v-for="s in flashcardSets" :key="s.id" :value="s">
+          <option v-for="s in flashcardSets" :key="s.id" :value="s.id">
             {{ truncate(s.name, 10) }}
           </option>
         </select>
@@ -130,18 +130,21 @@ function flashcardNumberByStage(stage: Stage): number {
 
 // <buckets
 
-const selectedFlashcardSet = computed({
+const selectedFlashcardSetId = computed({
   get: () => {
     const set = flashcardSet.value
     if (set) {
       saveSelectedSetId(set.id)
+      return set.id
     }
-    return set
   },
-  set: async (set) => {
-    if (set) {
-      saveSelectedSetId(set.id)
-      await loadFlashcardSetAndChronoStores(set)
+  set: async (setId) => {
+    if (setId) {
+      saveSelectedSetId(setId)
+      const set = flashcardSetsStore.findSet(setId)
+      if (set) {
+        await loadFlashcardSetAndChronoStores(set)
+      }
     }
   }
 })
