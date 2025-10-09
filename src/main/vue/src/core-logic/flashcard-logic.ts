@@ -34,6 +34,14 @@ export function updateFlashcardSides(flashcard: Flashcard, frontSide: string, ba
   return flashcard
 }
 
+export function copyFlashcardSet(value: FlashcardSet) : FlashcardSet {
+  return JSON.parse(JSON.stringify(value))
+}
+
+export function copyFlashcard(value: Flashcard) : Flashcard {
+  return JSON.parse(JSON.stringify(value))
+}
+
 export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
   const chronoStore = useChronoStore()
   const { currDay } = storeToRefs(chronoStore)

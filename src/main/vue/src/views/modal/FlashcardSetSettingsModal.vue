@@ -96,6 +96,7 @@ import {
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { reloadFlashcardSetStores } from '@/shared/stores.ts'
+import { copyFlashcardSet } from '@/core-logic/flashcard-logic.ts';
 
 const modalStore = useModalStore()
 const toaster = useSpaceToaster()
@@ -206,7 +207,7 @@ async function removeFlashcardSet(): Promise<boolean> {
 async function updateFlashcardSet(): Promise<boolean> {
   if (!flashcardSet.value) return false
 
-  const updatedSet: FlashcardSet = JSON.parse(JSON.stringify(flashcardSet.value))
+  const updatedSet = copyFlashcardSet(flashcardSet.value)
   updatedSet.name = curName.value ?? updatedSet.name
   updatedSet.languageId = curLanguage.value?.id ?? updatedSet.languageId
   updatedSet.default = curFirst.value ?? updatedSet.default
