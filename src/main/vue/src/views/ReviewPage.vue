@@ -156,16 +156,13 @@ const stageUpButton = ref<InstanceType<typeof SmartButton>>()
 const prevButton = ref<InstanceType<typeof SmartButton>>()
 const nextButton = ref<InstanceType<typeof SmartButton>>()
 
-const noPrevAvailable = computed(() => {
-  console.log('noPrevAvailable', flashcardsRemaining.value, flashcardsTotal.value)
-  return flashcardsTotal.value === flashcardsRemaining.value
-})
-const noNextAvailable = computed(() => currFlashcard.value === undefined)
 const reviewTopic = computed(() => props.stage?.displayName ?? 'Lightspeed')
 const reviewMode = computed(() => toReviewMode(props.stage))
 const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
 const flashcardsTotal = ref(0)
 const flashcardsRemaining = computed(() => reviewQueue.value.remaining())
+const editFormWasOpened = ref(false)
+const currFlashcard = ref<Flashcard>()
 const progress = computed(() => {
   const total = flashcardsTotal.value
   let remaining = flashcardsRemaining.value + 1
@@ -173,8 +170,8 @@ const progress = computed(() => {
   const completionRate = (total - remaining) / total
   return Math.max(0, Math.min(1, completionRate))
 })
-const editFormWasOpened = ref(false)
-const currFlashcard = ref<Flashcard>()
+const noPrevAvailable = computed(() => flashcardsTotal.value === flashcardsRemaining.value + 1)
+const noNextAvailable = computed(() => currFlashcard.value === undefined)
 
 function prevFlashcard(): boolean {
   currFlashcard.value = reviewQueue.value.prev()
