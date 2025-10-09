@@ -17,11 +17,11 @@ export const useFlashcardSetsStore = defineStore('flashcard-sets', {
     isEmpty(): boolean {
       return this.flashcardSets.length === 0
     },
-    firstFlashcardSet(): FlashcardSet | null {
-      return this.flashcardSets[0] ?? null
+    firstFlashcardSet(): FlashcardSet | undefined {
+      return this.flashcardSets[0]
     },
-    lastFlashcardSet(): FlashcardSet | null {
-      return this.flashcardSets[this.flashcardSets.length - 1] ?? null
+    lastFlashcardSet(): FlashcardSet | undefined {
+      return this.flashcardSets[this.flashcardSets.length - 1]
     },
   },
   actions: {
@@ -61,6 +61,9 @@ export const useFlashcardSetsStore = defineStore('flashcard-sets', {
       } else {
         throw Error(`Couldn't find flashcard set ${flashcardSet.id} in the store to update`)
       }
+    },
+    findSet(id: number): FlashcardSet | undefined {
+      return this.flashcardSets.find(v => v.id === id)
     },
   }
 })

@@ -15,20 +15,20 @@
 import MainMenu from '@/components/MainMenu.vue'
 import ReviewFormStarter from '@/components/ReviewFormStarter.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
-import { storeToRefs } from 'pinia'
-import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
 import {
+  determineCurrFlashcardSet,
   loadFlashcardSetAndChronoStores,
   loadFlashcardSetsStore,
 } from '@/shared/stores.ts'
 
-const flashcardSetsStore = useFlashcardSetsStore()
-const { firstFlashcardSet } = storeToRefs(flashcardSetsStore)
 
 loadFlashcardSetsStore()
-  .then((loaded) => {
-    if (loaded && firstFlashcardSet.value) {
-      loadFlashcardSetAndChronoStores(firstFlashcardSet.value, true)
+  .then(async (loaded) => {
+    if (loaded) {
+      const currFlashcardSet = determineCurrFlashcardSet()
+      if (currFlashcardSet) {
+        await loadFlashcardSetAndChronoStores(currFlashcardSet)
+      }
     }
   })
 

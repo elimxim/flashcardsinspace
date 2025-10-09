@@ -132,16 +132,16 @@ function flashcardNumberByStage(stage: Stage): number {
 
 const selectedFlashcardSet = computed({
   get: () => {
-    const set = flashcardSetStore.flashcardSet
-    if (set !== null) {
+    const set = flashcardSet.value
+    if (set) {
       saveSelectedSetId(set.id)
     }
     return set
   },
   set: async (set) => {
-    if (set !== null) {
+    if (set) {
       saveSelectedSetId(set.id)
-      await loadFlashcardSetAndChronoStores(set, false)
+      await loadFlashcardSetAndChronoStores(set)
     }
   }
 })

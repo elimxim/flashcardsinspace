@@ -94,7 +94,7 @@ import {
   sendFlashcardSetUpdateRequest,
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { reloadFlashcardSetStores } from '@/shared/stores.ts'
+import { reloadFlashcardSetAndChronoStores } from '@/shared/stores.ts'
 import { copyFlashcardSet } from '@/core-logic/flashcard-logic.ts'
 
 const modalStore = useModalStore()
@@ -159,7 +159,7 @@ function cancel() {
 async function remove() {
   const removed = await removeFlashcardSet()
   if (removed) {
-    await reloadFlashcardSetStores(true)
+    await reloadFlashcardSetAndChronoStores(true)
       .then(() => {
         modalStore.toggleFlashcardSetSettings()
         resetState()
