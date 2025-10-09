@@ -76,41 +76,18 @@ export const useChronoStore = defineStore('chrono', {
       this.checkStateLoaded()
       return true
     },
-    async markLastDaysAsInProgress(flashcardSet: FlashcardSet) {
-      if (isInProgressAvailable(this.currDay)) {
-        await this.markDaysAs(flashcardSet, chronodayStatuses.IN_PROGRESS, isInProgressAvailable)
-      }
-    },
-    async markLastDaysAsCompleted(flashcardSet: FlashcardSet) {
-      if (isCompleteAvailable(this.currDay)) {
-        await this.markDaysAs(flashcardSet, chronodayStatuses.COMPLETED, isCompleteAvailable)
-      }
-    },
-    async markDaysAs(
-      flashcardSet: FlashcardSet,
-      status: string,
-      daysFilter: (chronoday: Chronoday) => boolean,
-    ) {
-      const days = selectConsecutiveDaysBeforeIncluding(
-        this.chronodays, this.currDay, daysFilter
-      )
-
-      if (days.length === 0) {
-        console.error(`No days to mark as ${status}, flashcard set ID: ${flashcardSet.id}, current day: ${this.currDay.id}`)
-        return
-      }
-
-      const request: ChronoBulkUpdateRequest = {
-        ids: days.map((v): ChronodayId => ({ id: v.id })),
-        status: status
-      }
-
-      await apiClient.put<Chronoday>('/flashcard-sets/' + flashcardSet.id + '/chrono/bulk', request)
-        .then(() =>
-          // todo log response
-          this.loadChronodays(flashcardSet)
-        )
-      // todo handle errors
+    updateDays(updatedDays: Chronoday[]) {
+      updatedDays.forEach(newDay => {
+        const idx = this.chronodays.findIndex(v => v.id === newDay.id)
+        if (idx !== -1) {
+          this.chronodays[idx] = newDay
+        } else {
+          console.error(`Couldn't find day ${newDay.id} in the store to update status to ${newDay.status}`)
+        }
+        if (this.currDay.id === newDay.id) {
+          this.currDay = newDay
+        }
+      })
     },
     checkStateLoaded() {
       if (!this.loaded) throw Error(`State check: chrono store isn't loaded`)

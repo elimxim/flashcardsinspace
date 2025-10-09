@@ -71,13 +71,6 @@ class ChronoService(
     }
 
     @Transactional
-    fun bulkUpdate(user: User, setId: Long, request: ChronoBulkUpdateRequest): List<ChronodayDto> {
-        log.info("User ${user.id}: bulk updating chronodays for flashcard set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        return bulkUpdate(setId, requestValidator.validate(request))
-    }
-
-    @Transactional
     fun syncDay(user: User, setId: Long, day: ChronoSyncDay): Pair<ChronodayDto, List<ChronodayDto>> {
         log.info("User ${user.id}: chrono step $day for flashcard set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
@@ -131,6 +124,13 @@ class ChronoService(
     }
 
     @Transactional
+    fun bulkUpdate(user: User, setId: Long, request: ChronoBulkUpdateRequest): List<ChronodayDto> {
+        log.info("User ${user.id}: bulk updating chronodays for flashcard set $setId")
+        flashcardSetService.verifyUserHasAccess(user, setId)
+        return bulkUpdate(setId, requestValidator.validate(request))
+    }
+
+    @Transactional
     fun bulkUpdate(setId: Long, request: ValidChronoBulkUpdateRequest): List<ChronodayDto> {
         val flashcardSet = flashcardSetService.getEntity(setId)
         if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
@@ -147,11 +147,11 @@ class ChronoService(
             }
         }
 
-        val updateFlashcardSet = if (changed) {
+        val updatedFlashcardSet = if (changed) {
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
-        val chronodays = updateFlashcardSet.chronodays.filter { it.id in request.ids }
+        val chronodays = updatedFlashcardSet.chronodays.filter { it.id in request.ids }
         val schedule = lightspeedService.createSchedule(chronodays, daysAhead = 0)
         return schedule
     }

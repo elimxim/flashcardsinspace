@@ -47,7 +47,7 @@ export function selectConsecutiveDaysBeforeIncluding(
   const result: Chronoday[] = []
   for (let i = startDay.seqNumber; i >= 0; i--) {
     const chronoday = chronodays[i]
-    if (chronoday !== undefined && condition(chronoday)) {
+    if (chronoday && condition(chronoday)) {
       result.push(chronoday)
     } else {
       break

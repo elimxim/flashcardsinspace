@@ -108,6 +108,7 @@
       </div>
     </div>
   </div>
+  <SpaceToast/>
 </template>
 
 <script setup lang="ts">
@@ -115,10 +116,11 @@ import Progressbar from '@/components/Progressbar.vue'
 import SpaceDeck from '@/components/SpaceDeck.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
+import SpaceToast from '@/components/SpaceToast.vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { updateFlashcard } from '@/core-logic/flashcard-logic.ts'
+import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { nextStage, prevStage, Stage, stages } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
@@ -132,16 +134,27 @@ import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { loadSelectedSetId } from '@/shared/cookies.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
-import { Flashcard } from '@/model/flashcard.ts'
+import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import {
   loadFlashcardSetAndChronoStoresById
 } from '@/shared/stores.ts'
+import {
+  sendChronoBulkUpdateRequest,
+  sendFlashcardUpdateRequest
+} from '@/api/api-client.ts'
+import { useSpaceToaster } from '@/stores/toast-store.ts'
+import {
+  chronodayStatuses, isCompleteAvailable, isInProgressAvailable,
+  selectConsecutiveDaysBeforeIncluding
+} from '@/core-logic/chrono-logic.ts'
+import type { Chronoday } from '@/model/chrono.ts';
 
 const props = defineProps<{
   stage?: Stage,
 }>()
 
 const router = useRouter()
+const toaster = useSpaceToaster()
 const modalStore = useModalStore()
 const chronoStore = useChronoStore()
 const flashcardSetStore = useFlashcardSetStore()
@@ -150,6 +163,10 @@ const {
   flashcardSet,
   flashcards,
 } = storeToRefs(flashcardSetStore)
+const {
+  chronodays,
+  currDay
+} = storeToRefs(chronoStore)
 const { flashcardEditOpen } = storeToRefs(modalStore)
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
@@ -161,6 +178,7 @@ const nextButton = ref<InstanceType<typeof SmartButton>>()
 
 const reviewTopic = computed(() => props.stage?.displayName ?? 'Lightspeed')
 const reviewMode = computed(() => toReviewMode(props.stage))
+const isLightspeedMode = computed(() => reviewMode.value === ReviewMode.LIGHTSPEED)
 const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
 const flashcardsTotal = ref(0)
 const flashcardsRemaining = computed(() => reviewQueue.value.remaining())
@@ -202,11 +220,12 @@ function finishReview() {
   console.log(`Finishing review on stage: ${props.stage?.displayName ?? 'default'}`)
   reviewQueue.value = new EmptyReviewQueue()
   flashcardsTotal.value = 0
-  if (noNextAvailable.value
-    && reviewMode.value === ReviewMode.LIGHTSPEED
-    && flashcardSet.value !== null
-  ) {
-    chronoStore.markLastDaysAsCompleted(flashcardSet.value)
+  if (flashcardSet.value) {
+    if (noNextAvailable.value && isLightspeedMode.value) {
+      markDaysAsCompleted(flashcardSet.value)
+    }
+  } else {
+    console.error(`Can't gracefully finish review: flashcard set is undefined`)
   }
 }
 
@@ -217,37 +236,37 @@ function finishReviewAndGoToFlashcards() {
 
 async function stageDown() {
   if (flashcardSet.value && currFlashcard.value) {
-    const flashcard = currFlashcard.value
-    updateFlashcard(flashcard, prevStage(flashcard.stage))
-    flashcardSetStore.updateFlashcard(flashcard)
-    if (reviewMode.value === ReviewMode.LIGHTSPEED) {
-      await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
-    }
     editFormWasOpened.value = false
     spaceDeck.value?.willSlideToLeft()
-    if (!nextFlashcard()) {
-      if (reviewMode.value === ReviewMode.LIGHTSPEED) {
-        await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
-      }
+    const flashcard = copyFlashcard(currFlashcard.value)
+    updateFlashcard(flashcard, prevStage(flashcard.stage))
+    const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
+    if (success) {
+      await markDaysAndGoNext(flashcardSet.value)
     }
+  } else {
+    console.error(`stageDown's impossible:`,
+      `flashcard set ${flashcardSet.value?.id ?? 'undefined'}`,
+      `flashcard ${currFlashcard.value?.id ?? 'undefined'}`
+    )
   }
 }
 
 async function stageUp() {
   if (flashcardSet.value && currFlashcard.value) {
-    const flashcard = currFlashcard.value
-    updateFlashcard(flashcard, nextStage(flashcard.stage))
-    flashcardSetStore.updateFlashcard(flashcard)
-    if (reviewMode.value === ReviewMode.LIGHTSPEED) {
-      await chronoStore.markLastDaysAsInProgress(flashcardSet.value)
-    }
     editFormWasOpened.value = false
     spaceDeck.value?.willSlideToRight()
-    if (!nextFlashcard()) {
-      if (reviewMode.value === ReviewMode.LIGHTSPEED) {
-        await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
-      }
+    const flashcard = copyFlashcard(currFlashcard.value)
+    updateFlashcard(flashcard, nextStage(flashcard.stage))
+    const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
+    if (success) {
+      await markDaysAndGoNext(flashcardSet.value)
     }
+  } else {
+    console.error(`stageUp's impossible:`,
+      `flashcard set ${flashcardSet.value?.id ?? 'undefined'}`,
+      `flashcard ${currFlashcard.value?.id ?? 'undefined'}`
+    )
   }
 }
 
@@ -262,13 +281,80 @@ async function next() {
 }
 
 async function moveBack() {
-  if (currFlashcard.value) {
-    const flashcard = currFlashcard.value
-    updateFlashcard(flashcard, stages.S1)
-    flashcardSetStore.updateFlashcard(flashcard)
+  if (flashcardSet.value && currFlashcard.value) {
+    editFormWasOpened.value = false
     spaceDeck.value?.willSlideToLeft()
-    nextFlashcard()
+    const flashcard = copyFlashcard(currFlashcard.value)
+    updateFlashcard(flashcard, stages.S1)
+    const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
+    if (success) {
+      nextFlashcard()
+    }
+  } else {
+    console.error(`moveBack's impossible:`,
+      `flashcard set ${flashcardSet.value?.id ?? 'undefined'}`,
+      `flashcard ${currFlashcard.value?.id ?? 'undefined'}`
+    )
   }
+}
+
+async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flashcard): Promise<boolean> {
+  return await sendFlashcardUpdateRequest(flashcardSet.id, flashcard)
+    .then((response) => {
+      flashcardSetStore.changeFlashcard(response.data)
+      currFlashcard.value = response.data
+      return true
+    })
+    .catch((error) => {
+      console.error(`Failed to update flashcard ${flashcard.id}`, error.response?.data)
+      toaster.bakeError(`Couldn't move a flashcard`, error.response?.data)
+      return false
+    })
+}
+
+async function markDaysAndGoNext(flashcardSet: FlashcardSet) {
+  if (nextFlashcard() && isLightspeedMode.value) {
+    await markDaysAsInProgress(flashcardSet)
+  } else if (isLightspeedMode.value) {
+    await markDaysAsCompleted(flashcardSet)
+  }
+}
+
+async function markDaysAsInProgress(flashcardSet: FlashcardSet) {
+  if (isInProgressAvailable(currDay.value)) {
+    await markDaysAs(flashcardSet, chronodayStatuses.IN_PROGRESS, isInProgressAvailable)
+  }
+}
+
+async function markDaysAsCompleted(flashcardSet: FlashcardSet) {
+  if (isCompleteAvailable(currDay.value)) {
+    await markDaysAs(flashcardSet, chronodayStatuses.COMPLETED, isCompleteAvailable)
+  }
+}
+
+async function markDaysAs(
+  flashcardSet: FlashcardSet,
+  status: string,
+  daysFilter: (chronoday: Chronoday) => boolean,
+) {
+  const days = selectConsecutiveDaysBeforeIncluding(chronodays.value, currDay.value, daysFilter)
+  if (days.length === 0) {
+    console.error(
+      `No days to mark as ${status}`,
+      `flashcard set ${flashcardSet.id}`,
+      `current day: ${JSON.stringify(currDay.value)}`
+    )
+    return
+  }
+
+  await sendChronoBulkUpdateRequest(flashcardSet.id, status, days)
+    .then((response) => {
+      chronoStore.updateDays(response.data)
+    })
+    .catch((error) => {
+      console.error(`Failed to mark days as ${status} for ${flashcardSet.id}`, error.response?.data)
+      toaster.bakeError(`Couldn't move a flashcard`, error.response?.data)
+    })
 }
 
 function onFlashcardRemoved() {

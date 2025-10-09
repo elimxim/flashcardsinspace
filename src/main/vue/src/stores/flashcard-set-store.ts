@@ -105,24 +105,6 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
         console.error(`Couldn't find flashcard ${flashcard.id} in the store to update it`)
       }
     },
-    updateFlashcard(updateFlashcard: Flashcard) {
-      if (this.flashcardSet !== null) {
-        apiClient.put<Flashcard>('/flashcard-sets/' + this.flashcardSet.id + '/flashcards/' + updateFlashcard.id, updateFlashcard).then(response => {
-          const currFlashcard = this.flashcardMap.get(updateFlashcard.id) as Flashcard | undefined
-          if (currFlashcard !== undefined) {
-            currFlashcard.frontSide = response.data.frontSide
-            currFlashcard.backSide = response.data.backSide
-            currFlashcard.stage = response.data.stage
-            currFlashcard.reviewCount = response.data.reviewCount
-            currFlashcard.reviewHistory = response.data.reviewHistory
-            currFlashcard.lastUpdatedAt = response.data.lastUpdatedAt
-          }
-        })
-        // todo handle errors
-      } else {
-        throw new Error(`Can't update flashcard=${updateFlashcard}: flashcard set is null`)
-      }
-    },
     removeFlashcard(id: number) {
       this.flashcardMap.delete(id)
     },

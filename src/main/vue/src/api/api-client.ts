@@ -1,10 +1,12 @@
 import axios from 'axios'
 import {
+  type ChronoBulkUpdateRequest, type ChronodayId,
   ChronoSyncRequest,
   ChronoSyncResponse,
   FlashcardSetInitResponse,
 } from '@/api/communication.ts'
 import type { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
+import { Chronoday } from '@/model/chrono.ts';
 
 const apiClient = axios.create({
   baseURL: '/api',
@@ -75,4 +77,14 @@ export async function sendChronoSyncNextDay(setId: number) {
 export async function sendChronoSyncPrevDay(setId: number) {
   console.log(`[POST] request => chrono sync prev for set ${setId}`)
   return apiClient.post<ChronoSyncResponse>(`/flashcard-sets/${setId}/chrono/sync/prev`)
+}
+
+export async function sendChronoBulkUpdateRequest(setId: number, status: string, days: Chronoday[]) {
+  console.log(`[PUT] request => bulk update days ${status} for set ${setId}`)
+  const request: ChronoBulkUpdateRequest = {
+    ids: days.map((v): ChronodayId => ({ id: v.id })),
+    status: status
+  }
+
+  return apiClient.put<Chronoday[]>(`/flashcard-sets/${setId}/chrono/bulk`, request)
 }
