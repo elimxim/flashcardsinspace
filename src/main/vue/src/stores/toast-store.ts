@@ -39,13 +39,14 @@ export const useSpaceToaster = defineStore('space-toaster', {
   },
   actions: {
     bakeError(title: string, error: ErrorResponseBody | undefined) {
-      this.bake({
+      const toast: Toast = {
         type: ToastType.ERROR,
         title: title,
         message: error?.message,
         footer: error?.errorCode,
         duration: 4000,
-      })
+      }
+      this.bake(toast)
     },
     bakeSuccess(title: string, message: string, delay?: number) {
       const toast: Toast = {
@@ -66,10 +67,18 @@ export const useSpaceToaster = defineStore('space-toaster', {
       }, delay)
     },
     bake(toast: Toast) {
+      const wasShowing = this.show
       this.reset()
-      this.toast = toast
-      this.show = true
-      this.start()
+      const showNow = () => {
+        this.toast = toast
+        this.show = true
+        this.start()
+      }
+      if (wasShowing) {
+        requestAnimationFrame(showNow)
+      } else {
+        showNow()
+      }
     },
     start() {
       if (this.toast !== null) {
@@ -83,8 +92,7 @@ export const useSpaceToaster = defineStore('space-toaster', {
       if (this.toast !== null) {
         if (this.toast.persistent || this.timeout == null) return
         this.paused = true
-        const now = performance.now()
-        this.remaining -= now - this.startedAt
+        this.remaining -= performance.now() - this.startedAt
         window.clearTimeout(this.timeout)
         this.timeout = null
       }
