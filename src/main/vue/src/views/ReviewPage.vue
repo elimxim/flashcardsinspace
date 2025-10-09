@@ -166,7 +166,13 @@ const reviewMode = computed(() => toReviewMode(props.stage))
 const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
 const flashcardsTotal = ref(0)
 const flashcardsRemaining = computed(() => reviewQueue.value.remaining())
-const progress = ref(0)
+const progress = computed(() => {
+  const total = flashcardsTotal.value
+  let remaining = flashcardsRemaining.value + 1
+  if (noNextAvailable.value) remaining = 0
+  const completionRate = (total - remaining) / total
+  return Math.max(0, Math.min(1, completionRate))
+})
 const editFormWasOpened = ref(false)
 const currFlashcard = ref<Flashcard>()
 
@@ -178,13 +184,6 @@ function prevFlashcard(): boolean {
 function nextFlashcard(): boolean {
   currFlashcard.value = reviewQueue.value.next()
   return currFlashcard.value !== undefined
-}
-
-function calcProgress() {
-  const total = flashcardsTotal.value
-  const remaining = flashcardsRemaining.value + 1
-  const completionRate = (total - remaining) / total
-  progress.value = Math.max(0, Math.min(1, completionRate))
 }
 
 function startReview() {
@@ -225,12 +224,9 @@ async function stageDown() {
     editFormWasOpened.value = false
     spaceDeck.value?.willSlideToLeft()
     if (!nextFlashcard()) {
-      progress.value = 1
       if (reviewMode.value === ReviewMode.LIGHTSPEED) {
         await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
       }
-    } else {
-      calcProgress()
     }
   }
 }
@@ -246,32 +242,21 @@ async function stageUp() {
     editFormWasOpened.value = false
     spaceDeck.value?.willSlideToRight()
     if (!nextFlashcard()) {
-      progress.value = 1
       if (reviewMode.value === ReviewMode.LIGHTSPEED) {
         await chronoStore.markLastDaysAsCompleted(flashcardSet.value)
       }
-    } else {
-      calcProgress()
     }
   }
 }
 
 async function prev() {
   spaceDeck.value?.willSlideToLeft()
-  if (prevFlashcard()) {
-    calcProgress()
-  } else {
-    progress.value = 1
-  }
+  prevFlashcard()
 }
 
 async function next() {
   spaceDeck.value?.willSlideToRight()
-  if (nextFlashcard()) {
-    calcProgress()
-  } else {
-    progress.value = 1
-  }
+  nextFlashcard()
 }
 
 async function moveBack() {
@@ -280,21 +265,13 @@ async function moveBack() {
     updateFlashcard(flashcard, stages.S1)
     flashcardSetStore.updateFlashcard(flashcard)
     spaceDeck.value?.willSlideToLeft()
-    if (nextFlashcard()) {
-      calcProgress()
-    } else {
-      progress.value = 1
-    }
+    nextFlashcard()
   }
 }
 
 function onFlashcardRemoved() {
   editFormWasOpened.value = false
-  if (nextFlashcard()) {
-    calcProgress()
-  } else {
-    progress.value = 1
-  }
+  nextFlashcard()
 }
 
 async function loadReviewState() {
@@ -324,9 +301,7 @@ async function loadReviewState() {
   }
   console.log('Starting review...')
   console.log('flashcardSetStore.flashcards:', flashcardSetStore.flashcards.length)
-  //reviewStore.startReview(flashcardSetStore.flashcards, props.stage)
   startReview()
-  calcProgress()
 }
 
 watch(flashcardEditOpen, (newVal) => {
