@@ -6,10 +6,9 @@
   - Describe the project
 - Refactoring
   - Communication fields renaming
-  - ReviewPage refactoring
-    - Routing: URL should include the flashcard id
   - Inputs change "<> is required" to "<>" if it's required
 - UX:
+  - Use user timezone instead of UTC
   - Home page
   - Lightspeed page
   - Footer
