@@ -137,6 +137,7 @@ const selectedFlashcardSetId = computed({
       saveSelectedSetId(set.id)
       return set.id
     }
+    return undefined
   },
   set: async (setId) => {
     if (setId) {

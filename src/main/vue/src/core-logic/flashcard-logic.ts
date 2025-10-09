@@ -44,9 +44,6 @@ export function copyFlashcard(value: Flashcard) : Flashcard {
 
 export function sortFlashcardSets(flashcardSets: FlashcardSet[]): FlashcardSet[] {
   return flashcardSets.sort((a, b) => {
-    if (a.default && !b.default) return -1
-    if (!a.default && b.default) return 1
-
     return a.name.localeCompare(b.name)
   })
 }
@@ -73,13 +70,11 @@ export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
 export function createFlashcardSet(
   name: string,
   language: Language,
-  first: boolean = false,
 ): FlashcardSet {
   return {
     id: 0,
     name: name,
     status: flashcardSetStatuses.ACTIVE,
-    default: first,
     languageId: language.id,
     createdAt: new Date(),
     startedAt: null,

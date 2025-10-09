@@ -36,16 +36,6 @@
           />
         </AwesomeContainer>
       </div>
-      <div class="modal-main-area--inner">
-        <label>
-          <input v-model="curFirst" type="checkbox"/>
-          {{
-            curFirst
-              ? "This flashcard set is set as the default"
-              : "Set this flashcard set as the default"
-          }}
-        </label>
-      </div>
     </div>
     <div class="modal-control-buttons">
       <SmartButton
@@ -109,11 +99,9 @@ const { flashcardSet, language } = storeToRefs(flashcardSetStore)
 const curName = ref<string | undefined>(flashcardSet.value?.name)
 const curNameInput = ref<HTMLElement>()
 const curLanguage = ref<Language | undefined>(language.value)
-const curFirst = ref<boolean | undefined>(flashcardSet.value?.default)
 
 const stateChanged = computed(() => {
   return flashcardSet.value?.name !== curName.value
-    || flashcardSet.value?.default !== curFirst.value
     || language.value !== curLanguage.value
 })
 
@@ -184,7 +172,6 @@ function resetState() {
   $v.value.$reset()
   curName.value = flashcardSet.value?.name
   curLanguage.value = language.value
-  curFirst.value = flashcardSet.value?.default
 }
 
 async function removeFlashcardSet(): Promise<boolean> {
@@ -209,7 +196,6 @@ async function updateFlashcardSet(): Promise<boolean> {
   const updatedSet = copyFlashcardSet(flashcardSet.value)
   updatedSet.name = curName.value ?? updatedSet.name
   updatedSet.languageId = curLanguage.value?.id ?? updatedSet.languageId
-  updatedSet.default = curFirst.value ?? updatedSet.default
 
   return await sendFlashcardSetUpdateRequest(updatedSet.id, updatedSet)
     .then((response) => {
@@ -226,7 +212,6 @@ async function updateFlashcardSet(): Promise<boolean> {
 
 watch(flashcardSet, (newVal) => {
   curName.value = newVal?.name
-  curFirst.value = newVal?.default
 })
 
 watch(language, (newVal) => {

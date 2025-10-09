@@ -23,7 +23,6 @@ export interface FlashcardSet {
   id: number
   name: string
   status: string,
-  default: boolean // fixme first
   languageId: number
   createdAt: Date
   startedAt: string | null // fixme Date
