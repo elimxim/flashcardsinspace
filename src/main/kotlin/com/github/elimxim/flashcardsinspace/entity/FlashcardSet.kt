@@ -18,9 +18,6 @@ class FlashcardSet(
     var status: FlashcardSetStatus = FlashcardSetStatus.ACTIVE,
 
     @Column(nullable = false)
-    var first: Boolean = false,
-
-    @Column(nullable = false)
     var createdAt: ZonedDateTime,
 
     @Column(nullable = false)

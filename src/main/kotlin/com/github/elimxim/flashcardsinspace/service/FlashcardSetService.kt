@@ -51,7 +51,6 @@ class FlashcardSetService(
         val flashcardSet = FlashcardSet(
             name = request.name,
             language = language,
-            first = false,
             createdAt = ZonedDateTime.now(),
             flashcards = arrayListOf(),
             user = user,
@@ -88,10 +87,6 @@ class FlashcardSetService(
         }
         if (request.status!= null && request.status != flashcardSet.status) {
             flashcardSet.status = request.status
-            changed = true
-        }
-        if (request.first != null && request.first != flashcardSet.first) {
-            flashcardSet.first = request.first
             changed = true
         }
         if (request.languageId != null && request.languageId != flashcardSet.language.id) {

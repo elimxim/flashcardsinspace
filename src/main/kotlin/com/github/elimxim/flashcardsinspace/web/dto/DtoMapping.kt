@@ -19,7 +19,6 @@ fun Language.toDto() = LanguageDto(
 fun FlashcardSet.toDto() = FlashcardSetDto(
     id = id,
     name = name,
-    default = first,
     status = status.name,
     languageId = language.id,
     createdAt = createdAt.toString(),

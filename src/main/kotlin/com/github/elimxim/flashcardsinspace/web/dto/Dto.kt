@@ -17,7 +17,6 @@ data class LanguageDto(
 data class FlashcardSetDto(
     val id: Long,
     val name: String,
-    val default: Boolean, // fixme first
     val status: String,
     val languageId: Long,
     val createdAt: String, // fixme ZonedDateTime
