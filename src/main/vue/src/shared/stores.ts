@@ -10,7 +10,7 @@ import {
   sendFlashcardsGetRequest
 } from '@/api/api-client.ts'
 
-export async function reloadFlashcardSetStores(): Promise<boolean> {
+export async function reloadFlashcardSetStores(forced: boolean = false): Promise<boolean> {
   console.log('Reloading flashcard set stores')
   const flashcardSetsStore = useFlashcardSetsStore()
   const flashcardSetStore = useFlashcardSetStore()
@@ -18,18 +18,23 @@ export async function reloadFlashcardSetStores(): Promise<boolean> {
   const { firstFlashcardSet } = storeToRefs(flashcardSetsStore)
 
   if (firstFlashcardSet.value) {
-    return await loadFlashcardSetStores(firstFlashcardSet.value)
+    return await loadFlashcardSetAndChronoStores(firstFlashcardSet.value, forced)
   } else {
     flashcardSetStore.resetState()
     return true
   }
 }
 
-export async function loadFlashcardSetStores(flashcardSet: FlashcardSet): Promise<boolean> {
-  console.log(`Loading flashcard set stores state for ${flashcardSet.id}`)
+export async function loadFlashcardSetAndChronoStores(flashcardSet: FlashcardSet, forced: boolean = false): Promise<boolean> {
+  console.log(`Loading flashcard set and chrono stores for ${flashcardSet.id}`)
   const toaster = useSpaceToaster()
   const flashcardSetStore = useFlashcardSetStore()
   const chronoStore = useChronoStore()
+
+  if (flashcardSetStore.loaded && !forced) {
+    console.log(`Flashcard set ${flashcardSet.id} already loaded, skipping`)
+    return true
+  }
 
   return await sendFlashcardsGetRequest(flashcardSet.id)
     .then(async (response) => {
@@ -50,13 +55,13 @@ export async function loadFlashcardSetStores(flashcardSet: FlashcardSet): Promis
     })
 }
 
-export async function fullyLoadFlashcardSetStore(setId: number): Promise<boolean> {
-  console.log(`Fully loading flashcard set stores for ${setId}`)
+export async function loadFlashcardSetAndChronoStoresById(setId: number, forced: boolean = false): Promise<boolean> {
+  console.log(`Loading flashcard set and chrono stores for ${setId}`)
   const toaster = useSpaceToaster()
 
   return await sendFlashcardSetGetRequest(setId)
     .then((response) => {
-      return loadFlashcardSetStores(response.data)
+      return loadFlashcardSetAndChronoStores(response.data, forced)
     })
     .catch((error) => {
       console.error(`Failed to get flashcard set ${setId}`, error)

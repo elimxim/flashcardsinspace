@@ -159,7 +159,7 @@ function cancel() {
 async function remove() {
   const removed = await removeFlashcardSet()
   if (removed) {
-    await reloadFlashcardSetStores()
+    await reloadFlashcardSetStores(true)
       .then(() => {
         modalStore.toggleFlashcardSetSettings()
         resetState()

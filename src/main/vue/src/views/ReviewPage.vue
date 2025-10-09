@@ -133,6 +133,9 @@ import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { loadSelectedSetId } from '@/shared/cookies.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { Flashcard } from '@/model/flashcard.ts'
+import {
+  loadFlashcardSetAndChronoStoresById
+} from '@/shared/stores.ts'
 
 const props = defineProps<{
   stage?: Stage,
@@ -184,17 +187,19 @@ function nextFlashcard(): boolean {
 }
 
 function startReview() {
+  console.log(`Starting review on stage: ${props.stage?.displayName ?? 'default'}`)
   if (props.stage) {
-    console.log('Creating review queue for stage', props.stage)
     reviewQueue.value = createReviewQueueForStage(flashcards.value, props.stage)
   } else {
     reviewQueue.value = createReviewQueue(flashcards.value)
   }
   flashcardsTotal.value = reviewQueue.value.remaining()
   nextFlashcard()
+  console.log(`Flashcards TOTAL: ${flashcardsTotal.value}`)
 }
 
 function finishReview() {
+  console.log(`Finishing review on stage: ${props.stage?.displayName ?? 'default'}`)
   reviewQueue.value = new EmptyReviewQueue()
   flashcardsTotal.value = 0
   if (noNextAvailable.value
@@ -271,36 +276,6 @@ function onFlashcardRemoved() {
   nextFlashcard()
 }
 
-async function loadReviewState() {
-  console.log('Loading review state...')
-  if (!flashcardSetStore.loaded) {
-    console.log('flashcardSetStore.loaded:', flashcardSetStore.loaded)
-    const selectedSetId = loadSelectedSetId()
-    if (selectedSetId) {
-      console.log('Loading flashcard set', selectedSetId, '...')
-      await flashcardSetStore.loadFlashcardSet(selectedSetId)
-        .then(async () => {
-          console.log('Loading flashcards for set', selectedSetId, '...')
-          await flashcardSetStore.loadFlashcards()
-        })
-        .then(async () => {
-          if (!chronoStore.loaded) {
-            console.log('chronoStore.loaded:', chronoStore.loaded)
-            if (flashcardSet.value !== null) {
-              console.log('Loading chronodays...')
-              await chronoStore.loadChronodays(flashcardSet.value)
-            } else {
-              console.log('Flashcard set not found')
-            }
-          }
-        })
-    }
-  }
-  console.log('Starting review...')
-  console.log('flashcardSetStore.flashcards:', flashcardSetStore.flashcards.length)
-  startReview()
-}
-
 watch(flashcardEditOpen, (newVal) => {
   if (newVal) {
     editFormWasOpened.value = newVal
@@ -308,27 +283,26 @@ watch(flashcardEditOpen, (newVal) => {
 })
 
 onMounted(async () => {
-  await loadReviewState()
+  if (!flashcardSetStore.loaded) {
+    console.log('Flashcard set not loaded, loading...')
+    const selectedSetId = loadSelectedSetId()
+    if (selectedSetId) {
+      await loadFlashcardSetAndChronoStoresById(selectedSetId)
+    } else {
+      console.log('Flashcard set not found in cookies')
+    }
+  }
+  startReview()
   spaceDeck.value?.setDeckReady()
-  console.log('Started review',
-    props.stage ? `on stage: ${props.stage.displayName}` : 'on default stage',
-    'flashcards TOTAL:', flashcardsTotal.value,
-  )
   document.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
-  console.log('Finishing review',
-    props.stage ? `on stage: ${props.stage}` : 'on default stage',
-  )
   finishReview()
   document.removeEventListener('keydown', handleKeydown)
 })
 
 onBeforeRouteLeave(() => {
-  console.log('Finishing review...',
-    props.stage ? ` on stage: ${props.stage}` : '',
-  )
   finishReview()
 })
 
