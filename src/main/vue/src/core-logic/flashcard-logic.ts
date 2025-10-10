@@ -28,7 +28,7 @@ export function newFlashcard(frontSide: string, backSide: string): Flashcard {
 export function updateFlashcardSides(flashcard: Flashcard, frontSide: string, backSide: string): Flashcard {
   flashcard.frontSide = frontSide
   flashcard.backSide = backSide
-  flashcard.lastUpdatedAt = new Date().toISOString()
+  flashcard.lastUpdatedAt = new Date()
   return flashcard
 }
 
@@ -61,7 +61,7 @@ export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
   flashcard.lastReviewDate = chronodate
   flashcard.timesReviewed += 1
   flashcard.reviewHistory.history.push(info)
-  flashcard.lastUpdatedAt = new Date().toISOString()
+  flashcard.lastUpdatedAt = new Date()
   return flashcard
 }
 

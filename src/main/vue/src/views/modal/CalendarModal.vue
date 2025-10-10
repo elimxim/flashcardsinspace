@@ -84,6 +84,7 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { sendChronoSyncNextDay, sendChronoSyncPrevDay } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
+import { parseLocalDate } from '@/utils/date.ts'
 
 const modalStore = useModalStore()
 const toaster = useSpaceToaster()
@@ -101,7 +102,7 @@ const prevMonthButton = ref<HTMLButtonElement>()
 const nextMonthButton = ref<HTMLButtonElement>()
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const currMonth = ref(new Date(currDay.value.chronodate))
+const currMonth = ref(parseLocalDate(currDay.value.chronodate))
 
 const calendarPage = computed(() =>
   calcCalendarPage(currMonth.value, currDay.value, chronodays.value)
@@ -167,7 +168,7 @@ function canShowStages(day: CalendarDay): boolean {
 }
 
 function exit() {
-  currMonth.value = new Date(currDay.value.chronodate)
+  currMonth.value = parseLocalDate(currDay.value.chronodate)
   modalStore.toggleCalendar()
 }
 
@@ -180,7 +181,7 @@ async function goPrevDay() {
         response.data.chronodays,
         response.data.currDay,
       )
-      currMonth.value = new Date(response.data.currDay.chronodate)
+      currMonth.value = parseLocalDate(response.data.currDay.chronodate)
     })
     .catch((error) => {
       console.error('Failed to sync prev day:', error)
@@ -197,7 +198,7 @@ async function goNextDay() {
         response.data.chronodays,
         response.data.currDay,
       )
-      currMonth.value = new Date(response.data.currDay.chronodate)
+      currMonth.value = parseLocalDate(response.data.currDay.chronodate)
     })
     .catch((error) => {
       console.error('Failed to sync next day:', error)
@@ -210,7 +211,7 @@ const isDaySwitchPossible = computed(() =>
 )
 
 watch(currDay, (newValue) => {
-  currMonth.value = new Date(newValue.chronodate)
+  currMonth.value = parseLocalDate(newValue.chronodate)
 })
 
 onMounted(() => {

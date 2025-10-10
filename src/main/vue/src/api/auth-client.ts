@@ -1,11 +1,14 @@
 import axios from 'axios'
 import { User } from '@/model/user.ts'
 import apiClient from '@/api/api-client.ts'
+import { configureDateTransformers } from '@/api/axios-config.ts'
 
 const authClient = axios.create({
   baseURL: '/auth',
   withCredentials: false,
 })
+
+configureDateTransformers(authClient)
 
 export default authClient
 

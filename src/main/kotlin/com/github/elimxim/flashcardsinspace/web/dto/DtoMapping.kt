@@ -7,7 +7,7 @@ fun User.toDto() = UserDto(
     name = username,
     email = email,
     roles = roles.split(",").toList(),
-    registeredAt = registeredAt.toString(),
+    registeredAt = registeredAt,
 )
 
 fun Language.toDto() = LanguageDto(
@@ -21,9 +21,9 @@ fun FlashcardSet.toDto() = FlashcardSetDto(
     name = name,
     status = status.name,
     languageId = language.id,
-    createdAt = createdAt.toString(),
-    startedAt = startedAt?.toString(),
-    lastUpdatedAt = lastUpdatedAt?.toString(),
+    createdAt = createdAt,
+    startedAt = startedAt,
+    lastUpdatedAt = lastUpdatedAt,
 )
 
 fun Flashcard.toDto() = FlashcardDto(
@@ -33,9 +33,9 @@ fun Flashcard.toDto() = FlashcardDto(
     stage = stage.name,
     timesReviewed = timesReviewed,
     reviewHistory = reviewHistory.toDto(),
-    creationDate = creationDate.toString(),
-    lastReviewDate = lastReviewDate?.toString(),
-    lastUpdatedAt = lastUpdatedAt?.toString(),
+    creationDate = creationDate,
+    lastReviewDate = lastReviewDate,
+    lastUpdatedAt = lastUpdatedAt,
 )
 
 fun ReviewHistory.toDto() = ReviewHistoryDto(
@@ -44,5 +44,5 @@ fun ReviewHistory.toDto() = ReviewHistoryDto(
 
 fun ReviewInfo.toDto() = ReviewInfoDto(
     stage = stage.name,
-    reviewDate = reviewDate.toString(),
+    reviewDate = reviewDate,
 )

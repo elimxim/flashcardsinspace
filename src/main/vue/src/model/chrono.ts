@@ -1,6 +1,6 @@
 export interface Chronoday {
   id: number
-  chronodate: string // fixme Date
+  chronodate: string // "yyyy-MM-dd"
   seqNumber: number
   status: string
   stages: string[]

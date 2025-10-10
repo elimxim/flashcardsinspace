@@ -11,7 +11,6 @@ import java.time.ZonedDateTime
 
 @Service
 class LightspeedService {
-
     fun createSchedule(
         startDatetime: ZonedDateTime,
         capacity: Int = 200,
@@ -26,7 +25,7 @@ class LightspeedService {
             result.add(
                 ChronodayDto(
                     id = 0,
-                    chronodate = date.toString(),
+                    chronodate = date,
                     seqNumber = scheduleDay.number,
                     status = ChronodayStatus.NOT_STARTED.name,
                     stages = scheduleDay.stages.map { it.name }
@@ -37,7 +36,7 @@ class LightspeedService {
         result.addFirst(
             ChronodayDto(
                 id = 0,
-                chronodate = startDate.toString(),
+                chronodate = startDate,
                 seqNumber = 0,
                 status = ChronodayStatus.INITIAL.name,
                 stages = listOf()
@@ -79,7 +78,7 @@ class LightspeedService {
             result.add(
                 ChronodayDto(
                     id = chronoday?.id ?: 0,
-                    chronodate = date.toString(),
+                    chronodate = date,
                     seqNumber = scheduleDay.number,
                     status = chronoday?.status?.name ?: ChronodayStatus.NOT_STARTED.name,
                     stages = scheduleDay.stages.map { it.name }
@@ -92,7 +91,7 @@ class LightspeedService {
         result.addFirst(
             ChronodayDto(
                 id = initialChronoday.id,
-                chronodate = initialChronoday.chronodate.toString(),
+                chronodate = initialChronoday.chronodate,
                 seqNumber = 0,
                 status = initialChronoday.status.name,
                 stages = listOf()

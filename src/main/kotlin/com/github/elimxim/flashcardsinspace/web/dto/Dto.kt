@@ -1,11 +1,14 @@
 package com.github.elimxim.flashcardsinspace.web.dto
 
+import java.time.LocalDate
+import java.time.ZonedDateTime
+
 data class UserDto(
     val id: Long,
     val email: String,
     val name: String,
     val roles: List<String>,
-    val registeredAt: String, // fixme ZonedDateTime
+    val registeredAt: ZonedDateTime,
 )
 
 data class LanguageDto(
@@ -19,9 +22,9 @@ data class FlashcardSetDto(
     val name: String,
     val status: String,
     val languageId: Long,
-    val createdAt: String, // fixme ZonedDateTime
-    val startedAt: String?, // fixme ZonedDateTime
-    val lastUpdatedAt: String?, // fixme ZonedDateTime
+    val createdAt: ZonedDateTime,
+    val startedAt: ZonedDateTime?,
+    val lastUpdatedAt: ZonedDateTime?,
 )
 
 data class FlashcardDto(
@@ -31,9 +34,9 @@ data class FlashcardDto(
     val stage: String,
     val timesReviewed: Int,
     val reviewHistory: ReviewHistoryDto,
-    val creationDate: String, // fixme LocalDate
-    val lastReviewDate: String?, // fixme LocalDate
-    val lastUpdatedAt: String?, // fixme ZonedDateTime
+    val creationDate: LocalDate,
+    val lastReviewDate: LocalDate?,
+    val lastUpdatedAt: ZonedDateTime?,
 )
 
 data class ReviewHistoryDto(
@@ -42,12 +45,12 @@ data class ReviewHistoryDto(
 
 data class ReviewInfoDto(
     val stage: String,
-    val reviewDate: String,
+    val reviewDate: LocalDate,
 )
 
 data class ChronodayDto(
     val id: Long,
-    val chronodate: String, // fixme LocalDate
+    val chronodate: LocalDate,
     val seqNumber: Int,
     val status: String,
     val stages: List<String>,

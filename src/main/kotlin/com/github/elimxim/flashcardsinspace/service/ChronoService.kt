@@ -39,10 +39,10 @@ class ChronoService(
         val flashcardSet = flashcardSetService.getEntity(setId)
         if (flashcardSet.chronodays.isEmpty()) {
             val schedule = lightspeedService.createSchedule(startDatetime = clientDatetime)
-            val currDayStr = clientDatetime.toLocalDate().toString()
-            val currDay = schedule.find { it.chronodate == currDayStr }
+            val currDate = clientDatetime.toLocalDate()
+            val currDay = schedule.find { it.chronodate.isEqual(currDate) }
                 ?: throw CorruptedChronoStateException(
-                    "Can't find current day $currDayStr in schedule"
+                    "Can't find current day $currDate in schedule"
                 )
             return currDay to schedule
         }
@@ -175,11 +175,11 @@ class ChronoService(
 
     private fun applySchedule(flashcardSet: FlashcardSet): Pair<ChronodayDto, List<ChronodayDto>> {
         val schedule = lightspeedService.createSchedule(flashcardSet.chronodays)
-        val lastChronoDateStr = flashcardSet.lastChronoday()?.chronodate?.toString()
-        val currDay = schedule.find { it.chronodate == lastChronoDateStr }
+        val lastChronoDate = flashcardSet.lastChronoday()?.chronodate
+        val currDay = schedule.find { it.chronodate.isEqual(lastChronoDate) }
             ?: throw CorruptedChronoStateException(
                 """
-                    Can't find last chrono day $lastChronoDateStr 
+                    Can't find last chrono day $lastChronoDate
                     in schedule for flashcard set ${flashcardSet.id}
                     """.trimOneLine()
             )

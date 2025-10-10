@@ -7,11 +7,14 @@ import {
 } from '@/api/communication.ts'
 import type { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { Chronoday } from '@/model/chrono.ts'
+import { configureDateTransformers } from '@/api/axios-config.ts'
 
 const apiClient = axios.create({
   baseURL: '/api',
   withCredentials: true,
 })
+
+configureDateTransformers(apiClient)
 
 export default apiClient
 
@@ -67,7 +70,7 @@ export async function sendFlashcardRemovalRequest(setId: number, id: number) {
 
 export async function sendChronoSyncRequest(setId: number) {
   const request: ChronoSyncRequest = {
-    clientDatetime: new Date().toISOString()
+    clientDatetime: new Date()
   }
 
   console.log(`[POST] request => chrono sync for set ${setId}`)
