@@ -52,7 +52,7 @@ export const useFlashcardStore = defineStore('flashcard', {
     },
     checkStateLoaded() {
       if (!this.flashcardSet) throw Error(`State check: flashcard set must be set`)
-      if (!this.loaded) throw Error(`State check: flashcard set store isn't loaded`)
+      if (!this.loaded) throw Error(`State check: flashcard store isn't loaded`)
     },
     resetState() {
       this.flashcardSet = undefined

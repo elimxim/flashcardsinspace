@@ -6,7 +6,7 @@ export interface FlashcardSetsState {
   loaded: boolean
 }
 
-export const useFlashcardSetsStore = defineStore('flashcard-sets', {
+export const useFlashcardSetStore = defineStore('flashcard-set', {
   state: (): FlashcardSetsState => {
     return {
       flashcardSets: [],
@@ -31,7 +31,7 @@ export const useFlashcardSetsStore = defineStore('flashcard-sets', {
       this.loaded = true
     },
     checkStateLoaded() {
-      if (!this.loaded) throw Error(`State check: flashcard sets store isn't loaded`)
+      if (!this.loaded) throw Error(`State check: flashcard set store isn't loaded`)
     },
     resetState() {
       this.flashcardSets = []

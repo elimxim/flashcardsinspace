@@ -73,7 +73,7 @@ import SpaceToast from '@/components/SpaceToast.vue'
 import { computed, ref, watch } from 'vue'
 import { helpers, maxLength, required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
-import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { storeToRefs } from 'pinia'
 import { useModalStore } from '@/stores/modal-store.ts'
@@ -90,7 +90,7 @@ import { copyFlashcardSet } from '@/core-logic/flashcard-logic.ts'
 const modalStore = useModalStore()
 const toaster = useSpaceToaster()
 const languageStore = useLanguageStore()
-const flashcardSetsStore = useFlashcardSetsStore()
+const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
 
 const { languages } = storeToRefs(languageStore)
@@ -180,7 +180,7 @@ async function removeFlashcardSet(): Promise<boolean> {
   const removedSet = flashcardSet.value
   return await sendFlashcardSetRemovalRequest(removedSet.id)
     .then(() => {
-      flashcardSetsStore.removeSet(removedSet)
+      flashcardSetStore.removeSet(removedSet)
       return true
     })
     .catch((error) => {
@@ -199,7 +199,7 @@ async function updateFlashcardSet(): Promise<boolean> {
 
   return await sendFlashcardSetUpdateRequest(updatedSet.id, updatedSet)
     .then((response) => {
-      flashcardSetsStore.updateSet(response.data)
+      flashcardSetStore.updateSet(response.data)
       flashcardStore.changeSet(response.data)
       return true
     })

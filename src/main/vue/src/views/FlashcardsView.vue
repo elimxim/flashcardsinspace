@@ -18,11 +18,11 @@ import SpaceToast from '@/components/SpaceToast.vue'
 import {
   determineCurrFlashcardSet,
   loadFlashcardAndChronoStores,
-  loadFlashcardSetsStore,
+  loadFlashcardSetStore,
 } from '@/shared/stores.ts'
 
 
-loadFlashcardSetsStore()
+loadFlashcardSetStore()
   .then(async (loaded) => {
     if (loaded) {
       const currFlashcardSet = determineCurrFlashcardSet()

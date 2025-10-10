@@ -97,7 +97,7 @@ import { maxLength, required } from '@vuelidate/validators'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
-import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import {
@@ -123,7 +123,7 @@ const props = withDefaults(defineProps<{
 
 const modalStore = useModalStore()
 const chronoStore = useChronoStore()
-const flashcardSetsStore = useFlashcardSetsStore()
+const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
 const toaster = useSpaceToaster()
 
@@ -238,7 +238,7 @@ async function addNewFlashcard(): Promise<boolean> {
   } else {
     return await sendFlashcardSetInitRequest(setId, flashcard)
       .then((response) => {
-        flashcardSetsStore.updateSet(response.data.flashcardSet)
+        flashcardSetStore.updateSet(response.data.flashcardSet)
         flashcardStore.changeSet(response.data.flashcardSet)
         flashcardStore.addNewFlashcard(flashcard)
         chronoStore.loadState(

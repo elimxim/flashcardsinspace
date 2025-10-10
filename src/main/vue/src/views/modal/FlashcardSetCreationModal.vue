@@ -62,7 +62,7 @@ import SmartButton from '@/components/SmartButton.vue'
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import { computed, ref, watch } from 'vue'
-import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { helpers, maxLength, required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
@@ -80,7 +80,7 @@ import { useSpaceToaster } from '@/stores/toast-store.ts'
 
 const modalStore = useModalStore()
 const toaster = useSpaceToaster()
-const flashcardSetsStore = useFlashcardSetsStore()
+const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 const languageStore = useLanguageStore()
@@ -147,7 +147,7 @@ async function createNewFlashcardSet(): Promise<boolean> {
   const newSet = createFlashcardSet(name.value, language.value)
   return await sendFlashcardSetCreationRequest(newSet)
     .then((response) => {
-      flashcardSetsStore.addSet(response.data)
+      flashcardSetStore.addSet(response.data)
       flashcardStore.loadState(response.data, [])
       return sendChronoSyncRequest(response.data.id)
     })

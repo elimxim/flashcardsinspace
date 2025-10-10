@@ -81,7 +81,7 @@ import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.v
 import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.vue'
 import FlashcardModificationModal from '@/views/modal/FlashcardModificationModal.vue'
 import CalendarModal from '@/views/modal/CalendarModal.vue'
-import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
@@ -95,11 +95,11 @@ import { saveSelectedSetId } from '@/shared/cookies.ts'
 import { loadFlashcardAndChronoStores } from '@/shared/stores.ts'
 
 const modalStore = useModalStore()
-const flashcardSetsStore = useFlashcardSetsStore()
+const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 
-const { flashcardSets, isEmpty: isNoFlashcardSets } = storeToRefs(flashcardSetsStore)
+const { flashcardSets, isEmpty: isNoFlashcardSets } = storeToRefs(flashcardSetStore)
 const { flashcardSet } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
@@ -142,7 +142,7 @@ const selectedFlashcardSetId = computed({
   set: async (setId) => {
     if (setId) {
       saveSelectedSetId(setId)
-      const set = flashcardSetsStore.findSet(setId)
+      const set = flashcardSetStore.findSet(setId)
       if (set) {
         await loadFlashcardAndChronoStores(set)
       }
