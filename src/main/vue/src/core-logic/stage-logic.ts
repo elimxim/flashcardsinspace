@@ -73,8 +73,8 @@ export const specialStageSet = new Set([
   specialStages.OUTER_SPACE,
 ])
 
-export function toSortedOrders(stageNames: string[]) {
-  return stageNames.map(name =>
+export function toSortedOrderNumbers(stages: string[]): number[] {
+  return stages.map(name =>
     stageNameMap.get(name.toString())?.order
   ).filter(order =>
     order !== undefined

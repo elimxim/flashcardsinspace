@@ -58,7 +58,7 @@
       <SmartButton
         class="calendar-button"
         text="Next"
-        :on-click="switchToNextDay"
+        :on-click="goNextDay"
         :disabled="!isDaySwitchPossible"
         auto-blur
       />
@@ -188,7 +188,7 @@ async function goPrevDay() {
     })
 }
 
-async function switchToNextDay() {
+async function goNextDay() {
   if (!flashcardSet.value) return
   if (!chronoStore.canGoNext()) return
   await sendChronoSyncNextDay(flashcardSet.value.id)

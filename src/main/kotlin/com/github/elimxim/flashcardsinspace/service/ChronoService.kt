@@ -151,9 +151,8 @@ class ChronoService(
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
-        val chronodays = updatedFlashcardSet.chronodays.filter { it.id in request.ids }
-        val schedule = lightspeedService.createSchedule(chronodays, daysAhead = 0)
-        return schedule
+        val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays, daysAhead = 0)
+        return schedule.filter { it.id in request.ids }
     }
 
     @Transactional

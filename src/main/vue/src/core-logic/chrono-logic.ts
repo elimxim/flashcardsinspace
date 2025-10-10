@@ -1,5 +1,5 @@
 import { asIsoDateStr } from '@/utils/date.ts'
-import { toSortedOrders } from '@/core-logic/stage-logic.ts'
+import { toSortedOrderNumbers } from '@/core-logic/stage-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 
 export const chronodayStatuses = {
@@ -13,9 +13,9 @@ export const chronodayStatuses = {
 export interface CalendarDay {
   number: number
   date: string
-  status: string | null
-  stages: string | null
-  seqNumber: number | null
+  status?: string
+  stages?: string
+  seqNumber?: number
   isCurrMonth: boolean
   isCurrDay: boolean
 }
@@ -75,9 +75,6 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
     result.push({
       number: date.getDate(),
       date: date.toDateString(),
-      status: null,
-      stages: null,
-      seqNumber: null,
       isCurrMonth: false,
       isCurrDay: false,
     })
@@ -94,9 +91,9 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
     result.push({
       number: i,
       date: date.toDateString(),
-      status: chronoday?.status ?? null,
-      stages: toSortedOrders(chronoday?.stages ?? []).toString(),
-      seqNumber: chronoday?.seqNumber ?? null,
+      status: chronoday?.status,
+      stages: toSortedOrderNumbers(chronoday?.stages ?? []).toString(),
+      seqNumber: chronoday?.seqNumber,
       isCurrMonth: true,
       isCurrDay: isoDateStr === currDay.chronodate,
     })
@@ -115,9 +112,6 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
     result.push({
       number: date.getDate(),
       date: date.toDateString(),
-      status: null,
-      stages: null,
-      seqNumber: null,
       isCurrMonth: false,
       isCurrDay: false,
     })
@@ -132,9 +126,6 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
       result.push({
         number: date.getDate(),
         date: date.toDateString(),
-        status: null,
-        stages: null,
-        seqNumber: null,
         isCurrMonth: false,
         isCurrDay: false,
       })
