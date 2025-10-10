@@ -154,10 +154,12 @@ defineExpose({
   border-color: var(--inpt--border-color--focus);
 }
 
+.smart-input--error textarea,
 .smart-input--error input {
   border-color: var(--inpt--border-color--error);
 }
 
+.smart-input--error textarea::placeholder,
 .smart-input--error input::placeholder {
   font-size: var(--inpt--font-size--error);
   color: var(--inpt--color--error);
