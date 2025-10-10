@@ -74,7 +74,7 @@ import { computed, ref, watch } from 'vue'
 import { helpers, maxLength, required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
-import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
+import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { storeToRefs } from 'pinia'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { Language } from '@/model/language.ts'
@@ -84,17 +84,17 @@ import {
   sendFlashcardSetUpdateRequest,
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { reloadFlashcardSetAndChronoStores } from '@/shared/stores.ts'
+import { reloadFlashcardAndChronoStores } from '@/shared/stores.ts'
 import { copyFlashcardSet } from '@/core-logic/flashcard-logic.ts'
 
 const modalStore = useModalStore()
 const toaster = useSpaceToaster()
 const languageStore = useLanguageStore()
 const flashcardSetsStore = useFlashcardSetsStore()
-const flashcardSetStore = useFlashcardSetStore()
+const flashcardStore = useFlashcardStore()
 
 const { languages } = storeToRefs(languageStore)
-const { flashcardSet, language } = storeToRefs(flashcardSetStore)
+const { flashcardSet, language } = storeToRefs(flashcardStore)
 
 const curName = ref<string | undefined>(flashcardSet.value?.name)
 const curNameInput = ref<HTMLElement>()
@@ -147,7 +147,7 @@ function cancel() {
 async function remove() {
   const removed = await removeFlashcardSet()
   if (removed) {
-    await reloadFlashcardSetAndChronoStores(true)
+    await reloadFlashcardAndChronoStores(true)
       .then(() => {
         modalStore.toggleFlashcardSetSettings()
         resetState()
@@ -200,7 +200,7 @@ async function updateFlashcardSet(): Promise<boolean> {
   return await sendFlashcardSetUpdateRequest(updatedSet.id, updatedSet)
     .then((response) => {
       flashcardSetsStore.updateSet(response.data)
-      flashcardSetStore.changeSet(response.data)
+      flashcardStore.changeSet(response.data)
       return true
     })
     .catch((error) => {

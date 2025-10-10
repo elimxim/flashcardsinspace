@@ -12,14 +12,14 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
+import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
 
 const router = useRouter()
-const flashcardSetStore = useFlashcardSetStore()
+const flashcardStore = useFlashcardStore()
 
-const { isEmpty } = storeToRefs(flashcardSetStore)
+const { isEmpty } = storeToRefs(flashcardStore)
 
 function startReview() {
   router.push({ name: routeNames.review })

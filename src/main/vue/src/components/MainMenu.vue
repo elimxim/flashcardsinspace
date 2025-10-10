@@ -82,7 +82,7 @@ import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.v
 import FlashcardModificationModal from '@/views/modal/FlashcardModificationModal.vue'
 import CalendarModal from '@/views/modal/CalendarModal.vue'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
-import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
+import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, type ComputedRef, onMounted, ref } from 'vue'
@@ -92,15 +92,15 @@ import { allStages, type Stage, specialStageSet } from '@/core-logic/stage-logic
 import { countFlashcards } from '@/core-logic/review-logic.ts'
 import router, { routeNames } from '@/router'
 import { saveSelectedSetId } from '@/shared/cookies.ts'
-import { loadFlashcardSetAndChronoStores } from '@/shared/stores.ts'
+import { loadFlashcardAndChronoStores } from '@/shared/stores.ts'
 
 const modalStore = useModalStore()
 const flashcardSetsStore = useFlashcardSetsStore()
-const flashcardSetStore = useFlashcardSetStore()
+const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 
 const { flashcardSets, isEmpty: isNoFlashcardSets } = storeToRefs(flashcardSetsStore)
-const { flashcardSet } = storeToRefs(flashcardSetStore)
+const { flashcardSet } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
 const showFlashcardMenuItem = computed(() => flashcardSet.value !== undefined)
@@ -114,7 +114,7 @@ interface Bucket {
   reviewable: boolean
 }
 
-const totalFlashcardNumber = computed(() => flashcardSetStore.flashcards.length)
+const totalFlashcardNumber = computed(() => flashcardStore.flashcards.length)
 
 const buckets: Bucket[] = allStages.map(stage => {
   return {
@@ -125,7 +125,7 @@ const buckets: Bucket[] = allStages.map(stage => {
 })
 
 function flashcardNumberByStage(stage: Stage): number {
-  return countFlashcards(flashcardSetStore.flashcards, stage)
+  return countFlashcards(flashcardStore.flashcards, stage)
 }
 
 // <buckets
@@ -144,7 +144,7 @@ const selectedFlashcardSetId = computed({
       saveSelectedSetId(setId)
       const set = flashcardSetsStore.findSet(setId)
       if (set) {
-        await loadFlashcardSetAndChronoStores(set)
+        await loadFlashcardAndChronoStores(set)
       }
     }
   }

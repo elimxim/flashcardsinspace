@@ -10,7 +10,7 @@ export interface FlashcardSetState {
   loaded: boolean
 }
 
-export const useFlashcardSetStore = defineStore('flashcard-set', {
+export const useFlashcardStore = defineStore('flashcard', {
   state: (): FlashcardSetState => {
     return {
       flashcardSet: undefined,

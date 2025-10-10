@@ -94,7 +94,7 @@ import {
 } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { maxLength, required } from '@vuelidate/validators'
-import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
+import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
@@ -124,10 +124,10 @@ const props = withDefaults(defineProps<{
 const modalStore = useModalStore()
 const chronoStore = useChronoStore()
 const flashcardSetsStore = useFlashcardSetsStore()
-const flashcardSetStore = useFlashcardSetStore()
+const flashcardStore = useFlashcardStore()
 const toaster = useSpaceToaster()
 
-const { flashcardSet, isStarted } = storeToRefs(flashcardSetStore)
+const { flashcardSet, isStarted } = storeToRefs(flashcardStore)
 
 const frontSide = ref(flashcard.value?.frontSide ?? '')
 const frontSideTextArea = ref<HTMLElement>()
@@ -211,7 +211,7 @@ async function removeFlashcard(): Promise<boolean> {
   const flashcardId = flashcard.value.id
   return await sendFlashcardRemovalRequest(flashcardSet.value.id, flashcardId)
     .then(() => {
-      flashcardSetStore.removeFlashcard(flashcardId)
+      flashcardStore.removeFlashcard(flashcardId)
       toaster.bakeSuccess('Success', 'Flashcard removed', 200)
       return true
     }).catch((error) => {
@@ -227,7 +227,7 @@ async function addNewFlashcard(): Promise<boolean> {
   if (isStarted.value) {
     return await sendFlashcardCreationRequest(setId, flashcard)
       .then((response) => {
-        flashcardSetStore.addNewFlashcard(response.data)
+        flashcardStore.addNewFlashcard(response.data)
         return true
       })
       .catch((error) => {
@@ -239,8 +239,8 @@ async function addNewFlashcard(): Promise<boolean> {
     return await sendFlashcardSetInitRequest(setId, flashcard)
       .then((response) => {
         flashcardSetsStore.updateSet(response.data.flashcardSet)
-        flashcardSetStore.changeSet(response.data.flashcardSet)
-        flashcardSetStore.addNewFlashcard(flashcard)
+        flashcardStore.changeSet(response.data.flashcardSet)
+        flashcardStore.addNewFlashcard(flashcard)
         chronoStore.loadState(
           response.data.chronodays,
           response.data.currDay
@@ -264,7 +264,7 @@ async function updateFlashcard(): Promise<boolean> {
   )
   return await sendFlashcardUpdateRequest(flashcardSet.value.id, updatedFlashcard)
     .then((response) => {
-      flashcardSetStore.changeFlashcard(response.data)
+      flashcardStore.changeFlashcard(response.data)
       return true
     })
     .catch((error) => {

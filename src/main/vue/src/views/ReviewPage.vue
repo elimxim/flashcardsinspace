@@ -117,7 +117,7 @@ import SpaceDeck from '@/components/SpaceDeck.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
-import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
+import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
@@ -136,7 +136,7 @@ import { loadSelectedSetId } from '@/shared/cookies.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import {
-  loadFlashcardSetAndChronoStoresById
+  loadFlashcardAndChronoStoresById
 } from '@/shared/stores.ts'
 import {
   sendChronoBulkUpdateRequest,
@@ -159,12 +159,12 @@ const router = useRouter()
 const toaster = useSpaceToaster()
 const modalStore = useModalStore()
 const chronoStore = useChronoStore()
-const flashcardSetStore = useFlashcardSetStore()
+const flashcardStore = useFlashcardStore()
 
 const {
   flashcardSet,
   flashcards,
-} = storeToRefs(flashcardSetStore)
+} = storeToRefs(flashcardStore)
 const {
   chronodays,
   currDay
@@ -310,7 +310,7 @@ async function moveBack() {
 async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flashcard): Promise<boolean> {
   return await sendFlashcardUpdateRequest(flashcardSet.id, flashcard)
     .then((response) => {
-      flashcardSetStore.changeFlashcard(response.data)
+      flashcardStore.changeFlashcard(response.data)
       currFlashcard.value = response.data
       return true
     })
@@ -378,11 +378,11 @@ watch(flashcardEditOpen, (newVal) => {
 })
 
 onMounted(async () => {
-  if (!flashcardSetStore.loaded) {
+  if (!flashcardStore.loaded) {
     console.log('Flashcard set not loaded, loading...')
     const selectedSetId = loadSelectedSetId()
     if (selectedSetId) {
-      await loadFlashcardSetAndChronoStoresById(selectedSetId)
+      await loadFlashcardAndChronoStoresById(selectedSetId)
     } else {
       console.log('Flashcard set not found in cookies')
     }

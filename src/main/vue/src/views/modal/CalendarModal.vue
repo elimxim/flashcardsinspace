@@ -80,7 +80,7 @@ import {
   type CalendarDay,
   chronodayStatuses
 } from '@/core-logic/chrono-logic.ts'
-import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
+import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { sendChronoSyncNextDay, sendChronoSyncPrevDay } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
@@ -88,13 +88,13 @@ import { useSpaceToaster } from '@/stores/toast-store.ts'
 const modalStore = useModalStore()
 const toaster = useSpaceToaster()
 const chronoStore = useChronoStore()
-const flashcardSetStore = useFlashcardSetStore()
+const flashcardStore = useFlashcardStore()
 
 const {
   flashcardSet,
   isStarted,
   isSuspended,
-} = storeToRefs(flashcardSetStore)
+} = storeToRefs(flashcardStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
 
 const prevMonthButton = ref<HTMLButtonElement>()

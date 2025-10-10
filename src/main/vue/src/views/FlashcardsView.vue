@@ -17,7 +17,7 @@ import ReviewFormStarter from '@/components/ReviewFormStarter.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import {
   determineCurrFlashcardSet,
-  loadFlashcardSetAndChronoStores,
+  loadFlashcardAndChronoStores,
   loadFlashcardSetsStore,
 } from '@/shared/stores.ts'
 
@@ -27,7 +27,7 @@ loadFlashcardSetsStore()
     if (loaded) {
       const currFlashcardSet = determineCurrFlashcardSet()
       if (currFlashcardSet) {
-        await loadFlashcardSetAndChronoStores(currFlashcardSet)
+        await loadFlashcardAndChronoStores(currFlashcardSet)
       }
     }
   })

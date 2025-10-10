@@ -1,5 +1,5 @@
 import { useFlashcardSetsStore } from '@/stores/flashcard-sets-store.ts'
-import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
+import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { FlashcardSet } from '@/model/flashcard.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
@@ -28,34 +28,34 @@ export function determineCurrFlashcardSet(): FlashcardSet | undefined {
   }
 }
 
-export async function reloadFlashcardSetAndChronoStores(forced: boolean = false): Promise<boolean> {
+export async function reloadFlashcardAndChronoStores(forced: boolean = false): Promise<boolean> {
   console.log('Reloading flashcard set stores')
-  const flashcardSetStore = useFlashcardSetStore()
+  const flashcardStore = useFlashcardStore()
 
   const currFlashcardSet = determineCurrFlashcardSet()
   if (currFlashcardSet) {
-    return await loadFlashcardSetAndChronoStores(currFlashcardSet, forced)
+    return await loadFlashcardAndChronoStores(currFlashcardSet, forced)
   } else {
-    flashcardSetStore.resetState()
+    flashcardStore.resetState()
     return true
   }
 }
 
-export async function loadFlashcardSetAndChronoStores(flashcardSet: FlashcardSet, forced: boolean = false): Promise<boolean> {
+export async function loadFlashcardAndChronoStores(flashcardSet: FlashcardSet, forced: boolean = false): Promise<boolean> {
   console.log(`Loading flashcard set and chrono stores for ${flashcardSet.id}, forced: ${forced}`)
   const toaster = useSpaceToaster()
-  const flashcardSetStore = useFlashcardSetStore()
+  const flashcardStore = useFlashcardStore()
   const chronoStore = useChronoStore()
 
-  const currSetId = flashcardSetStore.flashcardSet?.id
-  if (flashcardSetStore.loaded && flashcardSet.id === currSetId && !forced) {
+  const currSetId = flashcardStore.flashcardSet?.id
+  if (flashcardStore.loaded && flashcardSet.id === currSetId && !forced) {
     console.log(`Flashcard set ${flashcardSet.id} already loaded, skipping`)
     return true
   }
 
   return await sendFlashcardsGetRequest(flashcardSet.id)
     .then(async (response) => {
-      flashcardSetStore.loadState(flashcardSet, response.data)
+      flashcardStore.loadState(flashcardSet, response.data)
       return sendChronoSyncRequest(flashcardSet.id)
     })
     .then((response) => {
@@ -72,13 +72,13 @@ export async function loadFlashcardSetAndChronoStores(flashcardSet: FlashcardSet
     })
 }
 
-export async function loadFlashcardSetAndChronoStoresById(setId: number, forced: boolean = false): Promise<boolean> {
+export async function loadFlashcardAndChronoStoresById(setId: number, forced: boolean = false): Promise<boolean> {
   console.log(`Loading flashcard set and chrono stores for ${setId}, forced: ${forced}`)
   const toaster = useSpaceToaster()
 
   return await sendFlashcardSetGetRequest(setId)
     .then((response) => {
-      return loadFlashcardSetAndChronoStores(response.data, forced)
+      return loadFlashcardAndChronoStores(response.data, forced)
     })
     .catch((error) => {
       console.error(`Failed to get flashcard set ${setId}`, error)
