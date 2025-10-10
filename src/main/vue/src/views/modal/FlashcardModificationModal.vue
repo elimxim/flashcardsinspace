@@ -234,7 +234,7 @@ async function addNewFlashcard(): Promise<boolean> {
       .then((response) => {
         flashcardSetStore.updateSet(response.data.flashcardSet)
         flashcardStore.changeSet(response.data.flashcardSet)
-        flashcardStore.addNewFlashcard(flashcard)
+        flashcardStore.addNewFlashcard(response.data.flashcard)
         chronoStore.loadState(
           response.data.chronodays,
           response.data.currDay
