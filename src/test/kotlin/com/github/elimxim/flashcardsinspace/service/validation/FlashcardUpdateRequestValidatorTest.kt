@@ -83,7 +83,7 @@ class FlashcardUpdateRequestValidatorTest {
     @Test
     fun `should fail validation if reviewCount is not a number`() {
         // given:
-        val request = validRequest().apply { reviewCount = "abc" }
+        val request = validRequest().apply { timesReviewed = "abc" }
 
         // when:
         val exception = assertThrows<InvalidRequestFieldsException> {
@@ -91,13 +91,13 @@ class FlashcardUpdateRequestValidatorTest {
         }
 
         // then:
-        assertThat(exception.fields).containsExactly("reviewCount")
+        assertThat(exception.fields).containsExactly("timesReviewed")
     }
 
     @Test
     fun `should fail validation if reviewedAt is not a valid date`() {
         // given:
-        val request = validRequest().apply { reviewedAt = "2025/09/15" }
+        val request = validRequest().apply { lastReviewDate = "2025/09/15" }
 
         // when:
         val exception = assertThrows<InvalidRequestFieldsException> {
@@ -105,7 +105,7 @@ class FlashcardUpdateRequestValidatorTest {
         }
 
         // then:
-        assertThat(exception.fields).containsExactly("reviewedAt")
+        assertThat(exception.fields).containsExactly("lastReviewDate")
     }
 
     @Test
@@ -115,7 +115,7 @@ class FlashcardUpdateRequestValidatorTest {
             reviewHistory?.history = listOf(
                 FlashcardUpdateRequest.ReviewInfo().apply {
                     stage = "INVALID"
-                    reviewedAt = "2025-09-01"
+                    reviewDate = "2025-09-01"
                 }
             )
         }
@@ -136,7 +136,7 @@ class FlashcardUpdateRequestValidatorTest {
             reviewHistory = FlashcardUpdateRequest.ReviewHistory(
                 history = listOf(FlashcardUpdateRequest.ReviewInfo().apply {
                     stage = "S1"
-                    reviewedAt = "invalid_date"
+                    reviewDate = "invalid_date"
                 })
             )
         }
@@ -147,7 +147,7 @@ class FlashcardUpdateRequestValidatorTest {
         }
 
         // then:
-        assertThat(exception.fields).containsExactly("reviewedAt")
+        assertThat(exception.fields).containsExactly("reviewDate")
     }
 
     @Test
@@ -155,8 +155,8 @@ class FlashcardUpdateRequestValidatorTest {
         // given:
         val request = validRequest().apply {
             frontSide = "a".repeat(513)
-            reviewCount = "abc"
-            reviewedAt = "2025-13-01"
+            timesReviewed = "abc"
+            lastReviewDate = "2025-13-01"
         }
 
         // when:
@@ -165,13 +165,13 @@ class FlashcardUpdateRequestValidatorTest {
         }
 
         // then:
-        assertThat(exception.fields).containsExactlyInAnyOrder("frontSide", "reviewCount", "reviewedAt")
+        assertThat(exception.fields).containsExactlyInAnyOrder("frontSide", "timesReviewed", "lastReviewDate")
     }
 
     private fun validRequest(): FlashcardUpdateRequest {
         val reviewInfo = FlashcardUpdateRequest.ReviewInfo().apply {
             stage = "S1"
-            reviewedAt = "2025-09-01"
+            reviewDate = "2025-09-01"
         }
         val reviewHistory = FlashcardUpdateRequest.ReviewHistory().apply {
             history = listOf(reviewInfo)
@@ -180,9 +180,9 @@ class FlashcardUpdateRequestValidatorTest {
             frontSide = "Updated front"
             backSide = "Updated back"
             stage = "S1"
-            reviewCount = "5"
+            timesReviewed = "5"
             this.reviewHistory = reviewHistory
-            reviewedAt = "2025-09-15"
+            lastReviewDate = "2025-09-15"
         }
     }
 }

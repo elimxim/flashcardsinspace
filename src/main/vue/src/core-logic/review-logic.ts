@@ -201,11 +201,11 @@ export function createReviewQueueForStage(flashcards: Flashcard[], stage: Stage)
 }
 
 function isUnknownFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
-  return flashcard.createdAt === day.chronodate
+  return flashcard.creationDate === day.chronodate
 }
 
 function isReviewedFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
-  return flashcard.reviewedAt !== undefined && flashcard.reviewedAt === day.chronodate
+  return flashcard.lastReviewDate !== undefined && flashcard.lastReviewDate === day.chronodate
 }
 
 export function countFlashcards(flashcards: Flashcard[], stage: Stage): number {

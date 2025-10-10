@@ -29,10 +29,10 @@ data class FlashcardDto(
     val frontSide: String,
     val backSide: String,
     val stage: String,
-    val reviewCount: Int, // fixme timesReviewed
+    val timesReviewed: Int,
     val reviewHistory: ReviewHistoryDto,
-    val createdAt: String, // fixme creationDate + LocalDate
-    val reviewedAt: String?, // fixme lastReviewDate + LocalDate
+    val creationDate: String, // fixme LocalDate
+    val lastReviewDate: String?, // fixme LocalDate
     val lastUpdatedAt: String?, // fixme ZonedDateTime
 )
 
@@ -42,7 +42,7 @@ data class ReviewHistoryDto(
 
 data class ReviewInfoDto(
     val stage: String,
-    val reviewedAt: String, // fixme reviewDate
+    val reviewDate: String,
 )
 
 data class ChronodayDto(

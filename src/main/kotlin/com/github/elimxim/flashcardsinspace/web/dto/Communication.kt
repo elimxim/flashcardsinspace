@@ -68,7 +68,7 @@ class FlashcardCreationRequest(
     @field:NotNull
     @field:NotBlank
     @field:IsoLocalDate
-    var createdAt: String? = null, // fixme creationDate
+    var creationDate: String? = null,
 )
 
 data class ValidFlashcardCreationRequest(
@@ -86,11 +86,11 @@ class FlashcardUpdateRequest(
     @field:ValidFlashcardStage
     var stage: String? = null,
     @field:Pattern(regexp="^\\d+$")
-    var reviewCount: String? = null, // fixme timesReviewed
+    var timesReviewed: String? = null,
     @field:Valid
     var reviewHistory: ReviewHistory? = null,
     @field:IsoLocalDate
-    var reviewedAt: String? = null, // fixme lastReviewDate
+    var lastReviewDate: String? = null,
 ) {
     class ReviewHistory(
         @field:Valid
@@ -105,7 +105,7 @@ class FlashcardUpdateRequest(
         @field:NotNull
         @field:NotBlank
         @field:IsoLocalDate
-        var reviewedAt: String? = null, // fixme reviewDate
+        var reviewDate: String? = null,
     )
 }
 
@@ -142,8 +142,6 @@ class FlashcardSetUpdateRequest(
     @field:Size(max = 64)
     @field:Pattern(regexp="^[A-Za-z0-9 _-]+$")
     var name: String? = null,
-    @field:Pattern(regexp="^(true|false)$")
-    var default: String? = null, // fixme first
     @field:ValidFlashcardSetStatus
     var status: String? = null,
     @field:Pattern(regexp="^\\d+$")
@@ -154,7 +152,6 @@ class FlashcardSetUpdateRequest(
 
 class ValidFlashcardSetUpdateRequest(
     val name: String? = null,
-    val first: Boolean? = null,
     val status: FlashcardSetStatus? = null,
     val languageId: Long? = null,
     val startedAt: ZonedDateTime? = null,

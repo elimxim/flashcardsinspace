@@ -216,9 +216,9 @@ function flashcard(id: number, stage: Stage): Flashcard {
     frontSide: '',
     backSide: '',
     stage: stage.name,
-    reviewCount: 0,
+    timesReviewed: 0,
     reviewHistory: { history: [] },
-    createdAt: new Date().toString(),
+    creationDate: new Date().toString(),
   }
 }
 

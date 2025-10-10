@@ -19,9 +19,9 @@ export function newFlashcard(frontSide: string, backSide: string): Flashcard {
     frontSide: frontSide,
     backSide: backSide,
     stage: stages.S1.name,
-    reviewCount: 0,
+    timesReviewed: 0,
     reviewHistory: { history: [] },
-    createdAt: currDay.value.chronodate,
+    creationDate: currDay.value.chronodate,
   }
 }
 
@@ -50,16 +50,16 @@ export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
   const chronoStore = useChronoStore()
   const { currDay } = storeToRefs(chronoStore)
 
-  const reviewedAt = currDay.value.chronodate
+  const chronodate = currDay.value.chronodate
 
   const info: ReviewInfo = {
     stage: stage.name,
-    reviewedAt: reviewedAt,
+    reviewDate: chronodate,
   }
 
   flashcard.stage = stage.name
-  flashcard.reviewedAt = reviewedAt
-  flashcard.reviewCount += 1
+  flashcard.lastReviewDate = chronodate
+  flashcard.timesReviewed += 1
   flashcard.reviewHistory.history.push(info)
   flashcard.lastUpdatedAt = new Date().toISOString()
   return flashcard

@@ -25,7 +25,6 @@ class FlashcardSetUpdateRequestValidatorTest {
 
         // then:
         assertThat(validRequest.name).isEqualTo("Updated Set Name")
-        assertThat(validRequest.first).isTrue()
         assertThat(validRequest.status).isEqualTo(FlashcardSetStatus.ACTIVE)
         assertThat(validRequest.languageId).isEqualTo(2L)
         assertThat(validRequest.startedAt).isEqualTo(ZonedDateTime.parse("2025-09-30T10:15:30+01:00[Europe/Paris]"))
@@ -35,7 +34,6 @@ class FlashcardSetUpdateRequestValidatorTest {
     fun `should pass validation if optional fields are null`() {
         // given:
         val request = validRequest().apply {
-            default = null
             startedAt = null
         }
 
@@ -43,7 +41,6 @@ class FlashcardSetUpdateRequestValidatorTest {
         val validRequest = validator.validate(request)
 
         // then:
-        assertThat(validRequest.first).isNull()
         assertThat(validRequest.startedAt).isNull()
     }
 
@@ -75,21 +72,6 @@ class FlashcardSetUpdateRequestValidatorTest {
 
         // then:
         assertThat(exception.fields).containsExactly("name")
-    }
-
-    @Test
-    fun `should fail validation if default is invalid`() {
-        // given:
-        val request = validRequest().apply {
-            default = "yes"
-        }
-
-        // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
-            validator.validate(request) }
-
-        // then:
-        assertThat(exception.fields).containsExactly("default")
     }
 
     @Test
@@ -142,7 +124,6 @@ class FlashcardSetUpdateRequestValidatorTest {
         // given:
         val request = FlashcardSetUpdateRequest().apply {
             name = "!"
-            default = "1"
             status = "invalid"
             languageId = ""
             startedAt = "2025"
@@ -154,7 +135,6 @@ class FlashcardSetUpdateRequestValidatorTest {
 
         // then:
         assertThat(exception.fields).containsExactlyInAnyOrder(
-            "default",
             "languageId",
             "name",
             "startedAt",
@@ -165,7 +145,6 @@ class FlashcardSetUpdateRequestValidatorTest {
     private fun validRequest(): FlashcardSetUpdateRequest {
         return FlashcardSetUpdateRequest().apply {
             name = "Updated Set Name"
-            default = "true"
             status = "ACTIVE"
             languageId = "2"
             startedAt = "2025-09-30T10:15:30+01:00[Europe/Paris]"

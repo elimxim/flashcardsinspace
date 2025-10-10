@@ -226,7 +226,7 @@ class FlashcardCreationRequestValidatorTest {
     fun `should fail validation if createdAt is null`() {
         // given:
         val request = validRequest().apply {
-            createdAt = null
+            creationDate = null
         }
 
         // when:
@@ -235,14 +235,14 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // then:
-        assertThat(exception.fields).containsExactly("createdAt")
+        assertThat(exception.fields).containsExactly("creationDate")
     }
 
     @Test
     fun `should fail validation if createdAt is empty`() {
         // given:
         val request = validRequest().apply {
-            createdAt = ""
+            creationDate = ""
         }
 
         // when:
@@ -251,14 +251,14 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // then:
-        assertThat(exception.fields).containsExactly("createdAt")
+        assertThat(exception.fields).containsExactly("creationDate")
     }
 
     @Test
     fun `should fail validation if createdAt is blank`() {
         // given:
         val request = validRequest().apply {
-            createdAt = "   "
+            creationDate = "   "
         }
 
         // when:
@@ -267,14 +267,14 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // then:
-        assertThat(exception.fields).containsExactly("createdAt")
+        assertThat(exception.fields).containsExactly("creationDate")
     }
 
     @Test
     fun `should fail validation if createdAt has invalid format`() {
         // given:
         val request = validRequest().apply {
-            createdAt = "2025/01/01"
+            creationDate = "2025/01/01"
         }
 
         // when:
@@ -283,7 +283,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // then:
-        assertThat(exception.fields).containsExactly("createdAt")
+        assertThat(exception.fields).containsExactly("creationDate")
     }
 
     @Test
@@ -293,7 +293,7 @@ class FlashcardCreationRequestValidatorTest {
             frontSide = null
             backSide = ""
             stage = " "
-            createdAt = "invalid-date"
+            creationDate = "invalid-date"
         }
 
         // when:
@@ -302,13 +302,13 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // then:
-        assertThat(exception.fields).containsExactlyInAnyOrder("frontSide", "backSide", "stage", "createdAt")
+        assertThat(exception.fields).containsExactlyInAnyOrder("frontSide", "backSide", "stage", "creationDate")
     }
 
     private fun validRequest() = FlashcardCreationRequest(
         frontSide = "What is the largest black hole?",
         backSide = "TON\n618",
         stage = "S1",
-        createdAt = "2025-01-01"
+        creationDate = "2025-01-01"
     )
 }

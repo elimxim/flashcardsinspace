@@ -57,7 +57,7 @@ const flashcardWasEdited = ref(false)
 const spaceCard = ref<InstanceType<typeof SpaceCard>>()
 const cardTransition = ref('')
 
-const viewedTimes = computed(() => (flashcard.value?.reviewCount ?? 0) + 1)
+const viewedTimes = computed(() => (flashcard.value?.timesReviewed ?? 0) + 1)
 
 function setDeckReady() {
   console.log(`FlashcardDeck.ready`)

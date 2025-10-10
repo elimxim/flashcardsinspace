@@ -151,25 +151,25 @@ fun FlashcardCreationRequest.toValidRequest() = ValidFlashcardCreationRequest(
     frontSide = frontSide!!,
     backSide = backSide!!,
     stage = FlashcardStage.valueOf(stage!!),
-    creationDate = LocalDate.parse(createdAt!!, DateTimeFormatter.ISO_LOCAL_DATE),
+    creationDate = LocalDate.parse(creationDate!!, DateTimeFormatter.ISO_LOCAL_DATE),
 )
 
 fun FlashcardUpdateRequest.toValidRequest() = ValidFlashcardUpdateRequest(
     frontSide = frontSide,
     backSide = backSide,
     stage = stage?.let { FlashcardStage.valueOf(it) },
-    timesReviewed = reviewCount?.toInt(),
+    timesReviewed = timesReviewed?.toInt(),
     reviewHistory = reviewHistory?.let {
         ValidFlashcardUpdateRequest.ReviewHistory(
             history = it.history.map { info ->
                 ValidFlashcardUpdateRequest.ReviewInfo(
                     stage = FlashcardStage.valueOf(info.stage!!),
-                    reviewDate = LocalDate.parse(info.reviewedAt!!, DateTimeFormatter.ISO_LOCAL_DATE),
+                    reviewDate = LocalDate.parse(info.reviewDate!!, DateTimeFormatter.ISO_LOCAL_DATE),
                 )
             }
         )
     },
-    lastReviewDate = reviewedAt?.let { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) },
+    lastReviewDate = lastReviewDate?.let { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) },
 )
 
 fun FlashcardSetCreationRequest.toValidRequest() = ValidFlashcardSetCreationRequest(
@@ -179,7 +179,6 @@ fun FlashcardSetCreationRequest.toValidRequest() = ValidFlashcardSetCreationRequ
 
 fun FlashcardSetUpdateRequest.toValidRequest() = ValidFlashcardSetUpdateRequest(
     name = name,
-    first = default?.toBooleanStrict(),
     status = status?.let { FlashcardSetStatus.valueOf(it) },
     languageId = languageId?.toLong(),
     startedAt = startedAt?.let { ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME) },

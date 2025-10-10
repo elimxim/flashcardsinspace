@@ -4,7 +4,7 @@ export interface ReviewHistory {
 
 export interface ReviewInfo {
   stage: string
-  reviewedAt: string // fixme reviewDate + Date
+  reviewDate: string // fixme Date
 }
 
 export interface Flashcard {
@@ -12,10 +12,10 @@ export interface Flashcard {
   frontSide: string
   backSide: string
   stage: string
-  reviewCount: number // fixme timesReviewed
+  timesReviewed: number
   reviewHistory: ReviewHistory
-  createdAt: string // fixme creationDate + Date
-  reviewedAt?: string | undefined // fixme reviewDate + Date
+  creationDate: string // fixme Date
+  lastReviewDate?: string | undefined // fixme Date
   lastUpdatedAt?: string | undefined
 }
 

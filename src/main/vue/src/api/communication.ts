@@ -10,12 +10,6 @@ export interface ErrorResponseBody {
   path: string,
 }
 
-export interface FlashcardSetUpdateRequest {
-  name?: string,
-  languageId?: number,
-  default?: boolean,
-}
-
 export interface ChronoSyncRequest {
   clientDatetime: string,
 }

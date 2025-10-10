@@ -31,10 +31,10 @@ fun Flashcard.toDto() = FlashcardDto(
     frontSide = frontSide,
     backSide = backSide,
     stage = stage.name,
-    reviewCount = timesReviewed,
+    timesReviewed = timesReviewed,
     reviewHistory = reviewHistory.toDto(),
-    createdAt = creationDate.toString(),
-    reviewedAt = lastReviewDate?.toString(),
+    creationDate = creationDate.toString(),
+    lastReviewDate = lastReviewDate?.toString(),
     lastUpdatedAt = lastUpdatedAt?.toString(),
 )
 
@@ -44,5 +44,5 @@ fun ReviewHistory.toDto() = ReviewHistoryDto(
 
 fun ReviewInfo.toDto() = ReviewInfoDto(
     stage = stage.name,
-    reviewedAt = reviewDate.toString(),
+    reviewDate = reviewDate.toString(),
 )

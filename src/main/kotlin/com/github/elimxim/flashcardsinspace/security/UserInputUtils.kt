@@ -45,46 +45,46 @@ fun FlashcardCreationRequest.normalize() = FlashcardCreationRequest(
     frontSide = frontSide?.normalize(),
     backSide = backSide?.normalize(),
     stage = stage?.normalize(),
-    createdAt = createdAt?.normalize(),
+    creationDate = creationDate?.normalize(),
 )
 
 fun FlashcardCreationRequest.escapeJava() = FlashcardCreationRequest(
     frontSide = frontSide?.escapeJava(),
     backSide = backSide?.escapeJava(),
     stage = stage?.escapeJava(),
-    createdAt = createdAt?.escapeJava(),
+    creationDate = creationDate?.escapeJava(),
 )
 
 fun FlashcardUpdateRequest.normalize() = FlashcardUpdateRequest(
     frontSide = frontSide?.normalize(),
     backSide = backSide?.normalize(),
     stage = stage?.normalize(),
-    reviewCount = reviewCount?.normalize(),
+    timesReviewed = timesReviewed?.normalize(),
     reviewHistory = FlashcardUpdateRequest.ReviewHistory(
         history = reviewHistory?.history.orEmpty().map {
             FlashcardUpdateRequest.ReviewInfo(
                 stage = it.stage?.normalize(),
-                reviewedAt = it.reviewedAt?.normalize(),
+                reviewDate = it.reviewDate?.normalize(),
             )
         }
     ),
-    reviewedAt = reviewedAt?.normalize(),
+    lastReviewDate = lastReviewDate?.normalize(),
 )
 
 fun FlashcardUpdateRequest.escapeJava() = FlashcardUpdateRequest(
     frontSide = frontSide?.escapeJava(),
     backSide = backSide?.escapeJava(),
     stage = stage?.escapeJava(),
-    reviewCount = reviewCount?.escapeJava(),
+    timesReviewed = timesReviewed?.escapeJava(),
     reviewHistory = FlashcardUpdateRequest.ReviewHistory(
         history = reviewHistory?.history.orEmpty().map {
             FlashcardUpdateRequest.ReviewInfo(
                 stage = it.stage?.escapeJava(),
-                reviewedAt = it.reviewedAt?.escapeJava(),
+                reviewDate = it.reviewDate?.escapeJava(),
             )
         }
     ),
-    reviewedAt = reviewedAt?.escapeJava(),
+    lastReviewDate = lastReviewDate?.escapeJava(),
 )
 
 fun FlashcardSetCreationRequest.normalize() = FlashcardSetCreationRequest(
@@ -99,7 +99,6 @@ fun FlashcardSetCreationRequest.escapeJava() = FlashcardSetCreationRequest(
 
 fun FlashcardSetUpdateRequest.normalize() = FlashcardSetUpdateRequest(
     name = name?.normalize(),
-    default = default?.normalize(),
     status = status?.normalize(),
     languageId = languageId?.normalize(),
     startedAt = startedAt?.normalize(),
@@ -107,7 +106,6 @@ fun FlashcardSetUpdateRequest.normalize() = FlashcardSetUpdateRequest(
 
 fun FlashcardSetUpdateRequest.escapeJava() = FlashcardSetUpdateRequest(
     name = name?.escapeJava(),
-    default = default?.escapeJava(),
     status = status?.escapeJava(),
     languageId = languageId?.escapeJava(),
     startedAt = startedAt?.escapeJava(),

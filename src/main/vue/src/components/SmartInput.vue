@@ -24,9 +24,9 @@
     />
     <input
       v-else
+      ref="input"
       v-model="model"
       v-bind="$attrs"
-      ref="input"
       class="transition--border-color"
       :type="inputType"
       :placeholder="inputPlaceholder"
