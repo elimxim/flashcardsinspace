@@ -2,23 +2,26 @@ import { defineStore } from 'pinia'
 import type { User } from '@/model/user.ts'
 
 export interface AuthState {
-  user: User | null,
+  user: User | undefined,
 }
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => {
     return {
-      user: null,
+      user: undefined,
     }
   },
   getters: {
     isAuthenticated(): boolean {
-      return this.user !== null
+      return this.user !== undefined
     }
   },
   actions: {
-    setUser(user: User | null) {
+    setUser(user: User | undefined) {
       this.user = user
+    },
+    resetUser() {
+      this.user = undefined
     },
   }
 })

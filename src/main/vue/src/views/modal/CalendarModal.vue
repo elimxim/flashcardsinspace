@@ -159,11 +159,11 @@ function dayCssClasses(day: CalendarDay): string {
 }
 
 function canShowSeq(day: CalendarDay): boolean {
-  return day.isCurrMonth && day.seqNumber !== null && day.seqNumber !== 0
+  return day.isCurrMonth && day.seqNumber !== undefined && day.seqNumber !== 0
 }
 
 function canShowStages(day: CalendarDay): boolean {
-  return day.isCurrMonth && day.stages !== null
+  return day.isCurrMonth && day.stages !== undefined
 }
 
 function exit() {

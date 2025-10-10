@@ -19,11 +19,9 @@ export function newFlashcard(frontSide: string, backSide: string): Flashcard {
     frontSide: frontSide,
     backSide: backSide,
     stage: stages.S1.name,
-    reviewedAt: null,
     reviewCount: 0,
     reviewHistory: { history: [] },
     createdAt: currDay.value.chronodate,
-    lastUpdatedAt: null,
   }
 }
 
@@ -77,7 +75,5 @@ export function createFlashcardSet(
     status: flashcardSetStatuses.ACTIVE,
     languageId: language.id,
     createdAt: new Date(),
-    startedAt: null,
-    lastUpdatedAt: null,
   }
 }

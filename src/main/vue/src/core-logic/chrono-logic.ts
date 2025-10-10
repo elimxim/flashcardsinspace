@@ -13,9 +13,9 @@ export const chronodayStatuses = {
 export interface CalendarDay {
   number: number
   date: string
-  status?: string
-  stages?: string
-  seqNumber?: number
+  status?: string | undefined
+  stages?: string | undefined
+  seqNumber?: number | undefined
   isCurrMonth: boolean
   isCurrDay: boolean
 }

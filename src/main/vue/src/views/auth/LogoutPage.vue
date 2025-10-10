@@ -82,7 +82,7 @@ onMounted(() => {
   sendLogoutRequest()
     .then(() => {
       console.info('Successfully logged out')
-      authStore.setUser(null)
+      authStore.resetUser()
     })
     .catch(error => {
       console.error('Failed to log out: ', error)

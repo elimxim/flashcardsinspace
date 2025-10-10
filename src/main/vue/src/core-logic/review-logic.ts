@@ -87,17 +87,16 @@ export class MultiStageReviewQueue implements ReviewQueue {
     const flashcards = this.flashcardMap.get(this.currStage)
     if (flashcards === undefined || flashcards.length === 0) {
       const nextStage = this.nextStage()
-      if (nextStage === null) {
-        return undefined
+      if (nextStage) {
+        this.currStage = nextStage
+        return this.next()
       }
-      this.currStage = nextStage
-      return this.next()
     } else {
       return flashcards.shift()
     }
   }
 
-  private nextStage(): Stage | null {
+  private nextStage(): Stage | undefined  {
     for (let i = this.currStage.order - 1; i >= stages.S1.order; i--) {
       const stage = stageOrderMap.get(i)
       if (stage !== undefined && this.flashcardMap.has(stage)) {
@@ -107,7 +106,6 @@ export class MultiStageReviewQueue implements ReviewQueue {
         }
       }
     }
-    return null
   }
 
   public remaining(): number {
@@ -207,7 +205,7 @@ function isUnknownFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
 }
 
 function isReviewedFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
-  return flashcard.reviewedAt === day.chronodate
+  return flashcard.reviewedAt !== undefined && flashcard.reviewedAt === day.chronodate
 }
 
 export function countFlashcards(flashcards: Flashcard[], stage: Stage): number {

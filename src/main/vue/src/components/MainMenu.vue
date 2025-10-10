@@ -103,7 +103,7 @@ const { flashcardSets, isEmpty: isNoFlashcardSets } = storeToRefs(flashcardSetsS
 const { flashcardSet } = storeToRefs(flashcardSetStore)
 const { currDay } = storeToRefs(chronoStore)
 
-const showFlashcardMenuItem = computed(() => flashcardSet.value !== null)
+const showFlashcardMenuItem = computed(() => flashcardSet.value !== undefined)
 const menuSelect = ref<HTMLSelectElement>()
 
 // buckets>

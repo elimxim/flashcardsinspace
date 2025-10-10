@@ -15,8 +15,8 @@ export interface Flashcard {
   reviewCount: number // fixme timesReviewed
   reviewHistory: ReviewHistory
   createdAt: string // fixme creationDate + Date
-  reviewedAt: string | null // fixme reviewDate + Date
-  lastUpdatedAt: string | null
+  reviewedAt?: string | undefined // fixme reviewDate + Date
+  lastUpdatedAt?: string | undefined
 }
 
 export interface FlashcardSet {
@@ -25,6 +25,6 @@ export interface FlashcardSet {
   status: string,
   languageId: number
   createdAt: Date
-  startedAt: string | null // fixme Date
-  lastUpdatedAt: string | null // fixme Date
+  startedAt?: string | undefined // fixme Date
+  lastUpdatedAt?: string | undefined // fixme Date
 }

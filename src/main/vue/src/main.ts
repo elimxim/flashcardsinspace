@@ -23,7 +23,7 @@ sendWhoAmIRequest().then(response => {
     authStore.setUser(response.data)
   } else {
     console.log('Who Am I: ', response.status)
-    authStore.setUser(null)
+    authStore.resetUser()
   }
 }).then(() => {
   app.use(router)

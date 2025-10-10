@@ -90,7 +90,7 @@ export const useSpaceToaster = defineStore('space-toaster', {
     },
     pause() {
       if (this.toast !== null) {
-        if (this.toast.persistent || this.timeout == null) return
+        if (this.toast.persistent || this.timeout === null) return
         this.paused = true
         this.remaining -= performance.now() - this.startedAt
         window.clearTimeout(this.timeout)
@@ -99,7 +99,7 @@ export const useSpaceToaster = defineStore('space-toaster', {
     },
     resume() {
       if (this.toast !== null) {
-        if (this.toast.persistent || this.timeout != null) return
+        if (this.toast.persistent || this.timeout !== null) return
         this.paused = false
         this.startedAt = performance.now()
         this.timeout = window.setTimeout(() => this.show = false, this.remaining)
