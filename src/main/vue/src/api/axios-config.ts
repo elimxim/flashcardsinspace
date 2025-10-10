@@ -22,7 +22,10 @@ function transformResponseDates(data: any): any {
   if (typeof data === 'object') {
     const result: any = {}
     for (const key in data) {
-      result[key] = transformResponseDates(data[key])
+      const value = data[key]
+      if (value !== null) {
+        result[key] = transformResponseDates(value)
+      }
     }
     return result
   }
