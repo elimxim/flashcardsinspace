@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-add-timezone-to-user
+      author: augment
+      changes:
+        - addColumn:
+            tableName: astro_user
+            columns:
+              - column:
+                  name: timezone
+                  type: VARCHAR(50)
+                  defaultValue: 'UTC'
+                  constraints:
+                    nullable: false
+

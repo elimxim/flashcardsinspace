@@ -9,10 +9,14 @@ import com.github.elimxim.flashcardsinspace.web.dto.ChronoBulkUpdateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
 import com.github.elimxim.flashcardsinspace.web.dto.ValidChronoBulkUpdateRequest
-import com.github.elimxim.flashcardsinspace.web.exception.*
+import com.github.elimxim.flashcardsinspace.web.exception.CorruptedChronoStateException
+import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetNotStartedException
+import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetSuspendedException
+import com.github.elimxim.flashcardsinspace.web.exception.NotRemovableChronodayException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 private val log = LoggerFactory.getLogger(ChronoService::class.java)
@@ -29,17 +33,21 @@ class ChronoService(
 ) {
     @Transactional
     fun sync(user: User, setId: Long, request: ChronoSyncRequest): Pair<ChronodayDto, List<ChronodayDto>> {
-        log.info("User ${user.id}: syncing chronodays for flashcard set $setId")
+        log.info("User ${user.id}: syncing chronodays for flashcard set $setId, timezone: ${user.timezone}")
         flashcardSetService.verifyUserHasAccess(user, setId)
-        return sync(setId, requestValidator.validate(request).clientDatetime)
+        return sync(setId, requestValidator.validate(request).clientDatetime, clientTimezone = user.timezone)
     }
 
     @Transactional
-    fun sync(setId: Long, clientDatetime: ZonedDateTime): Pair<ChronodayDto, List<ChronodayDto>> {
+    fun sync(setId: Long, clientDatetime: ZonedDateTime, clientTimezone: String): Pair<ChronodayDto, List<ChronodayDto>> {
         val flashcardSet = flashcardSetService.getEntity(setId)
+
+        val clientZoneId = ZoneId.of(clientTimezone)
+        val datetimeInUserZone = clientDatetime.withZoneSameInstant(clientZoneId)
+        val currDate = datetimeInUserZone.toLocalDate()
+
         if (flashcardSet.chronodays.isEmpty()) {
             val schedule = lightspeedService.createSchedule(startDatetime = clientDatetime)
-            val currDate = clientDatetime.toLocalDate()
             val currDay = schedule.find { it.chronodate.isEqual(currDate) }
                 ?: throw CorruptedChronoStateException(
                     "Can't find current day $currDate in schedule"
@@ -47,7 +55,6 @@ class ChronoService(
             return currDay to schedule
         }
 
-        val currDate = clientDatetime.toLocalDate()
         val lastDate = flashcardSet.lastChronoday()?.chronodate ?: currDate
         val updatedFlashcardSet = if (currDate.isAfter(lastDate)) {
             val status = if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
@@ -153,24 +160,6 @@ class ChronoService(
 
         val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays, daysAhead = 0)
         return schedule.filter { it.id in request.ids }
-    }
-
-    @Transactional
-    fun getEntity(id: Long): Chronoday =
-        chronodayRepository.findById(id).orElseThrow {
-            ChronodayNotFoundException("Chronoday with id $id not found")
-        }
-
-    @Transactional
-    fun verifyUserOperation(user: User, setId: Long, id: Long) {
-        if (getEntity(id).flashcardSet.id != setId) {
-            throw UnmatchedFlashcardSetIdException(
-                """
-                    User ${user.id} requested chronoday $id 
-                    doesn't belong to the requested set $setId
-                    """.trimOneLine()
-            )
-        }
     }
 
     private fun applySchedule(flashcardSet: FlashcardSet): Pair<ChronodayDto, List<ChronodayDto>> {

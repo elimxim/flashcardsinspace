@@ -14,19 +14,23 @@ export default authClient
 
 export async function sendSignupRequest(name: string, email: string, password: string, languageId: number | undefined) {
   console.log('[POST] request => sign up')
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   return await authClient.post<User>('/signup', {
     email: email,
     secret: password,
     name: name,
     languageId: languageId,
+    timezone: timezone,
   })
 }
 
 export async function sendLoginRequest(email: string, password: string) {
   console.log('[POST] request => login')
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   return authClient.post<User>('/login', {
     email: email,
     secret: password,
+    timezone: timezone,
   })
 }
 

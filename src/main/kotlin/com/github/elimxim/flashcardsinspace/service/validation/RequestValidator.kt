@@ -138,6 +138,7 @@ private fun fields(violations: List<Violation>) = violations
 fun LoginRequest.toValidRequest() = ValidLoginRequest(
     email = email!!,
     secret = secret!!,
+    timezone = timezone!!,
 )
 
 fun SignUpRequest.toValidRequest() = ValidSignUpRequest(
@@ -145,6 +146,7 @@ fun SignUpRequest.toValidRequest() = ValidSignUpRequest(
     name = name!!,
     secret = secret!!,
     languageId = languageId!!.toLong(),
+    timezone = timezone!!,
 )
 
 fun FlashcardCreationRequest.toValidRequest() = ValidFlashcardCreationRequest(

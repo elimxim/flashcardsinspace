@@ -9,6 +9,7 @@ data class UserDto(
     val name: String,
     val roles: List<String>,
     val registeredAt: ZonedDateTime,
+    val timezone: String,
 )
 
 data class LanguageDto(

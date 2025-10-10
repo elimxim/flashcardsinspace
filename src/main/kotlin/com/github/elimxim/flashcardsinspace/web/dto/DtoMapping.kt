@@ -8,6 +8,7 @@ fun User.toDto() = UserDto(
     email = email,
     roles = roles.split(",").toList(),
     registeredAt = registeredAt,
+    timezone = timezone,
 )
 
 fun Language.toDto() = LanguageDto(

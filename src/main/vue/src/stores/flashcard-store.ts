@@ -36,7 +36,9 @@ export const useFlashcardStore = defineStore('flashcard', {
       return this.flashcardMap.size === 0
     },
     isStarted(): boolean {
-      return this.flashcardSet?.startedAt !== undefined
+      const r = this.flashcardSet?.startedAt !== undefined
+      console.log(`Checking if flashcard set ${this.flashcardSet?.id} is started ${r} ${this.flashcardSet?.startedAt}`)
+      return r
     },
     isSuspended(): boolean {
       return this.flashcardSet?.status === flashcardSetStatuses.SUSPENDED

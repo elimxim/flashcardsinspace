@@ -53,10 +53,11 @@ class AuthService(
             language = language,
             roles = "ASTRONAUT",
             registeredAt = ZonedDateTime.now(),
+            timezone = request.timezone,
         )
 
         val savedUser = userRepository.save(user)
-        log.info("Signup successful: ${user.email} => ${user.id}")
+        log.info("Signup successful: ${user.email} => ${user.id}, timezone: ${user.timezone}")
 
         return savedUser
     }
@@ -79,7 +80,15 @@ class AuthService(
         val user = userRepository.findByEmail(request.email)
             .orElseThrow { UserNotFoundException("User not found: ${request.email.escapeJava()}") }
 
-        log.info("Login successful: ${user.email} => ${user.id}")
+        user.lastLoginAt = ZonedDateTime.now()
+        if (user.timezone != request.timezone) {
+            user.timezone = request.timezone
+            user.lastUpdatedAt = ZonedDateTime.now()
+            log.info("Updated timezone for user ${user.id}: ${request.timezone}")
+        }
+        userRepository.save(user)
+
+        log.info("Login successful: ${user.email} => ${user.id}, timezone: ${user.timezone}")
         return user
     }
 

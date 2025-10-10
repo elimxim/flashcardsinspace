@@ -29,6 +29,11 @@ class SignUpRequest(
     @field:NotBlank
     @field:Pattern(regexp="^\\d+$")
     var languageId: String? = null,
+    @field:NotNull
+    @field:NotBlank
+    @field:Size(max = 50)
+    @field:ValidTimezone
+    var timezone: String? = null,
 )
 
 data class ValidSignUpRequest(
@@ -36,6 +41,7 @@ data class ValidSignUpRequest(
     val name: String,
     val secret: Password,
     val languageId: Long,
+    val timezone: String,
 )
 
 class LoginRequest(
@@ -45,11 +51,17 @@ class LoginRequest(
     var email: String? = null,
     @field:RequiredConfidential
     var secret: Password? = null,
+    @field:NotNull
+    @field:NotBlank
+    @field:Size(max = 50)
+    @field:ValidTimezone
+    var timezone: String? = null,
 )
 
 data class ValidLoginRequest(
     val email: String,
     val secret: Password,
+    val timezone: String,
 )
 
 class FlashcardCreationRequest(

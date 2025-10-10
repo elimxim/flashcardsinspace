@@ -8,9 +8,11 @@ import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 import jakarta.validation.Payload
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.time.zone.ZoneRulesException
 import kotlin.reflect.KClass
 
 @Target(
@@ -133,6 +135,34 @@ class ChronodayStatusValidator : ConstraintValidator<ValidChronodayStatus, Strin
             ChronodayStatus.valueOf(value)
             return true
         } catch (_: IllegalArgumentException) {
+            return false
+        }
+    }
+}
+
+@Target(
+    AnnotationTarget.FIELD,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.VALUE_PARAMETER
+)
+@Retention(AnnotationRetention.RUNTIME)
+@Constraint(validatedBy = [TimezoneValidator::class])
+annotation class ValidTimezone(
+    val message: String = "{jakarta.validation.constraints.timezone.invalid.message}",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = [],
+)
+
+class TimezoneValidator : ConstraintValidator<ValidTimezone, String> {
+    override fun isValid(value: String?, context: ConstraintValidatorContext?): Boolean {
+        if (value.isNullOrBlank()) return true
+        try {
+            ZoneId.of(value)
+            return true
+        } catch (_: ZoneRulesException) {
+            return false
+        } catch (_: Exception) {
+            // Catch all exceptions including DateTimeException, IllegalArgumentException, etc.
             return false
         }
     }

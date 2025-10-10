@@ -27,6 +27,7 @@ class SignUpRequestValidatorTest {
         assertThat(validRequest.name).isEqualTo("Te_st Us-er")
         assertThat(validRequest.secret.unmasked()).isEqualTo("password123")
         assertThat(validRequest.languageId).isEqualTo(1L)
+        assertThat(validRequest.timezone).isEqualTo("America/New_York")
     }
 
     @Test
@@ -318,13 +319,10 @@ class SignUpRequestValidatorTest {
     }
 
     @Test
-    fun `should fail validation with all invalid fields`() {
+    fun `should fail validation if timezone is null`() {
         // given:
-        val request = SignUpRequest().apply {
-            email = "invalid-email"
-            name = "a".repeat(65)
-            secret = Password("123")
-            languageId = "abc"
+        val request = validRequest().apply {
+            timezone = null
         }
 
         // when:
@@ -333,7 +331,91 @@ class SignUpRequestValidatorTest {
         }
 
         // then:
-        assertThat(exception.fields).containsExactly("email", "languageId", "name", "secret")
+        assertThat(exception.fields).containsExactly("timezone")
+    }
+
+    @Test
+    fun `should fail validation if timezone is empty`() {
+        // given:
+        val request = validRequest().apply {
+            timezone = ""
+        }
+
+        // when:
+        val exception = assertThrows<InvalidRequestFieldsException> {
+            validator.validate(request)
+        }
+
+        // then:
+        assertThat(exception.fields).containsExactly("timezone")
+    }
+
+    @Test
+    fun `should fail validation if timezone is blank`() {
+        // given:
+        val request = validRequest().apply {
+            timezone = "  "
+        }
+
+        // when:
+        val exception = assertThrows<InvalidRequestFieldsException> {
+            validator.validate(request)
+        }
+
+        // then:
+        assertThat(exception.fields).containsExactly("timezone")
+    }
+
+    @Test
+    fun `should fail validation if timezone is invalid`() {
+        // given:
+        val request = validRequest().apply {
+            timezone = "Invalid/Timezone"
+        }
+
+        // when:
+        val exception = assertThrows<InvalidRequestFieldsException> {
+            validator.validate(request)
+        }
+
+        // then:
+        assertThat(exception.fields).containsExactly("timezone")
+    }
+
+    @Test
+    fun `should pass validation with different valid timezones`() {
+        listOf("UTC", "America/New_York", "Europe/London", "Asia/Tokyo", "Australia/Sydney").forEach { tz ->
+            // given:
+            val request = validRequest().apply {
+                timezone = tz
+            }
+
+            // when:
+            val validRequest = validator.validate(request)
+
+            // then:
+            assertThat(validRequest.timezone).isEqualTo(tz)
+        }
+    }
+
+    @Test
+    fun `should fail validation with all invalid fields`() {
+        // given:
+        val request = SignUpRequest().apply {
+            email = "invalid-email"
+            name = "a".repeat(65)
+            secret = Password("123")
+            languageId = "abc"
+            timezone = "Invalid/Timezone"
+        }
+
+        // when:
+        val exception = assertThrows<InvalidRequestFieldsException> {
+            validator.validate(request)
+        }
+
+        // then:
+        assertThat(exception.fields).containsExactly("email", "languageId", "name", "secret", "timezone")
     }
 
     private fun validRequest() = SignUpRequest().apply {
@@ -341,5 +423,6 @@ class SignUpRequestValidatorTest {
         name = "Te_st Us-er"
         secret = Password("password123")
         languageId = "1"
+        timezone = "America/New_York"
     }
 }

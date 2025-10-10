@@ -15,8 +15,8 @@ export interface Flashcard {
   timesReviewed: number
   reviewHistory: ReviewHistory
   creationDate: string // "yyyy-MM-dd"
-  lastReviewDate?: string // "yyyy-MM-dd"
-  lastUpdatedAt?: Date // ZonedDateTime
+  lastReviewDate?: string | undefined // "yyyy-MM-dd"
+  lastUpdatedAt?: Date | undefined // ZonedDateTime
 }
 
 export interface FlashcardSet {
@@ -25,6 +25,6 @@ export interface FlashcardSet {
   status: string
   languageId: number
   createdAt: Date // ZonedDateTime
-  startedAt?: Date // ZonedDateTime
-  lastUpdatedAt?: Date // ZonedDateTime
+  startedAt?: Date | undefined // ZonedDateTime
+  lastUpdatedAt?: Date | undefined // ZonedDateTime
 }

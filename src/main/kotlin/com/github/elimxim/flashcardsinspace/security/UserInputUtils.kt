@@ -22,6 +22,7 @@ fun SignUpRequest.normalize() = SignUpRequest(
     name = name?.normalize(),
     secret = secret?.normalize(),
     languageId = languageId?.normalize(),
+    timezone = timezone?.normalize(),
 )
 
 fun SignUpRequest.escapeJava() = SignUpRequest(
@@ -29,16 +30,19 @@ fun SignUpRequest.escapeJava() = SignUpRequest(
     name = name?.escapeJava(),
     secret = secret?.escapeJava(),
     languageId = languageId?.escapeJava(),
+    timezone = timezone?.escapeJava(),
 )
 
 fun LoginRequest.normalize() = LoginRequest(
     email = email?.normalize()?.lowercase(),
     secret = secret?.normalize(),
+    timezone = timezone?.normalize(),
 )
 
 fun LoginRequest.escapeJava() = LoginRequest(
     email = email?.escapeJava(),
     secret = secret?.escapeJava(),
+    timezone = timezone?.escapeJava(),
 )
 
 fun FlashcardCreationRequest.normalize() = FlashcardCreationRequest(

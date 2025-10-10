@@ -34,6 +34,9 @@ class User(
     @Column(nullable = true)
     var lastUpdatedAt: ZonedDateTime? = null,
 
+    @Column(nullable = false)
+    var timezone: String = "UTC",
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "language_id", referencedColumnName = "id")
     var language: Language,
