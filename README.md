@@ -4,9 +4,6 @@
 
 - README
   - Describe the project
-- Refactoring
-  - Communication fields renaming
-  - Inputs change "<> is required" to "<>" if it's required
 - UX:
   - Use user timezone instead of UTC
   - Home page

@@ -14,7 +14,7 @@
           v-model="name"
           type="text"
           :invalid="nameInvalid"
-          :placeholder="nameNotSet ? 'Name is required' : 'Name'"
+          placeholder="Name"
         />
         <span v-if="nameMaxLengthInvalid" class="text-error">
           Too long. Maximum 64 characters
@@ -31,7 +31,7 @@
             :options="languages"
             :option-label="(lang) => lang.name"
             :invalid="languageInvalid"
-            :option-placeholder="languageNotSet ? 'Language is required' : 'Language'"
+            option-placeholder="Language"
             search-placeholder="Search..."
           />
         </AwesomeContainer>
@@ -109,9 +109,6 @@ const formInvalid = computed(() => $v.value.$errors.length > 0)
 const nameInvalid = computed(() =>
   $v.value.name.$errors.length > 0
 )
-const nameNotSet = computed(() =>
-  $v.value.name.$errors.find(v => v.$validator === 'required') !== undefined
-)
 const nameMaxLengthInvalid = computed(() =>
   $v.value.name.$errors.find(v => v.$validator === 'maxLength') !== undefined
 )
@@ -120,9 +117,6 @@ const nameRegexMismatch = computed(() =>
 )
 const languageInvalid = computed(() =>
   $v.value.language.$errors.length > 0
-)
-const languageNotSet = computed(() =>
-  $v.value.language.$errors.find(v => v.$validator === 'required') !== undefined
 )
 
 function cancel() {

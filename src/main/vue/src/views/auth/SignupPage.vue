@@ -18,8 +18,8 @@
           type="text"
           name="name"
           autocomplete="name"
-          :invalid="usernameNotSet"
-          :placeholder="usernameNotSet ? 'Name is required' : 'Name'"
+          :invalid="usernameInvalid"
+          placeholder="Name"
         />
         <span v-if="usernameRegexMismatch" class="text-error">
           Please use only letters, numbers, dashes, underscores, and spaces
@@ -34,7 +34,7 @@
           name="username"
           autocomplete="username"
           :invalid="userEmailInvalid"
-          :placeholder="userEmailNotSet ? 'Email is required' : 'Email'"
+          placeholder="Email"
         />
         <span v-if="userEmailWrongFormat" class="text-error">
           This email seems to be lost in a cosmic dust cloud. Please check the format
@@ -45,8 +45,8 @@
             v-model="language"
             :options="languages"
             :option-label="(lang) => lang.name"
-            :invalid="languageNotSet"
-            :option-placeholder="languageNotSet ? 'Language is required' : 'Language'"
+            :invalid="languageInvalid"
+            option-placeholder="Language"
             search-placeholder="Search..."
           />
         </AwesomeContainer>
@@ -57,7 +57,7 @@
           name="new-password"
           autocomplete="new-password"
           :invalid="userPasswordInvalid"
-          :placeholder="userPasswordNotSet ? 'Password is required' : 'Password'"
+          placeholder="Password"
         />
         <span v-if="userPasswordMinLengthInvalid" class="text-error">
           Your password must be stronger than a piece of space junk. Please use 6 or more characters
@@ -72,7 +72,7 @@
           name="new-password"
           autocomplete="new-password"
           :invalid="confirmPasswordInvalid"
-          :placeholder="confirmPasswordNotSet ? 'Password confirmation is required' : 'Confirm Password'"
+          placeholder="Confirm Password"
         />
         <span v-if="confirmPasswordMismatch" class="text-error">
           The passwords do not match. Please try again
@@ -159,9 +159,6 @@ const $v = useVuelidate({
 
 const formInvalid = computed(() => $v.value.$errors.length > 0)
 const usernameInvalid = computed(() => $v.value.username.$errors.length > 0)
-const usernameNotSet = computed(() =>
-  $v.value.username.$errors.find(v => v.$validator === 'required') !== undefined
-)
 const usernameRegexMismatch = computed(() =>
   $v.value.username.$errors.find(v => v.$validator === 'regex') !== undefined
 )
@@ -169,20 +166,11 @@ const usernameMaxLengthInvalid = computed(() =>
   $v.value.username.$errors.find(v => v.$validator === 'maxLength') !== undefined
 )
 const userEmailInvalid = computed(() => $v.value.userEmail.$errors.length > 0)
-const userEmailNotSet = computed(() =>
-  $v.value.userEmail.$errors.find(v => v.$validator === 'required') !== undefined
-)
 const userEmailWrongFormat = computed(() =>
   $v.value.userEmail.$errors.find(v => v.$validator === 'email') !== undefined
 )
 const languageInvalid = computed(() => $v.value.language.$errors.length > 0)
-const languageNotSet = computed(() =>
-  $v.value.language.$errors.find(v => v.$validator === 'required') !== undefined
-)
 const userPasswordInvalid = computed(() => $v.value.userPassword.$errors.length > 0)
-const userPasswordNotSet = computed(() =>
-  $v.value.userPassword.$errors.find(v => v.$validator === 'required') !== undefined
-)
 const userPasswordMinLengthInvalid = computed(() =>
   $v.value.userPassword.$errors.find(v => v.$validator === 'minLength') !== undefined
 )
@@ -190,9 +178,6 @@ const userPasswordMaxLengthInvalid = computed(() =>
   $v.value.userPassword.$errors.find(v => v.$validator === 'maxLength') !== undefined
 )
 const confirmPasswordInvalid = computed(() => $v.value.confirmPassword.$errors.length > 0)
-const confirmPasswordNotSet = computed(() =>
-  $v.value.confirmPassword.$errors.find(v => v.$validator === 'required') !== undefined
-)
 const confirmPasswordMismatch = computed(() =>
   $v.value.confirmPassword.$errors.find(v => v.$validator === 'passwordConfirmed') !== undefined
 )

@@ -37,7 +37,7 @@
           name="username"
           autocomplete="username"
           :invalid="userEmailInvalid"
-          :placeholder="userEmailNotSet ? 'Email is required' : 'Email'"
+          placeholder="Email"
         />
         <span v-if="userEmailFormatWrong" class="text-error">
           This email seems to be lost in a cosmic dust cloud. Please check the format
@@ -49,7 +49,7 @@
           name="password"
           autocomplete="current-password"
           :invalid="userPasswordInvalid"
-          :placeholder="userPasswordNotSet ? 'Password is required' : 'Password'"
+          placeholder="Password"
         />
         <span
           v-if="userPasswordMaxLengthInvalid"
@@ -110,16 +110,10 @@ const $v = useVuelidate({
 
 const formInvalid = computed(() => $v.value.$errors.length > 0)
 const userEmailInvalid = computed(() => $v.value.userEmail.$errors.length > 0)
-const userEmailNotSet = computed(() =>
-  $v.value.userEmail.$errors.find(v => v.$validator === 'required') !== undefined
-)
 const userEmailFormatWrong = computed(() =>
   $v.value.userEmail.$errors.find(v => v.$validator === 'email') !== undefined
 )
 const userPasswordInvalid = computed(() => $v.value.userPassword.$errors.length > 0)
-const userPasswordNotSet = computed(() =>
-  $v.value.userPassword.$errors.find(v => v.$validator === 'required') !== undefined
-)
 const userPasswordMaxLengthInvalid = computed(() =>
   $v.value.userPassword.$errors.find(v => v.$validator === 'maxLength') !== undefined
 )

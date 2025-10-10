@@ -23,7 +23,7 @@
           v-model="frontSide"
           type="text"
           :invalid="frontSideInvalid"
-          :placeholder="frontSideNotSet ? 'Front side cannot be empty' : 'Front side'"
+          placeholder="Front side"
           area
         />
         <span v-if="frontSideMaxLengthInvalid" class="text-error">
@@ -35,7 +35,7 @@
           v-model="backSide"
           type="text"
           :invalid="backSideInvalid"
-          :placeholder="backSideNotSet ? 'Back side cannot be empty' : 'Back side'"
+          placeholder="Back side"
           area
         />
         <span v-if="backSideMaxLengthInvalid" class="text-error">
@@ -108,8 +108,8 @@ import { storeToRefs } from 'pinia'
 import {
   sendFlashcardRemovalRequest,
   sendFlashcardCreationRequest,
-  sendFlashcardSetInitRequest, sendFlashcardUpdateRequest,
-
+  sendFlashcardSetInitRequest,
+  sendFlashcardUpdateRequest,
 } from '@/api/api-client.ts'
 
 const flashcard = defineModel<Flashcard | null>('flashcard', { default: null })
@@ -151,16 +151,10 @@ const $v = useVuelidate(validationRules, {
 
 const formInvalid = computed(() => $v.value.$errors.length > 0)
 const frontSideInvalid = computed(() => $v.value.frontSide.$errors.length > 0)
-const frontSideNotSet = computed(() =>
-  $v.value.frontSide.$errors.find(v => v.$validator === 'required') !== undefined
-)
 const frontSideMaxLengthInvalid = computed(() =>
   $v.value.frontSide.$errors.find(v => v.$validator === 'maxLength') !== undefined
 )
 const backSideInvalid = computed(() => $v.value.backSide.$errors.length > 0)
-const backSideNotSet = computed(() =>
-  $v.value.backSide.$errors.find(v => v.$validator === 'required') !== undefined
-)
 const backSideMaxLengthInvalid = computed(() =>
   $v.value.backSide.$errors.find(v => v.$validator === 'maxLength') !== undefined
 )

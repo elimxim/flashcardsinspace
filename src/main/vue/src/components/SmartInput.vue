@@ -5,28 +5,31 @@
   >
     <textarea
       v-if="area"
+      v-bind="$attrs"
       ref="textArea"
       v-model="model"
-      :type="inputType"
       class="transition--border-color"
+      :type="inputType"
       :toast-type="$props.type"
-      v-bind="$attrs"
+      :placeholder="inputPlaceholder"
     />
     <input
       v-else-if="readonly"
-      ref="readonlyInput"
-      :value="value"
-      class="transition--border-color"
-      :type="inputType"
       v-bind="$attrs"
+      ref="readonlyInput"
+      class="transition--border-color"
+      :value="value"
+      :type="inputType"
+      :placeholder="inputPlaceholder"
     />
     <input
       v-else
-      ref="input"
       v-model="model"
+      v-bind="$attrs"
+      ref="input"
       class="transition--border-color"
       :type="inputType"
-      v-bind="$attrs"
+      :placeholder="inputPlaceholder"
     />
     <button
       v-if="!area && isPassword"
@@ -54,11 +57,13 @@ const props = withDefaults(defineProps<{
   invalid?: boolean
   readonly?: boolean
   value?: string
+  placeholder?: string
 }>(), {
   area: false,
   invalid: false,
   readonly: false,
   value: '',
+  placeholder: '',
 })
 
 const isPassword = computed(() => props.type === 'password')
@@ -76,6 +81,10 @@ const inputType = computed(() => {
     return props.type
   }
 })
+
+const inputPlaceholder = computed(() =>
+  props.invalid ? props.placeholder + '!' : props.placeholder
+)
 
 function toggleShowPassword() {
   showPassword.value = !showPassword.value

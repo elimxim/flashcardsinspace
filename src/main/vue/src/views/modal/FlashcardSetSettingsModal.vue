@@ -14,7 +14,7 @@
           v-model="curName"
           type="text"
           :invalid="curNameInvalid"
-          :placeholder="curNameNotSet ? 'Name is required' : 'Name'"
+          placeholder="Name"
         />
         <span v-if="curNameMaxLengthInvalid" class="text-error">
           Too long. Maximum 64 characters
@@ -31,7 +31,7 @@
             :options="languages"
             :option-label="(lang) => lang.name"
             :invalid="curLanguageInvalid"
-            :option-placeholder="curLanguageNotSet ? 'Language is required' : 'Language'"
+            option-placeholder="Language"
             search-placeholder="Search..."
           />
         </AwesomeContainer>
@@ -123,9 +123,6 @@ const formInvalid = computed(() => $v.value.$errors.length > 0)
 const curNameInvalid = computed(() =>
   $v.value.name.$errors.length > 0
 )
-const curNameNotSet = computed(() =>
-  $v.value.name.$errors.find(v => v.$validator === 'required') !== undefined
-)
 const curNameMaxLengthInvalid = computed(() =>
   $v.value.name.$errors.find(v => v.$validator === 'maxLength') !== undefined
 )
@@ -134,9 +131,6 @@ const curNameRegexMismatch = computed(() =>
 )
 const curLanguageInvalid = computed(() =>
   $v.value.language.$errors.length > 0
-)
-const curLanguageNotSet = computed(() =>
-  $v.value.language.$errors.find(v => v.$validator === 'required') !== undefined
 )
 
 function cancel() {
