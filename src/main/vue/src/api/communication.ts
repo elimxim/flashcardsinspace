@@ -7,7 +7,6 @@ export interface ErrorResponseBody {
   statusError: string,
   errorCode: string,
   message?: string,
-  path: string,
 }
 
 export interface ChronoSyncRequest {

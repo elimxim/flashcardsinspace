@@ -28,7 +28,6 @@ class GlobalExceptionHandler(private val messages: Messages) {
         log.error("UNEXPECTED exception occurred", ex)
         val body = errorBody(
             status = HttpStatus.INTERNAL_SERVER_ERROR,
-            path = request.getDescription(false).escapeHtml(),
             exception = UnexpectedException("Unexpected error occurred", ex)
         )
 
@@ -41,7 +40,6 @@ class GlobalExceptionHandler(private val messages: Messages) {
         log.error("${httpStatus.name} exception occurred", e)
         val body = errorBody(
             status = httpStatus,
-            path = request.getDescription(false).escapeHtml(),
             exception = e,
         )
 
@@ -52,10 +50,8 @@ class GlobalExceptionHandler(private val messages: Messages) {
     fun handle4xxException(e: Http4xxException, request: WebRequest): ResponseEntity<ErrorResponseBody> {
         val httpStatus = getHttpStatus(e)
         log.info("${httpStatus.name} exception occurred: ${e.message}", e.cause)
-
         val body = errorBody(
             status = httpStatus,
-            path = request.getDescription(false).escapeHtml(),
             exception = e,
         )
 
@@ -64,9 +60,7 @@ class GlobalExceptionHandler(private val messages: Messages) {
 
     private fun errorBody(
         status: HttpStatus,
-        path: String,
         exception: HttpException,
-        humor: Boolean = true,
     ): ErrorResponseBody {
         return ErrorResponseBody(
             timestamp = LocalDateTime.now(),
@@ -74,8 +68,7 @@ class GlobalExceptionHandler(private val messages: Messages) {
             statusCode = status.value(),
             statusError = status.reasonPhrase,
             errorCode = getErrorCode(exception),
-            message = messages.getMessage(exception),
-            path = path,
+            message = messages.getMessage(exception)?.escapeHtml(),
         )
     }
 
@@ -90,5 +83,4 @@ data class ErrorResponseBody(
     val statusError: String,
     val errorCode: String,
     val message: String?,
-    val path: String,
 )
