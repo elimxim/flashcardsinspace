@@ -3,7 +3,7 @@ import {
   type ChronoBulkUpdateRequest, type ChronodayId,
   ChronoSyncRequest,
   ChronoSyncResponse,
-  FlashcardSetInitResponse,
+  FlashcardSetInitResponse, FlashcardSetSuspendResponse,
 } from '@/api/communication.ts'
 import type { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { Chronoday } from '@/model/chrono.ts'
@@ -26,6 +26,11 @@ export async function sendFlashcardSetListGetRequest() {
 export async function sendFlashcardSetInitRequest(id: number, flashcard: Flashcard) {
   console.log(`[POST] request => init flashcard set ${id}`)
   return apiClient.post<FlashcardSetInitResponse>(`/flashcard-sets/${id}/init`, flashcard)
+}
+
+export async function sendFlashcardSetSuspendRequest(id: number, flashcardSet: FlashcardSet) {
+  console.log(`[POST] request => suspend flashcard set ${id}`)
+  return apiClient.post<FlashcardSetSuspendResponse>(`/flashcard-sets/${id}/suspend`, flashcardSet)
 }
 
 export async function sendFlashcardSetGetRequest(id: number) {

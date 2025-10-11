@@ -2,8 +2,8 @@
   <div class="review-form-starter">
     <button
       class="review-button review-start-button"
-      :class="{ 'review-start-button-disabled': isEmpty }"
-      :disabled="isEmpty"
+      :class="{ 'review-start-button-disabled': isDisabled }"
+      :disabled="isDisabled"
       @click="startReview">
       Start review
     </button>
@@ -11,6 +11,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useRouter } from 'vue-router'
@@ -19,7 +20,9 @@ import { routeNames } from '@/router'
 const router = useRouter()
 const flashcardStore = useFlashcardStore()
 
-const { isEmpty } = storeToRefs(flashcardStore)
+const { isEmpty, isSuspended } = storeToRefs(flashcardStore)
+
+const isDisabled = computed(() => isEmpty.value || isSuspended.value)
 
 function startReview() {
   router.push({ name: routeNames.review })

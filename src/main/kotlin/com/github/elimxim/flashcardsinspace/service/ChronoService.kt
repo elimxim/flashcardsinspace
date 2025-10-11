@@ -8,7 +8,10 @@ import com.github.elimxim.flashcardsinspace.web.dto.ChronoBulkUpdateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
 import com.github.elimxim.flashcardsinspace.web.dto.ValidChronoBulkUpdateRequest
-import com.github.elimxim.flashcardsinspace.web.exception.*
+import com.github.elimxim.flashcardsinspace.web.exception.ChronodayHasReviewsException
+import com.github.elimxim.flashcardsinspace.web.exception.ChronodayIsDayOff
+import com.github.elimxim.flashcardsinspace.web.exception.CorruptedChronoStateException
+import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetNotStartedException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -76,18 +79,20 @@ class ChronoService(
     fun syncDay(user: User, setId: Long, day: ChronoSyncDay): Pair<ChronodayDto, List<ChronodayDto>> {
         log.info("User ${user.id}: syncing day $day for flashcard set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
+        flashcardSetService.verifyNotSuspended(setId)
         return syncDay(setId, day)
     }
 
     @Transactional
     fun syncDay(setId: Long, day: ChronoSyncDay): Pair<ChronodayDto, List<ChronodayDto>> {
         val flashcardSet = flashcardSetService.getEntity(setId)
-        if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
-            throw InvalidSyncDayException("Flashcard set $setId is suspended")
-        }
 
         val lastChronoday = flashcardSet.lastChronoday()
             ?: throw FlashcardSetNotStartedException("Flashcard set $setId is not started")
+
+        if (flashcardSet.flashcards.isEmpty()) {
+            throw FlashcardSetNotStartedException("Flashcard set $setId has no flashcards")
+        }
 
         when (day) {
             ChronoSyncDay.NEXT -> {
@@ -105,10 +110,17 @@ class ChronoService(
                 }
 
                 if (hasReviews) {
-                    throw NotRemovableChronodayException(
+                    throw ChronodayHasReviewsException(
                         """
                     Can't remove last chronoday ${lastChronoday.id} from 
                     flashcard set $setId with flashcards get reviewed on this date
+                    """.trimOneLine()
+                    )
+                } else if (lastChronoday.status == ChronodayStatus.OFF) {
+                    throw ChronodayIsDayOff(
+                        """
+                    Can't remove last chronoday ${lastChronoday.id} from 
+                    flashcard set $setId with status ${lastChronoday.status}
                     """.trimOneLine()
                     )
                 }
@@ -125,17 +137,13 @@ class ChronoService(
     fun bulkUpdate(user: User, setId: Long, request: ChronoBulkUpdateRequest): List<ChronodayDto> {
         log.info("User ${user.id}: bulk updating chronodays for flashcard set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
+        flashcardSetService.verifyNotSuspended(setId)
         return bulkUpdate(setId, requestValidator.validate(request))
     }
 
     @Transactional
     fun bulkUpdate(setId: Long, request: ValidChronoBulkUpdateRequest): List<ChronodayDto> {
         val flashcardSet = flashcardSetService.getEntity(setId)
-        if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
-            throw FlashcardSetSuspendedException(
-                "Flashcard set $setId is suspended"
-            )
-        }
 
         var changed = false
         flashcardSet.chronodays.forEach { chronoday ->

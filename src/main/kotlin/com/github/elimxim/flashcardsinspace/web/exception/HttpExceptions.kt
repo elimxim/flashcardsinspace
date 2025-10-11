@@ -58,12 +58,16 @@ class LanguageNotFoundException(msg: String) : BadRequestException(msg)
 class FlashcardsSetAlreadyStartedException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("FSS400")
-@UserMessageCode("user.message.error.chronodays.invalidSync")
-class InvalidSyncDayException(msg: String) : BadRequestException(msg)
-
-@ErrorCode("FSS400")
 @UserMessageCode("user.message.error.flashcardSet.suspended")
 class FlashcardSetSuspendedException(msg: String) : BadRequestException(msg)
+
+@ErrorCode("FAS400")
+@UserMessageCode("user.message.error.flashcardSet.alreadySuspended")
+class FlashcardSetAlreadySuspendedException(msg: String) : BadRequestException(msg)
+
+@ErrorCode("FMS400")
+@UserMessageCode("user.message.error.flashcardSet.cannotBeSuspended")
+class FlashcardSetCannotBeSuspendedException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("FNS400")
 @UserMessageCode("user.message.error.flashcardSet.notStarted")
@@ -74,8 +78,12 @@ class FlashcardSetNotStartedException(msg: String) : BadRequestException(msg)
 class EmailIsAlreadyTakenException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("NRC400")
-@UserMessageCode("user.message.error.chronoday.notRemovable")
-class NotRemovableChronodayException(msg: String) : BadRequestException(msg)
+@UserMessageCode("user.message.error.chronoday.hasReviews")
+class ChronodayHasReviewsException(msg: String) : BadRequestException(msg)
+
+@ErrorCode("CDO400")
+@UserMessageCode("user.message.error.chronoday.isOffDay")
+class ChronodayIsDayOff(msg: String) : BadRequestException(msg)
 
 @ErrorCode("89023F")
 @UserMessageCode("user.message.error.flashcard.setId.unmatched")

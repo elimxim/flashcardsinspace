@@ -73,7 +73,7 @@ class GlobalExceptionHandler(private val messages: Messages) {
             httpStatus = status,
             statusCode = status.value(),
             statusError = status.reasonPhrase,
-            errorCode = getErrorCode(exception, humor),
+            errorCode = getErrorCode(exception),
             message = messages.getMessage(exception),
             path = path,
         )

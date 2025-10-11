@@ -40,8 +40,8 @@ export const useChronoStore = defineStore('chrono', {
     },
     canGoPrev(): boolean {
       this.checkStateLoaded()
-      if (this.currDay.seqNumber === 0) {
-        console.log('No prev day: current is initial')
+      if (this.currDay.seqNumber === undefined || this.currDay.seqNumber === 0) {
+        console.log('No prev day: current is initial or OFF')
         return false
       }
 

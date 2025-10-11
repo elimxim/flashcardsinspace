@@ -52,7 +52,7 @@ data class ReviewInfoDto(
 data class ChronodayDto(
     val id: Long,
     val chronodate: LocalDate,
-    val seqNumber: Int,
+    val seqNumber: Int?,
     val status: String,
     val stages: List<String>,
 )

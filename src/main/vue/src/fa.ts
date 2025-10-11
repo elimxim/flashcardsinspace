@@ -5,6 +5,7 @@ import {
   faBox,
   faCalendarDays,
   faCircleCheck,
+  faSquareCheck,
   faCircleExclamation,
   faCircleInfo,
   faCircleQuestion,
@@ -24,6 +25,7 @@ import {
   faEye as faRegularEye,
   faCircle as faRegularCircle,
   faCircleXmark as faRegularCircleXmark,
+  faSquare as faRegularSquare,
 } from '@fortawesome/free-regular-svg-icons'
 
 export function applyFaIcons() {
@@ -36,6 +38,7 @@ export function applyFaIcons() {
     faCircleExclamation,
     faCircleInfo,
     faCircleCheck,
+    faSquareCheck,
     faCircleQuestion,
     faGlobe,
     faXmark,
@@ -51,5 +54,6 @@ export function applyFaIcons() {
     faRegularEye,
     faRegularCircle,
     faRegularCircleXmark,
+    faRegularSquare,
   )
 }

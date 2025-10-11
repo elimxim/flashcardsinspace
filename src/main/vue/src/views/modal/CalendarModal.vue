@@ -41,7 +41,10 @@
               {{ day.seqNumber }}
             </div>
           </div>
-          <div v-if="canShowStages(day)" class="calendar-day__stages">
+          <div v-if="isVacationDay(day)" class="calendar-day__vacation">
+            🌴
+          </div>
+          <div v-else-if="canShowStages(day)" class="calendar-day__stages">
             {{ day.stages }}
           </div>
         </div>
@@ -94,7 +97,6 @@ const flashcardStore = useFlashcardStore()
 const {
   flashcardSet,
   isStarted,
-  isSuspended,
 } = storeToRefs(flashcardStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
 
@@ -167,6 +169,10 @@ function canShowStages(day: CalendarDay): boolean {
   return day.isCurrMonth && day.stages !== undefined
 }
 
+function isVacationDay(day: CalendarDay): boolean {
+  return day.isCurrMonth && day.status === chronodayStatuses.OFF
+}
+
 function exit() {
   currMonth.value = parseLocalDate(currDay.value.chronodate)
   modalStore.toggleCalendar()
@@ -207,7 +213,7 @@ async function goNextDay() {
 }
 
 const isDaySwitchPossible = computed(() =>
-  isStarted.value && !isSuspended.value
+  isStarted.value
 )
 
 watch(currDay, (newValue) => {
@@ -255,7 +261,9 @@ function handleKeydown(event: KeyboardEvent) {
   --day--not-started--color: var(--calendar--day--not-started--color, white);
   --day--not-started--bg-color: var(--calendar--day--not-started--bg-color, #e5e7eb);
   --day--not-started--stripe-color: var(--calendar--day--not-started--stripe-color, rgba(115, 115, 115, 0.35));
+  --day--off--color: var(--calendar--day--off--color, white);
   --day--off--bg-color: var(--calendar--day--off--bg-color, #43938a);
+  --day--off--stripe-color: var(--calendar--day--off--stripe-color, rgba(115, 115, 115, 0.35));
 }
 
 .calendar {
@@ -391,7 +399,13 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .calendar-day--off {
+  color: var(--day--off--color);
   background-color: var(--day--off--bg-color);
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--day--off--stripe-color) 0 10px,
+    transparent 10px 20px
+  );
 }
 
 .calendar-day:hover:not(.calendar-day--another) {
@@ -426,6 +440,14 @@ function handleKeydown(event: KeyboardEvent) {
   white-space: nowrap;
   margin-top: 2px;
   color: var(--day--stages--color);
+}
+
+.calendar-day__vacation {
+  font-size: clamp(1rem, 1.8vw, 1.6rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
 }
 
 .modal-control-buttons {

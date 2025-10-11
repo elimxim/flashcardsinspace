@@ -18,11 +18,9 @@ fun getHttpStatus(e: HttpException): HttpStatus {
     }
 }
 
-fun getErrorCode(e: HttpException, humor: Boolean): String {
+fun getErrorCode(e: HttpException): String {
     val anno = findAnnotationInClassHierarchy<ErrorCode>(e::class)
-    return anno?.value?.let {
-        if (humor) it.plus(".humor") else it
-    } ?: "000042"
+    return anno?.value ?: "000042"
 }
 
 inline fun <reified T : Annotation> findAnnotationInClassHierarchy(kClass: KClass<*>): T? {

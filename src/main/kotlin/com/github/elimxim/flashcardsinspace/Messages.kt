@@ -13,18 +13,19 @@ private val log = LoggerFactory.getLogger(Messages::class.java)
 
 @Component
 class Messages(private val messageSource: MessageSource) {
-    fun getMessage(code: String, args: List<Any> = emptyList()): String {
+    fun getMessage(code: String, args: List<Any> = emptyList(), humor: Boolean = true): String {
         return try {
-          messageSource.getMessage(code, args.toTypedArray(), Locale.getDefault())
+            val msgCode = if (humor) "$code.humor" else code
+            messageSource.getMessage(msgCode, args.toTypedArray(), Locale.getDefault())
         } catch (e: NoSuchMessageException) {
             log.error("Message with code $code not found", e)
-            return code;
+            return code
         }
     }
 
-    fun getMessage(e: HttpException?): String? {
+    fun getMessage(e: HttpException?, humor: Boolean = true): String? {
         if (e == null) return null
         val anno = findAnnotationInClassHierarchy<UserMessageCode>(e::class)
-        return anno?.let { getMessage(anno.value, e.args) }
+        return anno?.let { getMessage(anno.value, e.args, humor) }
     }
 }

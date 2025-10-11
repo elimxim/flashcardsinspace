@@ -28,8 +28,6 @@
     - Showing the total / review number of flashcards
     - Showing know / don't know number of flashcards
     - Showing FlashcardSet's name
-  - Flashcard Set
-    - Suspend/Resume the flashcard set
   - Auth
     - Password reset functionality (sending emails)
     - Link from Login page to Password reset page

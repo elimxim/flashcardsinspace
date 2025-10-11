@@ -42,7 +42,7 @@
         <div class="menu-item menu-item-color">
           <ul class="menu-composite-item">
             <li>Day</li>
-            <li class="menu-item-number">{{ currDay.seqNumber }}</li>
+            <li class="menu-item-number">{{ currDay.seqNumber ?? '🌴' }}</li>
           </ul>
         </div>
       </li>

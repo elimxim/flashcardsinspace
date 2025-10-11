@@ -212,3 +212,9 @@ data class FlashcardSetInitResponse(
     val currDay: ChronodayDto,
     val chronodays: List<ChronodayDto>,
 )
+
+data class FlashcardSetSuspendResponse(
+    val flashcardSet: FlashcardSetDto,
+    val currDay: ChronodayDto,
+    val chronodays: List<ChronodayDto>,
+)

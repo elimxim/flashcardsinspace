@@ -1,11 +1,15 @@
 import type { AxiosInstance } from 'axios'
 
+type JsonValue = string | number | boolean | null | JsonObject | JsonArray
+type JsonObject = { [key: string]: JsonValue }
+type JsonArray = JsonValue[]
+
 /**
  * Recursively transform ISO timestamp strings to Date objects in API responses
  * Only transforms strings matching ISO 8601 timestamp format (with time component)
  * Leaves LocalDate strings (yyyy-MM-dd) unchanged
  */
-function transformResponseDates(data: any): any {
+function transformResponseDates(data: unknown): unknown {
   if (data === null || data === undefined) return data
 
   if (typeof data === 'string') {
@@ -20,9 +24,9 @@ function transformResponseDates(data: any): any {
   }
 
   if (typeof data === 'object') {
-    const result: any = {}
+    const result: Record<string, unknown> = {}
     for (const key in data) {
-      const value = data[key]
+      const value = (data as Record<string, unknown>)[key]
       if (value !== null) {
         result[key] = transformResponseDates(value)
       }
@@ -37,7 +41,7 @@ function transformResponseDates(data: any): any {
  * Recursively transform Date objects to ISO strings in API requests
  * Converts Date objects to UTC ISO strings
  */
-function transformRequestDates(data: any): any {
+function transformRequestDates(data: unknown): unknown {
   if (data === null || data === undefined) return data
 
   if (data instanceof Date) {
@@ -49,9 +53,9 @@ function transformRequestDates(data: any): any {
   }
 
   if (typeof data === 'object') {
-    const result: any = {}
+    const result: Record<string, unknown> = {}
     for (const key in data) {
-      result[key] = transformRequestDates(data[key])
+      result[key] = transformRequestDates((data as Record<string, unknown>)[key])
     }
     return result
   }

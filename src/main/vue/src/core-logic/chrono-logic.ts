@@ -13,9 +13,9 @@ export const chronodayStatuses = {
 export interface CalendarDay {
   number: number
   date: string
-  status?: string | undefined
-  stages?: string | undefined
-  seqNumber?: number | undefined
+  status?: string
+  stages?: string
+  seqNumber?: number
   isCurrMonth: boolean
   isCurrDay: boolean
 }
@@ -44,12 +44,21 @@ export function selectConsecutiveDaysBeforeIncluding(
   startDay: Chronoday,
   condition: (chronoday: Chronoday) => boolean,
 ): Chronoday[] {
+  if (chronodays.length === 0) return []
+
+  const startIndex = chronodays.findIndex(day => day.id === startDay.id)
+  if (startIndex === -1) {
+    throw Error('Start day not found in chronodays array')
+  }
+
   const result: Chronoday[] = []
-  for (let i = startDay.seqNumber; i >= 0; i--) {
+  for (let i = startIndex; i >= 0; i--) {
+    console.log(`Checking day at index ${i} for condition ${condition.name}`)
     const chronoday = chronodays[i]
+    console.log(`Day at index ${i} is ${JSON.stringify(chronoday)}`)
     if (chronoday && condition(chronoday)) {
       result.push(chronoday)
-    } else {
+    } else if (chronoday && chronoday.status !== chronodayStatuses.OFF) {
       break
     }
   }

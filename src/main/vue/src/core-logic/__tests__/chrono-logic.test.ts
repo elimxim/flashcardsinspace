@@ -5,12 +5,12 @@ import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 
 describe('selectConsecutiveDaysBeforeIncluding', () => {
   const chronodays: Chronoday[] = [
-    chronoday(0, chronodayStatuses.COMPLETED),
-    chronoday(1, chronodayStatuses.COMPLETED),
-    chronoday(2, chronodayStatuses.OFF),
-    chronoday(3, chronodayStatuses.COMPLETED),
-    chronoday(4, chronodayStatuses.COMPLETED),
-    chronoday(5, chronodayStatuses.NOT_STARTED),
+    chronoday(0, 0, chronodayStatuses.COMPLETED),
+    chronoday(1, 1, chronodayStatuses.COMPLETED),
+    chronoday(2, undefined, chronodayStatuses.OFF),
+    chronoday(3, 2, chronodayStatuses.COMPLETED),
+    chronoday(4, 3, chronodayStatuses.COMPLETED),
+    chronoday(5, 4, chronodayStatuses.NOT_STARTED),
   ]
 
   it('should return an empty array if the condition is not met for the start day', () => {
@@ -25,7 +25,7 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
     expect(result).toEqual([])
   })
 
-  it('should return only the start day if it meets the condition but the previous one does not', () => {
+  it('should skip OFF days and continue collecting days that meet the condition', () => {
     // given:
     const startDay = chronodays[3]
     const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
@@ -34,10 +34,11 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
     const result = selectConsecutiveDaysBeforeIncluding(chronodays, startDay, condition)
 
     // then:
-    expect(result).toEqual([startDay])
+    // Should include day 3, skip OFF day 2, and include days 1 and 0
+    expect(result).toEqual([chronodays[3], chronodays[1], chronodays[0]])
   })
 
-  it('should return all consecutive days that meet the condition in reverse order', () => {
+  it('should return all consecutive days that meet the condition, skipping OFF days', () => {
     // given:
     const startDay = chronodays[4]
     const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
@@ -46,19 +47,21 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
     const result = selectConsecutiveDaysBeforeIncluding(chronodays, startDay, condition)
 
     // then:
-    expect(result).toEqual([chronodays[4], chronodays[3]])
+    // Should include days 4, 3, skip OFF day 2, and include days 1 and 0
+    expect(result).toEqual([chronodays[4], chronodays[3], chronodays[1], chronodays[0]])
   })
 
-  it('should stop when a day that does not meet the condition is found', () => {
+  it('should stop when a non-OFF day that does not meet the condition is found', () => {
     // given:
-    const startDay = chronodays[4]
+    const startDay = chronodays[5]
     const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
 
     // when:
     const result = selectConsecutiveDaysBeforeIncluding(chronodays, startDay, condition)
 
     // then:
-    expect(result).toEqual([chronodays[4], chronodays[3]])
+    // Should stop at day 5 (NOT_STARTED) which doesn't meet the condition
+    expect(result).toEqual([])
   })
 
   it('should return all days from the start day to the beginning if they all meet the condition', () => {
@@ -87,7 +90,7 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
 
   it('should return an empty array when the provided chronodays array is empty', () => {
     // given:
-    const dummyStartDay = chronoday(0, 'COMPLETED')
+    const dummyStartDay = chronoday(0, 0, 'COMPLETED')
 
     // when:
     const result = selectConsecutiveDaysBeforeIncluding([], dummyStartDay, () => true)
@@ -97,9 +100,9 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
   })
 })
 
-const chronoday = (seqNumber: number, status: string): Chronoday => ({
-  id: seqNumber,
-  chronodate: `2025-08-${10 + seqNumber}`,
+const chronoday = (id: number, seqNumber: number | undefined, status: string): Chronoday => ({
+  id,
+  chronodate: `2025-08-${10 + id}`,
   seqNumber,
   status,
   stages: [],

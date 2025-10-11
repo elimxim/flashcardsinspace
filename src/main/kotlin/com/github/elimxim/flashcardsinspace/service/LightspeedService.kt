@@ -54,15 +54,16 @@ class LightspeedService {
 
         val scheduleDays = LightspeedSchedule(chronodays.size + daysAhead).days()
         val chronodays = chronodays.sortedBy { it.chronodate }
-        val initialChronoday = chronodays.first()
-        val startDate = initialChronoday.chronodate
 
+        val initialChronoday = chronodays.first()
+        val startChronodate = initialChronoday.chronodate
         var prevChronoday: Chronoday? = initialChronoday
+
         val result = mutableListOf<ChronodayDto>()
-        for (i in 1..scheduleDays.size) {
-            val date = startDate.plusDays(i.toLong())
-            val scheduleDay = scheduleDays[i - 1]
-            val chronoday = chronodays.getOrElse(i) { null }
+        var scheduleIndex = 0
+        for (chronoIdx in 1..scheduleDays.size) {
+            val date = startChronodate.plusDays(chronoIdx.toLong())
+            val chronoday = chronodays.getOrElse(chronoIdx) { null }
 
             if (chronoday != null) {
                 if (chronoday.chronodate.isEqual(prevChronoday?.chronodate)) {
@@ -75,15 +76,29 @@ class LightspeedService {
                 }
             }
 
-            result.add(
-                ChronodayDto(
-                    id = chronoday?.id ?: 0,
-                    chronodate = date,
-                    seqNumber = scheduleDay.number,
-                    status = chronoday?.status?.name ?: ChronodayStatus.NOT_STARTED.name,
-                    stages = scheduleDay.stages.map { it.name }
+            if (chronoday?.status == ChronodayStatus.OFF) {
+                result.add(
+                    ChronodayDto(
+                        id = chronoday.id,
+                        chronodate = date,
+                        seqNumber = null,
+                        status = chronoday.status.name,
+                        stages = listOf()
+                    )
                 )
-            )
+            } else {
+                val scheduleDay = scheduleDays[scheduleIndex]
+                result.add(
+                    ChronodayDto(
+                        id = chronoday?.id ?: 0,
+                        chronodate = date,
+                        seqNumber = scheduleDay.number,
+                        status = chronoday?.status?.name ?: ChronodayStatus.NOT_STARTED.name,
+                        stages = scheduleDay.stages.map { it.name }
+                    )
+                )
+                scheduleIndex++
+            }
 
             prevChronoday = chronoday
         }

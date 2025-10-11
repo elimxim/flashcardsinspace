@@ -7,6 +7,7 @@ import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetReposi
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetNotFoundException
+import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetSuspendedException
 import com.github.elimxim.flashcardsinspace.web.exception.UserOperationNotAllowedException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -24,9 +25,9 @@ class FlashcardSetService(
     @Transactional
     fun getAll(user: User): List<FlashcardSetDto> {
         log.info("User ${user.id}: retrieving all flashcard sets")
-        val result = flashcardSetRepository.findAllByUserAndStatus(
+        val result = flashcardSetRepository.findAllByUserAndStatusIn(
             user = user,
-            status = FlashcardSetStatus.ACTIVE
+            status = listOf(FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED)
         )
         return result.map { it.toDto() }
     }
@@ -71,21 +72,20 @@ class FlashcardSetService(
         val flashcardSet = getEntity(id)
         val changed = mergeFlashcardSet(flashcardSet, request)
 
-        if (changed) {
-            flashcardSet.lastUpdatedAt = ZonedDateTime.now()
-            return flashcardSetRepository.save(flashcardSet).toDto()
+        return if (changed) {
+            flashcardSetRepository.save(flashcardSet).toDto()
         } else {
-            return flashcardSet.toDto()
+            flashcardSet.toDto()
         }
     }
 
-    private fun mergeFlashcardSet(flashcardSet: FlashcardSet, request: ValidFlashcardSetUpdateRequest): Boolean {
+    fun mergeFlashcardSet(flashcardSet: FlashcardSet, request: ValidFlashcardSetUpdateRequest): Boolean {
         var changed = false
         if (request.name != null && request.name != flashcardSet.name) {
             flashcardSet.name = request.name
             changed = true
         }
-        if (request.status!= null && request.status != flashcardSet.status) {
+        if (request.status != null && request.status != flashcardSet.status) {
             flashcardSet.status = request.status
             changed = true
         }
@@ -93,6 +93,10 @@ class FlashcardSetService(
             val language = languageService.getEntity(request.languageId)
             flashcardSet.language = language
             changed = true
+        }
+
+        if (changed) {
+            flashcardSet.lastUpdatedAt = ZonedDateTime.now()
         }
 
         return changed
@@ -121,6 +125,14 @@ class FlashcardSetService(
     fun verifyUserHasAccess(user: User, id: Long) {
         if (getEntity(id).user.id != user.id) {
             throw UserOperationNotAllowedException("User ${user.id} does not have access to flashcard set $id")
+        }
+    }
+
+    @Transactional
+    fun verifyNotSuspended(id: Long) {
+        val flashcardSet = getEntity(id)
+        if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
+            throw FlashcardSetSuspendedException("Flashcard set $id is suspended")
         }
     }
 }

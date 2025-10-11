@@ -97,7 +97,9 @@
   --calendar--day--not-started--color: #5a5a5a;
   --calendar--day--not-started--bg-color: rgba(0, 79, 104, 0.1);
   --calendar--day--not-started--stripe-color: rgba(30, 93, 115, 0.04);
-  --calendar--day--off--bg-color: rgba(67, 147, 138, 0.86);
+  --calendar--day--off--color: #e5e7eb;
+  --calendar--day--off--bg-color: rgba(228, 112, 175, 0.69);
+  --calendar--day--off--stripe-color: rgba(234, 112, 175, 0.51);
 
   /* icons */
   --fa-icon--color--globe: #007bff;

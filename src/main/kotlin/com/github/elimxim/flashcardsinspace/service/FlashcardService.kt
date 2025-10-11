@@ -6,6 +6,7 @@ import com.github.elimxim.flashcardsinspace.entity.ReviewInfo
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
+import com.github.elimxim.flashcardsinspace.util.*
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.FlashcardNotFoundException
 import com.github.elimxim.flashcardsinspace.web.exception.UnmatchedFlashcardSetIdException
@@ -65,6 +66,11 @@ class FlashcardService(
     fun update(setId: Long, id: Long, request: ValidFlashcardUpdateRequest): Flashcard {
         flashcardSetService.getEntity(setId)
         val flashcard = getEntity(id)
+
+        if (isReviewOperation(flashcard, request)) {
+            flashcardSetService.verifyNotSuspended(setId)
+        }
+
         if (mergeFlashcard(flashcard, request)) {
             flashcard.lastUpdatedAt = ZonedDateTime.now()
             return flashcardRepository.save(flashcard)
@@ -73,38 +79,45 @@ class FlashcardService(
         }
     }
 
+    private fun isReviewOperation(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Boolean {
+        return isStageChanged(flashcard, request)
+                || isTimesReviewedChanged(flashcard, request)
+                || isReviewHistoryChanged(flashcard, request)
+                || isLastReviewDateChanged(flashcard, request)
+    }
+
     private fun mergeFlashcard(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Boolean {
         var changed = false
-        if (request.frontSide != null && request.frontSide != flashcard.frontSide) {
-            flashcard.frontSide = request.frontSide
+        if (isFrontSideChanged(flashcard, request)) {
+            request.frontSide?.let { flashcard.frontSide = it }
             changed = true
         }
-        if (request.backSide != null && request.backSide != flashcard.backSide) {
-            flashcard.backSide = request.backSide
+        if (isBackSideChanged(flashcard, request)) {
+            request.backSide?.let { flashcard.backSide = it }
             changed = true
         }
-        if (request.stage != null && request.stage != flashcard.stage) {
-            flashcard.stage = request.stage
+        if (isStageChanged(flashcard, request)) {
+            request.stage?.let { flashcard.stage = it }
             changed = true
         }
-        if (request.timesReviewed != null && request.timesReviewed != flashcard.timesReviewed) {
-            flashcard.timesReviewed = request.timesReviewed
+        if (isTimesReviewedChanged(flashcard, request)) {
+            request.timesReviewed?.let { flashcard.timesReviewed = it }
             changed = true
         }
-        if (request.reviewHistory != null && request.reviewHistory.history.size != flashcard.reviewHistory.history.size) {
-            flashcard.reviewHistory = ReviewHistory(
-                history = request.reviewHistory.history.map {
-                    ReviewInfo(
-                        stage = it.stage,
-                        reviewDate = it.reviewDate
-                    )
-                }.toMutableList()
-            )
+        if (isReviewHistoryChanged(flashcard, request)) {
+            request.reviewHistory?.let {
+                flashcard.reviewHistory = ReviewHistory(
+                    history = it.history.map { info ->
+                        ReviewInfo(
+                            stage = info.stage,
+                            reviewDate = info.reviewDate
+                        )
+                    }.toMutableList()
+                )
+            }
             changed = true
         }
-        if (request.lastReviewDate != null &&
-            (flashcard.lastReviewDate == null || !request.lastReviewDate.isEqual(flashcard.lastReviewDate))
-        ) {
+        if (isLastReviewDateChanged(flashcard, request)) {
             flashcard.lastReviewDate = request.lastReviewDate
             changed = true
         }

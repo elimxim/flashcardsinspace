@@ -34,3 +34,9 @@ export interface FlashcardSetInitResponse {
   currDay: Chronoday,
   chronodays: Chronoday[],
 }
+
+export interface FlashcardSetSuspendResponse {
+  flashcardSet: FlashcardSet,
+  currDay: Chronoday,
+  chronodays: Chronoday[],
+}
