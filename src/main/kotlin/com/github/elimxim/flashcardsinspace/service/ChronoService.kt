@@ -1,7 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
-import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
@@ -9,10 +8,7 @@ import com.github.elimxim.flashcardsinspace.web.dto.ChronoBulkUpdateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
 import com.github.elimxim.flashcardsinspace.web.dto.ValidChronoBulkUpdateRequest
-import com.github.elimxim.flashcardsinspace.web.exception.CorruptedChronoStateException
-import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetNotStartedException
-import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetSuspendedException
-import com.github.elimxim.flashcardsinspace.web.exception.NotRemovableChronodayException
+import com.github.elimxim.flashcardsinspace.web.exception.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,7 +23,6 @@ enum class ChronoSyncDay { NEXT, PREV }
 class ChronoService(
     private val flashcardSetService: FlashcardSetService,
     private val flashcardSetRepository: FlashcardSetRepository,
-    private val chronodayRepository: ChronodayRepository,
     private val lightspeedService: LightspeedService,
     private val requestValidator: RequestValidator,
 ) {
@@ -79,7 +74,7 @@ class ChronoService(
 
     @Transactional
     fun syncDay(user: User, setId: Long, day: ChronoSyncDay): Pair<ChronodayDto, List<ChronodayDto>> {
-        log.info("User ${user.id}: chrono step $day for flashcard set $setId")
+        log.info("User ${user.id}: syncing day $day for flashcard set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         return syncDay(setId, day)
     }
@@ -88,15 +83,11 @@ class ChronoService(
     fun syncDay(setId: Long, day: ChronoSyncDay): Pair<ChronodayDto, List<ChronodayDto>> {
         val flashcardSet = flashcardSetService.getEntity(setId)
         if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
-            throw FlashcardSetSuspendedException(
-                "Flashcard set $setId is suspended"
-            )
+            throw InvalidSyncDayException("Flashcard set $setId is suspended")
         }
 
         val lastChronoday = flashcardSet.lastChronoday()
-            ?: throw FlashcardSetNotStartedException(
-                "Flashcard set $setId is not started"
-            )
+            ?: throw FlashcardSetNotStartedException("Flashcard set $setId is not started")
 
         when (day) {
             ChronoSyncDay.NEXT -> {

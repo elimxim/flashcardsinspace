@@ -7,7 +7,7 @@ import com.github.elimxim.flashcardsinspace.web.dto.FlashcardCreationRequest
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetInitResponse
 import com.github.elimxim.flashcardsinspace.web.dto.ValidFlashcardCreationRequest
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
-import com.github.elimxim.flashcardsinspace.web.exception.FlashcardsSetAlreadyInitializedException
+import com.github.elimxim.flashcardsinspace.web.exception.FlashcardsSetAlreadyStartedException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -33,8 +33,8 @@ class FlashcardSetInitService(
     fun init(id: Long, request: ValidFlashcardCreationRequest): FlashcardSetInitResponse {
         val flashcardSet = flashcardSetService.getEntity(id)
         if (flashcardSet.chronodays.isNotEmpty()) {
-            throw FlashcardsSetAlreadyInitializedException(
-                "Flashcard set $id is already initialized"
+            throw FlashcardsSetAlreadyStartedException(
+                "Flashcard set $id is already started"
             )
         }
 

@@ -35,52 +35,37 @@ sealed class InternalServerErrorException(
     msg: String, args: List<Any> = emptyList<Any>(), cause: Exception? = null
 ) : Http5xxException(args, msg, cause)
 
+// 400 - BAD REQUEST
 
-@ErrorCode("UE00000")
-@UserMessageCode("user.message.error.unexpected")
-class UnexpectedException(msg: String, cause: Exception) : InternalServerErrorException(msg, cause = cause)
-
-@ErrorCode("VIJ6NK")
-@UserMessageCode("user.message.error.auth.failed")
-class AuthenticationFailedException(msg: String, cause: Exception) : UnauthorizedException(msg, cause = cause)
-
-@ErrorCode("283J29")
-@UserMessageCode("user.message.error.auth.forbidden")
-class UserOperationNotAllowedException(msg: String) : UnauthorizedException(msg)
-
-@ErrorCode("HC28C8")
-@UserMessageCode("user.message.error.auth.user.notFound")
-class UserNotFoundException(msg: String) : NotFoundException(msg)
-
-@ErrorCode("7FO2VL")
+@ErrorCode("IRF400")
 @UserMessageCode("user.message.error.request.fields.invalid")
 class InvalidRequestFieldsException(msg: String, val fields: List<String>) : BadRequestException(msg)
 
-@ErrorCode("FSNFE1")
+@ErrorCode("FSN400")
 @UserMessageCode("user.message.error.flashcardSet.notFound")
 class FlashcardSetNotFoundException(msg: String) : BadRequestException(msg)
 
-@ErrorCode("JFO09E")
+@ErrorCode("FCN400")
 @UserMessageCode("user.message.error.flashcard.notFound")
 class FlashcardNotFoundException(msg: String) : BadRequestException(msg)
 
-@ErrorCode("DJ420F")
-@UserMessageCode("user.message.error.chronoday.notFound")
-class ChronodayNotFoundException(msg: String) : BadRequestException(msg)
-
-@ErrorCode("Q4SG3F")
+@ErrorCode("LNF400")
 @UserMessageCode("user.message.error.language.notFound")
 class LanguageNotFoundException(msg: String) : BadRequestException(msg)
 
-@ErrorCode("FSAIE1")
-@UserMessageCode("user.message.error.flashcardSet.alreadyInitialized")
-class FlashcardsSetAlreadyInitializedException(msg: String) : BadRequestException(msg)
+@ErrorCode("FSI400")
+@UserMessageCode("user.message.error.flashcardSet.alreadyStarted")
+class FlashcardsSetAlreadyStartedException(msg: String) : BadRequestException(msg)
 
-@ErrorCode("FG024F")
+@ErrorCode("FSS400")
+@UserMessageCode("user.message.error.chronodays.invalidSync")
+class InvalidSyncDayException(msg: String) : BadRequestException(msg)
+
+@ErrorCode("FSS400")
 @UserMessageCode("user.message.error.flashcardSet.suspended")
 class FlashcardSetSuspendedException(msg: String) : BadRequestException(msg)
 
-@ErrorCode("23J423")
+@ErrorCode("FNS400")
 @UserMessageCode("user.message.error.flashcardSet.notStarted")
 class FlashcardSetNotStartedException(msg: String) : BadRequestException(msg)
 
@@ -88,14 +73,36 @@ class FlashcardSetNotStartedException(msg: String) : BadRequestException(msg)
 @UserMessageCode("user.message.error.auth.email.alreadyTaken")
 class EmailIsAlreadyTakenException(msg: String) : BadRequestException(msg)
 
-@ErrorCode("CCSE01")
-@UserMessageCode("user.message.error.chronodays.corrupted")
-class CorruptedChronoStateException(msg: String) : InternalServerErrorException(msg)
-
-@ErrorCode("OWF890")
+@ErrorCode("NRC400")
 @UserMessageCode("user.message.error.chronoday.notRemovable")
 class NotRemovableChronodayException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("89023F")
 @UserMessageCode("user.message.error.flashcard.setId.unmatched")
 class UnmatchedFlashcardSetIdException(msg: String) : BadRequestException(msg)
+
+// 401 - UNAUTHORIZED
+
+@ErrorCode("AFE401")
+@UserMessageCode("user.message.error.auth.failed")
+class AuthenticationFailedException(msg: String, cause: Exception) : UnauthorizedException(msg, cause = cause)
+
+@ErrorCode("ONA401")
+@UserMessageCode("user.message.error.auth.forbidden")
+class UserOperationNotAllowedException(msg: String) : UnauthorizedException(msg)
+
+// 404 - NOT FOUND
+
+@ErrorCode("UNF404")
+@UserMessageCode("user.message.error.auth.user.notFound")
+class UserNotFoundException(msg: String) : NotFoundException(msg)
+
+// 500 - INTERNAL SERVER ERROR
+
+@ErrorCode("UE0500")
+@UserMessageCode("user.message.error.unexpected")
+class UnexpectedException(msg: String, cause: Exception) : InternalServerErrorException(msg, cause = cause)
+
+@ErrorCode("CCS500")
+@UserMessageCode("user.message.error.chronodays.corrupted")
+class CorruptedChronoStateException(msg: String) : InternalServerErrorException(msg)

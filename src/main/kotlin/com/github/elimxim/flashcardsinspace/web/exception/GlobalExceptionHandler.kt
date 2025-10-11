@@ -65,14 +65,15 @@ class GlobalExceptionHandler(private val messages: Messages) {
     private fun errorBody(
         status: HttpStatus,
         path: String,
-        exception: HttpException
+        exception: HttpException,
+        humor: Boolean = true,
     ): ErrorResponseBody {
         return ErrorResponseBody(
             timestamp = LocalDateTime.now(),
             httpStatus = status,
             statusCode = status.value(),
             statusError = status.reasonPhrase,
-            errorCode = getErrorCode(exception),
+            errorCode = getErrorCode(exception, humor),
             message = messages.getMessage(exception),
             path = path,
         )
