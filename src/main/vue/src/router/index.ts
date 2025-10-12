@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/auth-store.ts'
 import { storeToRefs } from 'pinia'
 import HomeView from '@/views/HomeView.vue'
 import FlashcardsView from '@/views/FlashcardsView.vue'
+import ControlPanel from '@/views/ControlPanel.vue'
 import LeitnerView from '@/views/LeitnerView.vue'
 import SupportView from '@/views/SupportView.vue'
 import UserView from '@/views/UserView.vue'
@@ -17,6 +18,7 @@ export const routeNames = {
   base: 'base',
   home: 'home',
   flashcards: 'flashcards',
+  controlPanel: 'controlPanel',
   leitner: 'leitner',
   user: 'user',
   support: 'support',
@@ -37,6 +39,14 @@ const routes: RouteRecordRaw[] = [
     path: '/flashcards',
     name: routeNames.flashcards,
     component: FlashcardsView,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/control-panel',
+    name: routeNames.controlPanel,
+    component: ControlPanel,
     meta: {
       requiresAuth: true,
     },

@@ -20,11 +20,20 @@ import {
   faXmark,
   faArrowsSpin,
   faCircleXmark,
+  faRocket,
+  faHouse,
+  faBars,
+  faPlus,
+  faRotateRight,
+  faStar,
+  faChevronLeft,
+  faChevronRight,
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faEye as faRegularEye,
   faCircle as faRegularCircle,
   faCircleXmark as faRegularCircleXmark,
+  faCircleQuestion as faRegularCircleQuestion,
   faSquare as faRegularSquare,
 } from '@fortawesome/free-regular-svg-icons'
 
@@ -50,10 +59,19 @@ export function applyFaIcons() {
     faEyeSlash,
     faArrowsSpin,
     faCircleXmark,
+    faRocket,
+    faHouse,
+    faBars,
+    faPlus,
+    faRotateRight,
+    faStar,
+    faChevronLeft,
+    faChevronRight,
 
     faRegularEye,
     faRegularCircle,
     faRegularCircleXmark,
+    faRegularCircleQuestion,
     faRegularSquare,
   )
 }
