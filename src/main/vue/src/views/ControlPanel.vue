@@ -5,18 +5,15 @@
       <div class="control-panel-main">
         <div class="control-panel-top-bar">
           <AwesomeButton
-            ref="toggleSidebarTopButton"
             :on-click="sidebar?.toggle"
             :hidden="sidebar?.expanded"
             :disabled="sidebar?.expanded"
             icon="fa-solid fa-bars"
-            auto-blur
           />
           <div class="top-bar-text">
             {{ flashcardSetName }}
           </div>
           <AwesomeButton
-            ref="settingsButton"
             icon="fa-solid fa-gear"
             :on-click="openFlashcardSetSettings"
             :disabled="!flashcardSet"

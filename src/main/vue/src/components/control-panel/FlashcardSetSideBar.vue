@@ -97,6 +97,7 @@ function getLanguageName(languageId: number): string {
 defineExpose({
   toggle,
   expanded: computed(() => expanded.value),
+  animating: computed(() => animating.value),
 })
 
 onMounted(() => {
@@ -204,22 +205,42 @@ onMounted(() => {
   align-items: center;
   padding: 6px 10px;
   cursor: pointer;
-  background-color: var(--bar--item--bg-color);
+  background: linear-gradient(135deg,
+    var(--bar--item--bg-color) 0%,
+    color-mix(in srgb, var(--bar--item--bg-color) 95%, #000000) 50%,
+    color-mix(in srgb, var(--bar--item--bg-color) 90%, #000000) 100%);
   border: 1px solid var(--bar--item--border-color);
   border-radius: 3px;
-  box-shadow: 0 1px 2px var(--bar--item--shadow-color);
-  transition: transform 0.2s ease-in-out;
+  box-shadow:
+    0 1px 2px var(--bar--item--shadow-color),
+    inset 0 1px 0 color-mix(in srgb, var(--bar--item--bg-color) 80%, #ffffff),
+    inset 0 -1px 0 color-mix(in srgb, var(--bar--item--bg-color) 80%, #000000);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .sidebar-item:hover {
-  background-color: var(--bar--item--bg-color--hover);
-  box-shadow: 0 2px 4px var(--bar--item--shadow-color);
+  background: linear-gradient(135deg,
+    var(--bar--item--bg-color--hover) 0%,
+    color-mix(in srgb, var(--bar--item--bg-color--hover) 92%, #000000) 50%,
+    color-mix(in srgb, var(--bar--item--bg-color--hover) 85%, #000000) 100%);
+  box-shadow:
+    0 3px 6px var(--bar--item--shadow-color),
+    inset 0 1px 0 color-mix(in srgb, var(--bar--item--bg-color--hover) 75%, #ffffff),
+    inset 0 -1px 0 color-mix(in srgb, var(--bar--item--bg-color--hover) 75%, #000000);
   transform: translateX(-6px);
 }
 
 .sidebar-item--active {
-  background-color: var(--bar--item--bg-color--active);
+  background: linear-gradient(135deg,
+    var(--bar--item--bg-color--active) 0%,
+    color-mix(in srgb, var(--bar--item--bg-color--active) 88%, #000000) 50%,
+    color-mix(in srgb, var(--bar--item--bg-color--active) 80%, #000000) 100%);
   border-color: var(--bar--item--border-color--active);
+  box-shadow:
+    0 2px 4px var(--bar--item--shadow-color),
+    inset 0 1px 0 color-mix(in srgb, var(--bar--item--bg-color--active) 70%, #ffffff),
+    inset 0 -1px 0 color-mix(in srgb, var(--bar--item--bg-color--active) 70%, #000000),
+    inset 0 0 0 1px color-mix(in srgb, var(--bar--item--bg-color--active) 60%, #0066cc);
 }
 
 .sidebar-item__lamp-container {
@@ -260,7 +281,10 @@ onMounted(() => {
   width: 32px;
   height: 24px;
   border-radius: 2px;
-  background-color: var(--bar--count--bg-color);
+  background: linear-gradient(135deg,
+    var(--bar--count--bg-color) 0%,
+    color-mix(in srgb, var(--bar--count--bg-color) 90%, #000000) 50%,
+    color-mix(in srgb, var(--bar--count--bg-color) 85%, #000000) 100%);
   border: 1px solid var(--bar--count--border-color);
   display: flex;
   align-items: center;
@@ -269,6 +293,8 @@ onMounted(() => {
   font-size: 0.7rem;
   box-shadow:
     inset 0 1px 2px var(--bar--item--count--shadow-color),
+    inset 0 1px 0 color-mix(in srgb, var(--bar--count--bg-color) 80%, #ffffff),
+    inset 0 -1px 0 color-mix(in srgb, var(--bar--count--bg-color) 80%, #000000),
     0 1px 2px var(--bar--item--count--shadow-color);
   margin-left: 0.75rem;
 }
