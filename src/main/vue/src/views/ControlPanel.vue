@@ -19,6 +19,7 @@
             ref="settingsButton"
             icon="fa-solid fa-gear"
             :on-click="openFlashcardSetSettings"
+            :disabled="!flashcardSet"
           />
         </div>
       </div>
@@ -67,7 +68,7 @@ onMounted(() => {
   font-family: var(--main-font-family);
   --top-bar--bg-color: #f5f5f5;
   --top-bar--text-color: #333333;
-  --top-bar--shadow-color: rgba(0, 0, 0, 0.1);
+  --top-bar--shadow-color: rgba(0, 0, 0, 0.4);
 }
 
 .control-panel {
@@ -98,7 +99,7 @@ onMounted(() => {
   align-items: center;
   padding: 10px;
   background-color: var(--top-bar--bg-color);
-  box-shadow: 0 2px 4px var(--top-bar--shadow-color);
+  box-shadow: -4px 0 4px 0 var(--top-bar--shadow-color);
   width: 100%;
 }
 

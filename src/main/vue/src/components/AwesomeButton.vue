@@ -65,7 +65,7 @@ defineExpose({
   padding: 0;
 }
 
-.awesome-button:hover {
+.awesome-button:not(.awesome-button--disabled):hover {
   color: var(--btn--color--hover);
 }
 

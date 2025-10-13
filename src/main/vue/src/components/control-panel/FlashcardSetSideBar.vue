@@ -26,9 +26,6 @@
         :class="{ 'sidebar-item--active': set.id === flashcardSet?.id }"
         @click="selectFlashcardSet(set.id)"
       >
-        <div class="sidebar-item__lamp-container">
-          <Lamp :on="set.id === flashcardSet?.id"/>
-        </div>
         <div class="sidebar-item__content">
           <div class="sidebar-item__name">{{ set.name }}</div>
           <div class="sidebar-item__language">{{ getLanguageName(set.languageId) }}</div>
@@ -44,7 +41,6 @@
 </template>
 
 <script setup lang="ts">
-import Lamp from '@/components/Lamp.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.vue'
@@ -112,12 +108,12 @@ onMounted(() => {
 <style scoped>
 .sidebar--theme {
   font-family: var(--main-font-family);
-  --bar--bg-color: var(--sidebar--bg-color, #f8f9fa);
+  --bar--bg-color: var(--sidebar--bg-color, #f5f5f5);
   --bar--border-color: var(--sidebar--border-color, #dee2e6);
   --bar--text-color: var(--sidebar--text-color, #495057);
-  --bar--shadow-color: var(--sidebar--shadow-color, rgba(0, 0, 0, 0.1));
+  --bar--shadow-color: var(--sidebar--shadow-color, rgba(0, 0, 0, 0.4));
   --bar--item--bg-color: var(--sidebar--item--bg-color, #ffffff);
-  --bar--item--bg-color--hover: var(--sidebar--item--bg-color--hover, #f8f9fa);
+  --bar--item--bg-color--hover: var(--sidebar--item--bg-color--hover, #e8eef5);
   --bar--item--bg-color--active: var(--sidebar--item--bg-color--active, #e8eef5);
   --bar--item--border-color: var(--sidebar--item--border-color, #dee2e6);
   --bar--item--border-color--active: var(--sidebar--item--border-color--active, #dee2e6);
@@ -125,17 +121,13 @@ onMounted(() => {
   --bar--item--shadow-color: var(--sidebar--item--shadow-color, rgba(0, 0, 0, 0.1));
   --bar--item--count--color: var(--sidebar--item--count-color, #6c757d);
   --bar--item--count--shadow-color: var(--sidebar--item--count--shadow-color, rgba(0, 0, 0, 0.1));
-  --bar--lamp--bg-color: var(--sidebar--lamp--bg-color, #e9ecef);
-  --bar--lamp--bg-color--active: var(--sidebar--lamp--bg-color--active, #2863a7);
-  --bar--lamp--border-color: var(--sidebar--lamp--border-color, #ced4da);
-  --bar--lamp--border-color--active: var(--sidebar--lamp--border-color--active, #ced4da);
   --bar--language--text-color: var(--sidebar--language--text-color, #6c757d);
   --bar--count--bg-color: var(--sidebar--count--bg-color, #f8f9fa);
   --bar--count--border-color: var(--sidebar--count--border-color, #dee2e6);
   --bar--scrollbar--track-color: var(--sidebar--scrollbar--track-color, #f1f3f4);
-  --bar--scrollbar--thumb-color: var(--sidebar--scrollbar--thumb-color, #c1c8cd);
-  --bar--scrollbar--thumb-color--hover: var(--sidebar--scrollbar--thumb-hover-color, #9f9f9f);
-  --bar--scrollbar--thumb-color--active: var(--sidebar--scrollbar--thumb-active-color, #9f9f9f);
+  --bar--scrollbar--thumb-color: var(--sidebar--scrollbar--thumb-color, #dfdfdf);
+  --bar--scrollbar--thumb-color--hover: var(--sidebar--scrollbar--thumb-hover-color, #cccccc);
+  --bar--scrollbar--thumb-color--active: var(--sidebar--scrollbar--thumb-active-color, #cccccc);
 }
 
 .sidebar {
@@ -145,8 +137,6 @@ onMounted(() => {
   width: 280px;
   height: 100%;
   background-color: var(--bar--bg-color);
-  border-right: 1px solid var(--bar--border-color);
-  box-shadow: 2px 0 8px var(--bar--shadow-color);
   transition: margin-left 0.35s ease-in-out;
   overflow: hidden;
 }
@@ -156,12 +146,13 @@ onMounted(() => {
 }
 
 .sidebar-header {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px;
   background-color: var(--bar--bg-color);
-  box-shadow: 0 2px 4px var(--bar--shadow-color);
+  box-shadow: 4px 0 4px 0 var(--bar--shadow-color);
   flex-shrink: 0;
 }
 
@@ -179,6 +170,7 @@ onMounted(() => {
   padding: 1rem;
   flex: 1;
   overflow: hidden;
+  border-right: 1px solid var(--bar--border-color);
 }
 
 .sidebar__content--scrollable {
@@ -216,6 +208,7 @@ onMounted(() => {
   border: 1px solid var(--bar--item--border-color);
   border-radius: 3px;
   box-shadow: 0 1px 2px var(--bar--item--shadow-color);
+  transition: transform 0.2s ease-in-out;
 }
 
 .sidebar-item:hover {
