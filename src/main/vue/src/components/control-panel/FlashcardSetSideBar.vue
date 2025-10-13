@@ -4,6 +4,11 @@
     :class="{ 'sidebar--collapsed': !expanded }"
   >
     <div class="sidebar-header">
+      <AwesomeButton
+        ref="createButton"
+        icon="fa-solid fa-plus"
+        :on-click="modalStore.toggleFlashcardSetCreation"
+      />
       <div class="sidebar-header__title">
         Flashcard Sets
       </div>
@@ -21,22 +26,35 @@
         v-for="set in flashcardSets"
         :key="set.id"
         class="sidebar-item"
-        :class="{ 'sidebar-flashcard-set--active': set.id === flashcardSet?.id }"
+        :class="{ 'sidebar-item--active': set.id === flashcardSet?.id }"
         @click="selectFlashcardSet(set.id)"
       >
-        <div class="sidebar-item__name">{{ set.name }}</div>
+        <div class="sidebar-item__lamp-container">
+          <div
+            class="sidebar-item__lamp"
+            :class="{ 'sidebar-item__lamp--active': set.id === flashcardSet?.id }"
+          >
+          </div>
+        </div>
+        <div class="sidebar-item__content">
+          <div class="sidebar-item__name">{{ set.name }}</div>
+          <div class="sidebar-item__language">{{ getLanguageName(set.languageId) }}</div>
+        </div>
         <div class="sidebar-item__count">{{ getFlashcardCount(set.id) }}</div>
       </div>
     </div>
   </div>
   <SpaceToast/>
+  <FlashcardSetCreationModal/>
 </template>
 
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
+import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
+import { useLanguageStore } from '@/stores/language-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
@@ -47,6 +65,7 @@ import {
 
 const flashcardStore = useFlashcardStore()
 const flashcardSetStore = useFlashcardSetStore()
+const languageStore = useLanguageStore()
 const modalStore = useModalStore()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
@@ -78,6 +97,11 @@ function getFlashcardCount(setId: number): number {
   return 0
 }
 
+function getLanguageName(languageId: number): string {
+  const language = languageStore.getLanguage(languageId)
+  return language ? language.name : 'Unknown'
+}
+
 defineExpose({
   toggle,
   expanded: computed(() => expanded.value),
@@ -92,20 +116,34 @@ onMounted(() => {
 <style scoped>
 .sidebar--theme {
   font-family: var(--main-font-family);
-  --bar--bg-color: var(--sidebar--bg-color, #fafafa);
-  --bar--border-color: var(--sidebar--border-color, #e0e0e0);
-  --bar--text-color: var(--sidebar--text-color, #333333);
+  --bar--bg-color: var(--sidebar--bg-color, #f8f9fa);
+  --bar--border-color: var(--sidebar--border-color, #dee2e6);
+  --bar--text-color: var(--sidebar--text-color, #495057);
   --bar--shadow-color: var(--sidebar--shadow-color, rgba(0, 0, 0, 0.1));
-  --bar--item--bg-color: var(--sidebar--item--bg-color, white);
-  --bar--item--bg-color--hover: var(--sidebar--item--bg-color--hover, #eeeeee);
-  --bar--item--bg-color--active: var(--sidebar--item--bg-color--active, #e3f2fd);
-  --bar--item--border-color: var(--sidebar--item--border-color, #e0e0e0);
-  --bar--item--border-color--active: var(--sidebar--item--border-color--active, #90caf9);
-  --bar--item--text-color: var(--sidebar--item--text-color, #333333);
-  --bar--item--count-color: var(--sidebar--item--count-color, #666666);
+  --bar--item--bg-color: var(--sidebar--item--bg-color, #ffffff);
+  --bar--item--bg-color--hover: var(--sidebar--item--bg-color--hover, #f8f9fa);
+  --bar--item--bg-color--active: var(--sidebar--item--bg-color--active, #e8eef5);
+  --bar--item--border-color: var(--sidebar--item--border-color, #dee2e6);
+  --bar--item--border-color--active: var(--sidebar--item--border-color--active, #dee2e6);
+  --bar--item--text-color: var(--sidebar--item--text-color, #495057);
+  --bar--item--shadow-color: var(--sidebar--item--shadow-color, rgba(0, 0, 0, 0.1));
+  --bar--item--count--color: var(--sidebar--item--count-color, #6c757d);
+  --bar--item--count--shadow-color: var(--sidebar--item--count--shadow-color, rgba(0, 0, 0, 0.1));
+  --bar--lamp--bg-color: var(--sidebar--lamp--bg-color, #e9ecef);
+  --bar--lamp--bg-color--active: var(--sidebar--lamp--bg-color--active, #2863a7);
+  --bar--lamp--border-color: var(--sidebar--lamp--border-color, #ced4da);
+  --bar--lamp--border-color--active: var(--sidebar--lamp--border-color--active, #ced4da);
+  --bar--language--text-color: var(--sidebar--language--text-color, #6c757d);
+  --bar--count--bg-color: var(--sidebar--count--bg-color, #f8f9fa);
+  --bar--count--border-color: var(--sidebar--count--border-color, #dee2e6);
+  --bar--scrollbar--track-color: var(--sidebar--scrollbar--track-color, #f1f3f4);
+  --bar--scrollbar--thumb-color: var(--sidebar--scrollbar--thumb-color, #c1c8cd);
+  --bar--scrollbar--thumb-color--hover: var(--sidebar--scrollbar--thumb-hover-color, #9f9f9f);
+  --bar--scrollbar--thumb-color--active: var(--sidebar--scrollbar--thumb-active-color, #9f9f9f);
 }
 
 .sidebar {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 280px;
@@ -143,7 +181,7 @@ onMounted(() => {
 .sidebar-content {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 10px;
   padding: 1rem;
   flex: 1;
   overflow: hidden;
@@ -153,45 +191,112 @@ onMounted(() => {
   overflow-y: auto;
 }
 
+.sidebar__content--scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar__content--scrollable::-webkit-scrollbar-track {
+  background: var(--bar--scrollbar--track-color);
+  border-radius: 4px;
+}
+
+.sidebar__content--scrollable::-webkit-scrollbar-thumb {
+  background: var(--bar--scrollbar--thumb-color);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.sidebar__content--scrollable::-webkit-scrollbar-thumb:hover {
+  background: var(--bar--scrollbar--thumb-color--hover);
+}
+
+.sidebar__content--scrollable::-webkit-scrollbar-thumb:active {
+  background: var(--bar--scrollbar--thumb-color--active);
+}
+
 .sidebar-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1rem;
+  padding: 6px 10px;
   cursor: pointer;
   background-color: var(--bar--item--bg-color);
   border: 1px solid var(--bar--item--border-color);
-  border-radius: 6px;
-  transition: all 0.1s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px var(--bar--item--shadow-color);
 }
 
 .sidebar-item:hover {
   background-color: var(--bar--item--bg-color--hover);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  transform: translateY(-1px);
+  box-shadow: 0 2px 4px var(--bar--item--shadow-color);
+  transform: translateX(-6px);
 }
 
-.sidebar-flashcard-set--active {
+.sidebar-item--active {
   background-color: var(--bar--item--bg-color--active);
   border-color: var(--bar--item--border-color--active);
 }
 
-.sidebar-item__name {
+.sidebar-item__lamp-container {
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.sidebar-item__lamp {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--bar--lamp--bg-color);
+  border: 3px solid var(--bar--lamp--border-color);
+  transition: all 0.3s ease;
+}
+
+.sidebar-item__lamp--active {
+  background-color: var(--bar--lamp--bg-color--active);
+  border-color: var(--bar--lamp--border-color--active);
+}
+
+.sidebar-item__content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.sidebar-item__name {
   color: var(--bar--item--text-color);
   font-size: 0.9rem;
+  font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-right: 0.5rem;
+}
+
+.sidebar-item__language {
+  color: var(--bar--language--text-color);
+  font-size: 0.65rem;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sidebar-item__count {
-  color: var(--bar--item--count-color);
-  font-size: 0.85rem;
-  font-weight: 500;
-  min-width: 30px;
-  text-align: right;
+  width: 32px;
+  height: 24px;
+  border-radius: 2px;
+  background-color: var(--bar--count--bg-color);
+  border: 1px solid var(--bar--count--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bar--item--count--color);
+  font-size: 0.7rem;
+  box-shadow:
+    inset 0 1px 2px var(--bar--item--count--shadow-color),
+    0 1px 2px var(--bar--item--count--shadow-color);
+  transition: all 0.2s ease;
+  margin-left: 0.75rem;
 }
 </style>
