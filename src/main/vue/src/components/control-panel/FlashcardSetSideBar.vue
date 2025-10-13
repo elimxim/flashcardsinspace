@@ -30,17 +30,15 @@
         @click="selectFlashcardSet(set.id)"
       >
         <div class="sidebar-item__lamp-container">
-          <div
-            class="sidebar-item__lamp"
-            :class="{ 'sidebar-item__lamp--active': set.id === flashcardSet?.id }"
-          >
-          </div>
+          <Lamp :on="set.id === flashcardSet?.id"/>
         </div>
         <div class="sidebar-item__content">
           <div class="sidebar-item__name">{{ set.name }}</div>
           <div class="sidebar-item__language">{{ getLanguageName(set.languageId) }}</div>
         </div>
-        <div class="sidebar-item__count">{{ getFlashcardCount(set.id) }}</div>
+        <div class="sidebar-item__count-container">
+          <div class="sidebar-item__count">{{ getFlashcardCount(set.id) }}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -49,6 +47,7 @@
 </template>
 
 <script setup lang="ts">
+import Lamp from '@/components/Lamp.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.vue'
@@ -197,12 +196,12 @@ onMounted(() => {
 
 .sidebar__content--scrollable::-webkit-scrollbar-track {
   background: var(--bar--scrollbar--track-color);
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 .sidebar__content--scrollable::-webkit-scrollbar-thumb {
   background: var(--bar--scrollbar--thumb-color);
-  border-radius: 4px;
+  border-radius: 0;
   transition: all 0.3s ease;
 }
 
@@ -240,20 +239,9 @@ onMounted(() => {
 .sidebar-item__lamp-container {
   margin-right: 0.75rem;
   flex-shrink: 0;
-}
-
-.sidebar-item__lamp {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background-color: var(--bar--lamp--bg-color);
-  border: 3px solid var(--bar--lamp--border-color);
-  transition: all 0.3s ease;
-}
-
-.sidebar-item__lamp--active {
-  background-color: var(--bar--lamp--bg-color--active);
-  border-color: var(--bar--lamp--border-color--active);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar-item__content {
