@@ -18,10 +18,7 @@
         :on-click="toggle"
       />
     </div>
-    <div
-      class="sidebar-content"
-      :class="{ 'sidebar__content--scrollable': expanded && !animating }"
-    >
+    <div class="sidebar-content sidebar__content--scrollable">
       <div
         v-for="set in flashcardSets"
         :key="set.id"
@@ -150,14 +147,12 @@ onMounted(() => {
   background-color: var(--bar--bg-color);
   border-right: 1px solid var(--bar--border-color);
   box-shadow: 2px 0 8px var(--bar--shadow-color);
-  transition: width 0.35s ease;
+  transition: margin-left 0.35s ease-in-out;
   overflow: hidden;
 }
 
 .sidebar--collapsed {
-  width: 0;
-  box-shadow: none;
-  border-right: none;
+  margin-left: -280px;
 }
 
 .sidebar-header {
@@ -202,7 +197,6 @@ onMounted(() => {
 .sidebar__content--scrollable::-webkit-scrollbar-thumb {
   background: var(--bar--scrollbar--thumb-color);
   border-radius: 0;
-  transition: all 0.3s ease;
 }
 
 .sidebar__content--scrollable::-webkit-scrollbar-thumb:hover {
@@ -221,7 +215,6 @@ onMounted(() => {
   background-color: var(--bar--item--bg-color);
   border: 1px solid var(--bar--item--border-color);
   border-radius: 3px;
-  transition: all 0.2s ease;
   box-shadow: 0 1px 2px var(--bar--item--shadow-color);
 }
 
@@ -284,7 +277,6 @@ onMounted(() => {
   box-shadow:
     inset 0 1px 2px var(--bar--item--count--shadow-color),
     0 1px 2px var(--bar--item--count--shadow-color);
-  transition: all 0.2s ease;
   margin-left: 0.75rem;
 }
 </style>
