@@ -52,8 +52,10 @@ import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import {
   loadFlashcardAndChronoStores,
-  loadFlashcardSetStore
+  loadFlashcardSetStore,
+  reloadFlashcardAndChronoStores,
 } from '@/shared/stores.ts'
+import { saveSelectedSetId } from '@/shared/cookies.ts'
 
 const flashcardStore = useFlashcardStore()
 const flashcardSetStore = useFlashcardSetStore()
@@ -82,6 +84,11 @@ async function selectFlashcardSet(setId: number) {
   const set = flashcardSetStore.findSet(setId)
   if (set) {
     await loadFlashcardAndChronoStores(set)
+      .then((loaded) => {
+        if (loaded) {
+          saveSelectedSetId(set.id)
+        }
+      })
   }
 }
 
@@ -102,6 +109,11 @@ defineExpose({
 
 onMounted(() => {
   loadFlashcardSetStore()
+    .then(async (loaded) => {
+      if (loaded) {
+        return reloadFlashcardAndChronoStores()
+      }
+    })
 })
 </script>
 
@@ -206,41 +218,38 @@ onMounted(() => {
   padding: 6px 10px;
   cursor: pointer;
   background: linear-gradient(135deg,
-    var(--bar--item--bg-color) 0%,
-    color-mix(in srgb, var(--bar--item--bg-color) 95%, #000000) 50%,
-    color-mix(in srgb, var(--bar--item--bg-color) 90%, #000000) 100%);
+  var(--bar--item--bg-color) 0%,
+  color-mix(in srgb, var(--bar--item--bg-color) 95%, #000000) 50%,
+  color-mix(in srgb, var(--bar--item--bg-color) 90%, #000000) 100%);
   border: 1px solid var(--bar--item--border-color);
   border-radius: 3px;
-  box-shadow:
-    0 1px 2px var(--bar--item--shadow-color),
-    inset 0 1px 0 color-mix(in srgb, var(--bar--item--bg-color) 80%, #ffffff),
-    inset 0 -1px 0 color-mix(in srgb, var(--bar--item--bg-color) 80%, #000000);
+  box-shadow: 0 1px 2px var(--bar--item--shadow-color),
+  inset 0 1px 0 color-mix(in srgb, var(--bar--item--bg-color) 80%, #ffffff),
+  inset 0 -1px 0 color-mix(in srgb, var(--bar--item--bg-color) 80%, #000000);
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .sidebar-item:hover {
   background: linear-gradient(135deg,
-    var(--bar--item--bg-color--hover) 0%,
-    color-mix(in srgb, var(--bar--item--bg-color--hover) 92%, #000000) 50%,
-    color-mix(in srgb, var(--bar--item--bg-color--hover) 85%, #000000) 100%);
-  box-shadow:
-    0 3px 6px var(--bar--item--shadow-color),
-    inset 0 1px 0 color-mix(in srgb, var(--bar--item--bg-color--hover) 75%, #ffffff),
-    inset 0 -1px 0 color-mix(in srgb, var(--bar--item--bg-color--hover) 75%, #000000);
+  var(--bar--item--bg-color--hover) 0%,
+  color-mix(in srgb, var(--bar--item--bg-color--hover) 92%, #000000) 50%,
+  color-mix(in srgb, var(--bar--item--bg-color--hover) 85%, #000000) 100%);
+  box-shadow: 0 3px 6px var(--bar--item--shadow-color),
+  inset 0 1px 0 color-mix(in srgb, var(--bar--item--bg-color--hover) 75%, #ffffff),
+  inset 0 -1px 0 color-mix(in srgb, var(--bar--item--bg-color--hover) 75%, #000000);
   transform: translateX(-6px);
 }
 
 .sidebar-item--active {
   background: linear-gradient(135deg,
-    var(--bar--item--bg-color--active) 0%,
-    color-mix(in srgb, var(--bar--item--bg-color--active) 88%, #000000) 50%,
-    color-mix(in srgb, var(--bar--item--bg-color--active) 80%, #000000) 100%);
+  var(--bar--item--bg-color--active) 0%,
+  color-mix(in srgb, var(--bar--item--bg-color--active) 88%, #000000) 50%,
+  color-mix(in srgb, var(--bar--item--bg-color--active) 80%, #000000) 100%);
   border-color: var(--bar--item--border-color--active);
-  box-shadow:
-    0 2px 4px var(--bar--item--shadow-color),
-    inset 0 1px 0 color-mix(in srgb, var(--bar--item--bg-color--active) 70%, #ffffff),
-    inset 0 -1px 0 color-mix(in srgb, var(--bar--item--bg-color--active) 70%, #000000),
-    inset 0 0 0 1px color-mix(in srgb, var(--bar--item--bg-color--active) 60%, #0066cc);
+  box-shadow: 0 2px 4px var(--bar--item--shadow-color),
+  inset 0 1px 0 color-mix(in srgb, var(--bar--item--bg-color--active) 70%, #ffffff),
+  inset 0 -1px 0 color-mix(in srgb, var(--bar--item--bg-color--active) 70%, #000000),
+  inset 0 0 0 1px color-mix(in srgb, var(--bar--item--bg-color--active) 60%, #0066cc);
 }
 
 .sidebar-item__lamp-container {
@@ -282,20 +291,19 @@ onMounted(() => {
   height: 24px;
   border-radius: 2px;
   background: linear-gradient(135deg,
-    var(--bar--count--bg-color) 0%,
-    color-mix(in srgb, var(--bar--count--bg-color) 90%, #000000) 50%,
-    color-mix(in srgb, var(--bar--count--bg-color) 85%, #000000) 100%);
+  var(--bar--count--bg-color) 0%,
+  color-mix(in srgb, var(--bar--count--bg-color) 90%, #000000) 50%,
+  color-mix(in srgb, var(--bar--count--bg-color) 85%, #000000) 100%);
   border: 1px solid var(--bar--count--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--bar--item--count--color);
   font-size: 0.7rem;
-  box-shadow:
-    inset 0 1px 2px var(--bar--item--count--shadow-color),
-    inset 0 1px 0 color-mix(in srgb, var(--bar--count--bg-color) 80%, #ffffff),
-    inset 0 -1px 0 color-mix(in srgb, var(--bar--count--bg-color) 80%, #000000),
-    0 1px 2px var(--bar--item--count--shadow-color);
+  box-shadow: inset 0 1px 2px var(--bar--item--count--shadow-color),
+  inset 0 1px 0 color-mix(in srgb, var(--bar--count--bg-color) 80%, #ffffff),
+  inset 0 -1px 0 color-mix(in srgb, var(--bar--count--bg-color) 80%, #000000),
+  0 1px 2px var(--bar--item--count--shadow-color);
   margin-left: 0.75rem;
 }
 </style>
