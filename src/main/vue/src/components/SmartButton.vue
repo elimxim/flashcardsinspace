@@ -153,6 +153,10 @@ defineExpose({
   z-index: -1;
 }
 
+.smart-button:not(.smart-button--disabled):active {
+  transform: translateY(1px);
+}
+
 .smart-button:not(.smart-button--disabled):hover,
 .smart-button:not(.smart-button--disabled):focus {
   outline: none;
