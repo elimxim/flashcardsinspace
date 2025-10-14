@@ -43,24 +43,33 @@ const props = withDefaults(defineProps<{
 })
 
 const launchButton = ref<HTMLButtonElement>()
-const ripples = ref([])
+
+interface Ripple {
+  id: number
+  x: number
+  y: number
+}
+
+const ripples = ref<Ripple[]>([])
 let rippleId = 0
 
-function onPress(e) {
+function onPress(event: MouseEvent) {
   if (props.disabled) return
-  createRipple(e)
+  createRipple(event)
   props.onClick()
 }
 
-function createRipple(e) {
+function createRipple(event: MouseEvent) {
   if (!launchButton.value) return
   const rect = launchButton.value.getBoundingClientRect()
-  const x = e.clientX - rect.left
-  const y = e.clientY - rect.top
-  const id = ++rippleId
-  ripples.value.push({id, x, y})
+  const ripple: Ripple = {
+    id: ++rippleId,
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  }
+  ripples.value.push(ripple)
   setTimeout(() => {
-    ripples.value = ripples.value.filter(r => r.id !== id)
+    ripples.value = ripples.value.filter(r => r.id !== ripple.id)
   }, 500)
 }
 </script>
