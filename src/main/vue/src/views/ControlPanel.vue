@@ -6,7 +6,7 @@
         <div class="control-panel-top-bar">
           <AwesomeButton
             :on-click="sidebar?.toggle"
-            :hidden="sidebar?.expanded"
+            :invisible="sidebar?.expanded"
             :disabled="sidebar?.expanded"
             icon="fa-solid fa-bars"
           />
