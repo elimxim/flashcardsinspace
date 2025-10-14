@@ -72,7 +72,7 @@ function createRipple(e) {
   --launch--label-color: var(--launch-button--text-color, #e6f7ff);
   --launch--lable-color--glowing: var(--launch-button--text-color--glowing, #6be4ff);
   --launch--shadow-color: var(--launch-button--shadow-color, rgba(0, 0, 0, 0.18));
-  --launch--shadow-color--hover: var(--launch-button--shadow-color, rgba(0, 0, 0, 0.5));
+  --launch--shadow-color--hover: var(--launch-button--shadow-color, rgba(0, 0, 0, 0.3));
   --laubch--riple--bg-color: var(--launch-button--ripple--bg-color, #fff3);
   --launch--bg-color--from: var(--launch-button--bg-color--from, #3f4d68);
   --launch--bg-color--via: var(--launch-button--bg-color--via, #616f8a);
@@ -97,7 +97,7 @@ function createRipple(e) {
   transition: transform .12s ease, filter .25s ease, box-shadow .25s ease;
 }
 
-.launch-button:active {
+.launch-button:not(.disabled):active {
   transform: translateY(1px);
 }
 
@@ -143,12 +143,12 @@ function createRipple(e) {
   opacity: .9;
 }
 
-.launch-button:hover {
+.launch-button:not(.disabled):hover {
   filter: saturate(1.1) brightness(1.06);
   box-shadow: 0 2px 4px var(--launch--shadow-color--hover)
 }
 
-.launch-button:hover .label-glow {
+.launch-button:not(.disabled):hover .label-glow {
   opacity: 1;
   filter: blur(6px) saturate(2)
 }
