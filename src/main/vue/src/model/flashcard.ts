@@ -28,3 +28,8 @@ export interface FlashcardSet {
   startedAt?: Date | undefined // ZonedDateTime
   lastUpdatedAt?: Date | undefined // ZonedDateTime
 }
+
+export interface FlashcardSetExtra {
+  id: number
+  flashcardsNumber: number
+}

@@ -1,11 +1,13 @@
 import axios from 'axios'
 import {
-  type ChronoBulkUpdateRequest, type ChronodayId,
+  type ChronoBulkUpdateRequest,
+  type ChronodayId,
   ChronoSyncRequest,
   ChronoSyncResponse,
-  FlashcardSetInitResponse, FlashcardSetSuspendResponse,
+  FlashcardSetInitResponse,
+  FlashcardSetSuspendResponse,
 } from '@/api/communication.ts'
-import type { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
+import type { Flashcard, FlashcardSet, FlashcardSetExtra } from '@/model/flashcard.ts'
 import { Chronoday } from '@/model/chrono.ts'
 import { configureDateTransformers } from '@/api/axios-config.ts'
 
@@ -18,9 +20,14 @@ configureDateTransformers(apiClient)
 
 export default apiClient
 
-export async function sendFlashcardSetListGetRequest() {
+export async function sendFlashcardSetsGetRequest() {
   console.log(`[GET] request => flashcard sets`)
   return apiClient.get<FlashcardSet[]>('/flashcard-sets')
+}
+
+export async function sendFlashcardSetExtraRequest() {
+  console.log(`[GET] request => flashcard sets extra`)
+  return apiClient.get<FlashcardSetExtra[]>('/flashcard-sets/extra')
 }
 
 export async function sendFlashcardSetInitRequest(id: number, flashcard: Flashcard) {

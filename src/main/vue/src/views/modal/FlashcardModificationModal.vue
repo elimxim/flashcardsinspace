@@ -202,10 +202,12 @@ async function update() {
 
 async function removeFlashcard(): Promise<boolean> {
   if (!flashcardSet.value || !flashcard.value) return false
+  const setId = flashcardSet.value.id
   const flashcardId = flashcard.value.id
   return await sendFlashcardRemovalRequest(flashcardSet.value.id, flashcardId)
     .then(() => {
       flashcardStore.removeFlashcard(flashcardId)
+      flashcardSetStore.decrementFlashcardsNumber(setId)
       toaster.bakeSuccess('Success', 'Flashcard removed', 200)
       return true
     }).catch((error) => {
@@ -222,6 +224,7 @@ async function addNewFlashcard(): Promise<boolean> {
     return await sendFlashcardCreationRequest(setId, flashcard)
       .then((response) => {
         flashcardStore.addNewFlashcard(response.data)
+        flashcardSetStore.incrementFlashcardsNumber(setId)
         return true
       })
       .catch((error) => {

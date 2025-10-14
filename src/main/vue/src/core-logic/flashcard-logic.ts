@@ -1,4 +1,9 @@
-import { type Flashcard, type FlashcardSet, type ReviewInfo } from '@/model/flashcard.ts'
+import {
+  type Flashcard,
+  type FlashcardSet,
+  FlashcardSetExtra,
+  type ReviewInfo
+} from '@/model/flashcard.ts'
 import { type Stage, stages } from '@/core-logic/stage-logic.ts'
 import type { Language } from '@/model/language.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
@@ -76,4 +81,8 @@ export function createFlashcardSet(
     languageId: language.id,
     createdAt: new Date(),
   }
+}
+
+export function mapFlashcardSetExtra(flashcardSetExtras: FlashcardSetExtra[]): Map<number, FlashcardSetExtra> {
+  return new Map(flashcardSetExtras.map(v => [v.id, v]))
 }

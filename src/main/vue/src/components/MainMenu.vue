@@ -99,7 +99,7 @@ const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 
-const { flashcardSets, isEmpty: isNoFlashcardSets } = storeToRefs(flashcardSetStore)
+const { flashcardSets, isNoFlashcardSets } = storeToRefs(flashcardSetStore)
 const { flashcardSet } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 

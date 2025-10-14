@@ -4,13 +4,13 @@ import { FlashcardSet } from '@/model/flashcard.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
-  sendChronoSyncRequest,
+  sendChronoSyncRequest, sendFlashcardSetExtraRequest,
   sendFlashcardSetGetRequest,
-  sendFlashcardSetListGetRequest,
+  sendFlashcardSetsGetRequest,
   sendFlashcardsGetRequest
 } from '@/api/api-client.ts'
-import { sortFlashcardSets } from '@/core-logic/flashcard-logic.ts'
 import { loadSelectedSetId } from '@/shared/cookies.ts'
+import { sortFlashcardSets } from '@/core-logic/flashcard-logic.ts'
 
 export function determineCurrFlashcardSet(): FlashcardSet | undefined {
   console.log('Determining current flashcard set')
@@ -97,10 +97,13 @@ export async function loadFlashcardSetStore(forced: boolean = false): Promise<bo
     return true
   }
 
-  return await sendFlashcardSetListGetRequest()
-    .then((response) => {
-      flashcardSetStore.loadState(sortFlashcardSets(response.data))
-      return true
+  return await sendFlashcardSetsGetRequest()
+    .then(async (response) => {
+      return sendFlashcardSetExtraRequest()
+        .then((extraResponse) => {
+          flashcardSetStore.loadState(sortFlashcardSets(response.data), extraResponse.data)
+          return true
+        })
     })
     .catch((error) => {
       console.error(`Failed to load flashcard sets`, error)

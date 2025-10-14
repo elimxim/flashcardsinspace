@@ -28,6 +28,11 @@ data class FlashcardSetDto(
     val lastUpdatedAt: ZonedDateTime?,
 )
 
+data class FlashcardSetExtraDto(
+    val id: Long,
+    val flashcardsNumber: Int,
+)
+
 data class FlashcardDto(
     val id: Long,
     val frontSide: String,

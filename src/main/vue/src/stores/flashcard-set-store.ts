@@ -1,8 +1,10 @@
-import { type FlashcardSet } from '@/model/flashcard.ts'
+import { type FlashcardSet, FlashcardSetExtra } from '@/model/flashcard.ts'
 import { defineStore } from 'pinia'
+import { mapFlashcardSetExtra } from '@/core-logic/flashcard-logic.ts'
 
 export interface FlashcardSetsState {
   flashcardSets: FlashcardSet[]
+  extra: Map<number,FlashcardSetExtra>
   loaded: boolean
 }
 
@@ -10,11 +12,12 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
   state: (): FlashcardSetsState => {
     return {
       flashcardSets: [],
+      extra: new Map(),
       loaded: false,
     }
   },
   getters: {
-    isEmpty(): boolean {
+    isNoFlashcardSets(): boolean {
       return this.flashcardSets.length === 0
     },
     firstFlashcardSet(): FlashcardSet | undefined {
@@ -25,9 +28,10 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     },
   },
   actions: {
-    loadState(flashcardSets: FlashcardSet[]) {
+    loadState(flashcardSets: FlashcardSet[], extras: FlashcardSetExtra[]) {
       this.resetState()
       this.flashcardSets = flashcardSets
+      this.extra = mapFlashcardSetExtra(extras)
       this.loaded = true
     },
     checkStateLoaded() {
@@ -35,6 +39,7 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     },
     resetState() {
       this.flashcardSets = []
+      this.extra = new Map()
       this.loaded = false
     },
     addSet(flashcardSet: FlashcardSet) {
@@ -64,6 +69,21 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     },
     findSet(id: number): FlashcardSet | undefined {
       return this.flashcardSets.find(v => v.id === id)
+    },
+    findExtra(id: number): FlashcardSetExtra | undefined {
+      return this.extra.get(id)
+    },
+    incrementFlashcardsNumber(id: number) {
+      const extra = this.findExtra(id)
+      if (extra) {
+        extra.flashcardsNumber += 1
+      }
+    },
+    decrementFlashcardsNumber(id: number) {
+      const extra = this.findExtra(id)
+      if (extra) {
+        extra.flashcardsNumber -= 1
+      }
     },
   }
 })

@@ -28,10 +28,10 @@
       >
         <div class="sidebar-item__content">
           <div class="sidebar-item__name">{{ set.name }}</div>
-          <div class="sidebar-item__language">{{ getLanguageName(set.languageId) }}</div>
+          <div class="sidebar-item__language">{{ getLanguageName(set) }}</div>
         </div>
         <div class="sidebar-item__count-container">
-          <div class="sidebar-item__count">{{ getFlashcardCount(set.id) }}</div>
+          <div class="sidebar-item__count">{{ getFlashcardsNumber(set) }}</div>
         </div>
       </div>
     </div>
@@ -49,13 +49,14 @@ import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { storeToRefs } from 'pinia'
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import {
   loadFlashcardAndChronoStores,
   loadFlashcardSetStore,
   reloadFlashcardAndChronoStores,
 } from '@/shared/stores.ts'
 import { saveSelectedSetId } from '@/shared/cookies.ts'
+import { FlashcardSet } from '@/model/flashcard.ts'
 
 const flashcardStore = useFlashcardStore()
 const flashcardSetStore = useFlashcardSetStore()
@@ -92,19 +93,27 @@ async function selectFlashcardSet(setId: number) {
   }
 }
 
-function getFlashcardCount(setId: number): number {
-  return 0
+function getFlashcardsNumber(set: FlashcardSet): number {
+  return flashcardSetStore.findExtra(set.id)?.flashcardsNumber ?? 0
 }
 
-function getLanguageName(languageId: number): string {
-  const language = languageStore.getLanguage(languageId)
+function getLanguageName(set: FlashcardSet): string {
+  const language = languageStore.getLanguage(set.languageId)
   return language ? language.name : 'Unknown'
+}
+
+function isExpanded() {
+  return expanded.value
+}
+
+function isAnimating() {
+  return animating.value
 }
 
 defineExpose({
   toggle,
-  expanded: computed(() => expanded.value),
-  animating: computed(() => animating.value),
+  isExpanded,
+  isAnimating,
 })
 
 onMounted(() => {
@@ -252,14 +261,6 @@ onMounted(() => {
   inset 0 0 0 1px color-mix(in srgb, var(--bar--item--bg-color--active) 60%, #0066cc);
 }
 
-.sidebar-item__lamp-container {
-  margin-right: 0.75rem;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .sidebar-item__content {
   flex: 1;
   display: flex;
@@ -290,20 +291,14 @@ onMounted(() => {
   width: 32px;
   height: 24px;
   border-radius: 2px;
-  background: linear-gradient(135deg,
-  var(--bar--count--bg-color) 0%,
-  color-mix(in srgb, var(--bar--count--bg-color) 90%, #000000) 50%,
-  color-mix(in srgb, var(--bar--count--bg-color) 85%, #000000) 100%);
+  background: var(--bar--count--bg-color);
   border: 1px solid var(--bar--count--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 1px;
   color: var(--bar--item--count--color);
   font-size: 0.7rem;
-  box-shadow: inset 0 1px 2px var(--bar--item--count--shadow-color),
-  inset 0 1px 0 color-mix(in srgb, var(--bar--count--bg-color) 80%, #ffffff),
-  inset 0 -1px 0 color-mix(in srgb, var(--bar--count--bg-color) 80%, #000000),
-  0 1px 2px var(--bar--item--count--shadow-color);
   margin-left: 0.75rem;
 }
 </style>

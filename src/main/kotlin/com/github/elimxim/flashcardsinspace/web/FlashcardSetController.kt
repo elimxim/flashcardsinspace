@@ -5,6 +5,7 @@ import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.FlashcardSetService
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetCreationRequest
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetDto
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetExtraDto
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetUpdateRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -21,6 +22,14 @@ class FlashcardSetController(
         @AuthenticationPrincipal user: User,
     ): ResponseEntity<List<FlashcardSetDto>> {
         val result = flashcardSetService.getAll(user)
+        return ResponseEntity.ok(result)
+    }
+
+    @GetMapping("/extra")
+    fun getFlashcardSetsExtra(
+        @AuthenticationPrincipal user: User,
+    ): ResponseEntity<List<FlashcardSetExtraDto>> {
+        val result = flashcardSetService.getAllExtra(user)
         return ResponseEntity.ok(result)
     }
 

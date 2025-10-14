@@ -6,8 +6,8 @@
         <div class="control-panel-top-bar">
           <AwesomeButton
             :on-click="sidebar?.toggle"
-            :invisible="sidebar?.expanded"
-            :disabled="sidebar?.expanded"
+            :invisible="sidebar?.isExpanded()"
+            :disabled="sidebar?.isExpanded()"
             icon="fa-solid fa-bars"
           />
           <div class="top-bar-text">
@@ -19,6 +19,11 @@
             :disabled="!flashcardSet"
           />
         </div>
+        <LaunchButton
+          label="Start Review"
+          :on-click="onLaunch"
+          :disabled="false"
+        />
       </div>
     </div>
   </div>
@@ -28,20 +33,18 @@
 <script setup lang="ts">
 import FlashcardSetSideBar from '@/components/control-panel/FlashcardSetSideBar.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
+import LaunchButton from '@/components/LaunchButton.vue'
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
-import { loadFlashcardAndChronoStores, loadFlashcardSetStore } from '@/shared/stores.ts'
+import { loadFlashcardSetStore } from '@/shared/stores.ts'
 
 const flashcardStore = useFlashcardStore()
-const flashcardSetStore = useFlashcardSetStore()
 const modalStore = useModalStore()
 
-const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
-const { flashcardSets } = storeToRefs(flashcardSetStore)
+const { flashcardSet } = storeToRefs(flashcardStore)
 
 const sidebar = ref<InstanceType<typeof FlashcardSetSideBar>>()
 
@@ -54,6 +57,8 @@ function openFlashcardSetSettings() {
     modalStore.toggleFlashcardSetSettings()
   }
 }
+
+const onLaunch = () => console.log('🚀 launch!')
 
 onMounted(() => {
   loadFlashcardSetStore()

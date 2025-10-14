@@ -3,6 +3,7 @@ package com.github.elimxim.flashcardsinspace.service
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
 import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.entity.flashcardsNumber
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.*
@@ -30,6 +31,21 @@ class FlashcardSetService(
             status = listOf(FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED)
         )
         return result.map { it.toDto() }
+    }
+
+    @Transactional
+    fun getAllExtra(user: User): List<FlashcardSetExtraDto> {
+        log.info("User ${user.id}: retrieving all flashcard sets extra")
+        val result = flashcardSetRepository.findAllByUserAndStatusIn(
+            user = user,
+            status = listOf(FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED)
+        )
+        return result.map {
+            FlashcardSetExtraDto(
+                id = it.id,
+                flashcardsNumber = it.flashcardsNumber(),
+            )
+        }
     }
 
     @Transactional

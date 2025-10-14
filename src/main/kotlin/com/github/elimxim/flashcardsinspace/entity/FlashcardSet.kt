@@ -1,6 +1,7 @@
 package com.github.elimxim.flashcardsinspace.entity
 
 import jakarta.persistence.*
+import org.hibernate.Hibernate
 import java.time.ZonedDateTime
 
 @Entity
@@ -38,6 +39,7 @@ class FlashcardSet(
         mappedBy = "flashcardSet",
         cascade = [CascadeType.ALL],
         orphanRemoval = true,
+        fetch = FetchType.LAZY,
     )
     var flashcards: MutableList<Flashcard> = arrayListOf(),
 
@@ -56,3 +58,6 @@ enum class FlashcardSetStatus {
 
 fun FlashcardSet.lastChronoday(): Chronoday? =
     chronodays.maxByOrNull { it.chronodate }
+
+fun FlashcardSet.flashcardsNumber(): Int =
+    Hibernate.size(flashcards)
