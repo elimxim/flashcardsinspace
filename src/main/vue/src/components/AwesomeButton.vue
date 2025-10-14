@@ -1,7 +1,10 @@
 <template>
   <button
     class="awesome-button awesome-button--theme select-none drag-none"
-    :class="{ 'awesome-button--disabled': disabled }"
+    :class="{
+      'awesome-button--disabled': disabled,
+      'awesome-button--invisible': invisible,
+    }"
     :disabled="disabled"
     v-bind="$attrs"
     @click.stop="press"
@@ -19,11 +22,13 @@ const props = withDefaults(defineProps<{
   spinnable?: boolean
   spinIcon?: string
   disabled?: boolean
+  invisible?: boolean
   onClick?: () => void
 }>(), {
   spinnable: false,
   spinIcon: undefined,
   disabled: false,
+  invisible: false,
   onClick: () => {
   },
 })
@@ -72,5 +77,9 @@ defineExpose({
 .awesome-button--disabled {
   color: var(--btn--color--disabled);
   cursor: default;
+}
+
+.awesome-button--invisible {
+  visibility: hidden;
 }
 </style>
