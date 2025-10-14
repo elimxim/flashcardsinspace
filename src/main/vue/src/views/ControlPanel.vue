@@ -2,15 +2,15 @@
   <div class="control-panel control-panel--theme">
     <div class="control-panel-layout">
       <FlashcardSetSideBar ref="sidebar"/>
-      <div class="control-panel-main">
-        <div class="control-panel-top-bar">
+      <div class="main-panel">
+        <div class="topbar">
           <AwesomeButton
             :on-click="sidebar?.toggle"
-            :invisible="sidebar?.isExpanded()"
+            :hidden="sidebar?.isExpanded()"
             :disabled="sidebar?.isExpanded()"
             icon="fa-solid fa-bars"
           />
-          <div class="top-bar-text">
+          <div class="topbar-text">
             {{ flashcardSetName }}
           </div>
           <AwesomeButton
@@ -19,11 +19,13 @@
             :disabled="!flashcardSet"
           />
         </div>
-        <LaunchButton
-          label="Start Review"
-          :on-click="onLaunch"
-          :disabled="false"
-        />
+        <div class="launch-panel">
+          <LaunchButton
+            label="Start Review"
+            :on-click="onLaunch"
+            :disabled="false"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -33,7 +35,7 @@
 <script setup lang="ts">
 import FlashcardSetSideBar from '@/components/control-panel/FlashcardSetSideBar.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import LaunchButton from '@/components/LaunchButton.vue'
+import LaunchButton from '@/components/control-panel/LaunchButton.vue'
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
@@ -68,9 +70,10 @@ onMounted(() => {
 <style scoped>
 .control-panel--theme {
   font-family: var(--main-font-family);
-  --top-bar--bg-color: #f5f5f5;
-  --top-bar--text-color: #333333;
-  --top-bar--shadow-color: rgba(0, 0, 0, 0.4);
+  --panel--bg-color: var(--control-panel--bg-color, #f5f5f5);
+  --panel--topbar--bg-color: #f5f5f5;
+  --panel--topbar--text-color: #333333;
+  --panel--topbar--shadow-color: rgba(0, 0, 0, 0.4);
 }
 
 .control-panel {
@@ -79,40 +82,51 @@ onMounted(() => {
   flex-direction: column;
   width: 100%;
   height: calc(100vh - var(--navbar-height));
+  background-color: var(--panel--bg-color);
 }
 
 .control-panel-layout {
+  position: relative;
   display: flex;
   width: 100%;
   height: 100%;
 }
 
-.control-panel-main {
+.main-panel {
   display: flex;
   flex-direction: column;
   flex: 1;
   overflow: hidden;
 }
 
-.control-panel-top-bar {
+.topbar {
   display: flex;
   justify-content: space-between;
   gap: 14px;
   align-items: center;
   padding: 10px;
-  background-color: var(--top-bar--bg-color);
-  box-shadow: -4px 0 4px 0 var(--top-bar--shadow-color);
+  background-color: var(--panel--topbar--bg-color);
+  box-shadow: -4px 0 4px 0 var(--panel--topbar--shadow-color);
   width: 100%;
+  height: 40px;
 }
 
-.top-bar-text {
+.topbar-text {
   font-size: clamp(1rem, 1.8vw, 1.2rem);
-  color: var(--top-bar--text-color);
+  color: var(--panel--topbar--text-color);
   font-weight: normal;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   flex: 1;
+}
+
+.launch-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  padding: 20px;
 }
 </style>
 

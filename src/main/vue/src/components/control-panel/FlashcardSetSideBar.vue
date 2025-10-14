@@ -173,6 +173,8 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 10px;
+  width: 100%;
+  height: 40px;
   background-color: var(--bar--bg-color);
   box-shadow: 4px 0 4px 0 var(--bar--shadow-color);
   flex-shrink: 0;
