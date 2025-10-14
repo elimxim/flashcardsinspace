@@ -25,7 +25,7 @@
 import { computed, ref } from 'vue'
 
 const props = withDefaults(defineProps<{
-  text: string,
+  text: string
   disabled?: boolean
   hidden?: boolean
   rounded?: boolean
