@@ -2,7 +2,7 @@ import { type Flashcard } from '@/model/flashcard.ts'
 import {
   getStage,
   specialStages,
-  type Stage,
+  type Stage, stageNameMap,
   stageOrderMap,
   stages,
 } from '@/core-logic/stage-logic.ts'
@@ -11,6 +11,7 @@ import type { Chronoday } from '@/model/chrono.ts'
 import { storeToRefs } from 'pinia'
 import { shuffle } from '@/utils/array.ts'
 import {
+  chronodayStatuses,
   isCompleteAvailable,
   selectConsecutiveDaysBeforeIncluding
 } from '@/core-logic/chrono-logic.ts'
@@ -41,7 +42,7 @@ export interface ReviewQueue {
 
   next(): Flashcard | undefined
 
-  remaining(): number
+  remaining(stage?: Stage): number
 }
 
 export class EmptyReviewQueue implements ReviewQueue {
@@ -108,7 +109,11 @@ export class MultiStageReviewQueue implements ReviewQueue {
     }
   }
 
-  public remaining(): number {
+  public remaining(stage?: Stage): number {
+    if (stage) {
+      return this.flashcardMap.get(stage)?.length ?? 0
+    }
+
     let total = 0
     this.flashcardMap.forEach((flashcards) => {
       total += flashcards.length
@@ -227,4 +232,24 @@ export function countFlashcards(flashcards: Flashcard[], stage: Stage): number {
   } else {
     return flashcards.filter(f => f.stage === stage.name).length
   }
+}
+
+export interface StageReview {
+  stage: string
+  count: number
+}
+
+export function calcStageReviews(flashcards: Flashcard[], day: Chronoday): StageReview[] {
+  const queue = createReviewQueue(flashcards)
+  return day.stages
+    .map(v => stageNameMap.get(v))
+    .filter(v => v !== undefined)
+    .sort((a, b) => b.order - a.order)
+    .map(stage => {
+      const count = queue.remaining(stage)
+      return {
+        stage: stage.displayName,
+        count: count,
+      }
+    })
 }

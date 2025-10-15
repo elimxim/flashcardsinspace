@@ -32,26 +32,34 @@
                 <div class="calendar-panel__main__day__text">
                   Day
                 </div>
-                <div v-if="isCurrDayOff" class="calendar-panel__main__day__vacation">
+                <div v-if="isOnVacation" class="calendar-panel__main__day__vacation">
                   🌴
                 </div>
                 <div v-else class="calendar-panel__main__day__number">
-                  400
+                  {{ dayNumber }}
                 </div>
               </div>
             </div>
             <div class="calendar-panel__stages">
-              <div class="calendar-stage">
-                <div class="calendar-stage__label">Stage 2</div>
-                <div class="calendar-stage__value">20</div>
+              <div
+                v-for="review in stageReviews"
+                :key="review.stage"
+                class="calendar-panel__stage"
+              >
+                <div class="calendar-panel__stage__text">
+                  {{ review.stage }}
+                </div>
+                <div class="calendar-panel__stage__number">
+                  {{ review.count }}
+                </div>
               </div>
-              <div class="calendar-stage">
-                <div class="calendar-stage__label">Stage 1</div>
-                <div class="calendar-stage__value">200</div>
-              </div>
-              <div class="calendar-stage">
-                <div class="calendar-stage__label">Total</div>
-                <div class="calendar-stage__value">220</div>
+              <div class="calendar-panel__stage">
+                <div class="calendar-panel__stage__text">
+                  Total
+                </div>
+                <div class="calendar-panel__stage__number">
+                  {{ reviewTotal }}
+                </div>
               </div>
             </div>
           </div>
@@ -84,30 +92,30 @@ import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import { loadFlashcardSetStore } from '@/shared/stores.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
-import { chronodayStatuses } from '@/core-logic/chrono-logic.ts';
+import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
+import { calcStageReviews, StageReview } from '@/core-logic/review-logic.ts'
+import { flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts';
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 const modalStore = useModalStore()
 
-const { flashcardSet } = storeToRefs(flashcardStore)
+const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
 const sidebar = ref<InstanceType<typeof FlashcardSetSideBar>>()
 
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
-const isCurrDayOff = computed(() => currDay.value?.status === chronodayStatuses.OFF)
-const dayNumber = computed(() => isCurrDayOff.value ? '🌴' : currDay.value?.seqNumber ?? '?')
+const isOnVacation = computed(() =>
+  flashcardSet.value?.status === flashcardSetStatuses.SUSPENDED || currDay.value?.status === chronodayStatuses.OFF
+)
+const dayNumber = computed(() => isOnVacation.value ? '🌴' : currDay.value?.seqNumber ?? '?')
 
-interface StageReview {
-  stage: string
-  count: number
-}
-
-const stageReviews = computed(() => {
+const stageReviews = computed<StageReview[]>(() => {
   if (!currDay.value) return []
-
+  return calcStageReviews(flashcards.value, currDay.value)
 })
+const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) => acc + v.count, 0))
 
 function openFlashcardSetSettings() {
   if (flashcardSet.value) {
@@ -186,32 +194,36 @@ onMounted(() => {
   border: 2px solid #0d124a;
   border-radius: 4px;
   margin: 4px;
+  flex-wrap: wrap;
 }
 
 .calendar-panel {
   display: flex;
   padding: 4px;
-  gap: 10px;
+  gap: 10px;;
 }
 
 .calendar-panel__main {
-  display: flex;
+  display: grid;
+  grid-template-rows: 1fr auto;
   flex-direction: column;
   justify-content: space-between;
-  gap: 4px;
+  gap: 6px;
 }
 
 .calendar-panel__main__button {
   flex: 1;
+  aspect-ratio: 1 / 1;
   border: 2px solid rgba(76, 76, 76, 0.53);
   border-radius: 6px;
   --awesome-button--font-size: clamp(40px, 6vw, 50px);
-  --awesome-button--color: #0d124a;
+  --awesome-button--color: rgba(13, 18, 74, 0.6);
+  --awesome-button--color--hover: rgba(255, 255, 255, 0.6);
   --awesome-button--bg: linear-gradient(135deg, rgba(102, 126, 234, 0.66) 0%, rgba(118, 75, 162, 0.68) 100%);
   --awesome-button--bg--hover: linear-gradient(135deg, rgba(240, 147, 251, 0.71) 0%, rgba(245, 87, 108, 0.69) 100%);
-  --awesome-button--bg--disabled:  linear-gradient(135deg, #d3d3d3 0%, #a8a8a8 100%);
+  --awesome-button--bg--disabled: linear-gradient(135deg, #d3d3d3 0%, #a8a8a8 100%);
   --awesome-button--border-radius: 6px;
-  --awesome-button--padding: 4px;
+  --awesome-button--padding: 8px;
 }
 
 .calendar-panel__main__day {
@@ -220,45 +232,64 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   gap: 4px;
+  height: 20px;
 }
 
 .calendar-panel__main__day__text {
-  font-size: clamp(0.8rem, 1.8vw, 1rem);
+  font-size: clamp(0.9rem, 1.8vw, 1rem);
 }
 
 .calendar-panel__main__day__number {
-  font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+  font-size: clamp(0.85rem, 1.8vw, 0.9rem);
   font-weight: 600;
   border: 1px solid var(--panel--border-color);
   color: var(--panel--text-color);
   border-radius: 3px;
   padding: 2px;
+  width: 40px;
+  text-align: center;
 }
 
 .calendar-panel__main__day__vacation {
-  font-size: clamp(0.8rem, 1.8vw, 1rem);
-  padding: 2px;
+  font-size: clamp(0.85rem, 1.8vw, 0.9rem);
+  width: 40px;
+  text-align: center;
 }
 
 .calendar-panel__stages {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-content: center;
   align-items: center;
-  padding: 4px;
-  border: 2px solid #0d124a;
-  border-radius: 4px;
   gap: 4px;
+  padding: 4px;
 }
 
-.calendar-stage {
+.calendar-panel__stage {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  border: 2px solid #0d124a;
   border-radius: 4px;
   width: 100%;
+  gap: 10px;
+}
+
+.calendar-panel__stage__text {
+  font-size: clamp(0.85rem, 1.8vw, 0.9rem);
+  white-space: nowrap;
+}
+
+.calendar-panel__stage__number {
+  font-size: clamp(0.85rem, 1.8vw, 0.9rem);
+  font-weight: 600;
+  border: 1px solid var(--panel--border-color);
+  color: var(--panel--text-color);
+  border-radius: 3px;
+  padding: 2px;
+  width: 30px;
+  text-align: center;
 }
 </style>
 
