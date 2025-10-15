@@ -53,15 +53,26 @@
                   <div class="calendar-panel__stage__text">
                     {{ review.stage }}
                   </div>
-                  <div class="calendar-panel__stage__number">
-                    {{ review.count }}
-                  </div>
                 </div>
                 <div class="calendar-panel__stage">
                   <div class="calendar-panel__stage__text">
                     Total
                   </div>
-                  <div class="calendar-panel__stage__number">
+                </div>
+              </div>
+              <div class="calendar-panel__review-numbers-container">
+                <div class="calendar-panel__review-numbers-label">
+                  To review
+                </div>
+                <div class="calendar-panel__review-numbers">
+                  <div
+                    v-for="review in stageReviews"
+                    :key="review.stage"
+                    class="calendar-panel__review-number"
+                  >
+                    {{ review.count }}
+                  </div>
+                  <div class="calendar-panel__review-number">
                     {{ reviewTotal }}
                   </div>
                 </div>
@@ -220,7 +231,7 @@ onMounted(() => {
 .calendar-panel-layout {
   display: flex;
   flex-direction: row;
-  padding: 8px;
+  padding: 4px;
   gap: 10px;
   border: 1px solid rgba(128, 128, 128, 0.62);
   border-radius: 6px;
@@ -232,6 +243,7 @@ onMounted(() => {
   flex-direction: column;
   justify-content: space-between;
   gap: 6px;
+  margin: 4px;
 }
 
 .calendar-panel__main__button {
@@ -287,8 +299,9 @@ onMounted(() => {
   justify-content: space-between;
   align-content: center;
   align-items: center;
-  gap: 4px;
   padding: 4px;
+  margin-top: 16px;
+  margin-bottom: 6px;
 }
 
 .calendar-panel__stage {
@@ -307,7 +320,40 @@ onMounted(() => {
   white-space: nowrap;
 }
 
-.calendar-panel__stage__number {
+.calendar-panel__review-numbers-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 2px;
+  padding: 0;
+  margin: 0;
+}
+
+.calendar-panel__review-numbers-label {
+  font-size: clamp(0.4rem, 1.5vw, 0.5rem);
+  color: red;
+  letter-spacing: 0.05rem;
+  word-spacing: 0.05rem;
+  text-transform: uppercase;
+  padding: 0;
+  margin: 0;
+}
+
+.calendar-panel__review-numbers {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid red;
+  border-radius: 4px;
+  gap: 10px;
+  padding: 6px 12px;
+  margin: 0;
+}
+
+.calendar-panel__review-number {
   font-size: clamp(0.85rem, 1.8vw, 0.9rem);
   font-weight: 600;
   border: 1px solid var(--panel--border-color);
