@@ -172,18 +172,16 @@
   --logout-progressbar--to: #2563eb;
   --logout-progressbar--bg-color: rgba(0, 0, 0, 0.1);
 
-  /* flashcard */
+  /* space card */
 
-  --flashcard__front--bg-color: #fdfdfd;
-  --flashcard__front--bg-image: linear-gradient(0deg, transparent 5px, rgba(34, 34, 34, 0.15) 5px, rgba(34, 34, 34, 0.15) 6px, transparent 5px);
-  --flashcard__front--bg-size: 100% 30px;
-  --flashcard__back--bg-color: #fdfdfd;
-  --flashcard__back--bg-image: none;
-  --flashcard__back--bg-size: none;
-  --flashcard--color: #686868;
-  --flashcard--color--strip: #9f9f9f;
-  --flashcard--color--strip--hover: #686868;
-  --flashcard--border-color: rgba(0, 0, 0, 0.05);
-  --flashcard--box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
-  --flashcard--box-shadow--hover: 0 12px 16px rgba(0, 0, 0, 0.2);
+  --space-card--color: #686868;
+  --space-card--color--strip: #9f9f9f;
+  --space-card--color--strip--hover: #686868;
+  --space-card--box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+  --space-card--box-shadow--hover: 0 12px 16px rgba(0, 0, 0, 0.2);
+  --space-card--border-color: rgba(0, 0, 0, 0.05);
+  --space-card--front--bg-color: #fdfdfd;
+  --space-card--front--bg-image: linear-gradient(0deg, transparent 5px, rgba(34, 34, 34, 0.15) 5px, rgba(34, 34, 34, 0.15) 6px, transparent 5px);
+  --space-card--front--bg-size: 100% 30px;
+  --space-card--back--bg-color: #fdfdfd;
 }
