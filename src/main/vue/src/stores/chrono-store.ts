@@ -18,9 +18,6 @@ export const useChronoStore = defineStore('chrono', {
     }
   },
   getters: {
-    currDayStages(): Set<string> {
-      return new Set(this.currDay.stages)
-    },
   },
   actions: {
     loadState(chronodays: Chronoday[], currDay: Chronoday) {
