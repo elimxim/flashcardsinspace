@@ -1,5 +1,6 @@
 <template>
   <button
+    v-if="!hidden"
     class="awesome-button awesome-button--theme select-none drag-none"
     :class="{
       'awesome-button--disabled': disabled,
@@ -30,12 +31,14 @@ const props = withDefaults(defineProps<{
   spinnable?: boolean
   spinIcon?: string
   disabled?: boolean
+  hidden?: boolean
   invisible?: boolean
   onClick?: () => void
 }>(), {
   spinnable: false,
   spinIcon: undefined,
   disabled: false,
+  hidden: false,
   invisible: false,
   onClick: () => {
   },
@@ -75,6 +78,9 @@ defineExpose({
 }
 
 .awesome-button {
+  position: relative;
+  display: flex;
+  align-items: center;
   font-size: var(--btn--fontsize);
   color: var(--btn--color);
   background: var(--btn--bg);
@@ -85,7 +91,6 @@ defineExpose({
   margin: 0;
   padding: var(--btn--padding);
   transition: all 0.3s ease;
-  position: relative;
   overflow: hidden;
 }
 
@@ -107,10 +112,12 @@ defineExpose({
 }
 
 .awesome-icon {
+  flex: 1;
   transition: transform 0.2s ease;
 }
 
 .awesome-spinning-icon {
+  flex: 1;
   color: var(--btn--color--hover);
   background: var(--btn--bg--hover);
   animation: spin 2s linear infinite;
