@@ -9,8 +9,16 @@
     v-bind="$attrs"
     @click.stop="press"
   >
-    <font-awesome-icon v-if="pressed && spinnable" :icon="spinIcon || icon" spin/>
-    <font-awesome-icon v-else :icon="icon"/>
+    <font-awesome-icon
+      v-if="pressed && spinnable"
+      :icon="spinIcon || icon"
+      class="awesome-spinning-icon"
+    />
+    <font-awesome-icon
+      v-else
+      :icon="icon"
+      class="awesome-icon"
+    />
   </button>
 </template>
 
@@ -57,29 +65,67 @@ defineExpose({
   --btn--color: var(--awesome-button--color, #818181);
   --btn--color--hover: var(--awesome-button--color--hover, #404040);
   --btn--color--disabled: var(--awesome-button--color--disabled, #cacaca);
+  --btn--bg: var(--awesome-button--bg, none);
+  --btn--bg--hover: var(--awesome-button--bg--hover, none);
+  --btn--bg--disabled: var(--awesome-button--bg--disabled, none);
+  --btn--border: var(--awesome-button--border, none);
+  --btn--border--hover: var(--awesome-button--border--hover, none);
+  --btn--border-radius: var(--awesome-button--border-radius, none);
+  --btn--padding: var(--awesome-button--padding, 0);
 }
 
 .awesome-button {
   font-size: var(--btn--fontsize);
   color: var(--btn--color);
-  border: none;
+  background: var(--btn--bg);
+  border: var(--btn--border);
+  border-radius: var(--btn--border-radius);
   outline: none;
-  background: none;
   cursor: pointer;
   margin: 0;
-  padding: 0;
+  padding: var(--btn--padding);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .awesome-button:not(.awesome-button--disabled):hover {
   color: var(--btn--color--hover);
+  background: var(--btn--bg--hover);
 }
 
 .awesome-button--disabled {
   color: var(--btn--color--disabled);
+  background: var(--btn--bg--disabled);
   cursor: default;
+  box-shadow: none;
+  transform: none;
 }
 
 .awesome-button--invisible {
   visibility: hidden;
+}
+
+.awesome-icon {
+  transition: transform 0.2s ease;
+}
+
+.awesome-spinning-icon {
+  color: var(--btn--color--hover);
+  background: var(--btn--bg--hover);
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.awesome-button:not(.awesome-button--disabled):hover .awesome-icon {
+  transform: scale(1.05);
 }
 </style>
