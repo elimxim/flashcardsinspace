@@ -203,10 +203,15 @@ onMounted(() => {
 
 .calendar-panel__main__button {
   flex: 1;
-  border: 2px solid #0d124a;
+  border: 2px solid rgba(76, 76, 76, 0.53);
   border-radius: 6px;
   --awesome-button--font-size: clamp(40px, 6vw, 50px);
   --awesome-button--color: #0d124a;
+  --awesome-button--bg: linear-gradient(135deg, rgba(102, 126, 234, 0.66) 0%, rgba(118, 75, 162, 0.68) 100%);
+  --awesome-button--bg--hover: linear-gradient(135deg, rgba(240, 147, 251, 0.71) 0%, rgba(245, 87, 108, 0.69) 100%);
+  --awesome-button--bg--disabled:  linear-gradient(135deg, #d3d3d3 0%, #a8a8a8 100%);
+  --awesome-button--border-radius: 6px;
+  --awesome-button--padding: 4px;
 }
 
 .calendar-panel__main__day {
