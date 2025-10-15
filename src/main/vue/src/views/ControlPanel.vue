@@ -21,44 +21,49 @@
         </div>
         <div class="launch-panel">
           <div class="calendar-panel">
-            <div class="calendar-panel__main">
-              <AwesomeButton
-                icon="fa-solid fa-calendar-days"
-                class="calendar-panel__main__button"
-                :disabled="!flashcardSet"
-                :on-click="modalStore.toggleCalendar"
-              />
-              <div class="calendar-panel__main__day">
-                <div class="calendar-panel__main__day__text">
-                  Day
-                </div>
-                <div v-if="isOnVacation" class="calendar-panel__main__day__vacation">
-                  🌴
-                </div>
-                <div v-else class="calendar-panel__main__day__number">
-                  {{ dayNumber }}
-                </div>
-              </div>
+            <div class="calendar-panel-label">
+              Current day
             </div>
-            <div class="calendar-panel__stages">
-              <div
-                v-for="review in stageReviews"
-                :key="review.stage"
-                class="calendar-panel__stage"
-              >
-                <div class="calendar-panel__stage__text">
-                  {{ review.stage }}
-                </div>
-                <div class="calendar-panel__stage__number">
-                  {{ review.count }}
+            <div class="calendar-panel-layout">
+              <div class="calendar-panel__main">
+                <AwesomeButton
+                  icon="fa-solid fa-calendar-days"
+                  class="calendar-panel__main__button"
+                  :disabled="!flashcardSet"
+                  :on-click="modalStore.toggleCalendar"
+                />
+                <div class="calendar-panel__main__day">
+                  <div class="calendar-panel__main__day__text">
+                    Day
+                  </div>
+                  <div v-if="isOnVacation" class="calendar-panel__main__day__vacation">
+                    🌴
+                  </div>
+                  <div v-else class="calendar-panel__main__day__number">
+                    {{ dayNumber }}
+                  </div>
                 </div>
               </div>
-              <div class="calendar-panel__stage">
-                <div class="calendar-panel__stage__text">
-                  Total
+              <div class="calendar-panel__stages">
+                <div
+                  v-for="review in stageReviews"
+                  :key="review.stage"
+                  class="calendar-panel__stage"
+                >
+                  <div class="calendar-panel__stage__text">
+                    {{ review.stage }}
+                  </div>
+                  <div class="calendar-panel__stage__number">
+                    {{ review.count }}
+                  </div>
                 </div>
-                <div class="calendar-panel__stage__number">
-                  {{ reviewTotal }}
+                <div class="calendar-panel__stage">
+                  <div class="calendar-panel__stage__text">
+                    Total
+                  </div>
+                  <div class="calendar-panel__stage__number">
+                    {{ reviewTotal }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -199,8 +204,26 @@ onMounted(() => {
 
 .calendar-panel {
   display: flex;
-  padding: 4px;
-  gap: 10px;;
+  flex-direction: column;
+  padding: 1px;
+}
+
+.calendar-panel-label {
+  font-size: clamp(0.5rem, 1.8vw, 0.6rem);
+  color: #555555;
+  letter-spacing: 0.1rem;
+  word-spacing: 0.1rem;
+  text-transform: uppercase;
+  padding: 0 0 0 6px;
+}
+
+.calendar-panel-layout {
+  display: flex;
+  flex-direction: row;
+  padding: 8px;
+  gap: 10px;
+  border: 1px solid rgba(128, 128, 128, 0.62);
+  border-radius: 6px;
 }
 
 .calendar-panel__main {
@@ -237,6 +260,8 @@ onMounted(() => {
 
 .calendar-panel__main__day__text {
   font-size: clamp(0.9rem, 1.8vw, 1rem);
+  color: #4a4a4a;
+  white-space: nowrap;
 }
 
 .calendar-panel__main__day__number {
@@ -278,6 +303,7 @@ onMounted(() => {
 
 .calendar-panel__stage__text {
   font-size: clamp(0.85rem, 1.8vw, 0.9rem);
+  color: #4a4a4a;
   white-space: nowrap;
 }
 
