@@ -153,7 +153,7 @@ function createRipple(event: MouseEvent) {
 }
 
 .launch-button:not(.disabled):hover {
-  filter: saturate(1.1) brightness(1.06);
+  filter: saturate(1.2) brightness(1.2);
   box-shadow: 0 2px 4px var(--launch--shadow-color--hover)
 }
 
