@@ -231,7 +231,7 @@ onMounted(() => {
 .calendar-panel-layout {
   display: flex;
   flex-direction: row;
-  padding: 4px;
+  padding: 2px 6px 4px 4px;
   gap: 10px;
   border: 1px solid rgba(128, 128, 128, 0.62);
   border-radius: 6px;
@@ -266,7 +266,7 @@ onMounted(() => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
   height: 20px;
 }
 
@@ -299,9 +299,10 @@ onMounted(() => {
   justify-content: space-between;
   align-content: center;
   align-items: center;
-  padding: 4px;
-  margin-top: 16px;
-  margin-bottom: 6px;
+  padding: 6px 2px;
+  margin-top: 14px;
+  margin-bottom: 2px;
+  gap: 6px;
 }
 
 .calendar-panel__stage {
@@ -309,9 +310,8 @@ onMounted(() => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  border-radius: 4px;
   width: 100%;
-  gap: 10px;
+  padding: 2px;
 }
 
 .calendar-panel__stage__text {
@@ -325,14 +325,14 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: 2px;
+  gap: 1px;
   padding: 0;
   margin: 0;
 }
 
 .calendar-panel__review-numbers-label {
-  font-size: clamp(0.4rem, 1.5vw, 0.5rem);
-  color: red;
+  font-size: clamp(0.5rem, 1.5vw, 0.55rem);
+  color: rgba(43, 69, 142, 0.88);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -346,9 +346,9 @@ onMounted(() => {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid red;
+  border: 1px solid rgba(43, 69, 142, 0.62);
   border-radius: 4px;
-  gap: 10px;
+  gap: 6px;
   padding: 6px 12px;
   margin: 0;
 }
