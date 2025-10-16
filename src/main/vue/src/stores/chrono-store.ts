@@ -18,6 +18,9 @@ export const useChronoStore = defineStore('chrono', {
     }
   },
   getters: {
+    isDayOff(): boolean {
+      return this.currDay.status === chronodayStatuses.OFF
+    }
   },
   actions: {
     loadState(chronodays: Chronoday[], currDay: Chronoday) {

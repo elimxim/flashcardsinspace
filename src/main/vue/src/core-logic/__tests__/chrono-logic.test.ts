@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { selectConsecutiveDaysBeforeIncluding } from '@/core-logic/chrono-logic.ts'
+import { selectConsecutiveDaysBefore } from '@/core-logic/chrono-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 
@@ -19,7 +19,7 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
     const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
 
     // when:
-    const result = selectConsecutiveDaysBeforeIncluding(chronodays, startDay, condition)
+    const result = selectConsecutiveDaysBefore(chronodays, startDay, condition)
 
     // then:
     expect(result).toEqual([])
@@ -31,7 +31,7 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
     const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
 
     // when:
-    const result = selectConsecutiveDaysBeforeIncluding(chronodays, startDay, condition)
+    const result = selectConsecutiveDaysBefore(chronodays, startDay, condition)
 
     // then:
     // Should include day 3, skip OFF day 2, and include days 1 and 0
@@ -44,7 +44,7 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
     const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
 
     // when:
-    const result = selectConsecutiveDaysBeforeIncluding(chronodays, startDay, condition)
+    const result = selectConsecutiveDaysBefore(chronodays, startDay, condition)
 
     // then:
     // Should include days 4, 3, skip OFF day 2, and include days 1 and 0
@@ -57,7 +57,7 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
     const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
 
     // when:
-    const result = selectConsecutiveDaysBeforeIncluding(chronodays, startDay, condition)
+    const result = selectConsecutiveDaysBefore(chronodays, startDay, condition)
 
     // then:
     // Should stop at day 5 (NOT_STARTED) which doesn't meet the condition
@@ -70,7 +70,7 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
     const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
 
     // when:
-    const result = selectConsecutiveDaysBeforeIncluding(chronodays, startDay, condition)
+    const result = selectConsecutiveDaysBefore(chronodays, startDay, condition)
 
     // then:
     expect(result).toEqual([chronodays[1], chronodays[0]])
@@ -82,7 +82,7 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
     const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
 
     // when:
-    const result = selectConsecutiveDaysBeforeIncluding(chronodays, startDay, condition)
+    const result = selectConsecutiveDaysBefore(chronodays, startDay, condition)
 
     // then:
     expect(result).toEqual([startDay])
@@ -93,7 +93,7 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
     const dummyStartDay = chronoday(0, 0, 'COMPLETED')
 
     // when:
-    const result = selectConsecutiveDaysBeforeIncluding([], dummyStartDay, () => true)
+    const result = selectConsecutiveDaysBefore([], dummyStartDay, () => true)
 
     // then:
     expect(result).toEqual([])

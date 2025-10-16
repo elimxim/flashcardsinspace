@@ -147,7 +147,7 @@ import {
   chronodayStatuses,
   isCompleteAvailable,
   isInProgressAvailable,
-  selectConsecutiveDaysBeforeIncluding
+  selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 
@@ -346,7 +346,7 @@ async function markDaysAs(
   status: string,
   daysFilter: (chronoday: Chronoday) => boolean,
 ) {
-  const days = selectConsecutiveDaysBeforeIncluding(chronodays.value, currDay.value, daysFilter)
+  const days = selectConsecutiveDaysBefore(chronodays.value, currDay.value, daysFilter)
   if (days.length === 0) {
     console.error(
       `No days to mark as ${status}`,

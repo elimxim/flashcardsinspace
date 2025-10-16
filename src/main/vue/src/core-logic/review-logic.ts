@@ -13,7 +13,7 @@ import { shuffle } from '@/utils/array.ts'
 import {
   chronodayStatuses,
   isCompleteAvailable,
-  selectConsecutiveDaysBeforeIncluding
+  selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
 
 export enum ReviewMode {
@@ -155,7 +155,7 @@ export class MonoStageReviewQueue implements ReviewQueue {
 export function createReviewQueue(flashcards: Flashcard[]): ReviewQueue {
   const chronoStore = useChronoStore()
   const currDay = chronoStore.currDay
-  const daysForReview = selectConsecutiveDaysBeforeIncluding(
+  const daysForReview = selectConsecutiveDaysBefore(
     chronoStore.chronodays, chronoStore.currDay, isCompleteAvailable
   )
   const stagesForReview = new Set(daysForReview.map(d => d.stages).flat())

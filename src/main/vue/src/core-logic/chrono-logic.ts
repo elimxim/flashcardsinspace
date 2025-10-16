@@ -39,16 +39,18 @@ export function isCompleteAvailable(chronoday: Chronoday): boolean {
   }
 }
 
-export function selectConsecutiveDaysBeforeIncluding(
+export function selectConsecutiveDaysBefore(
   chronodays: Chronoday[],
   startDay: Chronoday,
   condition: (chronoday: Chronoday) => boolean,
+  including: boolean = true,
 ): Chronoday[] {
   if (chronodays.length === 0) return []
 
-  const startIndex = chronodays.findIndex(day => day.id === startDay.id)
+  const startDayIndex = chronodays.findIndex(day => day.id === startDay.id)
+  const startIndex = including ? startDayIndex : startDayIndex - 1
   if (startIndex === -1) {
-    throw Error('Start day not found in chronodays array')
+    throw Error(`Start day ${startDay.id} not found in chronodays`)
   }
 
   const result: Chronoday[] = []
