@@ -4,54 +4,54 @@
       Current day
     </div>
     <div class="calendar-panel-layout">
-      <div class="calendar-panel__main">
+      <div class="calendar-right-area">
         <AwesomeButton
           icon="fa-solid fa-calendar-days"
-          class="calendar-panel__main__button"
+          class="calendar-modal-button"
           :disabled="!flashcardSet"
           :on-click="modalStore.toggleCalendar"
         />
-        <div class="calendar-panel__main__day">
-          <div class="calendar-panel__main__day__text">
+        <div class="calendar-day">
+          <div class="calendar-day__text">
             Day
           </div>
-          <div v-if="isOnVacation" class="calendar-panel__main__day__vacation">
+          <div v-if="isOnVacation" class="calendar-day__vacation">
             🌴
           </div>
-          <div v-else class="calendar-panel__main__day__number">
+          <div v-else class="calendar-day__number">
             {{ dayNumber }}
           </div>
         </div>
       </div>
-      <div class="calendar-panel__stages">
+      <div class="calendar-stages">
         <div
           v-for="review in stageReviews"
           :key="review.stage"
-          class="calendar-panel__stage"
+          class="calendar-stage"
         >
-          <div class="calendar-panel__stage__text">
+          <div class="calendar-stage__text">
             {{ review.stage }}
           </div>
         </div>
-        <div class="calendar-panel__stage">
-          <div class="calendar-panel__stage__text">
+        <div class="calendar-stage">
+          <div class="calendar-stage__text">
             Total
           </div>
         </div>
       </div>
-      <div class="calendar-panel__review-numbers-container">
-        <div class="calendar-panel__review-numbers-label">
+      <div class="calendar-review-container">
+        <div class="calendar-review-label">
           To review
         </div>
-        <div class="calendar-panel__review-numbers">
+        <div class="calendar-review-numbers">
           <div
             v-for="review in stageReviews"
             :key="review.stage"
-            class="calendar-panel__review-number"
+            class="calendar-review-number"
           >
             {{ review.count }}
           </div>
-          <div class="calendar-panel__review-number">
+          <div class="calendar-review-number">
             {{ reviewTotal }}
           </div>
         </div>
@@ -121,7 +121,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   border-radius: 6px;
 }
 
-.calendar-panel__main {
+.calendar-right-area {
   display: grid;
   grid-template-rows: 1fr auto;
   flex-direction: column;
@@ -130,7 +130,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   margin: 4px;
 }
 
-.calendar-panel__main__button {
+.calendar-modal-button {
   flex: 1;
   aspect-ratio: 1 / 1;
   border: 2px solid rgba(76, 76, 76, 0.53);
@@ -145,7 +145,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   --awesome-button--padding: 8px;
 }
 
-.calendar-panel__main__day {
+.calendar-day {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -154,13 +154,13 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   height: 20px;
 }
 
-.calendar-panel__main__day__text {
+.calendar-day__text {
   font-size: clamp(0.9rem, 1.8vw, 1rem);
   color: #4a4a4a;
   white-space: nowrap;
 }
 
-.calendar-panel__main__day__number {
+.calendar-day__number {
   font-size: clamp(0.85rem, 1.8vw, 0.9rem);
   font-weight: 600;
   border: 1px solid var(--panel--border-color);
@@ -171,13 +171,13 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   text-align: center;
 }
 
-.calendar-panel__main__day__vacation {
+.calendar-day__vacation {
   font-size: clamp(0.85rem, 1.8vw, 0.9rem);
   width: 40px;
   text-align: center;
 }
 
-.calendar-panel__stages {
+.calendar-stages {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -189,7 +189,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   gap: 6px;
 }
 
-.calendar-panel__stage {
+.calendar-stage {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -198,13 +198,13 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   padding: 2px;
 }
 
-.calendar-panel__stage__text {
+.calendar-stage__text {
   font-size: clamp(0.85rem, 1.8vw, 0.9rem);
   color: #4a4a4a;
   white-space: nowrap;
 }
 
-.calendar-panel__review-numbers-container {
+.calendar-review-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -214,7 +214,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   margin: 0;
 }
 
-.calendar-panel__review-numbers-label {
+.calendar-review-label {
   font-size: clamp(0.5rem, 1.5vw, 0.55rem);
   color: rgba(43, 69, 142, 0.88);
   letter-spacing: 0.05rem;
@@ -224,7 +224,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   margin: 0;
 }
 
-.calendar-panel__review-numbers {
+.calendar-review-numbers {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -237,7 +237,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   margin: 0;
 }
 
-.calendar-panel__review-number {
+.calendar-review-number {
   font-size: clamp(0.85rem, 1.8vw, 0.9rem);
   font-weight: 600;
   border: 1px solid var(--panel--border-color);
