@@ -226,7 +226,7 @@ onMounted(() => {
 .sidebar-item {
   display: flex;
   align-items: center;
-  padding: 6px 10px;
+  padding: 10px;
   cursor: pointer;
   background: linear-gradient(135deg,
   var(--bar--item--bg-color) 0%,
