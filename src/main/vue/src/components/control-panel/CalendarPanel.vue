@@ -4,7 +4,7 @@
       Current day
     </div>
     <div class="calendar-panel-layout">
-      <div class="calendar-right-area">
+      <div class="calendar-left-area">
         <AwesomeButton
           icon="fa-solid fa-calendar-days"
           class="calendar-modal-button"
@@ -23,27 +23,22 @@
           </div>
         </div>
       </div>
-      <div class="calendar-stages">
-        <div
-          v-for="review in stageReviews"
-          :key="review.stage"
-          class="calendar-stage"
-        >
-          <div class="calendar-stage__text">
+      <div class="calendar-right-area">
+        <div class="calendar-stages-header"></div>
+        <div class="calendar-review-numbers-header">To review</div>
+        <div class="calendar-stages-wrapper">
+          <div
+            v-for="review in stageReviews"
+            :key="review.stage"
+            class="calendar-stage"
+          >
             {{ review.stage }}
           </div>
-        </div>
-        <div class="calendar-stage">
-          <div class="calendar-stage__text">
+          <div class="calendar-stage">
             Total
           </div>
         </div>
-      </div>
-      <div class="calendar-review-container">
-        <div class="calendar-review-label">
-          To review
-        </div>
-        <div class="calendar-review-numbers">
+        <div class="calendar-review-numbers-wrapper">
           <div
             v-for="review in stageReviews"
             :key="review.stage"
@@ -121,7 +116,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   border-radius: 6px;
 }
 
-.calendar-right-area {
+.calendar-left-area {
   display: grid;
   grid-template-rows: 1fr auto;
   flex-direction: column;
@@ -177,64 +172,57 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   text-align: center;
 }
 
-.calendar-stages {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-content: center;
+.calendar-right-area {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto repeat(3, 1fr);
+  gap: 1px 10px;
   align-items: center;
-  padding: 6px 2px;
-  margin-top: 14px;
-  margin-bottom: 2px;
-  gap: 6px;
 }
 
-.calendar-stage {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 2px;
+.calendar-stages-header {
+  /* Empty cell in top-left */
 }
 
-.calendar-stage__text {
-  font-size: clamp(0.85rem, 1.8vw, 0.9rem);
-  color: #4a4a4a;
-  white-space: nowrap;
-}
-
-.calendar-review-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  gap: 1px;
-  padding: 0;
-  margin: 0;
-}
-
-.calendar-review-label {
+.calendar-review-numbers-header {
   font-size: clamp(0.5rem, 1.5vw, 0.55rem);
   color: rgba(43, 69, 142, 0.88);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
-  padding: 0;
-  margin: 0;
+  text-align: center;
 }
 
-.calendar-review-numbers {
-  flex: 1;
+.calendar-stages-wrapper {
+  grid-row: 2 / 5;
+  grid-column: 1 / 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 0;
+  border-radius: 4px;
+}
+
+.calendar-stage {
+  font-size: clamp(0.85rem, 1.8vw, 0.9rem);
+  color: #4a4a4a;
+  white-space: nowrap;
+  padding: 3px 0;
+}
+
+.calendar-review-numbers-wrapper {
+  grid-row: 2 / 5;
+  grid-column: 2 / 3;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid rgba(43, 69, 142, 0.62);
-  border-radius: 4px;
   gap: 6px;
-  padding: 6px 12px;
-  margin: 0;
+  padding: 10px 0;
+  border-radius: 4px;
+  background: rgba(88, 114, 209, 0.13);
 }
 
 .calendar-review-number {
