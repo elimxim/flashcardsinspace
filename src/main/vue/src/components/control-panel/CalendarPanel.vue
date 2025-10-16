@@ -1,55 +1,65 @@
 <template>
   <div class="calendar-panel calendar-panel--theme">
-    <div class="calendar-panel-label">
-      Current day
-    </div>
-    <div class="calendar-panel-layout">
-      <div class="calendar-left-area">
-        <AwesomeButton
-          icon="fa-solid fa-calendar-days"
-          class="calendar-panel-button"
-          :disabled="!flashcardSet"
-          :on-click="modalStore.toggleCalendar"
-        />
-        <div class="calendar-day">
-          <div class="calendar-day__text">
-            Day
+    <div class="current-day-panel">
+      <div class="calendar-panel-label">
+        Current day
+      </div>
+      <div class="calendar-panel-layout">
+        <div class="calendar-left-area">
+          <AwesomeButton
+            :icon="calendarIcon"
+            class="calendar-panel-button"
+            :disabled="!flashcardSet"
+            :on-click="modalStore.toggleCalendar"
+          />
+          <div class="calendar-day">
+            <div class="calendar-day__text">
+              Day
+            </div>
+            <div v-if="isOnVacation" class="calendar-day__vacation">
+              🌴
+            </div>
+            <div v-else class="calendar-day__number">
+              {{ currDayNumber }}
+            </div>
           </div>
-          <div v-if="isOnVacation" class="calendar-day__vacation">
-            🌴
+        </div>
+        <div class="calendar-right-area">
+          <div class="calendar-stages-header"></div>
+          <div class="calendar-review-numbers-header">To review</div>
+          <div class="calendar-stages-wrapper">
+            <div
+              v-for="review in currDayStageReviews"
+              :key="review.stage"
+              class="calendar-stage"
+            >
+              {{ review.stage }}
+            </div>
+            <div class="calendar-stage">
+              Total
+            </div>
           </div>
-          <div v-else class="calendar-day__number">
-            {{ dayNumber }}
+          <div class="calendar-review-numbers-wrapper">
+            <div
+              v-for="review in currDayStageReviews"
+              :key="review.stage"
+              class="calendar-review-number"
+            >
+              {{ review.count }}
+            </div>
+            <div class="calendar-review-number">
+              {{ currDayReviewTotal }}
+            </div>
           </div>
         </div>
       </div>
-      <div class="calendar-right-area">
-        <div class="calendar-stages-header"></div>
-        <div class="calendar-review-numbers-header">To review</div>
-        <div class="calendar-stages-wrapper">
-          <div
-            v-for="review in stageReviews"
-            :key="review.stage"
-            class="calendar-stage"
-          >
-            {{ review.stage }}
-          </div>
-          <div class="calendar-stage">
-            Total
-          </div>
-        </div>
-        <div class="calendar-review-numbers-wrapper">
-          <div
-            v-for="review in stageReviews"
-            :key="review.stage"
-            class="calendar-review-number"
-          >
-            {{ review.count }}
-          </div>
-          <div class="calendar-review-number">
-            {{ reviewTotal }}
-          </div>
-        </div>
+    </div>
+    <div v-if="hasNotCompletedPreviousDays" class="previous-days-panel">
+      <div class="calendar-panel-label">
+        Previous days
+      </div>
+      <div class="calendar-panel-layout">
+
       </div>
     </div>
   </div>
@@ -60,31 +70,55 @@
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import CalendarModal from '@/views/modal/CalendarModal.vue'
 import { computed } from 'vue'
-import { flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
-import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 import { calcStageReviews, StageReview } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { storeToRefs } from 'pinia'
+import { isCompleteAvailable, selectConsecutiveDaysBefore } from '@/core-logic/chrono-logic.ts';
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 const modalStore = useModalStore()
 
-const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
-const { currDay } = storeToRefs(chronoStore)
+const { flashcardSet, flashcards, isSuspended } = storeToRefs(flashcardStore)
+const { currDay, isDayOff } = storeToRefs(chronoStore)
 
-const isOnVacation = computed(() =>
-  flashcardSet.value?.status === flashcardSetStatuses.SUSPENDED || currDay.value?.status === chronodayStatuses.OFF
-)
-const dayNumber = computed(() => isOnVacation.value ? '🌴' : currDay.value?.seqNumber ?? '?')
+const isOnVacation = computed(() => isSuspended.value || isDayOff.value)
+const currDayNumber = computed(() => isOnVacation.value ? '🌴' : currDay.value?.seqNumber ?? '?')
 
-const stageReviews = computed<StageReview[]>(() => {
+const currDayStageReviews = computed<StageReview[]>(() => {
   if (!currDay.value) return []
   return calcStageReviews(flashcards.value, currDay.value)
 })
-const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) => acc + v.count, 0))
+
+const currDayReviewTotal = computed<number>(() => currDayStageReviews.value.reduce((acc, v) => acc + v.count, 0))
+
+const previousDays = computed(() => {
+  if (!currDay.value) return []
+  return selectConsecutiveDaysBefore(
+    chronoStore.chronodays,
+    currDay.value,
+    isCompleteAvailable,
+    false,
+  )
+})
+
+const hasNotCompletedPreviousDays = computed(() => {
+  return previousDays.value.length !== 0
+})
+
+
+const calendarIcon = computed(() => {
+  if (isOnVacation.value) {
+    return 'fa-solid fa-calendar'
+  } else if (currDayReviewTotal.value === 0) {
+    return 'fa-solid fa-calendar-check'
+  } else {
+    return 'fa-solid fa-calendar-days'
+  }
+})
+
 </script>
 
 <style scoped>
@@ -98,6 +132,18 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
 }
 
 .calendar-panel {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.current-day-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 1px;
+}
+
+.previous-days-panel {
   display: flex;
   flex-direction: column;
   padding: 1px;
@@ -140,7 +186,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
 }
 
 .calendar-day__text {
-  font-size: clamp(0.9rem, 1.8vw, 1rem);
+  font-size: clamp(0.85rem, 1.8vw, 0.9rem);
   color: var(--panel--text-color);
   white-space: nowrap;
 }
