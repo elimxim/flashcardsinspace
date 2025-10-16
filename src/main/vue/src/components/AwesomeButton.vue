@@ -74,7 +74,7 @@ defineExpose({
   --btn--border: var(--awesome-button--border, none);
   --btn--border--hover: var(--awesome-button--border--hover, none);
   --btn--border-radius: var(--awesome-button--border-radius, none);
-  --btn--padding: var(--awesome-button--padding, 0);
+  --btn--padding: var(--awesome-button--padding, 1px);
 }
 
 .awesome-button {
@@ -90,7 +90,7 @@ defineExpose({
   cursor: pointer;
   margin: 0;
   padding: var(--btn--padding);
-  transition: all 0.3s ease;
+  transition: all 0.3s ease-in-out;
   overflow: hidden;
 }
 
@@ -133,6 +133,6 @@ defineExpose({
 }
 
 .awesome-button:not(.awesome-button--disabled):hover .awesome-icon {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 </style>
