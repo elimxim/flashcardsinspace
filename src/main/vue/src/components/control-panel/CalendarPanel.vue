@@ -7,7 +7,7 @@
       <div class="calendar-left-area">
         <AwesomeButton
           icon="fa-solid fa-calendar-days"
-          class="calendar-modal-button"
+          class="calendar-panel-button"
           :disabled="!flashcardSet"
           :on-click="modalStore.toggleCalendar"
         />
@@ -89,7 +89,12 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
 
 <style scoped>
 .calendar-panel--theme {
-
+  --panel--label-color: var(--calendar-panel--label-color, #555555);
+  --panel--text-color: var(--calendar-panel--text-color, rgba(57, 57, 57, 0.92));
+  --panel--number-color: var(--calendar-panel--number-color, rgba(17, 33, 85, 0.92));
+  --panel--border-color: var(--calendar-panel--border-color, rgba(128, 128, 128, 0.62));
+  --panel--review--header-color: var(--calendar-panel--review--header-color, rgba(43, 69, 142, 0.88));
+  --panel--review--bg: var(--calendar-panel--review--bg, rgba(88, 114, 209, 0.13));
 }
 
 .calendar-panel {
@@ -100,7 +105,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
 
 .calendar-panel-label {
   font-size: clamp(0.5rem, 1.8vw, 0.6rem);
-  color: #555555;
+  color: var(--panel--label-color);
   letter-spacing: 0.1rem;
   word-spacing: 0.1rem;
   text-transform: uppercase;
@@ -112,7 +117,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   flex-direction: row;
   padding: 2px 6px 4px 4px;
   gap: 10px;
-  border: 1px solid rgba(128, 128, 128, 0.62);
+  border: 1px solid var(--panel--border-color);
   border-radius: 6px;
 }
 
@@ -123,21 +128,6 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   justify-content: space-between;
   gap: 6px;
   margin: 4px;
-}
-
-.calendar-modal-button {
-  flex: 1;
-  aspect-ratio: 1 / 1;
-  border: 2px solid rgba(76, 76, 76, 0.53);
-  border-radius: 6px;
-  --awesome-button--font-size: clamp(40px, 6vw, 50px);
-  --awesome-button--color: rgba(13, 18, 74, 0.6);
-  --awesome-button--color--hover: rgba(255, 255, 255, 0.6);
-  --awesome-button--bg: linear-gradient(135deg, rgba(102, 126, 234, 0.66) 0%, rgba(118, 75, 162, 0.68) 100%);
-  --awesome-button--bg--hover: linear-gradient(135deg, rgba(240, 147, 251, 0.71) 0%, rgba(245, 87, 108, 0.69) 100%);
-  --awesome-button--bg--disabled: linear-gradient(135deg, #d3d3d3 0%, #a8a8a8 100%);
-  --awesome-button--border-radius: 6px;
-  --awesome-button--padding: 8px;
 }
 
 .calendar-day {
@@ -151,7 +141,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
 
 .calendar-day__text {
   font-size: clamp(0.9rem, 1.8vw, 1rem);
-  color: #4a4a4a;
+  color: var(--panel--text-color);
   white-space: nowrap;
 }
 
@@ -159,7 +149,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   font-size: clamp(0.85rem, 1.8vw, 0.9rem);
   font-weight: 600;
   border: 1px solid var(--panel--border-color);
-  color: var(--panel--text-color);
+  color: var(--panel--number-color);
   border-radius: 3px;
   padding: 2px;
   width: 40px;
@@ -181,12 +171,12 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
 }
 
 .calendar-stages-header {
-  /* Empty cell in top-left */
+  font-size: clamp(0.5rem, 1.5vw, 0.55rem);
 }
 
 .calendar-review-numbers-header {
   font-size: clamp(0.5rem, 1.5vw, 0.55rem);
-  color: rgba(43, 69, 142, 0.88);
+  color: var(--panel--review--header-color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -207,7 +197,7 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
 
 .calendar-stage {
   font-size: clamp(0.85rem, 1.8vw, 0.9rem);
-  color: #4a4a4a;
+  color: var(--panel--text-color);
   white-space: nowrap;
   padding: 3px 0;
 }
@@ -222,14 +212,14 @@ const reviewTotal = computed<number>(() => stageReviews.value.reduce((acc, v) =>
   gap: 6px;
   padding: 10px 0;
   border-radius: 4px;
-  background: rgba(88, 114, 209, 0.13);
+  background: var(--panel--review--bg);
 }
 
 .calendar-review-number {
   font-size: clamp(0.85rem, 1.8vw, 0.9rem);
   font-weight: 600;
   border: 1px solid var(--panel--border-color);
-  color: var(--panel--text-color);
+  color: var(--panel--number-color);
   border-radius: 3px;
   padding: 2px;
   width: 30px;
