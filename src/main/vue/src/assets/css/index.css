@@ -1,4 +1,4 @@
-@layer base, layout, shared, components, utilities;
+@layer base, layout, shared, components;
 
 @import '@/assets/css/base/reset.css' layer(base);
 @import '@/assets/css/base/themes.css' layer(base);
@@ -6,8 +6,7 @@
 @import '@/assets/css/layout/auth.css' layer(layout);
 @import '@/assets/css/shared/errors.css' layer(shared);
 @import '@/assets/css/shared/awesome.css' layer(shared);
-@import '@/assets/css/components/modal.css' layer(components);
+@import '@/assets/css/shared/abilities.css' layer(shared);
+@import '@/assets/css/shared/transitions.css' layer(shared);
 @import '@/assets/css/components/buttons.css' layer(components);
 @import '@/assets/css/components/inputs.css' layer(components);
-@import '@/assets/css/utilities/abilities.css' layer(utilities);
-@import '@/assets/css/utilities/transitions.css' layer(utilities);
