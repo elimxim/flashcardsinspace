@@ -239,9 +239,9 @@ export interface StageReview {
   count: number
 }
 
-export function calcStageReviews(flashcards: Flashcard[], day: Chronoday): StageReview[] {
+export function calcStageReviews(flashcards: Flashcard[], stages: string[]): StageReview[] {
   const queue = createReviewQueue(flashcards)
-  return day.stages
+  return stages
     .map(v => stageNameMap.get(v))
     .filter(v => v !== undefined)
     .sort((a, b) => b.order - a.order)
