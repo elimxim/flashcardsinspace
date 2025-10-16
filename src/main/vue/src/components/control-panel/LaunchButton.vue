@@ -134,7 +134,7 @@ function createRipple(event: MouseEvent) {
 .label {
   position: relative;
   z-index: 3;
-  font-size: clamp(8px, 1.2vw, 12px);
+  font-size: clamp(10px, 1.2vw, 14px);
   letter-spacing: .18em;
   color: var(--launch--label-color);
 }
@@ -145,7 +145,7 @@ function createRipple(event: MouseEvent) {
   inset: 0;
   display: grid;
   place-items: center;
-  font-size: clamp(8px, 1.2vw, 12px);
+  font-size: clamp(10px, 1.2vw, 14px);
   letter-spacing: .18em;
   color: var(--launch--lable-color--glowing);
   filter: blur(6px) saturate(1.3);
