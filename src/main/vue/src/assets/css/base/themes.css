@@ -194,6 +194,8 @@
   --calendar-panel-button--bg--hover: linear-gradient(135deg, rgba(240, 147, 251, 0.71) 0%, rgba(245, 87, 108, 0.69) 100%);
   --calendar-panel-button--bg--disabled: linear-gradient(135deg, #d3d3d3 0%, #a8a8a8 100%);
 
+  /* launch button */
+
   --launch-button--border-color: rgba(128, 128, 128, 0.62);
   --launch-button--color: rgba(13, 18, 74, 0.6);
   --launch-button--color--hover: rgba(255, 255, 255, 0.6);
