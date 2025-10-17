@@ -113,7 +113,7 @@ defineExpose({
 
 .awesome-icon {
   flex: 1;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease-in-out;
 }
 
 .awesome-spinning-icon {
@@ -134,5 +134,9 @@ defineExpose({
 
 .awesome-button:not(.awesome-button--disabled):hover .awesome-icon {
   transform: scale(1.1);
+}
+
+.awesome-button:not(.awesome-button--disabled):active {
+  transform: scale(0.95);
 }
 </style>
