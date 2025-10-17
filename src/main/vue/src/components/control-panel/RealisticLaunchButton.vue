@@ -72,23 +72,23 @@ function createRipple(event: MouseEvent) {
 
 <style scoped>
 .launch-button--theme {
-  --launch--size: var(--realistic-launch-button--size, 100px);
-  --launch--border-radius: var(--realistic-launch-button--border-radius, 3px);
-  --launch--label-color: var(--realistic-launch-button--text-color, #e6f7ff);
-  --launch--lable-color--glowing: var(--realistic-launch-button--text-color--glowing, #6be4ff);
-  --launch--shadow-color: var(--realistic-launch-button--shadow-color, rgba(0, 0, 0, 0.18));
-  --launch--shadow-color--hover: var(--realistic-launch-button--shadow-color, rgba(0, 0, 0, 0.3));
-  --laubch--riple--bg-color: var(--realistic-launch-button--ripple--bg-color, #fff3);
-  --launch--bg-color--from: var(--realistic-launch-button--bg-color--from, #3f4d68);
-  --launch--bg-color--via: var(--realistic-launch-button--bg-color--via, #616f8a);
+  --r-launch--size: var(--realistic-launch-button--size, 100px);
+  --r-launch--border-radius: var(--realistic-launch-button--border-radius, 3px);
+  --r-launch--label-color: var(--realistic-launch-button--text-color, #e6f7ff);
+  --r-launch--lable-color--glowing: var(--realistic-launch-button--text-color--glowing, #6be4ff);
+  --r-launch--shadow-color: var(--realistic-launch-button--shadow-color, rgba(0, 0, 0, 0.18));
+  --r-launch--shadow-color--hover: var(--realistic-launch-button--shadow-color, rgba(0, 0, 0, 0.3));
+  --r-laubch--riple--bg-color: var(--realistic-launch-button--ripple--bg-color, #fff3);
+  --r-launch--bg-color--from: var(--realistic-launch-button--bg-color--from, #3f4d68);
+  --r-launch--bg-color--via: var(--realistic-launch-button--bg-color--via, #616f8a);
 }
 
 .launch-button {
   position: relative;
   display: grid;
   place-items: center;
-  width: var(--launch--size);
-  height: var(--launch--size);
+  width: var(--r-launch--size);
+  height: var(--r-launch--size);
   aspect-ratio: 1 / 1;
   border: none;
   cursor: pointer;
@@ -96,9 +96,9 @@ function createRipple(event: MouseEvent) {
   user-select: none;
   text-transform: uppercase;
   word-break: break-word;
-  border-radius: var(--launch--border-radius);
-  background: radial-gradient(80% 60% at 50% 40%, var(--launch--bg-color--from), var(--launch--bg-color--via) 90%);
-  box-shadow: 0 2px 4px var(--launch--shadow-color);
+  border-radius: var(--r-launch--border-radius);
+  background: radial-gradient(80% 60% at 50% 40%, var(--r-launch--bg-color--from), var(--r-launch--bg-color--via) 90%);
+  box-shadow: 0 2px 4px var(--r-launch--shadow-color);
   transition: transform .12s ease, filter .25s ease, box-shadow .25s ease;
 }
 
@@ -114,7 +114,7 @@ function createRipple(event: MouseEvent) {
 .glass-pane {
   position: absolute;
   inset: 4px;
-  border-radius: var(--launch--border-radius);
+  border-radius: var(--r-launch--border-radius);
   background:
     linear-gradient(180deg, #ffffff2a, #ffffff10 40%, #00000055 80%, #0000),
     radial-gradient(60% 40% at 50% 0%, #ffffff14, #0000 60%);
@@ -132,7 +132,7 @@ function createRipple(event: MouseEvent) {
   z-index: 3;
   font-size: clamp(10px, 1.2vw, 14px);
   letter-spacing: .18em;
-  color: var(--launch--label-color);
+  color: var(--r-launch--label-color);
 }
 
 .label-glow {
@@ -143,14 +143,14 @@ function createRipple(event: MouseEvent) {
   place-items: center;
   font-size: clamp(10px, 1.2vw, 14px);
   letter-spacing: .18em;
-  color: var(--launch--lable-color--glowing);
+  color: var(--r-launch--lable-color--glowing);
   filter: blur(6px) saturate(1.3);
   opacity: .9;
 }
 
 .launch-button:not(.disabled):hover {
   filter: saturate(1.2) brightness(1.2);
-  box-shadow: 0 2px 4px var(--launch--shadow-color--hover)
+  box-shadow: 0 2px 4px var(--r-launch--shadow-color--hover)
 }
 
 .launch-button:not(.disabled):hover .label-glow {
@@ -163,7 +163,7 @@ function createRipple(event: MouseEvent) {
   border-radius: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  background: var(--laubch--riple--bg-color);
+  background: var(--r-laubch--riple--bg-color);
   animation: ripple .65s ease-out forwards;
   z-index: 4
 }
