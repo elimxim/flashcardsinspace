@@ -45,7 +45,6 @@ import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import { loadFlashcardSetStore } from '@/shared/stores.ts'
 
-
 const flashcardStore = useFlashcardStore()
 const modalStore = useModalStore()
 

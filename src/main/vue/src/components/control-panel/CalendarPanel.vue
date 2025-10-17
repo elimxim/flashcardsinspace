@@ -142,7 +142,7 @@ import {
   chronodayStatuses,
   isCompleteAvailable,
   selectConsecutiveDaysBefore
-} from '@/core-logic/chrono-logic.ts';
+} from '@/core-logic/chrono-logic.ts'
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
@@ -189,6 +189,8 @@ const previousDaysFrom = computed(() => {
   const days = previousDays.value
   if (days.length !== 0) {
     return days[days.length - 1]
+  } else {
+    return currDay.value
   }
 })
 
@@ -196,6 +198,8 @@ const previousDaysTo = computed(() => {
   const days = previousDays.value
   if (days.length !== 0) {
     return days[0]
+  } else {
+    return currDay.value
   }
 })
 

@@ -11,7 +11,6 @@ import type { Chronoday } from '@/model/chrono.ts'
 import { storeToRefs } from 'pinia'
 import { shuffle } from '@/utils/array.ts'
 import {
-  chronodayStatuses,
   isCompleteAvailable,
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
