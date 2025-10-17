@@ -46,6 +46,7 @@ export function selectConsecutiveDaysBefore(
   including: boolean = true,
 ): Chronoday[] {
   if (chronodays.length === 0) return []
+  if (startDay.status === chronodayStatuses.INITIAL) return []
 
   const startDayIndex = chronodays.findIndex(day => day.id === startDay.id)
   const startIndex = including ? startDayIndex : startDayIndex - 1
