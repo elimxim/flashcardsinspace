@@ -69,8 +69,11 @@
         class="calendar-popup"
       >
         <div class="calendar-popup-layout">
-          <div class="calendar-popup-header">
-            You have uncompleted days before
+          <div v-if="previousDaysFrom !== previousDaysTo" class="calendar-popup-header">
+            You have uncompleted previous days
+          </div>
+          <div v-else class="calendar-popup-header">
+            You have an uncompleted previous day
           </div>
           <div v-if="previousDaysFrom !== previousDaysTo" class="calendar-popup-days-range">
             <div class="calendar-popup-text">
@@ -91,7 +94,7 @@
               {{ previousDaysTo?.seqNumber }}
             </div>
           </div>
-          <div class="calendar-popup-review">
+          <div v-if="prevDaysReviewTotal > 0" class="calendar-popup-review">
             <div class="calendar-popup-text">
               With the total number of flashcards to review
             </div>
@@ -100,6 +103,12 @@
                 {{ prevDaysReviewTotal }}
               </div>
             </div>
+          </div>
+          <div v-else-if="previousDaysFrom !== previousDaysTo" class="calendar-popup-text">
+            They will be completed since you complete the current day
+          </div>
+          <div v-else class="calendar-popup-text">
+            It will be completed since you complete the current day
           </div>
         </div>
       </div>
