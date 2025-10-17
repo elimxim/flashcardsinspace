@@ -73,7 +73,7 @@ defineExpose({
   --btn--bg--disabled: var(--awesome-button--bg--disabled, none);
   --btn--border: var(--awesome-button--border, none);
   --btn--border--hover: var(--awesome-button--border--hover, none);
-  --btn--border-radius: var(--awesome-button--border-radius, none);
+  --r-launch--border-radius: var(--awesome-button--border-radius, none);
   --btn--padding: var(--awesome-button--padding, 1px);
 }
 
@@ -85,7 +85,7 @@ defineExpose({
   color: var(--btn--color);
   background: var(--btn--bg);
   border: var(--btn--border);
-  border-radius: var(--btn--border-radius);
+  border-radius: var(--r-launch--border-radius);
   outline: none;
   cursor: pointer;
   margin: 0;
@@ -136,7 +136,4 @@ defineExpose({
   transform: scale(1.1);
 }
 
-.awesome-button:not(.awesome-button--disabled):active {
-  transform: scale(0.95);
-}
 </style>
