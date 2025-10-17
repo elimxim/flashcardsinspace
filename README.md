@@ -11,11 +11,17 @@
   - Footer
   - Bugreport form
   - Review Session
+  - Streak of days
+  - Statistics page
+    - How much time you've spent review in total, daily, weekly, monthly, yearly
+    - The top 10 most looked at flashcards
+    - Charts
   - Control Panel (instead of Main Menu)
     - Showing duplicated flashcards
     - Uploading/downloading flashcards to/from csv
     - Showing removed flashcard sets
     - Showing removed flashcards
+    - Search flashcards
   - Flashcard
     - Copy button
     - Delete button
