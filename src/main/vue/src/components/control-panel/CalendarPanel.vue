@@ -8,7 +8,7 @@
         v-if="hasNotCompletedPreviousDays"
         class="calendar-panel-info"
         icon="fa-solid fa-circle-exclamation"
-        :on-click="togglePreviousDaysPopup"
+        :on-hover="togglePreviousDaysPopup"
       />
       <div class="current-day-panel-layout">
         <div class="current-day-panel__left-area">
@@ -376,7 +376,7 @@ const calendarIcon = computed(() => {
   left: 0;
   margin-top: 4px;
   background-color: transparent;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(40px);
   border: 1px solid var(--panel--border-color);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
