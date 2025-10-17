@@ -76,7 +76,6 @@ function willSlideToRight() {
 }
 
 function prepareSlideTransition(value: string) {
-  spaceCard.value?.flipToFront()
   if (!deckReady.value) {
     cardTransition.value = ''
     return
