@@ -4,6 +4,12 @@
       <div class="calendar-panel-label">
         Current day
       </div>
+      <AwesomeButton
+        v-if="hasNotCompletedPreviousDays"
+        class="calendar-panel-info"
+        icon="fa-solid fa-circle-exclamation"
+        :on-click="togglePreviousDaysPopup"
+      />
       <div class="current-day-panel-layout">
         <div class="current-day-panel__left-area">
           <AwesomeButton
@@ -56,14 +62,6 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="calendar-panel-info-wrapper">
-      <AwesomeButton
-        v-if="hasNotCompletedPreviousDays"
-        class="calendar-panel-info"
-        icon="fa-solid fa-circle-exclamation"
-        :on-click="togglePreviousDaysPopup"
-      />
     </div>
     <Transition name="slide-fade">
       <div
@@ -227,7 +225,15 @@ const calendarIcon = computed(() => {
   padding: 0 0 0 6px;
 }
 
+.calendar-panel-info {
+  position: absolute;
+  top: -4px;
+  right: -16px;
+  z-index: 10;
+}
+
 .current-day-panel {
+  position: relative;
   display: flex;
   flex-direction: column;
   padding: 1px;
@@ -364,13 +370,6 @@ const calendarIcon = computed(() => {
   text-align: center;
 }
 
-.calendar-panel-info-wrapper {
-  display: flex;
-  flex-direction: column;
-  padding: 2px;
-  background: pink;
-}
-
 .calendar-popup {
   position: absolute;
   top: 100%;
@@ -436,11 +435,11 @@ const calendarIcon = computed(() => {
 }
 
 .slide-fade-enter-active {
-  transition: all 0.2s ease-out;
+  transition: opacity 0.2s ease-out;
 }
 
 .slide-fade-leave-active {
-  transition: all 0.2s ease-in;
+  transition: opacity 0.2s ease-in;
 }
 
 .slide-fade-enter-from {
