@@ -64,44 +64,44 @@ defineExpose({
 
 <style scoped>
 .awesome-button--theme {
-  --btn--fontsize: var(--awesome-button--font-size, 1.2rem);
-  --btn--color: var(--awesome-button--color, #818181);
-  --btn--color--hover: var(--awesome-button--color--hover, #404040);
-  --btn--color--disabled: var(--awesome-button--color--disabled, #cacaca);
-  --btn--bg: var(--awesome-button--bg, none);
-  --btn--bg--hover: var(--awesome-button--bg--hover, none);
-  --btn--bg--disabled: var(--awesome-button--bg--disabled, none);
-  --btn--border: var(--awesome-button--border, none);
-  --btn--border--hover: var(--awesome-button--border--hover, none);
-  --r-launch--border-radius: var(--awesome-button--border-radius, none);
-  --btn--padding: var(--awesome-button--padding, 1px);
+  --a-btn--fontsize: var(--awesome-button--font-size, 1.2rem);
+  --a-btn--color: var(--awesome-button--color, #818181);
+  --a-btn--color--hover: var(--awesome-button--color--hover, #404040);
+  --a-btn--color--disabled: var(--awesome-button--color--disabled, #cacaca);
+  --a-btn--bg: var(--awesome-button--bg, none);
+  --a-btn--bg--hover: var(--awesome-button--bg--hover, none);
+  --a-btn--bg--disabled: var(--awesome-button--bg--disabled, none);
+  --a-btn--border: var(--awesome-button--border, none);
+  --a-btn--border--hover: var(--awesome-button--border--hover, none);
+  --a-btn--border-radius: var(--awesome-button--border-radius, none);
+  --a-btn--padding: var(--awesome-button--padding, 1px);
 }
 
 .awesome-button {
   position: relative;
   display: flex;
   align-items: center;
-  font-size: var(--btn--fontsize);
-  color: var(--btn--color);
-  background: var(--btn--bg);
-  border: var(--btn--border);
-  border-radius: var(--r-launch--border-radius);
+  font-size: var(--a-btn--fontsize);
+  color: var(--a-btn--color);
+  background: var(--a-btn--bg);
+  border: var(--a-btn--border);
+  border-radius: var(--a-btn--border-radius);
   outline: none;
   cursor: pointer;
   margin: 0;
-  padding: var(--btn--padding);
+  padding: var(--a-btn--padding);
   transition: all 0.3s ease-in-out;
   overflow: hidden;
 }
 
 .awesome-button:not(.awesome-button--disabled):hover {
-  color: var(--btn--color--hover);
-  background: var(--btn--bg--hover);
+  color: var(--a-btn--color--hover);
+  background: var(--a-btn--bg--hover);
 }
 
 .awesome-button--disabled {
-  color: var(--btn--color--disabled);
-  background: var(--btn--bg--disabled);
+  color: var(--a-btn--color--disabled);
+  background: var(--a-btn--bg--disabled);
   cursor: default;
   box-shadow: none;
   transform: none;
@@ -118,8 +118,8 @@ defineExpose({
 
 .awesome-spinning-icon {
   flex: 1;
-  color: var(--btn--color--hover);
-  background: var(--btn--bg--hover);
+  color: var(--a-btn--color--hover);
+  background: var(--a-btn--bg--hover);
   animation: spin 2s linear infinite;
 }
 
