@@ -39,7 +39,7 @@
 import FlashcardSetSideBar from '@/components/control-panel/FlashcardSetSideBar.vue'
 import CalendarPanel from '@/components/control-panel/CalendarPanel.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import LaunchButton from '@/components/control-panel/LaunchButton.vue'
+import RealisticLaunchButton from '@/components/control-panel/RealisticLaunchButton.vue'
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
 import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.vue'
 import FlashcardModificationModal from '@/views/modal/FlashcardModificationModal.vue'
@@ -131,7 +131,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: flex-start;
   padding: 8px;
-  border: 2px solid #0d124a;
+
   border-radius: 4px;
   margin: 4px;
   flex-wrap: wrap;
