@@ -25,32 +25,33 @@
           </div>
         </div>
         <div class="current-day-panel__right-area">
-          <div class="review-stages-header"/>
-          <div class="review-numbers-header">
+          <div class="current-day-header">
             To review
           </div>
-          <div class="review-stages-wrapper">
-            <div
-              v-for="review in currDayStageReviews"
-              :key="review.stage"
-              class="review-stage"
-            >
-              {{ review.stage }}
+          <div class="review-grid">
+            <div class="review-stages-wrapper">
+              <div
+                v-for="review in currDayStageReviews"
+                :key="review.stage"
+                class="review-stage"
+              >
+                {{ review.stage }}
+              </div>
+              <div class="review-stage">
+                Total
+              </div>
             </div>
-            <div class="review-stage">
-              Total
-            </div>
-          </div>
-          <div class="review-numbers-wrapper">
-            <div
-              v-for="review in currDayStageReviews"
-              :key="review.stage"
-              class="review-number"
-            >
-              {{ review.count }}
-            </div>
-            <div class="review-number">
-              {{ currDayReviewTotal }}
+            <div class="review-numbers-wrapper">
+              <div
+                v-for="review in currDayStageReviews"
+                :key="review.stage"
+                class="review-number"
+              >
+                {{ review.count }}
+              </div>
+              <div class="review-number">
+                {{ currDayReviewTotal }}
+              </div>
             </div>
           </div>
         </div>
@@ -85,6 +86,9 @@
           <div class="calendar-day-number">
             {{ previousDaysTo?.seqNumber }}
           </div>
+        </div>
+        <div class="previous-days-footer">
+          They will be completed once you complete the current day
         </div>
       </div>
     </div>
@@ -186,19 +190,7 @@ const calendarIcon = computed(() => {
 .calendar-panel {
   display: flex;
   flex-direction: row;
-  gap: 10px;
-}
-
-.current-day-panel {
-  display: flex;
-  flex-direction: column;
-  padding: 1px;
-}
-
-.previous-days-panel {
-  display: flex;
-  flex-direction: column;
-  padding: 1px;
+  gap: 6px;
 }
 
 .calendar-panel-label {
@@ -210,19 +202,33 @@ const calendarIcon = computed(() => {
   padding: 0 0 0 6px;
 }
 
+.current-day-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 1px;
+}
+
 .current-day-panel-layout {
   display: flex;
   flex-direction: row;
-  padding: 2px 6px 4px 4px;
-  gap: 10px;
+  padding: 0 4px 4px 4px;
+  gap: 4px;
   border: 1px solid var(--panel--border-color);
   border-radius: 6px;
+  width: clamp(180px, 20vw, 200px);
+  height: clamp(110px, 20vw, 120px);
+}
+
+.previous-days-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 1px;
 }
 
 .previous-days-layout {
   display: flex;
   flex-direction: column;
-  padding: 2px 6px;
+  padding: 0 4px 4px 4px;
   gap: 2px;
   border: 1px solid var(--panel--border-color);
   border-radius: 6px;
@@ -233,8 +239,10 @@ const calendarIcon = computed(() => {
   grid-template-rows: 1fr auto;
   flex-direction: column;
   justify-content: space-between;
-  gap: 6px;
-  margin: 4px;
+  gap: 4px;
+  margin: 4px 0;
+  height: 100%;
+  width: 100%;
 }
 
 .current-calendar-day {
@@ -242,89 +250,99 @@ const calendarIcon = computed(() => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  height: 20px;
+  padding: 4px;
+  gap: clamp(4px, 1vw, 8px);
 }
 
 .calendar-day-text {
-  font-size: clamp(0.85rem, 1.8vw, 0.9rem);
+  font-size: clamp(0.75rem, 1.5vw, 0.9rem);
   color: var(--panel--text-color);
   white-space: nowrap;
 }
 
 .calendar-day-number {
-  font-size: clamp(0.85rem, 1.8vw, 0.9rem);
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
   font-weight: 600;
   border: 1px solid var(--panel--border-color);
   color: var(--panel--number-color);
   border-radius: 3px;
+  padding: 1px;
+  width: clamp(30px, 4vw, 40px);
+  text-align: center;
+}
+
+.calendar-day-vacation {
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
   padding: 2px;
   width: 40px;
   text-align: center;
 }
 
-.calendar-day-vacation {
-  font-size: clamp(0.85rem, 1.8vw, 0.9rem);
-  width: 40px;
-  text-align: center;
-}
-
 .current-day-panel__right-area {
-  display: grid;
-  grid-template-columns: auto auto;
-  grid-template-rows: auto repeat(3, 1fr);
-  gap: 1px 10px;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  height: 100%;
+  width: 100%;
 }
 
-.review-stages-header {
-  font-size: clamp(0.5rem, 1.5vw, 0.6rem);
-}
-
-.review-numbers-header {
-  font-size: clamp(0.5rem, 1.5vw, 0.6rem);
+.current-day-header {
+  font-size: clamp(0.5rem, 1vw, 0.6rem);
   color: var(--panel--review--header-color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
-  text-align: center;
+  text-align: end;
   white-space: nowrap;
 }
 
+.review-grid {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  grid-auto-flow: column;
+  gap: 0 4px;
+  align-items: center;
+}
+
 .review-stages-wrapper {
-  grid-row: 2 / 5;
   grid-column: 1 / 2;
+  grid-row: 1 / 4;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 6px;
   padding: 10px 0;
   border-radius: 4px;
+  height: 100%;
+  min-height: 0;
+}
+
+.review-numbers-wrapper {
+  grid-column: 2 / 3;
+  grid-row: 1 / 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 4px;
+  border-radius: 4px;
+  height: 100%;
+  min-height: 0;
+  background: var(--panel--review--bg);
 }
 
 .review-stage {
-  font-size: clamp(0.85rem, 1.8vw, 0.9rem);
+  font-size: clamp(0.75rem, 1.5vw, 0.9rem);
   color: var(--panel--text-color);
   white-space: nowrap;
   padding: 3px 0;
 }
 
-.review-numbers-wrapper {
-  grid-row: 2 / 5;
-  grid-column: 2 / 3;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 0;
-  border-radius: 4px;
-  background: var(--panel--review--bg);
-}
-
 .review-number {
-  font-size: clamp(0.85rem, 1.8vw, 0.9rem);
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
   font-weight: 600;
   border: 1px solid var(--panel--border-color);
   color: var(--panel--number-color);
@@ -335,13 +353,22 @@ const calendarIcon = computed(() => {
 }
 
 .previous-days-header {
-  font-size: clamp(0.5rem, 1.5vw, 0.6rem);
+  font-size: clamp(0.5rem, 1vw, 0.6rem);
   color: var(--panel--review--header-color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
   text-align: start;
   white-space: nowrap;
+}
+
+.previous-days-footer {
+  font-size: clamp(0.5rem, 1vw, 0.6rem);
+  color: var(--panel--review--header-color);
+  letter-spacing: 0.05rem;
+  word-spacing: 0.05rem;
+  text-transform: uppercase;
+  text-align: start;
 }
 
 .previous-days-range {
