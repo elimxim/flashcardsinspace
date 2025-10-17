@@ -156,7 +156,7 @@ onMounted(() => {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 280px;
+  width: clamp(200px, 40vw, 280px);
   height: 100%;
   background-color: var(--bar--bg-color);
   transition: margin-left 0.35s ease-in-out;
@@ -164,7 +164,7 @@ onMounted(() => {
 }
 
 .sidebar--collapsed {
-  margin-left: -280px;
+  margin-left: clamp(-280px, -40vw, -200px);
 }
 
 .sidebar-header {
