@@ -63,7 +63,7 @@
         </div>
       </div>
     </div>
-    <Transition name="slide-fade">
+    <transition name="slide-fade">
       <div
         v-if="hasNotCompletedPreviousDays && showPreviousDaysPopup"
         class="calendar-popup"
@@ -124,7 +124,7 @@
           </div>
         </div>
       </div>
-    </Transition>
+    </transition>
   </div>
   <CalendarModal/>
 </template>
@@ -375,7 +375,7 @@ const calendarIcon = computed(() => {
 
 .review-stage {
   font-size: clamp(0.75rem, 1.5vw, 0.9rem);
-  color: var(--panel--text-color);
+  color: var(--d-panel--text-color);
   white-space: nowrap;
   padding: 3px 0;
 }
