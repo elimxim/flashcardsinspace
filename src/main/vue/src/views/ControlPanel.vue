@@ -22,9 +22,7 @@
         <div class="launch-panel">
           <CalendarPanel/>
           <LaunchButton
-            label="Start Review"
             :on-click="onLaunch"
-            :disabled="false"
           />
         </div>
       </div>
@@ -39,7 +37,7 @@
 import FlashcardSetSideBar from '@/components/control-panel/FlashcardSetSideBar.vue'
 import CalendarPanel from '@/components/control-panel/CalendarPanel.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import RealisticLaunchButton from '@/components/control-panel/RealisticLaunchButton.vue'
+import LaunchButton from '@/components/control-panel/LaunchButton.vue'
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
 import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.vue'
 import FlashcardModificationModal from '@/views/modal/FlashcardModificationModal.vue'
