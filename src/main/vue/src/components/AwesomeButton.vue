@@ -9,6 +9,8 @@
     :disabled="disabled"
     v-bind="$attrs"
     @click.stop="press"
+    @mouseenter="onHover"
+    @mouseleave="onHover"
   >
     <font-awesome-icon
       v-if="pressed && spinnable"
@@ -34,6 +36,7 @@ const props = withDefaults(defineProps<{
   hidden?: boolean
   invisible?: boolean
   onClick?: () => void
+  onHover?: () => void
 }>(), {
   spinnable: false,
   spinIcon: undefined,
@@ -41,6 +44,8 @@ const props = withDefaults(defineProps<{
   hidden: false,
   invisible: false,
   onClick: () => {
+  },
+  onHover: () => {
   },
 })
 
