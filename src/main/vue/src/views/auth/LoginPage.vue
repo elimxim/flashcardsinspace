@@ -10,7 +10,6 @@
     <div
       ref="lilrocket"
       class="lilrocket"
-      :class="{ 'initial-bounce': isBouncing }"
       @mousedown="onMouseDown"
       @mouseup="onMouseUp"
       @mouseleave="onMouseUp"
@@ -94,7 +93,6 @@ const toaster = useSpaceToaster()
 
 const userEmail = ref('')
 const userPassword = ref('')
-const isBouncing = ref(true)
 const loginFailed = ref(false)
 
 const $v = useVuelidate({
@@ -203,7 +201,6 @@ function onMouseDown() {
       }
       nextTick(() => {
         setNextLilrocket()
-        setBouncingTimeout()
       })
     }, 4000)
   }, 500)
@@ -216,16 +213,8 @@ function onMouseUp() {
   clearTimeout(pressTimer)
 }
 
-function setBouncingTimeout() {
-  isBouncing.value = true
-  setTimeout(() => {
-    isBouncing.value = false
-  }, 1000)
-}
-
 onMounted(() => {
   setRandomLilrocket()
-  setBouncingTimeout()
 })
 
 // <lilrocket
@@ -244,20 +233,7 @@ onMounted(() => {
 }
 
 .lilrocket.initial-bounce {
-  animation: bounce-in 1s ease-in-out,
-  shake 4s infinite 1s ease-in-out;
-}
-
-@keyframes bounce-in {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
+  animation: shake 4s infinite 1s ease-in-out;
 }
 
 .lilrocket:hover {
