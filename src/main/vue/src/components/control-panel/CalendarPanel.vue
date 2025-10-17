@@ -1,6 +1,6 @@
 <template>
   <div class="calendar-panel calendar-panel--theme">
-    <div class="current-day-panel">
+    <div class="calendar-panel-content">
       <div class="calendar-panel-label">
         Current day
       </div>
@@ -10,15 +10,15 @@
         icon="fa-solid fa-circle-exclamation"
         :on-hover="togglePreviousDaysPopup"
       />
-      <div class="current-day-panel-layout">
-        <div class="current-day-panel__left-area">
+      <div class="calendar-panel-layout">
+        <div class="calendar-panel-left-area">
           <AwesomeButton
             :icon="calendarIcon"
             class="calendar-panel-button"
             :disabled="!flashcardSet"
             :on-click="modalStore.toggleCalendar"
           />
-          <div class="current-calendar-day">
+          <div class="calendar-panel-day">
             <div class="calendar-day-text">
               Day
             </div>
@@ -30,12 +30,12 @@
             </div>
           </div>
         </div>
-        <div class="current-day-panel__right-area">
-          <div class="current-day-header">
+        <div class="calendar-panel-right-area">
+          <div class="calendar-panel-review-header">
             To review
           </div>
           <div class="review-grid">
-            <div class="review-stages-wrapper">
+            <div class="review-stage-column">
               <div
                 v-for="review in currDayStageReviews"
                 :key="review.stage"
@@ -47,7 +47,7 @@
                 Total
               </div>
             </div>
-            <div class="review-numbers-wrapper">
+            <div class="review-number-column">
               <div
                 v-for="review in currDayStageReviews"
                 :key="review.stage"
@@ -69,13 +69,19 @@
         class="calendar-popup"
       >
         <div class="calendar-popup-layout">
-          <div v-if="previousDaysFrom !== previousDaysTo" class="calendar-popup-header">
+          <div
+            v-if="previousDaysFrom !== previousDaysTo"
+            class="calendar-popup-header"
+          >
             You have uncompleted previous days
           </div>
           <div v-else class="calendar-popup-header">
             You have an uncompleted previous day
           </div>
-          <div v-if="previousDaysFrom !== previousDaysTo" class="calendar-popup-days-range">
+          <div
+            v-if="previousDaysFrom !== previousDaysTo"
+            class="calendar-popup-centered-row"
+          >
             <div class="calendar-popup-text">
               From
             </div>
@@ -89,12 +95,15 @@
               {{ previousDaysTo?.seqNumber }}
             </div>
           </div>
-          <div v-else class="calendar-popup-days-range">
+          <div v-else class="calendar-popup-centered-row">
             <div class="calendar-day-number">
               {{ previousDaysTo?.seqNumber }}
             </div>
           </div>
-          <div v-if="prevDaysReviewTotal > 0" class="calendar-popup-review">
+          <div
+            v-if="prevDaysReviewTotal > 0"
+            class="calendar-popup-review"
+          >
             <div class="calendar-popup-text">
               With the total number of flashcards to review
             </div>
@@ -104,7 +113,10 @@
               </div>
             </div>
           </div>
-          <div v-else-if="previousDaysFrom !== previousDaysTo" class="calendar-popup-text">
+          <div
+            v-else-if="previousDaysFrom !== previousDaysTo"
+            class="calendar-popup-text"
+          >
             They will be completed since you complete the current day
           </div>
           <div v-else class="calendar-popup-text">
@@ -241,14 +253,14 @@ const calendarIcon = computed(() => {
   z-index: 10;
 }
 
-.current-day-panel {
+.calendar-panel-content {
   position: relative;
   display: flex;
   flex-direction: column;
   padding: 1px;
 }
 
-.current-day-panel-layout {
+.calendar-panel-layout {
   display: flex;
   flex-direction: row;
   padding: 0 4px 4px 4px;
@@ -259,7 +271,7 @@ const calendarIcon = computed(() => {
   height: clamp(110px, 20vw, 120px);
 }
 
-.current-day-panel__left-area {
+.calendar-panel-left-area {
   display: grid;
   grid-template-rows: 1fr auto;
   flex-direction: column;
@@ -269,7 +281,14 @@ const calendarIcon = computed(() => {
   margin: 4px 0;
 }
 
-.current-calendar-day {
+.calendar-panel-right-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.calendar-panel-day {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -306,14 +325,7 @@ const calendarIcon = computed(() => {
   text-align: center;
 }
 
-.current-day-panel__right-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.current-day-header {
+.calendar-panel-review-header {
   font-size: clamp(0.5rem, 1vw, 0.6rem);
   color: var(--d-panel--review--header-color);
   letter-spacing: 0.05rem;
@@ -334,7 +346,7 @@ const calendarIcon = computed(() => {
   align-items: center;
 }
 
-.review-stages-wrapper {
+.review-stage-column {
   grid-column: 1 / 2;
   grid-row: 1 / 4;
   display: flex;
@@ -347,7 +359,7 @@ const calendarIcon = computed(() => {
   min-height: 0;
 }
 
-.review-numbers-wrapper {
+.review-number-column {
   grid-column: 2 / 3;
   grid-row: 1 / 4;
   display: flex;
@@ -421,7 +433,7 @@ const calendarIcon = computed(() => {
   text-align: center;
 }
 
-.calendar-popup-days-range {
+.calendar-popup-centered-row {
   display: flex;
   flex-direction: row;
   justify-content: center;
