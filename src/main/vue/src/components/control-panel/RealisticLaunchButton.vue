@@ -72,15 +72,15 @@ function createRipple(event: MouseEvent) {
 
 <style scoped>
 .launch-button--theme {
-  --launch--size: var(--launch-button--size, 100px);
-  --launch--border-radius: var(--launch-button--border-radius, 3px);
-  --launch--label-color: var(--launch-button--text-color, #e6f7ff);
-  --launch--lable-color--glowing: var(--launch-button--text-color--glowing, #6be4ff);
-  --launch--shadow-color: var(--launch-button--shadow-color, rgba(0, 0, 0, 0.18));
-  --launch--shadow-color--hover: var(--launch-button--shadow-color, rgba(0, 0, 0, 0.3));
-  --laubch--riple--bg-color: var(--launch-button--ripple--bg-color, #fff3);
-  --launch--bg-color--from: var(--launch-button--bg-color--from, #3f4d68);
-  --launch--bg-color--via: var(--launch-button--bg-color--via, #616f8a);
+  --launch--size: var(--realistic-launch-button--size, 100px);
+  --launch--border-radius: var(--realistic-launch-button--border-radius, 3px);
+  --launch--label-color: var(--realistic-launch-button--text-color, #e6f7ff);
+  --launch--lable-color--glowing: var(--realistic-launch-button--text-color--glowing, #6be4ff);
+  --launch--shadow-color: var(--realistic-launch-button--shadow-color, rgba(0, 0, 0, 0.18));
+  --launch--shadow-color--hover: var(--realistic-launch-button--shadow-color, rgba(0, 0, 0, 0.3));
+  --laubch--riple--bg-color: var(--realistic-launch-button--ripple--bg-color, #fff3);
+  --launch--bg-color--from: var(--realistic-launch-button--bg-color--from, #3f4d68);
+  --launch--bg-color--via: var(--realistic-launch-button--bg-color--via, #616f8a);
 }
 
 .launch-button {
