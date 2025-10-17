@@ -28,14 +28,14 @@ import AwesomeButton from '@/components/AwesomeButton.vue'
 .launch-button--theme {
   --l-btn--text-color: var(--launch-button--text-color, #e2e8f0);
   --l-btn--text-shadow-color: var(--launch-button--text-shadow-color, rgba(0, 0, 0, 0.3));
-  --awesome-button--font-size: 60px;
+  --awesome-button--font-size: clamp(40px, 10vw, 60px);
   --awesome-button--color: var(--launch-button--color);
   --awesome-button--color--hover: var(--launch-button--color--hover);
   --awesome-button--bg: var(--launch-button--bg);
   --awesome-button--bg--hover: var(--launch-button--bg--hover);
   --awesome-button--bg--disabled: var(--launch-button--bg--disabled);
   --awesome-button--border-radius: 6px;
-  --awesome-button--padding: 30px;
+  --awesome-button--padding: clamp(16px, 4vw, 20px);
 }
 
 .launch-button {
