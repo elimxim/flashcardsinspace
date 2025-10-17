@@ -61,7 +61,7 @@
       <div class="calendar-panel-label">
         Previous days
       </div>
-      <div class="previous-days-layout">
+      <div class="previous-days-panel-layout">
         <div class="previous-days-header">
           You have uncompleted days
         </div>
@@ -105,7 +105,11 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { storeToRefs } from 'pinia'
-import { isCompleteAvailable, selectConsecutiveDaysBefore } from '@/core-logic/chrono-logic.ts';
+import {
+  chronodayStatuses,
+  isCompleteAvailable,
+  selectConsecutiveDaysBefore
+} from '@/core-logic/chrono-logic.ts';
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
@@ -166,7 +170,7 @@ const prevDaysReviewTotal = computed(() => {
 })
 
 const calendarIcon = computed(() => {
-  if (isOnVacation.value) {
+  if (isOnVacation.value || currDay.value.status === chronodayStatuses.INITIAL) {
     return 'fa-solid fa-calendar'
   } else if (currDayReviewTotal.value === 0) {
     return 'fa-solid fa-calendar-check'
@@ -225,13 +229,15 @@ const calendarIcon = computed(() => {
   padding: 1px;
 }
 
-.previous-days-layout {
+.previous-days-panel-layout {
   display: flex;
   flex-direction: column;
   padding: 0 4px 4px 4px;
   gap: 2px;
   border: 1px solid var(--panel--border-color);
   border-radius: 6px;
+  width: clamp(180px, 20vw, 210px);
+  height: clamp(110px, 20vw, 120px);
 }
 
 .current-day-panel__left-area {
@@ -239,10 +245,9 @@ const calendarIcon = computed(() => {
   grid-template-rows: 1fr auto;
   flex-direction: column;
   justify-content: space-between;
-  gap: 4px;
-  margin: 4px 0;
+  gap: 8px;
   height: 100%;
-  width: 100%;
+  margin: 4px 0;
 }
 
 .current-calendar-day {
@@ -272,18 +277,21 @@ const calendarIcon = computed(() => {
 }
 
 .calendar-day-vacation {
-  font-size: clamp(0.75rem, 1vw, 0.9rem);
-  padding: 2px;
-  width: 40px;
+  font-size: clamp(0.70rem, 2vw, 0.8rem);
+  font-weight: 600;
+  border: 1px solid var(--panel--border-color);
+  color: var(--panel--number-color);
+  border-radius: 3px;
+  padding: 1px;
+  width: clamp(30px, 4vw, 40px);
   text-align: center;
 }
 
 .current-day-panel__right-area {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 1px;
-  height: 100%;
-  width: 100%;
 }
 
 .current-day-header {
@@ -358,7 +366,7 @@ const calendarIcon = computed(() => {
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
-  text-align: start;
+  text-align: center;
   white-space: nowrap;
 }
 
@@ -368,7 +376,7 @@ const calendarIcon = computed(() => {
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
-  text-align: start;
+  text-align: center;
 }
 
 .previous-days-range {
