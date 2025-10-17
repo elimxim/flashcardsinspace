@@ -5,10 +5,6 @@
     class="launch-button launch-button--theme"
     type="button"
     :class="{ disabled }"
-    :style="{
-      '--accent': accent,
-      '--glow': glow,
-    }"
     :disabled="disabled"
     @click="onPress"
   >
