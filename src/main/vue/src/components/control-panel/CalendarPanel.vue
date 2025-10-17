@@ -57,41 +57,55 @@
         </div>
       </div>
     </div>
-    <div v-if="hasNotCompletedPreviousDays" class="previous-days-panel">
-      <div class="calendar-panel-label">
-        Previous days
-      </div>
-      <div class="previous-days-panel-layout">
-        <div class="previous-days-header">
-          You have uncompleted days
-        </div>
-        <div v-if="previousDaysFrom !== previousDaysTo" class="previous-days-range">
-          <div class="calendar-day-text">
-            From
-          </div>
-          <div class="calendar-day-number">
-            {{ previousDaysFrom?.seqNumber }}
-          </div>
-          <div class="calendar-day-text">
-            To
-          </div>
-          <div class="calendar-day-number">
-            {{ previousDaysTo?.seqNumber }}
-          </div>
-        </div>
-        <div v-else class="previous-days-range">
-          <div class="calendar-day-text">
-            Day
-          </div>
-          <div class="calendar-day-number">
-            {{ previousDaysTo?.seqNumber }}
-          </div>
-        </div>
-        <div class="previous-days-footer">
-          They will be completed once you complete the current day
-        </div>
-      </div>
+    <div class="calendar-panel-info-wrapper">
+      <AwesomeButton
+        v-if="hasNotCompletedPreviousDays"
+        class="calendar-panel-info"
+        icon="fa-solid fa-circle-exclamation"
+        :on-click="togglePreviousDaysPopup"
+      />
     </div>
+    <Transition name="slide-fade">
+      <div
+        v-if="hasNotCompletedPreviousDays && showPreviousDaysPopup"
+        class="calendar-popup"
+      >
+        <div class="calendar-popup-layout">
+          <div class="calendar-popup-header">
+            You have uncompleted days before
+          </div>
+          <div v-if="previousDaysFrom !== previousDaysTo" class="calendar-popup-days-range">
+            <div class="calendar-popup-text">
+              From
+            </div>
+            <div class="calendar-day-number">
+              {{ previousDaysFrom?.seqNumber }}
+            </div>
+            <div class="calendar-popup-text">
+              To
+            </div>
+            <div class="calendar-day-number">
+              {{ previousDaysTo?.seqNumber }}
+            </div>
+          </div>
+          <div v-else class="calendar-popup-days-range">
+            <div class="calendar-day-number">
+              {{ previousDaysTo?.seqNumber }}
+            </div>
+          </div>
+          <div class="calendar-popup-review">
+            <div class="calendar-popup-text">
+              With the total number of flashcards to review
+            </div>
+            <div class="calendar-popup-review-total">
+              <div class="review-number">
+                {{ prevDaysReviewTotal }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
   <CalendarModal/>
 </template>
@@ -99,7 +113,7 @@
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import CalendarModal from '@/views/modal/CalendarModal.vue'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { calcStageReviews, StageReview } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
@@ -117,6 +131,12 @@ const modalStore = useModalStore()
 
 const { flashcardSet, flashcards, isSuspended } = storeToRefs(flashcardStore)
 const { currDay, isDayOff } = storeToRefs(chronoStore)
+
+const showPreviousDaysPopup = ref(false)
+
+const togglePreviousDaysPopup = () => {
+  showPreviousDaysPopup.value = !showPreviousDaysPopup.value
+}
 
 const isOnVacation = computed(() => isSuspended.value || isDayOff.value)
 const currDayNumber = computed(() =>
@@ -183,6 +203,7 @@ const calendarIcon = computed(() => {
 
 <style scoped>
 .calendar-panel--theme {
+  font-family: var(--main-font-family);
   --panel--label-color: var(--calendar-panel--label-color, #555555);
   --panel--text-color: var(--calendar-panel--text-color, rgba(57, 57, 57, 0.92));
   --panel--number-color: var(--calendar-panel--number-color, rgba(17, 33, 85, 0.92));
@@ -192,9 +213,9 @@ const calendarIcon = computed(() => {
 }
 
 .calendar-panel {
+  position: relative;
   display: flex;
   flex-direction: row;
-  gap: 6px;
 }
 
 .calendar-panel-label {
@@ -220,23 +241,6 @@ const calendarIcon = computed(() => {
   border: 1px solid var(--panel--border-color);
   border-radius: 6px;
   width: clamp(180px, 20vw, 200px);
-  height: clamp(110px, 20vw, 120px);
-}
-
-.previous-days-panel {
-  display: flex;
-  flex-direction: column;
-  padding: 1px;
-}
-
-.previous-days-panel-layout {
-  display: flex;
-  flex-direction: column;
-  padding: 0 4px 4px 4px;
-  gap: 2px;
-  border: 1px solid var(--panel--border-color);
-  border-radius: 6px;
-  width: clamp(180px, 20vw, 210px);
   height: clamp(110px, 20vw, 120px);
 }
 
@@ -360,7 +364,37 @@ const calendarIcon = computed(() => {
   text-align: center;
 }
 
-.previous-days-header {
+.calendar-panel-info-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 2px;
+  background: pink;
+}
+
+.calendar-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background-color: transparent;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--panel--border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 800;
+}
+
+.calendar-popup-layout {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  gap: 4px;
+  border-radius: 6px;
+  width: fit-content;
+  height: fit-content;
+}
+
+.calendar-popup-header {
   font-size: clamp(0.5rem, 1vw, 0.6rem);
   color: var(--panel--review--header-color);
   letter-spacing: 0.05rem;
@@ -370,20 +404,50 @@ const calendarIcon = computed(() => {
   white-space: nowrap;
 }
 
-.previous-days-footer {
+.calendar-popup-text {
   font-size: clamp(0.5rem, 1vw, 0.6rem);
   color: var(--panel--review--header-color);
-  letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
+  letter-spacing: 0.05rem;
   text-transform: uppercase;
   text-align: center;
 }
 
-.previous-days-range {
+.calendar-popup-days-range {
   display: flex;
   flex-direction: row;
-  justify-content: start;
+  justify-content: center;
   align-items: center;
   gap: 6px;
+}
+
+.calendar-popup-review {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.calendar-popup-review-total {
+  padding: 4px;
+  border-radius: 4px;
+  background: var(--panel--review--bg);
+}
+
+.slide-fade-enter-active {
+  transition: all 0.2s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.slide-fade-enter-from {
+  opacity: 0;
+}
+
+.slide-fade-leave-to {
+  opacity: 0;
 }
 </style>
