@@ -211,12 +211,12 @@ const calendarIcon = computed(() => {
 <style scoped>
 .calendar-panel--theme {
   font-family: var(--main-font-family);
-  --panel--label-color: var(--calendar-panel--label-color, #555555);
-  --panel--text-color: var(--calendar-panel--text-color, rgba(57, 57, 57, 0.92));
-  --panel--number-color: var(--calendar-panel--number-color, rgba(17, 33, 85, 0.92));
-  --panel--border-color: var(--calendar-panel--border-color, rgba(128, 128, 128, 0.62));
-  --panel--review--header-color: var(--calendar-panel--review--header-color, rgba(43, 69, 142, 0.88));
-  --panel--review--bg: var(--calendar-panel--review--bg, rgba(88, 114, 209, 0.13));
+  --d-panel--label-color: var(--calendar-panel--label-color, #555555);
+  --d-panel--text-color: var(--calendar-panel--text-color, rgba(57, 57, 57, 0.92));
+  --d-panel--number-color: var(--calendar-panel--number-color, rgba(17, 33, 85, 0.92));
+  --d-panel--border-color: var(--calendar-panel--border-color, rgba(128, 128, 128, 0.62));
+  --d-panel--review--header-color: var(--calendar-panel--review--header-color, rgba(43, 69, 142, 0.88));
+  --d-panel--review--bg: var(--calendar-panel--review--bg, rgba(88, 114, 209, 0.13));
 }
 
 .calendar-panel {
@@ -227,7 +227,7 @@ const calendarIcon = computed(() => {
 
 .calendar-panel-label {
   font-size: clamp(0.5rem, 1.8vw, 0.6rem);
-  color: var(--panel--label-color);
+  color: var(--d-panel--label-color);
   letter-spacing: 0.1rem;
   word-spacing: 0.1rem;
   text-transform: uppercase;
@@ -253,7 +253,7 @@ const calendarIcon = computed(() => {
   flex-direction: row;
   padding: 0 4px 4px 4px;
   gap: 4px;
-  border: 1px solid var(--panel--border-color);
+  border: 1px solid var(--d-panel--border-color);
   border-radius: 6px;
   width: clamp(180px, 20vw, 200px);
   height: clamp(110px, 20vw, 120px);
@@ -280,15 +280,15 @@ const calendarIcon = computed(() => {
 
 .calendar-day-text {
   font-size: clamp(0.75rem, 1.5vw, 0.9rem);
-  color: var(--panel--text-color);
+  color: var(--d-panel--text-color);
   white-space: nowrap;
 }
 
 .calendar-day-number {
   font-size: clamp(0.75rem, 2vw, 0.9rem);
   font-weight: 600;
-  border: 1px solid var(--panel--border-color);
-  color: var(--panel--number-color);
+  border: 1px solid var(--d-panel--border-color);
+  color: var(--d-panel--number-color);
   border-radius: 3px;
   padding: 1px;
   width: clamp(30px, 4vw, 40px);
@@ -298,8 +298,8 @@ const calendarIcon = computed(() => {
 .calendar-day-vacation {
   font-size: clamp(0.70rem, 2vw, 0.8rem);
   font-weight: 600;
-  border: 1px solid var(--panel--border-color);
-  color: var(--panel--number-color);
+  border: 1px solid var(--d-panel--border-color);
+  color: var(--d-panel--number-color);
   border-radius: 3px;
   padding: 1px;
   width: clamp(30px, 4vw, 40px);
@@ -315,7 +315,7 @@ const calendarIcon = computed(() => {
 
 .current-day-header {
   font-size: clamp(0.5rem, 1vw, 0.6rem);
-  color: var(--panel--review--header-color);
+  color: var(--d-panel--review--header-color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -358,7 +358,7 @@ const calendarIcon = computed(() => {
   border-radius: 4px;
   height: 100%;
   min-height: 0;
-  background: var(--panel--review--bg);
+  background: var(--d-panel--review--bg);
 }
 
 .review-stage {
@@ -371,8 +371,8 @@ const calendarIcon = computed(() => {
 .review-number {
   font-size: clamp(0.75rem, 2vw, 0.9rem);
   font-weight: 600;
-  border: 1px solid var(--panel--border-color);
-  color: var(--panel--number-color);
+  border: 1px solid var(--d-panel--border-color);
+  color: var(--d-panel--number-color);
   border-radius: 3px;
   padding: 2px;
   width: 30px;
@@ -386,7 +386,7 @@ const calendarIcon = computed(() => {
   margin-top: 4px;
   background-color: transparent;
   backdrop-filter: blur(40px);
-  border: 1px solid var(--panel--border-color);
+  border: 1px solid var(--d-panel--border-color);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 800;
@@ -404,7 +404,7 @@ const calendarIcon = computed(() => {
 
 .calendar-popup-header {
   font-size: clamp(0.5rem, 1vw, 0.6rem);
-  color: var(--panel--review--header-color);
+  color: var(--d-panel--review--header-color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -414,7 +414,7 @@ const calendarIcon = computed(() => {
 
 .calendar-popup-text {
   font-size: clamp(0.5rem, 1vw, 0.6rem);
-  color: var(--panel--review--header-color);
+  color: var(--d-panel--review--header-color);
   word-spacing: 0.05rem;
   letter-spacing: 0.05rem;
   text-transform: uppercase;
@@ -440,7 +440,7 @@ const calendarIcon = computed(() => {
 .calendar-popup-review-total {
   padding: 4px;
   border-radius: 4px;
-  background: var(--panel--review--bg);
+  background: var(--d-panel--review--bg);
 }
 
 .slide-fade-enter-active {
