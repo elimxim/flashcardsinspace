@@ -52,8 +52,8 @@
 }
 
 .calendar-panel-info {
-  --awesome-button--font-size: clamp(18px, 2vw, 22px);
-  --awesome-button--color: rgb(248, 88, 52);
-  --awesome-button--color--hover: rgb(253, 41, 35);
+  --awesome-button--font-size: 22px;
+  --awesome-button--color: rgb(253, 107, 76);
+  --awesome-button--color--hover: rgb(255, 66, 61);
   --awesome-button--padding: 2px;
 }
