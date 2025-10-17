@@ -112,29 +112,29 @@ defineExpose({
 
 <style scoped>
 .smart-button--theme {
-  --btn--font-family: var(--smart-button--font-family);
-  --btn--color: var(--smart-button--color, white);
-  --btn--border-color: var(--smart-button--border-color, transparent);
-  --btn--border-width: var(--smart-button--border-width, 0);
-  --btn--border-radius: var(--smart-button--border-radius, 3px);
-  --btn--width: var(--smart-button--width, 100px);
-  --btn--bg-color: var(--smart-button--bg-color, #323232);
-  --btn--bg-color--hover: var(--smart-button--bg-color--hover, #515151);
-  --btn--color--disabled: var(--smart-button--color--disabled, #a3a3a3);
-  --btn--bg-color--disabled: var(--smart-button--bg-color--disabled, #C8C8C8FF);
+  --s-btn--font-family: var(--smart-button--font-family);
+  --s-btn--color: var(--smart-button--color, white);
+  --s-btn--border-color: var(--smart-button--border-color, transparent);
+  --s-btn--border-width: var(--smart-button--border-width, 0);
+  --s-btn--border-radius: var(--smart-button--border-radius, 3px);
+  --s-btn--width: var(--smart-button--width, 100px);
+  --s-btn--bg-color: var(--smart-button--bg-color, #323232);
+  --s-btn--bg-color--hover: var(--smart-button--bg-color--hover, #515151);
+  --s-btn--color--disabled: var(--smart-button--color--disabled, #a3a3a3);
+  --s-btn--bg-color--disabled: var(--smart-button--bg-color--disabled, #C8C8C8FF);
 }
 
 .smart-button {
-  font-family: var(--btn--font-family);
-  color: var(--btn--color);
-  border-color: var(--btn--border-color);
-  border-width: var(--btn--border-width);
+  font-family: var(--s-btn--font-family);
+  color: var(--s-btn--color);
+  border-color: var(--s-btn--border-color);
+  border-width: var(--s-btn--border-width);
   border-style: solid;
-  border-radius: var(--btn--border-radius);
-  background-color: var(--btn--bg-color);
+  border-radius: var(--s-btn--border-radius);
+  background-color: var(--s-btn--bg-color);
   position: relative;
   font-size: 16px;
-  width: var(--btn--width);
+  width: var(--s-btn--width);
   height: 40px;
   cursor: pointer;
   z-index: 1;
@@ -147,8 +147,8 @@ defineExpose({
   left: 0;
   width: v-bind(progressPercentage);
   height: 100%;
-  background-color: var(--btn--bg-color);
-  border-radius: var(--btn--border-radius);
+  background-color: var(--s-btn--bg-color);
+  border-radius: var(--s-btn--border-radius);
   transition: width 0.05s linear;
   z-index: -1;
 }
@@ -160,12 +160,12 @@ defineExpose({
 .smart-button:not(.smart-button--disabled):hover,
 .smart-button:not(.smart-button--disabled):focus {
   outline: none;
-  background-color: var(--btn--bg-color--hover);
+  background-color: var(--s-btn--bg-color--hover);
 }
 
 .smart-button--disabled {
-  color: var(--btn--color--disabled);
-  background-color: var(--btn--bg-color--disabled);
+  color: var(--s-btn--color--disabled);
+  background-color: var(--s-btn--bg-color--disabled);
   cursor: default;
 }
 
