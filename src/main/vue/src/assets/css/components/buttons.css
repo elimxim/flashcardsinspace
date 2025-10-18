@@ -38,14 +38,13 @@
 }
 
 .calendar-panel-button {
-  border: 1px solid var(--calendar-panel-button--border-color);
-  border-radius: 6px;
   --awesome-button--font-size: clamp(40px, 10vw, 50px);
   --awesome-button--color: var(--calendar-panel-button--color);
   --awesome-button--color--hover: var(--calendar-panel-button--color--hover);
   --awesome-button--bg: var(--calendar-panel-button--bg);
   --awesome-button--bg--hover: var(--calendar-panel-button--bg--hover);
   --awesome-button--bg--disabled: var(--calendar-panel-button--bg--disabled);
+  --awesome-button--border: 1px solid var(--calendar-panel-button--border-color);
   --awesome-button--border-radius: 6px;
 }
 
