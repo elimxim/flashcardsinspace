@@ -13,8 +13,9 @@ defineProps<{
 
 <style scoped>
 .awesome-container--theme {
-  --icon--font-size: var(--awesome-container--icon--font-size, 36px);
-  --icon--color: var(--awesome-container--icon--color, #c3c3c3);
+  --a-container--icon--font-size: var(--awesome-container--icon--font-size, 36px);
+  --a-container--icon--color: var(--awesome-container--icon--color, #c3c3c3);
+  --a-container--gap: var(--awesome-container--gap, 1rem);
 }
 
 .awesome-container {
@@ -22,11 +23,11 @@ defineProps<{
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 1rem;
+  gap: var(--a-container--gap);
 }
 
 .awesome-container__icon {
-  font-size: var(--icon--font-size);
-  color: var(--icon--color);
+  font-size: var(--a-container--icon--font-size);
+  color: var(--a-container--icon--color);
 }
 </style>
