@@ -293,7 +293,7 @@ function startReview() {
   grid-template-rows: 1fr auto;
   flex-direction: column;
   justify-content: space-between;
-  gap: 8px;
+  gap: 4px;
   height: 100%;
   margin: 4px 0;
 }
