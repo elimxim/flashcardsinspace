@@ -70,6 +70,8 @@ defineExpose({
 <style scoped>
 .awesome-button--theme {
   --a-btn--fontsize: var(--awesome-button--font-size, 1.2rem);
+  --a-btn--width: var(--awesome-button--width, fit-content);
+  --a-btn--height: var(--awesome-button--height, fit-content);
   --a-btn--color: var(--awesome-button--color, #818181);
   --a-btn--color--hover: var(--awesome-button--color--hover, #404040);
   --a-btn--color--disabled: var(--awesome-button--color--disabled, #cacaca);
@@ -91,6 +93,8 @@ defineExpose({
   background: var(--a-btn--bg);
   border: var(--a-btn--border);
   border-radius: var(--a-btn--border-radius);
+  width: var(--a-btn--width);
+  height: var(--a-btn--height);
   outline: none;
   cursor: pointer;
   margin: 0;
