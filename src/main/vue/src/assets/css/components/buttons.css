@@ -41,6 +41,8 @@
   aspect-ratio: 1 / 1;
   border: 1px solid var(--calendar-panel-button--border-color);
   border-radius: 6px;
+  --awesome-button--width: 100%;
+  --awesome-button--height: 100%;
   --awesome-button--font-size: 50px;
   --awesome-button--color: var(--calendar-panel-button--color);
   --awesome-button--color--hover: var(--calendar-panel-button--color--hover);
