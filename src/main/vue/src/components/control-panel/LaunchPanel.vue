@@ -27,7 +27,6 @@ function startReview() {
 
 <style scoped>
 .launch-panel--theme {
-  font-family: var(--main-font-family);
   --l-panel--label-color: var(--launch-panel--label-color, #555555);
   --l-panel--border-color: var(--launch-panel--border-color, rgba(128, 128, 128, 0.62));
 }

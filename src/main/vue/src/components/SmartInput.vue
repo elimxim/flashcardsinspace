@@ -109,7 +109,6 @@ defineExpose({
 
 <style scoped>
 .smart-input--theme {
-  --inpt--font-family: var(--smart-input--font-family, var(--main-font-family));
   --inpt--font-size: var(--smart-input--font-size, clamp(0.9rem, 2vh, 1rem));
   --inpt--font-size--error: var(--smart-input--font-size--error, clamp(0.9rem, 2vh, 1rem));
   --inpt--color: var(--smart-input--color, #45454a);
@@ -119,7 +118,6 @@ defineExpose({
   --inpt--border-color--focus: var(--smart-input--border-color--focus, #007bff);
   --inpt--border-color--error: var(--smart-input--border-color--error, #c80f0f);
   --inpt--border-radius: var(--smart-input--border-radius, 4px);
-  --inpt--placeholder--font-family: var(--smart-input--placeholder--font-family, var(--main-font-family));
   --inpt--placeholder--color: var(--smart-input--placeholder--color, #b8c4d6);
   --inpt--secret-button--color: var(--smart-input--secret-button--color, #b8c4d6);
   --inpt--secret-button--color--hover: var(--smart-input--secret-button--color--hover, #007bff);
@@ -136,7 +134,6 @@ defineExpose({
 .smart-input input {
   flex: 1;
   width: 100%;
-  font-family: var(--inpt--font-family);
   font-size: var(--inpt--font-size);
   color: var(--inpt--color);
   background-color: var(--inpt--bg-color);
@@ -151,7 +148,6 @@ defineExpose({
 
 .smart-input textarea::placeholder,
 .smart-input input::placeholder {
-  font-family: var(--inpt--placeholder--font-family);
   color: var(--inpt--placeholder--color);
 }
 
@@ -176,7 +172,6 @@ defineExpose({
 
 .secret-button {
   position: absolute;
-  font-family: var(--inpt--font-family);
   color: var(--inpt--secret-button--color);
   border-radius: var(--inpt--border-radius);
   border: none;

@@ -129,7 +129,6 @@ onMounted(() => {
 
 <style scoped>
 .sidebar--theme {
-  font-family: var(--main-font-family);
   --bar--bg-color: var(--sidebar--bg-color, #f5f5f5);
   --bar--border-color: var(--sidebar--border-color, #dee2e6);
   --bar--text-color: var(--sidebar--text-color, #495057);

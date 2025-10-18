@@ -62,7 +62,6 @@ onMounted(() => {
 
 <style scoped>
 .control-panel--theme {
-  font-family: var(--main-font-family);
   --c-panel--text-color: #333333;
   --c-panel--bg-color: var(--control-panel--bg-color, #f5f5f5);
   --c-panel--topbar--bg-color: #f5f5f5;
@@ -117,10 +116,10 @@ onMounted(() => {
 
 .main-panel {
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center;
   padding: 6px;
-  gap: clamp(4px, 4vw, 20px);
+  gap: clamp(4px, 1vw, 10px);
   border-radius: 4px;
   flex-wrap: wrap;
 }

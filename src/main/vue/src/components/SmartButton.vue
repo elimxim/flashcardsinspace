@@ -112,7 +112,6 @@ defineExpose({
 
 <style scoped>
 .smart-button--theme {
-  --s-btn--font-family: var(--smart-button--font-family);
   --s-btn--color: var(--smart-button--color, white);
   --s-btn--border-color: var(--smart-button--border-color, transparent);
   --s-btn--border-width: var(--smart-button--border-width, 0);
@@ -125,7 +124,6 @@ defineExpose({
 }
 
 .smart-button {
-  font-family: var(--s-btn--font-family);
   color: var(--s-btn--color);
   border-color: var(--s-btn--border-color);
   border-width: var(--s-btn--border-width);

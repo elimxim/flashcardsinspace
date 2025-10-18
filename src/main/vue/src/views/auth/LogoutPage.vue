@@ -112,7 +112,6 @@ onBeforeUnmount(clearTimers)
   flex-direction: column;
   justify-content: flex-start;
   text-align: justify;
-  font-family: var(--main-font-family);
   padding: 0.25rem;
   background: transparent;
 }

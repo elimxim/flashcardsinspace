@@ -58,7 +58,6 @@ const currentLabel = computed(() => {
   --chkbx--color-checked--hover: var(--smart-checkbox--color-checked--hover, #0056b3);
   --chkbx--label--color: var(--smart-checkbox--label--color, #45454a);
   --chkbx--label--font-size: var(--smart-checkbox--label--font-size, clamp(0.9rem, 2vh, 1rem));
-  --chkbx--label--font-family: var(--smart-checkbox--label--font-family, var(--main-font-family));
 }
 
 .smart-checkbox {
@@ -116,7 +115,6 @@ const currentLabel = computed(() => {
 }
 
 .checkbox-label {
-  font-family: var(--chkbx--label--font-family);
   font-size: var(--chkbx--label--font-size);
   color: var(--chkbx--label--color);
 }

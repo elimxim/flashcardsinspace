@@ -246,7 +246,6 @@ function startReview() {
 
 <style scoped>
 .calendar-panel--theme {
-  font-family: var(--main-font-family);
   --d-panel--label-color: var(--calendar-panel--label-color, #555555);
   --d-panel--text-color: var(--calendar-panel--text-color, rgba(57, 57, 57, 0.92));
   --d-panel--number-color: var(--calendar-panel--number-color, rgba(17, 33, 85, 0.92));

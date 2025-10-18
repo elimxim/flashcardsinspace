@@ -60,7 +60,6 @@ const flashcardCount = computed(() => flashcards.value.length)
 
 <style scoped>
 .flashcard-panel--theme {
-  font-family: var(--main-font-family);
   --f-panel--label-color: var(--flashcard-panel--label-color, #555555);
   --f-panel--text-color: var(--flashcard-panel--text-color, rgba(57, 57, 57, 0.92));
   --f-panel--text-color--info: var(--flashcard-panel--text-color--info, rgba(43, 69, 142, 0.88));
