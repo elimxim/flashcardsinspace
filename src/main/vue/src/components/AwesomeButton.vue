@@ -160,11 +160,11 @@ defineExpose({
   height: 100%;
   min-width: 0;
   min-height: 0;
+  transition: transform 0.2s ease-in-out;
 }
 
 .awesome-icon {
   font-size: min(var(--a-btn--fontsize), 100cqw, 100cqh);
-  transition: transform 0.2s ease-in-out;
 }
 
 .awesome-spinning-icon {
