@@ -61,6 +61,11 @@
             </div>
           </div>
         </div>
+        <div class="calendar-panel-launch-area">
+          <LaunchButton
+            :on-click="startReview"
+          />
+        </div>
       </div>
     </div>
     <transition name="slide-fade">
@@ -132,6 +137,7 @@
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import CalendarModal from '@/views/modal/CalendarModal.vue'
+import LaunchButton from '@/components/control-panel/LaunchButton.vue'
 import { computed, ref } from 'vue'
 import { calcStageReviews, StageReview } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
@@ -143,7 +149,10 @@ import {
   isCompleteAvailable,
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
+import { useRouter } from 'vue-router'
+import { routeNames } from '@/router'
 
+const router = useRouter()
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 const modalStore = useModalStore()
@@ -222,6 +231,10 @@ const calendarIcon = computed(() => {
   }
 })
 
+function startReview() {
+  router.push({ name: routeNames.review })
+}
+
 </script>
 
 <style scoped>
@@ -271,7 +284,7 @@ const calendarIcon = computed(() => {
   gap: 4px;
   border: 1px solid var(--d-panel--border-color);
   border-radius: 6px;
-  width: clamp(180px, 20vw, 200px);
+  width: clamp(280px, 40vw, 320px);
   height: clamp(110px, 20vw, 120px);
 }
 
@@ -286,10 +299,15 @@ const calendarIcon = computed(() => {
 }
 
 .calendar-panel-right-area {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 1px;
+}
+
+.calendar-panel-launch-area {
+  display: grid;
+  align-items: center;
+  padding: 8px 4px 4px 10px;
 }
 
 .calendar-panel-day {
@@ -474,4 +492,5 @@ const calendarIcon = computed(() => {
 .slide-fade-leave-to {
   opacity: 0;
 }
+
 </style>
