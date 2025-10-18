@@ -335,7 +335,7 @@ function startReview() {
 
 .calendar-day-number {
   font-size: clamp(0.75rem, 2vw, 0.9rem);
-  font-weight: 600;
+  font-weight: 500;
   border: 1px solid var(--d-panel--border-color);
   color: var(--d-panel--number-color);
   border-radius: 3px;
@@ -415,7 +415,7 @@ function startReview() {
 
 .review-number {
   font-size: clamp(0.75rem, 2vw, 0.9rem);
-  font-weight: 600;
+  font-weight: 500;
   border: 1px solid var(--d-panel--border-color);
   color: var(--d-panel--number-color);
   border-radius: 3px;
