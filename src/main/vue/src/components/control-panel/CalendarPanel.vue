@@ -17,6 +17,8 @@
             class="calendar-panel-button"
             :disabled="!flashcardSet"
             :on-click="modalStore.toggleCalendar"
+            fill-space
+            square
           />
           <div class="calendar-panel-day">
             <div class="calendar-day-text">
@@ -280,11 +282,11 @@ function startReview() {
 .calendar-panel-layout {
   display: flex;
   flex-direction: row;
-  padding: 0 4px 4px 4px;
+  padding: 4px;
   gap: 4px;
   border: 1px solid var(--d-panel--border-color);
   border-radius: 6px;
-  width: clamp(280px, 40vw, 320px);
+  width: clamp(280px, 40vw, 380px);
   height: clamp(110px, 20vw, 120px);
 }
 
@@ -295,19 +297,20 @@ function startReview() {
   justify-content: space-between;
   gap: 4px;
   height: 100%;
-  margin: 4px 0;
 }
 
 .calendar-panel-right-area {
   display: flex;
   flex-direction: column;
   gap: 1px;
+  height: 100%;
 }
 
 .calendar-panel-launch-area {
-  display: grid;
+  flex: 1;
+  display: flex;
   align-items: center;
-  padding: 8px 4px 4px 10px;
+  height: 100%;
 }
 
 .calendar-panel-day {
@@ -353,7 +356,7 @@ function startReview() {
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
-  text-align: end;
+  text-align: center;
   white-space: nowrap;
 }
 
@@ -364,8 +367,11 @@ function startReview() {
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(3, 1fr);
   grid-auto-flow: column;
-  gap: 0 4px;
   align-items: center;
+  gap: 0 4px;
+  border: 2px solid var(--d-panel--review--bg);
+  border-radius: 4px;
+  padding-left: 4px;
 }
 
 .review-stage-column {

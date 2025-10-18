@@ -1,28 +1,38 @@
 <template>
-  <button
+  <div
     v-if="!hidden"
-    class="awesome-button awesome-button--theme select-none drag-none"
+    class="awesome-button-wrapper"
     :class="{
-      'awesome-button--disabled': disabled,
-      'awesome-button--invisible': invisible,
+      'awesome-button-wrapper--square': square,
+      'awesome-button-wrapper--fill-space': fillSpace,
     }"
-    :disabled="disabled"
-    v-bind="$attrs"
-    @click.stop="press"
-    @mouseenter="onHover"
-    @mouseleave="onHover"
   >
-    <font-awesome-icon
-      v-if="pressed && spinnable"
-      :icon="spinIcon || icon"
-      class="awesome-spinning-icon"
-    />
-    <font-awesome-icon
-      v-else
-      :icon="icon"
-      class="awesome-icon"
-    />
-  </button>
+    <button
+      class="awesome-button awesome-button--theme select-none drag-none"
+      :class="{
+        'awesome-button--disabled': disabled,
+        'awesome-button--invisible': invisible,
+      }"
+      :disabled="disabled"
+      v-bind="$attrs"
+      @click.stop="press"
+      @mouseenter="onHover"
+      @mouseleave="onHover"
+    >
+      <div class="awesome-icon-wrapper">
+        <font-awesome-icon
+          v-if="pressed && spinnable"
+          :icon="spinIcon || icon"
+          class="awesome-spinning-icon"
+        />
+        <font-awesome-icon
+          v-else
+          :icon="icon"
+          class="awesome-icon"
+        />
+      </div>
+    </button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -35,6 +45,8 @@ const props = withDefaults(defineProps<{
   disabled?: boolean
   hidden?: boolean
   invisible?: boolean
+  square?: boolean
+  fillSpace?: boolean
   onClick?: () => void
   onHover?: () => void
 }>(), {
@@ -43,6 +55,8 @@ const props = withDefaults(defineProps<{
   disabled: false,
   hidden: false,
   invisible: false,
+  square: false,
+  fillSpace: false,
   onClick: () => {
   },
   onHover: () => {
@@ -70,8 +84,6 @@ defineExpose({
 <style scoped>
 .awesome-button--theme {
   --a-btn--fontsize: var(--awesome-button--font-size, 1.2rem);
-  --a-btn--width: var(--awesome-button--width, fit-content);
-  --a-btn--height: var(--awesome-button--height, fit-content);
   --a-btn--color: var(--awesome-button--color, #818181);
   --a-btn--color--hover: var(--awesome-button--color--hover, #404040);
   --a-btn--color--disabled: var(--awesome-button--color--disabled, #cacaca);
@@ -81,24 +93,44 @@ defineExpose({
   --a-btn--border: var(--awesome-button--border, none);
   --a-btn--border--hover: var(--awesome-button--border--hover, none);
   --a-btn--border-radius: var(--awesome-button--border-radius, none);
-  --a-btn--padding: var(--awesome-button--padding, 1px);
+}
+
+.awesome-button-wrapper {
+  display: grid;
+  width: fit-content;
+  height: fit-content;
+}
+
+.awesome-button-wrapper--square {
+  width: fit-content;
+  height: fit-content;
+  aspect-ratio: 1 / 1;
+}
+
+.awesome-button-wrapper--fill-space {
+  width: 100%;
+  height: 100%;
+}
+
+.awesome-button-wrapper--square.awesome-button-wrapper--fill-space {
+  width: auto;
+  height: 100%;
+  aspect-ratio: 1 / 1;
 }
 
 .awesome-button {
   position: relative;
-  display: flex;
-  align-items: center;
-  font-size: var(--a-btn--fontsize);
+  place-items: center;
   color: var(--a-btn--color);
   background: var(--a-btn--bg);
   border: var(--a-btn--border);
   border-radius: var(--a-btn--border-radius);
-  width: var(--a-btn--width);
-  height: var(--a-btn--height);
+  width: 100%;
+  height: 100%;
   outline: none;
   cursor: pointer;
   margin: 0;
-  padding: var(--a-btn--padding);
+  padding: 1px;
   transition: all 0.3s ease-in-out;
   overflow: hidden;
 }
@@ -120,13 +152,23 @@ defineExpose({
   visibility: hidden;
 }
 
+.awesome-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
 .awesome-icon {
-  flex: 1;
+  font-size: min(var(--a-btn--fontsize), 100cqw, 100cqh);
   transition: transform 0.2s ease-in-out;
 }
 
 .awesome-spinning-icon {
-  flex: 1;
+  font-size: min(var(--a-btn--fontsize), 100cqw, 100cqh);
   color: var(--a-btn--color--hover);
   background: var(--a-btn--bg--hover);
   animation: spin 2s linear infinite;
@@ -141,7 +183,7 @@ defineExpose({
   }
 }
 
-.awesome-button:not(.awesome-button--disabled):hover .awesome-icon {
+.awesome-button-wrapper:has(.awesome-button:not(.awesome-button--disabled):hover) .awesome-icon-wrapper {
   transform: scale(1.1);
 }
 

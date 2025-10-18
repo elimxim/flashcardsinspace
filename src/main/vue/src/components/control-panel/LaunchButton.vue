@@ -6,12 +6,11 @@
       :density="16"
       vertical-drift="6px"
     />
-    <div class="launch-button-layout">
-      <AwesomeButton
-        v-bind="$attrs"
-        icon="fa-solid fa-rocket"
-      />
-    </div>
+    <AwesomeButton
+      v-bind="$attrs"
+      icon="fa-solid fa-rocket"
+      fill-space
+    />
     <div class="curtain">
       <div class="curtain-text">Start Review</div>
     </div>
@@ -35,20 +34,14 @@ import AwesomeButton from '@/components/AwesomeButton.vue'
   --awesome-button--bg--hover: var(--launch-button--bg--hover);
   --awesome-button--bg--disabled: var(--launch-button--bg--disabled);
   --awesome-button--border-radius: 6px;
-  --awesome-button--padding: clamp(16px, 4vw, 20px);
 }
 
 .launch-button {
   position: relative;
-  aspect-ratio: 1 / 1;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.launch-button-layout {
-  position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  border-radius: 6px;
 }
 
 .curtain {
@@ -70,7 +63,7 @@ import AwesomeButton from '@/components/AwesomeButton.vue'
 }
 
 .curtain-text {
-  font-size: 16px;
+  font-size: clamp(12px, 2vw ,16px);
   color: var(--l-btn--text-color);
   text-shadow: 0 2px 4px var(--l-btn--text-shadow-color);
   letter-spacing: 0.05rem;
