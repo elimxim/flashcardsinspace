@@ -20,23 +20,21 @@
           />
         </div>
         <div class="main-panel">
+          <FlashcardInfoPanel/>
           <CalendarPanel/>
         </div>
       </div>
     </div>
   </div>
   <FlashcardSetSettingsModal/>
-  <FlashcardSetCreationModal/>
-  <FlashcardModificationModal/>
 </template>
 
 <script setup lang="ts">
 import FlashcardSetSideBar from '@/components/control-panel/FlashcardSetSideBar.vue'
 import CalendarPanel from '@/components/control-panel/CalendarPanel.vue'
+import FlashcardInfoPanel from '@/components/control-panel/FlashcardInfoPanel.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
-import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.vue'
-import FlashcardModificationModal from '@/views/modal/FlashcardModificationModal.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'
 import { storeToRefs } from 'pinia'
