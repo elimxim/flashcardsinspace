@@ -27,7 +27,7 @@ import AwesomeButton from '@/components/AwesomeButton.vue'
 .launch-button--theme {
   --l-btn--text-color: var(--launch-button--text-color, #e2e8f0);
   --l-btn--text-shadow-color: var(--launch-button--text-shadow-color, rgba(0, 0, 0, 0.3));
-  --awesome-button--font-size: clamp(40px, 10vw, 60px);
+  --awesome-button--font-size: clamp(40px, 10vw, 70px);
   --awesome-button--color: var(--launch-button--color);
   --awesome-button--color--hover: var(--launch-button--color--hover);
   --awesome-button--bg: var(--launch-button--bg);
