@@ -21,7 +21,6 @@
         </div>
         <div class="main-panel">
           <CalendarPanel/>
-          <LaunchPanel/>
         </div>
       </div>
     </div>
@@ -34,7 +33,6 @@
 <script setup lang="ts">
 import FlashcardSetSideBar from '@/components/control-panel/FlashcardSetSideBar.vue'
 import CalendarPanel from '@/components/control-panel/CalendarPanel.vue'
-import LaunchPanel from '@/components/control-panel/LaunchPanel.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
 import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.vue'
