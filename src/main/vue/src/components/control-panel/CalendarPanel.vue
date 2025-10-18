@@ -6,7 +6,7 @@
       </div>
       <AwesomeButton
         v-if="hasNotCompletedPreviousDays"
-        class="calendar-panel-info"
+        class="calendar-panel-info-button calendar-panel-info-button-layout"
         icon="fa-solid fa-circle-exclamation"
         :on-hover="togglePreviousDaysPopup"
       />
@@ -265,10 +265,10 @@ function startReview() {
   padding: 0 0 0 6px;
 }
 
-.calendar-panel-info {
+.calendar-panel-info-button-layout {
   position: absolute;
-  top: -4px;
-  right: -16px;
+  top: -2px;
+  right: -12px;
   z-index: 10;
 }
 

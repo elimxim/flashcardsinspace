@@ -49,7 +49,7 @@
   --awesome-button--border-radius: 6px;
 }
 
-.calendar-panel-info {
+.calendar-panel-info-button {
   --awesome-button--font-size: 22px;
   --awesome-button--color: rgb(253, 107, 76);
   --awesome-button--color--hover: rgb(255, 66, 61);
