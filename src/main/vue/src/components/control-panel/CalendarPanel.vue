@@ -76,37 +76,35 @@
         class="calendar-popup"
       >
         <div class="calendar-popup-layout">
-          <div
-            v-if="previousDaysFrom !== previousDaysTo"
-            class="calendar-popup-header"
-          >
-            You have uncompleted previous days
-          </div>
-          <div v-else class="calendar-popup-header">
-            You have an uncompleted previous day
-          </div>
-          <div
-            v-if="previousDaysFrom !== previousDaysTo"
-            class="calendar-popup-centered-row"
-          >
-            <div class="calendar-popup-text">
-              From
+          <template v-if="previousDaysFrom !== previousDaysTo">
+            <div class="calendar-popup-header">
+              You have uncompleted previous days
             </div>
-            <div class="calendar-day-number">
-              {{ previousDaysFrom?.seqNumber }}
+            <div class="calendar-popup-centered-row">
+              <div class="calendar-popup-text">
+                From
+              </div>
+              <div class="calendar-day-number">
+                {{ previousDaysFrom?.seqNumber }}
+              </div>
+              <div class="calendar-popup-text">
+                To
+              </div>
+              <div class="calendar-day-number">
+                {{ previousDaysTo?.seqNumber }}
+              </div>
             </div>
-            <div class="calendar-popup-text">
-              To
+          </template>
+          <template v-else>
+            <div class="calendar-popup-header">
+              You have an uncompleted previous day
             </div>
-            <div class="calendar-day-number">
-              {{ previousDaysTo?.seqNumber }}
+            <div class="calendar-popup-centered-row">
+              <div class="calendar-day-number">
+                {{ previousDaysTo?.seqNumber }}
+              </div>
             </div>
-          </div>
-          <div v-else class="calendar-popup-centered-row">
-            <div class="calendar-day-number">
-              {{ previousDaysTo?.seqNumber }}
-            </div>
-          </div>
+          </template>
           <div
             v-if="prevDaysReviewTotal > 0"
             class="calendar-popup-review"
@@ -120,15 +118,22 @@
               </div>
             </div>
           </div>
-          <div
-            v-else-if="previousDaysFrom !== previousDaysTo"
-            class="calendar-popup-text"
-          >
-            They will be completed since you complete the current day
-          </div>
-          <div v-else class="calendar-popup-text">
-            It will be completed since you complete the current day
-          </div>
+          <template v-else-if="previousDaysFrom !== previousDaysTo">
+            <div class="calendar-popup-text">
+              They will be completed since
+            </div>
+            <div class="calendar-popup-text">
+              you complete the current day
+            </div>
+          </template>
+          <template v-else>
+            <div class="calendar-popup-text">
+              It will be completed since
+            </div>
+            <div class="calendar-popup-text">
+              you complete the current day
+            </div>
+          </template>
         </div>
       </div>
     </transition>
@@ -395,7 +400,7 @@ function startReview() {
   justify-content: space-between;
   align-items: center;
   padding: 10px 4px;
-  border-radius: 4px;
+  border-radius: 2px;
   height: 100%;
   min-height: 0;
   background: var(--d-panel--review--bg);
@@ -436,9 +441,8 @@ function startReview() {
   display: flex;
   flex-direction: column;
   padding: 4px;
-  gap: 4px;
   border-radius: 6px;
-  width: fit-content;
+  width: clamp(280px, 40vw, 380px);
   height: fit-content;
 }
 
