@@ -1,6 +1,6 @@
 <template>
   <Modal
-    :visible="modalStore.flashcardSetSettingsOpen"
+    :visible="toggleStore.flashcardSetSettingsOpen"
     :on-press-exit="cancel"
     :on-press-enter="update"
     :on-press-delete="remove"
@@ -84,7 +84,7 @@ import { useVuelidate } from '@vuelidate/core'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { storeToRefs } from 'pinia'
-import { useModalStore } from '@/stores/modal-store.ts'
+import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import {
@@ -97,7 +97,7 @@ import { reloadFlashcardAndChronoStores } from '@/shared/stores.ts'
 import { copyFlashcardSet, flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 
-const modalStore = useModalStore()
+const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
 const languageStore = useLanguageStore()
 const flashcardSetStore = useFlashcardSetStore()
@@ -153,7 +153,7 @@ const curLanguageInvalid = computed(() =>
 )
 
 function cancel() {
-  modalStore.toggleFlashcardSetSettings()
+  toggleStore.toggleFlashcardSetSettings()
   resetState()
 }
 
@@ -162,7 +162,7 @@ async function remove() {
   if (removed) {
     await reloadFlashcardAndChronoStores(true)
       .then(() => {
-        modalStore.toggleFlashcardSetSettings()
+        toggleStore.toggleFlashcardSetSettings()
         resetState()
       })
   }
@@ -174,7 +174,7 @@ async function update() {
     if (!formInvalid.value) {
       const updated = await updateFlashcardSet()
       if (updated) {
-        modalStore.toggleFlashcardSetSettings()
+        toggleStore.toggleFlashcardSetSettings()
         resetState()
       }
     }

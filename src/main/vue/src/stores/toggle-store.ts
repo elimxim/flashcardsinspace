@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export interface ModalState {
+export interface ToggleState {
   flashcardSetSettingsOpen: boolean
   flashcardSetCreationOpen: boolean
   flashcardCreationOpen: boolean
@@ -8,8 +8,8 @@ export interface ModalState {
   calendarOpen: boolean
 }
 
-export const useModalStore = defineStore('modal', {
-  state: (): ModalState => {
+export const useToggleStore = defineStore('toggle', {
+  state: (): ToggleState => {
     return {
       flashcardSetSettingsOpen: false,
       flashcardSetCreationOpen: false,

@@ -33,7 +33,7 @@
 import SpaceCard from '@/components/SpaceCard.vue'
 import FlashcardModificationModal from '@/views/modal/FlashcardModificationModal.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useModalStore } from '@/stores/modal-store.ts'
+import { useToggleStore } from '@/stores/toggle-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 
 const flashcard = defineModel<Flashcard | null>('flashcard', { default: null })
@@ -49,7 +49,7 @@ const props = withDefaults(defineProps<{
   },
 })
 
-const modalStore = useModalStore()
+const toggleStore = useToggleStore()
 
 const deckReady = ref(false)
 const flashcardWasRemoved = ref(false)
@@ -104,7 +104,7 @@ watch(flashcardWasRemoved, (newVal) => {
 
 watch(flashcardWasEdited, (newVal) => {
   if (newVal) {
-    modalStore.toggleFlashcardEdit()
+    toggleStore.toggleFlashcardEdit()
     props.onFlashcardEdited()
     flashcardWasEdited.value = false
   }
@@ -119,7 +119,7 @@ onUnmounted(() => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
-  if (modalStore.isAnyModalOpen()) return
+  if (toggleStore.isAnyModalOpen()) return
   if (event.key === ' ' || ['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
     event.stopPropagation()
     spaceCard.value?.flip()

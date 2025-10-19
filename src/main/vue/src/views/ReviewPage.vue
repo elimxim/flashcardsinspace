@@ -133,7 +133,7 @@ import {
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { loadSelectedSetId } from '@/shared/cookies.ts'
-import { useModalStore } from '@/stores/modal-store.ts'
+import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import {
   loadFlashcardAndChronoStoresById
@@ -157,7 +157,7 @@ const props = defineProps<{
 
 const router = useRouter()
 const toaster = useSpaceToaster()
-const modalStore = useModalStore()
+const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
 const flashcardStore = useFlashcardStore()
 
@@ -169,7 +169,7 @@ const {
   chronodays,
   currDay
 } = storeToRefs(chronoStore)
-const { flashcardEditOpen } = storeToRefs(modalStore)
+const { flashcardEditOpen } = storeToRefs(toggleStore)
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 const escapeButton = ref<InstanceType<typeof AwesomeButton>>()
@@ -402,7 +402,7 @@ onBeforeRouteLeave(async () => {
 })
 
 function handleKeydown(event: KeyboardEvent) {
-  if (modalStore.isAnyModalOpen()) return
+  if (toggleStore.isAnyModalOpen()) return
 
   if (event.key === 'Escape') {
     event.stopPropagation()

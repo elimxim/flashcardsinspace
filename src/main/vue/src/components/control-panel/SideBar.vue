@@ -12,7 +12,7 @@
         <AwesomeButton
           ref="createButton"
           icon="fa-solid fa-plus"
-          :on-click="modalStore.toggleFlashcardSetCreation"
+          :on-click="toggleStore.toggleFlashcardSetCreation"
         />
       </template>
       <template #right>
@@ -53,7 +53,7 @@ import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.v
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
-import { useModalStore } from '@/stores/modal-store.ts'
+import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
 import {
@@ -67,7 +67,7 @@ import { FlashcardSet } from '@/model/flashcard.ts'
 const flashcardStore = useFlashcardStore()
 const flashcardSetStore = useFlashcardSetStore()
 const languageStore = useLanguageStore()
-const modalStore = useModalStore()
+const toggleStore = useToggleStore()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
 const { flashcardSets } = storeToRefs(flashcardSetStore)

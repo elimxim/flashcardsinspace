@@ -1,6 +1,6 @@
 <template>
   <Modal
-    :visible="editMode ? modalStore.flashcardEditOpen : modalStore.flashcardCreationOpen"
+    :visible="editMode ? toggleStore.flashcardEditOpen : toggleStore.flashcardCreationOpen"
     :on-press-exit="cancel"
     :on-press-enter="props.editMode ? update : create"
     :on-press-delete="remove"
@@ -95,7 +95,7 @@ import {
 import { useVuelidate } from '@vuelidate/core'
 import { maxLength, required } from '@vuelidate/validators'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { useModalStore } from '@/stores/modal-store.ts'
+import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
@@ -121,7 +121,7 @@ const props = withDefaults(defineProps<{
   editMode: false,
 })
 
-const modalStore = useModalStore()
+const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
 const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
@@ -273,9 +273,9 @@ async function updateFlashcard(): Promise<boolean> {
 
 function toggleModalForm() {
   if (props.editMode) {
-    modalStore.toggleFlashcardEdit()
+    toggleStore.toggleFlashcardEdit()
   } else {
-    modalStore.toggleFlashcardCreation()
+    toggleStore.toggleFlashcardCreation()
   }
 }
 

@@ -1,6 +1,6 @@
 <template>
   <Modal
-    :visible="modalStore.calendarOpen"
+    :visible="toggleStore.calendarOpen"
     :on-press-exit="exit"
   >
     <div class="calendar calendar--theme">
@@ -84,12 +84,12 @@ import {
   chronodayStatuses
 } from '@/core-logic/chrono-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { useModalStore } from '@/stores/modal-store.ts'
+import { useToggleStore } from '@/stores/toggle-store.ts'
 import { sendChronoSyncNextDay, sendChronoSyncPrevDay } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { parseLocalDate } from '@/utils/date.ts'
 
-const modalStore = useModalStore()
+const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
 const chronoStore = useChronoStore()
 const flashcardStore = useFlashcardStore()
@@ -175,7 +175,7 @@ function isVacationDay(day: CalendarDay): boolean {
 
 function exit() {
   currMonth.value = parseLocalDate(currDay.value.chronodate)
-  modalStore.toggleCalendar()
+  toggleStore.toggleCalendar()
 }
 
 async function goPrevDay() {

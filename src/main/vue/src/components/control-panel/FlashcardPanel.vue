@@ -3,7 +3,7 @@
     <AwesomeButton
       icon="fa-solid fa-rectangle-list"
       class="flashcard-panel-button"
-      :on-click="modalStore.toggleFlashcardCreation"
+      :on-click="toggleStore.toggleFlashcardCreation"
       fill-space
       square
     />
@@ -17,9 +17,9 @@
 <script setup lang="ts">
 import FlashcardModificationModal from '@/views/modal/FlashcardModificationModal.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import { useModalStore } from '@/stores/modal-store.ts'
+import { useToggleStore } from '@/stores/toggle-store.ts'
 
-const modalStore = useModalStore()
+const toggleStore = useToggleStore()
 
 </script>
 

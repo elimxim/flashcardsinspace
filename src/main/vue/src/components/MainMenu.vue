@@ -86,7 +86,7 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, type ComputedRef, onMounted, ref } from 'vue'
-import { useModalStore } from '@/stores/modal-store.ts'
+import { useToggleStore } from '@/stores/toggle-store.ts'
 import { truncate } from '@/utils/string.ts'
 import { allStages, type Stage, specialStageSet } from '@/core-logic/stage-logic.ts'
 import { countFlashcards } from '@/core-logic/review-logic.ts'
@@ -94,7 +94,7 @@ import router, { routeNames } from '@/router'
 import { saveSelectedSetId } from '@/shared/cookies.ts'
 import { loadFlashcardAndChronoStores } from '@/shared/stores.ts'
 
-const modalStore = useModalStore()
+const toggleStore = useToggleStore()
 const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
@@ -152,22 +152,22 @@ const selectedFlashcardSetId = computed({
 
 function onFlashcardSetSettingsClick() {
   if (!isNoFlashcardSets.value) {
-    modalStore.toggleFlashcardSetSettings()
+    toggleStore.toggleFlashcardSetSettings()
   }
 }
 
 function onFlashcardSetCreationClick() {
-  modalStore.toggleFlashcardSetCreation()
+  toggleStore.toggleFlashcardSetCreation()
 }
 
 function onFlashcardCreationClick() {
   if (!isNoFlashcardSets.value) {
-    modalStore.toggleFlashcardCreation()
+    toggleStore.toggleFlashcardCreation()
   }
 }
 
 function onCalendarClick() {
-  modalStore.toggleCalendar()
+  toggleStore.toggleCalendar()
 }
 
 function startStageReview(stage: Stage) {

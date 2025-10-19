@@ -6,7 +6,7 @@
           :icon="calendarIcon"
           class="calendar-panel-button"
           :disabled="!flashcardSet"
-          :on-click="modalStore.toggleCalendar"
+          :on-click="toggleStore.toggleCalendar"
           fill-space
           square
         />
@@ -140,7 +140,7 @@ import { computed, ref } from 'vue'
 import { calcStageReviews, StageReview } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
-import { useModalStore } from '@/stores/modal-store.ts'
+import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
 import {
   chronodayStatuses,
@@ -150,7 +150,7 @@ import {
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
-const modalStore = useModalStore()
+const toggleStore = useToggleStore()
 
 const { flashcardSet, flashcards, isSuspended } = storeToRefs(flashcardStore)
 const {

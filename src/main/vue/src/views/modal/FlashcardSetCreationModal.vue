@@ -1,6 +1,6 @@
 <template>
   <Modal
-    :visible="modalStore.flashcardSetCreationOpen"
+    :visible="toggleStore.flashcardSetCreationOpen"
     :on-press-exit="cancel"
     :on-press-enter="create"
     :focus-on="nameInput"
@@ -69,7 +69,7 @@ import { useVuelidate } from '@vuelidate/core'
 import type { Language } from '@/model/language.ts'
 import { storeToRefs } from 'pinia'
 import { useLanguageStore } from '@/stores/language-store.ts'
-import { useModalStore } from '@/stores/modal-store.ts'
+import { useToggleStore } from '@/stores/toggle-store.ts'
 import { createFlashcardSet } from '@/core-logic/flashcard-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
@@ -78,7 +78,7 @@ import {
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 
-const modalStore = useModalStore()
+const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
 const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
@@ -120,7 +120,7 @@ const languageInvalid = computed(() =>
 )
 
 function cancel() {
-  modalStore.toggleFlashcardSetCreation()
+  toggleStore.toggleFlashcardSetCreation()
   resetState()
 }
 
@@ -129,7 +129,7 @@ async function create() {
   if (!formInvalid.value) {
     const created = await createNewFlashcardSet()
     if (created) {
-      modalStore.toggleFlashcardSetCreation()
+      toggleStore.toggleFlashcardSetCreation()
       resetState()
     }
   }

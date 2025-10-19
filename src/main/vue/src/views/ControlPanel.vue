@@ -44,13 +44,13 @@ import LaunchPanel from '@/components/control-panel/LaunchPanel.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { useModalStore } from '@/stores/modal-store.ts'
+import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import { loadFlashcardSetStore } from '@/shared/stores.ts'
 
 const flashcardStore = useFlashcardStore()
-const modalStore = useModalStore()
+const toggleStore = useToggleStore()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
 
@@ -59,7 +59,7 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 function openFlashcardSetSettings() {
   if (flashcardSet.value) {
-    modalStore.toggleFlashcardSetSettings()
+    toggleStore.toggleFlashcardSetSettings()
   }
 }
 
