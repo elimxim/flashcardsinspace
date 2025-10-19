@@ -19,7 +19,7 @@
       @mouseenter="onHover"
       @mouseleave="onHover"
     >
-      <div class="awesome-icon-wrapper">
+      <span class="awesome-icon-wrapper">
         <font-awesome-icon
           v-if="pressed && spinnable"
           :icon="spinIcon || icon"
@@ -30,7 +30,7 @@
           :icon="icon"
           class="awesome-icon"
         />
-      </div>
+      </span>
     </button>
   </div>
 </template>
