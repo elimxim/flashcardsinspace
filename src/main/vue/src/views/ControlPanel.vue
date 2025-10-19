@@ -22,7 +22,7 @@
         </ControlBar>
         <FlashcardInfoBar :hidden="!flashcardSet || !sidebar?.isExpanded()" />
         <div class="main-panel">
-          <FlashcardInfoPanel/>
+          <FlashcardPanel/>
           <CalendarPanel/>
         </div>
       </div>
@@ -36,7 +36,7 @@ import SideBar from '@/components/control-panel/SideBar.vue'
 import ControlBar from '@/components/ControlBar.vue'
 import CalendarPanel from '@/components/control-panel/CalendarPanel.vue'
 import FlashcardInfoBar from '@/components/control-panel/FlashcardInfoBar.vue'
-import FlashcardInfoPanel from '@/components/control-panel/FlashcardInfoPanel.vue'
+import FlashcardPanel from '@/components/control-panel/FlashcardPanel.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
@@ -105,6 +105,7 @@ onMounted(() => {
   padding: 6px;
   gap: clamp(4px, 1vw, 10px);
   border-radius: 4px;
+  height: 120px;
   flex-wrap: wrap;
 }
 
