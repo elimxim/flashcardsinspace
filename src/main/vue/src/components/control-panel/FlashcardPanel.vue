@@ -29,6 +29,7 @@ const modalStore = useModalStore()
 }
 
 .flashcard-panel {
+  position: relative;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   height: 100%;
