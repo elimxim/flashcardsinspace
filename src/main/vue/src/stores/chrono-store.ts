@@ -20,7 +20,10 @@ export const useChronoStore = defineStore('chrono', {
   getters: {
     isDayOff(): boolean {
       return this.currDay.status === chronodayStatuses.OFF
-    }
+    },
+    isInitialDay(): boolean {
+      return this.currDay.status === chronodayStatuses.INITIAL
+    },
   },
   actions: {
     loadState(chronodays: Chronoday[], currDay: Chronoday) {
