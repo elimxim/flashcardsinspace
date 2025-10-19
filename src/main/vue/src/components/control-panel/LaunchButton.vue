@@ -1,5 +1,8 @@
 <template>
-  <div class="launch-button launch-button--theme">
+  <div
+    class="launch-button launch-button--theme"
+    :class="{ 'launch-button--disabled': disabled }"
+  >
     <Starfield
       twinkle
       :star-size="4"
@@ -9,6 +12,7 @@
     <AwesomeButton
       v-bind="$attrs"
       icon="fa-solid fa-rocket"
+      :disabled="disabled"
       fill-space
       square
     />
@@ -22,6 +26,12 @@
 import Starfield from '@/components/Starfield.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 
+withDefaults(defineProps<{
+  disabled?: boolean
+}>(), {
+  disabled: false,
+})
+
 </script>
 
 <style scoped>
@@ -33,6 +43,7 @@ import AwesomeButton from '@/components/AwesomeButton.vue'
   --awesome-button--color--hover: var(--launch-button--color--hover);
   --awesome-button--bg: var(--launch-button--bg);
   --awesome-button--bg--hover: var(--launch-button--bg--hover);
+  --awesome-button--color--disabled: var(--launch-button--color--disabled);
   --awesome-button--bg--disabled: var(--launch-button--bg--disabled);
   --awesome-button--border-radius: 6px;
 }
@@ -74,5 +85,9 @@ import AwesomeButton from '@/components/AwesomeButton.vue'
 
 .launch-button:hover .curtain {
   transform: translateY(-100%);
+}
+
+.launch-button--disabled:hover .curtain {
+  transform: none;
 }
 </style>
