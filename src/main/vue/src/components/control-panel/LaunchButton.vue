@@ -10,6 +10,7 @@
       v-bind="$attrs"
       icon="fa-solid fa-rocket"
       fill-space
+      square
     />
     <div class="curtain">
       <div class="curtain-text">Start Review</div>
