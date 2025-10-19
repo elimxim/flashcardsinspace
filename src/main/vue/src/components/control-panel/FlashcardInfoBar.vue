@@ -53,14 +53,14 @@ const flashcardCount = computed(() => flashcards.value.length)
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  padding: 4px 10px;
+  padding: 4px 4px 0 10px;
   margin-top: 4px;
   gap: 40px;
 }
 
 .language-info {
   display: flex;
-  --awesome-container--icon--font-size: clamp(0.9rem, 2vw, 1.2rem);
+  --awesome-container--icon--font-size: 1.2rem;
   --awesome-container--icon--color: var(--f-bar--language--icon-color);
   --awesome-container--gap: 8px;
 }
