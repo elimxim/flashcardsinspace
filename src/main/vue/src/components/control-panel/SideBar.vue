@@ -3,22 +3,27 @@
     class="sidebar sidebar--theme"
     :class="{ 'sidebar--collapsed': !expanded }"
   >
-    <div class="sidebar-header">
-      <AwesomeButton
-        ref="createButton"
-        icon="fa-solid fa-plus"
-        :on-click="modalStore.toggleFlashcardSetCreation"
-      />
-      <div class="sidebar-header__title">
-        Flashcard Sets
-      </div>
-      <AwesomeButton
-        ref="toggleButton"
-        icon="fa-solid fa-chevron-left"
-        :on-click="toggle"
-      />
-    </div>
-    <div class="sidebar-content sidebar__content--scrollable">
+    <ControlBar
+      class="sidebar-control-bar"
+      title="Flashcard Sets"
+      center-title
+    >
+      <template #left>
+        <AwesomeButton
+          ref="createButton"
+          icon="fa-solid fa-plus"
+          :on-click="modalStore.toggleFlashcardSetCreation"
+        />
+      </template>
+      <template #right>
+        <AwesomeButton
+          ref="toggleButton"
+          icon="fa-solid fa-chevron-left"
+          :on-click="toggle"
+        />
+      </template>
+    </ControlBar>
+    <div class="sidebar-content sidebar-content--scrollable">
       <div
         v-for="set in flashcardSets"
         :key="set.id"
@@ -41,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import ControlBar from '@/components/ControlBar.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.vue'
@@ -131,8 +137,6 @@ onMounted(() => {
 .sidebar--theme {
   --bar--bg-color: var(--sidebar--bg-color, #f5f5f5);
   --bar--border-color: var(--sidebar--border-color, #dee2e6);
-  --bar--text-color: var(--sidebar--text-color, #495057);
-  --bar--shadow-color: var(--sidebar--shadow-color, rgba(0, 0, 0, 0.4));
   --bar--item--bg-color: var(--sidebar--item--bg-color, #ffffff);
   --bar--item--bg-color--hover: var(--sidebar--item--bg-color--hover, #e8eef5);
   --bar--item--bg-color--active: var(--sidebar--item--bg-color--active, #e8eef5);
@@ -166,24 +170,8 @@ onMounted(() => {
   margin-left: clamp(-280px, -40vw, -200px);
 }
 
-.sidebar-header {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  width: 100%;
-  height: 40px;
-  background-color: var(--bar--bg-color);
-  box-shadow: 4px 0 4px 0 var(--bar--shadow-color);
-  flex-shrink: 0;
-}
-
-.sidebar-header__title {
-  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
-  color: var(--bar--text-color);
-  font-weight: normal;
-  white-space: nowrap;
+.sidebar-control-bar {
+  --control-bar--title--font-size: clamp(0.9rem, 1.5vw, 1.1rem);
 }
 
 .sidebar-content {
@@ -196,29 +184,29 @@ onMounted(() => {
   border-right: 1px solid var(--bar--border-color);
 }
 
-.sidebar__content--scrollable {
+.sidebar-content--scrollable {
   overflow-y: auto;
 }
 
-.sidebar__content--scrollable::-webkit-scrollbar {
+.sidebar-content--scrollable::-webkit-scrollbar {
   width: 8px;
 }
 
-.sidebar__content--scrollable::-webkit-scrollbar-track {
+.sidebar-content--scrollable::-webkit-scrollbar-track {
   background: var(--bar--scrollbar--track-color);
   border-radius: 0;
 }
 
-.sidebar__content--scrollable::-webkit-scrollbar-thumb {
+.sidebar-content--scrollable::-webkit-scrollbar-thumb {
   background: var(--bar--scrollbar--thumb-color);
   border-radius: 0;
 }
 
-.sidebar__content--scrollable::-webkit-scrollbar-thumb:hover {
+.sidebar-content--scrollable::-webkit-scrollbar-thumb:hover {
   background: var(--bar--scrollbar--thumb-color--hover);
 }
 
-.sidebar__content--scrollable::-webkit-scrollbar-thumb:active {
+.sidebar-content--scrollable::-webkit-scrollbar-thumb:active {
   background: var(--bar--scrollbar--thumb-color--active);
 }
 

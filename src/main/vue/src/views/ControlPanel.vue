@@ -1,24 +1,25 @@
 <template>
   <div class="control-panel control-panel--theme">
     <div class="control-panel-layout">
-      <FlashcardSetSideBar ref="sidebar"/>
+      <SideBar ref="sidebar"/>
       <div class="control-panel-content">
-        <div class="topbar">
-          <AwesomeButton
-            :on-click="sidebar?.toggle"
-            :hidden="sidebar?.isExpanded()"
-            :disabled="sidebar?.isExpanded()"
-            icon="fa-solid fa-bars"
-          />
-          <div class="topbar-text">
-            {{ flashcardSetName }}
-          </div>
-          <AwesomeButton
-            icon="fa-solid fa-gear"
-            :on-click="openFlashcardSetSettings"
-            :disabled="!flashcardSet"
-          />
-        </div>
+        <ControlBar :title="flashcardSetName">
+          <template #left>
+            <AwesomeButton
+              :on-click="sidebar?.toggle"
+              :hidden="sidebar?.isExpanded()"
+              :disabled="sidebar?.isExpanded()"
+              icon="fa-solid fa-bars"
+            />
+          </template>
+          <template #right>
+            <AwesomeButton
+              icon="fa-solid fa-gear"
+              :on-click="openFlashcardSetSettings"
+              :disabled="!flashcardSet"
+            />
+          </template>
+        </ControlBar>
         <div class="main-panel">
           <FlashcardInfoPanel/>
           <CalendarPanel/>
@@ -30,7 +31,8 @@
 </template>
 
 <script setup lang="ts">
-import FlashcardSetSideBar from '@/components/control-panel/FlashcardSetSideBar.vue'
+import SideBar from '@/components/control-panel/SideBar.vue'
+import ControlBar from '@/components/ControlBar.vue'
 import CalendarPanel from '@/components/control-panel/CalendarPanel.vue'
 import FlashcardInfoPanel from '@/components/control-panel/FlashcardInfoPanel.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
@@ -46,7 +48,7 @@ const modalStore = useModalStore()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
 
-const sidebar = ref<InstanceType<typeof FlashcardSetSideBar>>()
+const sidebar = ref<InstanceType<typeof SideBar>>()
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 function openFlashcardSetSettings() {
@@ -64,9 +66,6 @@ onMounted(() => {
 .control-panel--theme {
   --c-panel--text-color: #333333;
   --c-panel--bg-color: var(--control-panel--bg-color, #f5f5f5);
-  --c-panel--topbar--bg-color: #f5f5f5;
-  --c-panel--topbar--text-color: #333333;
-  --c-panel--topbar--shadow-color: rgba(0, 0, 0, 0.4);
 }
 
 .control-panel {
@@ -90,28 +89,6 @@ onMounted(() => {
   flex-direction: column;
   flex: 1;
   overflow: hidden;
-}
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  align-items: center;
-  padding: 10px;
-  background-color: var(--c-panel--topbar--bg-color);
-  box-shadow: -4px 0 4px 0 var(--c-panel--topbar--shadow-color);
-  width: 100%;
-  height: 40px;
-}
-
-.topbar-text {
-  font-size: clamp(1rem, 1.8vw, 1.2rem);
-  color: var(--c-panel--topbar--text-color);
-  font-weight: normal;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
 }
 
 .main-panel {
