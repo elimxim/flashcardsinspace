@@ -33,7 +33,11 @@
       >
         <div class="sidebar-item__content">
           <div class="sidebar-item__name">{{ set.name }}</div>
-          <div class="sidebar-item__language">{{ getLanguageName(set) }}</div>
+          <AwesomeContainer class="sidebar-item__language-container" icon="fa-solid fa-globe">
+            <div class="sidebar-item__language">
+              {{ getLanguageName(set) }}
+            </div>
+          </AwesomeContainer>
         </div>
         <div class="sidebar-item__count-container">
           <div class="sidebar-item__count">{{ getFlashcardsNumber(set) }}</div>
@@ -48,6 +52,7 @@
 <script setup lang="ts">
 import ControlBar from '@/components/ControlBar.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
+import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
@@ -127,19 +132,19 @@ onMounted(() => {
 
 <style scoped>
 .sidebar--theme {
-  --bar--bg-color: var(--sidebar--bg-color, #f5f5f5);
+  --bar--bg: var(--sidebar--bg, #f5f5f5);
   --bar--border-color: var(--sidebar--border-color, #dee2e6);
-  --bar--item--bg-color: var(--sidebar--item--bg-color, #ffffff);
-  --bar--item--bg-color--hover: var(--sidebar--item--bg-color--hover, #e8eef5);
-  --bar--item--bg-color--active: var(--sidebar--item--bg-color--active, #e8eef5);
+  --bar--item--bg: var(--sidebar--item--bg, #ffffff);
+  --bar--item--bg--hover: var(--sidebar--item--bg--hover, #e8eef5);
+  --bar--item--bg--active: var(--sidebar--item--bg--active, #e8eef5);
   --bar--item--border-color: var(--sidebar--item--border-color, #dee2e6);
   --bar--item--border-color--active: var(--sidebar--item--border-color--active, #dee2e6);
   --bar--item--text-color: var(--sidebar--item--text-color, #495057);
-  --bar--item--shadow-color: var(--sidebar--item--shadow-color, rgba(0, 0, 0, 0.1));
+  --bar--item--shadow-color: var(--sidebar--item--shadow-color, rgba(0, 0, 0, 0.08));
   --bar--item--count--color: var(--sidebar--item--count-color, #6c757d);
-  --bar--item--count--shadow-color: var(--sidebar--item--count--shadow-color, rgba(0, 0, 0, 0.1));
   --bar--language--text-color: var(--sidebar--language--text-color, #6c757d);
-  --bar--count--bg-color: var(--sidebar--count--bg-color, #f8f9fa);
+  --bar--language--icon-color: var(--sidebar--language--icon-color, rgba(0, 123, 255, 0.52));
+  --bar--count--bg: var(--sidebar--count--bg, #f8f9fa);
   --bar--count--border-color: var(--sidebar--count--border-color, #dee2e6);
   --bar--scrollbar--track-color: var(--sidebar--scrollbar--track-color, #f1f3f4);
   --bar--scrollbar--thumb-color: var(--sidebar--scrollbar--thumb-color, #dfdfdf);
@@ -153,7 +158,7 @@ onMounted(() => {
   flex-direction: column;
   width: clamp(200px, 40vw, 280px);
   height: 100%;
-  background-color: var(--bar--bg-color);
+  background: var(--bar--bg);
   transition: margin-left 0.35s ease-in-out;
   overflow: hidden;
 }
@@ -207,46 +212,31 @@ onMounted(() => {
   align-items: center;
   padding: 10px;
   cursor: pointer;
-  background: linear-gradient(135deg,
-  var(--bar--item--bg-color) 0%,
-  color-mix(in srgb, var(--bar--item--bg-color) 95%, #000000) 50%,
-  color-mix(in srgb, var(--bar--item--bg-color) 90%, #000000) 100%);
+  background: var(--bar--item--bg);
   border: 1px solid var(--bar--item--border-color);
-  border-radius: 3px;
-  box-shadow: 0 1px 2px var(--bar--item--shadow-color),
-  inset 0 1px 0 color-mix(in srgb, var(--bar--item--bg-color) 80%, #ffffff),
-  inset 0 -1px 0 color-mix(in srgb, var(--bar--item--bg-color) 80%, #000000);
+  border-radius: 6px;
+  box-shadow: 2px 2px 3px var(--bar--item--shadow-color);
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .sidebar-item:hover {
-  background: linear-gradient(135deg,
-  var(--bar--item--bg-color--hover) 0%,
-  color-mix(in srgb, var(--bar--item--bg-color--hover) 92%, #000000) 50%,
-  color-mix(in srgb, var(--bar--item--bg-color--hover) 85%, #000000) 100%);
-  box-shadow: 0 3px 6px var(--bar--item--shadow-color),
-  inset 0 1px 0 color-mix(in srgb, var(--bar--item--bg-color--hover) 75%, #ffffff),
-  inset 0 -1px 0 color-mix(in srgb, var(--bar--item--bg-color--hover) 75%, #000000);
+  background: var(--bar--item--bg--hover);
+  box-shadow: 8px 3px 3px var(--bar--item--shadow-color);
   transform: translateX(-6px);
 }
 
 .sidebar-item--active {
-  background: linear-gradient(135deg,
-  var(--bar--item--bg-color--active) 0%,
-  color-mix(in srgb, var(--bar--item--bg-color--active) 88%, #000000) 50%,
-  color-mix(in srgb, var(--bar--item--bg-color--active) 80%, #000000) 100%);
+  background: var(--bar--item--bg--active);
   border-color: var(--bar--item--border-color--active);
-  box-shadow: 0 2px 4px var(--bar--item--shadow-color),
-  inset 0 1px 0 color-mix(in srgb, var(--bar--item--bg-color--active) 70%, #ffffff),
-  inset 0 -1px 0 color-mix(in srgb, var(--bar--item--bg-color--active) 70%, #000000),
-  inset 0 0 0 1px color-mix(in srgb, var(--bar--item--bg-color--active) 60%, #0066cc);
+  box-shadow: 8px 3px 3px var(--bar--item--shadow-color);
+  transform: translateX(-6px);
 }
 
 .sidebar-item__content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -257,6 +247,12 @@ onMounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.sidebar-item__language-container {
+  --awesome-container--icon--font-size: 0.8rem;
+  --awesome-container--icon--color: var(--bar--language--icon-color);
+  --awesome-container--gap: 4px;
 }
 
 .sidebar-item__language {
@@ -271,8 +267,8 @@ onMounted(() => {
 .sidebar-item__count {
   width: 32px;
   height: 24px;
-  border-radius: 2px;
-  background: var(--bar--count--bg-color);
+  border-radius: 4px;
+  background: var(--bar--count--bg);
   border: 1px solid var(--bar--count--border-color);
   display: flex;
   align-items: center;
