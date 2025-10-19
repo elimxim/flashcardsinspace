@@ -239,7 +239,7 @@ async function finishReview() {
 async function finishReviewAndGoToFlashcards() {
   await finishReview()
     .then(() =>
-      router.push({ name: routeNames.controlPanel })
+      router.push({ name: routeNames.flashcards })
     )
 }
 
