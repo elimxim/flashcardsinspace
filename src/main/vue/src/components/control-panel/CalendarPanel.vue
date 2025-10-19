@@ -1,72 +1,64 @@
 <template>
   <div class="calendar-panel calendar-panel--theme">
-    <div class="calendar-panel-content">
-      <div class="calendar-panel-label">
-        Current day
+    <div class="calendar-panel-main-area">
+      <div class="calendar-button-wrapper">
+        <AwesomeButton
+          :icon="calendarIcon"
+          class="calendar-panel-button"
+          :disabled="!flashcardSet"
+          :on-click="modalStore.toggleCalendar"
+          fill-space
+          square
+        />
+        <AwesomeButton
+          v-if="hasNotCompletedPreviousDays"
+          class="calendar-info-button"
+          icon="fa-solid fa-circle-exclamation"
+          :on-hover="togglePreviousDaysPopup"
+        />
       </div>
-      <AwesomeButton
-        v-if="hasNotCompletedPreviousDays"
-        class="calendar-panel-info-button calendar-panel-info-button-layout"
-        icon="fa-solid fa-circle-exclamation"
-        :on-hover="togglePreviousDaysPopup"
-      />
-      <div class="calendar-panel-layout">
-        <div class="calendar-panel-left-area">
-          <AwesomeButton
-            :icon="calendarIcon"
-            class="calendar-panel-button"
-            :disabled="!flashcardSet"
-            :on-click="modalStore.toggleCalendar"
-            fill-space
-            square
-          />
-          <div class="calendar-panel-day">
-            <div class="calendar-day-text">
-              Day
-            </div>
-            <div v-if="isOnVacation" class="calendar-day-vacation">
-              🌴
-            </div>
-            <div v-else class="calendar-day-number">
-              {{ currDayNumber }}
-            </div>
+      <div class="calendar-day-area">
+        <div class="calendar-day-text">
+          Day
+        </div>
+        <div class="calendar-day-number">
+          <template v-if="isOnVacation">
+            🌴
+          </template>
+          <template v-else>
+            {{ currDayNumber }}
+          </template>
+        </div>
+      </div>
+    </div>
+    <div class="calendar-panel-review-area">
+      <div class="calendar-panel-review-header">
+        To review
+      </div>
+      <div class="review-grid">
+        <div class="review-stage-column">
+          <div
+            v-for="review in currDayStageReviews"
+            :key="review.stage"
+            class="review-stage"
+          >
+            {{ review.stage }}
+          </div>
+          <div class="review-stage">
+            Total
           </div>
         </div>
-        <div class="calendar-panel-right-area">
-          <div class="calendar-panel-review-header">
-            To review
+        <div class="review-number-column">
+          <div
+            v-for="review in currDayStageReviews"
+            :key="review.stage"
+            class="review-number"
+          >
+            {{ review.count }}
           </div>
-          <div class="review-grid">
-            <div class="review-stage-column">
-              <div
-                v-for="review in currDayStageReviews"
-                :key="review.stage"
-                class="review-stage"
-              >
-                {{ review.stage }}
-              </div>
-              <div class="review-stage">
-                Total
-              </div>
-            </div>
-            <div class="review-number-column">
-              <div
-                v-for="review in currDayStageReviews"
-                :key="review.stage"
-                class="review-number"
-              >
-                {{ review.count }}
-              </div>
-              <div class="review-number">
-                {{ currDayReviewTotal }}
-              </div>
-            </div>
+          <div class="review-number">
+            {{ currDayReviewTotal }}
           </div>
-        </div>
-        <div class="calendar-panel-launch-area">
-          <LaunchButton
-            :on-click="startReview"
-          />
         </div>
       </div>
     </div>
@@ -144,7 +136,6 @@
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import CalendarModal from '@/views/modal/CalendarModal.vue'
-import LaunchButton from '@/components/control-panel/LaunchButton.vue'
 import { computed, ref } from 'vue'
 import { calcStageReviews, StageReview } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
@@ -156,10 +147,7 @@ import {
   isCompleteAvailable,
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
-import { useRouter } from 'vue-router'
-import { routeNames } from '@/router'
 
-const router = useRouter()
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 const modalStore = useModalStore()
@@ -238,124 +226,87 @@ const calendarIcon = computed(() => {
   }
 })
 
-function startReview() {
-  router.push({ name: routeNames.review })
-}
-
 </script>
 
 <style scoped>
 .calendar-panel--theme {
-  --d-panel--label-color: var(--calendar-panel--label-color, #555555);
   --d-panel--text-color: var(--calendar-panel--text-color, rgba(57, 57, 57, 0.92));
   --d-panel--number-color: var(--calendar-panel--number-color, rgba(17, 33, 85, 0.92));
   --d-panel--border-color: var(--calendar-panel--border-color, rgba(128, 128, 128, 0.62));
   --d-panel--review--header-color: var(--calendar-panel--review--header-color, rgba(43, 69, 142, 0.88));
   --d-panel--review--bg: var(--calendar-panel--review--bg, rgba(88, 114, 209, 0.13));
+  --d-panel--info-button--color: var(--calendar-panel--info-button--color, rgb(253, 107, 76));
+  --d-panel--info-button--color--hover: var(--calendar-panel--info-button--color--hover, rgb(255, 66, 61));
 }
 
 .calendar-panel {
   position: relative;
   display: flex;
   flex-direction: row;
+  padding: 1px;
+  gap: 10px;
+  width: fit-content;
+  height: 100%;
 }
 
-.calendar-panel-label {
-  font-size: clamp(0.5rem, 1.8vw, 0.6rem);
-  color: var(--d-panel--label-color);
-  letter-spacing: 0.1rem;
-  word-spacing: 0.1rem;
-  text-transform: uppercase;
-  padding: 0 0 0 6px;
+.calendar-button-wrapper {
+  position: relative;
+  height: 100%;
 }
 
-.calendar-panel-info-button-layout {
+.calendar-info-button {
+  --awesome-button--border-radius: 50%;
+  --awesome-button--font-size: 22px;
+  --awesome-button--color: var(--d-panel--info-button--color);
+  --awesome-button--color--hover: var(--d-panel--info-button--color--hover);
   position: absolute;
-  top: -2px;
-  right: -12px;
+  top: -14px;
+  right: -14px;
   z-index: 10;
 }
 
-.calendar-panel-content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  padding: 1px;
-}
-
-.calendar-panel-layout {
-  display: flex;
-  flex-direction: row;
-  padding: 4px;
-  gap: 4px;
-  border: 1px solid var(--d-panel--border-color);
-  border-radius: 6px;
-  width: clamp(280px, 40vw, 380px);
-  height: clamp(110px, 20vw, 120px);
-}
-
-.calendar-panel-left-area {
+.calendar-panel-main-area {
   display: grid;
-  grid-template-rows: 1fr auto;
-  flex-direction: column;
-  justify-content: space-between;
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: 4px;
   height: 100%;
 }
 
-.calendar-panel-right-area {
+.calendar-panel-review-area {
   display: flex;
   flex-direction: column;
   gap: 1px;
   height: 100%;
 }
 
-.calendar-panel-launch-area {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  height: 100%;
-}
-
-.calendar-panel-day {
+.calendar-day-area {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 4px;
-  gap: clamp(4px, 1vw, 8px);
+  padding: 0 4px;
+  gap: 4px;
 }
 
 .calendar-day-text {
-  font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+  font-size: 0.9rem;
   color: var(--d-panel--text-color);
   white-space: nowrap;
 }
 
 .calendar-day-number {
-  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  font-size: 0.8rem;
   font-weight: 500;
   border: 1px solid var(--d-panel--border-color);
   color: var(--d-panel--number-color);
   border-radius: 3px;
   padding: 1px;
-  width: clamp(30px, 4vw, 40px);
-  text-align: center;
-}
-
-.calendar-day-vacation {
-  font-size: clamp(0.70rem, 2vw, 0.8rem);
-  font-weight: 600;
-  border: 1px solid var(--d-panel--border-color);
-  color: var(--d-panel--number-color);
-  border-radius: 3px;
-  padding: 1px;
-  width: clamp(30px, 4vw, 40px);
+  width: 40px;
   text-align: center;
 }
 
 .calendar-panel-review-header {
-  font-size: clamp(0.5rem, 1vw, 0.6rem);
+  font-size: 0.7rem;
   color: var(--d-panel--review--header-color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
@@ -372,7 +323,7 @@ function startReview() {
   grid-template-rows: repeat(3, 1fr);
   grid-auto-flow: column;
   align-items: center;
-  gap: 0 4px;
+  gap: 4px;
   border: 2px solid var(--d-panel--review--bg);
   border-radius: 4px;
   padding-left: 4px;
@@ -399,26 +350,26 @@ function startReview() {
   justify-content: space-between;
   align-items: center;
   padding: 10px 4px;
-  border-radius: 2px;
+  border-radius: 0 2px 2px 0;
   height: 100%;
   min-height: 0;
   background: var(--d-panel--review--bg);
 }
 
 .review-stage {
-  font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+  font-size: 0.9rem;
   color: var(--d-panel--text-color);
   white-space: nowrap;
   padding: 3px 0;
 }
 
 .review-number {
-  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  font-size: 0.8rem;
   font-weight: 500;
   border: 1px solid var(--d-panel--border-color);
   color: var(--d-panel--number-color);
   border-radius: 3px;
-  padding: 2px;
+  padding: 1px;
   width: 30px;
   text-align: center;
 }
@@ -427,7 +378,7 @@ function startReview() {
   position: absolute;
   top: 100%;
   left: 0;
-  margin-top: 4px;
+  margin-top: 10px;
   background-color: transparent;
   backdrop-filter: blur(40px);
   border: 1px solid var(--d-panel--border-color);
@@ -441,12 +392,12 @@ function startReview() {
   flex-direction: column;
   padding: 4px;
   border-radius: 6px;
-  width: clamp(280px, 40vw, 380px);
+  width: fit-content;
   height: fit-content;
 }
 
 .calendar-popup-header {
-  font-size: clamp(0.5rem, 1vw, 0.6rem);
+  font-size: 0.6rem;
   color: var(--d-panel--review--header-color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
@@ -456,7 +407,7 @@ function startReview() {
 }
 
 .calendar-popup-text {
-  font-size: clamp(0.5rem, 1vw, 0.6rem);
+  font-size: 0.6rem;
   color: var(--d-panel--review--header-color);
   word-spacing: 0.05rem;
   letter-spacing: 0.05rem;
