@@ -93,6 +93,7 @@ defineExpose({
   --a-btn--border: var(--awesome-button--border, none);
   --a-btn--border--hover: var(--awesome-button--border--hover, none);
   --a-btn--border-radius: var(--awesome-button--border-radius, none);
+  --a-btn--padding: var(--awesome-button--padding, 1px);
 }
 
 .awesome-button-wrapper {
@@ -130,7 +131,7 @@ defineExpose({
   outline: none;
   cursor: pointer;
   margin: 0;
-  padding: 1px;
+  padding: var(--a-btn--padding);
   transition: all 0.3s ease-in-out;
   overflow: hidden;
 }
@@ -169,8 +170,6 @@ defineExpose({
 
 .awesome-spinning-icon {
   font-size: min(var(--a-btn--fontsize), 100cqw, 100cqh);
-  color: var(--a-btn--color--hover);
-  background: var(--a-btn--bg--hover);
   animation: spin 2s linear infinite;
 }
 
