@@ -1,31 +1,31 @@
 .cancel-button {
-  --smart-button--bg-color: var(--cancel-button--bg-color);
-  --smart-button--bg-color--hover: var(--cancel-button--bg-color--hover)
+  --smart-button--bg: var(--cancel-button--bg-color);
+  --smart-button--bg--hover: var(--cancel-button--bg-color--hover)
 }
 
 .remove-button {
-  --smart-button--bg-color: var(--remove-button--bg-color);
-  --smart-button--bg-color--hover: var(--remove-button--bg-color--hover)
+  --smart-button--bg: var(--remove-button--bg-color);
+  --smart-button--bg--hover: var(--remove-button--bg-color--hover)
 }
 
 .update-button {
-  --smart-button--bg-color: var(--update-button--bg-color);
-  --smart-button--bg-color--hover: var(--update-button--bg-color--hover)
+  --smart-button--bg: var(--update-button--bg-color);
+  --smart-button--bg--hover: var(--update-button--bg-color--hover)
 }
 
 .create-button {
-  --smart-button--bg-color: var(--create-button--bg-color);
-  --smart-button--bg-color--hover: var(--create-button--bg-color--hover)
+  --smart-button--bg: var(--create-button--bg-color);
+  --smart-button--bg--hover: var(--create-button--bg-color--hover)
 }
 
 .auth-button {
-  --smart-button--bg-color: var(--auth-button--bg-color);
-  --smart-button--bg-color--hover: var(--auth-button--bg-color--hover);
+  --smart-button--bg: var(--auth-button--bg-color);
+  --smart-button--bg--hover: var(--auth-button--bg-color--hover);
 }
 
 .calendar-button {
-  --smart-button--bg-color: var(--calendar-button--bg-color);
-  --smart-button--bg-color--hover: var(--calendar-button--bg-color--hover);
+  --smart-button--bg: var(--calendar-button--bg-color);
+  --smart-button--bg--hover: var(--calendar-button--bg-color--hover);
 }
 
 .review-button {
@@ -33,8 +33,8 @@
 }
 
 .move-back-button {
-  --smart-button--bg-color: var(--move-back-button--bg-color);
-  --smart-button--bg-color--hover: var(--move-back-button--bg-color--hover);
+  --smart-button--bg: var(--move-back-button--bg-color);
+  --smart-button--bg--hover: var(--move-back-button--bg-color--hover);
 }
 
 .calendar-panel-button {

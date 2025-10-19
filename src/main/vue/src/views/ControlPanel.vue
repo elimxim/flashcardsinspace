@@ -107,7 +107,7 @@ onMounted(() => {
   align-items: center;
   margin-top: 10px;
   padding: 6px;
-  gap: 10px;
+  gap: 16px;
   border-radius: 4px;
   height: 120px;
   flex-wrap: wrap;
