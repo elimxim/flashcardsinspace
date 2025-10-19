@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <div class="calendar-panel-review-area">
+    <div v-if="!isInitialDay" class="calendar-panel-review-area">
       <div class="calendar-panel-review-header">
         To review
       </div>
@@ -153,7 +153,11 @@ const chronoStore = useChronoStore()
 const modalStore = useModalStore()
 
 const { flashcardSet, flashcards, isSuspended } = storeToRefs(flashcardStore)
-const { currDay, isDayOff } = storeToRefs(chronoStore)
+const {
+  currDay,
+  isDayOff,
+  isInitialDay,
+} = storeToRefs(chronoStore)
 
 const showPreviousDaysPopup = ref(false)
 
