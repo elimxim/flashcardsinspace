@@ -34,6 +34,6 @@ function startReview() {
   align-items: center;
   padding: 1px;
   height: 100%;
-  width: fit-content;
+  width: 160px;
 }
 </style>

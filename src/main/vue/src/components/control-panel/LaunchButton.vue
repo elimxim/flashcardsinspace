@@ -14,7 +14,6 @@
       icon="fa-solid fa-rocket"
       :disabled="disabled"
       fill-space
-      square
     />
     <div class="curtain">
       <div class="curtain-text">Start Review</div>
