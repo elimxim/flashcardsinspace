@@ -24,6 +24,7 @@
             />
           </template>
         </ControlBar>
+        <FlashcardInfoBar :hidden="!flashcardSet || !sidebar?.isExpanded()" />
         <div class="main-panel">
           <FlashcardInfoPanel/>
           <CalendarPanel/>
@@ -38,6 +39,7 @@
 import SideBar from '@/components/control-panel/SideBar.vue'
 import ControlBar from '@/components/ControlBar.vue'
 import CalendarPanel from '@/components/control-panel/CalendarPanel.vue'
+import FlashcardInfoBar from '@/components/control-panel/FlashcardInfoBar.vue'
 import FlashcardInfoPanel from '@/components/control-panel/FlashcardInfoPanel.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import GlowLamp from '@/components/control-panel/GlowLamp.vue'
@@ -51,7 +53,11 @@ import { loadFlashcardSetStore } from '@/shared/stores.ts'
 const flashcardStore = useFlashcardStore()
 const modalStore = useModalStore()
 
-const { flashcardSet } = storeToRefs(flashcardStore)
+const {
+  flashcardSet,
+  flashcards,
+  language,
+} = storeToRefs(flashcardStore)
 
 const sidebar = ref<InstanceType<typeof SideBar>>()
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
@@ -85,14 +91,15 @@ onMounted(() => {
 .control-panel-layout {
   position: relative;
   display: flex;
+  flex-direction: row;
   width: 100%;
   height: 100%;
 }
 
 .control-panel-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  flex: 1;
   overflow: hidden;
 }
 
