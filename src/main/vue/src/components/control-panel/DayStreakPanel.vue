@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
-import { computed } from 'vue';
+import { computed } from 'vue'
 import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 
 const chronoStore = useChronoStore()
