@@ -60,7 +60,7 @@ const dayStreakNumber = computed(() => {
 .day-streak-panel--theme {
   --s-panel--number--color: var(--day-streak-panel--number--color, rgba(233, 238, 255, 0.92));
   --s-panel--text--color: var(--day-streak-panel--text--color, rgba(251, 233, 255, 0.88));
-  --s-panel--bg: var(--day-streak-panel--bg, linear-gradient(135deg, rgba(131, 34, 234, 0.66) 0%, rgba(159, 25, 101, 0.68) 100%));
+  --s-panel--bg: var(--day-streak-panel--bg, linear-gradient(135deg, rgba(234, 94, 34, 0.66) 0%, rgba(159, 25, 56, 0.68) 100%));
   --s-panel--border-color: var(--day-streak-panel--border-color, rgba(128, 128, 128, 0.62));
 }
 
