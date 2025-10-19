@@ -11,6 +11,10 @@
               :disabled="sidebar?.isExpanded()"
               icon="fa-solid fa-bars"
             />
+            <GlowLamp
+              :on="sidebar?.isExpanded()"
+              :hidden="!sidebar?.isExpanded()"
+            />
           </template>
           <template #right>
             <AwesomeButton
@@ -36,6 +40,7 @@ import ControlBar from '@/components/ControlBar.vue'
 import CalendarPanel from '@/components/control-panel/CalendarPanel.vue'
 import FlashcardInfoPanel from '@/components/control-panel/FlashcardInfoPanel.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
+import GlowLamp from '@/components/control-panel/GlowLamp.vue'
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useModalStore } from '@/stores/modal-store.ts'

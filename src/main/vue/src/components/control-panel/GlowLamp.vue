@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="!hidden"
     class="lamp lamp--theme"
     :class="shapeClass"
     role="switch"
@@ -26,14 +27,17 @@ const props = withDefaults(defineProps<{
   radius?: number
   /** light softness in px (blur) */
   softness?: number
+  /** hide the lamp */
+  hidden?: boolean
 }>(), {
   on: false,
-  size: 24,
+  size: 22,
   shape: 'circle',
   borderWidth: 2,
-  intensity: 0.8,
-  radius: 100,
+  intensity: 0.5,
+  radius: 95,
   softness: 1,
+  hidden: false,
 })
 
 const shapeClass = computed(() => props.shape ? `shape-${props.shape}` : 'shape-circle')
@@ -46,9 +50,9 @@ const softnessPx = computed(() => `${Math.max(0, props.softness)}px`)
 
 <style scoped>
 .lamp--theme {
-  --lamp--bg-color: #e9ecef;
-  --lamp--border-color: rgba(255, 255, 255, .35);
-  --lamp--color: #0ba6e8;
+  --lamp--color: var(--glow-lamp--color, #5c0be8);
+  --lamp--bg-color: var(--glow-lamp--bg-color, #ae9698);
+  --lamp--border-color: var(--glow-lamp--border-color, rgba(216, 216, 216, 0.65));
 }
 
 .lamp {
