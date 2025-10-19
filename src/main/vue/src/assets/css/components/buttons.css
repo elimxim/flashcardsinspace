@@ -38,7 +38,7 @@
 }
 
 .calendar-panel-button {
-  --awesome-button--font-size: clamp(40px, 10vw, 50px);
+  --awesome-button--font-size: 50px;
   --awesome-button--color: var(--calendar-panel-button--color);
   --awesome-button--color--hover: var(--calendar-panel-button--color--hover);
   --awesome-button--bg: var(--calendar-panel-button--bg);
@@ -48,14 +48,8 @@
   --awesome-button--border-radius: 6px;
 }
 
-.calendar-panel-info-button {
-  --awesome-button--font-size: 22px;
-  --awesome-button--color: rgb(253, 107, 76);
-  --awesome-button--color--hover: rgb(255, 66, 61);
-}
-
 .flashcard-panel-button {
-  --awesome-button--font-size: clamp(25px, 10vw, 34px);
+  --awesome-button--font-size: 50px;
   --awesome-button--color: var(--flashcard-panel-button--color);
   --awesome-button--color--hover: var(--flashcard-panel-button--color--hover);
   --awesome-button--bg: var(--flashcard-panel-button--bg);
