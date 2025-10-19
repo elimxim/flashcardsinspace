@@ -1,14 +1,12 @@
 <template>
   <div class="flashcard-panel flashcard-panel--theme">
-    <div class="flashcard-panel-button-wrapper">
-      <AwesomeButton
-        icon="fa-solid fa-rectangle-list"
-        class="flashcard-panel-button"
-        :on-click="modalStore.toggleFlashcardCreation"
-        fill-space
-        square
-      />
-    </div>
+    <AwesomeButton
+      icon="fa-solid fa-rectangle-list"
+      class="flashcard-panel-button"
+      :on-click="modalStore.toggleFlashcardCreation"
+      fill-space
+      square
+    />
     <div class="flashcard-panel-text">
       Add flashcard
     </div>
@@ -31,16 +29,16 @@ const modalStore = useModalStore()
 }
 
 .flashcard-panel {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: fit-content;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
   height: 100%;
+  width: auto;
   gap: 1px;
+  padding: 1px;
 }
 
 .flashcard-panel-text {
-  font-size: clamp(0.6rem, 2vw, 0.7rem);
+  font-size: 0.6rem;
   color: var(--f-panel--text-color);
   word-spacing: 0.05rem;
   letter-spacing: 0.05rem;
@@ -49,10 +47,5 @@ const modalStore = useModalStore()
   text-align: center;
 }
 
-.flashcard-panel-button-wrapper {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-}
 </style>
 
