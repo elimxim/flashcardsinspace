@@ -7,8 +7,8 @@
           <template #left>
             <AwesomeButton
               :on-click="sidebar?.toggle"
-              :hidden="sidebar?.isExpanded()"
-              :disabled="sidebar?.isExpanded()"
+              :hidden="isSidebarExpanded"
+              :disabled="isSidebarExpanded"
               icon="fa-solid fa-bars"
             />
           </template>
@@ -20,7 +20,7 @@
             />
           </template>
         </ControlBar>
-        <FlashcardInfoBar :hidden="!flashcardSet || sidebar?.isExpanded()" />
+        <FlashcardInfoBar :hidden="!flashcardSet || isSidebarExpanded" />
         <div class="main-panel">
           <FlashcardPanel/>
           <CalendarPanel/>
@@ -48,11 +48,14 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import { loadFlashcardSetStore } from '@/shared/stores.ts'
+import { useControlStore } from '@/stores/control-store.ts'
 
 const flashcardStore = useFlashcardStore()
 const toggleStore = useToggleStore()
+const controlStore = useControlStore()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
+const { isSidebarExpanded } = storeToRefs(controlStore)
 
 const sidebar = ref<InstanceType<typeof SideBar>>()
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')

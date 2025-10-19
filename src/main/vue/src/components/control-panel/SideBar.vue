@@ -1,7 +1,7 @@
 <template>
   <div
     class="sidebar sidebar--theme"
-    :class="{ 'sidebar--collapsed': !expanded }"
+    :class="{ 'sidebar--collapsed': !isSidebarExpanded }"
   >
     <ControlBar
       class="sidebar-control-bar"
@@ -63,25 +63,27 @@ import {
 } from '@/shared/stores.ts'
 import { saveSelectedSetId } from '@/shared/cookies.ts'
 import { FlashcardSet } from '@/model/flashcard.ts'
+import { useControlStore } from '@/stores/control-store.ts'
 
 const flashcardStore = useFlashcardStore()
 const flashcardSetStore = useFlashcardSetStore()
 const languageStore = useLanguageStore()
 const toggleStore = useToggleStore()
+const controlStore = useControlStore()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
 const { flashcardSets } = storeToRefs(flashcardSetStore)
+const { isSidebarExpanded } = storeToRefs(controlStore)
 
 let animationTimeout: number | undefined
 const animating = ref(false)
-const expanded = ref(true)
 
 function toggle() {
   if (animationTimeout) {
     window.clearTimeout(animationTimeout)
   }
   animating.value = true
-  expanded.value = !expanded.value
+  controlStore.toggleSidebar()
   animationTimeout = window.setTimeout(() => {
     animating.value = false
   }, 400)
@@ -108,18 +110,8 @@ function getLanguageName(set: FlashcardSet): string {
   return language ? language.name : 'Unknown'
 }
 
-function isExpanded() {
-  return expanded.value
-}
-
-function isAnimating() {
-  return animating.value
-}
-
 defineExpose({
   toggle,
-  isExpanded,
-  isAnimating,
 })
 
 onMounted(() => {
