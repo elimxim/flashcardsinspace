@@ -20,7 +20,7 @@
             />
           </template>
         </ControlBar>
-        <FlashcardInfoBar :hidden="!flashcardSet || !sidebar?.isExpanded()" />
+        <FlashcardInfoBar :hidden="!flashcardSet || sidebar?.isExpanded()" />
         <div class="main-panel">
           <FlashcardPanel/>
           <CalendarPanel/>
@@ -102,8 +102,9 @@ onMounted(() => {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  margin-top: 10px;
   padding: 6px;
-  gap: clamp(4px, 1vw, 10px);
+  gap: 10px;
   border-radius: 4px;
   height: 120px;
   flex-wrap: wrap;
