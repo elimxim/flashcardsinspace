@@ -88,7 +88,7 @@ function handleKeydown(event: KeyboardEvent) {
     event.stopPropagation()
     pressExit()
   } else if (event.key === 'Enter' && !event.ctrlKey) {
-    if (!(event.target instanceof HTMLInputElement)) {
+    if (!(event.target instanceof HTMLTextAreaElement)) {
       event.preventDefault()
       event.stopPropagation()
       pressEnter()
