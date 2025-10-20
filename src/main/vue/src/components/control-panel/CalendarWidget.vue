@@ -260,9 +260,9 @@ const calendarIcon = computed(() => {
 
 .calendar-info-button {
   --awesome-button--border-radius: 50%;
-  --awesome-button--font-size: 22px;
-  --awesome-button--color: var(--d-widget--info-button--color);
-  --awesome-button--color--hover: var(--d-widget--info-button--color--hover);
+  --awesome-button--icon--size: 22px;
+  --awesome-button--icon--color: var(--d-widget--info-button--color);
+  --awesome-button--icon--color--hover: var(--d-widget--info-button--color--hover);
   position: absolute;
   top: -14px;
   right: -14px;

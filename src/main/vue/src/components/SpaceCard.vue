@@ -245,9 +245,9 @@ defineExpose({
 }
 
 .space-card-edit-button {
-  --awesome-button--font-size: inherit;
-  --awesome-button--color: var(--card--color--strip);
-  --awesome-button--color--hover: var(--card--color--strip--hover);
+  --awesome-button--icon--size: inherit;
+  --awesome-button--icon--color: var(--card--color--strip);
+  --awesome-button--icon--color--hover: var(--card--color--strip--hover);
 }
 
 </style>

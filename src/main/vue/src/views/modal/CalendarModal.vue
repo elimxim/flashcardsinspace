@@ -283,7 +283,7 @@ function handleKeydown(event: KeyboardEvent) {
   padding: 4px;
   font-size: clamp(0.95rem, 2vw, 1.15rem);
   font-weight: 600;
-  --awesome-button--font-size: clamp(0.9rem, 2vw, 1.1rem);
+  --awesome-button--icon--size: clamp(0.9rem, 2vw, 1.1rem);
 }
 
 .calendar-weekdays {

@@ -38,9 +38,9 @@
 }
 
 .calendar-widget-button {
-  --awesome-button--font-size: 50px;
-  --awesome-button--color: var(--calendar-widget-button--color);
-  --awesome-button--color--hover: var(--calendar-widget-button--color--hover);
+  --awesome-button--icon--size: 50px;
+  --awesome-button--icon--color: var(--calendar-widget-button--color);
+  --awesome-button--icon--color--hover: var(--calendar-widget-button--color--hover);
   --awesome-button--bg: var(--calendar-widget-button--bg);
   --awesome-button--bg--hover: var(--calendar-widget-button--bg--hover);
   --awesome-button--bg--disabled: var(--calendar-widget-button--bg--disabled);
@@ -49,9 +49,9 @@
 }
 
 .flashcard-widget-button {
-  --awesome-button--font-size: 50px;
-  --awesome-button--color: var(--flashcard-widget-button--color);
-  --awesome-button--color--hover: var(--flashcard-widget-button--color--hover);
+  --awesome-button--icon--size: 50px;
+  --awesome-button--icon--color: var(--flashcard-widget-button--color);
+  --awesome-button--icon--color--hover: var(--flashcard-widget-button--color--hover);
   --awesome-button--bg: var(--flashcard-widget-button--bg);
   --awesome-button--bg--hover: var(--flashcard-widget-button--bg--hover);
   --awesome-button--bg--disabled: var(--flashcard-widget-button--bg--disabled);
@@ -60,8 +60,8 @@
 }
 
 .control-bar-button {
-  --awesome-button--color: var(--control-bar--button--color);
-  --awesome-button--color--hover: var(--control-bar--button--color--hover);
+  --awesome-button--icon--color: var(--control-bar--button--color);
+  --awesome-button--icon--color--hover: var(--control-bar--button--color--hover);
   --awesome-button--bg: var(--control-bar--button--bg);
   --awesome-button--bg--hover: var(--control-bar--button--bg--hover);
 }
