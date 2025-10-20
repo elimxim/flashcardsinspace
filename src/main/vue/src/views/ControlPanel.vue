@@ -27,7 +27,7 @@
           <FlashcardPanel/>
           <CalendarPanel/>
           <LaunchPanel/>
-          <DayStreakPanel/>
+          <DayStreakWidget/>
         </div>
       </div>
     </div>
@@ -41,7 +41,7 @@ import ControlBar from '@/components/ControlBar.vue'
 import FlashcardInfoBar from '@/components/control-panel/FlashcardInfoBar.vue'
 import FlashcardPanel from '@/components/control-panel/FlashcardPanel.vue'
 import CalendarPanel from '@/components/control-panel/CalendarPanel.vue'
-import DayStreakPanel from '@/components/control-panel/DayStreakPanel.vue'
+import DayStreakWidget from '@/components/control-panel/DayStreakWidget.vue'
 import LaunchPanel from '@/components/control-panel/LaunchPanel.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'

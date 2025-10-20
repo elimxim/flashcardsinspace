@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isInitialDay" class="day-streak-panel day-streak-panel--theme">
+  <div v-if="!isInitialDay" class="day-streak-widget day-streak-widget--theme">
     <div class="day-streak select-none">
       <div class="day-steak-number">
         {{ dayStreakNumber }}
@@ -57,14 +57,14 @@ const dayStreakNumber = computed(() => {
 </script>
 
 <style scoped>
-.day-streak-panel--theme {
-  --s-panel--number--color: var(--day-streak-panel--number--color, rgba(233, 238, 255, 0.92));
-  --s-panel--text--color: var(--day-streak-panel--text--color, rgba(251, 233, 255, 0.88));
-  --s-panel--bg: var(--day-streak-panel--bg, linear-gradient(135deg, rgba(234, 94, 34, 0.66) 0%, rgba(159, 25, 56, 0.68) 100%));
-  --s-panel--border-color: var(--day-streak-panel--border-color, rgba(128, 128, 128, 0.62));
+.day-streak-widget--theme {
+  --s-widget--number--color: var(--day-streak-widget--number--color, rgba(233, 238, 255, 0.92));
+  --s-widget--text--color: var(--day-streak-widget--text--color, rgba(251, 233, 255, 0.88));
+  --s-widget--bg: var(--day-streak-widget--bg, linear-gradient(135deg, rgba(234, 94, 34, 0.66) 0%, rgba(159, 25, 56, 0.68) 100%));
+  --s-widget--border-color: var(--day-streak-widget--border-color, rgba(128, 128, 128, 0.62));
 }
 
-.day-streak-panel {
+.day-streak-widget {
   position: relative;
   display: flex;
   padding: 1px;
@@ -78,15 +78,15 @@ const dayStreakNumber = computed(() => {
   justify-content: center;
   gap: 2px;
   border-radius: 6px;
-  border: 1px solid var(--s-panel--border-color);
-  background: var(--s-panel--bg);
+  border: 1px solid var(--s-widget--border-color);
+  background: var(--s-widget--bg);
   padding: 4px;
   font-size: 0.8rem;
   height: 100%;
 }
 
 .day-steak-number {
-  color: var(--s-panel--number--color);
+  color: var(--s-widget--number--color);
   font-weight: 800;
   font-family: var(--day-streak--font-family);
   font-variant-numeric: tabular-nums lining-nums;
@@ -100,7 +100,7 @@ const dayStreakNumber = computed(() => {
 .day-streak-text {
   font-size: 0.6rem;
   font-weight: 600;
-  color: var(--s-panel--text--color);
+  color: var(--s-widget--text--color);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   text-align: center;
