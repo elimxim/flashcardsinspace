@@ -33,31 +33,27 @@
       />
     </div>
     <div v-if="!isInitialDay" class="calendar-review-area">
-      <div class="calendar-review-header">
+      <div class="review-header">
         To review
       </div>
-      <div class="review-grid">
-        <div class="review-stage-column">
-          <div
-            v-for="review in currDayStageReviews"
-            :key="review.stage"
-            class="review-stage"
-          >
+      <div class="review-list">
+        <div
+          v-for="review in currDayStageReviews"
+          :key="review.stage"
+          class="review-item"
+        >
+          <div class="review-stage-label">
             {{ review.stage }}
           </div>
-          <div class="review-stage">
-            Total
-          </div>
-        </div>
-        <div class="review-number-column">
-          <div
-            v-for="review in currDayStageReviews"
-            :key="review.stage"
-            class="review-number"
-          >
+          <div class="review-count-display">
             {{ review.count }}
           </div>
-          <div class="review-number">
+        </div>
+        <div class="review-item review-item--total">
+          <div class="review-stage-label">
+            Total
+          </div>
+          <div class="review-count-display">
             {{ currDayReviewTotal }}
           </div>
         </div>
@@ -235,13 +231,15 @@ const calendarIcon = computed(() => {
 
 <style scoped>
 .calendar-widget--theme {
-  --d-widget--text-color: var(--calendar-widget--text-color, rgba(57, 57, 57, 0.92));
-  --d-widget--number-color: var(--calendar-widget--number-color, rgba(17, 33, 85, 0.92));
   --d-widget--border-color: var(--calendar-widget--border-color, rgba(128, 128, 128, 0.62));
-  --d-widget--review--header-color: var(--calendar-widget--review--header-color, rgba(43, 69, 142, 0.88));
-  --d-widget--review--bg: var(--calendar-widget--review--bg, rgba(88, 114, 209, 0.13));
-  --d-widget--info-button--color: var(--calendar-widget--info-button--color, rgb(253, 107, 76));
-  --d-widget--info-button--color--hover: var(--calendar-widget--info-button--color--hover, rgb(255, 66, 61));
+  --d-widget--stage-label--color: var(--calendar-widget--stage-label--color, rgba(13, 18, 74, 0.6));
+  --d-widget--number--color: var(--calendar-widget--number--color, rgba(13, 18, 74, 0.6));
+  --d-widget--number--bg: var(--calendar-widget--number--bg, rgba(255, 255, 255, 0.6));
+  --d-widget--review--header-color: var(--calendar-widget--review--header-color, rgba(255, 255, 255, 0.6));
+  --d-widget--review--bg: var(--calendar-widget--review--bg, linear-gradient(135deg, rgba(47, 189, 172, 0.66) 0%, rgba(18, 29, 83, 0.68) 100%));
+  --d-widget--popup-button--color: var(--calendar-widget--popup-button--color, rgb(253, 107, 76));
+  --d-widget--popup-button--color--hover: var(--calendar-widget--popup-button--color--hover, rgb(255, 66, 61));
+  --d-widget--popup--shadow-color: var(--calendar-widget--popup--shadow-color, rgba(0, 0, 0, 0.15));
 }
 
 .calendar-widget {
@@ -249,7 +247,7 @@ const calendarIcon = computed(() => {
   display: flex;
   flex-direction: row;
   padding: 1px;
-  gap: 10px;
+  gap: 16px;
   width: fit-content;
   height: 100%;
 }
@@ -257,8 +255,8 @@ const calendarIcon = computed(() => {
 .calendar-info-button {
   --awesome-button--border-radius: 50%;
   --awesome-button--icon--size: 22px;
-  --awesome-button--icon--color: var(--d-widget--info-button--color);
-  --awesome-button--icon--color--hover: var(--d-widget--info-button--color--hover);
+  --awesome-button--icon--color: var(--d-widget--popup-button--color);
+  --awesome-button--icon--color--hover: var(--d-widget--popup-button--color--hover);
   position: absolute;
   top: -14px;
   right: -14px;
@@ -274,8 +272,11 @@ const calendarIcon = computed(() => {
 .calendar-review-area {
   display: flex;
   flex-direction: column;
-  gap: 1px;
   height: 100%;
+  overflow: hidden;
+  background: var(--d-widget--review--bg);
+  border: 1px solid var(--d-widget--border-color);
+  border-radius: 6px;
 }
 
 .calendar-button-area {
@@ -299,8 +300,8 @@ const calendarIcon = computed(() => {
 .calendar-button-number {
   font-size: 0.9rem;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.6);
-  color: rgba(13, 18, 74, 0.6);
+  background: var(--d-widget--number--bg);
+  color: var(--d-widget--number--color);
   border-radius: 3px;
   padding: 1px;
   width: 40px;
@@ -311,79 +312,67 @@ const calendarIcon = computed(() => {
   font-size: 0.8rem;
   font-weight: 500;
   border: 1px solid var(--d-widget--border-color);
-  color: var(--d-widget--number-color);
+  color: var(--d-widget--number--color);
   border-radius: 3px;
   padding: 1px;
   width: 40px;
   text-align: center;
 }
 
-.calendar-review-header {
-  font-size: 0.7rem;
+.review-header {
+  font-size: 0.9rem;
+  font-weight: 600;
   color: var(--d-widget--review--header-color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
   text-align: center;
   white-space: nowrap;
+  padding: 2px;
+  flex-shrink: 0;
 }
 
-.review-grid {
-  flex: 1;
-  min-width: 0;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  grid-auto-flow: column;
-  align-items: center;
+.review-list {
+  display: flex;
+  flex-direction: column;
   gap: 4px;
-  border: 2px solid var(--d-widget--review--bg);
-  border-radius: 4px;
-  padding-left: 4px;
-}
-
-.review-stage-column {
-  grid-column: 1 / 2;
-  grid-row: 1 / 4;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 8px 0;
-  border-radius: 4px;
-  height: 100%;
+  flex: 1;
   min-height: 0;
+  padding: 6px;
 }
 
-.review-number-column {
-  grid-column: 2 / 3;
-  grid-row: 1 / 4;
+.review-item {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  flex-direction: row;
   align-items: center;
-  padding: 10px 4px;
-  border-radius: 0 2px 2px 0;
-  height: 100%;
-  min-height: 0;
-  background: var(--d-widget--review--bg);
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.review-stage {
+.review-item--total {
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+.review-stage-label {
   font-size: 0.9rem;
-  color: var(--d-widget--text-color);
+  word-spacing: 0.05rem;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
   white-space: nowrap;
-  padding: 3px 0;
+  color: var(--d-widget--stage-label--color);
+  flex: 1;
+  text-align: left;
 }
 
-.review-number {
-  font-size: 0.8rem;
-  font-weight: 500;
-  border: 1px solid var(--d-widget--border-color);
-  color: var(--d-widget--number-color);
-  border-radius: 3px;
-  padding: 1px;
-  width: 30px;
+.review-count-display {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--d-widget--number--color);
+  background: var(--d-widget--number--bg);
+  border-radius: 4px;
+  padding: 2px;
+  width: 40px;
   text-align: center;
 }
 
@@ -396,7 +385,7 @@ const calendarIcon = computed(() => {
   backdrop-filter: blur(40px);
   border: 1px solid var(--d-widget--border-color);
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--d-widget--popup--shadow-color);
   z-index: 800;
 }
 
