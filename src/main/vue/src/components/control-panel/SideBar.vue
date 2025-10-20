@@ -12,6 +12,7 @@
         <AwesomeButton
           ref="createButton"
           icon="fa-solid fa-plus"
+          class="control-bar-button"
           :on-click="toggleStore.toggleFlashcardSetCreation"
         />
       </template>
@@ -19,6 +20,7 @@
         <AwesomeButton
           ref="toggleButton"
           icon="fa-solid fa-chevron-left"
+          class="control-bar-button"
           :on-click="toggle"
         />
       </template>

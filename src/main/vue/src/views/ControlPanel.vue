@@ -6,15 +6,17 @@
         <ControlBar :title="flashcardSetName">
           <template #left>
             <AwesomeButton
+              icon="fa-solid fa-bars"
+              class="control-bar-button"
               :on-click="sidebar?.toggle"
               :hidden="isSidebarExpanded"
               :disabled="isSidebarExpanded"
-              icon="fa-solid fa-bars"
             />
           </template>
           <template #right>
             <AwesomeButton
               icon="fa-solid fa-gear"
+              class="control-bar-button"
               :on-click="openFlashcardSetSettings"
               :disabled="!flashcardSet"
             />

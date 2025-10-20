@@ -193,6 +193,15 @@
   --space-card--front--bg-size: 100% 30px;
   --space-card--back--bg-color: #fdfdfd;
 
+  /* control bar */
+  --control-bar--bg-color: #32334a;
+  --control-bar--title--color: #f3efef;
+  --control-bar--shadow-color: rgba(0, 0, 0, 0.25);
+  --control-bar--button--color: #bfbfbf;
+  --control-bar--button--color--hover: #f3efef;
+  --control-bar--button--bg: transparent;
+  --control-bar--button--bg--hover: transparent;
+
   /* calendar panel */
 
   --calendar-panel-button--border-color: rgba(128, 128, 128, 0.62);

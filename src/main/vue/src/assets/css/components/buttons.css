@@ -58,3 +58,10 @@
   --awesome-button--border: 1px solid var(--flashcard-panel-button--border-color);
   --awesome-button--border-radius: 6px;
 }
+
+.control-bar-button {
+  --awesome-button--color: var(--control-bar--button--color);
+  --awesome-button--color--hover: var(--control-bar--button--color--hover);
+  --awesome-button--bg: var(--control-bar--button--bg);
+  --awesome-button--bg--hover: var(--control-bar--button--bg--hover);
+}
