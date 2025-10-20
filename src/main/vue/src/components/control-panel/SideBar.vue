@@ -132,9 +132,9 @@ onMounted(() => {
 
 <style scoped>
 .sidebar--theme {
-  --bar--bg: var(--sidebar--bg, linear-gradient(135deg, rgba(7, 9, 30, 0.86) 0%, rgba(25, 13, 37, 0.82) 100%));
+  --bar--bg: var(--sidebar--bg, linear-gradient(135deg, rgba(9, 7, 30, 0.86) 0%, rgba(14, 13, 37, 0.82) 100%));
   --bar--border-color: var(--sidebar--border-color, rgba(222, 226, 230, 0.85));
-  --bar--item--bg: var(--sidebar--item--bg, linear-gradient(135deg, rgba(130, 150, 202, 0.31) 0%, rgba(135, 119, 189, 0.31) 100%));
+  --bar--item--bg: var(--sidebar--item--bg, linear-gradient(135deg, rgba(154, 190, 197, 0.31) 0%, rgba(156, 166, 200, 0.31) 100%));
   --bar--item--bg--hover: var(--sidebar--item--bg--hover, linear-gradient(135deg, rgba(73, 139, 154, 0.78) 0%, rgba(147, 56, 177, 0.67) 100%));
   --bar--item--bg--active: var(--sidebar--item--bg--active, linear-gradient(135deg, rgba(73, 139, 154, 0.78) 0%, rgba(147, 56, 177, 0.67) 100%));
   --bar--item--border-color: var(--sidebar--item--border-color, rgba(63, 13, 83, 0.81));
