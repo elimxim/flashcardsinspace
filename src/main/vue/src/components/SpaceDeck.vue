@@ -10,7 +10,7 @@
           :front-side="flashcard?.frontSide"
           :back-side="flashcard?.backSide"
           :viewed-times="viewedTimes"
-          :on-edit="() => flashcardWasEdited = true"
+          :on-edit="toggleStore.toggleFlashcardEdit"
         />
         <SpaceCard
           v-else
@@ -40,12 +40,9 @@ const flashcard = defineModel<Flashcard | null>('flashcard', { default: null })
 
 const props = withDefaults(defineProps<{
   onFlashcardRemoved?: () => void
-  onFlashcardEdited?: () => void
 }>(), {
   flashcard: null,
   onFlashcardRemoved: () => {
-  },
-  onFlashcardEdited: () => {
   },
 })
 
@@ -53,7 +50,6 @@ const toggleStore = useToggleStore()
 
 const deckReady = ref(false)
 const flashcardWasRemoved = ref(false)
-const flashcardWasEdited = ref(false)
 const spaceCard = ref<InstanceType<typeof SpaceCard>>()
 const cardTransition = ref('')
 
@@ -99,14 +95,6 @@ watch(flashcardWasRemoved, (newVal) => {
     spaceCard.value?.flipToFront()
     props.onFlashcardRemoved()
     flashcardWasRemoved.value = false
-  }
-})
-
-watch(flashcardWasEdited, (newVal) => {
-  if (newVal) {
-    toggleStore.toggleFlashcardEdit()
-    props.onFlashcardEdited()
-    flashcardWasEdited.value = false
   }
 })
 

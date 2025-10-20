@@ -48,7 +48,7 @@
           ref="stageUpButton"
           text="Know"
           class="review-button create-button"
-          :disabled="editFormWasOpened || noNextAvailable"
+          :disabled="noNextAvailable"
           :hidden="noNextAvailable"
           :on-click="stageUp"
           auto-blur
@@ -118,7 +118,7 @@ import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { nextStage, prevStage, Stage, stages } from '@/core-logic/stage-logic.ts'
@@ -169,7 +169,6 @@ const {
   chronodays,
   currDay
 } = storeToRefs(chronoStore)
-const { flashcardEditOpen } = storeToRefs(toggleStore)
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 const escapeButton = ref<InstanceType<typeof AwesomeButton>>()
@@ -184,7 +183,6 @@ const isLightspeedMode = computed(() => reviewMode.value === ReviewMode.LIGHTSPE
 const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
 const flashcardsTotal = ref(0)
 const flashcardsRemaining = computed(() => reviewQueue.value.remaining())
-const editFormWasOpened = ref(false)
 const currFlashcard = ref<Flashcard>()
 const progress = computed(() => {
   const total = flashcardsTotal.value
@@ -245,7 +243,6 @@ async function finishReviewAndGoToFlashcards() {
 
 async function stageDown() {
   if (flashcardSet.value && currFlashcard.value) {
-    editFormWasOpened.value = false
     spaceDeck.value?.willSlideToLeft()
     const flashcard = copyFlashcard(currFlashcard.value)
     updateFlashcard(flashcard, prevStage(flashcard.stage))
@@ -263,7 +260,6 @@ async function stageDown() {
 
 async function stageUp() {
   if (flashcardSet.value && currFlashcard.value) {
-    editFormWasOpened.value = false
     spaceDeck.value?.willSlideToRight()
     const flashcard = copyFlashcard(currFlashcard.value)
     updateFlashcard(flashcard, nextStage(flashcard.stage))
@@ -291,7 +287,6 @@ async function next() {
 
 async function moveBack() {
   if (flashcardSet.value && currFlashcard.value) {
-    editFormWasOpened.value = false
     spaceDeck.value?.willSlideToLeft()
     const flashcard = copyFlashcard(currFlashcard.value)
     updateFlashcard(flashcard, stages.S1)
@@ -367,15 +362,8 @@ async function markDaysAs(
 }
 
 function onFlashcardRemoved() {
-  editFormWasOpened.value = false
   nextFlashcard()
 }
-
-watch(flashcardEditOpen, (newVal) => {
-  if (newVal) {
-    editFormWasOpened.value = newVal
-  }
-})
 
 onMounted(async () => {
   if (!flashcardStore.loaded) {
