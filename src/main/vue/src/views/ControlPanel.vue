@@ -26,7 +26,7 @@
         <div class="main-panel">
           <FlashcardWidget/>
           <CalendarWidget/>
-          <LaunchPanel/>
+          <LaunchWidget/>
           <DayStreakWidget/>
         </div>
       </div>
@@ -42,7 +42,7 @@ import FlashcardInfoBar from '@/components/control-panel/FlashcardInfoBar.vue'
 import FlashcardWidget from '@/components/control-panel/FlashcardWidget.vue'
 import CalendarWidget from '@/components/control-panel/CalendarWidget.vue'
 import DayStreakWidget from '@/components/control-panel/DayStreakWidget.vue'
-import LaunchPanel from '@/components/control-panel/LaunchPanel.vue'
+import LaunchWidget from '@/components/control-panel/LaunchWidget.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'

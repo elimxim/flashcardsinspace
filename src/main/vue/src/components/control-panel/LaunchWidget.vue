@@ -1,5 +1,5 @@
 <template>
-  <div class="launch-panel">
+  <div class="launch-widget">
     <LaunchButton
       :on-click="startReview"
       :disabled="isDisabled"
@@ -28,7 +28,7 @@ function startReview() {
 </script>
 
 <style scoped>
-.launch-panel {
+.launch-widget {
   position: relative;
   display: flex;
   align-items: center;
