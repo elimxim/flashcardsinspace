@@ -1,10 +1,10 @@
 <template>
-  <div class="calendar-panel calendar-panel--theme">
-    <div class="calendar-panel-main-area">
+  <div class="calendar-widget calendar-widget--theme">
+    <div class="calendar-main-area">
       <div class="calendar-button-wrapper">
         <AwesomeButton
           :icon="calendarIcon"
-          class="calendar-panel-button"
+          class="calendar-widget-button"
           :disabled="!flashcardSet"
           :on-click="toggleStore.toggleCalendar"
           fill-space
@@ -31,8 +31,8 @@
         </div>
       </div>
     </div>
-    <div v-if="!isInitialDay" class="calendar-panel-review-area">
-      <div class="calendar-panel-review-header">
+    <div v-if="!isInitialDay" class="calendar-review-area">
+      <div class="calendar-review-header">
         To review
       </div>
       <div class="review-grid">
@@ -233,17 +233,17 @@ const calendarIcon = computed(() => {
 </script>
 
 <style scoped>
-.calendar-panel--theme {
-  --d-panel--text-color: var(--calendar-panel--text-color, rgba(57, 57, 57, 0.92));
-  --d-panel--number-color: var(--calendar-panel--number-color, rgba(17, 33, 85, 0.92));
-  --d-panel--border-color: var(--calendar-panel--border-color, rgba(128, 128, 128, 0.62));
-  --d-panel--review--header-color: var(--calendar-panel--review--header-color, rgba(43, 69, 142, 0.88));
-  --d-panel--review--bg: var(--calendar-panel--review--bg, rgba(88, 114, 209, 0.13));
-  --d-panel--info-button--color: var(--calendar-panel--info-button--color, rgb(253, 107, 76));
-  --d-panel--info-button--color--hover: var(--calendar-panel--info-button--color--hover, rgb(255, 66, 61));
+.calendar-widget--theme {
+  --d-widget--text-color: var(--calendar-widget--text-color, rgba(57, 57, 57, 0.92));
+  --d-widget--number-color: var(--calendar-widget--number-color, rgba(17, 33, 85, 0.92));
+  --d-widget--border-color: var(--calendar-widget--border-color, rgba(128, 128, 128, 0.62));
+  --d-widget--review--header-color: var(--calendar-widget--review--header-color, rgba(43, 69, 142, 0.88));
+  --d-widget--review--bg: var(--calendar-widget--review--bg, rgba(88, 114, 209, 0.13));
+  --d-widget--info-button--color: var(--calendar-widget--info-button--color, rgb(253, 107, 76));
+  --d-widget--info-button--color--hover: var(--calendar-widget--info-button--color--hover, rgb(255, 66, 61));
 }
 
-.calendar-panel {
+.calendar-widget {
   position: relative;
   display: flex;
   flex-direction: row;
@@ -261,22 +261,22 @@ const calendarIcon = computed(() => {
 .calendar-info-button {
   --awesome-button--border-radius: 50%;
   --awesome-button--font-size: 22px;
-  --awesome-button--color: var(--d-panel--info-button--color);
-  --awesome-button--color--hover: var(--d-panel--info-button--color--hover);
+  --awesome-button--color: var(--d-widget--info-button--color);
+  --awesome-button--color--hover: var(--d-widget--info-button--color--hover);
   position: absolute;
   top: -14px;
   right: -14px;
   z-index: 10;
 }
 
-.calendar-panel-main-area {
+.calendar-main-area {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   gap: 4px;
   height: 100%;
 }
 
-.calendar-panel-review-area {
+.calendar-review-area {
   display: flex;
   flex-direction: column;
   gap: 1px;
@@ -294,24 +294,24 @@ const calendarIcon = computed(() => {
 
 .calendar-day-text {
   font-size: 0.9rem;
-  color: var(--d-panel--text-color);
+  color: var(--d-widget--text-color);
   white-space: nowrap;
 }
 
 .calendar-day-number {
   font-size: 0.8rem;
   font-weight: 500;
-  border: 1px solid var(--d-panel--border-color);
-  color: var(--d-panel--number-color);
+  border: 1px solid var(--d-widget--border-color);
+  color: var(--d-widget--number-color);
   border-radius: 3px;
   padding: 1px;
   width: 40px;
   text-align: center;
 }
 
-.calendar-panel-review-header {
+.calendar-review-header {
   font-size: 0.7rem;
-  color: var(--d-panel--review--header-color);
+  color: var(--d-widget--review--header-color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -328,7 +328,7 @@ const calendarIcon = computed(() => {
   grid-auto-flow: column;
   align-items: center;
   gap: 4px;
-  border: 2px solid var(--d-panel--review--bg);
+  border: 2px solid var(--d-widget--review--bg);
   border-radius: 4px;
   padding-left: 4px;
 }
@@ -357,12 +357,12 @@ const calendarIcon = computed(() => {
   border-radius: 0 2px 2px 0;
   height: 100%;
   min-height: 0;
-  background: var(--d-panel--review--bg);
+  background: var(--d-widget--review--bg);
 }
 
 .review-stage {
   font-size: 0.9rem;
-  color: var(--d-panel--text-color);
+  color: var(--d-widget--text-color);
   white-space: nowrap;
   padding: 3px 0;
 }
@@ -370,8 +370,8 @@ const calendarIcon = computed(() => {
 .review-number {
   font-size: 0.8rem;
   font-weight: 500;
-  border: 1px solid var(--d-panel--border-color);
-  color: var(--d-panel--number-color);
+  border: 1px solid var(--d-widget--border-color);
+  color: var(--d-widget--number-color);
   border-radius: 3px;
   padding: 1px;
   width: 30px;
@@ -385,7 +385,7 @@ const calendarIcon = computed(() => {
   margin-top: 10px;
   background-color: transparent;
   backdrop-filter: blur(40px);
-  border: 1px solid var(--d-panel--border-color);
+  border: 1px solid var(--d-widget--border-color);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 800;
@@ -402,7 +402,7 @@ const calendarIcon = computed(() => {
 
 .calendar-popup-header {
   font-size: 0.6rem;
-  color: var(--d-panel--review--header-color);
+  color: var(--d-widget--review--header-color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -412,7 +412,7 @@ const calendarIcon = computed(() => {
 
 .calendar-popup-text {
   font-size: 0.6rem;
-  color: var(--d-panel--review--header-color);
+  color: var(--d-widget--review--header-color);
   word-spacing: 0.05rem;
   letter-spacing: 0.05rem;
   text-transform: uppercase;
@@ -438,7 +438,7 @@ const calendarIcon = computed(() => {
 .calendar-popup-review-total {
   padding: 4px;
   border-radius: 4px;
-  background: var(--d-panel--review--bg);
+  background: var(--d-widget--review--bg);
 }
 
 .slide-fade-enter-active {

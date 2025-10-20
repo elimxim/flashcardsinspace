@@ -37,14 +37,14 @@
   --smart-button--bg--hover: var(--move-back-button--bg-color--hover);
 }
 
-.calendar-panel-button {
+.calendar-widget-button {
   --awesome-button--font-size: 50px;
-  --awesome-button--color: var(--calendar-panel-button--color);
-  --awesome-button--color--hover: var(--calendar-panel-button--color--hover);
-  --awesome-button--bg: var(--calendar-panel-button--bg);
-  --awesome-button--bg--hover: var(--calendar-panel-button--bg--hover);
-  --awesome-button--bg--disabled: var(--calendar-panel-button--bg--disabled);
-  --awesome-button--border: 1px solid var(--calendar-panel-button--border-color);
+  --awesome-button--color: var(--calendar-widget-button--color);
+  --awesome-button--color--hover: var(--calendar-widget-button--color--hover);
+  --awesome-button--bg: var(--calendar-widget-button--bg);
+  --awesome-button--bg--hover: var(--calendar-widget-button--bg--hover);
+  --awesome-button--bg--disabled: var(--calendar-widget-button--bg--disabled);
+  --awesome-button--border: 1px solid var(--calendar-widget-button--border-color);
   --awesome-button--border-radius: 6px;
 }
 

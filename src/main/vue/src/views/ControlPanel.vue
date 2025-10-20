@@ -25,7 +25,7 @@
         <FlashcardInfoBar :hidden="!flashcardSet || isSidebarExpanded" />
         <div class="main-panel">
           <FlashcardPanel/>
-          <CalendarPanel/>
+          <CalendarWidget/>
           <LaunchPanel/>
           <DayStreakWidget/>
         </div>
@@ -40,7 +40,7 @@ import SideBar from '@/components/control-panel/SideBar.vue'
 import ControlBar from '@/components/ControlBar.vue'
 import FlashcardInfoBar from '@/components/control-panel/FlashcardInfoBar.vue'
 import FlashcardPanel from '@/components/control-panel/FlashcardPanel.vue'
-import CalendarPanel from '@/components/control-panel/CalendarPanel.vue'
+import CalendarWidget from '@/components/control-panel/CalendarWidget.vue'
 import DayStreakWidget from '@/components/control-panel/DayStreakWidget.vue'
 import LaunchPanel from '@/components/control-panel/LaunchPanel.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'

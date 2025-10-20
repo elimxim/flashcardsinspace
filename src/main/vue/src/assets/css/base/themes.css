@@ -204,12 +204,12 @@
 
   /* calendar panel */
 
-  --calendar-panel-button--border-color: rgba(128, 128, 128, 0.62);
-  --calendar-panel-button--color: rgba(13, 18, 74, 0.6);
-  --calendar-panel-button--color--hover: rgba(255, 255, 255, 0.6);
-  --calendar-panel-button--bg: linear-gradient(135deg, rgba(102, 126, 234, 0.66) 0%, rgba(118, 75, 162, 0.68) 100%);
-  --calendar-panel-button--bg--hover: linear-gradient(135deg, rgba(240, 147, 251, 0.71) 0%, rgba(245, 87, 108, 0.69) 100%);
-  --calendar-panel-button--bg--disabled: linear-gradient(135deg, #d3d3d3 0%, #a8a8a8 100%);
+  --calendar-widget-button--border-color: rgba(128, 128, 128, 0.62);
+  --calendar-widget-button--color: rgba(13, 18, 74, 0.6);
+  --calendar-widget-button--color--hover: rgba(255, 255, 255, 0.6);
+  --calendar-widget-button--bg: linear-gradient(135deg, rgba(102, 126, 234, 0.66) 0%, rgba(118, 75, 162, 0.68) 100%);
+  --calendar-widget-button--bg--hover: linear-gradient(135deg, rgba(240, 147, 251, 0.71) 0%, rgba(245, 87, 108, 0.69) 100%);
+  --calendar-widget-button--bg--disabled: linear-gradient(135deg, #d3d3d3 0%, #a8a8a8 100%);
 
   /* launch button */
 
