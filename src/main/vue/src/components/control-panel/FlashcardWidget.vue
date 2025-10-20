@@ -1,13 +1,13 @@
 <template>
-  <div class="flashcard-panel flashcard-panel--theme">
+  <div class="flashcard-widget flashcard-widget--theme">
     <AwesomeButton
       icon="fa-solid fa-rectangle-list"
-      class="flashcard-panel-button"
+      class="flashcard-widget-button"
       :on-click="toggleStore.toggleFlashcardCreation"
       fill-space
       square
     />
-    <div class="flashcard-panel-text">
+    <div class="flashcard-widget-text">
       Add flashcard
     </div>
   </div>
@@ -24,11 +24,11 @@ const toggleStore = useToggleStore()
 </script>
 
 <style scoped>
-.flashcard-panel--theme {
-  --f-panel--text-color: var(--flashcard-panel--text-color, rgba(43, 69, 142, 0.88));
+.flashcard-widget--theme {
+  --f-widget--text-color: var(--flashcard-widget--text-color, rgba(43, 69, 142, 0.88));
 }
 
-.flashcard-panel {
+.flashcard-widget {
   position: relative;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
@@ -38,9 +38,9 @@ const toggleStore = useToggleStore()
   padding: 1px;
 }
 
-.flashcard-panel-text {
+.flashcard-widget-text {
   font-size: 0.6rem;
-  color: var(--f-panel--text-color);
+  color: var(--f-widget--text-color);
   word-spacing: 0.05rem;
   letter-spacing: 0.05rem;
   text-transform: uppercase;

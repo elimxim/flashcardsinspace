@@ -48,14 +48,14 @@
   --awesome-button--border-radius: 6px;
 }
 
-.flashcard-panel-button {
+.flashcard-widget-button {
   --awesome-button--font-size: 50px;
-  --awesome-button--color: var(--flashcard-panel-button--color);
-  --awesome-button--color--hover: var(--flashcard-panel-button--color--hover);
-  --awesome-button--bg: var(--flashcard-panel-button--bg);
-  --awesome-button--bg--hover: var(--flashcard-panel-button--bg--hover);
-  --awesome-button--bg--disabled: var(--flashcard-panel-button--bg--disabled);
-  --awesome-button--border: 1px solid var(--flashcard-panel-button--border-color);
+  --awesome-button--color: var(--flashcard-widget-button--color);
+  --awesome-button--color--hover: var(--flashcard-widget-button--color--hover);
+  --awesome-button--bg: var(--flashcard-widget-button--bg);
+  --awesome-button--bg--hover: var(--flashcard-widget-button--bg--hover);
+  --awesome-button--bg--disabled: var(--flashcard-widget-button--bg--disabled);
+  --awesome-button--border: 1px solid var(--flashcard-widget-button--border-color);
   --awesome-button--border-radius: 6px;
 }
 

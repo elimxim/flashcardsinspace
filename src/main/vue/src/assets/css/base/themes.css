@@ -223,10 +223,10 @@
 
   /* flashcard panel */
 
-  --flashcard-panel-button--border-color: rgba(128, 128, 128, 0.62);
-  --flashcard-panel-button--color: rgba(13, 18, 74, 0.6);
-  --flashcard-panel-button--color--hover: rgba(255, 255, 255, 0.6);
-  --flashcard-panel-button--bg: linear-gradient(135deg, rgba(102, 126, 234, 0.66) 0%, rgba(118, 75, 162, 0.68) 100%);
-  --flashcard-panel-button--bg--hover: linear-gradient(135deg, rgba(38, 148, 227, 0.71) 0%, rgba(18, 69, 136, 0.69) 100%);
-  --flashcard-panel-button--bg--disabled: linear-gradient(135deg, #d3d3d3 0%, #a8a8a8 100%);
+  --flashcard-widget-button--border-color: rgba(128, 128, 128, 0.62);
+  --flashcard-widget-button--color: rgba(13, 18, 74, 0.6);
+  --flashcard-widget-button--color--hover: rgba(255, 255, 255, 0.6);
+  --flashcard-widget-button--bg: linear-gradient(135deg, rgba(102, 126, 234, 0.66) 0%, rgba(118, 75, 162, 0.68) 100%);
+  --flashcard-widget-button--bg--hover: linear-gradient(135deg, rgba(38, 148, 227, 0.71) 0%, rgba(18, 69, 136, 0.69) 100%);
+  --flashcard-widget-button--bg--disabled: linear-gradient(135deg, #d3d3d3 0%, #a8a8a8 100%);
 }
