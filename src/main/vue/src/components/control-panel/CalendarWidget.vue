@@ -14,7 +14,7 @@
             <div class="calendar-button-text">
               Day
             </div>
-            <div class="calendar-button-number">
+            <div class="calendar-popup-number">
               <template v-if="isOnVacation">
                 🌴
               </template>
@@ -233,10 +233,11 @@ const calendarIcon = computed(() => {
 .calendar-widget--theme {
   --d-widget--border-color: var(--calendar-widget--border-color, rgba(128, 128, 128, 0.62));
   --d-widget--stage-label--color: var(--calendar-widget--stage-label--color, rgba(13, 18, 74, 0.6));
-  --d-widget--number--color: var(--calendar-widget--number--color, rgba(13, 18, 74, 0.6));
   --d-widget--number--bg: var(--calendar-widget--number--bg, rgba(255, 255, 255, 0.6));
   --d-widget--review--header-color: var(--calendar-widget--review--header-color, rgba(255, 255, 255, 0.6));
   --d-widget--review--bg: var(--calendar-widget--review--bg, linear-gradient(135deg, rgba(47, 189, 172, 0.66) 0%, rgba(18, 29, 83, 0.68) 100%));
+  --d-widget--popup--text-color: var(--calendar-widget--popup--text-color, rgb(29, 68, 151));
+  --d-widget--popup--number-color: var(--calendar-widget--popup--number-color, rgba(20, 27, 106, 0.82));
   --d-widget--popup-button--color: var(--calendar-widget--popup-button--color, rgb(253, 107, 76));
   --d-widget--popup-button--color--hover: var(--calendar-widget--popup-button--color--hover, rgb(255, 66, 61));
   --d-widget--popup--shadow-color: var(--calendar-widget--popup--shadow-color, rgba(0, 0, 0, 0.15));
@@ -297,22 +298,11 @@ const calendarIcon = computed(() => {
   white-space: nowrap;
 }
 
-.calendar-button-number {
-  font-size: 0.9rem;
-  font-weight: 600;
-  background: var(--d-widget--number--bg);
-  color: var(--d-widget--number--color);
-  border-radius: 3px;
-  padding: 1px;
-  width: 40px;
-  text-align: center;
-}
-
 .calendar-day-number {
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 600;
   border: 1px solid var(--d-widget--border-color);
-  color: var(--d-widget--number--color);
+  color: var(--d-widget--popup--number-color);
   border-radius: 3px;
   padding: 1px;
   width: 40px;
@@ -350,7 +340,6 @@ const calendarIcon = computed(() => {
 }
 
 .review-item--total {
-  margin-top: 2px;
   font-weight: 600;
 }
 
@@ -368,7 +357,7 @@ const calendarIcon = computed(() => {
 .review-count-display {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--d-widget--number--color);
+  color: var(--d-widget--popup--number-color);
   background: var(--d-widget--number--bg);
   border-radius: 4px;
   padding: 2px;
@@ -400,8 +389,8 @@ const calendarIcon = computed(() => {
 }
 
 .calendar-popup-header {
-  font-size: 0.6rem;
-  color: var(--d-widget--review--header-color);
+  font-size: 0.7rem;
+  color: var(--d-widget--popup--text-color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -410,13 +399,25 @@ const calendarIcon = computed(() => {
 }
 
 .calendar-popup-text {
-  font-size: 0.6rem;
-  color: var(--d-widget--review--header-color);
+  font-size: 0.7rem;
+  color: var(--d-widget--popup--text-color);
   word-spacing: 0.05rem;
   letter-spacing: 0.05rem;
   text-transform: uppercase;
   text-align: center;
 }
+
+.calendar-popup-number {
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: var(--d-widget--number--bg);
+  color: var(--d-widget--popup--number-color);
+  border-radius: 3px;
+  padding: 1px;
+  width: 40px;
+  text-align: center;
+}
+
 
 .calendar-popup-centered-row {
   display: flex;
