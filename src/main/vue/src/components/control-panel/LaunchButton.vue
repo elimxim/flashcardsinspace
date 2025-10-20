@@ -74,7 +74,7 @@ withDefaults(defineProps<{
 }
 
 .curtain-text {
-  font-size: clamp(12px, 2vw ,16px);
+  font-size: 16px;
   color: var(--l-btn--text-color);
   text-shadow: 0 2px 4px var(--l-btn--text-shadow-color);
   letter-spacing: 0.05rem;
