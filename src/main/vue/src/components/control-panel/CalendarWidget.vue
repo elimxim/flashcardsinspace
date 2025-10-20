@@ -1,35 +1,36 @@
 <template>
   <div class="calendar-widget calendar-widget--theme">
     <div class="calendar-main-area">
-      <div class="calendar-button-wrapper">
-        <AwesomeButton
-          :icon="calendarIcon"
-          class="calendar-widget-button"
-          :disabled="!flashcardSet"
-          :on-click="toggleStore.toggleCalendar"
-          fill-space
-          square
-        />
-        <AwesomeButton
-          v-if="hasNotCompletedPreviousDays"
-          class="calendar-info-button"
-          icon="fa-solid fa-circle-exclamation"
-          :on-hover="togglePreviousDaysPopup"
-        />
-      </div>
-      <div class="calendar-day-area">
-        <div class="calendar-day-text">
-          Day
-        </div>
-        <div class="calendar-day-number">
-          <template v-if="isOnVacation">
-            🌴
-          </template>
-          <template v-else>
-            {{ currDayNumber }}
-          </template>
-        </div>
-      </div>
+      <AwesomeButton
+        :icon="calendarIcon"
+        class="calendar-widget-button"
+        :disabled="!flashcardSet"
+        :on-click="toggleStore.toggleCalendar"
+        fill-space
+        square
+      >
+        <template #below>
+          <div class="calendar-button-area">
+            <div class="calendar-button-text">
+              Day
+            </div>
+            <div class="calendar-button-number">
+              <template v-if="isOnVacation">
+                🌴
+              </template>
+              <template v-else>
+                {{ currDayNumber }}
+              </template>
+            </div>
+          </div>
+        </template>
+      </AwesomeButton>
+      <AwesomeButton
+        v-if="hasNotCompletedPreviousDays"
+        class="calendar-info-button"
+        icon="fa-solid fa-circle-exclamation"
+        :on-hover="togglePreviousDaysPopup"
+      />
     </div>
     <div v-if="!isInitialDay" class="calendar-review-area">
       <div class="calendar-review-header">
@@ -112,7 +113,7 @@
           </div>
           <template v-else-if="previousDaysFrom !== previousDaysTo">
             <div class="calendar-popup-text">
-              They will be completed since
+              They will be completed once
             </div>
             <div class="calendar-popup-text">
               you complete the current day
@@ -120,7 +121,7 @@
           </template>
           <template v-else>
             <div class="calendar-popup-text">
-              It will be completed since
+              It will be completed once
             </div>
             <div class="calendar-popup-text">
               you complete the current day
@@ -253,11 +254,6 @@ const calendarIcon = computed(() => {
   height: 100%;
 }
 
-.calendar-button-wrapper {
-  position: relative;
-  height: 100%;
-}
-
 .calendar-info-button {
   --awesome-button--border-radius: 50%;
   --awesome-button--icon--size: 22px;
@@ -270,9 +266,8 @@ const calendarIcon = computed(() => {
 }
 
 .calendar-main-area {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: 4px;
+  position: relative;
+  display: flex;
   height: 100%;
 }
 
@@ -283,19 +278,33 @@ const calendarIcon = computed(() => {
   height: 100%;
 }
 
-.calendar-day-area {
+.calendar-button-area {
+  margin-top: 8px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0 4px;
-  gap: 4px;
+  gap: 8px;
 }
 
-.calendar-day-text {
+.calendar-button-text {
   font-size: 0.9rem;
-  color: var(--d-widget--text-color);
+  font-weight: 600;
+  word-spacing: 0.05rem;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
   white-space: nowrap;
+}
+
+.calendar-button-number {
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.6);
+  color: rgba(13, 18, 74, 0.6);
+  border-radius: 3px;
+  padding: 1px;
+  width: 40px;
+  text-align: center;
 }
 
 .calendar-day-number {
@@ -340,7 +349,7 @@ const calendarIcon = computed(() => {
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 10px 0;
+  padding: 8px 0;
   border-radius: 4px;
   height: 100%;
   min-height: 0;
@@ -394,6 +403,7 @@ const calendarIcon = computed(() => {
 .calendar-popup-layout {
   display: flex;
   flex-direction: column;
+  gap: 1px;
   padding: 4px;
   border-radius: 6px;
   width: fit-content;
