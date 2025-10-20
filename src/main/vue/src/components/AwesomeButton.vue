@@ -7,7 +7,8 @@
       'awesome-button-wrapper--fill-space': fillSpace,
     }"
   >
-    <button
+    <div
+      role="button"
       class="awesome-button awesome-button--theme select-none drag-none"
       :class="{
         'awesome-button--disabled': disabled,
@@ -19,7 +20,8 @@
       @mouseenter="onHover"
       @mouseleave="onHover"
     >
-      <span class="awesome-icon-wrapper">
+      <slot name="above"/>
+      <div class="awesome-icon-wrapper">
         <font-awesome-icon
           v-if="pressed && spinnable"
           :icon="spinIcon || icon"
@@ -30,8 +32,9 @@
           :icon="icon"
           class="awesome-icon"
         />
-      </span>
-    </button>
+      </div>
+      <slot name="below"/>
+    </div>
   </div>
 </template>
 
@@ -121,7 +124,11 @@ defineExpose({
 
 .awesome-button {
   position: relative;
+  display: flex;
+  flex-direction: column;
   place-items: center;
+  justify-content: center;
+  gap: 4px;
   color: var(--a-btn--icon--color);
   background: var(--a-btn--bg);
   border: var(--a-btn--border);
@@ -157,8 +164,6 @@ defineExpose({
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
   min-width: 0;
   min-height: 0;
   transition: transform 0.2s ease-in-out;
