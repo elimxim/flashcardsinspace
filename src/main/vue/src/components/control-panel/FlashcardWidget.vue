@@ -6,10 +6,13 @@
       :on-click="toggleStore.toggleFlashcardCreation"
       fill-space
       square
-    />
-    <div class="flashcard-widget-text">
-      Add flashcard
-    </div>
+    >
+      <template #below>
+        <div class="flashcard-widget-button-text">
+          Add flashcard
+        </div>
+      </template>
+    </AwesomeButton>
   </div>
   <FlashcardModificationModal/>
 </template>
@@ -24,10 +27,6 @@ const toggleStore = useToggleStore()
 </script>
 
 <style scoped>
-.flashcard-widget--theme {
-  --f-widget--text-color: var(--flashcard-widget--text-color, rgba(43, 69, 142, 0.88));
-}
-
 .flashcard-widget {
   position: relative;
   display: grid;
@@ -38,13 +37,13 @@ const toggleStore = useToggleStore()
   padding: 1px;
 }
 
-.flashcard-widget-text {
-  font-size: 0.6rem;
-  color: var(--f-widget--text-color);
+.flashcard-widget-button-text {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
   word-spacing: 0.05rem;
   letter-spacing: 0.05rem;
   text-transform: uppercase;
-  white-space: nowrap;
   text-align: center;
 }
 
