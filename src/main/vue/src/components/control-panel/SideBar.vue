@@ -135,7 +135,7 @@ onMounted(() => {
 <style scoped>
 .sidebar--theme {
   --bar--bg: var(--sidebar--bg, linear-gradient(135deg, rgba(9, 7, 30, 0.86) 0%, rgba(14, 13, 37, 0.82) 100%));
-  --bar--border-color: var(--sidebar--border-color, rgba(222, 226, 230, 0.85));
+  --bar--border-color: var(--sidebar--border-color, rgba(89, 78, 117, 0.85));
   --bar--item--bg: var(--sidebar--item--bg, linear-gradient(135deg, rgba(154, 190, 197, 0.31) 0%, rgba(156, 166, 200, 0.31) 100%));
   --bar--item--bg--hover: var(--sidebar--item--bg--hover, linear-gradient(135deg, rgba(73, 139, 154, 0.78) 0%, rgba(147, 56, 177, 0.67) 100%));
   --bar--item--bg--active: var(--sidebar--item--bg--active, linear-gradient(135deg, rgba(73, 139, 154, 0.78) 0%, rgba(147, 56, 177, 0.67) 100%));
@@ -148,10 +148,10 @@ onMounted(() => {
   --bar--item--count--border-color: var(--sidebar--item--count--border-color, rgba(103, 126, 149, 0.83));
   --bar--language--text-color: var(--sidebar--language--text-color, #efe9ef);
   --bar--language--icon-color: var(--sidebar--language--icon-color, rgba(172, 252, 255, 0.85));
-  --bar--scrollbar--track-color: var(--sidebar--scrollbar--track-color, #f1f3f4);
-  --bar--scrollbar--thumb-color: var(--sidebar--scrollbar--thumb-color, #dfdfdf);
-  --bar--scrollbar--thumb-color--hover: var(--sidebar--scrollbar--thumb-hover-color, #cccccc);
-  --bar--scrollbar--thumb-color--active: var(--sidebar--scrollbar--thumb-active-color, #cccccc);
+  --bar--scrollbar--track-color: var(--sidebar--scrollbar--track-color, #575e68);
+  --bar--scrollbar--thumb-color: var(--sidebar--scrollbar--thumb-color, #808daa);
+  --bar--scrollbar--thumb-color--hover: var(--sidebar--scrollbar--thumb-hover-color, #98a9ca);
+  --bar--scrollbar--thumb-color--active: var(--sidebar--scrollbar--thumb-active-color, #98a9ca);
 }
 
 .sidebar {
