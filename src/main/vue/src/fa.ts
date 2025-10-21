@@ -30,6 +30,7 @@ import {
   faStar,
   faChevronLeft,
   faChevronRight,
+  faMagnifyingGlass,
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faEye as faRegularEye,
@@ -71,6 +72,7 @@ export function applyFaIcons() {
     faStar,
     faChevronLeft,
     faChevronRight,
+    faMagnifyingGlass,
 
     faRegularEye,
     faRegularCircle,
