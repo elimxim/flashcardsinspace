@@ -11,6 +11,10 @@ textarea {
   font-family: inherit;
 }
 
+button {
+  font-family: inherit;
+}
+
 /* Hide the default password reveal eye icon in Microsoft Edge */
 input[type="password"]::-ms-reveal {
   display: none;
