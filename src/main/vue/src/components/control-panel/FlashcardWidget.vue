@@ -29,12 +29,10 @@ const toggleStore = useToggleStore()
 <style scoped>
 .flashcard-widget {
   position: relative;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  display: flex;
+  padding: 1px;
   height: 100%;
   width: auto;
-  gap: 1px;
-  padding: 1px;
 }
 
 .flashcard-widget-button-text {
