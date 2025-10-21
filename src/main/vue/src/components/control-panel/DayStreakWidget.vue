@@ -67,7 +67,6 @@ const dayStreakNumber = computed(() => {
 .day-streak-widget {
   position: relative;
   display: flex;
-  padding: 1px;
   width: fit-content;
   height: 100%;
 }
