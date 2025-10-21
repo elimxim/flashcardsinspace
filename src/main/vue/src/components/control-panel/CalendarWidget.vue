@@ -1,6 +1,6 @@
 <template>
   <div class="calendar-widget calendar-widget--theme">
-    <div class="calendar-main-area">
+    <div class="calendar-widget-button-wrapper">
       <AwesomeButton
         :icon="calendarIcon"
         class="calendar-widget-button"
@@ -10,7 +10,7 @@
         square
       >
         <template #below>
-          <div class="calendar-button-area">
+          <div class="calendar-button-slot">
             <div class="calendar-button-text">
               Day
             </div>
@@ -32,7 +32,7 @@
         :on-hover="togglePreviousDaysPopup"
       />
     </div>
-    <div v-if="!isInitialDay" class="calendar-review-area">
+    <div v-if="!isInitialDay" class="calendar-widget-review-layout">
       <div class="review-header">
         To review
       </div>
@@ -234,8 +234,8 @@ const calendarIcon = computed(() => {
   --c-widget--border-color: var(--calendar-widget--border-color, rgba(128, 128, 128, 0.62));
   --c-widget--stage-label--color: var(--calendar-widget--stage-label--color, rgba(13, 18, 74, 0.6));
   --c-widget--number--bg: var(--calendar-widget--number--bg, rgba(255, 255, 255, 0.6));
-  --c-widget--review--header-color: var(--calendar-widget--review--header-color, rgba(255, 255, 255, 0.6));
-  --c-widget--review--bg: var(--calendar-widget--review--bg, linear-gradient(135deg, rgba(47, 189, 172, 0.66) 0%, rgba(18, 29, 83, 0.68) 100%));
+  --c-widget--review--header-color: var(--calendar-widget--review--header-color, rgba(13, 18, 74, 0.6));
+  --c-widget--review--bg: var(--calendar-widget--review--bg, linear-gradient(135deg, rgba(102, 126, 234, 0.66) 0%, rgba(118, 75, 162, 0.68) 100%));
   --c-widget--popup--text-color: var(--calendar-widget--popup--text-color, rgb(29, 68, 151));
   --c-widget--popup--number-color: var(--calendar-widget--popup--number-color, rgba(20, 27, 106, 0.82));
   --c-widget--popup-button--color: var(--calendar-widget--popup-button--color, rgb(253, 107, 76));
@@ -247,10 +247,36 @@ const calendarIcon = computed(() => {
   position: relative;
   display: flex;
   flex-direction: row;
-  padding: 1px;
   gap: 16px;
   width: fit-content;
   height: 100%;
+}
+
+.calendar-widget-button-wrapper {
+  position: relative;
+  display: flex;
+  height: 100%;
+}
+
+.calendar-widget-review-layout {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--c-widget--review--bg);
+  border: 1px solid var(--c-widget--border-color);
+  border-radius: 6px;
+  padding: 4px;
+}
+
+.calendar-button-slot {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
 }
 
 .calendar-info-button {
@@ -262,31 +288,6 @@ const calendarIcon = computed(() => {
   top: -14px;
   right: -14px;
   z-index: 10;
-}
-
-.calendar-main-area {
-  position: relative;
-  display: flex;
-  height: 100%;
-}
-
-.calendar-review-area {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  background: var(--c-widget--review--bg);
-  border: 1px solid var(--c-widget--border-color);
-  border-radius: 6px;
-}
-
-.calendar-button-area {
-  margin-top: 8px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
 }
 
 .calendar-button-text {
