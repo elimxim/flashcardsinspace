@@ -53,13 +53,14 @@
   --button--bg-color--action--focus: #0056b3;
   --button--bg-color--disabled: #ededed;
 
-  /*--smart-button--color: white;*/
+  /*--smart-button--title--color: white;*/
+  /*--smart-button--title--color--hover: white;*/
   /*--smart-button--border-color: transparent;*/
   /*--smart-button--border-width: 0;*/
   /*--smart-button--border-radius: 3px;*/
   /*--smart-button--width: 100px;*/
 
-  --smart-button--color--disabled: #a3a3a3;
+  --smart-button--title--color--disabled: #a3a3a3;
   --smart-button--bg--disabled: #C8C8C8FF;
 
   --cancel-button--bg-color: #4e4e4e;

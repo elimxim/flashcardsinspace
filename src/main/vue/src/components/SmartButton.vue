@@ -6,6 +6,7 @@
       'smart-button--disabled': disabled,
       'smart-button--rounded': rounded,
       'smart-button--fill-width': fillWidth,
+      'smart-button--fill-height': fillHeight,
     }"
     :disabled="disabled"
     :hidden="hidden"
@@ -17,7 +18,9 @@
     @touchend="cancelHold"
     @click="click"
   >
-    {{ text }}
+    <span class="smart-button-title">
+      {{ text }}
+    </span>
   </button>
 </template>
 
@@ -32,6 +35,8 @@ const props = withDefaults(defineProps<{
   holdTime?: number
   autoBlur?: boolean
   fillWidth?: boolean
+  fillHeight?: boolean
+  titleScale?: number
   onClick?: () => void
 }>(), {
   disabled: false,
@@ -40,6 +45,8 @@ const props = withDefaults(defineProps<{
   holdTime: 0,
   autoBlur: false,
   fillWidth: false,
+  fillHeight: false,
+  titleScale: 1,
   onClick: () => {
   },
 })
@@ -112,28 +119,33 @@ defineExpose({
 
 <style scoped>
 .smart-button--theme {
-  --s-btn--color: var(--smart-button--color, white);
-  --s-btn--color--disabled: var(--smart-button--color--disabled, #a3a3a3);
+  --s-btn--title--font-size: var(--smart-button--title--font-size, 16px);
+  --s-btn--title--color: var(--smart-button--title--color, white);
+  --s-btn--title--color--hover: var(--smart-button--title--color--hover, white);
+  --s-btn--title--color--disabled: var(--smart-button--title--color--disabled, #a3a3a3);
+  --s-btn--title--word-spacing: var(--smart-button--title--word-spacing, 0);
+  --s-btn--title--letter-spacing: var(--smart-button--title--letter-spacing, 0);
   --s-btn--border-color: var(--smart-button--border-color, transparent);
   --s-btn--border-width: var(--smart-button--border-width, 0);
   --s-btn--border-radius: var(--smart-button--border-radius, 3px);
   --s-btn--width: var(--smart-button--width, 100px);
+  --s-btn--height: var(--smart-button--height, 40px);
   --s-btn--bg: var(--smart-button--bg, #323232);
   --s-btn--bg--hover: var(--smart-button--bg--hover, #515151);
   --s-btn--bg--disabled: var(--smart-button--bg--disabled, #C8C8C8FF);
 }
 
 .smart-button {
-  color: var(--s-btn--color);
+  color: var(--s-btn--title--color);
   border-color: var(--s-btn--border-color);
   border-width: var(--s-btn--border-width);
   border-style: solid;
   border-radius: var(--s-btn--border-radius);
   background: var(--s-btn--bg);
   position: relative;
-  font-size: 16px;
+
   width: var(--s-btn--width);
-  height: 40px;
+  height: var(--s-btn--height);
   cursor: pointer;
   z-index: 1;
 }
@@ -151,6 +163,14 @@ defineExpose({
   z-index: -1;
 }
 
+.smart-button-title {
+  display: inline-block;
+  font-size: var(--s-btn--title--font-size);
+  word-spacing: var(--s-btn--title--word-spacing);
+  letter-spacing: var(--s-btn--title--letter-spacing);
+  transition: transform 0.1s ease-in-out;
+}
+
 .smart-button:not(.smart-button--disabled):active {
   transform: translateY(1px);
 }
@@ -158,11 +178,16 @@ defineExpose({
 .smart-button:not(.smart-button--disabled):hover,
 .smart-button:not(.smart-button--disabled):focus {
   outline: none;
+  color: var(--s-btn--title--color--hover);
   background: var(--s-btn--bg--hover);
 }
 
+.smart-button:not(.smart-button--disabled):hover .smart-button-title {
+  transform: scale(v-bind(titleScale));
+}
+
 .smart-button--disabled {
-  color: var(--s-btn--color--disabled);
+  color: var(--s-btn--title--color--disabled);
   background: var(--s-btn--bg--disabled);
   cursor: default;
 }
@@ -173,6 +198,10 @@ defineExpose({
 
 .smart-button--fill-width {
   --smart-button--width: 100%;
+}
+
+.smart-button--fill-height {
+  --smart-button--height: 100%;
 }
 
 </style>
