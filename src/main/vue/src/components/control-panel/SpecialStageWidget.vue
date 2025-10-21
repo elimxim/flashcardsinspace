@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import SmartButton from '@/components/SmartButton.vue'
 import { Stage } from '@/core-logic/stage-logic.ts'
-import { computed } from 'vue';
+import { computed } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { countFlashcards } from '@/core-logic/review-logic.ts'
 import { storeToRefs } from 'pinia'
