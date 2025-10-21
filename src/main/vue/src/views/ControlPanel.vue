@@ -26,6 +26,7 @@
         <div class="main-panel">
           <FlashcardWidget/>
           <CalendarWidget/>
+          <ReviewInfoWidget/>
           <LaunchWidget/>
           <SpecialStageWidget
             :stage="specialStages.UNKNOWN"
@@ -49,6 +50,7 @@ import ControlBar from '@/components/ControlBar.vue'
 import FlashcardInfoBar from '@/components/control-panel/FlashcardInfoBar.vue'
 import FlashcardWidget from '@/components/control-panel/FlashcardWidget.vue'
 import CalendarWidget from '@/components/control-panel/CalendarWidget.vue'
+import ReviewInfoWidget from '@/components/control-panel/ReviewInfoWidget.vue'
 import SpecialStageWidget from '@/components/control-panel/SpecialStageWidget.vue'
 import DayStreakWidget from '@/components/control-panel/DayStreakWidget.vue'
 import LaunchWidget from '@/components/control-panel/LaunchWidget.vue'

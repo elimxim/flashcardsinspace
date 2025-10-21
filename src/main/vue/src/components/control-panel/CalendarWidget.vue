@@ -1,64 +1,35 @@
 <template>
   <div class="calendar-widget calendar-widget--theme">
-    <div class="calendar-widget-button-wrapper">
-      <AwesomeButton
-        :icon="calendarIcon"
-        class="calendar-widget-button"
-        :disabled="!flashcardSet"
-        :on-click="toggleStore.toggleCalendar"
-        fill-space
-        square
-      >
-        <template #below>
-          <div class="calendar-button-slot">
-            <div class="calendar-button-text">
-              Day
-            </div>
-            <div class="calendar-popup-number">
-              <template v-if="isOnVacation">
-                🌴
-              </template>
-              <template v-else>
-                {{ currDayNumber }}
-              </template>
-            </div>
+    <AwesomeButton
+      :icon="calendarIcon"
+      class="calendar-widget-button"
+      :disabled="!flashcardSet"
+      :on-click="toggleStore.toggleCalendar"
+      fill-space
+      square
+    >
+      <template #below>
+        <div class="calendar-button-slot">
+          <div class="calendar-button-text">
+            Day
           </div>
-        </template>
-      </AwesomeButton>
-      <AwesomeButton
-        v-if="hasNotCompletedPreviousDays"
-        class="calendar-info-button"
-        icon="fa-solid fa-circle-exclamation"
-        :on-hover="togglePreviousDaysPopup"
-      />
-    </div>
-    <div v-if="!isInitialDay" class="calendar-widget-review-layout">
-      <div class="review-header">
-        To review
-      </div>
-      <div class="review-list">
-        <div
-          v-for="review in currDayStageReviews"
-          :key="review.stage"
-          class="review-item"
-        >
-          <div class="review-stage-label">
-            {{ review.stage }}
-          </div>
-          <div class="review-count-display">
-            {{ review.count }}
+          <div class="calendar-popup-number">
+            <template v-if="isOnVacation">
+              🌴
+            </template>
+            <template v-else>
+              {{ currDayNumber }}
+            </template>
           </div>
         </div>
-        <div class="review-item review-item--total">
-          <div class="review-stage-label">
-            Total
-          </div>
-          <div class="review-count-display">
-            {{ currDayReviewTotal }}
-          </div>
-        </div>
-      </div>
-    </div>
+      </template>
+    </AwesomeButton>
+    <AwesomeButton
+      v-if="hasNotCompletedPreviousDays"
+      class="calendar-info-button"
+      icon="fa-solid fa-circle-exclamation"
+      :on-hover="togglePreviousDaysPopup"
+    />
     <transition name="slide-fade">
       <div
         v-if="hasNotCompletedPreviousDays && showPreviousDaysPopup"
@@ -134,7 +105,7 @@
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import CalendarModal from '@/views/modal/CalendarModal.vue'
 import { computed, ref } from 'vue'
-import { calcStageReviews, StageReview } from '@/core-logic/review-logic.ts'
+import { calcStageReviews } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
@@ -150,11 +121,7 @@ const chronoStore = useChronoStore()
 const toggleStore = useToggleStore()
 
 const { flashcardSet, flashcards, isSuspended } = storeToRefs(flashcardStore)
-const {
-  currDay,
-  isDayOff,
-  isInitialDay,
-} = storeToRefs(chronoStore)
+const { currDay, isDayOff } = storeToRefs(chronoStore)
 
 const showPreviousDaysPopup = ref(false)
 
@@ -165,15 +132,6 @@ const togglePreviousDaysPopup = () => {
 const isOnVacation = computed(() => isSuspended.value || isDayOff.value)
 const currDayNumber = computed(() =>
   isOnVacation.value ? '🌴' : currDay.value?.seqNumber ?? '?'
-)
-
-const currDayStageReviews = computed<StageReview[]>(() => {
-  if (!currDay.value) return []
-  return calcStageReviews(flashcards.value, currDay.value.stages)
-})
-
-const currDayReviewTotal = computed(() =>
-  currDayStageReviews.value.reduce((acc, v) => acc + v.count, 0)
 )
 
 const previousDays = computed(() => {
@@ -220,7 +178,7 @@ const prevDaysReviewTotal = computed(() => {
 const calendarIcon = computed(() => {
   if (isOnVacation.value || currDay.value.status === chronodayStatuses.INITIAL) {
     return 'fa-solid fa-calendar'
-  } else if (currDayReviewTotal.value === 0) {
+  } else if (currDay.value.status === chronodayStatuses.COMPLETED) {
     return 'fa-solid fa-calendar-check'
   } else {
     return 'fa-solid fa-calendar-days'
@@ -232,14 +190,11 @@ const calendarIcon = computed(() => {
 <style scoped>
 .calendar-widget--theme {
   --c-widget--border-color: var(--calendar-widget--border-color, rgba(128, 128, 128, 0.62));
-  --c-widget--stage-label--color: var(--calendar-widget--stage-label--color, rgba(13, 18, 74, 0.6));
-  --c-widget--number--bg: var(--calendar-widget--number--bg, rgba(255, 255, 255, 0.6));
-  --c-widget--review--header-color: var(--calendar-widget--review--header-color, rgba(13, 18, 74, 0.6));
-  --c-widget--review--bg: var(--calendar-widget--review--bg, linear-gradient(135deg, rgba(102, 126, 234, 0.66) 0%, rgba(118, 75, 162, 0.68) 100%));
-  --c-widget--popup--text-color: var(--calendar-widget--popup--text-color, rgb(29, 68, 151));
-  --c-widget--popup--number-color: var(--calendar-widget--popup--number-color, rgba(20, 27, 106, 0.82));
-  --c-widget--popup-button--color: var(--calendar-widget--popup-button--color, rgb(253, 107, 76));
-  --c-widget--popup-button--color--hover: var(--calendar-widget--popup-button--color--hover, rgb(255, 66, 61));
+  --c-widget--popup--text--color: var(--calendar-widget--popup--text--color, rgb(29, 68, 151));
+  --c-widget--popup--button--color: var(--calendar-widget--popup--button--color, rgb(253, 107, 76));
+  --c-widget--popup--button--color--hover: var(--calendar-widget--popup--button--color--hover, rgb(255, 66, 61));
+  --c-widget--popup--number--bg: var(--calendar-widget--popup--number--bg, rgba(255, 255, 255, 0.6));
+  --c-widget--popup--number--color: var(--calendar-widget--popup--number-color, rgba(20, 27, 106, 0.82));
   --c-widget--popup--shadow-color: var(--calendar-widget--popup--shadow-color, rgba(0, 0, 0, 0.15));
 }
 
@@ -250,24 +205,6 @@ const calendarIcon = computed(() => {
   gap: 16px;
   width: fit-content;
   height: 100%;
-}
-
-.calendar-widget-button-wrapper {
-  position: relative;
-  display: flex;
-  height: 100%;
-}
-
-.calendar-widget-review-layout {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  background: var(--c-widget--review--bg);
-  border: 1px solid var(--c-widget--border-color);
-  border-radius: 6px;
-  padding: 4px;
 }
 
 .calendar-button-slot {
@@ -282,8 +219,8 @@ const calendarIcon = computed(() => {
 .calendar-info-button {
   --awesome-button--border-radius: 50%;
   --awesome-button--icon--size: 22px;
-  --awesome-button--icon--color: var(--c-widget--popup-button--color);
-  --awesome-button--icon--color--hover: var(--c-widget--popup-button--color--hover);
+  --awesome-button--icon--color: var(--c-widget--popup--button--color);
+  --awesome-button--icon--color--hover: var(--c-widget--popup--button--color--hover);
   position: absolute;
   top: -14px;
   right: -14px;
@@ -303,65 +240,9 @@ const calendarIcon = computed(() => {
   font-size: 0.8rem;
   font-weight: 600;
   border: 1px solid var(--c-widget--border-color);
-  color: var(--c-widget--popup--number-color);
+  color: var(--c-widget--popup--number--color);
   border-radius: 3px;
   padding: 1px;
-  width: 40px;
-  text-align: center;
-}
-
-.review-header {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--c-widget--review--header-color);
-  letter-spacing: 0.05rem;
-  word-spacing: 0.05rem;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: nowrap;
-  padding: 2px;
-  flex-shrink: 0;
-}
-
-.review-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-  min-height: 0;
-  padding: 6px;
-}
-
-.review-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.review-item--total {
-  font-weight: 600;
-}
-
-.review-stage-label {
-  font-size: 0.9rem;
-  word-spacing: 0.05rem;
-  letter-spacing: 0.05rem;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--c-widget--stage-label--color);
-  flex: 1;
-  text-align: left;
-}
-
-.review-count-display {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--c-widget--popup--number-color);
-  background: var(--c-widget--number--bg);
-  border-radius: 4px;
-  padding: 2px;
   width: 40px;
   text-align: center;
 }
@@ -391,7 +272,7 @@ const calendarIcon = computed(() => {
 
 .calendar-popup-header {
   font-size: 0.7rem;
-  color: var(--c-widget--popup--text-color);
+  color: var(--c-widget--popup--text--color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -401,7 +282,7 @@ const calendarIcon = computed(() => {
 
 .calendar-popup-text {
   font-size: 0.7rem;
-  color: var(--c-widget--popup--text-color);
+  color: var(--c-widget--popup--text--color);
   word-spacing: 0.05rem;
   letter-spacing: 0.05rem;
   text-transform: uppercase;
@@ -411,8 +292,8 @@ const calendarIcon = computed(() => {
 .calendar-popup-number {
   font-size: 0.9rem;
   font-weight: 600;
-  background: var(--c-widget--number--bg);
-  color: var(--c-widget--popup--number-color);
+  background: var(--c-widget--popup--number--bg);
+  color: var(--c-widget--popup--number--color);
   border-radius: 3px;
   padding: 1px;
   width: 40px;
@@ -439,7 +320,7 @@ const calendarIcon = computed(() => {
 .calendar-popup-review-total {
   padding: 4px;
   border-radius: 4px;
-  background: var(--c-widget--review--bg);
+  background: var(--c-widget--popup--number--bg);
 }
 
 .slide-fade-enter-active {
