@@ -27,6 +27,14 @@
           <FlashcardWidget/>
           <CalendarWidget/>
           <LaunchWidget/>
+          <SpecialStageWidget
+            :stage="specialStages.UNKNOWN"
+            icon="fa-regular fa-circle-question"
+          />
+          <SpecialStageWidget
+            :stage="specialStages.ATTEMPTED"
+            icon="fa-solid fa-rotate-right"
+          />
           <DayStreakWidget/>
         </div>
       </div>
@@ -41,6 +49,7 @@ import ControlBar from '@/components/ControlBar.vue'
 import FlashcardInfoBar from '@/components/control-panel/FlashcardInfoBar.vue'
 import FlashcardWidget from '@/components/control-panel/FlashcardWidget.vue'
 import CalendarWidget from '@/components/control-panel/CalendarWidget.vue'
+import SpecialStageWidget from '@/components/control-panel/SpecialStageWidget.vue'
 import DayStreakWidget from '@/components/control-panel/DayStreakWidget.vue'
 import LaunchWidget from '@/components/control-panel/LaunchWidget.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
@@ -51,6 +60,7 @@ import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import { loadFlashcardSetStore } from '@/shared/stores.ts'
 import { useControlStore } from '@/stores/control-store.ts'
+import { specialStages } from '@/core-logic/stage-logic.ts'
 
 const flashcardStore = useFlashcardStore()
 const toggleStore = useToggleStore()
