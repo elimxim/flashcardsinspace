@@ -100,6 +100,7 @@ defineExpose({
 }
 
 .awesome-button-wrapper {
+  position: relative;
   display: grid;
   width: fit-content;
   height: fit-content;
