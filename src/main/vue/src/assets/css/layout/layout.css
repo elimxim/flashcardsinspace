@@ -19,9 +19,5 @@
 }
 
 .page--auto-padded {
-  padding: clamp(0.5rem, 2vh, 1rem) clamp(0.5rem, 1vw, 1rem);
-}
-
-.page--min-padded {
-  padding: 4px;
+  padding: clamp(0.5rem, 1vh, 1rem) clamp(0.5rem, 1vw, 1rem);
 }

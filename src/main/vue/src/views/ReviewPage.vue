@@ -4,26 +4,36 @@
       'page',
       'page--x-centered',
       'page--y-centered',
-      'page--min-padded',
     ]"
   >
+    <ControlBar
+      :title="flashcardSetName"
+      center-title
+      without-shadow
+    >
+      <template v-if="reviewTopic" #left>
+        <div class="review-mode">
+          {{ reviewTopic }}
+        </div>
+      </template>
+      <template #right>
+        <AwesomeButton
+          ref="escapeButton"
+          icon="fa-solid fa-circle-xmark"
+          class="control-bar-button"
+          :on-click="finishReviewAndLeave"
+        />
+      </template>
+    </ControlBar>
     <div class="review-info">
-      <span class="corner-text">
-        {{ reviewTopic }}
-      </span>
       <span class="review-progressbar">
         <Progressbar
           :progress="progress"
-          height="0.5rem"
+          height="12px"
           track-rounded
           bar-rounded
         />
       </span>
-      <AwesomeButton
-        ref="escapeButton"
-        icon="fa-solid fa-xmark"
-        :on-click="finishReviewAndGoToFlashcards"
-      />
     </div>
     <div class="review-body">
       <SpaceDeck
@@ -112,6 +122,7 @@
 </template>
 
 <script setup lang="ts">
+import ControlBar from '@/components/ControlBar.vue'
 import Progressbar from '@/components/Progressbar.vue'
 import SpaceDeck from '@/components/SpaceDeck.vue'
 import SmartButton from '@/components/SmartButton.vue'
@@ -125,7 +136,8 @@ import { nextStage, prevStage, Stage, stages } from '@/core-logic/stage-logic.ts
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
   createReviewQueue,
-  createReviewQueueForStage, EmptyReviewQueue,
+  createReviewQueueForStage,
+  EmptyReviewQueue,
   ReviewMode,
   ReviewQueue,
   toReviewMode
@@ -177,7 +189,8 @@ const stageUpButton = ref<InstanceType<typeof SmartButton>>()
 const prevButton = ref<InstanceType<typeof SmartButton>>()
 const nextButton = ref<InstanceType<typeof SmartButton>>()
 
-const reviewTopic = computed(() => props.stage?.displayName ?? 'Lightspeed')
+const flashcardSetName = computed(() => flashcardSet.value?.name || '')
+const reviewTopic = computed(() => props.stage?.displayName)
 const reviewMode = computed(() => toReviewMode(props.stage))
 const isLightspeedMode = computed(() => reviewMode.value === ReviewMode.LIGHTSPEED)
 const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
@@ -234,7 +247,7 @@ async function finishReview() {
   }
 }
 
-async function finishReviewAndGoToFlashcards() {
+async function finishReviewAndLeave() {
   await finishReview()
     .then(() =>
       router.push({ name: routeNames.flashcards })
@@ -413,15 +426,17 @@ function handleKeydown(event: KeyboardEvent) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px;
   width: 100%;
   gap: 10px;
 }
 
-.corner-text {
-  background: none;
-  color: #9f9f9f;
-  font-size: 1rem;
+.review-mode {
+  color: rgba(243, 239, 239, 0.7);
+  font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+  letter-spacing: 0.05rem;
+  word-spacing: 0.05rem;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .review-body {
