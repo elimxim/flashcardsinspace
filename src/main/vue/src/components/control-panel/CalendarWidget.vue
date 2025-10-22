@@ -202,6 +202,8 @@ const calendarIcon = computed(() => {
   position: relative;
   height: 100%;
   width: fit-content;
+  display: flex;
+  flex-direction: row;
 }
 
 .calendar-button-slot {
@@ -220,8 +222,12 @@ const calendarIcon = computed(() => {
   --awesome-button--icon--color--hover: var(--c-widget--popup--button--color--hover);
   position: absolute;
   top: -14px;
-  right: -14px;
+  left: 100%;
+  margin-left: -12px;
   z-index: 10;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
 }
 
 .calendar-button-text {
