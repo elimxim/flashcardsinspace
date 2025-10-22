@@ -71,8 +71,8 @@ function startReview() {
   flex-direction: column;
   gap: 4px;
   padding: 4px;
-  width: fit-content;
   height: 100%;
+  min-width: fit-content;
   background: var(--s-widget--bg);
   border-radius: 6px;
 }

@@ -66,6 +66,7 @@ const currDayReviewTotal = computed(() =>
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-width: fit-content;
   overflow: hidden;
   background: var(--r-widget--bg);
   border: 1px solid var(--r-widget--border-color);
@@ -92,7 +93,7 @@ const currDayReviewTotal = computed(() =>
   gap: 4px;
   flex: 1;
   min-height: 0;
-  padding: 6px;
+  padding: 2px 6px 6px 6px;
 }
 
 .review-item {

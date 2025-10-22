@@ -33,6 +33,6 @@ function startReview() {
   display: flex;
   align-items: center;
   height: 100%;
-  width: 160px;
+  min-width: 106px;
 }
 </style>
