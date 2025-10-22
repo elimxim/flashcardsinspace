@@ -1,13 +1,20 @@
 <template>
-  <div class="control-bar control-bar--theme">
-    <slot name="left"/>
+  <div
+    class="control-bar control-bar--theme"
+    :class="{ 'shadow': !withoutShadow }"
+  >
+    <div class="left-controls">
+      <slot name="left"/>
+    </div>
     <div
       class="control-bar-title"
-      :class="{ 'flex-grow': !centerTitle }"
+      :class="{ 'centered': centerTitle }"
     >
       {{ title }}
     </div>
-    <slot name="right"/>
+    <div class="right-controls">
+      <slot name="right"/>
+    </div>
   </div>
 </template>
 
@@ -15,8 +22,10 @@
 withDefaults(defineProps<{
   title: string
   centerTitle?: boolean
+  withoutShadow?: boolean
 }>(), {
   centerTitle: false,
+  withoutShadow: false,
 })
 
 </script>
@@ -31,27 +40,45 @@ withDefaults(defineProps<{
 
 .control-bar {
   position: relative;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
   padding: 10px;
   background-color: var(--c-bar--bg-color);
-  box-shadow: 0 2px 3px 2px var(--c-bar--shadow-color);
   width: 100%;
   height: 40px;
 }
 
+.control-bar.shadow {
+  box-shadow: 0 2px 3px 2px var(--c-bar--shadow-color);
+}
+
+.left-controls {
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 1;
+}
+
+.right-controls {
+  grid-column: 3;
+  grid-row: 1;
+  z-index: 1;
+}
+
 .control-bar-title {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  text-align: left;
   color: var(--c-bar--title--color);
-  font-size:var(--c-bar--title--font-size);
+  font-size: var(--c-bar--title--font-size);
   font-weight: normal;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.control-bar-title.flex-grow {
-  flex: 1;
+.control-bar-title.centered {
+  text-align: center;
 }
 </style>
