@@ -54,7 +54,7 @@ export function useFlip(containerRef: Ref<HTMLElement | null | undefined>) {
           element.style.transition = 'none'
 
           // Force reflow
-          element.offsetHeight
+          void element.offsetHeight
 
           // Play: Transition to the new position
           requestAnimationFrame(() => {
