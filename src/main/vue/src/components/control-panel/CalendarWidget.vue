@@ -200,9 +200,6 @@ const calendarIcon = computed(() => {
 
 .calendar-widget {
   position: relative;
-  display: flex;
-  flex-direction: row;
-  gap: 16px;
   width: fit-content;
   height: 100%;
 }
