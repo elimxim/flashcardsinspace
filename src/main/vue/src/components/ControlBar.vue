@@ -43,7 +43,7 @@ withDefaults(defineProps<{
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 10px;
   background-color: var(--c-bar--bg-color);
   width: 100%;
@@ -67,7 +67,7 @@ withDefaults(defineProps<{
 }
 
 .control-bar-title {
-  grid-column: 1 / -1;
+  grid-column: 2;
   grid-row: 1;
   text-align: left;
   color: var(--c-bar--title--color);
@@ -79,6 +79,7 @@ withDefaults(defineProps<{
 }
 
 .control-bar-title.centered {
+  grid-column: 1 / -1;
   text-align: center;
 }
 </style>
