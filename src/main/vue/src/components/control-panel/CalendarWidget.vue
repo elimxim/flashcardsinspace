@@ -204,6 +204,8 @@ const calendarIcon = computed(() => {
   width: fit-content;
   display: flex;
   flex-direction: row;
+  overflow: visible;
+  flex-shrink: 0;
 }
 
 .calendar-button-slot {
