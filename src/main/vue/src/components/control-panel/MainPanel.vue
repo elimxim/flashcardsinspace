@@ -97,7 +97,7 @@ const widgets: Record<string, Widget> = {
 const widgetRows = computed(() => {
   const width = mainPanelWidth.value
 
-  if (width < 580) {
+  if (width < 540) {
     return [
       {
         id: 'row-1',
