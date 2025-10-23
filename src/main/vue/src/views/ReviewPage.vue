@@ -1,6 +1,7 @@
 <template>
   <div
     :class="[
+      'review-page--theme',
       'page',
       'page--x-centered',
       'page--y-centered',
@@ -26,14 +27,18 @@
       </template>
     </ControlBar>
     <div class="review-info">
-      <span class="review-progressbar">
+      <div class="review-count review-count--left">
+        {{ flashcardsSeen }}
+      </div>
+      <div class="review-progressbar">
         <Progressbar
           :progress="progress"
-          height="12px"
-          track-rounded
-          bar-rounded
+          height="16px"
         />
-      </span>
+      </div>
+      <div class="review-count review-count--right">
+        {{ flashcardsRemaining }}
+      </div>
     </div>
     <div class="review-body">
       <SpaceDeck
@@ -195,20 +200,27 @@ const reviewMode = computed(() => toReviewMode(props.stage))
 const isLightspeedMode = computed(() => reviewMode.value === ReviewMode.LIGHTSPEED)
 const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
 const flashcardsTotal = ref(0)
-const flashcardsRemaining = computed(() => reviewQueue.value.remaining())
+const flashcardsRemaining = computed(() => {
+  if (noNextAvailable.value) return 0
+  return reviewQueue.value.remaining() + 1
+})
 const currFlashcard = ref<Flashcard>()
+const flashcardsSeen = computed(() =>
+  Math.max(0, flashcardsTotal.value - flashcardsRemaining.value)
+)
 const progress = computed(() => {
-  const total = flashcardsTotal.value
-  let remaining = flashcardsRemaining.value + 1
-  if (noNextAvailable.value) remaining = 0
-  const completionRate = (total - remaining) / total
-  return Math.max(0, Math.min(1, completionRate))
+  const completionRate = flashcardsSeen.value / flashcardsTotal.value
+  if (completionRate) {
+    return Math.max(0, Math.min(1, completionRate))
+  } else {
+    return 0
+  }
 })
 const noPrevAvailable = computed(() => {
   if (flashcardsTotal.value === 1) {
     return !noNextAvailable.value
   }
-  return flashcardsTotal.value === flashcardsRemaining.value + 1
+  return flashcardsTotal.value === flashcardsRemaining.value
 })
 const noNextAvailable = computed(() => currFlashcard.value === undefined)
 
@@ -422,12 +434,20 @@ function handleKeydown(event: KeyboardEvent) {
 </script>
 
 <style scoped>
+.review-page--theme {
+  --r-page--review-count--color: var(--review-page--review-count--color, rgba(17, 33, 85, 0.92));
+  --r-page--review-count--bg: var(--review-page--review-count--border-color, rgba(0, 0, 0, 0.1));
+  --progressbar--from: var(--review-progressbar--from);
+  --progressbar--via: var(--review-progressbar--via);
+  --progressbar--to: var(--review-progressbar--to);
+  --progressbar--bg-color: var(--review-progressbar--bg-color);
+}
+
 .review-info {
   display: flex;
-  align-items: center;
+  align-items: start;
   justify-content: space-between;
   width: 100%;
-  gap: 10px;
 }
 
 .review-mode {
@@ -460,10 +480,16 @@ function handleKeydown(event: KeyboardEvent) {
 
 .review-progressbar {
   flex: 1;
-  --progressbar--from: var(--review-progressbar--from);
-  --progressbar--via: var(--review-progressbar--via);
-  --progressbar--to: var(--review-progressbar--to);
-  --progressbar--bg-color: var(--review-progressbar--bg-color);
+}
+
+.review-count {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--r-page--review-count--color);
+  background: var(--r-page--review-count--bg);
+  padding: 2px;
+  width: 50px;
+  text-align: center;
 }
 
 </style>
