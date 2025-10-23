@@ -31,7 +31,6 @@ const toggleStore = useToggleStore()
   position: relative;
   display: flex;
   height: 100%;
-  width: fit-content;
 }
 
 .flashcard-widget-button-text {

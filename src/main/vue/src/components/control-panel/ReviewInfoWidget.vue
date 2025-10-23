@@ -66,7 +66,6 @@ const currDayReviewTotal = computed(() =>
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-width: fit-content;
   overflow: hidden;
   background: var(--r-widget--bg);
   border: 1px solid var(--r-widget--border-color);
