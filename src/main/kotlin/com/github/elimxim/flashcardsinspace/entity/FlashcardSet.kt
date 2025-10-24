@@ -47,8 +47,8 @@ class FlashcardSet(
         mappedBy = "flashcardSet",
         cascade = [CascadeType.ALL],
         orphanRemoval = true,
+        fetch = FetchType.LAZY,
     )
-    @OrderBy("chronodate ASC")
     var chronodays: MutableList<Chronoday> = arrayListOf(),
 )
 
