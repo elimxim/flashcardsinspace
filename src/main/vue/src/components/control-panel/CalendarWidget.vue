@@ -24,12 +24,6 @@
         </div>
       </template>
     </AwesomeButton>
-    <AwesomeButton
-      v-if="hasNotCompletedPreviousDays"
-      class="calendar-info-button"
-      icon="fa-solid fa-circle-exclamation"
-      :on-hover="togglePreviousDaysPopup"
-    />
     <transition name="slide-fade">
       <div
         v-if="hasNotCompletedPreviousDays && showPreviousDaysPopup"
@@ -124,10 +118,6 @@ const { flashcardSet, flashcards, isSuspended } = storeToRefs(flashcardStore)
 const { currDay, isDayOff } = storeToRefs(chronoStore)
 
 const showPreviousDaysPopup = ref(false)
-
-const togglePreviousDaysPopup = () => {
-  showPreviousDaysPopup.value = !showPreviousDaysPopup.value
-}
 
 const isOnVacation = computed(() => isSuspended.value || isDayOff.value)
 const currDayNumber = computed(() =>
