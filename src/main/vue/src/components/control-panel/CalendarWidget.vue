@@ -1,106 +1,104 @@
 <template>
   <div class="calendar-widget calendar-widget--theme">
-    <div class="calendar-widget-layout">
-      <AwesomeButton
-        :icon="calendarIcon"
-        class="calendar-widget-button"
-        :disabled="!flashcardSet"
-        :on-click="toggleStore.toggleCalendar"
-        fill-space
-        square
-      >
-        <template #below>
-          <div class="calendar-button-slot">
-            <div class="calendar-button-text">
-              Day
-            </div>
-            <div class="calendar-popup-number">
-              <template v-if="isOnVacation">
-                🌴
-              </template>
-              <template v-else>
-                {{ currDayNumber }}
-              </template>
-            </div>
+    <AwesomeButton
+      :icon="calendarIcon"
+      class="calendar-widget-button"
+      :disabled="!flashcardSet"
+      :on-click="toggleStore.toggleCalendar"
+      fill-space
+      square
+    >
+      <template #below>
+        <div class="calendar-button-slot">
+          <div class="calendar-button-text">
+            Day
           </div>
-        </template>
-      </AwesomeButton>
-      <AwesomeButton
-        v-if="hasNotCompletedPreviousDays"
-        class="calendar-info-button"
-        icon="fa-solid fa-circle-exclamation"
-        :on-hover="togglePreviousDaysPopup"
-      />
-      <transition name="slide-fade">
-        <div
-          v-if="hasNotCompletedPreviousDays && showPreviousDaysPopup"
-          class="calendar-popup"
-        >
-          <div class="calendar-popup-layout">
-            <template v-if="previousDaysFrom !== previousDaysTo">
-              <div class="calendar-popup-header">
-                You have uncompleted previous days
-              </div>
-              <div class="calendar-popup-centered-row">
-                <div class="calendar-popup-text">
-                  From
-                </div>
-                <div class="calendar-day-number">
-                  {{ previousDaysFrom?.seqNumber }}
-                </div>
-                <div class="calendar-popup-text">
-                  To
-                </div>
-                <div class="calendar-day-number">
-                  {{ previousDaysTo?.seqNumber }}
-                </div>
-              </div>
+          <div class="calendar-popup-number">
+            <template v-if="isOnVacation">
+              🌴
             </template>
             <template v-else>
-              <div class="calendar-popup-header">
-                You have an uncompleted previous day
-              </div>
-              <div class="calendar-popup-centered-row">
-                <div class="calendar-day-number">
-                  {{ previousDaysTo?.seqNumber }}
-                </div>
-              </div>
-            </template>
-            <div
-              v-if="prevDaysReviewTotal > 0"
-              class="calendar-popup-review"
-            >
-              <div class="calendar-popup-text">
-                With the total number of flashcards to review
-              </div>
-              <div class="calendar-popup-review-total">
-                <div class="review-number">
-                  {{ prevDaysReviewTotal }}
-                </div>
-              </div>
-            </div>
-            <template v-else-if="previousDaysFrom !== previousDaysTo">
-              <div class="calendar-popup-text">
-                They will be completed once
-              </div>
-              <div class="calendar-popup-text">
-                you complete the current day
-              </div>
-            </template>
-            <template v-else>
-              <div class="calendar-popup-text">
-                It will be completed once
-              </div>
-              <div class="calendar-popup-text">
-                you complete the current day
-              </div>
+              {{ currDayNumber }}
             </template>
           </div>
         </div>
-      </transition>
-    </div>
-    <CalendarModal/>
+      </template>
+    </AwesomeButton>
+    <AwesomeButton
+      v-if="hasNotCompletedPreviousDays"
+      class="calendar-info-button"
+      icon="fa-solid fa-circle-exclamation"
+      :on-hover="togglePreviousDaysPopup"
+    />
+    <transition name="slide-fade">
+      <div
+        v-if="hasNotCompletedPreviousDays && showPreviousDaysPopup"
+        class="calendar-popup"
+      >
+        <div class="calendar-popup-layout">
+          <template v-if="previousDaysFrom !== previousDaysTo">
+            <div class="calendar-popup-header">
+              You have uncompleted previous days
+            </div>
+            <div class="calendar-popup-centered-row">
+              <div class="calendar-popup-text">
+                From
+              </div>
+              <div class="calendar-day-number">
+                {{ previousDaysFrom?.seqNumber }}
+              </div>
+              <div class="calendar-popup-text">
+                To
+              </div>
+              <div class="calendar-day-number">
+                {{ previousDaysTo?.seqNumber }}
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div class="calendar-popup-header">
+              You have an uncompleted previous day
+            </div>
+            <div class="calendar-popup-centered-row">
+              <div class="calendar-day-number">
+                {{ previousDaysTo?.seqNumber }}
+              </div>
+            </div>
+          </template>
+          <div
+            v-if="prevDaysReviewTotal > 0"
+            class="calendar-popup-review"
+          >
+            <div class="calendar-popup-text">
+              With the total number of flashcards to review
+            </div>
+            <div class="calendar-popup-review-total">
+              <div class="review-number">
+                {{ prevDaysReviewTotal }}
+              </div>
+            </div>
+          </div>
+          <template v-else-if="previousDaysFrom !== previousDaysTo">
+            <div class="calendar-popup-text">
+              They will be completed once
+            </div>
+            <div class="calendar-popup-text">
+              you complete the current day
+            </div>
+          </template>
+          <template v-else>
+            <div class="calendar-popup-text">
+              It will be completed once
+            </div>
+            <div class="calendar-popup-text">
+              you complete the current day
+            </div>
+          </template>
+        </div>
+      </div>
+    </transition>
   </div>
+  <CalendarModal/>
 </template>
 
 <script setup lang="ts">
@@ -201,13 +199,6 @@ const calendarIcon = computed(() => {
 }
 
 .calendar-widget {
-  position: relative;
-  display: flex;
-  height: 100%;
-  width: fit-content;
-}
-
-.calendar-widget-layout {
   position: relative;
   display: flex;
   height: 100%;
