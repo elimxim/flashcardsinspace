@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 011-create-day-streak-table
+      author: elimxim
+      changes:
+        - createTable:
+            tableName: day_streak
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: streak
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: chronoday_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_day_streak_2_chronoday_id
+                    references: chronoday(id)
+                    validateForeignKey: true
+              - column:
+                  name: flashcard_set_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_day_streak_2_flashcard_set_id
+                    references: flashcard_set(id)
+                    validateForeignKey: true
