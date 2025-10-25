@@ -48,7 +48,7 @@ const controlStore = useControlStore()
 const chronoStore = useChronoStore()
 
 const { isSidebarExpanded } = storeToRefs(controlStore)
-const { isInitialDay } = storeToRefs(chronoStore)
+const { isInitialDay, isDayOff } = storeToRefs(chronoStore)
 
 const mainPanel = ref<HTMLElement>()
 const mainPanelWidth = ref(0)
@@ -85,7 +85,7 @@ const widgets: Record<string, Widget> = {
     component: ReviewInfoWidget,
     className: 'main-panel-stretching-widget',
     props: {},
-    hidden: isInitialDay,
+    hidden: computed(() => isInitialDay.value || isDayOff.value),
   },
   launch: {
     id: 'launch',
