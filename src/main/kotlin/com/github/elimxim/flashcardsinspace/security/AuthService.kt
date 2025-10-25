@@ -33,15 +33,17 @@ class AuthService(
 ) {
     @Transactional
     fun signUp(request: SignUpRequest): User {
-        log.info("Sign up attempt: ${request.email?.escapeJava()}")
+        log.info("Sign up attempt ${maskSecret(request.email?.escapeJava())}")
         return signUp(requestValidator.validate(request))
     }
 
     @Transactional
     fun signUp(request: ValidSignUpRequest): User {
         if (userRepository.findByEmail(request.email).isPresent) {
-            log.info("Email {} is already taken", request.email)
-            throw EmailIsAlreadyTakenException("Email '${request.email}' is already exists")
+            log.info("Email ${maskSecret(request.email)} is already taken")
+            throw EmailIsAlreadyTakenException(
+                "Email ${maskSecret(request.email)} is already exists"
+            )
         }
 
         val language = languageService.getEntity(request.languageId)
@@ -57,14 +59,14 @@ class AuthService(
         )
 
         val savedUser = userRepository.save(user)
-        log.info("Signup successful: ${user.email} => ${user.id}, timezone: ${user.timezone}")
+        log.info("Signup successful ${user.email} => ${user.id}, timezone: ${user.timezone}")
 
         return savedUser
     }
 
     @Transactional
     fun login(request: LoginRequest): User {
-        log.info("Login attempt: ${request.email?.escapeJava()}")
+        log.info("Login attempt ${maskSecret(request.email?.escapeJava())}")
         return login(requestValidator.validate(request))
     }
 
@@ -74,11 +76,14 @@ class AuthService(
             val token = UsernamePasswordAuthenticationToken(request.email, request.secret.unmasked())
             authenticationManager.authenticate(token)
         } catch (e: Exception) {
-            throw AuthenticationFailedException("Failed to authenticate user: ${request.email.escapeJava()}", e)
+            throw AuthenticationFailedException(
+                "Failed to authenticate user: ${maskSecret(request.email.escapeJava())}", e
+            )
         }
 
-        val user = userRepository.findByEmail(request.email)
-            .orElseThrow { UserNotFoundException("User not found: ${request.email.escapeJava()}") }
+        val user = userRepository.findByEmail(request.email).orElseThrow {
+            UserNotFoundException("User not found: ${maskSecret(request.email.escapeJava())}")
+        }
 
         user.lastLoginAt = ZonedDateTime.now()
         if (user.timezone != request.timezone) {
@@ -88,7 +93,7 @@ class AuthService(
         }
         userRepository.save(user)
 
-        log.info("Login successful: ${user.email} => ${user.id}, timezone: ${user.timezone}")
+        log.info("Login successful ${maskSecret(user.email)} => ${user.id}, timezone: ${user.timezone}")
         return user
     }
 
@@ -99,8 +104,9 @@ class AuthService(
     @Transactional
     fun refreshToken(refreshToken: String): User {
         val email = jwtService.extractUsername(refreshToken)
-        val user = userRepository.findByEmail(email)
-            .orElseThrow { UsernameNotFoundException("User not found") }
+        val user = userRepository.findByEmail(email).orElseThrow {
+            UsernameNotFoundException("User not found ${maskSecret(email.escapeJava())}")
+        }
 
         if (!jwtService.isTokenValid(refreshToken, user)) {
             log.error("Invalid refresh token for user {}", email)

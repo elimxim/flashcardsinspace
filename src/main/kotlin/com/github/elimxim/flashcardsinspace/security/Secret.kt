@@ -31,14 +31,12 @@ class Password(private val secret: String) : Confidential by Secret(secret) {
 @JsonSerialize(using = SecretSerializer::class)
 @JsonDeserialize(using = SecretDeserializer::class)
 class Secret(private val secret: String) : Confidential {
-    val maskPercentage: Int = 80
-
     override fun unmasked(): String {
         return secret
     }
 
     override fun masked(): String {
-        return maskSecret(secret, percentage = 60)
+        return maskSecret(secret)
     }
 
     override fun toString(): String {
@@ -55,12 +53,14 @@ class Secret(private val secret: String) : Confidential {
 }
 
 fun maskSecret(
-    secret: String,
-    percentage: Int,
+    secret: String?,
+    percentage: Int = 60,
     dynamicMask: Boolean = false,
     staticMaskLength: Int = 3,
     maxVisibleSideLength: Int = 3,
 ): String {
+    if (secret == null) return "null"
+
     if (percentage !in 0..100) {
         throw IllegalArgumentException("Percentage must be between 0 and 100")
     } else if (secret.isEmpty()) {
