@@ -4,6 +4,7 @@ import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.ChronoService
 import com.github.elimxim.flashcardsinspace.service.ChronoSyncDay
+import com.github.elimxim.flashcardsinspace.util.withLoggingContext
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoBulkUpdateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncResponse
@@ -23,7 +24,7 @@ class ChronoController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @RequestBody request: ChronoSyncRequest,
-    ): ResponseEntity<ChronoSyncResponse> {
+    ): ResponseEntity<ChronoSyncResponse> = withLoggingContext(user) {
         val response = chronoService.sync(user, setId, request.normalize())
         return ResponseEntity.ok(response)
     }
@@ -32,7 +33,7 @@ class ChronoController(
     fun synchronizeNextDay(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
-    ): ResponseEntity<ChronoSyncResponse> {
+    ): ResponseEntity<ChronoSyncResponse> = withLoggingContext(user) {
         val response = chronoService.syncDay(user, setId, day = ChronoSyncDay.NEXT)
         return ResponseEntity.ok(response)
     }
@@ -41,7 +42,7 @@ class ChronoController(
     fun synchronizePrevDay(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
-    ): ResponseEntity<ChronoSyncResponse> {
+    ): ResponseEntity<ChronoSyncResponse> = withLoggingContext(user) {
         val response = chronoService.syncDay(user, setId, day = ChronoSyncDay.PREV)
         return ResponseEntity.ok(response)
     }
@@ -51,7 +52,7 @@ class ChronoController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @RequestBody request: ChronoBulkUpdateRequest,
-    ): ResponseEntity<ChronoUpdateResponse> {
+    ): ResponseEntity<ChronoUpdateResponse> = withLoggingContext(user) {
         val response = chronoService.bulkUpdate(user, setId, request.normalize())
         return ResponseEntity.ok(response)
     }

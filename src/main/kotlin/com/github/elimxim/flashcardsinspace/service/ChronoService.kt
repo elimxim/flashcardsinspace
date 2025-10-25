@@ -29,7 +29,7 @@ class ChronoService(
 ) {
     @Transactional
     fun sync(user: User, setId: Long, request: ChronoSyncRequest): ChronoSyncResponse {
-        log.info("User ${user.id}: syncing chronodays for flashcard set $setId, timezone: ${user.timezone}")
+        log.info("Syncing chronodays for flashcard set $setId, timezone: ${user.timezone}")
         flashcardSetService.verifyUserHasAccess(user, setId)
         return sync(setId, requestValidator.validate(request).clientDatetime, clientTimezone = user.timezone)
     }
@@ -154,7 +154,7 @@ class ChronoService(
 
     @Transactional
     fun bulkUpdate(user: User, setId: Long, request: ChronoBulkUpdateRequest): ChronoUpdateResponse {
-        log.info("User ${user.id}: bulk updating chronodays for flashcard set $setId")
+        log.info("Bulk updating chronodays for flashcard set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         flashcardSetService.verifyNotSuspended(setId)
         return bulkUpdate(setId, requestValidator.validate(request))

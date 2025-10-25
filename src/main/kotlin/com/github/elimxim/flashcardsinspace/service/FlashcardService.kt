@@ -25,7 +25,7 @@ class FlashcardService(
 ) {
     @Transactional
     fun get(user: User, setId: Long): List<FlashcardDto> {
-        log.info("User ${user.id}: retrieving flashcards from set $setId")
+        log.info("Retrieving flashcards from set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         return flashcardSetService.getEntity(setId)
             .flashcards.map { it.toDto() }
@@ -33,7 +33,7 @@ class FlashcardService(
 
     @Transactional
     fun add(user: User, setId: Long, request: FlashcardCreationRequest): FlashcardDto {
-        log.info("User ${user.id}: adding a new flashcard to set $setId")
+        log.info("Adding a new flashcard to set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         return add(setId, requestValidator.validate(request)).toDto()
     }
@@ -127,7 +127,7 @@ class FlashcardService(
 
     @Transactional
     fun remove(user: User, setId: Long, id: Long) {
-        log.info("User ${user.id}: removing flashcard $id from set $setId")
+        log.info("Removing flashcard $id from set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         verifyUserOperation(user, setId, id)
         val flashcardSet = flashcardSetService.getEntity(setId)

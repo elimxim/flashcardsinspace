@@ -29,7 +29,7 @@ class FlashcardSetSuspendService(
 ) {
     @Transactional
     fun suspend(user: User, id: Long, request: FlashcardSetUpdateRequest): FlashcardSetSuspendResponse {
-        log.info("User ${user.id}: suspending flashcard set $id")
+        log.info("Suspending flashcard set $id")
         flashcardSetService.verifyUserHasAccess(user, id)
         return suspend(id, requestValidator.validate(request))
     }

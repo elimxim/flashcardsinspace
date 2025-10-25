@@ -3,6 +3,7 @@ package com.github.elimxim.flashcardsinspace.web
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.FlashcardService
+import com.github.elimxim.flashcardsinspace.util.withLoggingContext
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardCreationRequest
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardDto
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardUpdateRequest
@@ -20,7 +21,7 @@ class FlashcardController(
     fun getFlashcards(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
-    ): ResponseEntity<List<FlashcardDto>> {
+    ): ResponseEntity<List<FlashcardDto>> = withLoggingContext(user) {
         val result = flashcardService.get(user, setId)
         return ResponseEntity.ok(result)
     }
@@ -30,7 +31,7 @@ class FlashcardController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @RequestBody request: FlashcardCreationRequest,
-    ): ResponseEntity<FlashcardDto> {
+    ): ResponseEntity<FlashcardDto> = withLoggingContext(user) {
         val dto = flashcardService.add(user, setId, request.normalize())
         return ResponseEntity.ok(dto)
     }
@@ -41,7 +42,7 @@ class FlashcardController(
         @PathVariable setId: Long,
         @PathVariable id: Long,
         @RequestBody request: FlashcardUpdateRequest,
-    ): ResponseEntity<FlashcardDto> {
+    ): ResponseEntity<FlashcardDto> = withLoggingContext(user) {
         val dto = flashcardService.update(user, setId, id, request.normalize())
         return ResponseEntity.ok(dto)
     }
@@ -51,7 +52,7 @@ class FlashcardController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @PathVariable id: Long,
-    ): ResponseEntity<Unit> {
+    ): ResponseEntity<Unit> = withLoggingContext(user) {
         flashcardService.remove(user, setId, id)
         return ResponseEntity.ok().build()
     }

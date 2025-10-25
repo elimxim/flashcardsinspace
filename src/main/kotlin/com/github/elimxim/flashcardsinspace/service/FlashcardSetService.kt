@@ -25,7 +25,7 @@ class FlashcardSetService(
 ) {
     @Transactional
     fun getAll(user: User): List<FlashcardSetDto> {
-        log.info("User ${user.id}: retrieving all flashcard sets")
+        log.info("Retrieving all flashcard sets")
         val result = flashcardSetRepository.findAllByUserAndStatusIn(
             user = user,
             status = listOf(FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED)
@@ -35,7 +35,7 @@ class FlashcardSetService(
 
     @Transactional
     fun getAllExtra(user: User): List<FlashcardSetExtraDto> {
-        log.info("User ${user.id}: retrieving all flashcard sets extra")
+        log.info("Retrieving all flashcard sets extra")
         val result = flashcardSetRepository.findAllByUserAndStatusIn(
             user = user,
             status = listOf(FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED)
@@ -50,14 +50,14 @@ class FlashcardSetService(
 
     @Transactional
     fun get(user: User, id: Long): FlashcardSetDto {
-        log.info("User ${user.id}: retrieving flashcard set $id")
+        log.info("Retrieving flashcard set $id")
         verifyUserHasAccess(user, id)
         return getEntity(id).toDto()
     }
 
     @Transactional
     fun create(user: User, request: FlashcardSetCreationRequest): FlashcardSetDto {
-        log.info("User ${user.id}: creating a new flashcard set")
+        log.info("Creating a new flashcard set")
         return create(user, requestValidator.validate(request))
     }
 
@@ -120,7 +120,7 @@ class FlashcardSetService(
 
     @Transactional
     fun remove(user: User, id: Long) {
-        log.info("User ${user.id}: removing flashcard set $id")
+        log.info("Removing flashcard set $id")
         verifyUserHasAccess(user, id)
         val flashcardSet = getEntity(id)
         if (flashcardSet.flashcards.size >= 40) {

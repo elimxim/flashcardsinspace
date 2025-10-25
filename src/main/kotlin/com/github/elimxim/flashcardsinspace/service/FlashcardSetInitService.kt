@@ -24,7 +24,7 @@ class FlashcardSetInitService(
 ) {
     @Transactional
     fun init(user: User, id: Long, request: FlashcardCreationRequest): FlashcardSetInitResponse {
-        log.info("User ${user.id}: initializing flashcard set $id")
+        log.info("Initializing flashcard set $id")
         flashcardSetService.verifyUserHasAccess(user, id)
         return init(id, requestValidator.validate(request))
     }

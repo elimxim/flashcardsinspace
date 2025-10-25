@@ -3,6 +3,7 @@ package com.github.elimxim.flashcardsinspace.web
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.FlashcardSetService
+import com.github.elimxim.flashcardsinspace.util.withLoggingContext
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetCreationRequest
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetDto
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetExtraDto
@@ -20,7 +21,7 @@ class FlashcardSetController(
     @GetMapping
     fun getFlashcardSets(
         @AuthenticationPrincipal user: User,
-    ): ResponseEntity<List<FlashcardSetDto>> {
+    ): ResponseEntity<List<FlashcardSetDto>> = withLoggingContext(user) {
         val result = flashcardSetService.getAll(user)
         return ResponseEntity.ok(result)
     }
@@ -28,7 +29,7 @@ class FlashcardSetController(
     @GetMapping("/extra")
     fun getFlashcardSetsExtra(
         @AuthenticationPrincipal user: User,
-    ): ResponseEntity<List<FlashcardSetExtraDto>> {
+    ): ResponseEntity<List<FlashcardSetExtraDto>> = withLoggingContext(user) {
         val result = flashcardSetService.getAllExtra(user)
         return ResponseEntity.ok(result)
     }
@@ -37,7 +38,7 @@ class FlashcardSetController(
     fun getFlashcardSet(
         @AuthenticationPrincipal user: User,
         @PathVariable id: Long,
-    ): ResponseEntity<FlashcardSetDto> {
+    ): ResponseEntity<FlashcardSetDto> = withLoggingContext(user) {
         val dto = flashcardSetService.get(user, id)
         return ResponseEntity.ok(dto)
     }
@@ -46,7 +47,7 @@ class FlashcardSetController(
     fun addFlashcardSet(
         @AuthenticationPrincipal user: User,
         @RequestBody request: FlashcardSetCreationRequest,
-    ): ResponseEntity<FlashcardSetDto> {
+    ): ResponseEntity<FlashcardSetDto> = withLoggingContext(user) {
         val dto = flashcardSetService.create(user, request.normalize())
         return ResponseEntity.ok(dto)
     }
@@ -56,7 +57,7 @@ class FlashcardSetController(
         @AuthenticationPrincipal user: User,
         @PathVariable id: Long,
         @RequestBody request: FlashcardSetUpdateRequest,
-    ): ResponseEntity<FlashcardSetDto> {
+    ): ResponseEntity<FlashcardSetDto> = withLoggingContext(user) {
         val dto = flashcardSetService.update(user, id, request.normalize())
         return ResponseEntity.ok(dto)
     }
@@ -65,7 +66,7 @@ class FlashcardSetController(
     fun removeFlashcardSet(
         @AuthenticationPrincipal user: User,
         @PathVariable id: Long,
-    ): ResponseEntity<Unit> {
+    ): ResponseEntity<Unit> = withLoggingContext(user) {
         flashcardSetService.remove(user, id)
         return ResponseEntity.ok().build()
     }
