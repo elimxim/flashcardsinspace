@@ -5,14 +5,18 @@
       :key="row.id"
       class="main-panel-row"
     >
-      <div
+      <template
         v-for="widget in row.widgets"
         :key="widget.id"
-        :flip-key="widget.id"
-        :class="widget.className"
       >
-        <component :is="widget.component" v-bind="widget.props"/>
-      </div>
+        <div
+          v-if="!widget.hidden.value"
+          :class="widget.className"
+          :flip-key="widget.id"
+        >
+          <component v-bind="widget.props" :is="widget.component"/>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -25,15 +29,26 @@ import SpecialStageWidget from '@/components/control-panel/SpecialStageWidget.vu
 import DayStreakWidget from '@/components/control-panel/DayStreakWidget.vue'
 import LaunchWidget from '@/components/control-panel/LaunchWidget.vue'
 import { storeToRefs } from 'pinia'
-import { computed, onMounted, onUnmounted, ref, watch, type Component } from 'vue'
+import {
+  computed,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+  type Component,
+  ComputedRef,
+} from 'vue'
 import { loadFlashcardSetStore } from '@/shared/stores.ts'
 import { useControlStore } from '@/stores/control-store.ts'
 import { specialStages } from '@/core-logic/stage-logic.ts'
 import { useFlip } from '@/utils/flip.ts'
+import { useChronoStore } from '@/stores/chrono-store.ts'
 
 const controlStore = useControlStore()
+const chronoStore = useChronoStore()
 
 const { isSidebarExpanded } = storeToRefs(controlStore)
+const { isInitialDay } = storeToRefs(chronoStore)
 
 const mainPanel = ref<HTMLElement>()
 const mainPanelWidth = ref(0)
@@ -47,6 +62,7 @@ interface Widget {
   component: Component
   className: string
   props?: Record<string, unknown>
+  hidden: ComputedRef<boolean>
 }
 
 const widgets: Record<string, Widget> = {
@@ -54,43 +70,56 @@ const widgets: Record<string, Widget> = {
     id: 'flashcard',
     component: FlashcardWidget,
     className: 'main-panel-widget',
-    props: {}
+    props: {},
+    hidden: computed(() => false),
   },
   calendar: {
     id: 'calendar',
     component: CalendarWidget,
     className: 'main-panel-widget',
-    props: {}
+    props: {},
+    hidden: computed(() => false),
   },
   reviewInfo: {
     id: 'review-info',
     component: ReviewInfoWidget,
     className: 'main-panel-stretching-widget',
-    props: {}
+    props: {},
+    hidden: isInitialDay,
   },
   launch: {
     id: 'launch',
     component: LaunchWidget,
     className: 'main-panel-stretching-widget',
-    props: {}
+    props: {},
+    hidden: computed(() => false),
   },
   unknown: {
     id: 'unknown',
     component: SpecialStageWidget,
     className: 'main-panel-stretching-widget',
-    props: { stage: specialStages.UNKNOWN, icon: 'fa-regular fa-circle-question' }
+    props: {
+      stage: specialStages.UNKNOWN,
+      icon: 'fa-regular fa-circle-question',
+    },
+    hidden: computed(() => false),
   },
   attempted: {
     id: 'attempted',
     component: SpecialStageWidget,
     className: 'main-panel-stretching-widget',
-    props: { stage: specialStages.ATTEMPTED, icon: 'fa-solid fa-rotate-right' }
+    props: {
+      stage: specialStages.ATTEMPTED,
+      icon: 'fa-solid fa-rotate-right',
+    },
+    hidden: computed(() => false),
   },
   dayStreak: {
     id: 'day-streak',
     component: DayStreakWidget,
     className: 'main-panel-widget',
-    props: {}
+    props: {},
+    hidden: isInitialDay,
   },
 }
 

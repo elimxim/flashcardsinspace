@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isInitialDay" class="day-streak-widget day-streak-widget--theme">
+  <div class="day-streak-widget day-streak-widget--theme">
     <div class="day-streak select-none">
       <div class="day-steak-number">
         {{ dayStreak }}
@@ -16,10 +16,7 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 
 const chronoStore = useChronoStore()
-const {
-  dayStreak,
-  isInitialDay,
-} = storeToRefs(chronoStore)
+const { dayStreak } = storeToRefs(chronoStore)
 
 </script>
 

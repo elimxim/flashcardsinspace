@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isInitialDay" class="review-info-widget review-info-widget--theme">
+  <div class="review-info-widget review-info-widget--theme">
     <div class="review-info-title">
       To review
     </div>
@@ -39,7 +39,7 @@ const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 
 const { flashcards } = storeToRefs(flashcardStore)
-const { currDay, isInitialDay } = storeToRefs(chronoStore)
+const { currDay } = storeToRefs(chronoStore)
 
 const currDayStageReviews = computed<StageReview[]>(() => {
   if (!currDay.value) return []
