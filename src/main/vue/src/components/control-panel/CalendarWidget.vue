@@ -194,6 +194,7 @@ const calendarIcon = computed(() => {
   position: relative;
   height: 100%;
   width: fit-content;
+  aspect-ratio: 1 / 1; /* Fallback for old browsers that miscalculate the width for absolute button positioning */
 }
 
 .calendar-button-slot {
