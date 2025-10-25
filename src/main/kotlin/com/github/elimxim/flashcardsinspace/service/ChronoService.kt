@@ -4,10 +4,7 @@ import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
-import com.github.elimxim.flashcardsinspace.web.dto.ChronoBulkUpdateRequest
-import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncRequest
-import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
-import com.github.elimxim.flashcardsinspace.web.dto.ValidChronoBulkUpdateRequest
+import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.ChronodayHasReviewsException
 import com.github.elimxim.flashcardsinspace.web.exception.ChronodayIsDayOff
 import com.github.elimxim.flashcardsinspace.web.exception.CorruptedChronoStateException
@@ -28,16 +25,17 @@ class ChronoService(
     private val flashcardSetRepository: FlashcardSetRepository,
     private val lightspeedService: LightspeedService,
     private val requestValidator: RequestValidator,
+    private val dayStreakService: DayStreakService,
 ) {
     @Transactional
-    fun sync(user: User, setId: Long, request: ChronoSyncRequest): Pair<ChronodayDto, List<ChronodayDto>> {
+    fun sync(user: User, setId: Long, request: ChronoSyncRequest): ChronoSyncResponse {
         log.info("User ${user.id}: syncing chronodays for flashcard set $setId, timezone: ${user.timezone}")
         flashcardSetService.verifyUserHasAccess(user, setId)
         return sync(setId, requestValidator.validate(request).clientDatetime, clientTimezone = user.timezone)
     }
 
     @Transactional
-    fun sync(setId: Long, clientDatetime: ZonedDateTime, clientTimezone: String): Pair<ChronodayDto, List<ChronodayDto>> {
+    fun sync(setId: Long, clientDatetime: ZonedDateTime, clientTimezone: String): ChronoSyncResponse {
         val flashcardSet = flashcardSetService.getEntity(setId)
 
         val clientZoneId = ZoneId.of(clientTimezone)
@@ -50,7 +48,11 @@ class ChronoService(
                 ?: throw CorruptedChronoStateException(
                     "Can't find current day $currDate in schedule"
                 )
-            return currDay to schedule
+            return ChronoSyncResponse(
+                currDay = currDay,
+                chronodays = schedule,
+                dayStreak = 0,
+            )
         }
 
         val lastDate = flashcardSet.lastChronoday()?.chronodate ?: currDate
@@ -69,14 +71,22 @@ class ChronoService(
                 )
             }
 
+            dayStreakService.calcDayStreak(flashcardSet)
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
-        return applySchedule(updatedFlashcardSet)
+        val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
+        val (currDay, chronodays) = applySchedule(updatedFlashcardSet)
+
+        return ChronoSyncResponse(
+            currDay = currDay,
+            chronodays = chronodays,
+            dayStreak = dayStreak,
+        )
     }
 
     @Transactional
-    fun syncDay(user: User, setId: Long, day: ChronoSyncDay): Pair<ChronodayDto, List<ChronodayDto>> {
+    fun syncDay(user: User, setId: Long, day: ChronoSyncDay): ChronoSyncResponse {
         log.info("User ${user.id}: syncing day $day for flashcard set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         flashcardSetService.verifyNotSuspended(setId)
@@ -84,7 +94,7 @@ class ChronoService(
     }
 
     @Transactional
-    fun syncDay(setId: Long, day: ChronoSyncDay): Pair<ChronodayDto, List<ChronodayDto>> {
+    fun syncDay(setId: Long, day: ChronoSyncDay): ChronoSyncResponse {
         val flashcardSet = flashcardSetService.getEntity(setId)
 
         val lastChronoday = flashcardSet.lastChronoday()
@@ -129,12 +139,21 @@ class ChronoService(
             }
         }
 
+        dayStreakService.calcDayStreak(flashcardSet)
         val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
-        return applySchedule(updatedFlashcardSet)
+
+        val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
+        val (currDay, chronodays) = applySchedule(updatedFlashcardSet)
+
+        return ChronoSyncResponse(
+            currDay = currDay,
+            chronodays = chronodays,
+            dayStreak = dayStreak,
+        )
     }
 
     @Transactional
-    fun bulkUpdate(user: User, setId: Long, request: ChronoBulkUpdateRequest): List<ChronodayDto> {
+    fun bulkUpdate(user: User, setId: Long, request: ChronoBulkUpdateRequest): ChronoUpdateResponse {
         log.info("User ${user.id}: bulk updating chronodays for flashcard set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         flashcardSetService.verifyNotSuspended(setId)
@@ -142,7 +161,7 @@ class ChronoService(
     }
 
     @Transactional
-    fun bulkUpdate(setId: Long, request: ValidChronoBulkUpdateRequest): List<ChronodayDto> {
+    fun bulkUpdate(setId: Long, request: ValidChronoBulkUpdateRequest): ChronoUpdateResponse {
         val flashcardSet = flashcardSetService.getEntity(setId)
 
         var changed = false
@@ -154,11 +173,18 @@ class ChronoService(
         }
 
         val updatedFlashcardSet = if (changed) {
+            dayStreakService.calcDayStreak(flashcardSet)
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
+        val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
         val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays, daysAhead = 0)
-        return schedule.filter { it.id in request.ids }
+        val updatedDays = schedule.filter { it.id in request.ids }
+
+        return ChronoUpdateResponse(
+            chronodays = updatedDays,
+            dayStreak = dayStreak,
+        )
     }
 
     private fun applySchedule(flashcardSet: FlashcardSet): Pair<ChronodayDto, List<ChronodayDto>> {

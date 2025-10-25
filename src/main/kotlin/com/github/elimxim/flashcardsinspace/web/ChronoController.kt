@@ -7,7 +7,7 @@ import com.github.elimxim.flashcardsinspace.service.ChronoSyncDay
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoBulkUpdateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncResponse
-import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
+import com.github.elimxim.flashcardsinspace.web.dto.ChronoUpdateResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
@@ -24,8 +24,8 @@ class ChronoController(
         @PathVariable setId: Long,
         @RequestBody request: ChronoSyncRequest,
     ): ResponseEntity<ChronoSyncResponse> {
-        val (currDay, chronodays) = chronoService.sync(user, setId, request.normalize())
-        return ResponseEntity.ok(ChronoSyncResponse(currDay, chronodays))
+        val response = chronoService.sync(user, setId, request.normalize())
+        return ResponseEntity.ok(response)
     }
 
     @PostMapping("/sync/next")
@@ -33,8 +33,8 @@ class ChronoController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
     ): ResponseEntity<ChronoSyncResponse> {
-        val (currDay, chronodays) = chronoService.syncDay(user, setId, day = ChronoSyncDay.NEXT)
-        return ResponseEntity.ok(ChronoSyncResponse(currDay, chronodays))
+        val response = chronoService.syncDay(user, setId, day = ChronoSyncDay.NEXT)
+        return ResponseEntity.ok(response)
     }
 
     @PostMapping("/sync/prev")
@@ -42,8 +42,8 @@ class ChronoController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
     ): ResponseEntity<ChronoSyncResponse> {
-        val (currDay, chronodays) = chronoService.syncDay(user, setId, day = ChronoSyncDay.PREV)
-        return ResponseEntity.ok(ChronoSyncResponse(currDay, chronodays))
+        val response = chronoService.syncDay(user, setId, day = ChronoSyncDay.PREV)
+        return ResponseEntity.ok(response)
     }
 
     @PutMapping("/bulk")
@@ -51,9 +51,9 @@ class ChronoController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @RequestBody request: ChronoBulkUpdateRequest,
-    ): ResponseEntity<List<ChronodayDto>> {
-        val chronodays = chronoService.bulkUpdate(user, setId, request.normalize())
-        return ResponseEntity.ok(chronodays)
+    ): ResponseEntity<ChronoUpdateResponse> {
+        val response = chronoService.bulkUpdate(user, setId, request.normalize())
+        return ResponseEntity.ok(response)
     }
 
 }

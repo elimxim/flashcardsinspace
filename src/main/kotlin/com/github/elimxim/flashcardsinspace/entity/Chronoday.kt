@@ -27,3 +27,9 @@ class Chronoday(
 enum class ChronodayStatus {
     INITIAL, COMPLETED, IN_PROGRESS, NOT_STARTED, OFF
 }
+
+fun Chronoday.isInitial() = status == ChronodayStatus.INITIAL
+fun Chronoday.isInProgress() = status == ChronodayStatus.IN_PROGRESS
+fun Chronoday.isCompleted() = status == ChronodayStatus.COMPLETED
+fun Chronoday.isNotStarted() = status == ChronodayStatus.NOT_STARTED
+fun Chronoday.isOff() = status == ChronodayStatus.OFF

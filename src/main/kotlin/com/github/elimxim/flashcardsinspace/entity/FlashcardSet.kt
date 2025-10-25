@@ -50,6 +50,14 @@ class FlashcardSet(
         fetch = FetchType.LAZY,
     )
     var chronodays: MutableList<Chronoday> = arrayListOf(),
+
+    @OneToOne(
+        mappedBy = "flashcardSet",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+        fetch = FetchType.LAZY,
+    )
+    var dayStreak: DayStreak? = null,
 )
 
 enum class FlashcardSetStatus {
