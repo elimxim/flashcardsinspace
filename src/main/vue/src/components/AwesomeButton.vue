@@ -3,8 +3,9 @@
     v-if="!hidden"
     class="awesome-button-wrapper"
     :class="{
-      'awesome-button-wrapper--square': square,
-      'awesome-button-wrapper--fill-space': fillSpace,
+      'awesome-button-wrapper--square': square && !fillSpace,
+      'awesome-button-wrapper--growing': fillSpace && !square,
+      'awesome-button-wrapper--growing--square': fillSpace && square,
     }"
   >
     <div
@@ -107,17 +108,15 @@ defineExpose({
 }
 
 .awesome-button-wrapper--square {
-  width: fit-content;
-  height: fit-content;
   aspect-ratio: 1 / 1;
 }
 
-.awesome-button-wrapper--fill-space {
+.awesome-button-wrapper--growing {
   width: 100%;
   height: 100%;
 }
 
-.awesome-button-wrapper--square.awesome-button-wrapper--fill-space {
+.awesome-button-wrapper--growing--square {
   width: auto;
   height: 100%;
   aspect-ratio: 1 / 1;

@@ -69,14 +69,14 @@ const widgets: Record<string, Widget> = {
   flashcard: {
     id: 'flashcard',
     component: FlashcardWidget,
-    className: 'main-panel-widget',
+    className: 'main-panel-square-widget',
     props: {},
     hidden: computed(() => false),
   },
   calendar: {
     id: 'calendar',
     component: CalendarWidget,
-    className: 'main-panel-widget',
+    className: 'main-panel-square-widget',
     props: {},
     hidden: computed(() => false),
   },
@@ -218,10 +218,19 @@ onUnmounted(() => {
 
 .main-panel-widget {
   flex: 0 0 auto;
+  height: 100%;
+  width: fit-content;
+}
+
+.main-panel-square-widget {
+  flex: 0 0 auto;
+  height: 100%;
+  aspect-ratio: 1 / 1; /* Fallback for old browsers that miscalculate the width */
 }
 
 .main-panel-stretching-widget {
   flex: 1 1 auto;
+  height: 100%;
   max-width: 200px;
 }
 </style>

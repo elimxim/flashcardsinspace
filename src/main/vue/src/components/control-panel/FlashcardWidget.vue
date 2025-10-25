@@ -3,6 +3,7 @@
     <AwesomeButton
       icon="fa-solid fa-rectangle-list"
       class="flashcard-widget-button"
+      :disabled="!flashcardSet"
       :on-click="toggleStore.toggleFlashcardCreation"
       fill-space
       square
@@ -21,15 +22,19 @@
 import FlashcardModificationModal from '@/views/modal/FlashcardModificationModal.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
+import { useFlashcardStore } from '@/stores/flashcard-store.ts'
+import { storeToRefs } from 'pinia'
 
 const toggleStore = useToggleStore()
+
+const flashcardStore = useFlashcardStore()
+const { flashcardSet } = storeToRefs(flashcardStore)
 
 </script>
 
 <style scoped>
 .flashcard-widget {
   position: relative;
-  display: flex;
   height: 100%;
   width: fit-content;
 }
