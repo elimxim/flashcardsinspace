@@ -256,7 +256,7 @@ const calendarIcon = computed(() => {
 .calendar-popup-layout {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   padding: 4px;
   border-radius: 6px;
   width: fit-content;
