@@ -2,7 +2,7 @@
   <div v-if="!isInitialDay" class="day-streak-widget day-streak-widget--theme">
     <div class="day-streak select-none">
       <div class="day-steak-number">
-        {{ dayStreakNumber }}
+        {{ dayStreak }}
       </div>
       <div class="day-streak-text">
         Day Streak
@@ -14,45 +14,12 @@
 <script setup lang="ts">
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
-import { computed } from 'vue'
-import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 
 const chronoStore = useChronoStore()
 const {
-  chronodays,
-  currDay,
+  dayStreak,
   isInitialDay,
 } = storeToRefs(chronoStore)
-
-const dayStreakNumber = computed(() => {
-  if (!currDay.value) return 0
-
-  const days = chronodays.value
-  const startDay = currDay.value
-
-  const startIndex = days.findIndex(day => day.id === startDay.id)
-  if (startIndex === -1) return 0
-
-  let counter = 0
-  let startedCounting = false
-  for (let i = startIndex; i >= 0; i--) {
-    if (!startedCounting) {
-      if (days[i].status === chronodayStatuses.COMPLETED) {
-        startedCounting = true
-      } else if (days[i].status === chronodayStatuses.OFF) {
-        break
-      }
-    } else {
-      if (days[i].status === chronodayStatuses.COMPLETED) {
-        counter++
-      } else {
-        break
-      }
-    }
-  }
-
-  return counter
-})
 
 </script>
 
