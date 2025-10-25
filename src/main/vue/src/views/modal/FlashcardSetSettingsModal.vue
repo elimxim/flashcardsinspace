@@ -219,7 +219,8 @@ async function updateFlashcardSet(): Promise<boolean> {
         flashcardStore.changeSet(response.data.flashcardSet)
         chronoStore.loadState(
           response.data.chronodays,
-          response.data.currDay
+          response.data.currDay,
+          0,
         )
         return true
       }).catch((error) => {

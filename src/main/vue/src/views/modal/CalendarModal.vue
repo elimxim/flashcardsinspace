@@ -186,6 +186,7 @@ async function goPrevDay() {
       chronoStore.loadState(
         response.data.chronodays,
         response.data.currDay,
+        response.data.dayStreak,
       )
       currMonth.value = parseLocalDate(response.data.currDay.chronodate)
     })
@@ -203,6 +204,7 @@ async function goNextDay() {
       chronoStore.loadState(
         response.data.chronodays,
         response.data.currDay,
+        response.data.dayStreak,
       )
       currMonth.value = parseLocalDate(response.data.currDay.chronodate)
     })

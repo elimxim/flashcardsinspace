@@ -62,6 +62,7 @@ export async function loadFlashcardAndChronoStores(flashcardSet: FlashcardSet, f
       chronoStore.loadState(
         response.data.chronodays,
         response.data.currDay,
+        response.data.dayStreak,
       )
       return true
     })

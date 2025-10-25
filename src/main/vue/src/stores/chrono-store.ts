@@ -6,6 +6,7 @@ import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 export interface ChronoState {
   chronodays: Chronoday[]
   currDay: Chronoday
+  dayStreak: number
   loaded: boolean
 }
 
@@ -14,6 +15,7 @@ export const useChronoStore = defineStore('chrono', {
     return {
       chronodays: [],
       currDay: defaultCurrDay(),
+      dayStreak: 0,
       loaded: false,
     }
   },
@@ -26,11 +28,12 @@ export const useChronoStore = defineStore('chrono', {
     },
   },
   actions: {
-    loadState(chronodays: Chronoday[], currDay: Chronoday) {
+    loadState(chronodays: Chronoday[], currDay: Chronoday, dayStreak: number) {
       console.log(`Loading ${chronodays.length} chronodays with curr day ${currDay.chronodate}`)
       this.resetState()
       this.chronodays = chronodays
       this.currDay = currDay
+      this.dayStreak = dayStreak
       this.loaded = true
     },
     checkStateLoaded() {
@@ -39,6 +42,7 @@ export const useChronoStore = defineStore('chrono', {
     resetState() {
       this.chronodays = []
       this.currDay = defaultCurrDay()
+      this.dayStreak = 0
       this.loaded = false
     },
     canGoPrev(): boolean {
@@ -73,6 +77,9 @@ export const useChronoStore = defineStore('chrono', {
           console.error(`Couldn't find day ${newDay.id} in the store to update status to ${newDay.status}`)
         }
       })
+    },
+    updateDayStreak(streak: number) {
+      this.dayStreak = streak
     },
   }
 })

@@ -149,6 +149,7 @@ async function createNewFlashcardSet(): Promise<boolean> {
       chronoStore.loadState(
         response.data.chronodays,
         response.data.currDay,
+        response.data.dayStreak,
       )
       return true
     })

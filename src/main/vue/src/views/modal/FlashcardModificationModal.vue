@@ -240,7 +240,8 @@ async function addNewFlashcard(): Promise<boolean> {
         flashcardStore.addNewFlashcard(response.data.flashcard)
         chronoStore.loadState(
           response.data.chronodays,
-          response.data.currDay
+          response.data.currDay,
+          0,
         )
         return true
       })

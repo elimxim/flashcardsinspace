@@ -13,7 +13,7 @@
           <div class="calendar-button-text">
             Day
           </div>
-          <div class="calendar-popup-number">
+          <div class="calendar-button-number">
             <template v-if="isOnVacation">
               🌴
             </template>
@@ -60,38 +60,30 @@
               You have an uncompleted previous day
             </div>
             <div class="calendar-popup-centered-row">
-              <div class="calendar-day-number">
+              <div class="calendar-button-number">
                 {{ previousDaysTo?.seqNumber }}
               </div>
             </div>
           </template>
           <div
             v-if="prevDaysReviewTotal > 0"
-            class="calendar-popup-review"
+            class="calendar-popup-review-row"
           >
             <div class="calendar-popup-text">
               With the total number of flashcards to review
             </div>
             <div class="calendar-popup-review-total">
-              <div class="review-number">
-                {{ prevDaysReviewTotal }}
-              </div>
+              {{ prevDaysReviewTotal }}
             </div>
           </div>
           <template v-else-if="previousDaysFrom !== previousDaysTo">
             <div class="calendar-popup-text">
-              They will be completed once
-            </div>
-            <div class="calendar-popup-text">
-              you complete the current day
+              They will be completed once<br>you complete the current day
             </div>
           </template>
           <template v-else>
             <div class="calendar-popup-text">
-              It will be completed once
-            </div>
-            <div class="calendar-popup-text">
-              you complete the current day
+              It will be completed once<br>you complete the current day
             </div>
           </template>
         </div>
@@ -202,8 +194,7 @@ const calendarIcon = computed(() => {
   position: relative;
   display: flex;
   height: 100%;
-  flex-shrink: 0;
-  min-width: 0;
+  width: fit-content;
 }
 
 .calendar-button-slot {
@@ -291,14 +282,14 @@ const calendarIcon = computed(() => {
   text-align: center;
 }
 
-.calendar-popup-number {
+.calendar-button-number {
   font-size: 0.9rem;
   font-weight: 600;
-  background: var(--c-widget--popup--number--bg);
   color: var(--c-widget--popup--number--color);
+  background: var(--c-widget--popup--number--bg);
   border-radius: 3px;
   padding: 1px;
-  width: 40px;
+  width: 34px;
   text-align: center;
 }
 
@@ -311,18 +302,24 @@ const calendarIcon = computed(() => {
   gap: 6px;
 }
 
-.calendar-popup-review {
+.calendar-popup-review-row {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   gap: 6px;
 }
 
 .calendar-popup-review-total {
-  padding: 4px;
-  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--c-widget--popup--number--color);
   background: var(--c-widget--popup--number--bg);
+  border-radius: 3px;
+  padding: 1px;
+  min-width: 32px;
+  margin-right: 2px;
+  text-align: center;
 }
 
 .slide-fade-enter-active {

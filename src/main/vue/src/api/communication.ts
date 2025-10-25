@@ -16,11 +16,17 @@ export interface ChronoSyncRequest {
 export interface ChronoSyncResponse {
   chronodays: Chronoday[]
   currDay: Chronoday,
+  dayStreak: number,
 }
 
 export interface ChronoBulkUpdateRequest {
   ids: ChronodayId[],
   status: string,
+}
+
+export interface ChronoUpdateResponse {
+  chronodays: Chronoday[]
+  dayStreak: number,
 }
 
 export interface ChronodayId {

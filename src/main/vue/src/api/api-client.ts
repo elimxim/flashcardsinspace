@@ -3,7 +3,7 @@ import {
   type ChronoBulkUpdateRequest,
   type ChronodayId,
   ChronoSyncRequest,
-  ChronoSyncResponse,
+  ChronoSyncResponse, ChronoUpdateResponse,
   FlashcardSetInitResponse,
   FlashcardSetSuspendResponse,
 } from '@/api/communication.ts'
@@ -106,5 +106,5 @@ export async function sendChronoBulkUpdateRequest(setId: number, status: string,
     status: status
   }
 
-  return apiClient.put<Chronoday[]>(`/flashcard-sets/${setId}/chrono/bulk`, request)
+  return apiClient.put<ChronoUpdateResponse>(`/flashcard-sets/${setId}/chrono/bulk`, request)
 }

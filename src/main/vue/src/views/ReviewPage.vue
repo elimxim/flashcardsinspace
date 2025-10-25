@@ -378,7 +378,8 @@ async function markDaysAs(
 
   await sendChronoBulkUpdateRequest(flashcardSet.id, status, days)
     .then((response) => {
-      chronoStore.updateDays(response.data)
+      chronoStore.updateDays(response.data.chronodays)
+      chronoStore.updateDayStreak(response.data.dayStreak)
     })
     .catch((error) => {
       console.error(`Failed to mark days as ${status} for ${flashcardSet.id}`, error.response?.data)
