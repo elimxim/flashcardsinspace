@@ -1,0 +1,97 @@
+<template>
+  <div class="voice-player voice-player--theme">
+    <AwesomeButton
+      icon="fa-solid fa-volume-high"
+      class="voice-player-button voice-player-sound-button"
+      :disabled="!audioUrl"
+      :active="isPlaying"
+      :fade="isPlaying"
+      :on-click="isPlaying ? stop : play"
+      square
+    />
+    <audio
+      ref="audioRef"
+      :src="audioUrl"
+      @play="isPlaying = true"
+      @pause="isPlaying = false"
+      @ended="isPlaying = false"
+    />
+  </div>
+</template>
+
+<script setup lang="ts" generic="T extends Blob = Blob">
+import AwesomeButton from '@/components/AwesomeButton.vue'
+import { ref, onUnmounted } from 'vue'
+
+const props = defineProps<{
+  audioUrl: string | undefined
+}>()
+
+const audioRef = ref<HTMLAudioElement>()
+const isPlaying = ref(false)
+
+function play() {
+  const audio = audioRef.value as HTMLAudioElement | undefined
+  if (!audio || !props.audioUrl) return
+  audio.currentTime = 0
+  audio.play().catch((error) => {
+    console.warn('Audio play failed:', error)
+  })
+}
+
+function stop() {
+  const audio = audioRef.value as HTMLAudioElement | undefined
+  if (!audio || !props.audioUrl) return
+  audio.pause()
+  audio.currentTime = 0
+}
+
+onUnmounted(() => {
+  isPlaying.value = false
+  audioRef?.value?.pause()
+})
+
+defineExpose({
+  play
+})
+
+</script>
+
+<style scoped>
+.voice-player--theme {
+
+}
+
+.voice-player {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  height: 30px;
+  border-radius: 999px;
+}
+
+.voice-player-button {
+  --awesome-button--icon--size: 18px;
+  --awesome-button--icon--color: rgba(87, 87, 87, 0.86);
+}
+
+.voice-player-sound-button {
+  --awesome-button--icon--color--active: rgba(87, 87, 87, 0.86);
+  --awesome-button--bg--hover: rgba(87, 87, 87, 0.15);
+  --awesome-button--bg--active: rgba(87, 87, 87, 0.15);
+  --awesome-button--border-radius: 999px;
+  height: 30px;
+}
+
+.voice-player-stop-button {
+  --awesome-button--icon--color--active: rgba(87, 87, 87, 0.86);
+  --awesome-button--bg--hover: rgba(87, 87, 87, 0.15);
+  --awesome-button--bg--active: rgba(87, 87, 87, 0.15);
+  --awesome-button--border-radius: 999px;
+  height: 30px;
+}
+
+</style>
