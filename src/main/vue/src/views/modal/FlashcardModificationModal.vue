@@ -29,6 +29,7 @@
         <span v-if="frontSideMaxLengthInvalid" class="text-error">
           Your text has its own gravity! Maximum 512 characters.
         </span>
+        <VoiceRecorder/>
       </div>
       <div class="modal-main-area--inner">
         <SmartInput
@@ -85,6 +86,7 @@ import SmartButton from '@/components/SmartButton.vue'
 import SmartInput from '@/components/SmartInput.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
+import VoiceRecorder from '@/components/VoiceRecorder.vue'
 import {
   computed,
   defineProps,
