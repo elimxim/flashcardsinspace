@@ -12,12 +12,14 @@
       role="button"
       class="awesome-button awesome-button--theme select-none drag-none"
       :class="{
+        'awesome-button--active': active,
         'awesome-button--disabled': disabled,
         'awesome-button--invisible': invisible,
       }"
       :disabled="disabled"
       v-bind="$attrs"
       @click.stop="press"
+      @dblclick.stop="onDoubleClick"
       @mouseenter="onHover"
       @mouseleave="onHover"
     >
@@ -30,6 +32,9 @@
         />
         <font-awesome-icon
           v-else
+          :fade="fade"
+          :beat="beat"
+          :beat-fade="beatFade"
           :icon="icon"
           class="awesome-icon"
         />
@@ -44,24 +49,35 @@ import { ref } from 'vue'
 
 const props = withDefaults(defineProps<{
   icon: string
+  fade?: boolean
+  beat?: boolean
+  beatFade?: boolean
   spinnable?: boolean
   spinIcon?: string
   disabled?: boolean
+  active?: boolean
   hidden?: boolean
   invisible?: boolean
   square?: boolean
   fillSpace?: boolean
   onClick?: () => void
+  onDoubleClick?: () => void
   onHover?: () => void
 }>(), {
+  fade: false,
+  beat: false,
+  beatFade: false,
   spinnable: false,
   spinIcon: undefined,
   disabled: false,
+  active: false,
   hidden: false,
   invisible: false,
   square: false,
   fillSpace: false,
   onClick: () => {
+  },
+  onDoubleClick: () => {
   },
   onHover: () => {
   },
@@ -91,9 +107,11 @@ defineExpose({
   --a-btn--icon--color: var(--awesome-button--icon--color, #818181);
   --a-btn--icon--color--hover: var(--awesome-button--icon--color--hover, #404040);
   --a-btn--icon--color--disabled: var(--awesome-button--icon--color--disabled, #cacaca);
+  --a-btn--icon--color--active: var(--awesome-button--icon--color--active, #000000);
   --a-btn--bg: var(--awesome-button--bg, none);
   --a-btn--bg--hover: var(--awesome-button--bg--hover, none);
   --a-btn--bg--disabled: var(--awesome-button--bg--disabled, none);
+  --a-btn--bg--active: var(--awesome-button--bg--active, none);
   --a-btn--border: var(--awesome-button--border, none);
   --a-btn--border--hover: var(--awesome-button--border--hover, none);
   --a-btn--border-radius: var(--awesome-button--border-radius, none);
@@ -154,6 +172,11 @@ defineExpose({
   cursor: default;
   box-shadow: none;
   transform: none;
+}
+
+.awesome-button--active {
+  color: var(--a-btn--icon--color--active);
+  background: var(--a-btn--bg--active);
 }
 
 .awesome-button--invisible {
