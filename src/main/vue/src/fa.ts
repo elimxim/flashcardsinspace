@@ -31,6 +31,12 @@ import {
   faChevronLeft,
   faChevronRight,
   faMagnifyingGlass,
+  faVolumeHigh,
+  faMicrophone,
+  faPlay,
+  faStop,
+  faPause,
+  faTrash,
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faEye as faRegularEye,
@@ -73,6 +79,12 @@ export function applyFaIcons() {
     faChevronLeft,
     faChevronRight,
     faMagnifyingGlass,
+    faVolumeHigh,
+    faMicrophone,
+    faPlay,
+    faStop,
+    faPause,
+    faTrash,
 
     faRegularEye,
     faRegularCircle,
