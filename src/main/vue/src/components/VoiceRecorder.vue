@@ -39,13 +39,13 @@
           <AwesomeButton
             icon="fa-solid fa-trash"
             class="voice-recorder-control-button"
-            :disabled="!audioURL"
-            :on-click="discardRecording"
+            :disabled="!audioBlob"
+            :on-click="removeRecording"
           />
         </div>
       </template>
     </transition>
-    <VoicePlayer :audio-url="audioURL"/>
+    <VoicePlayer :audio-blob="audioBlob"/>
   </div>
 </template>
 
@@ -53,7 +53,8 @@
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import VoicePlayer from '@/components/VoicePlayer.vue'
 import { ref, computed, onBeforeUnmount, watch } from 'vue'
-import axios, { AxiosError, CancelTokenSource } from 'axios'
+
+const audioBlob = defineModel<Blob>('audioBlob')
 
 const props = withDefaults(defineProps<{
   maxDuration?: number
@@ -67,18 +68,13 @@ const isPaused = ref(false)
 
 const mediaStream = ref<MediaStream>()
 const mediaRecorder = ref<MediaRecorder>()
-const audioBlob = ref<Blob>()
-const audioURL = ref<string>()
 const blobChunks = ref<BlobPart[]>([])
 const currentMime = ref<string>('')
 const startTime = ref<number>(0)
 const elapsedMs = ref<number>(0)
-const isUploading = ref(false)
-const uploadPct = ref<number>(0)
 let timerIntervalId: number | undefined
-let cancelSrc: CancelTokenSource | undefined
 
-const audioMimeCandidates: string[] = [
+const mimeCandidates: string[] = [
   'audio/webm;codecs=opus',
   'audio/ogg;codecs=opus',
   'audio/mp4',
@@ -99,7 +95,7 @@ const recordingTime = computed(() => {
 })
 
 function pickAudioMimeType(): string | undefined {
-  for (const mime of audioMimeCandidates) {
+  for (const mime of mimeCandidates) {
     try {
       if ((window as any).MediaRecorder.isTypeSupported?.(mime)) {
         return mime
@@ -157,7 +153,6 @@ async function startRecording() {
     const finalMime = mediaRecorder.value?.mimeType || currentMime.value || 'audio/webm'
     currentMime.value = finalMime
     audioBlob.value = new Blob(blobChunks.value, { type: finalMime })
-    audioURL.value = URL.createObjectURL(audioBlob.value)
   }
 
   mediaRecorder.value.start()
@@ -190,9 +185,7 @@ function stopRecording() {
   console.log(`Audio recorded: ${audioSize()} KB`)
 }
 
-function discardRecording() {
-  if (audioURL.value) URL.revokeObjectURL(audioURL.value)
-  audioURL.value = undefined
+function removeRecording() {
   audioBlob.value = undefined
   blobChunks.value = []
   elapsedMs.value = 0
@@ -208,68 +201,12 @@ watch(elapsedMs, (newVal) => {
   }
 })
 
-// ---- Axios upload ----
-type UploadResponse = {
-  ok: boolean;
-  path: string;
-  type: string;
-  size: number;
-};
-
-async function uploadRecording() {
-  if (!audioBlob.value) return;
-
-  const ext = currentMime.value.includes('ogg') ? 'ogg'
-    : currentMime.value.includes('mp4') ? 'm4a'
-      : 'webm';
-
-  const file = new File([audioBlob.value], `voice-${Date.now()}.${ext}`, {
-    type: audioBlob.value.type || currentMime.value || 'application/octet-stream',
-  });
-
-  const form = new FormData();
-  form.append('file', file);
-
-  try {
-    isUploading.value = true;
-    uploadPct.value = 0;
-    cancelSrc = axios.CancelToken.source();
-
-    const { data } = await axios.post<UploadResponse>('/api/upload-audio', form, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-      onUploadProgress: (e) => {
-        if (e.total) uploadPct.value = Math.round((e.loaded / e.total) * 100);
-      },
-      cancelToken: cancelSrc.token,
-      // optional: timeout: 60_000,
-    });
-
-    if (!data?.ok) throw new Error('Upload failed');
-    alert(`Uploaded ✓ (${Math.round(data.size / 1024)} KB)`);
-  } catch (err) {
-    if (axios.isCancel(err)) {
-      alert('Upload canceled.');
-    } else {
-      const msg = (err as AxiosError)?.message ?? 'Upload failed';
-      alert(msg);
-    }
-  } finally {
-    isUploading.value = false;
-    uploadPct.value = 0;
-    cancelSrc = undefined;
-  }
-}
-
-function cancelUpload() {
-  cancelSrc?.cancel('User canceled')
-}
-
 onBeforeUnmount(() => {
   stopTimer()
-  if (audioURL.value) URL.revokeObjectURL(audioURL.value)
   mediaStream.value?.getTracks().forEach((t) => t.stop())
   mediaStream.value = undefined
-});
+})
+
 </script>
 
 <style scoped>
