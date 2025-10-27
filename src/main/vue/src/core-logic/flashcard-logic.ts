@@ -8,6 +8,8 @@ import { type Stage, stages } from '@/core-logic/stage-logic.ts'
 import type { Language } from '@/model/language.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
+import { sendFlashcardAudioFetchRequest } from '@/api/api-client.ts'
+import { useSpaceToaster } from '@/stores/toast-store.ts';
 
 export const flashcardSetStatuses = {
   ACTIVE: 'ACTIVE',
@@ -85,4 +87,32 @@ export function createFlashcardSet(
 
 export function mapFlashcardSetExtra(flashcardSetExtras: FlashcardSetExtra[]): Map<number, FlashcardSetExtra> {
   return new Map(flashcardSetExtras.map(v => [v.id, v]))
+}
+
+export async function fetchFlashcardAudio(
+  flashcardSet: FlashcardSet | undefined,
+  flashcard: Flashcard | undefined,
+  isFrontSide: boolean,
+): Promise<Blob | undefined> {
+  if (!flashcardSet || !flashcard) return undefined
+
+  let flashcardAudioId: number | undefined = undefined
+  if (isFrontSide && flashcard.frontSideAudioId) {
+    flashcardAudioId = flashcard.frontSideAudioId
+  } else if (!isFrontSide && flashcard.backSideAudioId) {
+    flashcardAudioId = flashcard.backSideAudioId
+  }
+
+  if (!flashcardAudioId) return undefined
+
+  const toaster = useSpaceToaster()
+  return await sendFlashcardAudioFetchRequest(flashcardSet.id, flashcard.id, flashcardAudioId)
+    .then((response) => {
+      return response.data
+    })
+    .catch((error) => {
+      console.error(`Failed to fetch audio ${flashcardAudioId} for flashcard ${flashcard.id}`, error)
+      toaster.bakeError(`Couldn't fetch audio`, error.response?.data)
+      return undefined
+    })
 }
