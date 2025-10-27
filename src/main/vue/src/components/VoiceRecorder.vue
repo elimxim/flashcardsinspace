@@ -97,7 +97,7 @@ const recordingTime = computed(() => {
 function pickAudioMimeType(): string | undefined {
   for (const mime of mimeCandidates) {
     try {
-      if ((window as any).MediaRecorder.isTypeSupported?.(mime)) {
+      if (window.MediaRecorder.isTypeSupported?.(mime)) {
         return mime
       }
     } catch {
