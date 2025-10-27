@@ -15,10 +15,12 @@
         'awesome-button--active': active,
         'awesome-button--disabled': disabled,
         'awesome-button--invisible': invisible,
+        'awesome-button--click-ripple': clickRipple,
+        'awesome-button--ripple-active': rippleActive,
       }"
       :disabled="disabled"
       v-bind="$attrs"
-      @click.stop="press"
+      @click.stop="handleClick"
       @dblclick.stop="onDoubleClick"
       @mouseenter="onHover"
       @mouseleave="onHover"
@@ -60,6 +62,7 @@ const props = withDefaults(defineProps<{
   invisible?: boolean
   square?: boolean
   fillSpace?: boolean
+  clickRipple?: boolean
   onClick?: () => void
   onDoubleClick?: () => void
   onHover?: () => void
@@ -75,6 +78,7 @@ const props = withDefaults(defineProps<{
   invisible: false,
   square: false,
   fillSpace: false,
+  clickRipple: false,
   onClick: () => {
   },
   onDoubleClick: () => {
@@ -84,10 +88,27 @@ const props = withDefaults(defineProps<{
 })
 
 const pressed = ref(false)
+const rippleActive = ref(false)
 
 function press() {
   pressed.value = !pressed.value
   props.onClick()
+}
+
+function handleClick() {
+  if (props.clickRipple && !props.disabled) {
+    triggerRipple()
+  } else {
+    press()
+  }
+}
+
+function triggerRipple() {
+  rippleActive.value = true
+  setTimeout(() => {
+    rippleActive.value = false
+    press()
+  }, 300)
 }
 
 function isPressed(): boolean {
@@ -161,7 +182,7 @@ defineExpose({
   overflow: hidden;
 }
 
-.awesome-button:not(.awesome-button--disabled):hover {
+.awesome-button:not(.awesome-button--disabled):not(.awesome-button--active):hover {
   color: var(--a-btn--icon--color--hover);
   background: var(--a-btn--bg--hover);
 }
@@ -212,6 +233,41 @@ defineExpose({
 
 .awesome-button-wrapper:has(.awesome-button:not(.awesome-button--disabled):hover) .awesome-icon-wrapper {
   transform: scale(1.1);
+}
+
+.awesome-button--click-ripple::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: var(--a-btn--bg--active);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  z-index: 1;
+  transition: none;
+}
+
+.awesome-button--click-ripple.awesome-button--ripple-active::before {
+  animation: growing-circle 0.3s ease-out;
+}
+
+@keyframes growing-circle {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 </style>
