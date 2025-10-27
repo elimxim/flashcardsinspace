@@ -36,7 +36,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 
-const flashcard = defineModel<Flashcard | null>('flashcard', { default: null })
+const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 
 const props = withDefaults(defineProps<{
   onFlashcardRemoved?: () => void
