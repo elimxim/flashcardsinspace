@@ -52,8 +52,14 @@
 <script lang="ts" setup>
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import VoicePlayer from '@/components/VoicePlayer.vue'
-import { ref, computed, onBeforeUnmount } from 'vue'
+import { ref, computed, onBeforeUnmount, watch } from 'vue'
 import axios, { AxiosError, CancelTokenSource } from 'axios'
+
+const props = withDefaults(defineProps<{
+  maxDuration?: number
+}>(), {
+  maxDuration: 20 * 1000
+})
 
 const isControlsExpanded = ref(false)
 const isRecording = ref(false)
@@ -112,8 +118,8 @@ async function ensureStream(): Promise<MediaStream> {
 }
 
 function startTimer() {
-  startTime.value = performance.now() - elapsedMs.value
   stopTimer()
+  startTime.value = performance.now() - elapsedMs.value
   timerIntervalId = window.setInterval(() => {
     elapsedMs.value = performance.now() - startTime.value
   }, 250)
@@ -195,6 +201,12 @@ function discardRecording() {
 function audioSize() {
   return audioBlob.value ? (audioBlob.value.size / 1024).toFixed(1) : '0.0'
 }
+
+watch(elapsedMs, (newVal) => {
+  if (isRecording.value && newVal >= props.maxDuration) {
+    stopRecording()
+  }
+})
 
 // ---- Axios upload ----
 type UploadResponse = {
