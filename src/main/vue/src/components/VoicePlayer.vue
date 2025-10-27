@@ -1,12 +1,14 @@
 <template>
-  <div class="voice-player voice-player--theme">
+  <div class="voice-player">
     <AwesomeButton
       icon="fa-solid fa-volume-high"
-      class="voice-player-button voice-player-sound-button"
+      class="voice-player-button"
+      style="height: 100%;"
       :disabled="!audioUrl"
       :active="isPlaying"
       :fade="isPlaying"
       :on-click="isPlaying ? stop : play"
+      click-ripple
       square
     />
     <audio
@@ -58,10 +60,6 @@ defineExpose({
 </script>
 
 <style scoped>
-.voice-player--theme {
-
-}
-
 .voice-player {
   position: relative;
   display: flex;
@@ -71,27 +69,6 @@ defineExpose({
   width: fit-content;
   height: 30px;
   border-radius: 999px;
-}
-
-.voice-player-button {
-  --awesome-button--icon--size: 18px;
-  --awesome-button--icon--color: rgba(87, 87, 87, 0.86);
-}
-
-.voice-player-sound-button {
-  --awesome-button--icon--color--active: rgba(87, 87, 87, 0.86);
-  --awesome-button--bg--hover: rgba(87, 87, 87, 0.15);
-  --awesome-button--bg--active: rgba(87, 87, 87, 0.15);
-  --awesome-button--border-radius: 999px;
-  height: 30px;
-}
-
-.voice-player-stop-button {
-  --awesome-button--icon--color--active: rgba(87, 87, 87, 0.86);
-  --awesome-button--bg--hover: rgba(87, 87, 87, 0.15);
-  --awesome-button--bg--active: rgba(87, 87, 87, 0.15);
-  --awesome-button--border-radius: 999px;
-  height: 30px;
 }
 
 </style>

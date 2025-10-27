@@ -2,45 +2,49 @@
   <div class="voice-recorder voice-recorder--theme">
     <AwesomeButton
       icon="fa-solid fa-microphone"
-      class="voice-recorder-button voice-recorder-mic-button"
+      class="voice-recorder-mic-button"
+      style="height: 100%;"
       :on-click="toggleControls"
       :active="isControlsExpanded"
+      click-ripple
       square
     />
-    <template v-if="isControlsExpanded">
-      <div v-if="!isSupported" class="voice-warning-text">
-        Your browser doesn’t support voice recording
-      </div>
-      <div v-else class="voice-recorder-controls">
-        <AwesomeButton
-          v-if="!isRecording || isPaused"
-          icon="fa-solid fa-play"
-          class="voice-recorder-button"
-          :on-click="!isRecording ? startRecording : isPaused ? resumeRecording : pauseRecording"
-        />
-        <AwesomeButton
-          v-if="isRecording && !isPaused"
-          icon="fa-solid fa-pause"
-          class="voice-recorder-button"
-          :on-click="pauseRecording"
-        />
-        <AwesomeButton
-          icon="fa-solid fa-stop"
-          class="voice-recorder-button"
-          :disabled="!isRecording"
-          :on-click="stopRecording"
-        />
-        <div class="voice-recorder-time">
-          {{ recordingTime }}
+    <transition name="voice-controls-slide">
+      <template v-if="isControlsExpanded">
+        <div v-if="!isSupported" class="voice-warning-text">
+          Your browser doesn’t support voice recording
         </div>
-        <AwesomeButton
-          icon="fa-solid fa-trash"
-          class="voice-recorder-button"
-          :disabled="!audioURL"
-          :on-click="discardRecording"
-        />
-      </div>
-    </template>
+        <div v-else class="voice-recorder-controls">
+          <AwesomeButton
+            v-if="!isRecording || isPaused"
+            icon="fa-solid fa-play"
+            class="voice-recorder-control-button"
+            :on-click="!isRecording ? startRecording : isPaused ? resumeRecording : pauseRecording"
+          />
+          <AwesomeButton
+            v-if="isRecording && !isPaused"
+            icon="fa-solid fa-pause"
+            class="voice-recorder-control-button"
+            :on-click="pauseRecording"
+          />
+          <AwesomeButton
+            icon="fa-solid fa-stop"
+            class="voice-recorder-control-button"
+            :disabled="!isRecording"
+            :on-click="stopRecording"
+          />
+          <div class="voice-recorder-time">
+            {{ recordingTime }}
+          </div>
+          <AwesomeButton
+            icon="fa-solid fa-trash"
+            class="voice-recorder-control-button"
+            :disabled="!audioURL"
+            :on-click="discardRecording"
+          />
+        </div>
+      </template>
+    </transition>
     <VoicePlayer :audio-url="audioURL"/>
   </div>
 </template>
@@ -87,10 +91,6 @@ const recordingTime = computed(() => {
   const ss = String(s % 60).padStart(2, '0')
   return `${mm}:${ss}`
 })
-
-const niceSize = computed(() =>
-  audioBlob.value ? (audioBlob.value.size / 1024).toFixed(1) : '0.0'
-)
 
 function pickAudioMimeType(): string | undefined {
   for (const mime of audioMimeCandidates) {
@@ -181,6 +181,7 @@ function stopRecording() {
   isRecording.value = false
   isPaused.value = false
   stopTimer()
+  console.log(`Audio recorded: ${audioSize()} KB`)
 }
 
 function discardRecording() {
@@ -189,6 +190,10 @@ function discardRecording() {
   audioBlob.value = undefined
   blobChunks.value = []
   elapsedMs.value = 0
+}
+
+function audioSize() {
+  return audioBlob.value ? (audioBlob.value.size / 1024).toFixed(1) : '0.0'
 }
 
 // ---- Axios upload ----
@@ -257,7 +262,10 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .voice-recorder--theme {
-
+  --v-recorder--time--color: var(--voice-recorder--time--color, rgba(0, 0, 0, 0.9));
+  --v-recorder--time--bg: var(--voice-recorder--controls--bg, rgba(255, 255, 255, 0.52));
+  --v-recorder--controls--bg: var(--voice-recorder--controls--bg, rgba(87, 87, 87, 0.15));
+  --v-recorder--warning-text--color: var(--voice-recorder--warning-text--color, #404040);
 }
 
 .voice-recorder {
@@ -265,15 +273,17 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   width: fit-content;
   height: 30px;
   border-radius: 999px;
+  overflow: hidden;
+  transition: all 0.3s;
 }
 
 .voice-warning-text {
   font-size: 0.9rem;
-  color: #404040;
+  color: var(--v-recorder--warning-text--color);
 }
 
 .voice-recorder-controls {
@@ -281,33 +291,56 @@ onBeforeUnmount(() => {
   flex-direction: row;
   align-items: center;
   gap: 10px;
-  background: rgba(87, 87, 87, 0.15);
+  background: var(--v-recorder--controls--bg);
   border-radius: 999px;
   padding: 3px 16px;
-}
-
-.voice-recorder-button {
-  --awesome-button--icon--size: 18px;
-  --awesome-button--icon--color: rgba(87, 87, 87, 0.86);
-}
-
-.voice-recorder-mic-button {
-  --awesome-button--icon--color--active: rgba(87, 87, 87, 0.86);
-  --awesome-button--bg--hover: rgba(87, 87, 87, 0.15);
-  --awesome-button--bg--active: rgba(87, 87, 87, 0.15);
-  --awesome-button--border-radius: 999px;
-  height: 30px;
 }
 
 .voice-recorder-time {
   font-size: 0.9rem;
   letter-spacing: 0.05em;
-  color: rgba(0, 0, 0, 0.9);
-  background: rgba(255, 255, 255, 0.52);
+  color: var(--v-recorder--time--color);
+  background: var(--v-recorder--time--bg);
   border-radius: 999px;
   text-align: center;
   text-wrap: nowrap;
   padding: 3px 16px;
+}
+
+.voice-controls-slide-enter-active {
+  animation: slideIn 0.3s ease-out;
+}
+
+.voice-controls-slide-leave-active {
+  animation: slideOut 0.3s ease-in;
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 1;
+    max-width: 0;
+    margin: 0;
+    padding: 0;
+  }
+  100% {
+    opacity: 1;
+    max-width: 500px;
+    padding: 3px 16px;
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    opacity: 1;
+    max-width: 500px;
+    padding: 3px 16px;
+  }
+  100% {
+    opacity: 0;
+    max-width: 0;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 </style>

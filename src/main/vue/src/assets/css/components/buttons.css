@@ -65,3 +65,29 @@
   --awesome-button--bg: var(--control-bar--button--bg);
   --awesome-button--bg--hover: var(--control-bar--button--bg--hover);
 }
+
+.voice-player-button {
+  --awesome-button--icon--size: 18px;
+  --awesome-button--icon--color: rgba(87, 87, 87, 0.86);
+  --awesome-button--icon--color--hover: rgba(0, 0, 0, 0.9);
+  --awesome-button--icon--color--active: rgba(0, 0, 0, 0.9);
+  --awesome-button--bg--hover: rgba(87, 87, 87, 0.12);
+  --awesome-button--bg--active: rgba(87, 87, 87, 0.2);
+  --awesome-button--border-radius: 999px;
+}
+
+.voice-recorder-mic-button {
+  --awesome-button--icon--size: 18px;
+  --awesome-button--icon--color: rgba(87, 87, 87, 0.86);
+  --awesome-button--icon--color--hover: rgba(0, 0, 0, 0.9);
+  --awesome-button--icon--color--active: rgba(0, 0, 0, 0.9);
+  --awesome-button--bg--hover: rgba(87, 87, 87, 0.12);
+  --awesome-button--bg--active: rgba(87, 87, 87, 0.18);
+  --awesome-button--border-radius: 999px;
+}
+
+.voice-recorder-control-button {
+  --awesome-button--icon--size: 18px;
+  --awesome-button--icon--color: rgba(87, 87, 87, 0.86);
+  --awesome-button--icon--color--hover: rgba(0, 0, 0, 0.9);
+}
