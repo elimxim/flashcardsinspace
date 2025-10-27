@@ -3,11 +3,12 @@ import {
   type ChronoBulkUpdateRequest,
   type ChronodayId,
   ChronoSyncRequest,
-  ChronoSyncResponse, ChronoUpdateResponse,
+  ChronoSyncResponse,
+  ChronoUpdateResponse,
   FlashcardSetInitResponse,
   FlashcardSetSuspendResponse,
 } from '@/api/communication.ts'
-import type { Flashcard, FlashcardSet, FlashcardSetExtra } from '@/model/flashcard.ts'
+import { Flashcard, FlashcardAudio, FlashcardSet, FlashcardSetExtra } from '@/model/flashcard.ts'
 import { Chronoday } from '@/model/chrono.ts'
 import { configureDateTransformers } from '@/api/axios-config.ts'
 
@@ -107,4 +108,36 @@ export async function sendChronoBulkUpdateRequest(setId: number, status: string,
   }
 
   return apiClient.put<ChronoUpdateResponse>(`/flashcard-sets/${setId}/chrono/bulk`, request)
+}
+
+export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId: number, side: string, audioData: Blob, mime?: string) {
+  let ext = 'webm'
+  if (mime?.includes('ogg')) {
+    ext = 'ogg'
+  } else if (mime?.includes('mp4')) {
+    ext = 'm4a'
+  }
+
+  const file = new File([audioData], `voice-${Date.now()}.${ext}`, {
+    type: audioData.type || mime || 'application/octet-stream',
+  })
+
+  const form = new FormData()
+  form.append('file', file)
+
+  return apiClient.post<FlashcardAudio>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio?side=${side}`,
+    form,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60_000,
+    }
+  )
+}
+
+export async function sendFlashcardAudioFetchRequest(setId: number, flashcardId: number, audioId: number) {
+  return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
+}
+
+export async function sendFlashcardAudioRemovalRequest(setId: number, flashcardId: number, audioId: number) {
+  return apiClient.delete(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
 }
