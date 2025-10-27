@@ -23,18 +23,19 @@
 
 <script setup lang="ts" generic="T extends Blob = Blob">
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import { ref, onUnmounted } from 'vue'
+import { ref, onBeforeUnmount, watch } from 'vue'
 
 const props = defineProps<{
-  audioUrl: string | undefined
+  audioBlob?: Blob | undefined
 }>()
 
+const audioUrl = ref<string>()
 const audioRef = ref<HTMLAudioElement>()
 const isPlaying = ref(false)
 
 function play() {
   const audio = audioRef.value as HTMLAudioElement | undefined
-  if (!audio || !props.audioUrl) return
+  if (!audio || !audioUrl.value) return
   audio.currentTime = 0
   audio.play().catch((error) => {
     console.warn('Audio play failed:', error)
@@ -43,14 +44,25 @@ function play() {
 
 function stop() {
   const audio = audioRef.value as HTMLAudioElement | undefined
-  if (!audio || !props.audioUrl) return
+  if (!audio || !audioUrl.value) return
   audio.pause()
   audio.currentTime = 0
 }
 
-onUnmounted(() => {
+watch(() => props.audioBlob, (newVal) => {
+  if (newVal) {
+    if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
+    audioUrl.value = URL.createObjectURL(newVal)
+  } else {
+    if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
+    audioUrl.value = undefined
+  }
+})
+
+onBeforeUnmount(() => {
   isPlaying.value = false
   audioRef?.value?.pause()
+  if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
 })
 
 defineExpose({
