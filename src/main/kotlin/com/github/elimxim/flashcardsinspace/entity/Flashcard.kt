@@ -17,8 +17,14 @@ class Flashcard(
     @Column(nullable = false)
     var frontSide: String,
 
+    @Column(nullable = true)
+    var frontSideAudioId: Long?,
+
     @Column(nullable = false)
     var backSide: String,
+
+    @Column(nullable = true)
+    var backSideAudioId: Long?,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
