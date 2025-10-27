@@ -41,6 +41,10 @@ sealed class InternalServerErrorException(
 @UserMessageCode("user.message.error.request.fields.invalid")
 class InvalidRequestFieldsException(msg: String, val fields: List<String>) : BadRequestException(msg)
 
+@ErrorCode("IRE400")
+@UserMessageCode("user.message.error.request.fields.invalid")
+class InvalidRequestException(msg: String) : BadRequestException(msg)
+
 @ErrorCode("FSN400")
 @UserMessageCode("user.message.error.flashcardSet.notFound")
 class FlashcardSetNotFoundException(msg: String) : BadRequestException(msg)
@@ -104,6 +108,10 @@ class UserOperationNotAllowedException(msg: String) : UnauthorizedException(msg)
 @ErrorCode("UNF404")
 @UserMessageCode("user.message.error.auth.user.notFound")
 class UserNotFoundException(msg: String) : NotFoundException(msg)
+
+@ErrorCode("ANF404")
+@UserMessageCode("user.message.error.audio.notFound")
+class AudioNotFoundException(msg: String) : NotFoundException(msg)
 
 // 500 - INTERNAL SERVER ERROR
 

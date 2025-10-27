@@ -36,13 +36,23 @@ data class FlashcardSetExtraDto(
 data class FlashcardDto(
     val id: Long,
     val frontSide: String,
+    val frontSideAudioId: Long?,
     val backSide: String,
+    val backSideAudioId: Long?,
     val stage: String,
     val timesReviewed: Int,
     val reviewHistory: ReviewHistoryDto,
     val creationDate: LocalDate,
     val lastReviewDate: LocalDate?,
     val lastUpdatedAt: ZonedDateTime?,
+)
+
+data class FlashcardAudioDto(
+    val id: Long,
+    val side: String,
+    val mimeType: String,
+    val audioSize: Long,
+    val uploadedAt: ZonedDateTime?,
 )
 
 data class ReviewHistoryDto(

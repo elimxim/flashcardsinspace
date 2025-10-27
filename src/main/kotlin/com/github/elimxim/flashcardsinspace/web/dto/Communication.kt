@@ -224,3 +224,14 @@ data class FlashcardSetSuspendResponse(
     val currDay: ChronodayDto,
     val chronodays: List<ChronodayDto>,
 )
+
+class UploadAudioRequest(
+    @field:NotNull
+    @field:NotBlank
+    @field:Pattern(regexp="^\\d+$")
+    var flashcardId: String? = null,
+    @field:NotNull
+    @field:NotBlank
+    @field:Pattern(regexp="^FRONT|BACK$")
+    var side: String? = null,
+)
