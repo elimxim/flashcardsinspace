@@ -4,6 +4,7 @@ import com.github.elimxim.flashcardsinspace.entity.Flashcard
 import com.github.elimxim.flashcardsinspace.entity.ReviewHistory
 import com.github.elimxim.flashcardsinspace.entity.ReviewInfo
 import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardAudioRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.*
@@ -21,6 +22,7 @@ private val log = LoggerFactory.getLogger(FlashcardService::class.java)
 class FlashcardService(
     private val flashcardSetService: FlashcardSetService,
     private val flashcardRepository: FlashcardRepository,
+    private val flashcardAudioRepository: FlashcardAudioRepository,
     private val requestValidator: RequestValidator,
 ) {
     @Transactional
@@ -132,8 +134,16 @@ class FlashcardService(
         verifyUserOperation(user, setId, id)
         val flashcardSet = flashcardSetService.getEntity(setId)
         val flashcard = getEntity(id)
+        removeAudio(flashcard)
         flashcardSet.flashcards.remove(flashcard)
         flashcardRepository.delete(flashcard)
+    }
+
+    private fun removeAudio(flashcard: Flashcard) {
+        listOfNotNull(flashcard.frontSideAudioId, flashcard.backSideAudioId).forEach {
+            log.info("Removing audio $it from flashcard ${flashcard.id}")
+            flashcardAudioRepository.deleteById(it)
+        }
     }
 
     @Transactional
