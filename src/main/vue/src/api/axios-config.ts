@@ -6,7 +6,7 @@ type JsonArray = JsonValue[]
 
 /**
  * Recursively transform ISO timestamp strings to Date objects in API responses
- * Only transforms strings matching ISO 8601 timestamp format (with time component)
+ * Only transforms strings matching ISO 8601 timestamp format
  * Leaves LocalDate strings (yyyy-MM-dd) unchanged
  */
 function transformResponseDates(data: unknown): unknown {
@@ -69,7 +69,8 @@ function transformRequestDates(data: unknown): unknown {
 export function configureDateTransformers(axiosInstance: AxiosInstance) {
   axiosInstance.interceptors.request.use(
     (config) => {
-      if (config.data) {
+      // Skip transformation for FormData (used in file uploads)
+      if (config.data && !(config.data instanceof FormData)) {
         config.data = transformRequestDates(config.data)
       }
       return config
@@ -81,11 +82,14 @@ export function configureDateTransformers(axiosInstance: AxiosInstance) {
 
   axiosInstance.interceptors.response.use(
     (response) => {
-      response.data = transformResponseDates(response.data)
+      // Skip transformation for Blob responses (binary data like audio files)
+      if (!(response.data instanceof Blob)) {
+        response.data = transformResponseDates(response.data)
+      }
       return response
     },
     (error) => {
-      if (error.response?.data) {
+      if (error.response?.data && !(error.response.data instanceof Blob)) {
         error.response.data = transformResponseDates(error.response.data)
       }
       return Promise.reject(error)
