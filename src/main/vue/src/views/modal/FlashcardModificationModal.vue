@@ -29,7 +29,9 @@
         <span v-if="frontSideMaxLengthInvalid" class="text-error">
           Your text has its own gravity! Maximum 512 characters.
         </span>
-        <VoiceRecorder/>
+        <VoiceRecorder
+          v-model="frontSideAudioBlob"
+        />
       </div>
       <div class="modal-main-area--inner">
         <SmartInput
@@ -42,6 +44,9 @@
         <span v-if="backSideMaxLengthInvalid" class="text-error">
           Your text has its own gravity! Maximum 512 characters.
         </span>
+        <VoiceRecorder
+          v-model="backSideAudioBlob"
+        />
       </div>
     </div>
     <div class="modal-control-buttons">
@@ -90,7 +95,7 @@ import VoiceRecorder from '@/components/VoiceRecorder.vue'
 import {
   computed,
   defineProps,
-  nextTick,
+  nextTick, onMounted,
   ref,
   watch
 } from 'vue'
@@ -103,8 +108,9 @@ import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import {
+  fetchFlashcardAudioBlob,
   newFlashcard,
-  updateFlashcardSides
+  updateFlashcardSides,
 } from '@/core-logic/flashcard-logic.ts'
 import { storeToRefs } from 'pinia'
 import {
@@ -112,9 +118,10 @@ import {
   sendFlashcardCreationRequest,
   sendFlashcardSetInitRequest,
   sendFlashcardUpdateRequest,
+  sendFlashcardAudioUploadRequest,
 } from '@/api/api-client.ts'
 
-const flashcard = defineModel<Flashcard | null>('flashcard', { default: null })
+const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const removed = defineModel<boolean>('removed', { default: false })
 
 const props = withDefaults(defineProps<{
@@ -133,13 +140,14 @@ const { flashcardSet, isStarted } = storeToRefs(flashcardStore)
 
 const frontSide = ref(flashcard.value?.frontSide ?? '')
 const frontSideTextArea = ref<HTMLElement>()
+const frontSideAudioId = ref(flashcard.value?.frontSideAudioId)
+const flashcardFrontSideAudioBlob = ref<Blob | undefined>()
+const frontSideAudioBlob = ref<Blob | undefined>()
 const backSide = ref(flashcard.value?.backSide ?? '')
 const infiniteLoopButton = ref<InstanceType<typeof AwesomeButton>>()
-
-const stateChanged = computed(() => {
-  return flashcard.value?.frontSide !== frontSide.value
-    || flashcard.value?.backSide !== backSide.value
-})
+const backSideAudioId = ref(flashcard.value?.backSideAudioId)
+const flashcardBackSideAudioBlob = ref<Blob | undefined>()
+const backSideAudioBlob = ref<Blob | undefined>()
 
 const validationRules = {
   frontSide: { required, maxLength: maxLength(512) },
@@ -161,8 +169,84 @@ const backSideMaxLengthInvalid = computed(() =>
   $v.value.backSide.$errors.find(v => v.$validator === 'maxLength') !== undefined
 )
 
-function cancel() {
-  resetState()
+const stateChanged = computed(() => {
+  return flashcard.value?.frontSide !== frontSide.value
+    || flashcard.value?.backSide !== backSide.value
+    || isFrontSideAudioChanged.value
+    || isBackSideAudioChanged.value
+})
+
+const isFrontSideAudioChanged = computed(() => {
+  if (!frontSideAudioId.value) {
+    return frontSideAudioBlob.value !== undefined && frontSideAudioBlob.value?.size > 0
+  } else {
+    return flashcardFrontSideAudioBlob.value?.size !== frontSideAudioBlob.value?.size
+  }
+})
+
+const isBackSideAudioChanged = computed(() => {
+  if (!backSideAudioId.value) {
+    return backSideAudioBlob.value !== undefined && backSideAudioBlob.value?.size > 0
+  } else {
+    return flashcardBackSideAudioBlob.value?.size !== backSideAudioBlob.value?.size
+  }
+})
+
+async function fetchFlashcardAudio() {
+  return Promise.all([
+    fetchAudioBlob(true)
+      .then((blob) => {
+        flashcardFrontSideAudioBlob.value = blob
+        frontSideAudioBlob.value = blob
+      }),
+    fetchAudioBlob(false)
+      .then((blob) => {
+        flashcardBackSideAudioBlob.value = blob
+        backSideAudioBlob.value = blob
+      }),
+  ])
+}
+
+async function fetchAudioBlob(isFrontSide: boolean): Promise<Blob | undefined> {
+  if (isFrontSide && frontSideAudioId.value) {
+    return await fetchFlashcardAudioBlob(flashcardSet.value, flashcard.value, isFrontSide)
+  } else if (!isFrontSide && backSideAudioId.value) {
+    return await fetchFlashcardAudioBlob(flashcardSet.value, flashcard.value, isFrontSide)
+  }
+}
+
+async function uploadFlashcardAudio(): Promise<boolean> {
+  return Promise.all([
+    uploadAudioBlob(frontSideAudioBlob.value, true),
+    uploadAudioBlob(backSideAudioBlob.value, false),
+  ])
+    .then((results) => {
+      return results.every(v => v)
+    })
+}
+
+async function uploadAudioBlob(audioBlob: Blob | undefined, isFrontSide: boolean): Promise<boolean> {
+  const flashcardSetId = flashcardSet.value?.id
+  const flashcardId = flashcard.value?.id
+  const side = isFrontSide ? 'FRONT' : 'BACK'
+
+  if (!audioBlob || !flashcardSetId || !flashcardId) return true
+
+  return await sendFlashcardAudioUploadRequest(flashcardSetId, flashcardId, side, audioBlob)
+    .then((response) => {
+      console.log(`Audio uploaded ${response.data.id}, size: ${response.data.audioSize}, mime: ${response.data.mimeType}`)
+      flashcardStore.setFlashcardAudioId(flashcardId, response.data.id, isFrontSide)
+      return true
+    })
+    .catch((error) => {
+      console.error(`Failed to upload audio for flashcard ${flashcardId}`, error)
+      toaster.bakeError(`Couldn't upload audio`, error.response?.data)
+      return false
+    })
+}
+
+async function cancel() {
+  await resetState()
   toggleModalForm()
   removed.value = false
 }
@@ -170,7 +254,7 @@ function cancel() {
 async function remove() {
   const done = await removeFlashcard()
   if (done) {
-    resetState()
+    await resetState()
     toggleModalForm()
     removed.value = true
   }
@@ -181,10 +265,11 @@ async function create() {
   if (!formInvalid.value) {
     const added = await addNewFlashcard()
     if (added) {
+      await uploadFlashcardAudio()
       if (!infiniteLoopButton.value?.isPressed()) {
         toggleModalForm()
       }
-      resetState()
+      await resetState()
     }
   }
 }
@@ -195,8 +280,9 @@ async function update() {
     if (!formInvalid.value) {
       const updated = await updateFlashcard()
       if (updated) {
+        await uploadFlashcardAudio()
         toggleModalForm()
-        resetState()
+        await resetState()
       }
     }
   }
@@ -282,18 +368,24 @@ function toggleModalForm() {
   }
 }
 
-function resetState() {
+async function resetState() {
   frontSide.value = flashcard.value?.frontSide ?? ''
+  frontSideAudioId.value = flashcard.value?.frontSideAudioId
   backSide.value = flashcard.value?.backSide ?? ''
+  backSideAudioId.value = flashcard.value?.backSideAudioId
+  await fetchFlashcardAudio()
   $v.value.$reset()
   nextTick().then(() => {
     frontSideTextArea.value?.focus()
   })
 }
 
-watch(flashcard, (newVal) => {
+watch(flashcard, async (newVal) => {
   frontSide.value = newVal?.frontSide ?? ''
+  frontSideAudioId.value = newVal?.frontSideAudioId
   backSide.value = newVal?.backSide ?? ''
+  backSideAudioId.value = newVal?.backSideAudioId
+  await fetchFlashcardAudio()
 })
 
 watch(frontSide, () => {
@@ -306,6 +398,10 @@ watch(backSide, () => {
   if (backSideInvalid.value) {
     $v.value.backSide.$reset()
   }
+})
+
+onMounted(async () => {
+  await fetchFlashcardAudio()
 })
 
 </script>
