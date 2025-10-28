@@ -54,7 +54,7 @@ import AwesomeButton from '@/components/AwesomeButton.vue'
 import VoicePlayer from '@/components/VoicePlayer.vue'
 import { ref, computed, onBeforeUnmount, watch } from 'vue'
 
-const audioBlob = defineModel<Blob>('audioBlob')
+const audioBlob = defineModel<Blob | undefined>()
 
 const props = withDefaults(defineProps<{
   maxDuration?: number
@@ -69,7 +69,6 @@ const isPaused = ref(false)
 const mediaStream = ref<MediaStream>()
 const mediaRecorder = ref<MediaRecorder>()
 const blobChunks = ref<BlobPart[]>([])
-const currentMime = ref<string>('')
 const startTime = ref<number>(0)
 const elapsedMs = ref<number>(0)
 let timerIntervalId: number | undefined
@@ -140,7 +139,6 @@ async function startRecording() {
   const mimeType = pickAudioMimeType()
 
   blobChunks.value = []
-  currentMime.value = mimeType || ''
   mediaRecorder.value = new MediaRecorder(stream,
     mimeType ? { mimeType: mimeType } : undefined
   )
@@ -149,10 +147,8 @@ async function startRecording() {
     if (e.data && e.data.size > 0) blobChunks.value.push(e.data)
   }
 
-  mediaRecorder.value.onstop = async () => {
-    const finalMime = mediaRecorder.value?.mimeType || currentMime.value || 'audio/webm'
-    currentMime.value = finalMime
-    audioBlob.value = new Blob(blobChunks.value, { type: finalMime })
+  mediaRecorder.value.onstop = () => {
+    audioBlob.value = new Blob(blobChunks.value, { type: mediaRecorder.value?.mimeType })
   }
 
   mediaRecorder.value.start()
@@ -195,16 +191,31 @@ function audioSize() {
   return audioBlob.value ? (audioBlob.value.size / 1024).toFixed(1) : '0.0'
 }
 
+function resetState() {
+  mediaStream.value?.getTracks().forEach((t) => t.stop())
+  mediaStream.value = undefined
+  blobChunks.value = []
+  elapsedMs.value = 0
+  mediaRecorder.value?.stop()
+  isRecording.value = false
+  isPaused.value = false
+  stopTimer()
+}
+
 watch(elapsedMs, (newVal) => {
   if (isRecording.value && newVal >= props.maxDuration) {
     stopRecording()
   }
 })
 
+watch(audioBlob, (newVal) => {
+  if (!newVal && !isRecording.value) {
+    resetState()
+  }
+})
+
 onBeforeUnmount(() => {
-  stopTimer()
-  mediaStream.value?.getTracks().forEach((t) => t.stop())
-  mediaStream.value = undefined
+  resetState()
 })
 
 </script>
