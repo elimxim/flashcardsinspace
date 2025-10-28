@@ -39,4 +39,10 @@ class TestConfigurationContext {
 
     @Bean
     fun chronodayRepository() = mockk<ChronodayRepository>()
+
+    @Bean
+    fun flashcardAudioRepository() = mockk<FlashcardAudioRepository>()
+
+    @Bean
+    fun dayStreakRepository() = mockk<DayStreakRepository>()
 }
