@@ -9,7 +9,8 @@ import type { Language } from '@/model/language.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { sendFlashcardAudioFetchRequest } from '@/api/api-client.ts'
-import { useSpaceToaster } from '@/stores/toast-store.ts';
+import { useSpaceToaster } from '@/stores/toast-store.ts'
+import { useFlashcardAudioStore } from '@/stores/flashcard-audio-store.ts'
 
 export const flashcardSetStatuses = {
   ACTIVE: 'ACTIVE',
@@ -39,11 +40,11 @@ export function updateFlashcardSides(flashcard: Flashcard, frontSide: string, ba
   return flashcard
 }
 
-export function copyFlashcardSet(value: FlashcardSet) : FlashcardSet {
+export function copyFlashcardSet(value: FlashcardSet): FlashcardSet {
   return JSON.parse(JSON.stringify(value))
 }
 
-export function copyFlashcard(value: Flashcard) : Flashcard {
+export function copyFlashcard(value: Flashcard): Flashcard {
   return JSON.parse(JSON.stringify(value))
 }
 
@@ -89,7 +90,7 @@ export function mapFlashcardSetExtra(flashcardSetExtras: FlashcardSetExtra[]): M
   return new Map(flashcardSetExtras.map(v => [v.id, v]))
 }
 
-export async function fetchFlashcardAudio(
+export async function fetchFlashcardAudioBlob(
   flashcardSet: FlashcardSet | undefined,
   flashcard: Flashcard | undefined,
   isFrontSide: boolean,
@@ -106,8 +107,18 @@ export async function fetchFlashcardAudio(
   if (!flashcardAudioId) return undefined
 
   const toaster = useSpaceToaster()
+  const audioStore = useFlashcardAudioStore()
+
+  const cachedAudio = audioStore.getAudio(flashcard.id, isFrontSide)
+  if (cachedAudio) {
+    console.log(`Returning cached audio ${flashcardAudioId} for flashcard ${flashcard.id}`)
+    return cachedAudio
+  }
+
   return await sendFlashcardAudioFetchRequest(flashcardSet.id, flashcard.id, flashcardAudioId)
     .then((response) => {
+      const contentType = response.headers['Content-Type']?.toString()
+      audioStore.addAudio(flashcard.id, response.data, contentType, isFrontSide)
       return response.data
     })
     .catch((error) => {
