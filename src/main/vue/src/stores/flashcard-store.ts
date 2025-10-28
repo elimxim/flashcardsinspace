@@ -91,6 +91,16 @@ export const useFlashcardStore = defineStore('flashcard', {
         this.flashcardMap.set(flashcard.id, flashcard)
       }
     },
+    setFlashcardAudioId(flashcardId: number, audioId: number, isFrontSide: boolean) {
+      console.log(`Setting audio id ${audioId} (front side: ${isFrontSide}) for flashcard ${flashcardId} in set ${this.flashcardSet?.id}`)
+      const flashcard = this.flashcardMap.get(flashcardId)
+      if (!flashcard) return
+      if (isFrontSide) {
+        flashcard.frontSideAudioId = audioId
+      } else {
+        flashcard.backSideAudioId = audioId
+      }
+    },
     removeFlashcard(id: number) {
       this.flashcardMap.delete(id)
     },
