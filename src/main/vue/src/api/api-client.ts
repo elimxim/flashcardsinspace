@@ -110,22 +110,22 @@ export async function sendChronoBulkUpdateRequest(setId: number, status: string,
   return apiClient.put<ChronoUpdateResponse>(`/flashcard-sets/${setId}/chrono/bulk`, request)
 }
 
-export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId: number, side: string, audioData: Blob, mime?: string) {
-  let ext = 'webm'
-  if (mime?.includes('ogg')) {
-    ext = 'ogg'
-  } else if (mime?.includes('mp4')) {
-    ext = 'm4a'
-  }
-
-  const file = new File([audioData], `voice-${Date.now()}.${ext}`, {
-    type: audioData.type || mime || 'application/octet-stream',
-  })
+export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId: number, side: string, audioBlob: Blob) {
+  const ext =
+    audioBlob.type.includes('ogg') ? 'ogg'
+      : audioBlob.type.includes('mp4') ? 'm4a'
+        : audioBlob.type.includes('webm') ? 'webm'
+          : 'unknown'
 
   const form = new FormData()
-  form.append('file', file)
+  form.append('side', side)
+  form.append('file', new File([audioBlob], `voice-${Date.now()}.${ext}`, {
+      type: audioBlob.type,
+    })
+  )
 
-  return apiClient.post<FlashcardAudio>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio?side=${side}`,
+  console.log(`[POST] request => upload audio for flashcard ${flashcardId} in set ${setId}`)
+  return apiClient.post<FlashcardAudio>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio`,
     form,
     {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -135,9 +135,13 @@ export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId
 }
 
 export async function sendFlashcardAudioFetchRequest(setId: number, flashcardId: number, audioId: number) {
-  return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
+  console.log(`[GET] request => audio ${audioId} for flashcard ${flashcardId} in set ${setId}`)
+  return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`, {
+    responseType: 'blob'
+  })
 }
 
 export async function sendFlashcardAudioRemovalRequest(setId: number, flashcardId: number, audioId: number) {
+  console.log(`[DELETE] request => audio ${audioId} for flashcard ${flashcardId} in set ${setId}`)
   return apiClient.delete(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
 }
