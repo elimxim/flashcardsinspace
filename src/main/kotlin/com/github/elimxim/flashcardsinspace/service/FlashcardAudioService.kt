@@ -24,34 +24,56 @@ class FlashcardAudioService(
 ) {
     @Transactional
     fun fetchAudio(user: User, setId: Long, flashcardId: Long, audioId: Long): FlashcardAudio {
-        log.info("Fetching audio with ID: $audioId")
+        log.info("Fetching audio $audioId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         flashcardService.verifyUserOperation(user, setId, flashcardId)
         return getEntity(audioId)
     }
 
     @Transactional
-    fun saveAudio(user: User, setId: Long, flashcardId: Long, side: String, file: MultipartFile): FlashcardAudioDto {
+    fun saveOrUpdateAudio(
+        user: User,
+        setId: Long,
+        flashcardId: Long,
+        side: String,
+        file: MultipartFile
+    ): FlashcardAudioDto {
         log.info("Uploading audio file: ${file.originalFilename}, size: ${file.size} bytes")
         flashcardSetService.verifyUserHasAccess(user, setId)
         flashcardService.verifyUserOperation(user, setId, flashcardId)
-        return saveAudio(flashcardService.getEntity(flashcardId), side, file)
+        return saveOrUpdateAudio(flashcardService.getEntity(flashcardId), side, file)
     }
 
     @Transactional
-    fun saveAudio(flashcard: Flashcard, side: String, file: MultipartFile): FlashcardAudioDto {
+    fun saveOrUpdateAudio(flashcard: Flashcard, side: String, file: MultipartFile): FlashcardAudioDto {
         val flashcardSide = parseSide(side)
         val audioData = file.bytes
-        val audio = FlashcardAudio(
-            side = flashcardSide,
-            mimeType = file.contentType ?: "audio/webm",
-            audioData = audioData,
-            audioSize = audioData.size.toLong(),
-            uploadedAt = ZonedDateTime.now(),
-        )
 
-        val savedAudio = flashcardAudioRepository.save(audio)
-        log.info("Audio ${savedAudio.id} saved, side: ${savedAudio.side}, size: ${audio.sizeKB()} KBs")
+        val audioId = if (flashcardSide == FlashcardSide.FRONT) {
+            flashcard.frontSideAudioId
+        } else {
+            flashcard.backSideAudioId
+        }
+
+        val updatedAudio = if (audioId != null) {
+            val existingAudio = getEntity(audioId)
+            existingAudio.mimeType = file.contentType
+            existingAudio.audioData = audioData
+            existingAudio.audioSize = audioData.size.toLong()
+            existingAudio.uploadedAt = ZonedDateTime.now()
+            existingAudio
+        } else {
+            FlashcardAudio(
+                side = flashcardSide,
+                mimeType = file.contentType,
+                audioData = audioData,
+                audioSize = audioData.size.toLong(),
+                uploadedAt = ZonedDateTime.now(),
+            )
+        }
+
+        val savedAudio = flashcardAudioRepository.save(updatedAudio)
+        log.info("Audio ${savedAudio.id} saved, side: ${savedAudio.side}, size: ${updatedAudio.sizeKB()} KBs")
 
         if (flashcardSide == FlashcardSide.FRONT) {
             flashcard.frontSideAudioId = savedAudio.id
@@ -93,6 +115,6 @@ class FlashcardAudioService(
     private fun parseSide(side: String) = when {
         FlashcardSide.FRONT.name.equals(side, ignoreCase = true) -> FlashcardSide.FRONT
         FlashcardSide.BACK.name.equals(side, ignoreCase = true) -> FlashcardSide.BACK
-        else -> throw InvalidRequestException("Invalid side: $side for uploading audio")
+        else -> throw InvalidRequestException("Invalid side $side for uploading audio")
     }
 }

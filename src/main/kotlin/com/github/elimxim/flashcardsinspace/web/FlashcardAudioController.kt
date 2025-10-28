@@ -18,18 +18,6 @@ import org.springframework.web.multipart.MultipartFile
 class FlashcardAudioController(
     private val flashcardAudioService: FlashcardAudioService,
 ) {
-    @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun uploadAudio(
-        @AuthenticationPrincipal user: User,
-        @PathVariable setId: Long,
-        @PathVariable flashcardId: Long,
-        @RequestParam side: String,
-        @RequestParam file: MultipartFile,
-    ): ResponseEntity<FlashcardAudioDto> = withLoggingContext(user) {
-        val dto = flashcardAudioService.saveAudio(user, setId, flashcardId, side.escapeJava().normalize(), file)
-        return ResponseEntity.ok(dto)
-    }
-
     @GetMapping("/{audioId:\\d+}")
     fun downloadAudio(
         @AuthenticationPrincipal user: User,
@@ -38,10 +26,26 @@ class FlashcardAudioController(
         @PathVariable audioId: Long,
     ): ResponseEntity<ByteArray> = withLoggingContext(user) {
         val audio = flashcardAudioService.fetchAudio(user, setId, flashcardId, audioId)
-        return ResponseEntity.ok()
-            .contentType(MediaType.parseMediaType(audio.mimeType))
-            .contentLength(audio.audioSize)
-            .body(audio.audioData)
+        return ResponseEntity.ok().run {
+            val mimeType = audio.mimeType
+            if (mimeType != null) {
+                contentType(MediaType.parseMediaType(mimeType))
+            }
+            contentLength(audio.audioSize)
+            body(audio.audioData)
+        }
+    }
+
+    @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun uploadAudio(
+        @AuthenticationPrincipal user: User,
+        @PathVariable setId: Long,
+        @PathVariable flashcardId: Long,
+        @RequestParam side: String,
+        @RequestParam file: MultipartFile,
+    ): ResponseEntity<FlashcardAudioDto> = withLoggingContext(user) {
+        val dto = flashcardAudioService.saveOrUpdateAudio(user, setId, flashcardId, side.escapeJava().normalize(), file)
+        return ResponseEntity.ok(dto)
     }
 
     @DeleteMapping("/{audioId:\\d+}")
