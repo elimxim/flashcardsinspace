@@ -50,7 +50,7 @@ data class FlashcardDto(
 data class FlashcardAudioDto(
     val id: Long,
     val side: String,
-    val mimeType: String,
+    val mimeType: String?,
     val audioSize: Long,
     val uploadedAt: ZonedDateTime?,
 )

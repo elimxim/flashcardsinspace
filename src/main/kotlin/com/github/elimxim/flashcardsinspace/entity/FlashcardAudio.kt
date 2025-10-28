@@ -1,6 +1,8 @@
 package com.github.elimxim.flashcardsinspace.entity
 
 import jakarta.persistence.*
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.time.ZonedDateTime
 import kotlin.math.roundToInt
 
@@ -15,10 +17,10 @@ class FlashcardAudio(
     @Column(nullable = false)
     var side: FlashcardSide,
 
-    @Column(nullable = false)
-    var mimeType: String,
+    @Column(nullable = true)
+    var mimeType: String? = null,
 
-    @Lob
+    @JdbcTypeCode(SqlTypes.VARBINARY)
     @Column(nullable = false)
     var audioData: ByteArray,
 
@@ -26,7 +28,7 @@ class FlashcardAudio(
     var audioSize: Long,
 
     @Column(nullable = false)
-    var uploadedAt: ZonedDateTime? = null,
+    var uploadedAt: ZonedDateTime,
 )
 
 enum class FlashcardSide {
