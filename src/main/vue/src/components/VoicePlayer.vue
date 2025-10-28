@@ -21,9 +21,9 @@
   </div>
 </template>
 
-<script setup lang="ts" generic="T extends Blob = Blob">
+<script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import { ref, onBeforeUnmount, watch } from 'vue'
+import { ref, onBeforeUnmount, watch, onMounted } from 'vue'
 
 const props = defineProps<{
   audioBlob?: Blob | undefined
@@ -35,10 +35,17 @@ const isPlaying = ref(false)
 
 function play() {
   const audio = audioRef.value as HTMLAudioElement | undefined
-  if (!audio || !audioUrl.value) return
+  if (!audio || !audioUrl.value) {
+    console.warn('Cannot play - audio element or URL missing', {
+      hasAudio: !!audio,
+      hasUrl: !!audioUrl.value
+    })
+    return
+  }
+  console.log('Playing audio from ', audioUrl.value)
   audio.currentTime = 0
   audio.play().catch((error) => {
-    console.warn('Audio play failed:', error)
+    console.error('Audio play failed:', error)
   })
 }
 
@@ -49,13 +56,31 @@ function stop() {
   audio.currentTime = 0
 }
 
-watch(() => props.audioBlob, (newVal) => {
-  if (newVal) {
-    if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
-    audioUrl.value = URL.createObjectURL(newVal)
+function updateAudioUrl(blob: Blob | undefined) {
+  if (blob && blob.size > 0) {
+    try {
+      if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
+      audioUrl.value = URL.createObjectURL(blob)
+    } catch (error) {
+      console.error('Failed to create object URL', error, blob)
+      audioUrl.value = undefined
+    }
   } else {
     if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
     audioUrl.value = undefined
+    if (blob) {
+      console.log('Invalid blob provided:', blob)
+    }
+  }
+}
+
+watch(() => props.audioBlob, (newVal) => {
+  updateAudioUrl(newVal)
+})
+
+onMounted(() => {
+  if (props.audioBlob) {
+    updateAudioUrl(props.audioBlob)
   }
 })
 
