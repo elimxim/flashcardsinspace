@@ -24,7 +24,7 @@ export interface Flashcard {
 export interface FlashcardAudio {
   id: number
   side: string
-  mimeType: string
+  mimeType?: string | undefined
   audioSize: number
   uploadedAt?: Date | undefined // ZonedDateTime
 }
