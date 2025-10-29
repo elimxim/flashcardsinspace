@@ -72,14 +72,14 @@
 
   <FlashcardSetSettingsModal/>
   <FlashcardSetCreationModal/>
-  <FlashcardModificationModal/>
+  <FlashcardCreationModal/>
   <CalendarModal/>
 </template>
 
 <script setup lang="ts">
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
 import FlashcardSetCreationModal from '@/views/modal/FlashcardSetCreationModal.vue'
-import FlashcardModificationModal from '@/views/modal/FlashcardModificationModal.vue'
+import FlashcardCreationModal from '@/views/modal/FlashcardCreationModal.vue'
 import CalendarModal from '@/views/modal/CalendarModal.vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
