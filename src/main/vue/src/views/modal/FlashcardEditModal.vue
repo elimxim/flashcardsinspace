@@ -1,21 +1,12 @@
 <template>
   <Modal
-    :visible="editMode ? toggleStore.flashcardEditOpen : toggleStore.flashcardCreationOpen"
+    title="Edit Flashcard"
+    :visible="toggleStore.flashcardEditOpen"
     :on-press-exit="cancel"
-    :on-press-enter="props.editMode ? update : create"
+    :on-press-enter="update"
     :on-press-delete="remove"
     :focus-on="frontSideTextArea"
-    :title="editMode ? 'Edit Flashcard' : 'New Flashcard'"
   >
-    <template v-if="!editMode" #control>
-      <AwesomeButton
-        ref="infiniteLoopButton"
-        icon="fa-regular fa-circle"
-        spin-icon="fa-solid fa-arrows-spin"
-        spinnable
-      />
-    </template>
-
     <div class="modal-main-area">
       <div class="modal-main-area--inner">
         <SmartInput
@@ -57,7 +48,6 @@
         auto-blur
       />
       <SmartButton
-        v-if="editMode"
         class="remove-button"
         text="Remove"
         :hold-time="1.2"
@@ -65,19 +55,10 @@
         auto-blur
       />
       <SmartButton
-        v-if="editMode"
         class="update-button"
         text="Update"
         :on-click="update"
         :disabled="!stateChanged || formInvalid"
-        auto-blur
-      />
-      <SmartButton
-        v-if="!editMode"
-        class="create-button"
-        text="Create"
-        :on-click="create"
-        :disabled="formInvalid"
         auto-blur
       />
     </div>
@@ -89,57 +70,37 @@
 import Modal from '@/components/Modal.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import SmartInput from '@/components/SmartInput.vue'
-import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import VoiceRecorder from '@/components/VoiceRecorder.vue'
-import {
-  computed,
-  defineProps,
-  nextTick, onMounted,
-  ref,
-  watch
-} from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { maxLength, required } from '@vuelidate/validators'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
-import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { useFlashcardAudioStore } from '@/stores/flashcard-audio-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import {
   fetchFlashcardAudioBlob,
-  newFlashcard,
+  removeFlashcardAudioBlob,
   updateFlashcardSides,
+  uploadFlashcardAudioBlob,
 } from '@/core-logic/flashcard-logic.ts'
 import { storeToRefs } from 'pinia'
 import {
   sendFlashcardRemovalRequest,
-  sendFlashcardCreationRequest,
-  sendFlashcardSetInitRequest,
   sendFlashcardUpdateRequest,
-  sendFlashcardAudioUploadRequest,
-  sendFlashcardAudioRemovalRequest,
 } from '@/api/api-client.ts'
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const removed = defineModel<boolean>('removed', { default: false })
 
-const props = withDefaults(defineProps<{
-  editMode?: boolean,
-}>(), {
-  editMode: false,
-})
-
 const toggleStore = useToggleStore()
-const chronoStore = useChronoStore()
 const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
-const audioStore = useFlashcardAudioStore()
 const toaster = useSpaceToaster()
 
-const { flashcardSet, isStarted } = storeToRefs(flashcardStore)
+const { flashcardSet } = storeToRefs(flashcardStore)
 
 const frontSide = ref(flashcard.value?.frontSide ?? '')
 const frontSideTextArea = ref<HTMLElement>()
@@ -147,7 +108,6 @@ const frontSideAudioId = ref(flashcard.value?.frontSideAudioId)
 const flashcardFrontSideAudioBlob = ref<Blob | undefined>()
 const frontSideAudioBlob = ref<Blob | undefined>()
 const backSide = ref(flashcard.value?.backSide ?? '')
-const infiniteLoopButton = ref<InstanceType<typeof AwesomeButton>>()
 const backSideAudioId = ref(flashcard.value?.backSideAudioId)
 const flashcardBackSideAudioBlob = ref<Blob | undefined>()
 const backSideAudioBlob = ref<Blob | undefined>()
@@ -195,93 +155,88 @@ const isBackSideAudioChanged = computed(() => {
   }
 })
 
-async function fetchFlashcardAudio() {
-  return Promise.all([
-    fetchAudioBlob(true)
-      .then((blob) => {
-        flashcardFrontSideAudioBlob.value = blob
-        frontSideAudioBlob.value = blob
-      }),
-    fetchAudioBlob(false)
-      .then((blob) => {
-        flashcardBackSideAudioBlob.value = blob
-        backSideAudioBlob.value = blob
-      }),
+async function fetchAudio() {
+  const set = flashcardSet.value
+  const card = flashcard.value
+
+  if (!set || !card) return
+
+  await Promise.all([
+    (async function () {
+      if (frontSideAudioId.value) {
+        return await fetchFlashcardAudioBlob(set, card, true)
+          .then((blob) => {
+            flashcardFrontSideAudioBlob.value = blob
+            frontSideAudioBlob.value = blob
+          })
+      }
+    })(),
+    (async function () {
+      if (backSideAudioId.value) {
+        return await fetchFlashcardAudioBlob(set, card, false)
+          .then((blob) => {
+            flashcardBackSideAudioBlob.value = blob
+            backSideAudioBlob.value = blob
+          })
+      }
+    })(),
   ])
 }
 
-async function fetchAudioBlob(isFrontSide: boolean): Promise<Blob | undefined> {
-  if (isFrontSide && frontSideAudioId.value) {
-    return await fetchFlashcardAudioBlob(flashcardSet.value, flashcard.value, isFrontSide)
-  } else if (!isFrontSide && backSideAudioId.value) {
-    return await fetchFlashcardAudioBlob(flashcardSet.value, flashcard.value, isFrontSide)
+async function uploadAudioIfRelevant(): Promise<boolean> {
+  const set = flashcardSet.value
+  const card = flashcard.value
+
+  if (!set || !card) {
+    console.error('Cannot upload audio: flashcard set or flashcard is undefined')
+    return true
   }
-}
 
-async function removeAudioBlobsIfRelevant() {
-  await Promise.all([
-    async function () {
-      if (frontSideAudioId.value && !frontSideAudioBlob.value && flashcardFrontSideAudioBlob.value) {
-        return removeAudioBlob(frontSideAudioId.value, true)
-      }
-    },
-    async function () {
-      if (backSideAudioId.value && !backSideAudioBlob.value && flashcardBackSideAudioBlob.value) {
-        return removeAudioBlob(backSideAudioId.value, false)
-      }
-    },
-  ])
-}
-
-async function removeAudioBlob(audioId: number, isFrontSide: boolean) {
-  const flashcardSetId = flashcardSet.value?.id
-  const flashcardId = flashcard.value?.id
-
-  if (!flashcardSetId || !flashcardId) return
-
-  await sendFlashcardAudioRemovalRequest(flashcardId, flashcardId, audioId)
-    .then(() => {
-      flashcardStore.removeFlashcardAudioId(flashcardId, audioId, isFrontSide)
-      audioStore.deleteAudio(flashcardId, isFrontSide)
-    })
-    .catch((error) => {
-      console.error(`Failed to remove audio for flashcard ${flashcardId}`, error)
-      toaster.bakeError(`Couldn't remove audio`, error.response?.data)
-    })
-}
-
-async function uploadAudioBlobsIfRelevant(): Promise<void> {
-  await Promise.all([
-    async function () {
+  return await Promise.all([
+    (async function () {
       if (frontSideAudioBlob.value) {
-        return uploadAudioBlob(frontSideAudioBlob.value, true)
+        return uploadFlashcardAudioBlob(set, card, frontSideAudioBlob.value, true)
+      } else {
+        return true
       }
-    },
-    async function () {
+    })(),
+    (async function () {
       if (backSideAudioBlob.value) {
-        return uploadAudioBlob(backSideAudioBlob.value, false)
+        return uploadFlashcardAudioBlob(set, card, backSideAudioBlob.value, false)
+      } else {
+        return true
       }
-    },
+    })(),
   ])
+    .then((results) => results.every(v => v))
 }
 
-async function uploadAudioBlob(audioBlob: Blob, isFrontSide: boolean): Promise<void> {
-  const flashcardSetId = flashcardSet.value?.id
-  const flashcardId = flashcard.value?.id
-  const side = isFrontSide ? 'FRONT' : 'BACK'
+async function removeAudioIfRelevant(): Promise<boolean> {
+  const set = flashcardSet.value
+  const card = flashcard.value
 
-  if (!flashcardSetId || !flashcardId) return
+  if (!set || !card) {
+    console.error('Cannot remove audio blobs: flashcard set or flashcard is undefined')
+    return true
+  }
 
-  return await sendFlashcardAudioUploadRequest(flashcardSetId, flashcardId, side, audioBlob)
-    .then((response) => {
-      console.log(`Audio uploaded ${response.data.id}, size: ${response.data.audioSize}, mime: ${response.data.mimeType}`)
-      flashcardStore.setFlashcardAudioId(flashcardId, response.data.id, isFrontSide)
-      audioStore.addAudio(response.data.id, audioBlob, response.data.mimeType, isFrontSide)
-    })
-    .catch((error) => {
-      console.error(`Failed to upload audio for flashcard ${flashcardId}`, error)
-      toaster.bakeError(`Couldn't upload audio`, error.response?.data)
-    })
+  return await Promise.all([
+    (async function () {
+      if (frontSideAudioId.value && !frontSideAudioBlob.value && flashcardFrontSideAudioBlob.value) {
+        return removeFlashcardAudioBlob(set, card, frontSideAudioId.value, true)
+      } else {
+        return true
+      }
+    })(),
+    (async function () {
+      if (backSideAudioId.value && !backSideAudioBlob.value && flashcardBackSideAudioBlob.value) {
+        return removeFlashcardAudioBlob(set, card, backSideAudioId.value, false)
+      } else {
+        return true
+      }
+    })(),
+  ])
+    .then((result) => result.every(v => v))
 }
 
 async function cancel() {
@@ -299,30 +254,18 @@ async function remove() {
   }
 }
 
-async function create() {
-  $v.value.$touch()
-  if (!formInvalid.value) {
-    const added = await addNewFlashcard()
-    if (added) {
-      await uploadAudioBlobsIfRelevant()
-      if (!infiniteLoopButton.value?.isPressed()) {
-        toggleModalForm()
-      }
-      await resetState()
-    }
-  }
-}
-
 async function update() {
   if (stateChanged.value) {
     $v.value.$touch()
     if (!formInvalid.value) {
       const updated = await updateFlashcard()
       if (updated) {
-        await uploadAudioBlobsIfRelevant()
-        await removeAudioBlobsIfRelevant()
-        toggleModalForm()
-        await resetState()
+        const uploaded = await uploadAudioIfRelevant()
+        const removed = await removeAudioIfRelevant()
+        if (uploaded && removed) {
+          toggleModalForm()
+          await resetState()
+        }
       }
     }
   }
@@ -344,43 +287,6 @@ async function removeFlashcard(): Promise<boolean> {
     })
 }
 
-async function addNewFlashcard(): Promise<boolean> {
-  if (!flashcardSet.value) return false
-  const setId = flashcardSet.value.id
-  const flashcard = newFlashcard(frontSide.value, backSide.value)
-  if (isStarted.value) {
-    return await sendFlashcardCreationRequest(setId, flashcard)
-      .then((response) => {
-        flashcardStore.addNewFlashcard(response.data)
-        flashcardSetStore.incrementFlashcardsNumber(setId)
-        return true
-      })
-      .catch((error) => {
-        console.error(`Failed to add a flashcard to set ${setId}`, error.response?.data)
-        toaster.bakeError(`Couldn't add a flashcard`, error.response?.data)
-        return false
-      })
-  } else {
-    return await sendFlashcardSetInitRequest(setId, flashcard)
-      .then((response) => {
-        flashcardSetStore.updateSet(response.data.flashcardSet)
-        flashcardStore.changeSet(response.data.flashcardSet)
-        flashcardStore.addNewFlashcard(response.data.flashcard)
-        chronoStore.loadState(
-          response.data.chronodays,
-          response.data.currDay,
-          0,
-        )
-        return true
-      })
-      .catch((error) => {
-        console.error(`Failed to init flashcard set ${setId}`, error.response?.data)
-        toaster.bakeError(`Couldn't add a flashcard`, error.response?.data)
-        return false
-      })
-  }
-}
-
 async function updateFlashcard(): Promise<boolean> {
   if (!flashcardSet.value || !flashcard.value) return false
   const updatedFlashcard = updateFlashcardSides(flashcard.value, frontSide.value, backSide.value)
@@ -397,11 +303,7 @@ async function updateFlashcard(): Promise<boolean> {
 }
 
 function toggleModalForm() {
-  if (props.editMode) {
-    toggleStore.toggleFlashcardEdit()
-  } else {
-    toggleStore.toggleFlashcardCreation()
-  }
+  toggleStore.toggleFlashcardEdit()
 }
 
 async function resetState() {
@@ -409,7 +311,7 @@ async function resetState() {
   frontSideAudioId.value = flashcard.value?.frontSideAudioId
   backSide.value = flashcard.value?.backSide ?? ''
   backSideAudioId.value = flashcard.value?.backSideAudioId
-  await fetchFlashcardAudio()
+  await fetchAudio()
   $v.value.$reset()
   nextTick().then(() => {
     frontSideTextArea.value?.focus()
@@ -421,7 +323,7 @@ watch(flashcard, async (newVal) => {
   frontSideAudioId.value = newVal?.frontSideAudioId
   backSide.value = newVal?.backSide ?? ''
   backSideAudioId.value = newVal?.backSideAudioId
-  await fetchFlashcardAudio()
+  await fetchAudio()
 })
 
 watch(frontSide, () => {
@@ -437,7 +339,7 @@ watch(backSide, () => {
 })
 
 onMounted(async () => {
-  await fetchFlashcardAudio()
+  await fetchAudio()
 })
 
 </script>
