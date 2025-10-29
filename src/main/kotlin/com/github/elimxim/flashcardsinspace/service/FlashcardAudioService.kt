@@ -1,12 +1,18 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.entity.FlashcardAudio
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSide
+import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardAudioRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
+import com.github.elimxim.flashcardsinspace.entity.sizeKB
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardAudioDto
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
 import com.github.elimxim.flashcardsinspace.web.exception.AudioNotFoundException
+import com.github.elimxim.flashcardsinspace.web.exception.AudioUploadBusyException
+import com.github.elimxim.flashcardsinspace.web.exception.FlashcardNotFoundException
 import com.github.elimxim.flashcardsinspace.web.exception.InvalidRequestException
+import org.hibernate.exception.LockTimeoutException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -41,13 +47,26 @@ class FlashcardAudioService(
         log.info("Uploading audio file: ${file.originalFilename}, size: ${file.size} bytes")
         flashcardSetService.verifyUserHasAccess(user, setId)
         flashcardService.verifyUserOperation(user, setId, flashcardId)
-        return saveOrUpdateAudio(flashcardService.getEntity(flashcardId), side, file)
+
+        return saveOrUpdateAudio(flashcardId, side, file)
     }
 
     @Transactional
-    fun saveOrUpdateAudio(flashcard: Flashcard, side: String, file: MultipartFile): FlashcardAudioDto {
+    fun saveOrUpdateAudio(flashcardId: Long, side: String, file: MultipartFile): FlashcardAudioDto {
         val flashcardSide = parseSide(side)
         val audioData = file.bytes
+
+        // Fetch flashcard with pessimistic lock to prevent race conditions
+        val flashcard = try {
+            flashcardRepository.findByIdWithLock(flashcardId).orElseThrow {
+                FlashcardNotFoundException("Flashcard with id $flashcardId not found")
+            }
+        } catch (e: LockTimeoutException) {
+            log.warn("Lock timeout while trying to upload audio for flashcard $flashcardId", e)
+            throw AudioUploadBusyException(
+                "Another audio upload is in progress for flashcard $flashcardId. Please try again.", e
+            )
+        }
 
         val audioId = if (flashcardSide == FlashcardSide.FRONT) {
             flashcard.frontSideAudioId
@@ -76,12 +95,10 @@ class FlashcardAudioService(
         log.info("Audio ${savedAudio.id} saved, side: ${savedAudio.side}, size: ${updatedAudio.sizeKB()} KBs")
 
         if (flashcardSide == FlashcardSide.FRONT) {
-            flashcard.frontSideAudioId = savedAudio.id
+            flashcardRepository.updateFrontSideAudioId(flashcardId, savedAudio.id)
         } else {
-            flashcard.backSideAudioId = savedAudio.id
+            flashcardRepository.updateBackSideAudioId(flashcardId, savedAudio.id)
         }
-
-        flashcardRepository.save(flashcard)
 
         return savedAudio.toDto()
     }
