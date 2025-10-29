@@ -106,6 +106,7 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
+import { useFlashcardAudioStore } from '@/stores/flashcard-audio-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import {
   fetchFlashcardAudioBlob,
@@ -119,6 +120,7 @@ import {
   sendFlashcardSetInitRequest,
   sendFlashcardUpdateRequest,
   sendFlashcardAudioUploadRequest,
+  sendFlashcardAudioRemovalRequest,
 } from '@/api/api-client.ts'
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
@@ -134,6 +136,7 @@ const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
 const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
+const audioStore = useFlashcardAudioStore()
 const toaster = useSpaceToaster()
 
 const { flashcardSet, isStarted } = storeToRefs(flashcardStore)
@@ -215,33 +218,69 @@ async function fetchAudioBlob(isFrontSide: boolean): Promise<Blob | undefined> {
   }
 }
 
-async function uploadFlashcardAudio(): Promise<boolean> {
-  return Promise.all([
-    uploadAudioBlob(frontSideAudioBlob.value, true),
-    uploadAudioBlob(backSideAudioBlob.value, false),
+async function removeAudioBlobsIfRelevant() {
+  await Promise.all([
+    async function () {
+      if (frontSideAudioId.value && !frontSideAudioBlob.value && flashcardFrontSideAudioBlob.value) {
+        return removeAudioBlob(frontSideAudioId.value, true)
+      }
+    },
+    async function () {
+      if (backSideAudioId.value && !backSideAudioBlob.value && flashcardBackSideAudioBlob.value) {
+        return removeAudioBlob(backSideAudioId.value, false)
+      }
+    },
   ])
-    .then((results) => {
-      return results.every(v => v)
+}
+
+async function removeAudioBlob(audioId: number, isFrontSide: boolean) {
+  const flashcardSetId = flashcardSet.value?.id
+  const flashcardId = flashcard.value?.id
+
+  if (!flashcardSetId || !flashcardId) return
+
+  await sendFlashcardAudioRemovalRequest(flashcardId, flashcardId, audioId)
+    .then(() => {
+      flashcardStore.removeFlashcardAudioId(flashcardId, audioId, isFrontSide)
+      audioStore.deleteAudio(flashcardId, isFrontSide)
+    })
+    .catch((error) => {
+      console.error(`Failed to remove audio for flashcard ${flashcardId}`, error)
+      toaster.bakeError(`Couldn't remove audio`, error.response?.data)
     })
 }
 
-async function uploadAudioBlob(audioBlob: Blob | undefined, isFrontSide: boolean): Promise<boolean> {
+async function uploadAudioBlobsIfRelevant(): Promise<void> {
+  await Promise.all([
+    async function () {
+      if (frontSideAudioBlob.value) {
+        return uploadAudioBlob(frontSideAudioBlob.value, true)
+      }
+    },
+    async function () {
+      if (backSideAudioBlob.value) {
+        return uploadAudioBlob(backSideAudioBlob.value, false)
+      }
+    },
+  ])
+}
+
+async function uploadAudioBlob(audioBlob: Blob, isFrontSide: boolean): Promise<void> {
   const flashcardSetId = flashcardSet.value?.id
   const flashcardId = flashcard.value?.id
   const side = isFrontSide ? 'FRONT' : 'BACK'
 
-  if (!audioBlob || !flashcardSetId || !flashcardId) return true
+  if (!flashcardSetId || !flashcardId) return
 
   return await sendFlashcardAudioUploadRequest(flashcardSetId, flashcardId, side, audioBlob)
     .then((response) => {
       console.log(`Audio uploaded ${response.data.id}, size: ${response.data.audioSize}, mime: ${response.data.mimeType}`)
       flashcardStore.setFlashcardAudioId(flashcardId, response.data.id, isFrontSide)
-      return true
+      audioStore.addAudio(response.data.id, audioBlob, response.data.mimeType, isFrontSide)
     })
     .catch((error) => {
       console.error(`Failed to upload audio for flashcard ${flashcardId}`, error)
       toaster.bakeError(`Couldn't upload audio`, error.response?.data)
-      return false
     })
 }
 
@@ -265,7 +304,7 @@ async function create() {
   if (!formInvalid.value) {
     const added = await addNewFlashcard()
     if (added) {
-      await uploadFlashcardAudio()
+      await uploadAudioBlobsIfRelevant()
       if (!infiniteLoopButton.value?.isPressed()) {
         toggleModalForm()
       }
@@ -280,7 +319,8 @@ async function update() {
     if (!formInvalid.value) {
       const updated = await updateFlashcard()
       if (updated) {
-        await uploadFlashcardAudio()
+        await uploadAudioBlobsIfRelevant()
+        await removeAudioBlobsIfRelevant()
         toggleModalForm()
         await resetState()
       }
@@ -343,11 +383,7 @@ async function addNewFlashcard(): Promise<boolean> {
 
 async function updateFlashcard(): Promise<boolean> {
   if (!flashcardSet.value || !flashcard.value) return false
-  const updatedFlashcard = updateFlashcardSides(
-    flashcard.value,
-    frontSide.value,
-    backSide.value
-  )
+  const updatedFlashcard = updateFlashcardSides(flashcard.value, frontSide.value, backSide.value)
   return await sendFlashcardUpdateRequest(flashcardSet.value.id, updatedFlashcard)
     .then((response) => {
       flashcardStore.changeFlashcard(response.data)
