@@ -8,9 +8,13 @@ import { type Stage, stages } from '@/core-logic/stage-logic.ts'
 import type { Language } from '@/model/language.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
-import { sendFlashcardAudioFetchRequest } from '@/api/api-client.ts'
+import {
+  sendFlashcardAudioFetchRequest, sendFlashcardAudioRemovalRequest,
+  sendFlashcardAudioUploadRequest
+} from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useFlashcardAudioStore } from '@/stores/flashcard-audio-store.ts'
+import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 
 export const flashcardSetStatuses = {
   ACTIVE: 'ACTIVE',
@@ -125,5 +129,54 @@ export async function fetchFlashcardAudioBlob(
       console.error(`Failed to fetch audio ${flashcardAudioId} for flashcard ${flashcard.id}`, error)
       toaster.bakeError(`Couldn't fetch audio`, error.response?.data)
       return undefined
+    })
+}
+
+export async function uploadFlashcardAudioBlob(
+  flashcardSet: FlashcardSet,
+  flashcard: Flashcard,
+  audioBlob: Blob,
+  isFrontSide: boolean,
+): Promise<boolean> {
+  const flashcardStore = useFlashcardStore()
+  const audioStore = useFlashcardAudioStore()
+  const toaster = useSpaceToaster()
+
+  const side = isFrontSide ? 'FRONT' : 'BACK'
+
+  return await sendFlashcardAudioUploadRequest(flashcardSet.id, flashcard.id, side, audioBlob)
+    .then((response) => {
+      console.log(`Audio uploaded ${response.data.id}, size: ${response.data.audioSize}, mime: ${response.data.mimeType}`)
+      flashcardStore.setFlashcardAudioId(flashcard.id, response.data.id, isFrontSide)
+      audioStore.addAudio(response.data.id, audioBlob, response.data.mimeType, isFrontSide)
+      return true
+    })
+    .catch((error) => {
+      console.error(`Failed to upload audio for flashcard ${flashcard.id}`, error)
+      toaster.bakeError(`Couldn't upload audio`, error.response?.data)
+      return false
+    })
+}
+
+export async function removeFlashcardAudioBlob(
+  flashcardSet: FlashcardSet,
+  flashcard: Flashcard,
+  audioId: number,
+  isFrontSide: boolean
+): Promise<boolean> {
+  const flashcardStore = useFlashcardStore()
+  const audioStore = useFlashcardAudioStore()
+  const toaster = useSpaceToaster()
+
+  return await sendFlashcardAudioRemovalRequest(flashcardSet.id, flashcard.id, audioId)
+    .then(() => {
+      flashcardStore.removeFlashcardAudioId(flashcard.id, audioId, isFrontSide)
+      audioStore.deleteAudio(flashcard.id, isFrontSide)
+      return true
+    })
+    .catch((error) => {
+      console.error(`Failed to remove audio ${audioId} for flashcard ${flashcard.id}`, error)
+      toaster.bakeError(`Couldn't remove audio`, error.response?.data)
+      return false
     })
 }
