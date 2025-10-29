@@ -134,9 +134,9 @@ class FlashcardService(
         verifyUserOperation(user, setId, id)
         val flashcardSet = flashcardSetService.getEntity(setId)
         val flashcard = getEntity(id)
-        removeAudio(flashcard)
         flashcardSet.flashcards.remove(flashcard)
         flashcardRepository.delete(flashcard)
+        removeAudio(flashcard)
     }
 
     private fun removeAudio(flashcard: Flashcard) {
