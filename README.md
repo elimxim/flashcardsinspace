@@ -2,6 +2,9 @@
 
 ## TODOS
 
+Urgent:
+- removing flashcard set is not possible
+
 - README
   - Describe the project
 - UX:
@@ -12,6 +15,7 @@
   - Bugreport form
   - Review Session
   - Streak of days
+  - Autopilot view mode for Attempted, Unknown and Outer space flashcards
   - Statistics page
     - How much time you've spent review in total, daily, weekly, monthly, yearly
     - The top 10 most looked at flashcards
