@@ -224,6 +224,13 @@ async function removeAudioIfRelevant(): Promise<boolean> {
     (async function () {
       if (frontSideAudioId.value && !frontSideAudioBlob.value && flashcardFrontSideAudioBlob.value) {
         return removeFlashcardAudioBlob(set, card, frontSideAudioId.value, true)
+          .then((result) => {
+            if (result) {
+              frontSideAudioId.value = undefined
+              flashcardFrontSideAudioBlob.value = undefined
+            }
+            return result
+          })
       } else {
         return true
       }
@@ -231,6 +238,13 @@ async function removeAudioIfRelevant(): Promise<boolean> {
     (async function () {
       if (backSideAudioId.value && !backSideAudioBlob.value && flashcardBackSideAudioBlob.value) {
         return removeFlashcardAudioBlob(set, card, backSideAudioId.value, false)
+          .then((result) => {
+            if (result) {
+              backSideAudioId.value = undefined
+              flashcardBackSideAudioBlob.value = undefined
+            }
+            return result
+          })
       } else {
         return true
       }
@@ -307,6 +321,7 @@ function toggleModalForm() {
 }
 
 async function resetState() {
+  console.log('Resetting state')
   frontSide.value = flashcard.value?.frontSide ?? ''
   frontSideAudioId.value = flashcard.value?.frontSideAudioId
   backSide.value = flashcard.value?.backSide ?? ''
@@ -319,6 +334,7 @@ async function resetState() {
 }
 
 watch(flashcard, async (newVal) => {
+  console.log('Watch.flashcard', newVal)
   frontSide.value = newVal?.frontSide ?? ''
   frontSideAudioId.value = newVal?.frontSideAudioId
   backSide.value = newVal?.backSide ?? ''
