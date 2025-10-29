@@ -24,11 +24,11 @@ class GlobalExceptionHandler(private val messages: Messages) {
     }
 
     @ExceptionHandler(Exception::class)
-    fun handleUnexpectedException(ex: Exception, request: WebRequest): ResponseEntity<ErrorResponseBody> {
-        log.error("UNEXPECTED exception occurred", ex)
+    fun handleUnexpectedException(e: Exception, request: WebRequest): ResponseEntity<ErrorResponseBody> {
+        log.error("UNEXPECTED exception occurred", e)
         val body = errorBody(
             status = HttpStatus.INTERNAL_SERVER_ERROR,
-            exception = UnexpectedException("Unexpected error occurred", ex)
+            exception = UnexpectedException("Unexpected error occurred", e)
         )
 
         return ResponseEntity(body, body.httpStatus)
