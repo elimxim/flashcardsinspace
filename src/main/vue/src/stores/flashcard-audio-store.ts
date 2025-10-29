@@ -46,6 +46,13 @@ export const useFlashcardAudioStore = defineStore('flashcard-audio', () => {
     accessOrder.value.splice(left, 0, id)
   }
 
+  function cleanAccessOrder(id: number) {
+    const index = accessOrder.value.indexOf(id)
+    if (index > -1) {
+      accessOrder.value.splice(index, 1)
+    }
+  }
+
   function calculateEntrySize(pair: BlobPair): number {
     return (pair.frontSide?.size ?? 0) + (pair.backSide?.size ?? 0)
   }
@@ -132,7 +139,36 @@ export const useFlashcardAudioStore = defineStore('flashcard-audio', () => {
     return isFrontSide ? entry.audio.frontSide : entry.audio.backSide
   }
 
-  function invalidateAll() {
+  function deleteAudio(id: number, isFrontSide: boolean): boolean {
+    console.log()
+    const entry = audioMap.value.get(id)
+    if (!entry) return false
+
+    const oldSize = calculateEntrySize(entry.audio)
+
+    if (isFrontSide) {
+      entry.audio.frontSide = undefined
+      entry.audio.frontSideMimeType = undefined
+    } else {
+      entry.audio.backSide = undefined
+      entry.audio.backSideMimeType = undefined
+    }
+
+    const newSize = calculateEntrySize(entry.audio)
+    if (newSize === 0) {
+      totalSize.value -= oldSize
+      audioMap.value.delete(id)
+      cleanAccessOrder(id)
+    } else {
+      totalSize.value -= oldSize
+      totalSize.value += newSize
+      entry.size = newSize
+    }
+
+    return true
+  }
+
+  function resetState() {
     audioMap.value.clear()
     totalSize.value = 0
     accessOrder.value = []
@@ -143,6 +179,7 @@ export const useFlashcardAudioStore = defineStore('flashcard-audio', () => {
     storagePercentage,
     addAudio,
     getAudio,
-    invalidateAll,
+    deleteAudio,
+    resetState,
   }
 })
