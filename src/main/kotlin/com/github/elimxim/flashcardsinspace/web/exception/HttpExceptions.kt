@@ -93,6 +93,10 @@ class ChronodayIsDayOff(msg: String) : BadRequestException(msg)
 @UserMessageCode("user.message.error.flashcard.setId.unmatched")
 class UnmatchedFlashcardSetIdException(msg: String) : BadRequestException(msg)
 
+@ErrorCode("AUB400")
+@UserMessageCode("user.message.error.audio.uploadBusy")
+class AudioUploadBusyException(msg: String, cause: Exception? = null) : BadRequestException(msg, cause = cause)
+
 // 401 - UNAUTHORIZED
 
 @ErrorCode("AFE401")
