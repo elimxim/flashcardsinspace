@@ -6,7 +6,7 @@ import java.time.LocalDate
 
 @Entity
 @Table(name = "chronoday")
-class Chronoday(
+open class Chronoday(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,

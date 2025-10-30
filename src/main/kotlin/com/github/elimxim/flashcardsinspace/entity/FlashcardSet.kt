@@ -6,7 +6,7 @@ import java.time.ZonedDateTime
 
 @Entity
 @Table(name = "flashcard_set")
-class FlashcardSet(
+open class FlashcardSet(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
