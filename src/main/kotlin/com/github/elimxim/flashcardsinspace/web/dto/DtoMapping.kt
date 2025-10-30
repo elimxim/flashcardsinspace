@@ -30,9 +30,7 @@ fun FlashcardSet.toDto() = FlashcardSetDto(
 fun Flashcard.toDto() = FlashcardDto(
     id = id,
     frontSide = frontSide,
-    frontSideAudioId = frontSideAudioId,
     backSide = backSide,
-    backSideAudioId = backSideAudioId,
     stage = stage.name,
     timesReviewed = timesReviewed,
     reviewHistory = reviewHistory.toDto(),
@@ -55,5 +53,6 @@ fun FlashcardAudio.toDto() = FlashcardAudioDto(
     side = side.name,
     mimeType = mimeType,
     audioSize = audioSize,
+    flashcardId = flashcard.id,
     uploadedAt = uploadedAt,
 )
