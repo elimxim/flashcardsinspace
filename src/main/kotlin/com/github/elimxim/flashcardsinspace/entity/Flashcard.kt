@@ -9,7 +9,7 @@ import java.time.ZonedDateTime
 
 @Entity
 @Table(name = "flashcard")
-class Flashcard(
+open class Flashcard(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
@@ -17,14 +17,8 @@ class Flashcard(
     @Column(nullable = false)
     var frontSide: String,
 
-    @Column(nullable = true)
-    var frontSideAudioId: Long? = null,
-
     @Column(nullable = false)
     var backSide: String,
-
-    @Column(nullable = true)
-    var backSideAudioId: Long? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,11 +43,23 @@ class Flashcard(
     @ManyToOne(optional = false)
     @JoinColumn(name = "flashcard_set_id", referencedColumnName = "id")
     var flashcardSet: FlashcardSet,
+
+    @OneToMany(
+        mappedBy = "flashcard",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+        fetch = FetchType.LAZY,
+    )
+    var audios: MutableList<FlashcardAudio> = mutableListOf(),
 )
 
 const val TERMINAL_STAGE_NAME = "OUTER_SPACE"
 enum class FlashcardStage {
     S1, S2, S3, S4, S5, S6, S7, OUTER_SPACE
+}
+
+enum class FlashcardSide {
+    FRONT, BACK
 }
 
 data class ReviewHistory(
