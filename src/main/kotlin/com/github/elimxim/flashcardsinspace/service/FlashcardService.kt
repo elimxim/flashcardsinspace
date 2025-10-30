@@ -136,14 +136,6 @@ class FlashcardService(
         val flashcard = getEntity(id)
         flashcardSet.flashcards.remove(flashcard)
         flashcardRepository.delete(flashcard)
-        removeAudio(flashcard)
-    }
-
-    private fun removeAudio(flashcard: Flashcard) {
-        listOfNotNull(flashcard.frontSideAudioId, flashcard.backSideAudioId).forEach {
-            log.info("Removing audio $it from flashcard ${flashcard.id}")
-            flashcardAudioRepository.deleteById(it)
-        }
     }
 
     @Transactional
