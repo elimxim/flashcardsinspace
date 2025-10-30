@@ -79,8 +79,10 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
+import { useAudioStore } from '@/stores/audio-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import {
+  flashcardSides,
   fetchFlashcardAudioBlob,
   removeFlashcardAudioBlob,
   updateFlashcardSides,
@@ -98,17 +100,18 @@ const removed = defineModel<boolean>('removed', { default: false })
 const toggleStore = useToggleStore()
 const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
+const audioStore = useAudioStore()
 const toaster = useSpaceToaster()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
 
 const frontSide = ref(flashcard.value?.frontSide ?? '')
 const frontSideTextArea = ref<HTMLElement>()
-const frontSideAudioId = ref(flashcard.value?.frontSideAudioId)
+const frontSideAudioId = ref(audioStore.getAudioId(flashcard.value?.id, flashcardSides.FRONT))
 const flashcardFrontSideAudioBlob = ref<Blob | undefined>()
 const frontSideAudioBlob = ref<Blob | undefined>()
 const backSide = ref(flashcard.value?.backSide ?? '')
-const backSideAudioId = ref(flashcard.value?.backSideAudioId)
+const backSideAudioId = ref(audioStore.getAudioId(flashcard.value?.id, flashcardSides.BACK))
 const flashcardBackSideAudioBlob = ref<Blob | undefined>()
 const backSideAudioBlob = ref<Blob | undefined>()
 
@@ -323,9 +326,9 @@ function toggleModalForm() {
 async function resetState() {
   console.log('Resetting state')
   frontSide.value = flashcard.value?.frontSide ?? ''
-  frontSideAudioId.value = flashcard.value?.frontSideAudioId
+  frontSideAudioId.value = audioStore.getAudioId(flashcard.value?.id, flashcardSides.FRONT)
   backSide.value = flashcard.value?.backSide ?? ''
-  backSideAudioId.value = flashcard.value?.backSideAudioId
+  backSideAudioId.value = audioStore.getAudioId(flashcard.value?.id, flashcardSides.BACK)
   await fetchAudio()
   $v.value.$reset()
   nextTick().then(() => {
@@ -336,9 +339,9 @@ async function resetState() {
 watch(flashcard, async (newVal) => {
   console.log('Watch.flashcard', newVal)
   frontSide.value = newVal?.frontSide ?? ''
-  frontSideAudioId.value = newVal?.frontSideAudioId
+  frontSideAudioId.value = audioStore.getAudioId(newVal?.id, flashcardSides.FRONT)
   backSide.value = newVal?.backSide ?? ''
-  backSideAudioId.value = newVal?.backSideAudioId
+  backSideAudioId.value = audioStore.getAudioId(newVal?.id, flashcardSides.BACK)
   await fetchAudio()
 })
 

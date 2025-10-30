@@ -10,9 +10,7 @@ export interface ReviewInfo {
 export interface Flashcard {
   id: number
   frontSide: string
-  frontSideAudioId?: number | undefined
   backSide: string
-  backSideAudioId?: number | undefined
   stage: string
   timesReviewed: number
   reviewHistory: ReviewHistory
@@ -26,7 +24,14 @@ export interface FlashcardAudio {
   side: string
   mimeType?: string | undefined
   audioSize: number
+  flashcardId: number
   uploadedAt?: Date | undefined // ZonedDateTime
+}
+
+export interface FlashcardAudioMetadata {
+  audioId: number
+  flashcardSide: string
+  flashcardId: number
 }
 
 export interface FlashcardSet {

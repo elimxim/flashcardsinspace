@@ -3,21 +3,15 @@ import { ref, computed } from 'vue'
 
 const MAX_AUDIO_STORAGE_BYTES = 40 * 1024 * 1024 // 40 MB
 
-export interface BlobEntry {
-  audio: BlobPair
+export interface AudioCacheEntry {
+  frontAudio: Blob | undefined
+  backAudio: Blob | undefined
   lastAccessedAt: number
   size: number
 }
 
-export interface BlobPair {
-  frontSide: Blob | undefined
-  frontSideMimeType: string | undefined
-  backSide: Blob | undefined
-  backSideMimeType: string | undefined
-}
-
-export const useFlashcardAudioStore = defineStore('flashcard-audio', () => {
-  const audioMap = ref<Map<number, BlobEntry>>(new Map())
+export const useAudioCache = defineStore('audio-cache', () => {
+  const audioMap = ref<Map<number, AudioCacheEntry>>(new Map())
   const totalSize = ref(0)
   const accessOrder = ref<number[]>([]) // oldest first
 
@@ -53,8 +47,8 @@ export const useFlashcardAudioStore = defineStore('flashcard-audio', () => {
     }
   }
 
-  function calculateEntrySize(pair: BlobPair): number {
-    return (pair.frontSide?.size ?? 0) + (pair.backSide?.size ?? 0)
+  function calculateEntrySize(enty: AudioCacheEntry): number {
+    return (enty.frontAudio?.size ?? 0) + (enty.backAudio?.size ?? 0)
   }
 
   function evictIfNeeded(requiredSize: number) {
@@ -74,53 +68,41 @@ export const useFlashcardAudioStore = defineStore('flashcard-audio', () => {
     }
   }
 
-  function addAudio(id: number, audioBlob: Blob, mimeType: string | undefined, isFrontSide: boolean) {
+  function addAudio(flashcardId: number, audioBlob: Blob, isFrontSide: boolean) {
+    console.log(`Caching audio for flashcard ${flashcardId}, isFrontSide: ${isFrontSide}`)
+
     const now = performance.now()
 
-    const blobEntry: BlobEntry | undefined = audioMap.value.get(id)
-    const oldSize = blobEntry?.size ?? 0
-
-    const blobPair: BlobPair = blobEntry?.audio ?? {
-      frontSide: undefined,
-      frontSideMimeType: undefined,
-      backSide: undefined,
-      backSideMimeType: undefined,
+    const entry: AudioCacheEntry | undefined = audioMap.value.get(flashcardId) ?? {
+      frontAudio: undefined,
+      backAudio: undefined,
+      lastAccessedAt: now,
+      size: 0,
     }
+
+    const oldSize = entry?.size ?? 0
 
     if (isFrontSide) {
-      blobPair.frontSide = audioBlob
-      blobPair.frontSideMimeType = mimeType
+      entry.frontAudio = audioBlob
     } else {
-      blobPair.backSide = audioBlob
-      blobPair.backSideMimeType = mimeType
+      entry.backAudio = audioBlob
     }
 
-    const newSize = calculateEntrySize(blobPair)
+    const newSize = calculateEntrySize(entry)
     const sizeDifference = newSize - oldSize
 
-    if (blobEntry) {
-      totalSize.value -= oldSize
-      const index = accessOrder.value.indexOf(id)
-      if (index > -1) {
-        accessOrder.value.splice(index, 1)
-      }
-    }
-
     evictIfNeeded(sizeDifference)
-
-    audioMap.value.set(id, {
-      audio: blobPair,
-      lastAccessedAt: now,
-      size: newSize,
-    })
-
+    audioMap.value.set(flashcardId, entry)
+    totalSize.value -= oldSize
     totalSize.value += newSize
-
-    updateAccessOrder(id, now)
+    cleanAccessOrder(flashcardId)
+    updateAccessOrder(flashcardId, now)
   }
 
-  function getAudio(id: number, isFrontSide: boolean): Blob | undefined {
-    const entry = audioMap.value.get(id)
+  function getAudio(flashcardId: number, isFrontSide: boolean): Blob | undefined {
+    console.log(`Getting cached audio for flashcard ${flashcardId}, isFrontSide: ${isFrontSide}`)
+
+    const entry = audioMap.value.get(flashcardId)
     if (!entry) return undefined
 
     const now = performance.now()
@@ -128,37 +110,37 @@ export const useFlashcardAudioStore = defineStore('flashcard-audio', () => {
     // Only update if the access time is significantly different (avoid thrashing)
     if (now - entry.lastAccessedAt > 1000) {
       entry.lastAccessedAt = now
-      const index = accessOrder.value.indexOf(id)
+      const index = accessOrder.value.indexOf(flashcardId)
       if (index > -1) {
         accessOrder.value.splice(index, 1)
       }
 
-      updateAccessOrder(id, now)
+      updateAccessOrder(flashcardId, now)
     }
 
-    return isFrontSide ? entry.audio.frontSide : entry.audio.backSide
+    return isFrontSide ? entry.frontAudio : entry.backAudio
   }
 
-  function deleteAudio(id: number, isFrontSide: boolean): boolean {
-    console.log()
-    const entry = audioMap.value.get(id)
+  function deleteAudio(flashcardId: number, isFrontSide: boolean): boolean {
+    console.log(`Deleting cached audio for flashcard ${flashcardId}, isFrontSide: ${isFrontSide}`)
+
+    const entry = audioMap.value.get(flashcardId)
     if (!entry) return false
 
-    const oldSize = calculateEntrySize(entry.audio)
+    const oldSize = calculateEntrySize(entry)
 
     if (isFrontSide) {
-      entry.audio.frontSide = undefined
-      entry.audio.frontSideMimeType = undefined
+      entry.frontAudio = undefined
     } else {
-      entry.audio.backSide = undefined
-      entry.audio.backSideMimeType = undefined
+      entry.backAudio = undefined
     }
 
-    const newSize = calculateEntrySize(entry.audio)
+    const newSize = calculateEntrySize(entry)
+
     if (newSize === 0) {
       totalSize.value -= oldSize
-      audioMap.value.delete(id)
-      cleanAccessOrder(id)
+      audioMap.value.delete(flashcardId)
+      cleanAccessOrder(flashcardId)
     } else {
       totalSize.value -= oldSize
       totalSize.value += newSize

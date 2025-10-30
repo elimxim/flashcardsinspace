@@ -82,11 +82,14 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
+import { useAudioStore } from '@/stores/audio-store.ts'
 import {
-  newFlashcard, uploadFlashcardAudioBlob,
+  newFlashcard,
+  uploadFlashcardAudioBlob,
 } from '@/core-logic/flashcard-logic.ts'
 import { storeToRefs } from 'pinia'
 import {
+  sendFlashcardAudioMetadataGetRequest,
   sendFlashcardCreationRequest,
   sendFlashcardSetInitRequest,
 } from '@/api/api-client.ts'
@@ -96,6 +99,7 @@ const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
 const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
+const audioStore = useAudioStore()
 const toaster = useSpaceToaster()
 
 const { flashcardSet, isStarted } = storeToRefs(flashcardStore)
@@ -207,6 +211,10 @@ async function addNewFlashcard(): Promise<boolean> {
           response.data.currDay,
           0,
         )
+        return sendFlashcardAudioMetadataGetRequest(setId)
+      })
+      .then((response) => {
+        audioStore.loadState(response.data)
         return true
       })
       .catch((error) => {

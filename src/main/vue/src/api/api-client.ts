@@ -8,7 +8,13 @@ import {
   FlashcardSetInitResponse,
   FlashcardSetSuspendResponse,
 } from '@/api/communication.ts'
-import { Flashcard, FlashcardAudio, FlashcardSet, FlashcardSetExtra } from '@/model/flashcard.ts'
+import {
+  Flashcard,
+  FlashcardAudio,
+  FlashcardAudioMetadata,
+  FlashcardSet,
+  FlashcardSetExtra
+} from '@/model/flashcard.ts'
 import { Chronoday } from '@/model/chrono.ts'
 import { configureDateTransformers } from '@/api/axios-config.ts'
 
@@ -110,6 +116,11 @@ export async function sendChronoBulkUpdateRequest(setId: number, status: string,
   return apiClient.put<ChronoUpdateResponse>(`/flashcard-sets/${setId}/chrono/bulk`, request)
 }
 
+export async function sendFlashcardAudioMetadataGetRequest(setId: number) {
+  console.log(`[GET] request => audio metadata for flashcard set ${setId}`)
+  return apiClient.get<FlashcardAudioMetadata[]>(`/flashcard-sets/${setId}/flashcards/audio/metadata`)
+}
+
 export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId: number, side: string, audioBlob: Blob) {
   const ext =
     audioBlob.type.includes('ogg') ? 'ogg'
@@ -134,7 +145,17 @@ export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId
   )
 }
 
-export async function sendFlashcardAudioFetchRequest(setId: number, flashcardId: number, audioId: number) {
+export async function sendFlashcardAudioFetchRequest(setId: number, flashcardId: number, side: string) {
+  console.log(`[GET] request => audio for flashcard ${flashcardId} / ${side} in set ${setId}`)
+  return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/`, {
+    responseType: 'blob',
+    params: {
+      side: side
+    },
+  })
+}
+
+export async function sendFlashcardAudioFetchByIdRequest(setId: number, flashcardId: number, audioId: number) {
   console.log(`[GET] request => audio ${audioId} for flashcard ${flashcardId} in set ${setId}`)
   return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`, {
     responseType: 'blob'

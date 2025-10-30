@@ -9,17 +9,23 @@ import type { Language } from '@/model/language.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import {
-  sendFlashcardAudioFetchRequest, sendFlashcardAudioRemovalRequest,
+  sendFlashcardAudioFetchRequest,
+  sendFlashcardAudioRemovalRequest,
   sendFlashcardAudioUploadRequest
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { useFlashcardAudioStore } from '@/stores/flashcard-audio-store.ts'
-import { useFlashcardStore } from '@/stores/flashcard-store.ts'
+import { useAudioCache } from '@/stores/audio-cache.ts'
+import { useAudioStore } from '@/stores/audio-store.ts'
 
 export const flashcardSetStatuses = {
   ACTIVE: 'ACTIVE',
   DELETED: 'DELETED',
   SUSPENDED: 'SUSPENDED',
+}
+
+export const flashcardSides = {
+  FRONT: 'FRONT',
+  BACK: 'BACK',
 }
 
 export function newFlashcard(frontSide: string, backSide: string): Flashcard {
@@ -90,6 +96,10 @@ export function createFlashcardSet(
   }
 }
 
+export function getFlashcardSide(isFrontSide: boolean) {
+  return isFrontSide ? flashcardSides.FRONT : flashcardSides.BACK
+}
+
 export function mapFlashcardSetExtra(flashcardSetExtras: FlashcardSetExtra[]): Map<number, FlashcardSetExtra> {
   return new Map(flashcardSetExtras.map(v => [v.id, v]))
 }
@@ -101,32 +111,25 @@ export async function fetchFlashcardAudioBlob(
 ): Promise<Blob | undefined> {
   if (!flashcardSet || !flashcard) return undefined
 
-  let flashcardAudioId: number | undefined = undefined
-  if (isFrontSide && flashcard.frontSideAudioId) {
-    flashcardAudioId = flashcard.frontSideAudioId
-  } else if (!isFrontSide && flashcard.backSideAudioId) {
-    flashcardAudioId = flashcard.backSideAudioId
-  }
-
-  if (!flashcardAudioId) return undefined
-
+  const audioStore = useAudioStore()
+  const audioCache = useAudioCache()
   const toaster = useSpaceToaster()
-  const audioStore = useFlashcardAudioStore()
 
-  const cachedAudio = audioStore.getAudio(flashcard.id, isFrontSide)
+  const cachedAudio = audioCache.getAudio(flashcard.id, isFrontSide)
   if (cachedAudio) {
-    console.log(`Returning cached audio ${flashcardAudioId} for flashcard ${flashcard.id}`)
+    console.log(`Returning cached audio for flashcard ${flashcard.id}, isFrontSide: ${isFrontSide}`)
     return cachedAudio
   }
 
-  return await sendFlashcardAudioFetchRequest(flashcardSet.id, flashcard.id, flashcardAudioId)
+  return await sendFlashcardAudioFetchRequest(flashcardSet.id, flashcard.id, getFlashcardSide(isFrontSide))
     .then((response) => {
-      const contentType = response.headers['Content-Type']?.toString()
-      audioStore.addAudio(flashcard.id, response.data, contentType, isFrontSide)
+      const audioId = Number(response.headers['x-audio-id'])
+      audioStore.setAudioId(flashcard.id, getFlashcardSide(isFrontSide), audioId)
+      audioCache.addAudio(flashcard.id, response.data, isFrontSide)
       return response.data
     })
     .catch((error) => {
-      console.error(`Failed to fetch audio ${flashcardAudioId} for flashcard ${flashcard.id}`, error)
+      console.error(`Failed to fetch audio for flashcard ${flashcard.id}, isFrontSide: ${isFrontSide}`, error)
       toaster.bakeError(`Couldn't fetch audio`, error.response?.data)
       return undefined
     })
@@ -138,17 +141,17 @@ export async function uploadFlashcardAudioBlob(
   audioBlob: Blob,
   isFrontSide: boolean,
 ): Promise<boolean> {
-  const flashcardStore = useFlashcardStore()
-  const audioStore = useFlashcardAudioStore()
+  const audioStore = useAudioStore()
+  const audioCache = useAudioCache()
   const toaster = useSpaceToaster()
 
-  const side = isFrontSide ? 'FRONT' : 'BACK'
+  const side = getFlashcardSide(isFrontSide)
 
   return await sendFlashcardAudioUploadRequest(flashcardSet.id, flashcard.id, side, audioBlob)
     .then((response) => {
       console.log(`Audio uploaded ${response.data.id}, size: ${response.data.audioSize}, mime: ${response.data.mimeType}`)
-      flashcardStore.setFlashcardAudioId(flashcard.id, response.data.id, isFrontSide)
-      audioStore.addAudio(response.data.id, audioBlob, response.data.mimeType, isFrontSide)
+      audioStore.setAudioId(flashcard.id, side, response.data.id)
+      audioCache.addAudio(flashcard.id, audioBlob, isFrontSide)
       return true
     })
     .catch((error) => {
@@ -164,14 +167,14 @@ export async function removeFlashcardAudioBlob(
   audioId: number,
   isFrontSide: boolean
 ): Promise<boolean> {
-  const flashcardStore = useFlashcardStore()
-  const audioStore = useFlashcardAudioStore()
+  const audioStore = useAudioStore()
+  const audioCache = useAudioCache()
   const toaster = useSpaceToaster()
 
   return await sendFlashcardAudioRemovalRequest(flashcardSet.id, flashcard.id, audioId)
     .then(() => {
-      flashcardStore.removeFlashcardAudioId(flashcard.id, audioId, isFrontSide)
-      audioStore.deleteAudio(flashcard.id, isFrontSide)
+      audioStore.removeAudioId(flashcard.id, getFlashcardSide(isFrontSide))
+      audioCache.deleteAudio(flashcard.id, isFrontSide)
       return true
     })
     .catch((error) => {

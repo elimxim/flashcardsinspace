@@ -64,9 +64,9 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
 import {
-  loadFlashcardAndChronoStores,
+  loadFlashcardRelatedStores,
   loadFlashcardSetStore,
-  reloadFlashcardAndChronoStores,
+  reloadFlashcardRelatedStores,
 } from '@/shared/stores.ts'
 import { saveSelectedSetId } from '@/shared/cookies.ts'
 import { FlashcardSet } from '@/model/flashcard.ts'
@@ -99,7 +99,7 @@ function toggle() {
 async function selectFlashcardSet(setId: number) {
   const set = flashcardSetStore.findSet(setId)
   if (set) {
-    await loadFlashcardAndChronoStores(set)
+    await loadFlashcardRelatedStores(set)
       .then((loaded) => {
         if (loaded) {
           saveSelectedSetId(set.id)
@@ -125,7 +125,7 @@ onMounted(() => {
   loadFlashcardSetStore()
     .then(async (loaded) => {
       if (loaded) {
-        return reloadFlashcardAndChronoStores()
+        return reloadFlashcardRelatedStores()
       }
     })
 })

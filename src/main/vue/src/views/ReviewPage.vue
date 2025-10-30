@@ -153,7 +153,7 @@ import { loadSelectedSetId } from '@/shared/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import {
-  loadFlashcardAndChronoStoresById
+  loadFlashcardRelatedStoresById
 } from '@/shared/stores.ts'
 import {
   sendChronoBulkUpdateRequest,
@@ -262,7 +262,7 @@ async function finishReview() {
 async function finishReviewAndLeave() {
   await finishReview()
     .then(() =>
-      router.push({ name: routeNames.flashcards })
+      router.push({ name: routeNames.controlPanel })
     )
 }
 
@@ -396,7 +396,7 @@ onMounted(async () => {
     console.log('Flashcard set not loaded, loading...')
     const selectedSetId = loadSelectedSetId()
     if (selectedSetId) {
-      await loadFlashcardAndChronoStoresById(selectedSetId)
+      await loadFlashcardRelatedStoresById(selectedSetId)
     } else {
       console.log('Flashcard set not found in cookies')
     }

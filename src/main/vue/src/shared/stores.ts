@@ -1,13 +1,16 @@
+import { FlashcardSet } from '@/model/flashcard.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { FlashcardSet } from '@/model/flashcard.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
+import { useAudioStore } from '@/stores/audio-store.ts'
 import {
-  sendChronoSyncRequest, sendFlashcardSetExtraRequest,
+  sendChronoSyncRequest,
+  sendFlashcardAudioMetadataGetRequest,
+  sendFlashcardSetExtraRequest,
   sendFlashcardSetGetRequest,
   sendFlashcardSetsGetRequest,
-  sendFlashcardsGetRequest
+  sendFlashcardsGetRequest,
 } from '@/api/api-client.ts'
 import { loadSelectedSetId } from '@/shared/cookies.ts'
 import { sortFlashcardSets } from '@/core-logic/flashcard-logic.ts'
@@ -28,28 +31,29 @@ export function determineCurrFlashcardSet(): FlashcardSet | undefined {
   }
 }
 
-export async function reloadFlashcardAndChronoStores(forced: boolean = false): Promise<boolean> {
-  console.log('Reloading flashcard and chrono stores')
+export async function reloadFlashcardRelatedStores(forced: boolean = false): Promise<boolean> {
+  console.log('Reloading flashcard related stores')
   const flashcardStore = useFlashcardStore()
 
   const currFlashcardSet = determineCurrFlashcardSet()
   if (currFlashcardSet) {
-    return await loadFlashcardAndChronoStores(currFlashcardSet, forced)
+    return await loadFlashcardRelatedStores(currFlashcardSet, forced)
   } else {
     flashcardStore.resetState()
     return true
   }
 }
 
-export async function loadFlashcardAndChronoStores(flashcardSet: FlashcardSet, forced: boolean = false): Promise<boolean> {
-  console.log(`Loading flashcard and chrono stores for ${flashcardSet.id}, forced: ${forced}`)
+export async function loadFlashcardRelatedStores(flashcardSet: FlashcardSet, forced: boolean = false): Promise<boolean> {
+  console.log(`Loading flashcard related stores for ${flashcardSet.id}, forced: ${forced}`)
   const toaster = useSpaceToaster()
   const flashcardStore = useFlashcardStore()
   const chronoStore = useChronoStore()
+  const audioStore = useAudioStore()
 
   const currSetId = flashcardStore.flashcardSet?.id
   if (flashcardStore.loaded && flashcardSet.id === currSetId && !forced) {
-    console.log(`Flashcard set ${flashcardSet.id} already loaded, skipping`)
+    console.log(`Flashcard store for flashcard set id ${flashcardSet.id} is already loaded`)
     return true
   }
 
@@ -64,26 +68,30 @@ export async function loadFlashcardAndChronoStores(flashcardSet: FlashcardSet, f
         response.data.currDay,
         response.data.dayStreak,
       )
+      return sendFlashcardAudioMetadataGetRequest(flashcardSet.id)
+    })
+    .then((response) => {
+      audioStore.loadState(response.data)
       return true
     })
     .catch((error) => {
       console.error(`Failed to load flashcard set ${flashcardSet.id}`, error)
-      toaster.bakeError(`Flashcard set error`, error.response?.data)
+      toaster.bakeError(`Data fetching error`, error.response?.data)
       return false
     })
 }
 
-export async function loadFlashcardAndChronoStoresById(setId: number, forced: boolean = false): Promise<boolean> {
-  console.log(`Loading flashcard and chrono stores for ${setId}, forced: ${forced}`)
+export async function loadFlashcardRelatedStoresById(setId: number, forced: boolean = false): Promise<boolean> {
+  console.log(`Loading flashcard related stores for ${setId}, forced: ${forced}`)
   const toaster = useSpaceToaster()
 
   return await sendFlashcardSetGetRequest(setId)
     .then((response) => {
-      return loadFlashcardAndChronoStores(response.data, forced)
+      return loadFlashcardRelatedStores(response.data, forced)
     })
     .catch((error) => {
       console.error(`Failed to get flashcard set ${setId}`, error)
-      toaster.bakeError(`Flashcard set error`, error.response?.data)
+      toaster.bakeError(`Data fetching error`, error.response?.data)
       return false
     })
 }
@@ -94,7 +102,7 @@ export async function loadFlashcardSetStore(forced: boolean = false): Promise<bo
   const toaster = useSpaceToaster()
 
   if (flashcardSetStore.loaded && !forced) {
-    console.log('Flashcard set store already loaded, skipping')
+    console.log('Flashcard set store is already loaded')
     return true
   }
 
@@ -108,7 +116,7 @@ export async function loadFlashcardSetStore(forced: boolean = false): Promise<bo
     })
     .catch((error) => {
       console.error(`Failed to load flashcard sets`, error)
-      toaster.bakeError(`Flashcard sets error`, error.response?.data)
+      toaster.bakeError(`Data fetching error`, error.response?.data)
       return false
     })
 }

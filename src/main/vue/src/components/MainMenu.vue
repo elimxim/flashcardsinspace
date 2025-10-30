@@ -92,7 +92,7 @@ import { allStages, type Stage, specialStageSet } from '@/core-logic/stage-logic
 import { countFlashcards } from '@/core-logic/review-logic.ts'
 import router, { routeNames } from '@/router'
 import { saveSelectedSetId } from '@/shared/cookies.ts'
-import { loadFlashcardAndChronoStores } from '@/shared/stores.ts'
+import { loadFlashcardRelatedStores } from '@/shared/stores.ts'
 
 const toggleStore = useToggleStore()
 const flashcardSetStore = useFlashcardSetStore()
@@ -144,7 +144,7 @@ const selectedFlashcardSetId = computed({
       saveSelectedSetId(setId)
       const set = flashcardSetStore.findSet(setId)
       if (set) {
-        await loadFlashcardAndChronoStores(set)
+        await loadFlashcardRelatedStores(set)
       }
     }
   }
