@@ -8,7 +8,7 @@ import kotlin.math.roundToInt
 
 @Entity
 @Table(name = "flashcard_audio")
-class FlashcardAudio(
+open class FlashcardAudio(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
@@ -27,14 +27,24 @@ class FlashcardAudio(
     @Column(nullable = false)
     var audioSize: Long,
 
+    @ManyToOne(
+        optional = false,
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.ALL]
+    )
+    @JoinColumn(name = "flashcard_id", referencedColumnName = "id")
+    var flashcard: Flashcard,
+
     @Column(nullable = false)
     var uploadedAt: ZonedDateTime,
 )
 
-enum class FlashcardSide {
-    FRONT, BACK
-}
-
 fun FlashcardAudio.sizeKB(): Int {
     return (audioSize / 1024.0).roundToInt()
 }
+
+data class FlashcardAudioMetadata(
+    val audioId: Long,
+    val flashcardSide: FlashcardSide,
+    val flashcardId: Long,
+)

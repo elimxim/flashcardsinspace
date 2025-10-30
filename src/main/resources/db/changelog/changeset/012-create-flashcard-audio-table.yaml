@@ -32,7 +32,21 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: flashcard_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_flashcard_audio_2_flashcard_id
+                    references: flashcard(id)
+                    validateForeignKey: true
+              - column:
                   name: uploaded_at
                   type: TIMESTAMP WITH TIME ZONE
                   constraints:
                     nullable: false
+        - createIndex:
+            tableName: flashcard_audio
+            indexName: idx_flashcard_audio_flashcard_id
+            columns:
+              - column:
+                  name: flashcard_id
