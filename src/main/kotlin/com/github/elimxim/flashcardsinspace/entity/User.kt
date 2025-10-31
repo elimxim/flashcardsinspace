@@ -11,42 +11,42 @@ import java.time.ZonedDateTime
 open class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    open val id: Long = 0,
 
     @Column(nullable = false, unique = true)
-    var email: String,
+    open var email: String,
 
     @Column(nullable = false)
-    var name: String,
+    open var name: String,
 
     @Column(nullable = false)
-    var secret: String,
+    open var secret: String,
 
     @Column(nullable = false)
-    var roles: String,
+    open var roles: String,
 
     @Column(nullable = false)
-    var registeredAt: ZonedDateTime,
+    open var registeredAt: ZonedDateTime,
 
     @Column(nullable = true)
-    var lastLoginAt: ZonedDateTime? = null,
+    open var lastLoginAt: ZonedDateTime? = null,
 
     @Column(nullable = true)
-    var lastUpdatedAt: ZonedDateTime? = null,
+    open var lastUpdatedAt: ZonedDateTime? = null,
 
     @Column(nullable = false)
-    var timezone: String = "UTC",
+    open var timezone: String = "UTC",
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "language_id", referencedColumnName = "id")
-    var language: Language,
+    open var language: Language,
 
     @OneToMany(
         mappedBy = "user",
         cascade = [CascadeType.ALL],
         fetch = FetchType.LAZY,
     )
-    var flashcardSets: MutableList<FlashcardSet> = mutableListOf(),
+    open var flashcardSets: MutableList<FlashcardSet> = mutableListOf(),
 ) : UserDetails {
     override fun getAuthorities(): Collection<GrantedAuthority> =
         roles.split(",").map { SimpleGrantedAuthority(it.trim()) }

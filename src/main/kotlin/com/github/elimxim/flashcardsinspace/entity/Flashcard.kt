@@ -12,37 +12,37 @@ import java.time.ZonedDateTime
 open class Flashcard(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    open val id: Long = 0,
 
     @Column(nullable = false)
-    var frontSide: String,
+    open var frontSide: String,
 
     @Column(nullable = false)
-    var backSide: String,
+    open var backSide: String,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var stage: FlashcardStage,
+    open var stage: FlashcardStage,
 
     @Column(nullable = false)
-    var timesReviewed: Int,
+    open var timesReviewed: Int,
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = true)
-    var reviewHistory: ReviewHistory = ReviewHistory(),
+    open var reviewHistory: ReviewHistory = ReviewHistory(),
 
     @Column(nullable = false)
-    var creationDate: LocalDate,
+    open var creationDate: LocalDate,
 
     @Column(nullable = true)
-    var lastReviewDate: LocalDate? = null,
+    open var lastReviewDate: LocalDate? = null,
 
     @Column(nullable = true)
-    var lastUpdatedAt: ZonedDateTime? = null,
+    open var lastUpdatedAt: ZonedDateTime? = null,
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "flashcard_set_id", referencedColumnName = "id")
-    var flashcardSet: FlashcardSet,
+    open var flashcardSet: FlashcardSet,
 
     @OneToMany(
         mappedBy = "flashcard",
@@ -50,7 +50,7 @@ open class Flashcard(
         orphanRemoval = true,
         fetch = FetchType.LAZY,
     )
-    var audios: MutableList<FlashcardAudio> = mutableListOf(),
+    open var audios: MutableList<FlashcardAudio> = mutableListOf(),
 )
 
 const val TERMINAL_STAGE_NAME = "OUTER_SPACE"

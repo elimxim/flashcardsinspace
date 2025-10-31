@@ -9,31 +9,31 @@ import java.time.ZonedDateTime
 open class FlashcardSet(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    open val id: Long = 0,
 
     @Column(nullable = false)
-    var name: String,
+    open var name: String,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var status: FlashcardSetStatus = FlashcardSetStatus.ACTIVE,
+    open var status: FlashcardSetStatus = FlashcardSetStatus.ACTIVE,
 
     @Column(nullable = false)
-    var createdAt: ZonedDateTime,
+    open var createdAt: ZonedDateTime,
 
     @Column(nullable = false)
-    var startedAt: ZonedDateTime? = null,
+    open var startedAt: ZonedDateTime? = null,
 
     @Column(nullable = true)
-    var lastUpdatedAt: ZonedDateTime? = null,
+    open var lastUpdatedAt: ZonedDateTime? = null,
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "language_id", referencedColumnName = "id")
-    var language: Language,
+    open var language: Language,
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    var user: User,
+    open var user: User,
 
     @OneToMany(
         mappedBy = "flashcardSet",
@@ -41,7 +41,7 @@ open class FlashcardSet(
         orphanRemoval = true,
         fetch = FetchType.LAZY,
     )
-    var flashcards: MutableList<Flashcard> = arrayListOf(),
+    open var flashcards: MutableList<Flashcard> = mutableListOf(),
 
     @OneToMany(
         mappedBy = "flashcardSet",
@@ -49,7 +49,7 @@ open class FlashcardSet(
         orphanRemoval = true,
         fetch = FetchType.LAZY,
     )
-    var chronodays: MutableList<Chronoday> = arrayListOf(),
+    open var chronodays: MutableList<Chronoday> = mutableListOf(),
 
     @OneToOne(
         mappedBy = "flashcardSet",
@@ -57,7 +57,7 @@ open class FlashcardSet(
         orphanRemoval = true,
         fetch = FetchType.LAZY,
     )
-    var dayStreak: DayStreak? = null,
+    open var dayStreak: DayStreak? = null,
 )
 
 enum class FlashcardSetStatus {

@@ -7,16 +7,16 @@ import jakarta.persistence.*
 open class DayStreak(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    open val id: Long = 0,
 
     @Column(nullable = false)
-    var streak: Int,
+    open var streak: Int,
 
     @OneToOne
     @JoinColumn(name = "chronoday_id", referencedColumnName = "id")
-    var lastDay: Chronoday,
+    open var lastDay: Chronoday,
 
     @OneToOne
     @JoinColumn(name = "flashcard_set_id", referencedColumnName = "id")
-    var flashcardSet: FlashcardSet,
+    open var flashcardSet: FlashcardSet,
 )

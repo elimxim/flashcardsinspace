@@ -11,21 +11,24 @@ import kotlin.math.roundToInt
 open class FlashcardAudio(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    open val id: Long = 0,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var side: FlashcardSide,
+    open var side: FlashcardSide,
 
     @Column(nullable = true)
-    var mimeType: String? = null,
+    open var mimeType: String? = null,
 
     @JdbcTypeCode(SqlTypes.VARBINARY)
     @Column(nullable = false)
-    var audioData: ByteArray,
+    open var audioData: ByteArray,
 
     @Column(nullable = false)
-    var audioSize: Long,
+    open var audioSize: Long,
+
+    @Column(nullable = false)
+    open var uploadedAt: ZonedDateTime,
 
     @ManyToOne(
         optional = false,
@@ -33,10 +36,7 @@ open class FlashcardAudio(
         cascade = [CascadeType.ALL]
     )
     @JoinColumn(name = "flashcard_id", referencedColumnName = "id")
-    var flashcard: Flashcard,
-
-    @Column(nullable = false)
-    var uploadedAt: ZonedDateTime,
+    open var flashcard: Flashcard,
 )
 
 fun FlashcardAudio.sizeKB(): Int {

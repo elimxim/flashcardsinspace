@@ -9,19 +9,19 @@ import java.time.LocalDate
 open class Chronoday(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    open val id: Long = 0,
 
     @field:JsonFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false)
-    var chronodate: LocalDate,
+    open var chronodate: LocalDate,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var status: ChronodayStatus,
+    open var status: ChronodayStatus,
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "flashcard_set_id", referencedColumnName = "id")
-    var flashcardSet: FlashcardSet,
+    open var flashcardSet: FlashcardSet,
 )
 
 enum class ChronodayStatus {
