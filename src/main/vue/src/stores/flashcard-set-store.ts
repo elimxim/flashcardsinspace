@@ -50,7 +50,7 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     removeSet(flashcardSet: FlashcardSet) {
       console.log(`Removing flashcard set ${flashcardSet.id}`)
       this.checkStateLoaded()
-      const idx = this.flashcardSets.indexOf(flashcardSet, 0)
+      const idx = this.flashcardSets.findIndex((v: FlashcardSet) => v.id == flashcardSet.id)
       if (idx !== -1) {
         this.flashcardSets.splice(idx, 1)
       } else {
