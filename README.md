@@ -2,19 +2,42 @@
 
 ## TODOS
 
-Urgent:
-- removing flashcard set is not possible
-
+- ROLE-based access control
 - README
   - Describe the project
 - UX:
-  - Use user timezone instead of UTC
   - Home page
   - Lightspeed page
+  - Support page
+    - Emotional support
+    - Website support
+    - ... support
+  - Auth
+    - Password reset functionality (sending emails)
+    - Link from Login page to Password reset page
+    - JWT refresh
+    - Remember if signed up using cookie (on/off refreshing JWT)
+    - Welcoming emails after signing up
+  - Indexable for robots (searchable improvements)
   - Footer
   - Bugreport form
   - Review Session
-  - Streak of days
+  - User page functionality:
+    - show
+      - username
+      - email
+      - registration date
+      - devices
+    - change
+      - password
+      - email
+      - username
+  - Showing information by navigation to an element
+  - Mobile friendly
+      - Modals => pages
+      - Don't know/Know the flashcard by swiping to the left of to the right
+      - Flipping the flashcard on touch
+  - Low internet connection friendly
   - Autopilot view mode for Attempted, Unknown and Outer space flashcards
   - Statistics page
     - How much time you've spent review in total, daily, weekly, monthly, yearly
@@ -34,47 +57,15 @@ Urgent:
     - Dynamic font size depending on the amount of the text
     - Pronunciation of the word
     - Zooming in and out the text
-  - ReviewPage
-    - Showing the total / review number of flashcards
-    - Showing know / don't know number of flashcards
-    - Showing FlashcardSet's name
-  - Auth
-    - Password reset functionality (sending emails)
-    - Link from Login page to Password reset page
-    - JWT refresh
-    - Remember if signed up using cookie (on/off refreshing JWT)
-    - Welcoming emails after signing up
-  - Responsive UI
-  - Indexable for robots (searchable improvements)
   - Themes
     - Dark mode
     - Space mode
-  - User page functionality: 
-    - show
-      - username
-      - email
-      - registration date
-      - devices
-    - change
-      - password
-      - email
-      - username
-  - Showing information by navigation to an element
   - First time user experience
-  - Mobile friendly
-    - Modals => pages
-    - Don't know/Know the flashcard by swiping to the left of to the right
-    - Flipping the flashcard on touch
-  - Low internet connection friendly
-- Logging
-  - Include User.id in the logging context
 - DevOps:
   - Notifications if the app is down
   - Notifications on errors in logs
   - CI + test coverage
-  - Add "npm run lint" and "npm run type-check" to gradle build script
 - Security:
   - auth journal (for login and signup attempts)
   - auth journal analysis
-  - ROLE-based access control
   - Rate limiter
