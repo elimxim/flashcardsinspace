@@ -4,6 +4,7 @@ import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.flashcardsNumber
+import com.github.elimxim.flashcardsinspace.entity.repository.DayStreakRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.*
@@ -22,6 +23,7 @@ class FlashcardSetService(
     private val flashcardSetRepository: FlashcardSetRepository,
     private val languageService: LanguageService,
     private val requestValidator: RequestValidator,
+    private val dayStreakRepository: DayStreakRepository,
 ) {
     @Transactional
     fun getAll(user: User): List<FlashcardSetDto> {
@@ -127,6 +129,8 @@ class FlashcardSetService(
             flashcardSet.status = FlashcardSetStatus.DELETED
             flashcardSetRepository.save(flashcardSet)
         } else {
+            flashcardSet.dayStreak = null
+            dayStreakRepository.deleteByFlashcardSetId(id)
             flashcardSetRepository.delete(flashcardSet)
         }
     }
