@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.elimxim.flashcardsinspace.Messages
 import com.github.elimxim.flashcardsinspace.security.escapeHtml
+import com.github.elimxim.flashcardsinspace.util.printApplicationStackTrace
+import com.github.elimxim.flashcardsinspace.util.withLoggingContext
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -18,45 +20,52 @@ private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 @ControllerAdvice
 class GlobalExceptionHandler(private val messages: Messages) {
     @ExceptionHandler(NoResourceFoundException::class)
-    fun handleNoResourceFoundException(e: NoResourceFoundException, request: WebRequest): ResponseEntity<Any> {
-        log.warn("Resource not found for request {}: {}", request.getDescription(false), e.message)
-        return ResponseEntity.notFound().build()
-    }
+    fun handleNoResourceFoundException(e: NoResourceFoundException, request: WebRequest): ResponseEntity<Any> =
+        withLoggingContext {
+            log.warn("Resource not found for request {}: {}", request.getDescription(false), e.message)
+            ResponseEntity.notFound().build()
+        }
 
     @ExceptionHandler(Exception::class)
-    fun handleUnexpectedException(e: Exception, request: WebRequest): ResponseEntity<ErrorResponseBody> {
-        log.error("UNEXPECTED exception occurred", e)
-        val body = errorBody(
-            status = HttpStatus.INTERNAL_SERVER_ERROR,
-            exception = UnexpectedException("Unexpected error occurred", e)
-        )
+    fun handleUnexpectedException(e: Exception, request: WebRequest): ResponseEntity<ErrorResponseBody> =
+        withLoggingContext {
+            log.error("UNEXPECTED exception occurred: ${e.message}", e)
+            e.printApplicationStackTrace()
+            val body = errorBody(
+                status = HttpStatus.INTERNAL_SERVER_ERROR,
+                exception = UnexpectedException("Unexpected error occurred", e)
+            )
 
-        return ResponseEntity(body, body.httpStatus)
-    }
+            ResponseEntity(body, body.httpStatus)
+        }
 
     @ExceptionHandler(Http5xxException::class)
-    fun handle5xxException(e: Http5xxException, request: WebRequest): ResponseEntity<ErrorResponseBody> {
-        val httpStatus = getHttpStatus(e)
-        log.error("${httpStatus.name} exception occurred", e)
-        val body = errorBody(
-            status = httpStatus,
-            exception = e,
-        )
+    fun handle5xxException(e: Http5xxException, request: WebRequest): ResponseEntity<ErrorResponseBody> =
+        withLoggingContext {
+            val httpStatus = getHttpStatus(e)
+            log.error("${httpStatus.name} exception occurred: ${e.message}", e)
+            e.printApplicationStackTrace()
+            val body = errorBody(
+                status = httpStatus,
+                exception = e,
+            )
 
-        return ResponseEntity(body, httpStatus)
-    }
+            ResponseEntity(body, httpStatus)
+        }
 
     @ExceptionHandler(Http4xxException::class)
-    fun handle4xxException(e: Http4xxException, request: WebRequest): ResponseEntity<ErrorResponseBody> {
-        val httpStatus = getHttpStatus(e)
-        log.info("${httpStatus.name} exception occurred: ${e.message}", e.cause)
-        val body = errorBody(
-            status = httpStatus,
-            exception = e,
-        )
+    fun handle4xxException(e: Http4xxException, request: WebRequest): ResponseEntity<ErrorResponseBody> =
+        withLoggingContext {
+            val httpStatus = getHttpStatus(e)
+            log.info("${httpStatus.name} exception occurred: ${e.message}", e.cause)
+            e.printApplicationStackTrace()
+            val body = errorBody(
+                status = httpStatus,
+                exception = e,
+            )
 
-        return ResponseEntity(body, httpStatus)
-    }
+            ResponseEntity(body, httpStatus)
+        }
 
     private fun errorBody(
         status: HttpStatus,
