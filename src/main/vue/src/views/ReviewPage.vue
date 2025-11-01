@@ -45,6 +45,8 @@
         ref="spaceDeck"
         v-model:flashcard="currFlashcard"
         :on-flashcard-removed="onFlashcardRemoved"
+        :flashcard-front-side-audio="flashcardFrontSideAudioBlob"
+        :flashcard-back-side-audio="flashcardBackSideAudioBlob"
       />
       <div class="review-nav">
         <SmartButton
@@ -134,9 +136,13 @@ import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
+import {
+  copyFlashcard,
+  fetchFlashcardAudioBlob, flashcardSides,
+  updateFlashcard
+} from '@/core-logic/flashcard-logic.ts'
 import { nextStage, prevStage, Stage, stages } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
@@ -167,6 +173,7 @@ import {
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
+import { useAudioStore } from '@/stores/audio-store.ts'
 
 const props = defineProps<{
   stage?: Stage,
@@ -177,15 +184,10 @@ const toaster = useSpaceToaster()
 const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
 const flashcardStore = useFlashcardStore()
+const audioStore = useAudioStore()
 
-const {
-  flashcardSet,
-  flashcards,
-} = storeToRefs(flashcardStore)
-const {
-  chronodays,
-  currDay
-} = storeToRefs(chronoStore)
+const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
+const { chronodays, currDay } = storeToRefs(chronoStore)
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 const escapeButton = ref<InstanceType<typeof AwesomeButton>>()
@@ -205,6 +207,8 @@ const flashcardsRemaining = computed(() => {
   return reviewQueue.value.remaining() + 1
 })
 const currFlashcard = ref<Flashcard>()
+const flashcardFrontSideAudioBlob = ref<Blob | undefined>()
+const flashcardBackSideAudioBlob = ref<Blob | undefined>()
 const flashcardsSeen = computed(() =>
   Math.max(0, flashcardsTotal.value - flashcardsRemaining.value)
 )
@@ -224,13 +228,15 @@ const noPrevAvailable = computed(() => {
 })
 const noNextAvailable = computed(() => currFlashcard.value === undefined)
 
-function prevFlashcard(): boolean {
+async function prevFlashcard(): Promise<boolean> {
   currFlashcard.value = reviewQueue.value.prev()
+  await fetchAudio()
   return currFlashcard.value !== undefined
 }
 
-function nextFlashcard(): boolean {
+async function nextFlashcard(): Promise<boolean> {
   currFlashcard.value = reviewQueue.value.next()
+  await fetchAudio()
   return currFlashcard.value !== undefined
 }
 
@@ -250,6 +256,8 @@ async function finishReview() {
   console.log(`Finishing review on stage: ${props.stage?.displayName ?? 'default'}`)
   reviewQueue.value = new EmptyReviewQueue()
   flashcardsTotal.value = 0
+  flashcardFrontSideAudioBlob.value = undefined
+  flashcardBackSideAudioBlob.value = undefined
   if (flashcardSet.value) {
     if (noNextAvailable.value && isLightspeedMode.value) {
       await markDaysAsCompleted(flashcardSet.value)
@@ -302,12 +310,12 @@ async function stageUp() {
 
 async function prev() {
   spaceDeck.value?.willSlideToLeft()
-  prevFlashcard()
+  await prevFlashcard()
 }
 
 async function next() {
   spaceDeck.value?.willSlideToRight()
-  nextFlashcard()
+  await nextFlashcard()
 }
 
 async function moveBack() {
@@ -317,7 +325,7 @@ async function moveBack() {
     updateFlashcard(flashcard, stages.S1)
     const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
     if (success) {
-      nextFlashcard()
+      await nextFlashcard()
     }
   } else {
     console.error(`moveBack's impossible:`,
@@ -342,7 +350,7 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
 }
 
 async function markDaysAndGoNext(flashcardSet: FlashcardSet) {
-  if (nextFlashcard() && isLightspeedMode.value) {
+  if (await nextFlashcard() && isLightspeedMode.value) {
     await markDaysAsInProgress(flashcardSet)
   } else if (isLightspeedMode.value) {
     await markDaysAsCompleted(flashcardSet)
@@ -387,9 +395,49 @@ async function markDaysAs(
     })
 }
 
+async function fetchAudio() {
+  const set = flashcardSet.value
+  const card = currFlashcard.value
+
+  if (!set || !card) {
+    flashcardFrontSideAudioBlob.value = undefined
+    flashcardBackSideAudioBlob.value = undefined
+    return
+  }
+
+  await Promise.all([
+    (async function () {
+      const frontSideAudioId = audioStore.getAudioId(card.id, flashcardSides.FRONT)
+      if (frontSideAudioId) {
+        return await fetchFlashcardAudioBlob(set, card, true)
+          .then((blob) => {
+            flashcardFrontSideAudioBlob.value = blob
+          })
+      } else {
+        flashcardFrontSideAudioBlob.value = undefined
+      }
+    })(),
+    (async function () {
+      const backSideAudioId = audioStore.getAudioId(card.id, flashcardSides.BACK)
+      if (backSideAudioId) {
+        return await fetchFlashcardAudioBlob(set, card, false)
+          .then((blob) => {
+            flashcardBackSideAudioBlob.value = blob
+          })
+      } else {
+        flashcardBackSideAudioBlob.value = undefined
+      }
+    })(),
+  ])
+}
+
 function onFlashcardRemoved() {
   nextFlashcard()
 }
+
+watch(currFlashcard, () => {
+  fetchAudio()
+})
 
 onMounted(async () => {
   if (!flashcardStore.loaded) {
