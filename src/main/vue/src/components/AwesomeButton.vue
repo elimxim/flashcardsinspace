@@ -96,7 +96,8 @@ function press() {
 }
 
 function handleClick() {
-  if (props.clickRipple && !props.disabled) {
+  if (props.disabled) return
+  if (props.clickRipple) {
     triggerRipple()
   } else {
     press()
