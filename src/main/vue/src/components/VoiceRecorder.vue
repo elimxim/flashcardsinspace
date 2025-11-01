@@ -45,7 +45,10 @@
         </div>
       </template>
     </transition>
-    <VoicePlayer :audio-blob="audioBlob"/>
+    <VoicePlayer
+      class="voice-recorder-play-button"
+      :audio-blob="audioBlob"
+    />
   </div>
 </template>
 
