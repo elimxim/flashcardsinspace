@@ -11,6 +11,8 @@
           :back-side="flashcard?.backSide"
           :viewed-times="viewedTimes"
           :on-edit="toggleStore.toggleFlashcardEdit"
+          :front-side-audio="flashcardFrontSideAudio"
+          :back-side-audio="flashcardBackSideAudio"
         />
         <SpaceCard
           v-else
@@ -38,9 +40,12 @@ import { type Flashcard } from '@/model/flashcard.ts'
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 
 const props = withDefaults(defineProps<{
+  flashcardFrontSideAudio?: Blob | undefined
+  flashcardBackSideAudio?: Blob | undefined
   onFlashcardRemoved?: () => void
 }>(), {
-  flashcard: null,
+  flashcardFrontSideAudio: undefined,
+  flashcardBackSideAudio: undefined,
   onFlashcardRemoved: () => {
   },
 })
