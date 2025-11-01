@@ -172,6 +172,9 @@ async function fetchAudio() {
             flashcardFrontSideAudioBlob.value = blob
             frontSideAudioBlob.value = blob
           })
+      } else {
+        flashcardFrontSideAudioBlob.value = undefined
+        frontSideAudioBlob.value = undefined
       }
     })(),
     (async function () {
@@ -181,6 +184,9 @@ async function fetchAudio() {
             flashcardBackSideAudioBlob.value = blob
             backSideAudioBlob.value = blob
           })
+      } else {
+        flashcardFrontSideAudioBlob.value = undefined
+        backSideAudioBlob.value = undefined
       }
     })(),
   ])

@@ -232,7 +232,9 @@ function toggleModalForm() {
 async function resetState() {
   createdFlashcard.value = undefined
   frontSide.value = ''
+  frontSideAudioBlob.value = undefined
   backSide.value = ''
+  backSideAudioBlob.value = undefined
   $v.value.$reset()
   nextTick().then(() => {
     frontSideTextArea.value?.focus()
