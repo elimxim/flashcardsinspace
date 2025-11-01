@@ -31,6 +31,9 @@
             <font-awesome-icon icon="fa-regular fa-eye"/>
             {{ viewedTimes }}
           </span>
+          <VoicePlayer
+            class="space-deck-voice-player"
+            :audio-blob="frontSideAudio"/>
         </div>
       </div>
       <div
@@ -59,6 +62,9 @@
             <font-awesome-icon icon="fa-regular fa-eye"/>
             {{ viewedTimes }}
           </span>
+          <VoicePlayer
+            class="space-deck-voice-player"
+            :audio-blob="backSideAudio"/>
         </div>
       </div>
     </div>
@@ -67,12 +73,15 @@
 
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
+import VoicePlayer from '@/components/VoicePlayer.vue'
 import { ref } from 'vue'
 
 const props = withDefaults(defineProps<{
   stage?: string
   frontSide?: string
+  frontSideAudio?: Blob | undefined
   backSide?: string
+  backSideAudio?: Blob | undefined
   viewedTimes?: number
   textOnly?: boolean
   unflippable?: boolean
@@ -212,10 +221,11 @@ defineExpose({
 }
 
 .space-card-strip {
-  height: fit-content;
+  height: 28px;
   font-size: clamp(1.1rem, 2vw, 1.2rem);
   color: var(--card--color--strip);
   display: flex;
+  align-items: center;
   justify-content: space-between;
   padding-left: 4px;
   padding-right: 4px;
@@ -242,12 +252,21 @@ defineExpose({
   background: none;
   font-size: inherit;
   color: inherit;
+
 }
 
 .space-card-edit-button {
-  --awesome-button--icon--size: inherit;
+  --awesome-button--icon--size: clamp(1.2rem, 2vw, 1.3rem);
   --awesome-button--icon--color: var(--card--color--strip);
   --awesome-button--icon--color--hover: var(--card--color--strip--hover);
+}
+
+.space-deck-voice-player {
+  --awesome-button--icon--size: clamp(1.2rem, 2vw, 1.3rem);
+  --awesome-button--icon--color: var(--card--color--strip);
+  --awesome-button--icon--color--hover: var(--card--color--strip--hover);
+  --awesome-button--icon--color--active: var(--card--color--strip--hover);
+  --awesome-button--border-radius: 999px;
 }
 
 </style>
