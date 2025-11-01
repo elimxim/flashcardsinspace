@@ -3,7 +3,6 @@
     <AwesomeButton
       icon="fa-solid fa-volume-high"
       class="voice-player-button"
-      style="height: 100%;"
       :disabled="!audioUrl"
       :active="isPlaying"
       :fade="isPlaying"
@@ -58,6 +57,7 @@ function stop() {
 
 function updateAudioUrl(blob: Blob | undefined) {
   if (blob && blob.size > 0) {
+    console.log('Updating audio URL')
     try {
       if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
       audioUrl.value = URL.createObjectURL(blob)
@@ -66,6 +66,7 @@ function updateAudioUrl(blob: Blob | undefined) {
       audioUrl.value = undefined
     }
   } else {
+    console.log('Unsetting audio URL')
     if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
     audioUrl.value = undefined
     if (blob) {
@@ -99,13 +100,13 @@ defineExpose({
 <style scoped>
 .voice-player {
   position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
   width: fit-content;
-  height: 30px;
+  height: 100%;
   border-radius: 999px;
+}
+
+.voice-player-button {
+  height: 100%;
 }
 
 </style>
