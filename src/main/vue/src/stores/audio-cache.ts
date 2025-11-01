@@ -97,6 +97,8 @@ export const useAudioCache = defineStore('audio-cache', () => {
     totalSize.value += newSize
     cleanAccessOrder(flashcardId)
     updateAccessOrder(flashcardId, now)
+
+    console.log(`Cache size: ${totalSize.value}`)
   }
 
   function getAudio(flashcardId: number, isFrontSide: boolean): Blob | undefined {
@@ -118,6 +120,7 @@ export const useAudioCache = defineStore('audio-cache', () => {
       updateAccessOrder(flashcardId, now)
     }
 
+    console.log(`Cache size: ${totalSize.value}`)
     return isFrontSide ? entry.frontAudio : entry.backAudio
   }
 
@@ -147,6 +150,7 @@ export const useAudioCache = defineStore('audio-cache', () => {
       entry.size = newSize
     }
 
+    console.log(`Cache size: ${totalSize.value}`)
     return true
   }
 
