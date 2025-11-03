@@ -57,7 +57,6 @@ function stop() {
 
 function updateAudioUrl(blob: Blob | undefined) {
   if (blob && blob.size > 0) {
-    console.log('Updating audio URL')
     try {
       if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
       audioUrl.value = URL.createObjectURL(blob)
@@ -66,7 +65,6 @@ function updateAudioUrl(blob: Blob | undefined) {
       audioUrl.value = undefined
     }
   } else {
-    console.log('Unsetting audio URL')
     if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
     audioUrl.value = undefined
     if (blob) {
