@@ -139,12 +139,7 @@ const backSideMaxLengthInvalid = computed(() =>
 const stateChanged = computed(() => {
   return flashcard.value?.frontSide !== frontSide.value
     || flashcard.value?.backSide !== backSide.value
-    || isAudioChanged.value
-})
-
-const isAudioChanged = computed(() => {
-  audioChanged.value = isFrontSideAudioChanged.value || isBackSideAudioChanged.value
-  return audioChanged.value
+    || isFrontSideAudioChanged.value || isBackSideAudioChanged.value
 })
 
 const isFrontSideAudioChanged = computed(() => {
@@ -210,6 +205,12 @@ async function uploadAudioIfRelevant(): Promise<boolean> {
     (async function () {
       if (isFrontSideAudioChanged.value && frontSideAudio.value) {
         return uploadFlashcardAudioBlob(set, card, frontSideAudio.value, true)
+          .then((success) => {
+            if (success) {
+              audioChanged.value = true
+            }
+            return success
+          })
       } else {
         return true
       }
@@ -217,6 +218,12 @@ async function uploadAudioIfRelevant(): Promise<boolean> {
     (async function () {
       if (isBackSideAudioChanged.value && backSideAudio.value) {
         return uploadFlashcardAudioBlob(set, card, backSideAudio.value, false)
+          .then((success) => {
+            if (success) {
+              audioChanged.value = true
+            }
+            return success
+          })
       } else {
         return true
       }
@@ -242,6 +249,7 @@ async function removeAudioIfRelevant(): Promise<boolean> {
             if (result) {
               frontSideAudioId.value = undefined
               frontSideAudioSize.value = undefined
+              audioChanged.value = true
             }
             return result
           })
@@ -256,6 +264,7 @@ async function removeAudioIfRelevant(): Promise<boolean> {
             if (result) {
               backSideAudioId.value = undefined
               backSideAudioSize.value = undefined
+              audioChanged.value = true
             }
             return result
           })
