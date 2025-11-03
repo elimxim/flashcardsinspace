@@ -135,7 +135,7 @@ export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId
     })
   )
 
-  console.log(`[POST] request => upload audio for flashcard ${flashcardId} in set ${setId}`)
+  console.log(`[POST] request => upload audio for flashcard ${flashcardId} / ${side} in set ${setId}`)
   return apiClient.post<FlashcardAudio>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio`,
     form,
     {
