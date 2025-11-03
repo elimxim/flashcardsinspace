@@ -397,7 +397,6 @@ async function markDaysAs(
 }
 
 async function fetchAudio() {
-  console.log('Fetching audio was triggered')
   const set = flashcardSet.value
   const card = currFlashcard.value
 
@@ -409,9 +408,7 @@ async function fetchAudio() {
 
   await Promise.all([
     (async function () {
-      console.log('Fetching front side audio')
       const frontSideAudioId = audioStore.getAudioId(card.id, flashcardSides.FRONT)
-      console.log('Front side audio id:', frontSideAudioId)
       if (frontSideAudioId) {
         return await fetchFlashcardAudioBlob(set, card, true)
           .then((blob) => {
@@ -422,9 +419,7 @@ async function fetchAudio() {
       }
     })(),
     (async function () {
-      console.log('Fetching back side audio')
       const backSideAudioId = audioStore.getAudioId(card.id, flashcardSides.BACK)
-      console.log('Back side audio id:', backSideAudioId)
       if (backSideAudioId) {
         return await fetchFlashcardAudioBlob(set, card, false)
           .then((blob) => {
@@ -438,10 +433,12 @@ async function fetchAudio() {
 }
 
 function onFlashcardRemoved() {
+  console.log('onFlashcardRemoved')
   nextFlashcard()
 }
 
 function onAudioChanged() {
+  console.log('onAudioChanged')
   fetchAudio()
 }
 
