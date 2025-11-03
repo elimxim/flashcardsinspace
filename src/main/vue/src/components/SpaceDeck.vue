@@ -27,6 +27,7 @@
   <FlashcardEditModal
     v-model:flashcard="flashcard"
     v-model:removed="flashcardWasRemoved"
+    v-model:audio-changed="audioWasChanged"
   />
 </template>
 
