@@ -73,8 +73,12 @@ export const useAudioCache = defineStore('audio-cache', () => {
     console.log(`Cache size: ${sizeInKB} KB`)
   }
 
+  function sizeInKB(blob: Blob | undefined): string {
+    return (blob?.size ?? 0 / 1024).toFixed(1)
+  }
+
   function addAudio(flashcardId: number, audioBlob: Blob, isFrontSide: boolean) {
-    console.log(`Caching audio for flashcard ${flashcardId}, isFrontSide: ${isFrontSide}`)
+    console.log(`Caching audio for flashcard ${flashcardId}, isFrontSide: ${isFrontSide}, size: ${sizeInKB(audioBlob)}`)
 
     const now = performance.now()
 
