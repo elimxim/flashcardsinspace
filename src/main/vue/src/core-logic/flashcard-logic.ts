@@ -43,11 +43,22 @@ export function newFlashcard(frontSide: string, backSide: string): Flashcard {
   }
 }
 
-export function updateFlashcardSides(flashcard: Flashcard, frontSide: string, backSide: string): Flashcard {
-  flashcard.frontSide = frontSide
-  flashcard.backSide = backSide
-  flashcard.lastUpdatedAt = new Date()
-  return flashcard
+export function changeFlashcardSides(flashcard: Flashcard, frontSide: string, backSide: string): boolean {
+  let changed = false
+  if (flashcard.frontSide !== frontSide) {
+    flashcard.frontSide = frontSide
+    changed = true
+  }
+  if (flashcard.backSide !== backSide) {
+    flashcard.backSide = backSide
+    changed = true
+  }
+
+  if (changed) {
+    flashcard.lastUpdatedAt = new Date()
+  }
+
+  return changed
 }
 
 export function copyFlashcardSet(value: FlashcardSet): FlashcardSet {

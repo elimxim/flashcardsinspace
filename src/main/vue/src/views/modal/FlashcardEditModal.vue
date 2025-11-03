@@ -21,7 +21,7 @@
           Your text has its own gravity! Maximum 512 characters.
         </span>
         <VoiceRecorder
-          v-model="frontSideAudioBlob"
+          v-model="frontSideAudio"
         />
       </div>
       <div class="modal-main-area--inner">
@@ -36,7 +36,7 @@
           Your text has its own gravity! Maximum 512 characters.
         </span>
         <VoiceRecorder
-          v-model="backSideAudioBlob"
+          v-model="backSideAudio"
         />
       </div>
     </div>
@@ -85,7 +85,7 @@ import {
   flashcardSides,
   fetchFlashcardAudioBlob,
   removeFlashcardAudioBlob,
-  updateFlashcardSides,
+  changeFlashcardSides,
   uploadFlashcardAudioBlob,
 } from '@/core-logic/flashcard-logic.ts'
 import { storeToRefs } from 'pinia'
@@ -96,6 +96,7 @@ import {
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const removed = defineModel<boolean>('removed', { default: false })
+const audioChanged = defineModel<boolean>('audioChanged', { default: false })
 
 const toggleStore = useToggleStore()
 const flashcardSetStore = useFlashcardSetStore()
@@ -108,12 +109,12 @@ const { flashcardSet } = storeToRefs(flashcardStore)
 const frontSide = ref(flashcard.value?.frontSide ?? '')
 const frontSideTextArea = ref<HTMLElement>()
 const frontSideAudioId = ref(audioStore.getAudioId(flashcard.value?.id, flashcardSides.FRONT))
-const flashcardFrontSideAudioBlob = ref<Blob | undefined>()
-const frontSideAudioBlob = ref<Blob | undefined>()
+const frontSideAudio = ref<Blob | undefined>()
+const frontSideAudioSize = ref<number | undefined>()
 const backSide = ref(flashcard.value?.backSide ?? '')
 const backSideAudioId = ref(audioStore.getAudioId(flashcard.value?.id, flashcardSides.BACK))
-const flashcardBackSideAudioBlob = ref<Blob | undefined>()
-const backSideAudioBlob = ref<Blob | undefined>()
+const backSideAudio = ref<Blob | undefined>()
+const backSideAudioSize = ref<number | undefined>()
 
 const validationRules = {
   frontSide: { required, maxLength: maxLength(512) },
@@ -138,23 +139,27 @@ const backSideMaxLengthInvalid = computed(() =>
 const stateChanged = computed(() => {
   return flashcard.value?.frontSide !== frontSide.value
     || flashcard.value?.backSide !== backSide.value
-    || isFrontSideAudioChanged.value
-    || isBackSideAudioChanged.value
+    || isAudioChanged.value
+})
+
+const isAudioChanged = computed(() => {
+  audioChanged.value = isFrontSideAudioChanged.value || isBackSideAudioChanged.value
+  return audioChanged.value
 })
 
 const isFrontSideAudioChanged = computed(() => {
   if (!frontSideAudioId.value) {
-    return frontSideAudioBlob.value !== undefined && frontSideAudioBlob.value?.size > 0
+    return frontSideAudio.value !== undefined && frontSideAudio.value?.size > 0
   } else {
-    return flashcardFrontSideAudioBlob.value?.size !== frontSideAudioBlob.value?.size
+    return frontSideAudioSize.value !== frontSideAudio.value?.size
   }
 })
 
 const isBackSideAudioChanged = computed(() => {
   if (!backSideAudioId.value) {
-    return backSideAudioBlob.value !== undefined && backSideAudioBlob.value?.size > 0
+    return backSideAudio.value !== undefined && backSideAudio.value?.size > 0
   } else {
-    return flashcardBackSideAudioBlob.value?.size !== backSideAudioBlob.value?.size
+    return backSideAudioSize.value !== backSideAudio.value?.size
   }
 })
 
@@ -169,24 +174,24 @@ async function fetchAudio() {
       if (frontSideAudioId.value) {
         return await fetchFlashcardAudioBlob(set, card, true)
           .then((blob) => {
-            flashcardFrontSideAudioBlob.value = blob
-            frontSideAudioBlob.value = blob
+            frontSideAudio.value = blob
+            frontSideAudioSize.value = blob?.size
           })
       } else {
-        flashcardFrontSideAudioBlob.value = undefined
-        frontSideAudioBlob.value = undefined
+        frontSideAudio.value = undefined
+        frontSideAudioSize.value = undefined
       }
     })(),
     (async function () {
       if (backSideAudioId.value) {
         return await fetchFlashcardAudioBlob(set, card, false)
           .then((blob) => {
-            flashcardBackSideAudioBlob.value = blob
-            backSideAudioBlob.value = blob
+            backSideAudio.value = blob
+            backSideAudioSize.value = blob?.size
           })
       } else {
-        flashcardFrontSideAudioBlob.value = undefined
-        backSideAudioBlob.value = undefined
+        backSideAudio.value = undefined
+        frontSideAudioSize.value = undefined
       }
     })(),
   ])
@@ -203,15 +208,15 @@ async function uploadAudioIfRelevant(): Promise<boolean> {
 
   return await Promise.all([
     (async function () {
-      if (frontSideAudioBlob.value) {
-        return uploadFlashcardAudioBlob(set, card, frontSideAudioBlob.value, true)
+      if (isFrontSideAudioChanged.value && frontSideAudio.value) {
+        return uploadFlashcardAudioBlob(set, card, frontSideAudio.value, true)
       } else {
         return true
       }
     })(),
     (async function () {
-      if (backSideAudioBlob.value) {
-        return uploadFlashcardAudioBlob(set, card, backSideAudioBlob.value, false)
+      if (isBackSideAudioChanged.value && backSideAudio.value) {
+        return uploadFlashcardAudioBlob(set, card, backSideAudio.value, false)
       } else {
         return true
       }
@@ -231,12 +236,12 @@ async function removeAudioIfRelevant(): Promise<boolean> {
 
   return await Promise.all([
     (async function () {
-      if (frontSideAudioId.value && !frontSideAudioBlob.value && flashcardFrontSideAudioBlob.value) {
+      if (frontSideAudioId.value && !frontSideAudio.value && frontSideAudioSize.value) {
         return removeFlashcardAudioBlob(set, card, frontSideAudioId.value, true)
           .then((result) => {
             if (result) {
               frontSideAudioId.value = undefined
-              flashcardFrontSideAudioBlob.value = undefined
+              frontSideAudioSize.value = undefined
             }
             return result
           })
@@ -245,12 +250,12 @@ async function removeAudioIfRelevant(): Promise<boolean> {
       }
     })(),
     (async function () {
-      if (backSideAudioId.value && !backSideAudioBlob.value && flashcardBackSideAudioBlob.value) {
+      if (backSideAudioId.value && !backSideAudio.value && backSideAudioSize.value) {
         return removeFlashcardAudioBlob(set, card, backSideAudioId.value, false)
           .then((result) => {
             if (result) {
               backSideAudioId.value = undefined
-              flashcardBackSideAudioBlob.value = undefined
+              backSideAudioSize.value = undefined
             }
             return result
           })
@@ -266,6 +271,7 @@ async function cancel() {
   await resetState()
   toggleModalForm()
   removed.value = false
+  audioChanged.value = false
 }
 
 async function remove() {
@@ -274,6 +280,7 @@ async function remove() {
     await resetState()
     toggleModalForm()
     removed.value = true
+    audioChanged.value = false
   }
 }
 
@@ -312,7 +319,11 @@ async function removeFlashcard(): Promise<boolean> {
 
 async function updateFlashcard(): Promise<boolean> {
   if (!flashcardSet.value || !flashcard.value) return false
-  const updatedFlashcard = updateFlashcardSides(flashcard.value, frontSide.value, backSide.value)
+
+  const updatedFlashcard = flashcard.value
+  const changed = changeFlashcardSides(updatedFlashcard, frontSide.value, backSide.value)
+  if (!changed) return true // consider it is updated
+
   return await sendFlashcardUpdateRequest(flashcardSet.value.id, updatedFlashcard)
     .then((response) => {
       flashcardStore.changeFlashcard(response.data)

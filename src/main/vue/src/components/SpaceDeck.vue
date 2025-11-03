@@ -43,10 +43,13 @@ const props = withDefaults(defineProps<{
   flashcardFrontSideAudio?: Blob | undefined
   flashcardBackSideAudio?: Blob | undefined
   onFlashcardRemoved?: () => void
+  onAudioChanged?: () => void
 }>(), {
   flashcardFrontSideAudio: undefined,
   flashcardBackSideAudio: undefined,
   onFlashcardRemoved: () => {
+  },
+  onAudioChanged: () => {
   },
 })
 
@@ -54,6 +57,7 @@ const toggleStore = useToggleStore()
 
 const deckReady = ref(false)
 const flashcardWasRemoved = ref(false)
+const audioWasChanged = ref(false)
 const spaceCard = ref<InstanceType<typeof SpaceCard>>()
 const cardTransition = ref('')
 
@@ -99,6 +103,13 @@ watch(flashcardWasRemoved, (newVal) => {
     spaceCard.value?.flipToFront()
     props.onFlashcardRemoved()
     flashcardWasRemoved.value = false
+  }
+})
+
+watch(audioWasChanged, (newVal) => {
+  if (newVal) {
+    props.onAudioChanged()
+    audioWasChanged.value = false
   }
 })
 
