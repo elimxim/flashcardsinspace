@@ -37,6 +37,8 @@ import {
   faStop,
   faPause,
   faTrash,
+  faRepeat,
+  faA,
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faEye as faRegularEye,
@@ -85,6 +87,8 @@ export function applyFaIcons() {
     faStop,
     faPause,
     faTrash,
+    faRepeat,
+    faA,
 
     faRegularEye,
     faRegularCircle,
