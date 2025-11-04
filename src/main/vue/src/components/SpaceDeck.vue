@@ -1,10 +1,15 @@
 <template>
   <div class="space-deck">
     <div class="flashcard-deck">
-      <transition :name="cardTransition">
+      <transition
+        :name="cardTransition"
+        @after-enter="onCardTransitionComplete"
+      >
         <SpaceCard
           v-if="flashcard && deckReady"
           ref="spaceCard"
+          v-model:auto-play-voice="autoPlayVoice"
+          v-model:auto-repeat-voice="autoRepeatVoice"
           :key="flashcard ? flashcard.id : 0"
           :stage="flashcard?.stage"
           :front-side="flashcard?.frontSide"
@@ -39,6 +44,8 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
+const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })
+const autoRepeatVoice = defineModel<boolean>('autoRepeatVoice', { default: false })
 
 const props = withDefaults(defineProps<{
   flashcardFrontSideAudio?: Blob | undefined
@@ -91,6 +98,10 @@ function prepareSlideTransition(value: string) {
   } else {
     cardTransition.value = value
   }
+}
+
+function onCardTransitionComplete() {
+  spaceCard.value?.onCardAnimationComplete()
 }
 
 defineExpose({

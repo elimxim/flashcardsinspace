@@ -15,7 +15,7 @@
       :src="audioUrl"
       @play="isPlaying = true"
       @pause="isPlaying = false"
-      @ended="isPlaying = false"
+      @ended="handleAudioEnded"
     />
   </div>
 </template>
@@ -24,35 +24,47 @@
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import { ref, onBeforeUnmount, watch, onMounted } from 'vue'
 
-const props = defineProps<{
-  audioBlob?: Blob | undefined
-}>()
+const props = withDefaults(defineProps<{
+  audioBlob?: Blob | undefined,
+  loopPlay?: boolean,
+}>(), {
+  audioBlob: undefined,
+  loopPlay: false,
+})
 
 const audioUrl = ref<string>()
 const audioRef = ref<HTMLAudioElement>()
 const isPlaying = ref(false)
+const isLooping = ref(false)
 
 function play() {
   const audio = audioRef.value as HTMLAudioElement | undefined
-  if (!audio || !audioUrl.value) {
-    console.warn('Cannot play - audio element or URL missing', {
-      hasAudio: !!audio,
-      hasUrl: !!audioUrl.value
-    })
-    return
+  if (!audio || !audioUrl.value) return
+
+  if (props.loopPlay) {
+    isLooping.value = true
   }
-  console.log('Playing audio from ', audioUrl.value)
+
   audio.currentTime = 0
-  audio.play().catch((error) => {
-    console.error('Audio play failed:', error)
-  })
+  audio.play()
+    .catch((error) => {
+      console.error('Audio play failed:', error)
+    })
 }
 
 function stop() {
   const audio = audioRef.value as HTMLAudioElement | undefined
   if (!audio || !audioUrl.value) return
+  isLooping.value = false
   audio.pause()
   audio.currentTime = 0
+}
+
+function handleAudioEnded() {
+  isPlaying.value = false
+  if (isLooping.value) {
+    play()
+  }
 }
 
 function updateAudioUrl(blob: Blob | undefined) {
@@ -85,12 +97,14 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   isPlaying.value = false
+  isLooping.value = false
   audioRef?.value?.pause()
   if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
 })
 
 defineExpose({
-  play
+  play,
+  stop,
 })
 
 </script>

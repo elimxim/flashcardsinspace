@@ -44,6 +44,8 @@
       <SpaceDeck
         ref="spaceDeck"
         v-model:flashcard="currFlashcard"
+        v-model:auto-play-voice="autoPlayVoice"
+        v-model:auto-repeat-voice="autoRepeatVoice"
         :on-flashcard-removed="onFlashcardRemoved"
         :on-audio-changed="onAudioChanged"
         :flashcard-front-side-audio="flashcardFrontSideAudioBlob"
@@ -210,6 +212,8 @@ const flashcardsRemaining = computed(() => {
 const currFlashcard = ref<Flashcard>()
 const flashcardFrontSideAudioBlob = ref<Blob | undefined>()
 const flashcardBackSideAudioBlob = ref<Blob | undefined>()
+const autoPlayVoice = ref(false)
+const autoRepeatVoice = ref(false)
 const flashcardsSeen = computed(() =>
   Math.max(0, flashcardsTotal.value - flashcardsRemaining.value)
 )
@@ -259,6 +263,8 @@ async function finishReview() {
   flashcardsTotal.value = 0
   flashcardFrontSideAudioBlob.value = undefined
   flashcardBackSideAudioBlob.value = undefined
+  autoPlayVoice.value = false
+  autoRepeatVoice.value = false
   if (flashcardSet.value) {
     if (noNextAvailable.value && isLightspeedMode.value) {
       await markDaysAsCompleted(flashcardSet.value)

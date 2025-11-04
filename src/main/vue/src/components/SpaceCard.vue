@@ -19,8 +19,8 @@
           <AwesomeButton
             v-if="!textOnly"
             icon="fa-solid fa-pen-to-square"
-            class="space-card-edit-button"
-            :on-click="onEdit"
+            class="space-card-button"
+            :on-click="handleEdit"
           />
         </div>
         <div class="space-card-body">
@@ -31,9 +31,26 @@
             <font-awesome-icon icon="fa-regular fa-eye"/>
             {{ viewedTimes }}
           </span>
-          <VoicePlayer
-            class="space-deck-voice-player"
-            :audio-blob="frontSideAudio"/>
+          <div v-if="!textOnly" class="space-card-strip-group">
+            <AwesomeButton
+              icon="fa-solid fa-repeat"
+              class="space-card-button"
+              :active="autoRepeatVoice"
+              :on-click="toggleAutoRepeatVoice"
+            />
+            <AwesomeButton
+              icon="fa-solid fa-a"
+              class="space-card-button"
+              :active="autoPlayVoice"
+              :on-click="toggleAutoPlayVoice"
+            />
+            <VoicePlayer
+              ref="frontVoicePlayer"
+              class="space-card-button"
+              :audio-blob="frontSideAudio"
+              :loop-play="autoRepeatVoice"
+            />
+          </div>
         </div>
       </div>
       <div
@@ -50,8 +67,8 @@
           <AwesomeButton
             v-if="!textOnly"
             icon="fa-solid fa-pen-to-square"
-            class="space-card-edit-button"
-            :on-click="onEdit"
+            class="space-card-button"
+            :on-click="handleEdit"
           />
         </div>
         <div class="space-card-body">
@@ -62,9 +79,26 @@
             <font-awesome-icon icon="fa-regular fa-eye"/>
             {{ viewedTimes }}
           </span>
-          <VoicePlayer
-            class="space-deck-voice-player"
-            :audio-blob="backSideAudio"/>
+          <div v-if="!textOnly" class="space-card-strip-group">
+            <AwesomeButton
+              icon="fa-solid fa-repeat"
+              class="space-card-button"
+              :active="autoRepeatVoice"
+              :on-click="toggleAutoRepeatVoice"
+            />
+            <AwesomeButton
+              icon="fa-solid fa-a"
+              class="space-card-button"
+              :active="autoPlayVoice"
+              :on-click="toggleAutoPlayVoice"
+            />
+            <VoicePlayer
+              ref="backVoicePlayer"
+              class="space-card-button"
+              :audio-blob="backSideAudio"
+              :loop-play="autoRepeatVoice"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -74,7 +108,10 @@
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import VoicePlayer from '@/components/VoicePlayer.vue'
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
+
+const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })
+const autoRepeatVoice = defineModel<boolean>('autoRepeatVoice', { default: false })
 
 const props = withDefaults(defineProps<{
   stage?: string
@@ -100,10 +137,20 @@ const props = withDefaults(defineProps<{
 })
 
 const flipped = ref(false)
+const cardAnimationCompleted = ref(false)
+const frontVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
+const backVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
 
 function flip() {
   if (!props.unflippable) {
+    stopAllVoices()
     flipped.value = !flipped.value
+
+    if (autoPlayVoice.value && cardAnimationCompleted.value) {
+      setTimeout(() => {
+        playCurrentSideVoice()
+      }, 500) // Match the flip animation duration
+    }
   }
 }
 
@@ -124,10 +171,46 @@ async function flipToFrontAndWait(): Promise<void> {
   })
 }
 
+function toggleAutoPlayVoice() {
+  autoPlayVoice.value = !autoPlayVoice.value
+}
+
+function toggleAutoRepeatVoice() {
+  autoRepeatVoice.value = !autoRepeatVoice.value
+}
+
+function stopAllVoices() {
+  frontVoicePlayer.value?.stop()
+  backVoicePlayer.value?.stop()
+}
+
+function playCurrentSideVoice() {
+  if (!flipped.value) {
+    frontVoicePlayer.value?.play()
+  } else {
+    backVoicePlayer.value?.play()
+  }
+}
+
+function handleEdit() {
+  stopAllVoices()
+  props.onEdit()
+}
+
+function onCardAnimationComplete() {
+  cardAnimationCompleted.value = true
+  if (autoPlayVoice.value) {
+    nextTick(() => {
+      playCurrentSideVoice()
+    })
+  }
+}
+
 defineExpose({
   flip,
   flipToFront,
   flipToFrontAndWait,
+  onCardAnimationComplete,
 })
 
 </script>
@@ -232,6 +315,14 @@ defineExpose({
   gap: 10px;
 }
 
+.space-card-strip-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
 .space-card-body {
   flex: 1;
   width: 100%;
@@ -255,18 +346,11 @@ defineExpose({
 
 }
 
-.space-card-edit-button {
-  --awesome-button--icon--size: clamp(1.2rem, 2vw, 1.3rem);
-  --awesome-button--icon--color: var(--card--color--strip);
-  --awesome-button--icon--color--hover: var(--card--color--strip--hover);
-}
-
-.space-deck-voice-player {
+.space-card-button {
   --awesome-button--icon--size: clamp(1.2rem, 2vw, 1.3rem);
   --awesome-button--icon--color: var(--card--color--strip);
   --awesome-button--icon--color--hover: var(--card--color--strip--hover);
   --awesome-button--icon--color--active: var(--card--color--strip--hover);
-  --awesome-button--border-radius: 999px;
 }
 
 </style>
