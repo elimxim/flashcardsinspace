@@ -55,15 +55,25 @@ withDefaults(defineProps<{
 }
 
 .left-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
   grid-column: 1;
   grid-row: 1;
   z-index: 1;
+  height: 100%;
 }
 
 .right-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
   grid-column: 3;
   grid-row: 1;
   z-index: 1;
+  height: 100%;
 }
 
 .control-bar-title {
