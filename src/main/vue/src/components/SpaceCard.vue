@@ -144,7 +144,9 @@ const props = withDefaults(defineProps<{
 }>(), {
   stage: undefined,
   frontSide: undefined,
+  frontSideAudio: undefined,
   backSide: undefined,
+  backSideAudio: undefined,
   viewedTimes: undefined,
   textOnly: false,
   unflippable: false,

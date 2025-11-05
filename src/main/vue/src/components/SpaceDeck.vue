@@ -8,9 +8,9 @@
         <SpaceCard
           v-if="flashcard && deckReady"
           ref="spaceCard"
+          :key="flashcard ? flashcard.id : 0"
           v-model:auto-play-voice="autoPlayVoice"
           v-model:auto-repeat-voice="autoRepeatVoice"
-          :key="flashcard ? flashcard.id : 0"
           :stage="flashcard?.stage"
           :front-side="flashcard?.frontSide"
           :back-side="flashcard?.backSide"

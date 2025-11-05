@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
 const props = withDefaults(defineProps<{
   text?: string
@@ -32,8 +32,6 @@ const props = withDefaults(defineProps<{
 
 const visible = ref(false)
 let timeout: ReturnType<typeof setTimeout> | null = null
-
-const positionClass = computed(() => `tooltip--${props.position}`)
 
 function show() {
   timeout = setTimeout(() => {
