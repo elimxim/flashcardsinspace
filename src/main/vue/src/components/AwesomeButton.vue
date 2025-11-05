@@ -8,45 +8,46 @@
       'awesome-button-wrapper--growing--square': fillSpace && square,
     }"
   >
-    <div
-      role="button"
-      class="awesome-button awesome-button--theme select-none drag-none"
-      :class="{
+    <Tooltip :text="tooltip" :position="tooltipPosition">
+      <div
+        role="button"
+        class="awesome-button awesome-button--theme select-none drag-none"
+        :class="{
         'awesome-button--active': active,
         'awesome-button--disabled': disabled,
         'awesome-button--invisible': invisible,
         'awesome-button--click-ripple': clickRipple,
         'awesome-button--ripple-active': rippleActive,
       }"
-      :disabled="disabled"
-      v-bind="$attrs"
-      @click.stop="handleClick"
-      @dblclick.stop="onDoubleClick"
-      @mouseenter="onHover"
-      @mouseleave="onHover"
-    >
-      <slot name="above"/>
-      <div class="awesome-icon-wrapper">
-        <font-awesome-icon
-          v-if="pressed && spinnable"
-          :icon="spinIcon || icon"
-          class="awesome-spinning-icon"
-        />
-        <font-awesome-icon
-          v-else
-          :fade="fade"
-          :beat="beat"
-          :beat-fade="beatFade"
-          :icon="icon"
-          class="awesome-icon"
-        />
+        :disabled="disabled"
+        v-bind="$attrs"
+        @click.stop="handleClick"
+        @dblclick.stop="onDoubleClick"
+      >
+        <slot name="above"/>
+        <div class="awesome-icon-wrapper">
+          <font-awesome-icon
+            v-if="pressed && spinnable"
+            :icon="spinIcon || icon"
+            class="awesome-spinning-icon"
+          />
+          <font-awesome-icon
+            v-else
+            :fade="fade"
+            :beat="beat"
+            :beat-fade="beatFade"
+            :icon="icon"
+            class="awesome-icon"
+          />
+        </div>
+        <slot name="below"/>
       </div>
-      <slot name="below"/>
-    </div>
+    </Tooltip>
   </div>
 </template>
 
 <script setup lang="ts">
+import Tooltip from '@/components/Tooltip.vue'
 import { ref } from 'vue'
 
 const props = withDefaults(defineProps<{
@@ -63,6 +64,8 @@ const props = withDefaults(defineProps<{
   square?: boolean
   fillSpace?: boolean
   clickRipple?: boolean
+  tooltip?: string
+  tooltipPosition?: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
   onClick?: () => void
   onDoubleClick?: () => void
   onHover?: () => void
@@ -79,6 +82,8 @@ const props = withDefaults(defineProps<{
   square: false,
   fillSpace: false,
   clickRipple: false,
+  tooltip: undefined,
+  tooltipPosition: 'top',
   onClick: () => {
   },
   onDoubleClick: () => {
@@ -89,6 +94,8 @@ const props = withDefaults(defineProps<{
 
 const pressed = ref(false)
 const rippleActive = ref(false)
+const showTooltip = ref(false)
+let tooltipTimeout: ReturnType<typeof setTimeout> | null = null
 
 function press() {
   pressed.value = !pressed.value
