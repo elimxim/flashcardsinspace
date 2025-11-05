@@ -23,6 +23,8 @@
         v-bind="$attrs"
         @click.stop="handleClick"
         @dblclick.stop="onDoubleClick"
+        @mouseenter="onHover"
+        @mouseleave="onHover"
       >
         <slot name="above"/>
         <div class="awesome-icon-wrapper">
@@ -94,8 +96,6 @@ const props = withDefaults(defineProps<{
 
 const pressed = ref(false)
 const rippleActive = ref(false)
-const showTooltip = ref(false)
-let tooltipTimeout: ReturnType<typeof setTimeout> | null = null
 
 function press() {
   pressed.value = !pressed.value
