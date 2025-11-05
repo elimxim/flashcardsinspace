@@ -9,13 +9,19 @@ import org.springframework.transaction.annotation.Transactional
 
 private val log = LoggerFactory.getLogger(DayStreakService::class.java)
 
+sealed class DayStreakScanResult {
+    data class Progress(val count: Int, val lastDay: Chronoday) : DayStreakScanResult()
+    data object Reset : DayStreakScanResult()
+    data object NoChange : DayStreakScanResult()
+}
+
 @Service
 class DayStreakService {
 
     @Transactional
-    fun calcDayStreak(flashcardSet: FlashcardSet): Boolean {
+    fun calcDayStreak(flashcardSet: FlashcardSet) {
         val chronodays = flashcardSet.chronodays.sortedBy { it.chronodate }
-        if (chronodays.size < 2) return false
+        if (chronodays.size < 2) return
 
         val dayStreak = getOrCreateDayStreak(flashcardSet, chronodays)
         val result = calcStreakDays(
@@ -24,7 +30,7 @@ class DayStreakService {
             chronodays = chronodays,
         )
 
-        return when (result) {
+        when (result) {
             is DayStreakScanResult.Progress -> {
                 log.info(
                     """
@@ -34,17 +40,15 @@ class DayStreakService {
                 )
                 dayStreak.streak += result.count
                 dayStreak.lastDay = result.lastDay
-                true
             }
 
             is DayStreakScanResult.Reset -> {
                 log.info("Day streak reset for flashcard set ${flashcardSet.id}")
                 dayStreak.streak = 0
-                true
             }
 
             is DayStreakScanResult.NoChange -> {
-                false
+                log.info("Day streak did not change for flashcard set ${flashcardSet.id}")
             }
         }
     }
@@ -96,6 +100,13 @@ class DayStreakService {
         toExclusive: Chronoday,
         chronodays: List<Chronoday>
     ): DayStreakScanResult {
+        log.info(
+            """
+            Calculating streak days for flashcard set ${fromInclusive.flashcardSet.id}:
+            [${fromInclusive.id} / ${fromInclusive.chronodate}, ${toExclusive.id} / ${toExclusive.chronodate})
+            """.trimOneLine()
+        )
+
         if (fromInclusive.isInitial()) return DayStreakScanResult.NoChange
 
         val fromIndex = getChronoIndex(fromInclusive, chronodays)
@@ -150,10 +161,3 @@ class DayStreakService {
     }
 
 }
-
-sealed class DayStreakScanResult {
-    data class Progress(val count: Int, val lastDay: Chronoday) : DayStreakScanResult()
-    data object Reset : DayStreakScanResult()
-    data object NoChange : DayStreakScanResult()
-}
-
