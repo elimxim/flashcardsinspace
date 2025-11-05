@@ -17,6 +17,8 @@
             <AwesomeButton
               icon="fa-solid fa-gear"
               class="control-bar-button"
+              tooltip="Edit Flashcard Set"
+              tooltip-position="bottom-left"
               :on-click="openFlashcardSetSettings"
               :disabled="!flashcardSet"
             />

@@ -13,6 +13,8 @@
           ref="createButton"
           icon="fa-solid fa-plus"
           class="control-bar-button"
+          tooltip="Create New Flashcard Set"
+          tooltip-position="bottom-right"
           :on-click="toggleStore.toggleFlashcardSetCreation"
         />
       </template>

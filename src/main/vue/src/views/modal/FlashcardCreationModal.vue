@@ -11,6 +11,8 @@
         ref="infiniteLoopButton"
         icon="fa-regular fa-circle"
         spin-icon="fa-solid fa-arrows-spin"
+        tooltip="Infinite loop"
+        tooltip-position="bottom-left"
         spinnable
       />
     </template>

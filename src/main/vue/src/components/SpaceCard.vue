@@ -14,12 +14,16 @@
       >
         <div class="space-card-strip select-none">
           <span v-if="!textOnly" class="space-card-strip-text">
-            {{ stage }}
+            <Tooltip text="Learning Stage" position="bottom">
+              {{ stage }}
+            </Tooltip>
           </span>
           <AwesomeButton
             v-if="!textOnly"
             icon="fa-solid fa-pen-to-square"
             class="space-card-button"
+            tooltip="Edit flashcard"
+            tooltip-position="bottom"
             :on-click="handleEdit"
           />
         </div>
@@ -28,19 +32,23 @@
         </div>
         <div class="space-card-strip select-none">
           <span v-if="!textOnly">
-            <font-awesome-icon icon="fa-regular fa-eye"/>
+            <Tooltip text="Viewed Times">
+              <font-awesome-icon icon="fa-regular fa-eye"/>
+            </Tooltip>
             {{ viewedTimes }}
           </span>
           <div v-if="!textOnly" class="space-card-strip-group">
             <AwesomeButton
               icon="fa-solid fa-repeat"
               class="space-card-button"
+              tooltip="Repeat voice"
               :active="autoRepeatVoice"
               :on-click="toggleAutoRepeatVoice"
             />
             <AwesomeButton
               icon="fa-solid fa-a"
               class="space-card-button"
+              tooltip="Auto play voice"
               :active="autoPlayVoice"
               :on-click="toggleAutoPlayVoice"
             />
@@ -62,12 +70,16 @@
       >
         <div class="space-card-strip select-none">
           <span v-if="!textOnly" class="space-card-strip-text">
-            {{ stage }}
+            <Tooltip text="Learning Stage" position="bottom">
+              {{ stage }}
+            </Tooltip>
           </span>
           <AwesomeButton
             v-if="!textOnly"
             icon="fa-solid fa-pen-to-square"
             class="space-card-button"
+            tooltip="Edit flashcard"
+            tooltip-position="bottom"
             :on-click="handleEdit"
           />
         </div>
@@ -76,19 +88,23 @@
         </div>
         <div class="space-card-strip select-none">
           <span v-if="!textOnly">
-            <font-awesome-icon icon="fa-regular fa-eye"/>
+            <Tooltip text="Viewed Times">
+              <font-awesome-icon icon="fa-regular fa-eye"/>
+            </Tooltip>
             {{ viewedTimes }}
           </span>
           <div v-if="!textOnly" class="space-card-strip-group">
             <AwesomeButton
               icon="fa-solid fa-repeat"
               class="space-card-button"
+              tooltip="Repeat voice"
               :active="autoRepeatVoice"
               :on-click="toggleAutoRepeatVoice"
             />
             <AwesomeButton
               icon="fa-solid fa-a"
               class="space-card-button"
+              tooltip="Auto play voice"
               :active="autoPlayVoice"
               :on-click="toggleAutoPlayVoice"
             />
@@ -108,6 +124,7 @@
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import VoicePlayer from '@/components/VoicePlayer.vue'
+import Tooltip from '@/components/Tooltip.vue'
 import { ref, nextTick } from 'vue'
 
 const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })

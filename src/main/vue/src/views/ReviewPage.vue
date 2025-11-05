@@ -22,6 +22,8 @@
           ref="escapeButton"
           icon="fa-solid fa-circle-xmark"
           class="control-bar-button"
+          tooltip="Finish review and leave"
+          tooltip-position="bottom-left"
           :on-click="finishReviewAndLeave"
         />
       </template>
