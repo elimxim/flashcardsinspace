@@ -57,9 +57,7 @@ class ChronoService(
 
         val lastDate = flashcardSet.lastChronoday()?.chronodate ?: currDate
         val updatedFlashcardSet = if (currDate.isAfter(lastDate)) {
-            val status = if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
-                ChronodayStatus.OFF
-            } else ChronodayStatus.NOT_STARTED
+            val status = if (flashcardSet.isSuspended()) ChronodayStatus.OFF else ChronodayStatus.NOT_STARTED
 
             lastDate.plusDays(1).datesUntil(currDate.plusDays(1)).forEach {
                 flashcardSet.chronodays.add(

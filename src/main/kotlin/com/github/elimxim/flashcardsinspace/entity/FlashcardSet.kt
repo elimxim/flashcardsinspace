@@ -69,3 +69,6 @@ fun FlashcardSet.lastChronoday(): Chronoday? =
 
 fun FlashcardSet.flashcardsNumber(): Int =
     Hibernate.size(flashcards)
+
+fun FlashcardSet.isSuspended(): Boolean =
+    status == FlashcardSetStatus.SUSPENDED

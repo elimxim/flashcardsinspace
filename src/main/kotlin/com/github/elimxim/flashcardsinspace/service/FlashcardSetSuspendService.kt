@@ -1,9 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
-import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
-import com.github.elimxim.flashcardsinspace.entity.User
-import com.github.elimxim.flashcardsinspace.entity.lastChronoday
+import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
@@ -38,7 +35,7 @@ class FlashcardSetSuspendService(
     fun suspend(id: Long, request: ValidFlashcardSetUpdateRequest): FlashcardSetSuspendResponse {
         val flashcardSet = flashcardSetService.getEntity(id)
 
-        if (flashcardSet.status == FlashcardSetStatus.SUSPENDED) {
+        if (flashcardSet.isSuspended()) {
             throw FlashcardSetAlreadySuspendedException("Flashcard set $id is already suspended")
         }
 
