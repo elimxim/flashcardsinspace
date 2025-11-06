@@ -107,35 +107,41 @@ class DayStreakService {
             """.trimOneLine()
         )
 
-        if (fromInclusive.isInitial()) return DayStreakScanResult.NoChange
+        if (fromInclusive.isInitial())
+            return DayStreakScanResult.NoChange
 
         val fromIndex = getChronoIndex(fromInclusive, chronodays)
         val toIndex = getChronoIndex(toExclusive, chronodays) + 1
 
-        if (fromIndex < toIndex) return DayStreakScanResult.NoChange
+        val toInclusive = chronodays.getOrNull(toIndex)
+            ?: return DayStreakScanResult.NoChange
+
+        if (fromInclusive.chronodate.isBefore(toInclusive.chronodate))
+            return DayStreakScanResult.NoChange
 
         var counter = 0
         var lastDay = toExclusive
         var countingBroken = false
         var countingStarted = false
         for (i in fromIndex downTo toIndex) {
+            val day = chronodays[i]
             if (!countingStarted) {
-                if (chronodays[i].isCompleted()) {
+                if (day.isCompleted()) {
                     countingStarted = true
-                    lastDay = chronodays[i]
+                    lastDay = day
                     counter++
-                } else if (chronodays[i].isInProgress()) {
+                } else if (day.isInProgress()) {
                     continue
-                } else if (chronodays[i].isNotStarted() && chronodays[i].id == fromInclusive.id) {
+                } else if (day.isNotStarted() && day.id == fromInclusive.id) {
                     continue
                 } else {
                     countingBroken = true
                     break
                 }
             } else {
-                if (chronodays[i].isCompleted()) {
+                if (day.isCompleted()) {
                     counter++
-                } else if (!chronodays[i].isOff()) {
+                } else if (!day.isOff()) {
                     break
                 }
             }
@@ -153,9 +159,7 @@ class DayStreakService {
     private fun getChronoIndex(day: Chronoday, chronodays: List<Chronoday>): Int {
         val idx = chronodays.indexOfFirst { it.id == day.id }
         if (idx == -1) {
-            throw CorruptedChronoStateException(
-                "Chronoday ${day.id} not found in chronodays"
-            )
+            throw CorruptedChronoStateException("Chronoday ${day.id} not found in chronodays")
         }
         return idx
     }
