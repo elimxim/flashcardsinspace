@@ -6,8 +6,6 @@ import {
 } from '@/model/flashcard.ts'
 import { type Stage, stages } from '@/core-logic/stage-logic.ts'
 import type { Language } from '@/model/language.ts'
-import { useChronoStore } from '@/stores/chrono-store.ts'
-import { storeToRefs } from 'pinia'
 import {
   sendFlashcardAudioFetchRequest,
   sendFlashcardAudioRemovalRequest,
@@ -28,10 +26,7 @@ export const flashcardSides = {
   BACK: 'BACK',
 }
 
-export function newFlashcard(frontSide: string, backSide: string): Flashcard {
-  const chronoStore = useChronoStore()
-  const { currDay } = storeToRefs(chronoStore)
-
+export function newFlashcard(frontSide: string, backSide: string, chronodate: string): Flashcard {
   return {
     id: 0,
     frontSide: frontSide,
@@ -39,7 +34,7 @@ export function newFlashcard(frontSide: string, backSide: string): Flashcard {
     stage: stages.S1.name,
     timesReviewed: 0,
     reviewHistory: { history: [] },
-    creationDate: currDay.value.chronodate,
+    creationDate: chronodate,
   }
 }
 
@@ -75,12 +70,7 @@ export function sortFlashcardSets(flashcardSets: FlashcardSet[]): FlashcardSet[]
   })
 }
 
-export function updateFlashcard(flashcard: Flashcard, stage: Stage): Flashcard {
-  const chronoStore = useChronoStore()
-  const { currDay } = storeToRefs(chronoStore)
-
-  const chronodate = currDay.value.chronodate
-
+export function updateFlashcard(flashcard: Flashcard, stage: Stage, chronodate: string): Flashcard {
   const info: ReviewInfo = {
     stage: stage.name,
     reviewDate: chronodate,

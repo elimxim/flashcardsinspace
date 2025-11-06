@@ -105,6 +105,7 @@ const audioStore = useAudioStore()
 const toaster = useSpaceToaster()
 
 const { flashcardSet, isStarted } = storeToRefs(flashcardStore)
+const { currDay } = storeToRefs(chronoStore)
 
 const frontSide = ref<string>('')
 const frontSideTextArea = ref<HTMLElement>()
@@ -187,7 +188,7 @@ async function create() {
 async function addNewFlashcard(): Promise<boolean> {
   if (!flashcardSet.value) return false
   const setId = flashcardSet.value.id
-  const flashcard = newFlashcard(frontSide.value, backSide.value)
+  const flashcard = newFlashcard(frontSide.value, backSide.value, currDay.value.chronodate)
   if (isStarted.value) {
     return await sendFlashcardCreationRequest(setId, flashcard)
       .then((response) => {

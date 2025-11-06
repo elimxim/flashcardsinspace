@@ -287,7 +287,7 @@ async function stageDown() {
   if (flashcardSet.value && currFlashcard.value) {
     spaceDeck.value?.willSlideToLeft()
     const flashcard = copyFlashcard(currFlashcard.value)
-    updateFlashcard(flashcard, prevStage(flashcard.stage))
+    updateFlashcard(flashcard, prevStage(flashcard.stage), currDay.value.chronodate)
     const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
     if (success) {
       await markDaysAndGoNext(flashcardSet.value)
@@ -304,7 +304,7 @@ async function stageUp() {
   if (flashcardSet.value && currFlashcard.value) {
     spaceDeck.value?.willSlideToRight()
     const flashcard = copyFlashcard(currFlashcard.value)
-    updateFlashcard(flashcard, nextStage(flashcard.stage))
+    updateFlashcard(flashcard, nextStage(flashcard.stage), currDay.value.chronodate)
     const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
     if (success) {
       await markDaysAndGoNext(flashcardSet.value)
@@ -331,7 +331,7 @@ async function moveBack() {
   if (flashcardSet.value && currFlashcard.value) {
     spaceDeck.value?.willSlideToLeft()
     const flashcard = copyFlashcard(currFlashcard.value)
-    updateFlashcard(flashcard, stages.S1)
+    updateFlashcard(flashcard, stages.S1, currDay.value.chronodate)
     const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
     if (success) {
       await nextFlashcard()
