@@ -10,6 +10,7 @@ import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoSyncResponse
 import com.github.elimxim.flashcardsinspace.web.dto.ChronoUpdateResponse
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
@@ -29,6 +30,7 @@ class ChronoController(
         return ResponseEntity.ok(response)
     }
 
+    @PreAuthorize("hasAuthority('COMMANDER')")
     @PostMapping("/sync/next")
     fun synchronizeNextDay(
         @AuthenticationPrincipal user: User,
@@ -38,6 +40,7 @@ class ChronoController(
         return ResponseEntity.ok(response)
     }
 
+    @PreAuthorize("hasAuthority('COMMANDER')")
     @PostMapping("/sync/prev")
     fun synchronizePrevDay(
         @AuthenticationPrincipal user: User,
