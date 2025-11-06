@@ -69,9 +69,10 @@ class ChronoService(
                 )
             }
 
-            dayStreakService.calcDayStreak(flashcardSet)
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
+
+        dayStreakService.calcDayStreak(updatedFlashcardSet)
 
         val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
         val (currDay, chronodays) = applySchedule(updatedFlashcardSet)
