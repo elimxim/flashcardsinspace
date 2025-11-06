@@ -16,7 +16,14 @@
       fill-space
     />
     <div class="curtain">
-      <div class="curtain-text">Start Review</div>
+      <div class="curtain-text">
+        <template v-if="!disabled">
+          Start Review
+        </template>
+        <template v-else>
+          Nothing to Review
+        </template>
+      </div>
     </div>
   </div>
 </template>
