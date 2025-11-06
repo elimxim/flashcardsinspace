@@ -2,13 +2,12 @@ import { type Flashcard } from '@/model/flashcard.ts'
 import {
   getStage,
   specialStages,
-  type Stage, stageNameMap,
+  type Stage,
+  stageNameMap,
   stageOrderMap,
   stages,
 } from '@/core-logic/stage-logic.ts'
-import { useChronoStore } from '@/stores/chrono-store.ts'
 import type { Chronoday } from '@/model/chrono.ts'
-import { storeToRefs } from 'pinia'
 import { shuffle } from '@/utils/array.ts'
 import {
   isCompleteAvailable,
@@ -151,11 +150,13 @@ export class MonoStageReviewQueue implements ReviewQueue {
   }
 }
 
-export function createReviewQueue(flashcards: Flashcard[]): ReviewQueue {
-  const chronoStore = useChronoStore()
-  const currDay = chronoStore.currDay
+export function createReviewQueue(
+  flashcards: Flashcard[],
+  currDay: Chronoday,
+  chronodays: Chronoday[],
+): ReviewQueue {
   const daysForReview = selectConsecutiveDaysBefore(
-    chronoStore.chronodays, chronoStore.currDay, isCompleteAvailable
+    chronodays, currDay, isCompleteAvailable
   )
   const stagesForReview = new Set(daysForReview.map(d => d.stages).flat())
 
@@ -182,18 +183,15 @@ export function createReviewQueue(flashcards: Flashcard[]): ReviewQueue {
   return queue
 }
 
-export function createReviewQueueForStage(flashcards: Flashcard[], stage: Stage): ReviewQueue {
-  const chronoStore = useChronoStore()
-  const { currDay } = storeToRefs(chronoStore)
-
+export function createReviewQueueForStage(flashcards: Flashcard[], stage: Stage, currDay: Chronoday): ReviewQueue {
   let result: Flashcard[]
   if (stage === specialStages.UNKNOWN) {
     result = flashcards.filter(f =>
-      f.stage === stages.S1.name && isUnknownFlashcard(f, currDay.value)
+      f.stage === stages.S1.name && isUnknownFlashcard(f, currDay)
     )
   } else if (stage === specialStages.ATTEMPTED) {
     result = flashcards.filter(f =>
-      f.stage === stages.S1.name && isReviewedFlashcard(f, currDay.value)
+      f.stage === stages.S1.name && isReviewedFlashcard(f, currDay)
     )
   } else {
     result = flashcards.filter(f => f.stage === stage.name)
@@ -212,21 +210,18 @@ function isReviewedFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
   return flashcard.lastReviewDate !== undefined && flashcard.lastReviewDate === day.chronodate
 }
 
-export function countFlashcards(flashcards: Flashcard[], stage: Stage): number {
-  const chronoStore = useChronoStore()
-  const { currDay } = storeToRefs(chronoStore)
-
+export function countFlashcards(flashcards: Flashcard[], stage: Stage, currDay: Chronoday): number {
   if (stage === specialStages.UNKNOWN) {
     return flashcards.filter(f =>
-      f.stage === stages.S1.name && isUnknownFlashcard(f, currDay.value)
+      f.stage === stages.S1.name && isUnknownFlashcard(f, currDay)
     ).length
   } else if (stage === specialStages.ATTEMPTED) {
     return flashcards.filter(f =>
-      f.stage === stages.S1.name && isReviewedFlashcard(f, currDay.value)
+      f.stage === stages.S1.name && isReviewedFlashcard(f, currDay)
     ).length
   } else if (stage == stages.S1) {
     return flashcards.filter(f =>
-      f.stage === stages.S1.name && !isUnknownFlashcard(f, currDay.value) && !isReviewedFlashcard(f, currDay.value)
+      f.stage === stages.S1.name && !isUnknownFlashcard(f, currDay) && !isReviewedFlashcard(f, currDay)
     ).length
   } else {
     return flashcards.filter(f => f.stage === stage.name).length
@@ -238,8 +233,13 @@ export interface StageReview {
   count: number
 }
 
-export function calcStageReviews(flashcards: Flashcard[], stages: string[]): StageReview[] {
-  const queue = createReviewQueue(flashcards)
+export function calcStageReviews(
+  flashcards: Flashcard[],
+  stages: string[],
+  currDay: Chronoday,
+  chronodays: Chronoday[],
+): StageReview[] {
+  const queue = createReviewQueue(flashcards, currDay, chronodays)
   return stages
     .map(v => stageNameMap.get(v))
     .filter(v => v !== undefined)

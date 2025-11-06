@@ -39,11 +39,11 @@ const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 
 const { flashcards } = storeToRefs(flashcardStore)
-const { currDay } = storeToRefs(chronoStore)
+const { currDay, chronodays } = storeToRefs(chronoStore)
 
 const currDayStageReviews = computed<StageReview[]>(() => {
   if (!currDay.value) return []
-  return calcStageReviews(flashcards.value, currDay.value.stages)
+  return calcStageReviews(flashcards.value, currDay.value.stages, currDay.value, chronodays.value)
 })
 
 const currDayReviewTotal = computed(() =>

@@ -14,15 +14,18 @@ import { routeNames } from '@/router'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { createReviewQueue } from '@/core-logic/review-logic.ts';
+import { createReviewQueue } from '@/core-logic/review-logic.ts'
+import { useChronoStore } from '@/stores/chrono-store.ts'
 
 const router = useRouter()
 const flashcardStore = useFlashcardStore()
+const chronoStore = useChronoStore()
 
 const { flashcards, isEmpty, isSuspended } = storeToRefs(flashcardStore)
+const { currDay, chronodays } = storeToRefs(chronoStore)
 
 const noFlashcardsForReview = computed<boolean>(() => {
-  const queue = createReviewQueue(flashcards.value)
+  const queue = createReviewQueue(flashcards.value, currDay.value, chronodays.value)
   return queue.remaining() === 0
 })
 

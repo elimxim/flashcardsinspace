@@ -35,6 +35,7 @@ import { countFlashcards } from '@/core-logic/review-logic.ts'
 import { storeToRefs } from 'pinia'
 import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
+import { useChronoStore } from '@/stores/chrono-store.ts'
 
 const props = defineProps<{
   stage: Stage
@@ -43,10 +44,14 @@ const props = defineProps<{
 
 const router = useRouter()
 const flashcardStore = useFlashcardStore()
+const chronoStore = useChronoStore()
 
 const { flashcards } = storeToRefs(flashcardStore)
+const { currDay } = storeToRefs(chronoStore)
 
-const flashcardsCount = computed(() => countFlashcards(flashcards.value, props.stage))
+const flashcardsCount = computed(() =>
+  countFlashcards(flashcards.value, props.stage, currDay.value)
+)
 
 function startReview() {
   router.push({ name: routeNames.review, query: { stage: props.stage.name } })

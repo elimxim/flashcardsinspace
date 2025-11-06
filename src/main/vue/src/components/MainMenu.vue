@@ -125,7 +125,7 @@ const buckets: Bucket[] = allStages.map(stage => {
 })
 
 function flashcardNumberByStage(stage: Stage): number {
-  return countFlashcards(flashcardStore.flashcards, stage)
+  return countFlashcards(flashcardStore.flashcards, stage, currDay.value)
 }
 
 // <buckets

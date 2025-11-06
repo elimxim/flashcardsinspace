@@ -113,7 +113,7 @@ const chronoStore = useChronoStore()
 const toggleStore = useToggleStore()
 
 const { flashcardSet, flashcards, isSuspended } = storeToRefs(flashcardStore)
-const { currDay, isDayOff } = storeToRefs(chronoStore)
+const { currDay, isDayOff, chronodays } = storeToRefs(chronoStore)
 
 const showPreviousDaysPopup = ref(false)
 
@@ -163,7 +163,7 @@ const prevDaysReviewTotal = computed(() => {
   const currStages = new Set(currDay.value.stages)
   const prevStages = previousDays.value.map(d => d.stages).flat()
   const uniqueStages = [...new Set(prevStages)].filter(v => !currStages.has(v))
-  return calcStageReviews(flashcards.value, uniqueStages)
+  return calcStageReviews(flashcards.value, uniqueStages, currDay.value, chronodays.value)
     .reduce((acc, v) => acc + v.count, 0)
 })
 

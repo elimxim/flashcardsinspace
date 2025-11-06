@@ -250,9 +250,9 @@ async function nextFlashcard(): Promise<boolean> {
 function startReview() {
   console.log(`Starting review on stage: ${props.stage?.displayName ?? 'default'}`)
   if (props.stage) {
-    reviewQueue.value = createReviewQueueForStage(flashcards.value, props.stage)
+    reviewQueue.value = createReviewQueueForStage(flashcards.value, props.stage, currDay.value)
   } else {
-    reviewQueue.value = createReviewQueue(flashcards.value)
+    reviewQueue.value = createReviewQueue(flashcards.value, currDay.value, chronodays.value)
   }
   flashcardsTotal.value = reviewQueue.value.remaining()
   nextFlashcard()
