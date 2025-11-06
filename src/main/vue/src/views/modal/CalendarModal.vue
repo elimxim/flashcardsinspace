@@ -50,7 +50,7 @@
         </div>
       </div>
     </div>
-    <div class="modal-control-buttons">
+    <div v-if="hasAccess" class="modal-control-buttons">
       <SmartButton
         class="calendar-button"
         text="Prev"
@@ -88,17 +88,18 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { sendChronoSyncNextDay, sendChronoSyncPrevDay } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { parseLocalDate } from '@/utils/date.ts'
+import { useAuthStore, UserRole } from '@/stores/auth-store.ts'
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
 const chronoStore = useChronoStore()
 const flashcardStore = useFlashcardStore()
+const authStore = useAuthStore()
 
-const {
-  flashcardSet,
-  isStarted,
-} = storeToRefs(flashcardStore)
+const { flashcardSet, isStarted } = storeToRefs(flashcardStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
+
+const hasAccess = computed(() => authStore.hasAccess(UserRole.COMMANDER))
 
 const prevMonthButton = ref<HTMLButtonElement>()
 const nextMonthButton = ref<HTMLButtonElement>()
