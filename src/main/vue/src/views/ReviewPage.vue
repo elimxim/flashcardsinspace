@@ -145,7 +145,8 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import {
   copyFlashcard,
-  fetchFlashcardAudioBlob, flashcardSides,
+  fetchFlashcardAudioBlob,
+  flashcardSides,
   updateFlashcard
 } from '@/core-logic/flashcard-logic.ts'
 import { nextStage, prevStage, Stage, stages } from '@/core-logic/stage-logic.ts'
@@ -173,11 +174,10 @@ import {
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import {
   chronodayStatuses,
-  isCompleteAvailable,
-  isInProgressAvailable,
+  chronodayStatusesToCompleteDay,
+  chronodayStatusesToProgressDay,
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
-import type { Chronoday } from '@/model/chrono.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
 
 const props = defineProps<{
@@ -367,23 +367,23 @@ async function markDaysAndGoNext(flashcardSet: FlashcardSet) {
 }
 
 async function markDaysAsInProgress(flashcardSet: FlashcardSet) {
-  if (isInProgressAvailable(currDay.value)) {
-    await markDaysAs(flashcardSet, chronodayStatuses.IN_PROGRESS, isInProgressAvailable)
+  if (chronodayStatusesToProgressDay.has(currDay.value.status)) {
+    await markDaysAs(flashcardSet, chronodayStatuses.IN_PROGRESS, chronodayStatusesToProgressDay)
   }
 }
 
 async function markDaysAsCompleted(flashcardSet: FlashcardSet) {
-  if (isCompleteAvailable(currDay.value)) {
-    await markDaysAs(flashcardSet, chronodayStatuses.COMPLETED, isCompleteAvailable)
+  if (chronodayStatusesToCompleteDay.has(currDay.value.status)) {
+    await markDaysAs(flashcardSet, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
   }
 }
 
 async function markDaysAs(
   flashcardSet: FlashcardSet,
   status: string,
-  daysFilter: (chronoday: Chronoday) => boolean,
+  acceptedStatuses: Set<string>,
 ) {
-  const days = selectConsecutiveDaysBefore(chronodays.value, currDay.value, daysFilter)
+  const days = selectConsecutiveDaysBefore(chronodays.value, currDay.value, acceptedStatuses)
   if (days.length === 0) {
     console.error(
       `No days to mark as ${status}`,

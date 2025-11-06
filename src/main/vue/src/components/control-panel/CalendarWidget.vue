@@ -104,7 +104,7 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
 import {
   chronodayStatuses,
-  isCompleteAvailable,
+  chronodayStatusesToCompleteDay,
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
 
@@ -131,7 +131,7 @@ const previousDays = computed(() => {
   return selectConsecutiveDaysBefore(
     chronoStore.chronodays,
     currDay.value,
-    isCompleteAvailable,
+    chronodayStatusesToCompleteDay,
     false,
   )
 })

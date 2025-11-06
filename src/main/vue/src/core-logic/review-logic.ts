@@ -10,7 +10,7 @@ import {
 import type { Chronoday } from '@/model/chrono.ts'
 import { shuffle } from '@/utils/array.ts'
 import {
-  isCompleteAvailable,
+  chronodayStatusesToCompleteDay,
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
 
@@ -154,9 +154,10 @@ export function createReviewQueue(
   flashcards: Flashcard[],
   currDay: Chronoday,
   chronodays: Chronoday[],
+  acceptedStatuses: Set<string> = chronodayStatusesToCompleteDay,
 ): ReviewQueue {
   const daysForReview = selectConsecutiveDaysBefore(
-    chronodays, currDay, isCompleteAvailable
+    chronodays, currDay, acceptedStatuses
   )
   const stagesForReview = new Set(daysForReview.map(d => d.stages).flat())
 

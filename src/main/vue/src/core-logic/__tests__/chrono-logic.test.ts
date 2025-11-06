@@ -16,10 +16,10 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
   it('should return an empty array if the condition is not met for the start day', () => {
     // given:
     const startDay = chronodays[5]
-    const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
+    const acceptedStatuses = new Set([chronodayStatuses.COMPLETED])
 
     // when:
-    const result = selectConsecutiveDaysBefore(chronodays, startDay, condition)
+    const result = selectConsecutiveDaysBefore(chronodays, startDay, acceptedStatuses)
 
     // then:
     expect(result).toEqual([])
@@ -28,10 +28,10 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
   it('should skip OFF days and continue collecting days that meet the condition', () => {
     // given:
     const startDay = chronodays[3]
-    const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
+    const acceptedStatuses = new Set([chronodayStatuses.COMPLETED])
 
     // when:
-    const result = selectConsecutiveDaysBefore(chronodays, startDay, condition)
+    const result = selectConsecutiveDaysBefore(chronodays, startDay, acceptedStatuses)
 
     // then:
     // Should include day 3, skip OFF day 2, and include days 1 and 0
@@ -41,10 +41,10 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
   it('should return all consecutive days that meet the condition, skipping OFF days', () => {
     // given:
     const startDay = chronodays[4]
-    const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
+    const acceptedStatuses = new Set([chronodayStatuses.COMPLETED])
 
     // when:
-    const result = selectConsecutiveDaysBefore(chronodays, startDay, condition)
+    const result = selectConsecutiveDaysBefore(chronodays, startDay, acceptedStatuses)
 
     // then:
     // Should include days 4, 3, skip OFF day 2, and include days 1 and 0
@@ -54,10 +54,10 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
   it('should stop when a non-OFF day that does not meet the condition is found', () => {
     // given:
     const startDay = chronodays[5]
-    const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
+    const acceptedStatuses = new Set([chronodayStatuses.COMPLETED])
 
     // when:
-    const result = selectConsecutiveDaysBefore(chronodays, startDay, condition)
+    const result = selectConsecutiveDaysBefore(chronodays, startDay, acceptedStatuses)
 
     // then:
     // Should stop at day 5 (NOT_STARTED) which doesn't meet the condition
@@ -67,10 +67,10 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
   it('should return all days from the start day to the beginning if they all meet the condition', () => {
     // given:
     const startDay = chronodays[1]
-    const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
+    const acceptedStatuses = new Set([chronodayStatuses.COMPLETED])
 
     // when:
-    const result = selectConsecutiveDaysBefore(chronodays, startDay, condition)
+    const result = selectConsecutiveDaysBefore(chronodays, startDay, acceptedStatuses)
 
     // then:
     expect(result).toEqual([chronodays[1], chronodays[0]])
@@ -79,10 +79,10 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
   it('should work correctly when startDay is the first day in the array', () => {
     // given:
     const startDay = chronodays[0]
-    const condition = (day: Chronoday) => day.status === chronodayStatuses.COMPLETED
+    const acceptedStatuses = new Set([chronodayStatuses.COMPLETED])
 
     // when:
-    const result = selectConsecutiveDaysBefore(chronodays, startDay, condition)
+    const result = selectConsecutiveDaysBefore(chronodays, startDay, acceptedStatuses)
 
     // then:
     expect(result).toEqual([startDay])
@@ -93,7 +93,7 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
     const dummyStartDay = chronoday(0, 0, 'COMPLETED')
 
     // when:
-    const result = selectConsecutiveDaysBefore([], dummyStartDay, () => true)
+    const result = selectConsecutiveDaysBefore([], dummyStartDay, new Set())
 
     // then:
     expect(result).toEqual([])

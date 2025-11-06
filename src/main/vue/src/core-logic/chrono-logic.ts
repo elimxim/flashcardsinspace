@@ -20,29 +20,19 @@ export interface CalendarDay {
   isCurrDay: boolean
 }
 
-export function isInProgressAvailable(chronoday: Chronoday): boolean {
-  switch (chronoday.status) {
-    case chronodayStatuses.NOT_STARTED:
-      return true
-    default:
-      return false
-  }
-}
+export const chronodayStatusesToProgressDay = new Set([
+  chronodayStatuses.NOT_STARTED,
+])
 
-export function isCompleteAvailable(chronoday: Chronoday): boolean {
-  switch (chronoday.status) {
-    case chronodayStatuses.NOT_STARTED:
-    case chronodayStatuses.IN_PROGRESS:
-      return true
-    default:
-      return false
-  }
-}
+export const chronodayStatusesToCompleteDay = new Set([
+  chronodayStatuses.NOT_STARTED,
+  chronodayStatuses.IN_PROGRESS,
+])
 
 export function selectConsecutiveDaysBefore(
   chronodays: Chronoday[],
   startDay: Chronoday,
-  condition: (chronoday: Chronoday) => boolean,
+  acceptedStatues: Set<string>,
   including: boolean = true,
 ): Chronoday[] {
   if (chronodays.length === 0) return []
@@ -56,10 +46,8 @@ export function selectConsecutiveDaysBefore(
 
   const result: Chronoday[] = []
   for (let i = startIndex; i >= 0; i--) {
-    console.log(`Checking day at index ${i} for condition ${condition.name}`)
     const chronoday = chronodays[i]
-    console.log(`Day at index ${i} is ${JSON.stringify(chronoday)}`)
-    if (chronoday && condition(chronoday)) {
+    if (chronoday && acceptedStatues.has(chronoday.status)) {
       result.push(chronoday)
     } else if (chronoday && chronoday.status !== chronodayStatuses.OFF) {
       break
