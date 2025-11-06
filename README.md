@@ -2,7 +2,6 @@
 
 ## TODOS
 
-- ROLE-based access control
 - README
   - Describe the project
 - UX:
