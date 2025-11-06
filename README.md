@@ -3,7 +3,6 @@
 ## TODOS
 
 - ROLE-based access control
-- Show description on hover
 - README
   - Describe the project
 - UX:
