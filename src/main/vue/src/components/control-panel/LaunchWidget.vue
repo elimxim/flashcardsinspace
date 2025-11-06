@@ -14,13 +14,21 @@ import { routeNames } from '@/router'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
+import { createReviewQueue } from '@/core-logic/review-logic.ts';
 
 const router = useRouter()
 const flashcardStore = useFlashcardStore()
 
-const { isEmpty, isSuspended } = storeToRefs(flashcardStore)
+const { flashcards, isEmpty, isSuspended } = storeToRefs(flashcardStore)
 
-const isDisabled = computed(() => isEmpty.value || isSuspended.value)
+const noFlashcardsForReview = computed<boolean>(() => {
+  const queue = createReviewQueue(flashcards.value)
+  return queue.remaining() === 0
+})
+
+const isDisabled = computed(() =>
+  isEmpty.value || isSuspended.value || noFlashcardsForReview.value
+)
 
 function startReview() {
   router.push({ name: routeNames.review })
