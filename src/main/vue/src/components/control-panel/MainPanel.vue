@@ -43,15 +43,12 @@ import { useControlStore } from '@/stores/control-store.ts'
 import { specialStages } from '@/core-logic/stage-logic.ts'
 import { useFlip } from '@/utils/flip.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
-import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 
 const controlStore = useControlStore()
-const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 
 const { isSidebarExpanded } = storeToRefs(controlStore)
-const { isInitialDay } = storeToRefs(chronoStore)
-const { isSuspended } = storeToRefs(flashcardStore)
+const { isInitialDay, isDayOff } = storeToRefs(chronoStore)
 
 const mainPanel = ref<HTMLElement>()
 const mainPanelWidth = ref(0)
@@ -88,7 +85,7 @@ const widgets: Record<string, Widget> = {
     component: ReviewInfoWidget,
     className: 'main-panel-stretching-widget',
     props: {},
-    hidden: computed(() => isInitialDay.value || isSuspended.value),
+    hidden: computed(() => isInitialDay.value || isDayOff.value),
   },
   launch: {
     id: 'launch',
