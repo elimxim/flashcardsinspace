@@ -51,7 +51,7 @@ const createFlashcardCountComputed = (stage: Stage) => {
 
 .stages-widget {
   position: relative;
-  padding: 4px;
+  padding: 1px 4px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -60,6 +60,7 @@ const createFlashcardCountComputed = (stage: Stage) => {
   border: 1px solid black;
   border-radius: 6px;
   width: 100%;
+  min-width: 360px;
   height: 100%;
 }
 
@@ -73,7 +74,6 @@ const createFlashcardCountComputed = (stage: Stage) => {
   align-self: start;
   text-align: left;
   white-space: nowrap;
-  padding: 2px;
 }
 
 .stage-grid {
@@ -99,13 +99,20 @@ const createFlashcardCountComputed = (stage: Stage) => {
   border-radius: 6px;
   justify-content: center;
   align-items: center;
-  width: fit-content;
+  width: 70%;
+  min-width: 40px;
+  max-width: 106px;
+  height: auto;
+  min-height: 40px;
+  max-height: 106px;
+  aspect-ratio: 1 / 1;
   padding: 4px;
   gap: 4px;
+  container-type: size;
 }
 
 .stage-name {
-  font-size: 0.8rem;
+  font-size: clamp(0.4rem, 24cqw, 1rem);
   font-weight: 500;
   color: black;
   letter-spacing: 0.05rem;
@@ -116,14 +123,14 @@ const createFlashcardCountComputed = (stage: Stage) => {
 }
 
 .stage-count {
-  font-size: 0.7rem;
+  font-size: clamp(0.3rem, 24cqw, 0.8rem);
   font-weight: 600;
   color: black;
   border: 1px solid black;
   border-radius: 4px;
   background: none;
   padding: 2px 4px;
-  width: 30px;
+  width: clamp(10px, 50cqw, 40px);
   text-align: center;
 }
 </style>
