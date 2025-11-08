@@ -3,11 +3,13 @@
     <div class="stages-title">
       Learning Stages
     </div>
-    <div class="stage-grid">
+    <div class="stage-grid" ref="gridRef">
       <div
-        v-for="stage in mainStageArray"
+        v-for="(stage, index) in mainStageArray"
         :key="stage.name"
         class="stage-wrapper"
+        :ref="(el) => { if (el) stageElements[index] = el as HTMLElement }"
+        :style="{ transform: `translateY(${stageOffsets[index]}px)` }"
       >
         <div class="stage">
           <div class="stage-name">
@@ -28,7 +30,7 @@ import { countFlashcards } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
@@ -36,11 +38,80 @@ const chronoStore = useChronoStore()
 const { flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
+const gridRef = ref<HTMLElement | null>(null)
+const stageOffsets = ref<number[]>(Array(7).fill(0))
+const stageElements = ref<HTMLElement[]>([])
+const resizeObserver = ref<ResizeObserver | null>(null)
+
 const createFlashcardCountComputed = (stage: Stage) => {
   return computed(() => {
     return countFlashcards(flashcards.value, stage, currDay.value)
   })
 }
+
+const calculateStageOffsets = () => {
+  if (!gridRef.value || stageElements.value.length === 0) return
+
+  const gridHeight = gridRef.value.clientHeight
+
+  const stageSizes: number[] = []
+  for (let i = 0; i < 7; i++) {
+    const el = stageElements.value[i]
+    if (el) {
+      stageSizes.push(el.offsetHeight)
+    } else {
+      stageSizes.push(0)
+    }
+  }
+
+  // Cubic growth function: f(i) = (i/6)^3
+  // Maps 0-6 to 0-1 with cubic growth
+  const cubicFactor = (index: number) => {
+    const normalized = index / 6
+    return normalized * normalized * normalized
+  }
+
+  // Calculate cubic factors for all stages
+  const factors = Array.from({ length: 7 }, (_, i) => cubicFactor(i))
+
+  const offsets: number[] = []
+
+  for (let i = 0; i < 7; i++) {
+    const stageHeight = stageSizes[i] || 50
+    const halfStageHeight = stageHeight / 2
+
+    // Position based on cubic distribution
+    const cubicPosition = factors[i] // 0 to 1
+    const maxY = gridHeight / 2 - halfStageHeight // bottom
+    const minY = -gridHeight / 2 + halfStageHeight // top
+    const offset = maxY - cubicPosition * (maxY - minY)
+
+    offsets.push(offset)
+  }
+
+  stageOffsets.value = offsets
+}
+
+onMounted(() => {
+  calculateStageOffsets()
+
+  window.addEventListener('resize', calculateStageOffsets)
+
+  if (gridRef.value) {
+    resizeObserver.value = new ResizeObserver(() => {
+      calculateStageOffsets()
+    })
+    resizeObserver.value.observe(gridRef.value)
+  }
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', calculateStageOffsets)
+
+  if (resizeObserver.value) {
+    resizeObserver.value.disconnect()
+  }
+})
 
 </script>
 
@@ -80,9 +151,11 @@ const createFlashcardCountComputed = (stage: Stage) => {
   flex: 1;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  align-content: center;
   gap: 4px;
   width: 100%;
+  position: relative;
+  align-items: center;
+  margin: 10px;
 }
 
 .stage-wrapper {
@@ -90,6 +163,8 @@ const createFlashcardCountComputed = (stage: Stage) => {
   display: flex;
   justify-content: center;
   align-items: center;
+  /* Positions calculated dynamically in TypeScript */
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .stage {
