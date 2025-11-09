@@ -26,6 +26,9 @@
         </ControlBar>
         <FlashcardInfoBar :hidden="!flashcardSet || isSidebarExpanded"/>
         <MainPanel/>
+        <div class="stages-panel">
+          <LearningStagesWidget/>
+        </div>
       </div>
     </div>
   </div>
@@ -37,6 +40,7 @@ import SideBar from '@/components/control-panel/SideBar.vue'
 import ControlBar from '@/components/ControlBar.vue'
 import FlashcardInfoBar from '@/components/control-panel/FlashcardInfoBar.vue'
 import MainPanel from '@/components/control-panel/MainPanel.vue'
+import LearningStagesWidget from '@/components/control-panel/LearningStagesWidget.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
@@ -74,6 +78,7 @@ function openFlashcardSetSettings() {
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-width: 654px;
   height: calc(100vh - var(--navbar-height));
   background-color: var(--c-panel--bg-color);
 }
@@ -91,6 +96,11 @@ function openFlashcardSetSettings() {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.stages-panel {
+  flex: 1;
+  padding: 6px 16px;
 }
 
 </style>
