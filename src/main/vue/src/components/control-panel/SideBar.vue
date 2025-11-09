@@ -138,18 +138,19 @@ onMounted(() => {
 .sidebar--theme {
   --bar--bg: var(--sidebar--bg, #32334a);
   --bar--border-color: var(--sidebar--border-color, rgba(89, 78, 117, 0.85));
-  --bar--item--bg: var(--sidebar--item--bg, linear-gradient(135deg, rgba(154, 190, 197, 0.31) 0%, rgba(156, 166, 200, 0.31) 100%));
-  --bar--item--bg--hover: var(--sidebar--item--bg--hover, linear-gradient(135deg, rgba(73, 139, 154, 0.78) 0%, rgba(147, 56, 177, 0.67) 100%));
-  --bar--item--bg--active: var(--sidebar--item--bg--active, linear-gradient(135deg, rgba(73, 139, 154, 0.78) 0%, rgba(147, 56, 177, 0.67) 100%));
-  --bar--item--border-color: var(--sidebar--item--border-color, rgba(63, 13, 83, 0.81));
-  --bar--item--border-color--active: var(--sidebar--item--border-color--active, rgba(63, 13, 83, 0.81));
-  --bar--item--text-color: var(--sidebar--item--text-color, rgba(245, 254, 255, 0.95));
+  --bar--item--bg: var(--sidebar--item--bg, linear-gradient(135deg, rgb(154, 166, 240, 0.75) 0%, rgb(162, 132, 192, 0.75) 100%));
+  --bar--item--bg--hover: var(--sidebar--item--bg--hover, linear-gradient(135deg, rgb(142, 111, 189, 0.75) 0%, rgb(215, 91, 208, 0.75) 100%));
+  --bar--item--bg--active: var(--sidebar--item--bg--active, linear-gradient(135deg, rgb(142, 111, 189, 0.75) 0%, rgb(215, 91, 208, 0.75) 100%));
+  --bar--item--border-color: var(--sidebar--item--border-color, rgba(74, 74, 74, 0.81));
+  --bar--item--border-color--active: var(--sidebar--item--border-color--active, rgba(255, 255, 255, 0.81));
+  --bar--item--color: var(--sidebar--item--color, rgba(13, 18, 74, 0.6));
+  --bar--item--color--hover: var(--sidebar--item--color--hover, rgba(255, 255, 255, 0.6));
+  --bar--item--color--active: var(--sidebar--item--color--active, rgba(255, 255, 255, 0.6));
   --bar--item--shadow-color: var(--sidebar--item--shadow-color, transparent);
-  --bar--item--count--color: var(--sidebar--item--count-color, #081233);
-  --bar--item--count--bg: var(--sidebar--item--count--bg, rgba(255, 255, 255, 0.87));
-  --bar--item--count--border-color: var(--sidebar--item--count--border-color, rgba(103, 126, 149, 0.83));
+  --bar--item--count--color: var(--sidebar--item--count-color, rgba(20, 27, 106, 0.82));
+  --bar--item--count--bg: var(--sidebar--item--count--bg, rgba(255, 255, 255, 0.6));
   --bar--language--text-color: var(--sidebar--language--text-color, #efe9ef);
-  --bar--language--icon-color: var(--sidebar--language--icon-color, rgba(172, 252, 255, 0.85));
+  --bar--language--icon-color: var(--sidebar--language--icon-color,rgba(255, 255, 255, 0.6));
   --bar--scrollbar--track-color: var(--sidebar--scrollbar--track-color, #575e68);
   --bar--scrollbar--thumb-color: var(--sidebar--scrollbar--thumb-color, #808daa);
   --bar--scrollbar--thumb-color--hover: var(--sidebar--scrollbar--thumb-hover-color, #98a9ca);
@@ -220,7 +221,6 @@ onMounted(() => {
   border: 1px solid var(--bar--item--border-color);
   border-radius: 6px;
   box-shadow: 2px 2px 3px var(--bar--item--shadow-color);
-  backdrop-filter: blur(4px);
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
@@ -231,12 +231,28 @@ onMounted(() => {
   transform: translateX(-6px);
 }
 
+.sidebar-item:hover .sidebar-item__name {
+  color: var(--bar--item--color--hover);
+}
+
+.sidebar-item:hover .sidebar-item__language {
+  color: var(--bar--item--color--hover);
+}
+
 .sidebar-item--active {
   background: var(--bar--item--bg--active);
   border-color: var(--bar--item--border-color--active);
   box-shadow: 8px 3px 3px var(--bar--item--shadow-color);
   backdrop-filter: none;
   transform: translateX(-6px);
+}
+
+.sidebar-item--active .sidebar-item__name {
+  color: var(--bar--item--color--active);
+}
+
+.sidebar-item--active .sidebar-item__language {
+  color: var(--bar--item--color--active);
 }
 
 .sidebar-item__content {
@@ -248,12 +264,13 @@ onMounted(() => {
 }
 
 .sidebar-item__name {
-  color: var(--bar--item--text-color);
-  font-size: 0.9rem;
-  font-weight: 500;
+  color: var(--bar--item--color);
+  font-size: 1.1rem;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: color 0.2s ease-in-out;
 }
 
 .sidebar-item__language-container {
@@ -263,26 +280,26 @@ onMounted(() => {
 }
 
 .sidebar-item__language {
-  color: var(--bar--language--text-color);
-  font-size: 0.65rem;
+  color: var(--bar--item--color);
+  font-size: 0.75rem;
   font-weight: 400;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: color 0.2s ease-in-out;
 }
 
 .sidebar-item__count {
-  width: 32px;
-  height: 24px;
-  border-radius: 4px;
+  width: 40px;
+  border-radius: 3px;
   background: var(--bar--item--count--bg);
-  border: 1px solid var(--bar--item--count--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1px;
+  padding: 2px;
   color: var(--bar--item--count--color);
-  font-size: 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
   margin-left: 0.75rem;
 }
 </style>
