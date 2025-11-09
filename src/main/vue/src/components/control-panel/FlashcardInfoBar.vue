@@ -93,7 +93,7 @@ const flashcardCount = computed(() => flashcards.value.length)
 
 .flashcards-info-number {
   font-size: clamp(0.75rem, 2vw, 0.9rem);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--f-bar--flashcards--number--color);
   background-color: var(--f-bar--flashcards--number--bg-color);
   border-radius: 3px;
