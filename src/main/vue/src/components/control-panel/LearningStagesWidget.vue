@@ -76,35 +76,27 @@ const calculateStageOffsets = () => {
     }
   }
 
-  // Get flashcard counts for each stage
   const flashcardCounts = mainStageArray.map(stage =>
     countFlashcards(flashcards.value, stage, currDay.value)
   )
 
-  // Find the maximum count
   const maxCount = Math.max(...flashcardCounts)
 
-  // If no flashcards, use default positioning
   if (maxCount === 0) {
     stageOffsets.value = Array(7).fill(0)
     return
   }
 
   // Calculate normalized factors based on flashcard counts
-  // Stage with max count gets factor 1 (offset 0), others get proportional factors
+  // Stage with max count gets factor 1, others get proportional factors
   const factors = flashcardCounts.map(count => count / maxCount)
 
   const offsets: number[] = []
 
   for (let i = 0; i < 7; i++) {
-    // Position based on flashcard count distribution from bottom to top
-    // Stage with max count stays at bottom (offset 0), others move up
-    const countFactor = factors[i] // 0 to 1
-    // top of the grid
-    const minY = 0
-    // bottom of grid (accounting for reference element height)
+    const countFactor = factors[i]
     const maxY = gridHeight - referenceHeight
-    const offset = maxY - countFactor * (maxY - minY)
+    const offset = maxY - countFactor * maxY
 
     offsets.push(offset)
   }
@@ -184,6 +176,7 @@ onUnmounted(() => {
 
 .stage-wrapper {
   width: 100%;
+  height: auto;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -209,8 +202,7 @@ onUnmounted(() => {
   padding: 4px;
   gap: 4px;
   container-type: size;
-  transition: height 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) 0.6s;
-}
+ }
 
 .stage-name {
   font-size: clamp(0.55rem, 24cqw, 0.9rem);
