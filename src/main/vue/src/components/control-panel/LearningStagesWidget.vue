@@ -1,5 +1,9 @@
 <template>
-  <div class="stages-widget stages-widget--theme">
+  <div
+    class="stages-widget stages-widget--theme"
+    @mouseenter="isHovering = true"
+    @mouseleave="isHovering = false"
+  >
     <div class="stages-title">
       Learning Stages
     </div>
@@ -30,7 +34,7 @@ import { countFlashcards } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
@@ -42,6 +46,7 @@ const gridRef = ref<HTMLElement | null>(null)
 const stageOffsets = ref<number[]>(Array(7).fill(0))
 const stageElements = ref<HTMLElement[]>([])
 const resizeObserver = ref<ResizeObserver | null>(null)
+const isHovering = ref(false)
 
 const createFlashcardCountComputed = (stage: Stage) => {
   return computed(() => {
@@ -50,7 +55,10 @@ const createFlashcardCountComputed = (stage: Stage) => {
 }
 
 const calculateStageOffsets = () => {
-  if (!gridRef.value || stageElements.value.length === 0) return
+  if (!gridRef.value || stageElements.value.length === 0 || !isHovering.value) {
+    stageOffsets.value = Array(7).fill(0)
+    return
+  }
 
   const gridHeight = gridRef.value.clientHeight
 
@@ -91,6 +99,10 @@ const calculateStageOffsets = () => {
 
   stageOffsets.value = offsets
 }
+
+watch(isHovering, () => {
+  calculateStageOffsets()
+})
 
 onMounted(() => {
   calculateStageOffsets()
@@ -163,8 +175,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Positions calculated dynamically in TypeScript */
-  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.6s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
 .stage {
