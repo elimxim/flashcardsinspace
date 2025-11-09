@@ -130,6 +130,6 @@ const currDayReviewTotal = computed(() =>
   padding: 2px;
   width: 40px;
   text-align: center;
-  transition: transform 0.2s ease-in-out;
+  transition: transform 0.1s ease-in-out;
 }
 </style>
