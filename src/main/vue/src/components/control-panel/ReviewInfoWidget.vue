@@ -1,9 +1,9 @@
 <template>
   <div class="review-info-widget review-info-widget--theme">
-    <div class="review-info-title">
+    <div class="review-info-title select-none">
       To review
     </div>
-    <div class="review-list">
+    <div class="review-list select-none">
       <div
         v-for="review in currDayStageReviews"
         :key="review.stage"
@@ -102,6 +102,10 @@ const currDayReviewTotal = computed(() =>
   gap: 8px;
 }
 
+.review-item:hover .review-item-count {
+  transform: scale(1.2);
+}
+
 .review-item--total {
   font-weight: 600;
 }
@@ -126,5 +130,6 @@ const currDayReviewTotal = computed(() =>
   padding: 2px;
   width: 40px;
   text-align: center;
+  transition: transform 0.2s ease-in-out;
 }
 </style>
