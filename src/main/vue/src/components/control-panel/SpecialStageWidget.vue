@@ -6,12 +6,12 @@
       <div class="special-stage-icon">
         <font-awesome-icon :icon="icon"/>
       </div>
-      <div class="special-stage-title">
+      <div class="special-stage-title select-none">
         {{ stage.displayName }}<br>Flashcards
       </div>
     </div>
     <div class="special-stage-bottom">
-      <div class="special-stage-count">
+      <div class="special-stage-count select-none">
         {{ flashcardsCount }}
       </div>
       <SmartButton
