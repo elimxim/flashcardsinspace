@@ -15,7 +15,6 @@
         :ref="(el) => { if (el) stageElements[index] = el as HTMLElement }"
         :style="{
           transform: `translateY(${stageOffsets[index]}px)`,
-          '--bar-height': `${gridRef?.clientHeight ? gridRef.clientHeight - stageOffsets[index] : 0}px`
         }"
       >
         <div class="stage select-none">
@@ -67,39 +66,45 @@ const calculateStageOffsets = () => {
 
   const gridHeight = gridRef.value.clientHeight
 
-  const stageSizes: number[] = []
-  for (let i = 0; i < 7; i++) {
-    const el = stageElements.value[i]
-    if (el) {
-      stageSizes.push(el.offsetHeight)
-    } else {
-      stageSizes.push(0)
+  // Get the actual height of the first stage element
+  const firstWrapper = stageElements.value[0]
+  let referenceHeight = 50 // fallback
+  if (firstWrapper) {
+    const stageEl = firstWrapper.querySelector('.stage') as HTMLElement
+    if (stageEl) {
+      referenceHeight = stageEl.offsetHeight
     }
   }
 
-  // Cubic growth function: f(i) = (i/6)^3
-  // Maps 0-6 to 0-1 with cubic growth
-  const cubicFactor = (index: number) => {
-    const normalized = index / 6
-    return normalized * normalized * normalized
+  // Get flashcard counts for each stage
+  const flashcardCounts = mainStageArray.map(stage =>
+    countFlashcards(flashcards.value, stage, currDay.value)
+  )
+
+  // Find the maximum count
+  const maxCount = Math.max(...flashcardCounts)
+
+  // If no flashcards, use default positioning
+  if (maxCount === 0) {
+    stageOffsets.value = Array(7).fill(0)
+    return
   }
 
-  // Calculate cubic factors for all stages
-  const factors = Array.from({ length: 7 }, (_, i) => cubicFactor(i))
+  // Calculate normalized factors based on flashcard counts
+  // Stage with max count gets factor 1 (offset 0), others get proportional factors
+  const factors = flashcardCounts.map(count => count / maxCount)
 
   const offsets: number[] = []
 
   for (let i = 0; i < 7; i++) {
-    const stageHeight = stageSizes[i] || 50
-
-    // Position based on cubic distribution from bottom to top
-    // Stage 0 starts at bottom, stage 6 at top
-    const cubicPosition = factors[i] // 0 to 1
+    // Position based on flashcard count distribution from bottom to top
+    // Stage with max count stays at bottom (offset 0), others move up
+    const countFactor = factors[i] // 0 to 1
     // top of the grid
     const minY = 0
-    // bottom of grid (accounting for element height)
-    const maxY = gridHeight - stageHeight
-    const offset = maxY - cubicPosition * (maxY - minY)
+    // bottom of grid (accounting for reference element height)
+    const maxY = gridHeight - referenceHeight
+    const offset = maxY - countFactor * (maxY - minY)
 
     offsets.push(offset)
   }
@@ -186,24 +191,6 @@ onUnmounted(() => {
   position: relative;
 }
 
-.stage-wrapper::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 70%;
-  height: 0px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-  border-radius: 6px;
-  z-index: -1;
-  transition: height 0.3s;
-}
-
-.stages-widget:hover .stage-wrapper::before {
-  height: var(--bar-height, 0px);
-}
-
 .stage {
   display: flex;
   flex-direction: column;
@@ -222,6 +209,7 @@ onUnmounted(() => {
   padding: 4px;
   gap: 4px;
   container-type: size;
+  transition: height 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) 0.6s;
 }
 
 .stage-name {
