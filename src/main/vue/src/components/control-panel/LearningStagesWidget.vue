@@ -7,12 +7,12 @@
     <div class="stages-title">
       Learning Stages
     </div>
-    <div class="stage-grid" ref="gridRef">
+    <div ref="gridRef" class="stage-grid">
       <div
         v-for="(stage, index) in mainStageArray"
         :key="stage.name"
-        class="stage-wrapper"
         :ref="(el) => { if (el) stageElements[index] = el as HTMLElement }"
+        class="stage-wrapper"
         :style="{
           transform: `translateY(${stageOffsets[index]}px)`,
         }"
