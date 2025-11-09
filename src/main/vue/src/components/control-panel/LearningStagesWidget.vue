@@ -17,7 +17,14 @@
           transform: `translateY(${stageOffsets[index]}px)`,
         }"
       >
-        <div class="stage select-none">
+        <div
+          class="stage select-none"
+          :style="stageHeights[index] > 0 ? {
+            height: `${stageHeights[index]}px`,
+            maxHeight: `${Math.max(stageHeights[index], 500)}px`,
+            aspectRatio: 'auto',
+          } : {}"
+        >
           <div class="stage-name">
             {{ stage.displayName }}
           </div>
@@ -38,7 +45,7 @@ import { countFlashcards } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
-import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
@@ -48,9 +55,11 @@ const { currDay } = storeToRefs(chronoStore)
 
 const gridRef = ref<HTMLElement | null>(null)
 const stageOffsets = ref<number[]>(Array(7).fill(0))
+const stageHeights = ref<number[]>(Array(7).fill(0))
 const stageElements = ref<HTMLElement[]>([])
 const resizeObserver = ref<ResizeObserver | null>(null)
 const isHovering = ref(false)
+const originalStageHeight = ref<number>(50) // Store the original stage height
 
 const createFlashcardCountComputed = (stage: Stage) => {
   return computed(() => {
@@ -58,23 +67,51 @@ const createFlashcardCountComputed = (stage: Stage) => {
   })
 }
 
-const calculateStageOffsets = () => {
-  if (!gridRef.value || stageElements.value.length === 0 || !isHovering.value) {
+const captureOriginalHeight = () => {
+  if (!gridRef.value || stageElements.value.length === 0) return
+
+  // Temporarily ensure we're not hovering to get clean measurements
+  const wasHovering = isHovering.value
+  if (wasHovering) {
+    isHovering.value = false
+    // Reset any applied styles
     stageOffsets.value = Array(7).fill(0)
+    stageHeights.value = Array(7).fill(0)
+  }
+
+  // Wait for next tick to ensure styles are applied
+  nextTick(() => {
+    const firstWrapper = stageElements.value[0]
+    if (firstWrapper) {
+      const stageEl = firstWrapper.querySelector('.stage') as HTMLElement
+      if (stageEl) {
+        originalStageHeight.value = stageEl.offsetHeight
+      }
+    }
+
+    // Restore hovering state if it was active
+    if (wasHovering) {
+      isHovering.value = true
+      calculateStageOffsets()
+    }
+  })
+}
+
+const calculateStageOffsets = () => {
+  if (!gridRef.value || stageElements.value.length === 0) {
+    stageOffsets.value = Array(7).fill(0)
+    stageHeights.value = Array(7).fill(0)
+    return
+  }
+
+  if (!isHovering.value) {
+    stageOffsets.value = Array(7).fill(0)
+    stageHeights.value = Array(7).fill(0)
     return
   }
 
   const gridHeight = gridRef.value.clientHeight
-
-  // Get the actual height of the first stage element
-  const firstWrapper = stageElements.value[0]
-  let referenceHeight = 50 // fallback
-  if (firstWrapper) {
-    const stageEl = firstWrapper.querySelector('.stage') as HTMLElement
-    if (stageEl) {
-      referenceHeight = stageEl.offsetHeight
-    }
-  }
+  const referenceHeight = originalStageHeight.value
 
   const flashcardCounts = mainStageArray.map(stage =>
     countFlashcards(flashcards.value, stage, currDay.value)
@@ -84,6 +121,7 @@ const calculateStageOffsets = () => {
 
   if (maxCount === 0) {
     stageOffsets.value = Array(7).fill(0)
+    stageHeights.value = Array(7).fill(0)
     return
   }
 
@@ -92,6 +130,7 @@ const calculateStageOffsets = () => {
   const factors = flashcardCounts.map(count => count / maxCount)
 
   const offsets: number[] = []
+  const heights: number[] = []
 
   for (let i = 0; i < 7; i++) {
     const countFactor = factors[i]
@@ -99,30 +138,54 @@ const calculateStageOffsets = () => {
     const offset = maxY - countFactor * maxY
 
     offsets.push(offset)
+
+    // Calculate height: stages with flashcards expand to fill space to bottom
+    if (flashcardCounts[i] > 0) {
+      // Height = original height + space from current position to bottom
+      const expandedHeight = referenceHeight + (gridHeight - referenceHeight - offset)
+      heights.push(expandedHeight)
+    } else {
+      // Stages with 0 flashcards keep original height
+      heights.push(0) // 0 means use auto height
+    }
   }
 
   stageOffsets.value = offsets
+  stageHeights.value = heights
 }
 
 watch(isHovering, () => {
   calculateStageOffsets()
 })
 
-onMounted(() => {
-  calculateStageOffsets()
+const handleResize = () => {
+  captureOriginalHeight()
+  // calculateStageOffsets will be called automatically after captureOriginalHeight
+  // if we were hovering, or we can call it explicitly
+  if (!isHovering.value) {
+    calculateStageOffsets()
+  }
+}
 
-  window.addEventListener('resize', calculateStageOffsets)
+onMounted(() => {
+  // Wait for next tick to ensure elements are rendered
+  nextTick(() => {
+    captureOriginalHeight()
+    calculateStageOffsets()
+  })
+
+  window.addEventListener('resize', handleResize)
 
   if (gridRef.value) {
     resizeObserver.value = new ResizeObserver(() => {
-      calculateStageOffsets()
+      handleResize()
     })
     resizeObserver.value.observe(gridRef.value)
   }
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', calculateStageOffsets)
+  window.removeEventListener('resize', handleResize)
 
   if (resizeObserver.value) {
     resizeObserver.value.disconnect()
@@ -202,6 +265,8 @@ onUnmounted(() => {
   padding: 4px;
   gap: 4px;
   container-type: size;
+  transition: height 0.6s cubic-bezier(0.34, 1.2, 0.64, 1),
+              max-height 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
  }
 
 .stage-name {
