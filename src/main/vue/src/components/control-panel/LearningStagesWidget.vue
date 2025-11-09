@@ -92,8 +92,8 @@ const calculateStageOffsets = () => {
 
     // Position based on cubic distribution
     const cubicPosition = factors[i] // 0 to 1
-    const maxY = gridHeight / 2 - halfStageHeight // bottom
     const minY = -gridHeight / 2 + halfStageHeight // top
+    const maxY = gridHeight / 2 - halfStageHeight // bottom
     const offset = maxY - cubicPosition * (maxY - minY)
 
     offsets.push(offset)
