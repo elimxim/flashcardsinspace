@@ -15,12 +15,14 @@
         :ref="(el) => { if (el) stageElements[index] = el as HTMLElement }"
         :style="{ transform: `translateY(${stageOffsets[index]}px)` }"
       >
-        <div class="stage">
+        <div class="stage select-none">
           <div class="stage-name">
             {{ stage.displayName }}
           </div>
-          <div class="stage-count">
-            {{ createFlashcardCountComputed(stage) }}
+          <div class="stage-count-wrapper">
+            <div class="stage-count">
+              {{ createFlashcardCountComputed(stage) }}
+            </div>
           </div>
         </div>
       </div>
@@ -206,6 +208,14 @@ onUnmounted(() => {
   text-transform: uppercase;
   text-align: center;
   white-space: normal;
+}
+
+.stage-count-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 .stage-count {
