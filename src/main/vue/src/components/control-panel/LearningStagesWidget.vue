@@ -152,7 +152,7 @@ onUnmounted(() => {
 .stages-title {
   font-size: 0.9rem;
   font-weight: 700;
-  color: black;
+  color: rgba(13, 18, 74, 0.6);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -183,7 +183,8 @@ onUnmounted(() => {
 .stage {
   display: flex;
   flex-direction: column;
-  border: 1px solid black;
+  border: 1px solid rgba(128, 128, 128, 0.62);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.66) 0%, rgba(118, 75, 162, 0.68) 100%);
   border-radius: 6px;
   justify-content: center;
   align-items: center;
@@ -201,8 +202,8 @@ onUnmounted(() => {
 
 .stage-name {
   font-size: clamp(0.55rem, 24cqw, 0.9rem);
-  font-weight: 500;
-  color: black;
+  font-weight: 600;
+  color: rgba(13, 18, 74, 0.6);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -221,10 +222,9 @@ onUnmounted(() => {
 .stage-count {
   font-size: clamp(0.6rem, 24cqw, 0.85rem);
   font-weight: 600;
-  color: black;
-  border: 1px solid black;
+  color: rgba(20, 27, 106, 0.82);
+  background: rgba(255, 255, 255, 0.6);
   border-radius: 3px;
-  background: none;
   padding: 2px;
   width: 60%;
   min-width: 30px;
