@@ -186,7 +186,7 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   width: 70%;
-  min-width: 40px;
+  min-width: 46px;
   max-width: 106px;
   height: auto;
   min-height: 40px;
@@ -198,25 +198,27 @@ onUnmounted(() => {
 }
 
 .stage-name {
-  font-size: clamp(0.4rem, 24cqw, 1rem);
+  font-size: clamp(0.55rem, 24cqw, 0.9rem);
   font-weight: 500;
   color: black;
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .stage-count {
-  font-size: clamp(0.3rem, 24cqw, 0.8rem);
+  font-size: clamp(0.6rem, 24cqw, 0.85rem);
   font-weight: 600;
   color: black;
   border: 1px solid black;
-  border-radius: 4px;
+  border-radius: 3px;
   background: none;
-  padding: 2px 4px;
-  width: clamp(10px, 50cqw, 40px);
+  padding: 2px;
+  width: 60%;
+  min-width: 30px;
+  max-width: 40px;
   text-align: center;
 }
 </style>

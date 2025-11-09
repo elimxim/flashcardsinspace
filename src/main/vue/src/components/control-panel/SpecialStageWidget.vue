@@ -122,7 +122,7 @@ function startReview() {
 }
 
 .special-stage-count {
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--s-widget--number--color);
   background: var(--s-widget--number--bg);

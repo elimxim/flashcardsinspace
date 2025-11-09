@@ -41,7 +41,7 @@ const { flashcardSet } = storeToRefs(flashcardStore)
 
 .flashcard-widget-button-text {
   margin-top: 4px;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 600;
   word-spacing: 0.05rem;
   letter-spacing: 0.05rem;

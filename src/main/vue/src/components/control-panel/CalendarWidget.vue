@@ -230,12 +230,12 @@ const calendarIcon = computed(() => {
 }
 
 .calendar-day-number {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   border: 1px solid var(--c-widget--border-color);
   color: var(--c-widget--popup--number--color);
   border-radius: 3px;
-  padding: 1px;
+  padding: 2px;
   width: 40px;
   text-align: center;
 }
@@ -283,13 +283,13 @@ const calendarIcon = computed(() => {
 }
 
 .calendar-button-number {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--c-widget--popup--number--color);
   background: var(--c-widget--popup--number--bg);
   border-radius: 3px;
-  padding: 1px;
-  width: 34px;
+  padding: 2px;
+  width: 40px;
   text-align: center;
 }
 
