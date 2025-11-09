@@ -88,12 +88,14 @@ const calculateStageOffsets = () => {
 
   for (let i = 0; i < 7; i++) {
     const stageHeight = stageSizes[i] || 50
-    const halfStageHeight = stageHeight / 2
 
-    // Position based on cubic distribution
+    // Position based on cubic distribution from bottom to top
+    // Stage 0 starts at bottom, stage 6 at top
     const cubicPosition = factors[i] // 0 to 1
-    const minY = -gridHeight / 2 + halfStageHeight // top
-    const maxY = gridHeight / 2 - halfStageHeight // bottom
+    // top of the grid
+    const minY = 0
+    // bottom of grid (accounting for element height)
+    const maxY = gridHeight - stageHeight
     const offset = maxY - cubicPosition * (maxY - minY)
 
     offsets.push(offset)
@@ -168,7 +170,7 @@ onUnmounted(() => {
   gap: 4px;
   width: 100%;
   position: relative;
-  align-items: center;
+  align-items: start;
   margin: 10px;
 }
 
