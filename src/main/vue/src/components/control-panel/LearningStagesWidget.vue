@@ -13,7 +13,10 @@
         :key="stage.name"
         class="stage-wrapper"
         :ref="(el) => { if (el) stageElements[index] = el as HTMLElement }"
-        :style="{ transform: `translateY(${stageOffsets[index]}px)` }"
+        :style="{
+          transform: `translateY(${stageOffsets[index]}px)`,
+          '--bar-height': `${gridRef?.clientHeight ? gridRef.clientHeight - stageOffsets[index] : 0}px`
+        }"
       >
         <div class="stage select-none">
           <div class="stage-name">
@@ -179,7 +182,26 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: transform 0.6s cubic-bezier(0.34, 1.4, 0.64, 1);
+  transition: transform 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
+  position: relative;
+}
+
+.stage-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 0px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  border-radius: 6px;
+  z-index: -1;
+  transition: height 0.3s;
+}
+
+.stages-widget:hover .stage-wrapper::before {
+  height: var(--bar-height, 0px);
 }
 
 .stage {
