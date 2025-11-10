@@ -214,7 +214,6 @@ onUnmounted(() => {
   --stages--stage-name--color: var(--stages-stage-name--color, rgba(13, 18, 74, 0.6));
   --stages--stage-count--color: var(--stages-stage-count--color, rgba(13, 18, 74, 0.6));
   --stages--stage-count--bg: var(--stages-stage-count--bg, rgba(255, 255, 255, 0.6));
-  --stages--current-day--glow-color: var(--stages-current-day--glow-color, rgba(255, 215, 0, 0.4));
 }
 
 .stages-widget {
