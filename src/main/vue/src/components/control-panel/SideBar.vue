@@ -138,9 +138,9 @@ onMounted(() => {
 .sidebar--theme {
   --bar--bg: var(--sidebar--bg, #32334a);
   --bar--border-color: var(--sidebar--border-color, rgba(89, 78, 117, 0.85));
-  --bar--item--bg: var(--sidebar--item--bg, linear-gradient(135deg, rgb(154, 166, 240, 0.75) 0%, rgb(162, 132, 192, 0.75) 100%));
-  --bar--item--bg--hover: var(--sidebar--item--bg--hover, linear-gradient(135deg, rgb(142, 111, 189, 0.75) 0%, rgb(215, 91, 208, 0.75) 100%));
-  --bar--item--bg--active: var(--sidebar--item--bg--active, linear-gradient(135deg, rgb(142, 111, 189, 0.75) 0%, rgb(215, 91, 208, 0.75) 100%));
+  --bar--item--bg: var(--sidebar--item--bg, linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%));
+  --bar--item--bg--hover: var(--sidebar--item--bg--hover, linear-gradient(135deg, rgb(142, 110, 189) 0%, rgb(215, 91, 209) 100%));
+  --bar--item--bg--active: var(--sidebar--item--bg--active, linear-gradient(135deg, rgb(142, 110, 189) 0%, rgb(215, 91, 209) 100%));
   --bar--item--border-color: var(--sidebar--item--border-color, rgba(74, 74, 74, 0.81));
   --bar--item--border-color--active: var(--sidebar--item--border-color--active, rgba(255, 255, 255, 0.81));
   --bar--item--color: var(--sidebar--item--color, rgba(13, 18, 74, 0.6));
