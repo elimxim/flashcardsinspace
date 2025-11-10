@@ -208,7 +208,7 @@ onUnmounted(() => {
   rgb(173, 179, 251) 85%,
   rgb(192, 201, 251) 100%
   ));
-  --stages--title--color: var(--stages-title--color, rgba(13, 18, 74, 0.6));
+  --stages--title--color: var(--stages-title--color, rgba(21, 21, 44, 0.6));
   --stages--stage--border-color: var(--stages-stage--border-color, rgba(0, 178, 255, 0.6));
   --stages--stage--bg: var(--stages-stage--bg, linear-gradient(175deg, rgb(93, 120, 204) 0%, rgb(133, 155, 225) 100%));
   --stages--stage-name--color: var(--stages-stage-name--color, rgba(13, 18, 74, 0.6));
@@ -218,7 +218,7 @@ onUnmounted(() => {
 
 .stages-widget {
   position: relative;
-  padding: 1px 4px;
+  padding: 4px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -256,6 +256,7 @@ onUnmounted(() => {
   align-self: start;
   text-align: left;
   white-space: nowrap;
+  padding: 2px 10px;
 }
 
 .stage-grid {
