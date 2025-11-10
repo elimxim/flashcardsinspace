@@ -189,12 +189,13 @@ onUnmounted(() => {
 
 <style scoped>
 .stages-widget--theme {
-  --stages--widget--border-color: var(--stages-widget--border-color, black);
+  --stages--widget--border-color: var(--stages-widget--border-color, rgba(89, 78, 117, 0.6));
+  --stages--widget--bg: var(--stages-widget--bg, none);
   --stages--title--color: var(--stages-title--color, rgba(13, 18, 74, 0.6));
-  --stages--stage--border-color: var(--stages-stage--border-color, rgba(128, 128, 128, 0.62));
-  --stages--stage--bg: var(--stages-stage--bg, linear-gradient(135deg, rgba(102, 126, 234, 0.66) 0%, rgba(118, 75, 162, 0.68) 100%));
+  --stages--stage--border-color: var(--stages-stage--border-color, rgba(180, 190, 220, 0.4));
+  --stages--stage--bg: var(--stages-stage--bg, linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%));
   --stages--stage-name--color: var(--stages-stage-name--color, rgba(13, 18, 74, 0.6));
-  --stages--stage-count--color: var(--stages-stage-count--color, rgba(20, 27, 106, 0.82));
+  --stages--stage-count--color: var(--stages-stage-count--color, rgba(13, 18, 74, 0.6));
   --stages--stage-count--bg: var(--stages-stage-count--bg, rgba(255, 255, 255, 0.6));
 }
 
@@ -254,13 +255,11 @@ onUnmounted(() => {
   border-radius: 6px;
   justify-content: center;
   align-items: center;
-  width: 70%;
-  min-width: 46px;
-  max-width: 80px;
+  width: 80%;
+  min-width: 50px;
   height: auto;
-  min-height: 46px;
+  min-height: clamp(50px, 24cqw, 80px);
   max-height: 80px;
-  aspect-ratio: 1 / 1;
   padding: 4px;
   gap: 4px;
   container-type: size;
