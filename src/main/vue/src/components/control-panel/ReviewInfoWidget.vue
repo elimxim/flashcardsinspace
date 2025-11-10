@@ -52,7 +52,7 @@ const currDayReviewTotal = computed(() =>
 
 <style scoped>
 .review-info-widget--theme {
-  --r-widget--bg: var(--review-info-widget--bg, linear-gradient(135deg, rgba(102, 126, 234, 0.66) 0%, rgba(118, 75, 162, 0.68) 100%));
+  --r-widget--bg: var(--review-info-widget--bg, linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%));
   --r-widget--border-color: var(--review-info-widget--border-color, rgba(128, 128, 128, 0.62));
   --r-widget--title--color: var(--review-info-widget--title--color, rgba(13, 18, 74, 0.6));
   --r-widget--label--color: var(--review-info-widget--label--color, rgba(13, 18, 74, 0.6));
@@ -102,10 +102,6 @@ const currDayReviewTotal = computed(() =>
   gap: 8px;
 }
 
-.review-item:hover .review-item-count {
-  transform: scale(1.2);
-}
-
 .review-item--total {
   font-weight: 600;
 }
@@ -130,6 +126,5 @@ const currDayReviewTotal = computed(() =>
   padding: 2px;
   width: 40px;
   text-align: center;
-  transition: transform 0.1s ease-in-out;
 }
 </style>

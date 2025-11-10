@@ -24,7 +24,7 @@ const { dayStreak } = storeToRefs(chronoStore)
 .day-streak-widget--theme {
   --d-widget--number--color: var(--day-streak-widget--number--color, rgba(233, 238, 255, 0.92));
   --d-widget--text--color: var(--day-streak-widget--text--color, rgba(251, 233, 255, 0.88));
-  --d-widget--bg: var(--day-streak-widget--bg, linear-gradient(135deg, rgba(240, 147, 251, 0.71) 0%, rgba(245, 87, 108, 0.69) 100%));
+  --d-widget--bg: var(--day-streak-widget--bg, linear-gradient(135deg, rgb(244, 178, 252) 0%, rgb(248, 139, 154) 100%));
   --d-widget--border-color: var(--day-streak-widget--border-color, rgba(128, 128, 128, 0.62));
 }
 

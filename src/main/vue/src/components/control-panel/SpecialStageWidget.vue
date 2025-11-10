@@ -61,7 +61,7 @@ function startReview() {
 
 <style scoped>
 .special-stage-widget--theme {
-  --s-widget--bg: var(--special-stage-widget--bg, linear-gradient(135deg, rgba(102, 126, 234, 0.66) 0%, rgba(118, 75, 162, 0.68) 100%));
+  --s-widget--bg: var(--special-stage-widget--bg, linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%));
   --s-widget--title--color: var(--special-stage-widget--title--color, rgba(13, 18, 74, 0.6));
   --s-widget--icon--color: var(--special-stage-widget--icon--color, rgba(255, 255, 255, 0.6));
   --s-widget--number--color: var(--special-stage-widget--number--color, rgba(20, 27, 106, 0.82));
