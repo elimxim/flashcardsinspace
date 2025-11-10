@@ -3,7 +3,7 @@
     class="stages-widget stages-widget--theme"
     :class="{
       'stages-widget--expanded': isHovering,
-
+      'hex-grid': isHovering,
     }"
     @mouseenter="isHovering = true"
     @mouseleave="isHovering = false"
@@ -240,9 +240,9 @@ onUnmounted(() => {
 
 .stages-widget--expanded.hex-grid {
   background:
-    repeating-linear-gradient(0deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.15) 24px, rgba(0, 255, 255, 0.15) 25px),
-    repeating-linear-gradient(60deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.15) 24px, rgba(0, 255, 255, 0.15) 25px),
-    repeating-linear-gradient(120deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.15) 24px, rgba(0, 255, 255, 0.15) 25px),
+    repeating-linear-gradient(0deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
+    repeating-linear-gradient(60deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
+    repeating-linear-gradient(120deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
     var(--stages--widget--bg);
 }
 
