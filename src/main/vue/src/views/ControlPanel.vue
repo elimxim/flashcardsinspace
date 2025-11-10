@@ -100,6 +100,8 @@ function openFlashcardSetSettings() {
 
 .stages-panel {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   padding: 6px 16px;
 }
 
