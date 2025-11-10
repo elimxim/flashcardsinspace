@@ -1,7 +1,10 @@
 <template>
   <div
     class="stages-widget stages-widget--theme"
-    :class="{ 'stages-widget--expanded': isHovering }"
+    :class="{
+      'stages-widget--expanded': isHovering,
+      'hex-grid': isHovering,
+    }"
     @mouseenter="isHovering = true"
     @mouseleave="isHovering = false"
   >
@@ -20,6 +23,9 @@
       >
         <div
           class="stage select-none"
+          :class="{
+            'stage--current-day': isStageInCurrentDay(stage)
+          }"
           :style="stageHeights[index] > 0 ? {
             height: `${stageHeights[index]}px`,
             maxHeight: `${stageHeights[index]}px`,
@@ -66,6 +72,10 @@ const createFlashcardCountComputed = (stage: Stage) => {
   return computed(() => {
     return countFlashcards(flashcards.value, stage, currDay.value)
   })
+}
+
+const isStageInCurrentDay = (stage: Stage) => {
+  return currDay.value?.stages?.includes(stage.name) ?? false
 }
 
 const captureOriginalHeight = () => {
@@ -190,20 +200,21 @@ onUnmounted(() => {
 
 <style scoped>
 .stages-widget--theme {
-  --stages--widget--border-color: var(--stages-widget--border-color, rgba(89, 78, 117, 0.6));
+  --stages--widget--border-color: var(--stages-widget--border-color, none);
   --stages--widget--bg: var(--stages-widget--bg, linear-gradient(180deg,
   rgb(163, 175, 232) 0%,
   rgb(183, 191, 240) 30%,
   rgb(202, 206, 248) 60%,
   rgb(227, 229, 251) 85%,
-  rgb(252, 252, 255) 100%
+  rgb(242, 242, 255) 100%
   ));
-  --stages--title--color: var(--stages-title--color, rgba(154, 170, 241, 0.68));
-  --stages--stage--border-color: var(--stages-stage--border-color, rgba(180, 190, 220, 0.4));
+  --stages--title--color: var(--stages-title--color, rgba(13, 18, 74, 0.6));
+  --stages--stage--border-color: var(--stages-stage--border-color, rgba(0, 255, 255, 0.6));
   --stages--stage--bg: var(--stages-stage--bg, linear-gradient(175deg, rgba(102, 102, 232, 0.65) 0%, rgba(11, 46, 117, 0.65) 100%));
   --stages--stage-name--color: var(--stages-stage-name--color, rgba(13, 18, 74, 0.6));
   --stages--stage-count--color: var(--stages-stage-count--color, rgba(13, 18, 74, 0.6));
   --stages--stage-count--bg: var(--stages-stage-count--bg, rgba(255, 255, 255, 0.6));
+  --stages--current-day--glow-color: var(--stages-current-day--glow-color, rgba(255, 215, 0, 0.4));
 }
 
 .stages-widget {
@@ -220,11 +231,20 @@ onUnmounted(() => {
   width: 100%;
   min-width: 360px;
   flex-grow: 0;
-  transition: flex-grow 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: flex-grow 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              background 0.3s ease-in-out;
 }
 
 .stages-widget--expanded {
   flex-grow: 1;
+}
+
+.stages-widget--expanded.hex-grid {
+  background:
+    repeating-linear-gradient(0deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.15) 24px, rgba(0, 255, 255, 0.15) 25px),
+    repeating-linear-gradient(60deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.15) 24px, rgba(0, 255, 255, 0.15) 25px),
+    repeating-linear-gradient(120deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.15) 24px, rgba(0, 255, 255, 0.15) 25px),
+    linear-gradient(180deg, rgb(163, 175, 232) 0%, rgb(183, 191, 240) 30%, rgb(202, 206, 248) 60%, rgb(227, 229, 251) 85%, rgb(252, 252, 255) 100%);
 }
 
 .stages-title {
@@ -276,8 +296,11 @@ onUnmounted(() => {
   padding: 4px;
   gap: 4px;
   container-type: size;
+  box-shadow: 0 0 6px var(--stages--stage--border-color),
+              0 2px 6px rgba(0, 0, 0, 0.15),
+              0 1px 3px rgba(0, 0, 0, 0.1);
   transition: height 0.3s ease-in-out,
-              max-height 0.3s ease-in-out;
+              max-height 0.3s ease-in-out
  }
 
 .stage-name {
