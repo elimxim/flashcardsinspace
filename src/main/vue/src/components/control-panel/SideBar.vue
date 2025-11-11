@@ -7,6 +7,7 @@
       class="sidebar-control-bar"
       title="Flashcard Sets"
       center-title
+      shadow
     >
       <template #left>
         <AwesomeButton
@@ -161,7 +162,7 @@ onMounted(() => {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: clamp(200px, 40vw, 280px);
+  width: clamp(200px, 40vw, 300px);
   height: 100%;
   background: var(--bar--bg);
   transition: margin-left 0.35s ease-in-out;
@@ -169,7 +170,7 @@ onMounted(() => {
 }
 
 .sidebar--collapsed {
-  margin-left: clamp(-280px, -40vw, -200px);
+  margin-left: clamp(-300px, -40vw, -200px);
 }
 
 .sidebar-control-bar {
