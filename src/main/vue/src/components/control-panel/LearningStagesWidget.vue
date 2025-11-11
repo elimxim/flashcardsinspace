@@ -200,20 +200,20 @@ onUnmounted(() => {
 
 <style scoped>
 .stages-widget--theme {
-  --stages--widget--border-color: var(--stages-widget--border-color, none);
-  --stages--widget--bg: var(--stages-widget--bg, linear-gradient(180deg,
+  --l-widget--border-color: var(--stages-widget--border-color, none);
+  --l-widget--bg: var(--stages-widget--bg, linear-gradient(180deg,
   rgb(82, 96, 175) 0%,
   rgb(111, 128, 214) 30%,
   rgb(149, 155, 253) 60%,
   rgb(173, 179, 251) 85%,
   rgb(192, 201, 251) 100%
   ));
-  --stages--title--color: var(--stages-title--color, rgba(21, 21, 44, 0.6));
-  --stages--stage--border-color: var(--stages-stage--border-color, rgba(0, 178, 255, 0.6));
-  --stages--stage--bg: var(--stages-stage--bg, linear-gradient(175deg, rgb(93, 120, 204) 0%, rgb(133, 155, 225) 100%));
-  --stages--stage-name--color: var(--stages-stage-name--color, rgba(13, 18, 74, 0.6));
-  --stages--stage-count--color: var(--stages-stage-count--color, rgba(13, 18, 74, 0.6));
-  --stages--stage-count--bg: var(--stages-stage-count--bg, rgba(255, 255, 255, 0.6));
+  --l-widget--title--color: var(--stages-widget--title--color, rgba(21, 21, 44, 0.6));
+  --l-widget--stage--border-color: var(--stages-widget--stage--border-color, rgba(0, 178, 255, 0.6));
+  --l-widget--stage--bg: var(--stages-widget--stage--bg, linear-gradient(175deg, rgb(93, 120, 204) 0%, rgb(133, 155, 225) 100%));
+  --l-widget--stage--name--color: var(--stages-widget--stage--name--color, rgba(13, 18, 74, 0.6));
+  --l-widget--stage--count--color: var(--stages-widget--stage--count--color, rgba(13, 18, 74, 0.6));
+  --l-widget--stage--count--bg: var(--stages-widget--stage--count--bg, rgba(255, 255, 255, 0.6));
 }
 
 .stages-widget {
@@ -224,8 +224,8 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   gap: 4px;
-  border: 1px solid var(--stages--widget--border-color);
-  background: var(--stages--widget--bg);
+  border: 1px solid var(--l-widget--border-color);
+  background: var(--l-widget--bg);
   border-radius: 6px;
   width: 100%;
   min-width: 360px;
@@ -243,13 +243,13 @@ onUnmounted(() => {
     repeating-linear-gradient(0deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
     repeating-linear-gradient(60deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
     repeating-linear-gradient(120deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
-    var(--stages--widget--bg);
+    var(--l-widget--bg);
 }
 
 .stages-title {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--stages--title--color);
+  color: var(--l-widget--title--color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -283,8 +283,8 @@ onUnmounted(() => {
 .stage {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--stages--stage--border-color);
-  background: var(--stages--stage--bg);
+  border: 1px solid var(--l-widget--stage--border-color);
+  background: var(--l-widget--stage--bg);
   border-radius: 6px;
   justify-content: center;
   align-items: center;
@@ -303,7 +303,7 @@ onUnmounted(() => {
 .stage-name {
   font-size: clamp(0.55rem, 24cqw, 0.9rem);
   font-weight: 600;
-  color: var(--stages--stage-name--color);
+  color: var(--l-widget--stage--name--color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -322,8 +322,8 @@ onUnmounted(() => {
 .stage-count {
   font-size: clamp(0.6rem, 24cqw, 0.85rem);
   font-weight: 600;
-  color: var(--stages--stage-count--color);
-  background: var(--stages--stage-count--bg);
+  color: var(--l-widget--stage--count--color);
+  background: var(--l-widget--stage--count--bg);
   border-radius: 3px;
   padding: 2px;
   width: 60%;
