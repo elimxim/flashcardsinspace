@@ -10,7 +10,6 @@
     <ControlBar
       :title="flashcardSetName"
       center-title
-      without-shadow
     >
       <template v-if="reviewTopic" #left>
         <div class="review-mode">
