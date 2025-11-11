@@ -213,7 +213,7 @@ const calendarIcon = computed(() => {
   --awesome-button--icon--color--hover: var(--c-widget--popup--button--color--hover);
   position: absolute;
   top: -14px;
-  right: 0;
+  right: 1px;
   transform: translateX(calc(100% - 12px));
   z-index: 10;
   width: 28px;
