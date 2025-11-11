@@ -2,8 +2,7 @@
   <div
     class="stages-widget stages-widget--theme"
     :class="{
-      'stages-widget--expanded': isHovering,
-      'hex-grid': isHovering,
+      'stages-widget--hex-grid': isHovering,
     }"
     @mouseenter="isHovering = true"
     @mouseleave="isHovering = false"
@@ -53,6 +52,12 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+
+const props = withDefaults(defineProps<{
+  growMultiplier?: number
+}>(), {
+  growMultiplier: 2,
+})
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
@@ -117,7 +122,7 @@ const calculateStageOffsets = () => {
     return
   }
 
-  const gridHeight = gridRef.value.clientHeight
+  const gridHeight = gridRef.value.clientHeight * props.growMultiplier
   const referenceHeight = originalStageHeight.value
 
   const flashcardCounts = mainStageArray.map(stage =>
@@ -234,11 +239,7 @@ onUnmounted(() => {
               background 0.3s ease-in-out;
 }
 
-.stages-widget--expanded {
-  flex-grow: 1;
-}
-
-.stages-widget--expanded.hex-grid {
+.stages-widget--hex-grid {
   background:
     repeating-linear-gradient(0deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
     repeating-linear-gradient(60deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
@@ -276,7 +277,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: transform 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
+  transition: transform 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
   position: relative;
 }
 
@@ -296,8 +297,8 @@ onUnmounted(() => {
   padding: 4px;
   gap: 4px;
   container-type: size;
-  transition: height 0.3s ease-in-out,
-              max-height 0.3s ease-in-out
+  transition: height 0.1s ease-in-out,
+              max-height 0.1s ease-in-out
  }
 
 .stage-name {
