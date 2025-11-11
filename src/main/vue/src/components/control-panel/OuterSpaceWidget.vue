@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import Starfield from '@/components/Starfield.vue'
 import SmartButton from '@/components/SmartButton.vue'
-import { computed } from 'vue';
+import { computed } from 'vue'
 import { countFlashcards } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
