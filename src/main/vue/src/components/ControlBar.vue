@@ -1,7 +1,7 @@
 <template>
   <div
     class="control-bar control-bar--theme"
-    :class="{ 'shadow': !withoutShadow }"
+    :class="{ 'shadow': shadow }"
   >
     <div class="left-controls">
       <slot name="left"/>
@@ -22,10 +22,10 @@
 withDefaults(defineProps<{
   title: string
   centerTitle?: boolean
-  withoutShadow?: boolean
+  shadow?: boolean
 }>(), {
   centerTitle: false,
-  withoutShadow: false,
+  shadow: false,
 })
 
 </script>
@@ -51,7 +51,7 @@ withDefaults(defineProps<{
 }
 
 .control-bar.shadow {
-  box-shadow: 0 2px 3px 2px var(--c-bar--shadow-color);
+  box-shadow: 0 3px 3px 0 var(--c-bar--shadow-color);
 }
 
 .left-controls {
