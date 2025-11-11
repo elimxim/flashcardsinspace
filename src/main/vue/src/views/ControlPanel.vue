@@ -1,33 +1,40 @@
 <template>
   <div class="control-panel control-panel--theme">
-    <div class="control-panel-layout">
+    <div class="control-sidebar">
       <SideBar ref="sidebar"/>
-      <div class="control-panel-content">
-        <ControlBar :title="flashcardSetName">
-          <template #left>
-            <AwesomeButton
-              icon="fa-solid fa-bars"
-              class="control-bar-button"
-              :on-click="sidebar?.toggle"
-              :hidden="isSidebarExpanded"
-              :disabled="isSidebarExpanded"
-            />
-          </template>
-          <template #right>
-            <AwesomeButton
-              icon="fa-solid fa-gear"
-              class="control-bar-button"
-              tooltip="Edit Flashcard Set"
-              tooltip-position="bottom-left"
-              :on-click="openFlashcardSetSettings"
-              :disabled="!flashcardSet"
-            />
-          </template>
-        </ControlBar>
-        <FlashcardInfoBar :hidden="!flashcardSet || isSidebarExpanded"/>
+    </div>
+    <div class="control-panel-layout">
+      <ControlBar :title="flashcardSetName" shadow>
+        <template #left>
+          <AwesomeButton
+            icon="fa-solid fa-bars"
+            class="control-bar-button"
+            :on-click="sidebar?.toggle"
+            :hidden="isSidebarExpanded"
+            :disabled="isSidebarExpanded"
+          />
+        </template>
+        <template #right>
+          <AwesomeButton
+            icon="fa-solid fa-gear"
+            class="control-bar-button"
+            tooltip="Edit Flashcard Set"
+            tooltip-position="bottom-left"
+            :on-click="openFlashcardSetSettings"
+            :disabled="!flashcardSet"
+          />
+        </template>
+      </ControlBar>
+      <div class="control-scrollable">
+        <FlashcardInfoBar
+          :hidden="!flashcardSet || isSidebarExpanded"
+        />
         <MainPanel/>
-        <div class="stages-panel">
-          <LearningStagesWidget/>
+        <div class="control-stages-panel">
+          <LearningStagesWidget :grow-multiplier="3"/>
+        </div>
+        <div class="control-outer-space-panel">
+          <OuterSpaceWidget/>
         </div>
       </div>
     </div>
@@ -41,6 +48,7 @@ import ControlBar from '@/components/ControlBar.vue'
 import FlashcardInfoBar from '@/components/control-panel/FlashcardInfoBar.vue'
 import MainPanel from '@/components/control-panel/MainPanel.vue'
 import LearningStagesWidget from '@/components/control-panel/LearningStagesWidget.vue'
+import OuterSpaceWidget from '@/components/control-panel/OuterSpaceWidget.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/views/modal/FlashcardSetSettingsModal.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
@@ -76,33 +84,49 @@ function openFlashcardSetSettings() {
 .control-panel {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   width: 100%;
-  min-width: 654px;
+  min-width: 420px;
   height: calc(100vh - var(--navbar-height));
   background-color: var(--c-panel--bg-color);
+}
+
+.control-sidebar {
+  z-index: 1;
 }
 
 .control-panel-layout {
   position: relative;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   width: 100%;
   height: 100%;
 }
 
-.control-panel-content {
+.control-scrollable {
   flex: 1;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  gap: 12px;
+  padding: 4px 10px 10px 10px;
+  overflow: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
 
-.stages-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 6px 16px;
+.control-scrollable::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.control-stages-panel {
+  transition: all 0.2s ease-in-out;
+}
+
+.control-outer-space-panel {
+  flex: 0 0 14%;
+  overflow: hidden;
 }
 
 </style>
