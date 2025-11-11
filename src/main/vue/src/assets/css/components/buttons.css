@@ -91,3 +91,11 @@
   --awesome-button--icon--color: rgba(87, 87, 87, 0.86);
   --awesome-button--icon--color--hover: rgba(0, 0, 0, 0.9);
 }
+
+.outer-space-button {
+  --smart-button--bg: #1A2228;
+  --smart-button--bg--hover: black;
+  --smart-button--bg--disabled: black;
+  --smart-button--padding: 10px;
+  --smart-button--border-radius: 6px;
+}
