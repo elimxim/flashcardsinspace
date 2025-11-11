@@ -110,7 +110,7 @@ function openFlashcardSetSettings() {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 4px 10px 10px 10px;
+  padding: 14px 10px 10px 10px;
   overflow: auto;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
