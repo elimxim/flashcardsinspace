@@ -203,15 +203,14 @@ onUnmounted(() => {
 .main-panel {
   display: flex;
   flex-direction: column;
-  margin-top: 10px;
-  gap: 16px;
+  gap: 12px;
   border-radius: 4px;
 }
 
 .main-panel-row {
   display: flex;
   justify-content: flex-start;
-  gap: 16px;
+  gap: 12px;
   height: 106px;
 }
 
