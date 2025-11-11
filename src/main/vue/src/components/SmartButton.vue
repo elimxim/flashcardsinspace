@@ -7,6 +7,7 @@
       'smart-button--rounded': rounded,
       'smart-button--fill-width': fillWidth,
       'smart-button--fill-height': fillHeight,
+      'smart-button--fit-content': fitContent,
     }"
     :disabled="disabled"
     :hidden="hidden"
@@ -36,6 +37,7 @@ const props = withDefaults(defineProps<{
   autoBlur?: boolean
   fillWidth?: boolean
   fillHeight?: boolean
+  fitContent?: boolean
   titleScale?: number
   onClick?: () => void
 }>(), {
@@ -46,6 +48,7 @@ const props = withDefaults(defineProps<{
   autoBlur: false,
   fillWidth: false,
   fillHeight: false,
+  fitContent: false,
   titleScale: 1,
   onClick: () => {
   },
@@ -130,6 +133,7 @@ defineExpose({
   --s-btn--border-radius: var(--smart-button--border-radius, 3px);
   --s-btn--width: var(--smart-button--width, 100px);
   --s-btn--height: var(--smart-button--height, 40px);
+  --s-btn--padding: var(--smart-button--padding, 0);
   --s-btn--bg: var(--smart-button--bg, #323232);
   --s-btn--bg--hover: var(--smart-button--bg--hover, #515151);
   --s-btn--bg--disabled: var(--smart-button--bg--disabled, #C8C8C8FF);
@@ -139,6 +143,7 @@ defineExpose({
   color: var(--s-btn--title--color);
   border-color: var(--s-btn--border-color);
   border-width: var(--s-btn--border-width);
+  padding: var(--s-btn--padding);
   border-style: solid;
   border-radius: var(--s-btn--border-radius);
   background: var(--s-btn--bg);
@@ -202,6 +207,11 @@ defineExpose({
 
 .smart-button--fill-height {
   --smart-button--height: 100%;
+}
+
+.smart-button--fit-content {
+  --smart-button--width: fit-content;
+  --smart-button--height: fit-content;
 }
 
 </style>
