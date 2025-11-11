@@ -53,8 +53,7 @@ const flashcardCount = computed(() => flashcards.value.length)
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  padding: 4px 4px 0 10px;
-  margin-top: 4px;
+  background: var(--f-bar--bg-color);
   gap: 40px;
 }
 
