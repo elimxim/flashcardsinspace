@@ -232,17 +232,17 @@ onUnmounted(() => {
 .stages-widget--theme {
   --l-widget--border-color: var(--stages-widget--border-color, none);
   --l-widget--bg: var(--stages-widget--bg, linear-gradient(180deg,
-  rgb(113, 123, 175) 0%,
-  rgb(150, 160, 211) 30%,
-  rgb(192, 196, 253) 60%,
-  rgb(211, 215, 250) 85%,
-  rgb(238, 240, 251) 100%
+  rgb(217, 222, 248) 0%,
+  rgb(186, 192, 250) 30%,
+  rgb(171, 176, 251) 60%,
+  rgb(150, 160, 211) 85%,
+  rgb(113, 123, 175) 100%
   ));
   --l-widget--hex-line--color: var(--stages-widget--hex-line--color, rgba(0, 255, 255, 0.15));
-  --l-widget--title--color: var(--stages-widget--title--color, rgba(21, 21, 44, 0.6));
+  --l-widget--title--color: var(--stages-widget--title--color, rgb(69, 79, 141));
   --l-widget--stage--border-color: var(--stages-widget--stage--border-color, rgba(0, 178, 255, 0.6));
-  --l-widget--stage--bg: var(--stages-widget--stage--bg, linear-gradient(175deg, rgb(93, 120, 204) 0%, rgb(133, 155, 225) 100%));
-  --l-widget--stage--name--color: var(--stages-widget--stage--name--color, rgba(13, 18, 74, 0.6));
+  --l-widget--stage--bg: var(--stages-widget--stage--bg, linear-gradient(175deg, rgba(93, 124, 204, 0.6) 0%, rgba(133, 159, 225, 0.6) 100%));
+  --l-widget--stage--name--color: var(--stages-widget--stage--name--color, rgb(69, 79, 141));
   --l-widget--stage--count--color: var(--stages-widget--stage--count--color, rgba(13, 18, 74, 0.6));
   --l-widget--stage--count--bg: var(--stages-widget--stage--count--bg, rgba(255, 255, 255, 0.6));
 }
