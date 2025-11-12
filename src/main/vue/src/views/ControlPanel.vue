@@ -30,9 +30,7 @@
           :hidden="!flashcardSet || isSidebarExpanded"
         />
         <MainPanel/>
-        <div class="control-stages-panel">
-          <LearningStagesWidget :grow-multiplier="3"/>
-        </div>
+        <LearningStagesWidget :grow-multiplier="3"/>
         <div class="control-outer-space-panel">
           <OuterSpaceWidget/>
         </div>
@@ -118,10 +116,6 @@ function openFlashcardSetSettings() {
 
 .control-scrollable::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
-}
-
-.control-stages-panel {
-  transition: all 0.2s ease-in-out;
 }
 
 .control-outer-space-panel {

@@ -14,22 +14,19 @@
       <div
         v-for="(stage, index) in mainStageArray"
         :key="stage.name"
-        :ref="(el) => { if (el) stageElements[index] = el as HTMLElement }"
-        class="stage-wrapper"
-        :style="{
-          transform: `translateY(${stageOffsets[index]}px)`,
-        }"
+        class="stage-wrapper select-none"
       >
         <div
-          class="stage select-none"
+          :ref="(el) => { if (el) stageElements[index] = el as HTMLElement }"
+          class="stage"
           :class="{
             'stage--current-day': isStageInCurrentDay(stage)
           }"
-          :style="stageHeights[index] > 0 ? {
+          :style="{
+            transform: `translateY(${stageOffsets[index]}px)`,
             height: `${stageHeights[index]}px`,
             maxHeight: `${stageHeights[index]}px`,
-            aspectRatio: 'auto',
-          } : {}"
+          }"
         >
           <div class="stage-name">
             {{ stage.displayName }}
@@ -65,13 +62,20 @@ const chronoStore = useChronoStore()
 const { flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
-const gridRef = ref<HTMLElement | null>(null)
+const gridRef = ref<HTMLElement>()
 const stageOffsets = ref<number[]>(Array(7).fill(0))
 const stageHeights = ref<number[]>(Array(7).fill(0))
 const stageElements = ref<HTMLElement[]>([])
-const resizeObserver = ref<ResizeObserver | null>(null)
+const resizeObserver = ref<ResizeObserver>()
 const isHovering = ref(false)
 const originalStageHeight = ref<number>(0)
+const originalGridHeight = ref<number>(0)
+const captureHeightTimeout = ref<number>()
+const isTransitioning = ref(false)
+const transitionTimeout = ref<number>()
+const transitionDurationMs = 300
+const transitionDuration = `${transitionDurationMs / 1000.0}s`
+const transitionDelayMs = transitionDurationMs + 50
 
 const createFlashcardCountComputed = (stage: Stage) => {
   return computed(() => {
@@ -83,30 +87,29 @@ const isStageInCurrentDay = (stage: Stage) => {
   return currDay.value?.stages?.includes(stage.name) ?? false
 }
 
-const captureOriginalHeight = () => {
+const captureOriginalHeights = () => {
   if (!gridRef.value || stageElements.value.length === 0) return
+  if (isHovering.value || isTransitioning.value) return
 
-  const wasHovering = isHovering.value
-  if (wasHovering) {
-    isHovering.value = false
-    stageOffsets.value = Array(7).fill(0)
-    stageHeights.value = Array(7).fill(0)
+  if (captureHeightTimeout.value) {
+    clearTimeout(captureHeightTimeout.value)
+    captureHeightTimeout.value = undefined
   }
 
-  nextTick(() => {
-    const firstWrapper = stageElements.value[0]
-    if (firstWrapper) {
-      const stageEl = firstWrapper.querySelector('.stage') as HTMLElement
+  captureHeightTimeout.value = window.setTimeout(() => {
+    if (!isHovering.value && !isTransitioning.value) {
+      const stageEl = stageElements.value[0]
       if (stageEl) {
         originalStageHeight.value = stageEl.offsetHeight
       }
+
+      if (gridRef.value) {
+        originalGridHeight.value = gridRef.value.clientHeight
+      }
     }
 
-    if (wasHovering) {
-      isHovering.value = true
-      calculateStageOffsets()
-    }
-  })
+    captureHeightTimeout.value = undefined
+  }, transitionDelayMs)
 }
 
 const calculateStageOffsets = () => {
@@ -116,14 +119,14 @@ const calculateStageOffsets = () => {
     return
   }
 
+  const gridHeight = originalGridHeight.value * props.growMultiplier
+  const referenceHeight = originalStageHeight.value
+
   if (!isHovering.value) {
     stageOffsets.value = Array(7).fill(0)
-    stageHeights.value = Array(7).fill(0)
+    stageHeights.value = Array(7).fill(referenceHeight)
     return
   }
-
-  const gridHeight = gridRef.value.clientHeight * props.growMultiplier
-  const referenceHeight = originalStageHeight.value
 
   const flashcardCounts = mainStageArray.map(stage =>
     countFlashcards(flashcards.value, stage, currDay.value)
@@ -133,7 +136,7 @@ const calculateStageOffsets = () => {
 
   if (maxCount === 0) {
     stageOffsets.value = Array(7).fill(0)
-    stageHeights.value = Array(7).fill(0)
+    stageHeights.value = Array(7).fill(referenceHeight)
     return
   }
 
@@ -151,13 +154,10 @@ const calculateStageOffsets = () => {
 
     offsets.push(offset)
 
-    // Calculate height: stages with flashcards expand to fill space to the bottom
     if (flashcardCounts[i] > 0) {
-      // Height = original height plus space from current position to bottom
       const expandedHeight = referenceHeight + (gridHeight - referenceHeight - offset)
       heights.push(expandedHeight)
     } else {
-      // Stages with 0 flashcards keep the original height
       heights.push(0)
     }
   }
@@ -166,21 +166,33 @@ const calculateStageOffsets = () => {
   stageHeights.value = heights
 }
 
-watch(isHovering, () => {
+watch(isHovering, (newVal, oldVal) => {
+  if (newVal !== oldVal) {
+    isTransitioning.value = true
+
+    // Clear any existing transition timeout
+    if (transitionTimeout.value) {
+      clearTimeout(transitionTimeout.value)
+    }
+
+    // Set a timeout to clear transitioning flag after animation completes
+    transitionTimeout.value = window.setTimeout(() => {
+      isTransitioning.value = false
+      transitionTimeout.value = undefined
+    }, transitionDelayMs)
+  }
   calculateStageOffsets()
 })
 
 const handleResize = () => {
-  captureOriginalHeight()
-  if (!isHovering.value) {
-    calculateStageOffsets()
+  if (!isHovering.value && !isTransitioning.value) {
+    captureOriginalHeights()
   }
 }
 
 onMounted(() => {
-  nextTick(() => {
-    captureOriginalHeight()
-    calculateStageOffsets()
+  nextTick().then(() => {
+    captureOriginalHeights()
   })
 
   window.addEventListener('resize', handleResize)
@@ -199,6 +211,19 @@ onUnmounted(() => {
   if (resizeObserver.value) {
     resizeObserver.value.disconnect()
   }
+
+  if (captureHeightTimeout.value) {
+    clearTimeout(captureHeightTimeout.value)
+    captureHeightTimeout.value = undefined
+  }
+
+  if (transitionTimeout.value) {
+    clearTimeout(transitionTimeout.value)
+    transitionTimeout.value = undefined
+  }
+
+  isHovering.value = false
+  isTransitioning.value = false
 })
 
 </script>
@@ -235,16 +260,14 @@ onUnmounted(() => {
   width: 100%;
   min-width: 360px;
   flex-grow: 0;
-  transition: flex-grow 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              background 0.3s ease-in-out;
+  transition: background 0.3s ease-in-out;
 }
 
 .stages-widget--hex-grid {
-  background:
-    repeating-linear-gradient(0deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
-    repeating-linear-gradient(60deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
-    repeating-linear-gradient(120deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
-    var(--l-widget--bg);
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
+  repeating-linear-gradient(60deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
+  repeating-linear-gradient(120deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
+  var(--l-widget--bg);
 }
 
 .stages-title {
@@ -277,7 +300,6 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: transform 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
   position: relative;
 }
 
@@ -297,9 +319,10 @@ onUnmounted(() => {
   padding: 4px;
   gap: 4px;
   container-type: size;
-  transition: height 0.1s ease-in-out,
-              max-height 0.1s ease-in-out
- }
+  transition: transform v-bind(transitionDuration) ease-in-out,
+              height v-bind(transitionDuration) ease-in-out,
+              max-height v-bind(transitionDuration) ease-in-out
+}
 
 .stage-name {
   font-size: clamp(0.55rem, 24cqw, 0.9rem);
