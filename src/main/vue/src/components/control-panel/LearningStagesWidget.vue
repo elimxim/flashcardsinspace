@@ -314,7 +314,7 @@ onUnmounted(() => {
   width: 80%;
   min-width: 50px;
   height: auto;
-  min-height: clamp(56px, 6cqw, 80px);
+  min-height: clamp(56px, 10cqw, 80px);
   max-height: 80px;
   padding: 4px;
   gap: 4px;
