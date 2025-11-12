@@ -232,12 +232,13 @@ onUnmounted(() => {
 .stages-widget--theme {
   --l-widget--border-color: var(--stages-widget--border-color, none);
   --l-widget--bg: var(--stages-widget--bg, linear-gradient(180deg,
-  rgb(82, 96, 175) 0%,
-  rgb(111, 128, 214) 30%,
-  rgb(149, 155, 253) 60%,
-  rgb(173, 179, 251) 85%,
-  rgb(192, 201, 251) 100%
+  rgb(113, 123, 175) 0%,
+  rgb(150, 160, 211) 30%,
+  rgb(192, 196, 253) 60%,
+  rgb(211, 215, 250) 85%,
+  rgb(238, 240, 251) 100%
   ));
+  --l-widget--hex-line--color: var(--stages-widget--hex-line--color, rgba(0, 255, 255, 0.15));
   --l-widget--title--color: var(--stages-widget--title--color, rgba(21, 21, 44, 0.6));
   --l-widget--stage--border-color: var(--stages-widget--stage--border-color, rgba(0, 178, 255, 0.6));
   --l-widget--stage--bg: var(--stages-widget--stage--bg, linear-gradient(175deg, rgb(93, 120, 204) 0%, rgb(133, 155, 225) 100%));
@@ -264,9 +265,9 @@ onUnmounted(() => {
 }
 
 .stages-widget--hex-grid {
-  background: repeating-linear-gradient(0deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
-  repeating-linear-gradient(60deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
-  repeating-linear-gradient(120deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 24px, var(--l-widget--hex-line--color) 24px, var(--l-widget--hex-line--color) 25px),
+  repeating-linear-gradient(60deg, transparent 0px, transparent 24px, var(--l-widget--hex-line--color) 24px, var(--l-widget--hex-line--color) 25px),
+  repeating-linear-gradient(120deg, transparent 0px, transparent 24px, var(--l-widget--hex-line--color) 24px, var(--l-widget--hex-line--color) 25px),
   var(--l-widget--bg);
 }
 
