@@ -6,16 +6,19 @@
       :density="100"
       vertical-drift="2px"
     />
+    <div class="left-spacer"></div>
     <SmartButton
-      text="ENTER OUTER SPACE"
       class="outer-space-button"
-      :disabled="flashcardCount === 0"
+      :text="isDisabled ? 'VOID' : 'ENTER OUTER SPACE'"
+      :disabled="isDisabled"
       :on-click="startReview"
       fit-content
       auto-blur
     />
-    <div class="outer-space-count">
-      {{ flashcardCount }}
+    <div class="right-spacer">
+      <div class="outer-space-count">
+        {{ flashcardCount }}
+      </div>
     </div>
   </div>
 </template>
@@ -42,6 +45,8 @@ const { currDay } = storeToRefs(chronoStore)
 const flashcardCount = computed(() => {
   return countFlashcards(flashcards.value, specialStages.OUTER_SPACE, currDay.value)
 })
+const isDisabled = computed(() => flashcardCount.value === 0)
+
 
 function startReview() {
   router.push({ name: routeNames.review, query: { stage: specialStages.OUTER_SPACE.name } })
@@ -51,7 +56,7 @@ function startReview() {
 
 <style scoped>
 .outer-space-widget--theme {
-  --o-widget--bg: var(--outer-space-widget--bg, #414A4C);
+  --o-widget--bg: var(--outer-space-widget--bg, #0C0404);
   --o-widget--stage--count--color: var(--stages-stage-count--color, rgba(13, 18, 74, 0.6));
   --o-widget--stage--count--bg: var(--stages-stage-count--bg, rgba(255, 255, 255, 0.6));
 }
@@ -60,14 +65,23 @@ function startReview() {
   position: relative;
   display: flex;
   flex-direction: row;
-  justify-content: center;
   align-items: center;
-  gap: 10px;
   width: 100%;
   height: 100%;
   border-radius: 6px;
   padding: 10px;
   background: var(--o-widget--bg);
+}
+
+.left-spacer {
+  flex: 1;
+}
+
+.right-spacer {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 10px;
 }
 
 .outer-space-count {
