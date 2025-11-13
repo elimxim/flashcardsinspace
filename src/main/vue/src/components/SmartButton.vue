@@ -12,11 +12,11 @@
     :disabled="disabled"
     :hidden="hidden"
     v-bind="$attrs"
-    @mousedown="startHold"
-    @mouseup="cancelHold"
-    @mouseleave="cancelHold"
-    @touchstart.prevent="startHold"
-    @touchend="cancelHold"
+    @mousedown="onMouseDown"
+    @mouseup="onMouseUp"
+    @mouseleave="onMouseLeave"
+    @touchstart.prevent="onTouchStart"
+    @touchend="onTouchEnd"
     @click="click"
   >
     <span class="smart-button-title">
@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 const props = withDefaults(defineProps<{
   text: string
@@ -66,6 +66,26 @@ function click() {
   if (props.disabled) return
   if (props.autoBlur) button.value?.blur()
   if (props.holdTime <= 0) props.onClick()
+}
+
+function onMouseDown(event: Event) {
+  startHold(event)
+}
+
+function onMouseUp() {
+  cancelHold()
+}
+
+function onMouseLeave() {
+  cancelHold()
+}
+
+function onTouchStart(event: Event) {
+  startHold(event)
+}
+
+function onTouchEnd() {
+  cancelHold()
 }
 
 function startHold(event: Event) {
@@ -118,6 +138,20 @@ defineExpose({
   click
 })
 
+onMounted(() => {
+  document.addEventListener('mouseup', handleGlobalMouseUp)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('mouseup', handleGlobalMouseUp)
+})
+
+function handleGlobalMouseUp() {
+  if (button.value && document.activeElement === button.value) {
+    button.value.blur()
+  }
+}
+
 </script>
 
 <style scoped>
@@ -129,7 +163,6 @@ defineExpose({
   --s-btn--title--word-spacing: var(--smart-button--title--word-spacing, 0);
   --s-btn--title--letter-spacing: var(--smart-button--title--letter-spacing, 0);
   --s-btn--border-color: var(--smart-button--border-color, transparent);
-  --s-btn--border-width: var(--smart-button--border-width, 0);
   --s-btn--border-radius: var(--smart-button--border-radius, 3px);
   --s-btn--width: var(--smart-button--width, 100px);
   --s-btn--height: var(--smart-button--height, 40px);
@@ -141,10 +174,8 @@ defineExpose({
 
 .smart-button {
   color: var(--s-btn--title--color);
-  border-color: var(--s-btn--border-color);
-  border-width: var(--s-btn--border-width);
   padding: var(--s-btn--padding);
-  border-style: solid;
+  border: 1px solid var(--s-btn--border-color);
   border-radius: var(--s-btn--border-radius);
   background: var(--s-btn--bg);
   position: relative;
