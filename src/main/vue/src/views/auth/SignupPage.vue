@@ -240,7 +240,7 @@ async function signup() {
   ).then(async (response) => {
     console.log('Successfully signed up: ', authStore.user?.id)
     authStore.setUser(response.data)
-    await router.push({ name: routeNames.flashcards })
+    await router.push({ name: routeNames.controlPanel })
   }).catch(error => {
     signupFailed.value = true
 

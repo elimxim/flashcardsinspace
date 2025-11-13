@@ -2,7 +2,6 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { storeToRefs } from 'pinia'
 import HomeView from '@/views/HomeView.vue'
-import FlashcardsView from '@/views/FlashcardsView.vue'
 import ControlPanel from '@/views/ControlPanel.vue'
 import LeitnerView from '@/views/LeitnerView.vue'
 import SupportView from '@/views/SupportView.vue'
@@ -17,7 +16,6 @@ import { toStage } from '@/core-logic/stage-logic.ts'
 export const routeNames = {
   base: 'base',
   home: 'home',
-  flashcards: 'flashcards',
   controlPanel: 'controlPanel',
   leitner: 'leitner',
   user: 'user',
@@ -34,14 +32,6 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: routeNames.base,
     redirect: { name: routeNames.home },
-  },
-  {
-    path: '/flashcards',
-    name: routeNames.flashcards,
-    component: FlashcardsView,
-    meta: {
-      requiresAuth: true,
-    },
   },
   {
     path: '/control-panel',

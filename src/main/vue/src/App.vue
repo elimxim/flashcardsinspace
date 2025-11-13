@@ -8,8 +8,8 @@
 
       <ul class="nav-items">
         <li :hidden="!isAuthenticated">
-          <router-link :to="{ name: routeNames.flashcards }">
-            Flashcards
+          <router-link :to="{ name: routeNames.controlPanel }">
+            Control Panel
           </router-link>
         </li>
         <li>
