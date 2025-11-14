@@ -130,7 +130,7 @@ import AwesomeButton from '@/components/AwesomeButton.vue'
 import VoicePlayer from '@/components/VoicePlayer.vue'
 import Tooltip from '@/components/Tooltip.vue'
 import { ref, nextTick, computed } from 'vue'
-import { stageNameMap } from '@/core-logic/stage-logic.ts';
+import { stageNameMap } from '@/core-logic/stage-logic.ts'
 
 const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })
 const autoRepeatVoice = defineModel<boolean>('autoRepeatVoice', { default: false })
