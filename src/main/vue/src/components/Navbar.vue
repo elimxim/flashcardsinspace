@@ -1,6 +1,6 @@
 <template>
   <nav class="navbar navbar--theme">
-    <Starfield twinkle :density="200" :star-size="1.6" vertical-drift="2px"/>
+    <Starfield twinkle :density="100" :star-size="1.6" vertical-drift="2px"/>
     <div class="logo-container">
       <img src="@/assets/logo.svg" alt="Logo" class="logo-image"/>
       <div class="title-text" @click="navigateToControlPanel">
@@ -98,7 +98,7 @@ function navigateToUser() {
 
 <style scoped>
 .navbar--theme {
-  --starfield--star--color: #b1b176;
+  --starfield--star--color: #FAF9F6;
 }
 
 .navbar {
@@ -109,7 +109,7 @@ function navigateToUser() {
   bottom: 0;
   display: flex;
   justify-content: space-between;
-  background-color: #0C0404;
+  background-color: #242124;
   padding: 10px;
   height: var(--navbar-height);
   min-height: var(--navbar-height);
@@ -126,8 +126,8 @@ function navigateToUser() {
 }
 
 .nav-control-item {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
 }
 
 .logo-container {
@@ -139,7 +139,7 @@ function navigateToUser() {
 }
 
 .logo-image {
-  height: 40px;
+  height: 69px;
   z-index: 1001;
 }
 

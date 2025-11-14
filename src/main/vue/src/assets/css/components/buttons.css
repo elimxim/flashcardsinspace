@@ -93,7 +93,7 @@
 }
 
 .outer-space-button {
-  --smart-button--bg: #2d3535;
+  --smart-button--bg: #242124;
   --smart-button--bg--hover: #34324a;
   --smart-button--bg--disabled: transparent;
   --smart-button--padding: 10px;
@@ -102,7 +102,7 @@
 }
 
 .navigation-button {
-  --awesome-button--icon--size: 1.2rem;
+  --awesome-button--icon--size: 1.3rem;
   --awesome-button--icon--color: #FAF9F6;
   --awesome-button--icon--color--hover: #dad0f8;
   --awesome-button--icon--color--disabled: rgba(250, 249, 246, 0.15);

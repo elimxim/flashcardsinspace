@@ -56,7 +56,7 @@ function startReview() {
 
 <style scoped>
 .outer-space-widget--theme {
-  --o-widget--bg: var(--outer-space-widget--bg, #0C0404);
+  --o-widget--bg: var(--outer-space-widget--bg, #414A4C);
   --o-widget--stage--count--color: var(--stages-stage-count--color, rgba(13, 18, 74, 0.6));
   --o-widget--stage--count--bg: var(--stages-stage-count--bg, rgba(255, 255, 255, 0.6));
 }
