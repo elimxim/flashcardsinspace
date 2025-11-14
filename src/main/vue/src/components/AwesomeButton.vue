@@ -40,8 +40,6 @@
           <font-awesome-icon
             v-else
             :fade="fade"
-            :beat="beat"
-            :beat-fade="beatFade"
             :icon="icon"
             class="awesome-icon"
           />
@@ -59,8 +57,6 @@ import { ref } from 'vue'
 const props = withDefaults(defineProps<{
   icon: string
   fade?: boolean
-  beat?: boolean
-  beatFade?: boolean
   spinnable?: boolean
   spinIcon?: string
   disabled?: boolean
@@ -78,8 +74,6 @@ const props = withDefaults(defineProps<{
   onHover?: () => void
 }>(), {
   fade: false,
-  beat: false,
-  beatFade: false,
   spinnable: false,
   spinIcon: undefined,
   disabled: false,
