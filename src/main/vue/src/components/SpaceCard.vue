@@ -73,7 +73,7 @@
         <div class="space-card-strip select-none">
           <span v-if="!textOnly" class="space-card-strip-text">
             <Tooltip text="Learning Stage" position="bottom-right">
-              {{ stage }}
+              {{ stageDisplayName }}
             </Tooltip>
           </span>
           <AwesomeButton
@@ -169,7 +169,7 @@ const stageDisplayName = computed(() => {
   if (props.stage === undefined || props.stage === 'OUTER_SPACE') {
     return ''
   } else {
-    return stageNameMap.get(props.stage) ?? props.stage
+    return stageNameMap.get(props.stage)?.displayName ?? props.stage
   }
 })
 
