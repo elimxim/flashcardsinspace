@@ -57,6 +57,7 @@ import { ref } from 'vue'
 const props = withDefaults(defineProps<{
   icon: string
   fade?: boolean
+  scaleFactor?: number
   spinnable?: boolean
   spinIcon?: string
   disabled?: boolean
@@ -74,6 +75,7 @@ const props = withDefaults(defineProps<{
   onHover?: () => void
 }>(), {
   fade: false,
+  scaleFactor: 1.1,
   spinnable: false,
   spinIcon: undefined,
   disabled: false,
@@ -240,7 +242,7 @@ defineExpose({
 }
 
 .awesome-button-wrapper:has(.awesome-button:not(.awesome-button--disabled):hover) .awesome-icon-wrapper {
-  transform: scale(1.1);
+  transform: scale(v-bind(scaleFactor));
 }
 
 .awesome-button--click-ripple::before {
