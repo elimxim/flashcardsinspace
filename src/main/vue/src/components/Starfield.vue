@@ -70,7 +70,7 @@ function starStyle(s: Star) {
 
 <style scoped>
 .starfield--theme {
-  --star-color: var(--starfield--star--color, rgba(255, 255, 255, 0.9))
+  --star--color: var(--starfield--star--color, rgba(255, 255, 255, 0.9));
 }
 
 .starfield {
@@ -81,14 +81,14 @@ function starStyle(s: Star) {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1;
+  z-index: 0;
 }
 
 .starfield__star {
   position: absolute;
   opacity: 1;
   border-radius: 9999px;
-  background-color: var(--star-color);
+  background-color: var(--star--color);
   will-change: opacity, transform;
   animation-name: twinkle, verticalDrift;
   animation-timing-function: ease-in-out, ease-in-out;
