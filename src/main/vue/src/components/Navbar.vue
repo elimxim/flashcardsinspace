@@ -98,7 +98,10 @@ function navigateToUser() {
 
 <style scoped>
 .navbar--theme {
-  --starfield--star--color: #FAF9F6;
+  --starfield--star--color: #dad0f8;
+  --nav--bg: #242124;
+  --nav--title--color: #FAF9F6;
+  --nav--title--color--hover: #dad0f8;
 }
 
 .navbar {
@@ -109,7 +112,7 @@ function navigateToUser() {
   bottom: 0;
   display: flex;
   justify-content: space-between;
-  background-color: #242124;
+  background: var(--nav--bg);
   padding: 10px;
   height: var(--navbar-height);
   min-height: var(--navbar-height);
@@ -149,12 +152,12 @@ function navigateToUser() {
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
-  color: #FAF9F6;
+  color: var(--nav--title--color);
   cursor: pointer;
   transition: color 0.3s ease-in-out;
 }
 
 .title-text:hover {
-  color: #dad0f8;
+  color: var(--nav--title--color--hover);
 }
 </style>
