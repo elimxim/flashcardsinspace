@@ -31,7 +31,6 @@
       - password
       - email
       - username
-  - Showing information by navigation to an element
   - Mobile friendly
       - Modals => pages
       - Don't know/Know the flashcard by swiping to the left of to the right
