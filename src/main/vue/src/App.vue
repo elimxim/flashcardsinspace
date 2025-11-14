@@ -18,11 +18,6 @@
           </router-link>
         </li>
         <li>
-          <router-link :to="{ name: routeNames.leitner }">
-            Leitner
-          </router-link>
-        </li>
-        <li>
           <router-link :to="{ name: routeNames.support }">
             Support
           </router-link>
