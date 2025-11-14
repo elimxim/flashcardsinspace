@@ -14,8 +14,8 @@
       >
         <div class="space-card-strip select-none">
           <span v-if="!textOnly" class="space-card-strip-text">
-            <Tooltip text="Learning Stage" position="bottom">
-              {{ stage }}
+            <Tooltip text="Learning Stage" position="bottom-right">
+              {{ stageDisplayName }}
             </Tooltip>
           </span>
           <AwesomeButton
@@ -23,7 +23,7 @@
             icon="fa-solid fa-pen-to-square"
             class="space-card-button"
             tooltip="Edit flashcard"
-            tooltip-position="bottom"
+            tooltip-position="bottom-left"
             :on-click="handleEdit"
           />
         </div>
@@ -32,7 +32,7 @@
         </div>
         <div class="space-card-strip select-none">
           <span v-if="!textOnly">
-            <Tooltip text="Viewed Times">
+            <Tooltip text="Viewed Times" position="top-right">
               <font-awesome-icon icon="fa-regular fa-eye"/>
             </Tooltip>
             {{ viewedTimes }}
@@ -42,6 +42,7 @@
               icon="fa-solid fa-repeat"
               class="space-card-button"
               tooltip="Repeat voice"
+              tooltip-position="top-left"
               :active="autoRepeatVoice"
               :on-click="toggleAutoRepeatVoice"
             />
@@ -49,6 +50,7 @@
               icon="fa-solid fa-a"
               class="space-card-button"
               tooltip="Auto play voice"
+              tooltip-position="top-left"
               :active="autoPlayVoice"
               :on-click="toggleAutoPlayVoice"
             />
@@ -70,7 +72,7 @@
       >
         <div class="space-card-strip select-none">
           <span v-if="!textOnly" class="space-card-strip-text">
-            <Tooltip text="Learning Stage" position="bottom">
+            <Tooltip text="Learning Stage" position="bottom-right">
               {{ stage }}
             </Tooltip>
           </span>
@@ -79,7 +81,7 @@
             icon="fa-solid fa-pen-to-square"
             class="space-card-button"
             tooltip="Edit flashcard"
-            tooltip-position="bottom"
+            tooltip-position="bottom-left"
             :on-click="handleEdit"
           />
         </div>
@@ -88,7 +90,7 @@
         </div>
         <div class="space-card-strip select-none">
           <span v-if="!textOnly">
-            <Tooltip text="Viewed Times">
+            <Tooltip text="Viewed Times" position="top-right">
               <font-awesome-icon icon="fa-regular fa-eye"/>
             </Tooltip>
             {{ viewedTimes }}
@@ -98,6 +100,7 @@
               icon="fa-solid fa-repeat"
               class="space-card-button"
               tooltip="Repeat voice"
+              tooltip-position="top-left"
               :active="autoRepeatVoice"
               :on-click="toggleAutoRepeatVoice"
             />
@@ -105,6 +108,7 @@
               icon="fa-solid fa-a"
               class="space-card-button"
               tooltip="Auto play voice"
+              tooltip-position="top-left"
               :active="autoPlayVoice"
               :on-click="toggleAutoPlayVoice"
             />
@@ -125,7 +129,8 @@
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import VoicePlayer from '@/components/VoicePlayer.vue'
 import Tooltip from '@/components/Tooltip.vue'
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, computed } from 'vue'
+import { stageNameMap } from '@/core-logic/stage-logic.ts';
 
 const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })
 const autoRepeatVoice = defineModel<boolean>('autoRepeatVoice', { default: false })
@@ -159,6 +164,14 @@ const flipped = ref(false)
 const cardAnimationCompleted = ref(false)
 const frontVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
 const backVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
+
+const stageDisplayName = computed(() => {
+  if (props.stage === undefined || props.stage === 'OUTER_SPACE') {
+    return ''
+  } else {
+    return stageNameMap.get(props.stage) ?? props.stage
+  }
+})
 
 function flip() {
   if (!props.unflippable) {
