@@ -100,3 +100,13 @@
   --smart-button--border-color: #4f5053;
   --smart-button--border-radius: 6px;
 }
+
+.navigation-button {
+  --awesome-button--icon--size: 1rem;
+  --awesome-button--icon--color: white;
+  --awesome-button--icon--color--hover: white;
+  --awesome-button--bg: black;
+  --awesome-button--bg--hover: black;
+  --awesome-button--border-radius: 999px;
+  --awesome-button--padding: 0px;
+}
