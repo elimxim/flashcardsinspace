@@ -4,8 +4,6 @@
       icon="fa-solid fa-microphone"
       class="voice-recorder-mic-button"
       style="height: 100%;"
-      tooltip="Open voice recorder"
-      tooltip-position="top-right"
       :on-click="toggleControls"
       :active="isControlsExpanded"
       click-ripple
