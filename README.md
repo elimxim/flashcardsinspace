@@ -15,7 +15,6 @@
     - Password reset functionality (sending emails)
     - Link from Login page to Password reset page
     - JWT refresh
-    - Remember if signed up using cookie (on/off refreshing JWT)
     - Welcoming emails after signing up
   - Indexable for robots (searchable improvements)
   - Footer
