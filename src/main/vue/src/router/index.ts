@@ -11,6 +11,7 @@ import LogoutPage from '@/views/auth/LogoutPage.vue'
 import PasswordResetView from '@/views/auth/PasswordResetView.vue'
 import ReviewPage from '@/views/ReviewPage.vue'
 import { toStage } from '@/core-logic/stage-logic.ts'
+import { loadUserSignedUp } from '@/shared/cookies.ts';
 
 export const routeNames = {
   base: 'base',
@@ -100,7 +101,12 @@ router.beforeEach(async (to, _, next) => {
   const { isAuthenticated } = storeToRefs(authStore)
 
   if (to.meta.requiresAuth && !isAuthenticated.value) {
-    next({ name: routeNames.signup })
+    const isUserSignedUp = loadUserSignedUp()
+    if (isUserSignedUp) {
+      next({ name: routeNames.login })
+    } else {
+      next({ name: routeNames.signup })
+    }
   } else {
     next()
   }
