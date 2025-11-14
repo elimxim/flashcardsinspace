@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<{
   position?: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 }>(), {
   text: undefined,
-  delay: 500,
+  delay: 1000,
   position: 'top',
 })
 
