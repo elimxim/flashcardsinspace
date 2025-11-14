@@ -3,7 +3,6 @@
     <AwesomeButton
       icon="fa-solid fa-volume-high"
       class="voice-player-button"
-      tooltip="Play voice"
       :disabled="!audioUrl"
       :active="isPlaying"
       :fade="isPlaying"
