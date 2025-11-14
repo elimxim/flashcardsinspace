@@ -8,7 +8,11 @@
       'awesome-button-wrapper--growing--square': fillSpace && square,
     }"
   >
-    <Tooltip :text="tooltip" :position="tooltipPosition">
+    <Tooltip
+      :text="tooltip"
+      :delay="tooltipDelay"
+      :position="tooltipPosition"
+    >
       <div
         role="button"
         class="awesome-button awesome-button--theme select-none drag-none"
@@ -68,6 +72,7 @@ const props = withDefaults(defineProps<{
   clickRipple?: boolean
   tooltip?: string
   tooltipPosition?: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+  tooltipDelay?: number
   onClick?: () => void
   onDoubleClick?: () => void
   onHover?: () => void
@@ -86,6 +91,7 @@ const props = withDefaults(defineProps<{
   clickRipple: false,
   tooltip: undefined,
   tooltipPosition: 'top',
+  tooltipDelay: 1000,
   onClick: () => {
   },
   onDoubleClick: () => {
