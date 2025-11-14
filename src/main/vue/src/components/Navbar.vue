@@ -13,8 +13,9 @@
           :disabled="!isAuthenticated"
           :on-click="navigateToControlPanel"
           tooltip="Control Panel"
-          :tooltip-delay="10"
+          :tooltip-delay="50"
           tooltip-position="bottom"
+          :scale-factor="1.2"
           fill-space
           square
         />
@@ -25,8 +26,9 @@
           icon="fa-solid fa-house"
           :on-click="navigateToHome"
           tooltip="Home"
-          :tooltip-delay="10"
+          :tooltip-delay="50"
           tooltip-position="bottom"
+          :scale-factor="1.2"
           fill-space
           square
         />
@@ -37,8 +39,9 @@
           icon="fa-solid fa-heart-pulse"
           :on-click="navigateToSupport"
           tooltip="Support"
-          :tooltip-delay="10"
+          :tooltip-delay="50"
           tooltip-position="bottom"
+          :scale-factor="1.2"
           fill-space
           square
         />
@@ -49,8 +52,9 @@
           icon="fa-solid fa-user-astronaut"
           :on-click="navigateToUser"
           tooltip="User"
-          :tooltip-delay="10"
+          :tooltip-delay="50"
           tooltip-position="bottom-left"
+          :scale-factor="1.2"
           fill-space
           square
         />
@@ -114,8 +118,8 @@ function navigateToUser() {
 }
 
 .nav-control-item {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
 }
 
 .logo-container {

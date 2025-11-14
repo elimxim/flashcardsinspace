@@ -102,7 +102,7 @@
 }
 
 .navigation-button {
-  --awesome-button--icon--size: 1rem;
+  --awesome-button--icon--size: 1.2rem;
   --awesome-button--icon--color: white;
   --awesome-button--icon--color--hover: white;
   --awesome-button--bg: black;
