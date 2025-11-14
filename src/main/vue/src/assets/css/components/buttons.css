@@ -105,7 +105,7 @@
   --awesome-button--icon--size: 1.2rem;
   --awesome-button--icon--color: #FAF9F6;
   --awesome-button--icon--color--hover: #dad0f8;
-  --awesome-button--icon--color--disabled: #FAF9F6;
+  --awesome-button--icon--color--disabled: rgba(250, 249, 246, 0.15);
   --awesome-button--bg--hover: rgba(250, 249, 246, 0.15);
   --awesome-button--border-radius: 999px;
   --awesome-button--padding: 0px;
