@@ -2,11 +2,11 @@
 
 ## TODOS
 
+- FONTS
 - README
   - Describe the project
 - UX:
   - Home page
-  - Lightspeed page
   - Support page
     - Emotional support
     - Website support
@@ -14,7 +14,6 @@
   - Auth
     - Password reset functionality (sending emails)
     - Link from Login page to Password reset page
-    - JWT refresh
     - Welcoming emails after signing up
   - Indexable for robots (searchable improvements)
   - Footer
