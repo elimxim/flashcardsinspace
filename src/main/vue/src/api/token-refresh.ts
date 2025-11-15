@@ -25,7 +25,7 @@ interface QueuedRequest {
 }
 
 let isRefreshing = false
-let refreshPromise: Promise<User> | null = null
+let refreshPromise: Promise<boolean> | null = null
 let failedQueue: QueuedRequest[] = []
 
 function rejectQueuedRequests(error: AxiosError) {
@@ -46,26 +46,28 @@ function processQueuedRequests(axiosInstance: AxiosInstance) {
   failedQueue = []
 }
 
-async function attemptTokenRefresh(): Promise<User> {
+export async function attemptTokenRefresh(): Promise<boolean> {
+  const authStore = useAuthStore()
   try {
     console.log('Refreshing token...')
     const response = await sendRefreshTokenRequest()
     console.log('Token refresh successful')
-    return response.data
+    authStore.setUser(response.data)
+    return true
   } catch (error) {
+    authStore.resetUser()
     if (error instanceof AxiosError) {
       const axiosError = error as AxiosError
       if (axiosError.response?.status === 401 || axiosError.response?.status === 403) {
         console.info(`Refresh token expired: ${axiosError}`)
-        throw new Error('Refresh token expired')
       }
     }
     console.error('Token refresh failed:', error)
-    throw error
+    return false
   }
 }
 
-async function refreshToken(): Promise<User> {
+async function refreshToken(): Promise<boolean> {
   if (isRefreshing && refreshPromise) {
     return refreshPromise
   }
@@ -84,28 +86,19 @@ async function handleUnauthorizedError(error: AxiosError, axiosInstance: AxiosIn
   if (error.response?.status === 401 || error.response?.status === 403) {
     console.log('Handling 401/403 error')
     const originalRequest = error.config as InternalAxiosRequestConfig
-    return new Promise<AxiosResponse>((resolve, reject) => {
+    return new Promise<AxiosResponse>(async (resolve, reject) => {
       console.log(`Request '${originalRequest.baseURL}' was queued`)
       failedQueue.push({ resolve, reject, config: originalRequest })
       if (!isRefreshing) {
-        performTokenRefreshAndProcessQueue(error, axiosInstance)
+        if (await refreshToken()) {
+          processQueuedRequests(axiosInstance)
+        } else {
+          rejectQueuedRequests(error)
+          await redirectToLoginPage()
+        }
       }
     })
   }
 
   return Promise.reject(error)
-}
-
-async function performTokenRefreshAndProcessQueue(error: AxiosError, axiosInstance: AxiosInstance) {
-  const authStore = useAuthStore()
-
-  try {
-    const user = await refreshToken()
-    authStore.setUser(user)
-    processQueuedRequests(axiosInstance)
-  } catch {
-    rejectQueuedRequests(error)
-    authStore.resetUser()
-    await redirectToLoginPage()
-  }
 }
