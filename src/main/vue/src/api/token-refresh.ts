@@ -4,7 +4,6 @@ import {
   type AxiosResponse,
   type InternalAxiosRequestConfig
 } from 'axios'
-import { User } from '@/model/user.ts'
 import { sendRefreshTokenRequest } from '@/api/auth-client.ts'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { redirectToLoginPage } from '@/router/index.ts'
@@ -86,16 +85,18 @@ async function handleUnauthorizedError(error: AxiosError, axiosInstance: AxiosIn
   if (error.response?.status === 401 || error.response?.status === 403) {
     console.log('Handling 401/403 error')
     const originalRequest = error.config as InternalAxiosRequestConfig
-    return new Promise<AxiosResponse>(async (resolve, reject) => {
+    return new Promise<AxiosResponse>((resolve, reject) => {
       console.log(`Request '${originalRequest.baseURL}' was queued`)
       failedQueue.push({ resolve, reject, config: originalRequest })
       if (!isRefreshing) {
-        if (await refreshToken()) {
-          processQueuedRequests(axiosInstance)
-        } else {
-          rejectQueuedRequests(error)
-          await redirectToLoginPage()
-        }
+        refreshToken().then(async (success) => {
+          if (success) {
+            processQueuedRequests(axiosInstance)
+          } else {
+            rejectQueuedRequests(error)
+            await redirectToLoginPage()
+          }
+        })
       }
     })
   }
