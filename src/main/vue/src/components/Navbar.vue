@@ -98,6 +98,7 @@ function navigateToUser() {
 
 <style scoped>
 .navbar--theme {
+  --nav--font-family: var(--navbar--font-family);
   --starfield--star--color: #dad0f8;
   --nav--bg: #242124;
   --nav--title--color: #FAF9F6;
@@ -147,10 +148,11 @@ function navigateToUser() {
 }
 
 .title-text {
+  font-family: var(--nav--font-family);
   font-size: clamp(1rem, 2vw ,1.5rem);
   font-weight: 600;
-  letter-spacing: 0.05rem;
-  word-spacing: 0.05rem;
+  letter-spacing: 0.1rem;
+  word-spacing: 0.1rem;
   text-transform: uppercase;
   color: var(--nav--title--color);
   cursor: pointer;

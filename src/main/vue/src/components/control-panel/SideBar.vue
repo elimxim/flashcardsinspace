@@ -5,7 +5,7 @@
   >
     <ControlBar
       class="sidebar-control-bar"
-      title="Flashcard Sets"
+      title="FLASHCARD SETS"
       center-title
       shadow
     >

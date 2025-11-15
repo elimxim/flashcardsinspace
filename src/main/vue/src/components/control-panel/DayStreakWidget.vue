@@ -22,6 +22,7 @@ const { dayStreak } = storeToRefs(chronoStore)
 
 <style scoped>
 .day-streak-widget--theme {
+  --d-widget--font-family: var(--day-streak--font-family);
   --d-widget--number--color: var(--day-streak-widget--number--color, rgba(233, 238, 255, 0.92));
   --d-widget--text--color: var(--day-streak-widget--text--color, rgba(251, 233, 255, 0.88));
   --d-widget--bg: var(--day-streak-widget--bg, linear-gradient(135deg, rgb(244, 178, 252) 0%, rgb(248, 139, 154) 100%));
@@ -50,8 +51,8 @@ const { dayStreak } = storeToRefs(chronoStore)
 
 .day-steak-number {
   color: var(--d-widget--number--color);
+  font-family: var(--d-widget--font-family);
   font-weight: 800;
-  font-family: var(--day-streak--font-family);
   font-variant-numeric: tabular-nums lining-nums;
   font-size: 3.4rem;
   white-space: nowrap;
@@ -61,9 +62,10 @@ const { dayStreak } = storeToRefs(chronoStore)
 }
 
 .day-streak-text {
-  font-size: 0.6rem;
-  font-weight: 600;
   color: var(--d-widget--text--color);
+  font-family: var(--d-widget--font-family);
+  font-weight: 800;
+  font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   text-align: center;

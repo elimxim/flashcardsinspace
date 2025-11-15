@@ -7,12 +7,18 @@ body {
   box-sizing: border-box;
 }
 
-textarea {
-  font-family: inherit;
+button {
+  font-family: var(--button--font-family);
 }
 
-button {
-  font-family: inherit;
+ul,
+li,
+div,
+span,
+input,
+text,
+textarea {
+  font-family: var(--main--font-family);
 }
 
 /* Hide the default password reveal eye icon in Microsoft Edge */

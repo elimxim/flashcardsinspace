@@ -156,12 +156,13 @@ function handleGlobalMouseUp() {
 
 <style scoped>
 .smart-button--theme {
+  --s-btn--font-family: var(--button--font-family);
   --s-btn--title--font-size: var(--smart-button--title--font-size, 16px);
   --s-btn--title--color: var(--smart-button--title--color, #FAF9F6);
   --s-btn--title--color--hover: var(--smart-button--title--color--hover, #FAF9F6);
   --s-btn--title--color--disabled: var(--smart-button--title--color--disabled, #a3a3a3);
-  --s-btn--title--word-spacing: var(--smart-button--title--word-spacing, 0);
-  --s-btn--title--letter-spacing: var(--smart-button--title--letter-spacing, 0);
+  --s-btn--title--word-spacing: var(--smart-button--title--word-spacing, 0.05rem);
+  --s-btn--title--letter-spacing: var(--smart-button--title--letter-spacing, 0.05rem);
   --s-btn--border-color: var(--smart-button--border-color, transparent);
   --s-btn--border-radius: var(--smart-button--border-radius, 3px);
   --s-btn--width: var(--smart-button--width, 100px);
@@ -201,9 +202,12 @@ function handleGlobalMouseUp() {
 
 .smart-button-title {
   display: inline-block;
+  font-family: var(--s-btn--font-family);
+  font-weight: 600;
   font-size: var(--s-btn--title--font-size);
   word-spacing: var(--s-btn--title--word-spacing);
   letter-spacing: var(--s-btn--title--letter-spacing);
+  text-transform: uppercase;
   transition: transform 0.1s ease-in-out;
 }
 
