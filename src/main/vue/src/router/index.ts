@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia'
 import HomeView from '@/pages/HomeView.vue'
 import ControlPanel from '@/pages/ControlPanel.vue'
 import SupportView from '@/pages/SupportView.vue'
-import UserView from '@/pages/UserView.vue'
+import UserPage from '@/pages/UserPage.vue'
 import SignupPage from '@/pages/auth/SignupPage.vue'
 import LoginPage from '@/pages/auth/LoginPage.vue'
 import LogoutPage from '@/pages/auth/LogoutPage.vue'
@@ -53,7 +53,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/user',
     name: routeNames.user,
-    component: UserView,
+    component: UserPage,
     meta: {
       requiresAuth: true,
     },

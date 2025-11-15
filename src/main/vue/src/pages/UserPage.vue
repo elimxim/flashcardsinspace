@@ -1,5 +1,4 @@
 <template>
-  <!-- todo show something more here -->
   <div class="user-container">
     <font-awesome-icon icon="fa-solid fa-circle-user"/>
   </div>
@@ -7,7 +6,9 @@
 
 
 <script setup lang="ts">
-// todo logout button
+
+
+
 </script>
 
 <style scoped>
