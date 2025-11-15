@@ -162,7 +162,7 @@ onMounted(() => {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: clamp(200px, 40vw, 300px);
+  width: clamp(200px, 40vw, 280px);
   height: 100%;
   background: var(--bar--bg);
   transition: margin-left 0.35s ease-in-out;
@@ -170,7 +170,7 @@ onMounted(() => {
 }
 
 .sidebar--collapsed {
-  margin-left: clamp(-300px, -40vw, -200px);
+  margin-left: clamp(-280px, -40vw, -200px);
 }
 
 .sidebar-control-bar {
