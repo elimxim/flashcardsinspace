@@ -41,7 +41,7 @@ class JwtService(private val securityProperties: SecurityProperties) {
         val refreshTokenCookie = Cookie("refreshToken", refreshToken).apply {
             isHttpOnly = true
             secure = true
-            path = "/auth/refresh-token"
+            path = "/auth/refresh"
             maxAge = (securityProperties.jwt.refreshTokenExpirationMs / 1000).toInt()
         }
 
@@ -60,7 +60,7 @@ class JwtService(private val securityProperties: SecurityProperties) {
         val refreshTokenCookie = Cookie("refreshToken", null).apply {
             isHttpOnly = true
             secure = true
-            path = "/auth/refresh-token"
+            path = "/auth/refresh"
             maxAge = 0
         }
 
