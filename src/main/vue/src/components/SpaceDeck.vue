@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import SpaceCard from '@/components/SpaceCard.vue'
-import FlashcardEditModal from '@/views/modal/FlashcardEditModal.vue'
+import FlashcardEditModal from '@/modals/FlashcardEditModal.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'

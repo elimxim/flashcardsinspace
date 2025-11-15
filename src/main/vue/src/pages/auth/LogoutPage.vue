@@ -32,7 +32,7 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth-store.ts'
-import { routeNames } from '@/router/index.ts'
+import { routeNames } from '@/router'
 import { sendLogoutRequest } from '@/api/auth-client.ts'
 import Progressbar from '@/components/Progressbar.vue'
 

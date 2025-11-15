@@ -95,7 +95,7 @@
 
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import CalendarModal from '@/views/modal/CalendarModal.vue'
+import CalendarModal from '@/modals/CalendarModal.vue'
 import { computed, ref } from 'vue'
 import { calcStageReviews } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'

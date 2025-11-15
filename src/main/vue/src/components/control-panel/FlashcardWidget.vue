@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import FlashcardCreationModal from '@/views/modal/FlashcardCreationModal.vue'
+import FlashcardCreationModal from '@/modals/FlashcardCreationModal.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
