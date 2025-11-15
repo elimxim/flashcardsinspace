@@ -9,4 +9,3 @@
 @import '@/assets/css/shared/abilities.css' layer(shared);
 @import '@/assets/css/shared/transitions.css' layer(shared);
 @import '@/assets/css/components/buttons.css' layer(components);
-@import '@/assets/css/components/inputs.css' layer(components);
