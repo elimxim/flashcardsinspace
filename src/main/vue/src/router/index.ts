@@ -11,7 +11,7 @@ import LogoutPage from '@/views/auth/LogoutPage.vue'
 import PasswordResetView from '@/views/auth/PasswordResetView.vue'
 import ReviewPage from '@/views/ReviewPage.vue'
 import { toStage } from '@/core-logic/stage-logic.ts'
-import { loadUserSignedUp } from '@/shared/cookies.ts';
+import { loadUserSignedUp } from '@/shared/cookies.ts'
 
 export const routeNames = {
   base: 'base',
@@ -113,3 +113,13 @@ router.beforeEach(async (to, _, next) => {
 })
 
 export default router
+
+function isOnAuthPage() {
+  return router.currentRoute.value.name === routeNames.login || router.currentRoute.value.name === routeNames.signup
+}
+
+export async function redirectToLoginPage() {
+  if (!isOnAuthPage()) {
+    await router.push({ name: routeNames.login })
+  }
+}
