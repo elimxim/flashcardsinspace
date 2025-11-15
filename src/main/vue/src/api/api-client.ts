@@ -17,6 +17,7 @@ import {
 } from '@/model/flashcard.ts'
 import { Chronoday } from '@/model/chrono.ts'
 import { configureDateTransformers } from '@/api/axios-config.ts'
+import { configureTokenRefreshInterceptor } from '@/api/token-refresh.ts'
 
 const apiClient = axios.create({
   baseURL: '/api',
@@ -24,6 +25,7 @@ const apiClient = axios.create({
 })
 
 configureDateTransformers(apiClient)
+configureTokenRefreshInterceptor(apiClient)
 
 export default apiClient
 

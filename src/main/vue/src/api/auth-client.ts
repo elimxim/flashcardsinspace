@@ -8,7 +8,13 @@ const authClient = axios.create({
   withCredentials: false,
 })
 
+const authClientWithCredentials = axios.create({
+  baseURL: '/auth',
+  withCredentials: true,
+})
+
 configureDateTransformers(authClient)
+configureDateTransformers(authClientWithCredentials)
 
 export default authClient
 
@@ -36,7 +42,12 @@ export async function sendLoginRequest(email: string, password: string) {
 
 export async function sendLogoutRequest() {
   console.log('[POST] request => log out')
-  return await authClient.post('/logout')
+  return await authClientWithCredentials.post('/logout')
+}
+
+export async function sendRefreshTokenRequest() {
+  console.log('[POST] request => refresh')
+  return await authClientWithCredentials.post<User>('/refresh')
 }
 
 export async function sendWhoAmIRequest() {
