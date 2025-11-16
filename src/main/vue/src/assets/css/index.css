@@ -4,7 +4,6 @@
 @import '@/assets/css/base/themes.css' layer(base);
 @import '@/assets/css/layout/layout.css' layer(layout);
 @import '@/assets/css/layout/auth.css' layer(layout);
-@import '@/assets/css/shared/errors.css' layer(shared);
 @import '@/assets/css/shared/shared.css' layer(shared);
 @import '@/assets/css/components/awesome.css' layer(components);
 @import '@/assets/css/components/buttons.css' layer(components);
