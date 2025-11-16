@@ -5,4 +5,5 @@ export interface User {
   roles: string[]
   registeredAt: Date // ZonedDateTime
   timezone: string
+  languageId: number
 }
