@@ -16,12 +16,18 @@
           :invalid="curNameInvalid"
           placeholder="Name"
         />
-        <span v-if="curNameMaxLengthInvalid" class="text-error">
-          Too long. Maximum 64 characters
-        </span>
-        <span v-else-if="curNameRegexMismatch" class=text-error>
-          Please use only letters, numbers, dashes, underscores, and spaces
-        </span>
+        <ErrorText
+          :errors="[
+            {
+              when: curNameMaxLengthInvalid,
+              text: 'Too long. Maximum 64 characters'
+            },
+            {
+              when: curNameRegexMismatch,
+              text: 'Please use only letters, numbers, dashes, underscores, and spaces'
+            },
+          ]"
+        />
       </div>
       <div class="modal-main-area--inner">
         <AwesomeContainer icon="fa-solid fa-globe" class="awesome-globe">
@@ -78,6 +84,7 @@ import SmartCheckbox from '@/components/SmartCheckbox.vue'
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
+import ErrorText from '@/components/ErrorText.vue'
 import { computed, ref, watch } from 'vue'
 import { helpers, maxLength, required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
