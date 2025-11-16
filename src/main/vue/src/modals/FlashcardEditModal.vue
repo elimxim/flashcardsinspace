@@ -17,9 +17,10 @@
           placeholder="Front side"
           area
         />
-        <span v-if="frontSideMaxLengthInvalid" class="text-error">
-          Your text has its own gravity! Maximum 512 characters.
-        </span>
+        <ErrorText
+          :when="frontSideMaxLengthInvalid"
+          text="Your text has its own gravity! Maximum 512 characters."
+        />
         <VoiceRecorder
           v-model="frontSideAudio"
         />
@@ -32,9 +33,10 @@
           placeholder="Back side"
           area
         />
-        <span v-if="backSideMaxLengthInvalid" class="text-error">
-          Your text has its own gravity! Maximum 512 characters.
-        </span>
+        <ErrorText
+          :when="backSideMaxLengthInvalid"
+          text="Your text has its own gravity! Maximum 512 characters."
+        />
         <VoiceRecorder
           v-model="backSideAudio"
         />
@@ -72,6 +74,7 @@ import SmartButton from '@/components/SmartButton.vue'
 import SmartInput from '@/components/SmartInput.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import VoiceRecorder from '@/components/VoiceRecorder.vue'
+import ErrorText from '@/components/ErrorText.vue'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { maxLength, required } from '@vuelidate/validators'
