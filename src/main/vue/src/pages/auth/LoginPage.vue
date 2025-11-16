@@ -38,9 +38,10 @@
           :invalid="userEmailInvalid"
           placeholder="Email"
         />
-        <span v-if="userEmailFormatWrong" class="text-error">
-          This email seems to be lost in a cosmic dust cloud. Please check the format
-        </span>
+        <ErrorText
+          :when="userEmailFormatWrong"
+          text="This email seems to be lost in a cosmic dust cloud. Please check the format"
+        />
         <SmartInput
           id="password"
           v-model="userPassword"
@@ -50,11 +51,10 @@
           :invalid="userPasswordInvalid"
           placeholder="Password"
         />
-        <span
-          v-if="userPasswordMaxLengthInvalid"
-          class="text-error">
-          This secret is expanding faster than the universe! Please keep it under 64 characters
-        </span>
+        <ErrorText
+          :when="userPasswordMaxLengthInvalid"
+          text="This secret is expanding faster than the universe! Please keep it under 64 characters"
+        />
         <SmartButton
           class="auth-button"
           text="Log in"
@@ -78,6 +78,7 @@ import SmartInput from '@/components/SmartInput.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import SmartPicture from '@/components/SmartPicture.vue'
+import ErrorText from '@/components/ErrorText.vue'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { email, maxLength, required } from '@vuelidate/validators'
