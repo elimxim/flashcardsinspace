@@ -60,7 +60,7 @@
       />
       <SmartButton
         class="update-button"
-        text="Update"
+        text="Save"
         :on-click="update"
         :disabled="!stateChanged || formInvalid"
         auto-blur
