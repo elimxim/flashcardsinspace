@@ -43,6 +43,7 @@ import {
   faUserAstronaut,
   faShuttleSpace,
   faEnvelope,
+  faTools,
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faEye as faRegularEye,
@@ -97,6 +98,7 @@ export function applyFaIcons() {
     faUserAstronaut,
     faShuttleSpace,
     faEnvelope,
+    faTools,
 
     faRegularEye,
     faRegularCircle,
