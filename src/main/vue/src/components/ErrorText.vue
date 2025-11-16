@@ -2,8 +2,8 @@
   <transition name="error-slide" mode="out-in">
     <div
       v-if="firstErrorText"
-      class="error-text error-text--theme"
       :key="firstErrorText"
+      class="error-text error-text--theme"
     >
       {{ firstErrorText }}
     </div>
@@ -37,6 +37,8 @@ const firstErrorText = computed(() => {
     const visibleText = props.errors.find(item => item.when)
     return visibleText?.text
   }
+
+  return undefined
 })
 
 </script>
