@@ -1,11 +1,11 @@
 <template>
-  <div class="page page--auto-padded scrollbar-hidden">
+  <div class="page page--auto-padded user-page--theme scrollbar-hidden">
     <div class="user-page-layout">
       <h2>Welcome aboard, {{ user?.name ?? 'Unknown' }}!</h2>
       <div>{{ randomDayPhrase }}</div>
       <div class="user-info">
         <div class="user-info-item">
-          <AwesomeContainer icon="fa-solid fa-user-astronaut">
+          <AwesomeContainer icon="fa-solid fa-user-astronaut" class="user-info-icon">
             <SmartInput
               v-model="username"
               type="text"
@@ -22,7 +22,7 @@
           </span>
         </div>
         <div class="user-info-item">
-          <AwesomeContainer icon="fa-solid fa-envelope">
+          <AwesomeContainer icon="fa-solid fa-envelope" class="user-info-icon">
             <SmartInput
               v-model="userEmail"
               type="email"
@@ -36,7 +36,7 @@
           </span>
         </div>
         <div class="user-info-item">
-          <AwesomeContainer icon="fa-solid fa-globe" class="awesome-globe">
+          <AwesomeContainer icon="fa-solid fa-globe" class="user-info-icon">
             <FuzzySelect
               id="language"
               v-model="language"
@@ -220,6 +220,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.user-page--theme {
+  --u-page--icon--color: #6369d5;
+}
+
 .user-page-layout {
   display: flex;
   flex-direction: column;
@@ -246,6 +250,10 @@ onMounted(() => {
 
 .user-info-item {
   align-items: center;
+}
+
+.user-info-icon {
+  --awesome-container--icon--color: var(--u-page--icon--color);
 }
 
 .user-controls {
