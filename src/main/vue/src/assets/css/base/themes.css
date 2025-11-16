@@ -185,7 +185,7 @@
   --space-card--border-color: rgba(0, 0, 0, 0.05);
   --space-card--front--bg-color: #fdfdfd;
   --space-card--front--bg-image: linear-gradient(0deg, transparent 5px, rgba(34, 34, 34, 0.15) 5px, rgba(34, 34, 34, 0.15) 6px, transparent 5px);
-  --space-card--front--bg-size: 100% 30px;
+  --space-card--front--bg-size: 100% 32px;
   --space-card--back--bg-color: #fdfdfd;
 
   /* control bar */
