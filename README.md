@@ -18,16 +18,8 @@
   - Footer
   - Bugreport form
   - Review Session
-  - User page functionality:
-    - show
-      - username
-      - email
-      - registration date
-      - devices
-    - change
-      - password
-      - email
-      - username
+  - User page: 
+    - Show active sessions and devices
   - Mobile friendly
       - Modals => pages
       - Don't know/Know the flashcard by swiping to the left of to the right
