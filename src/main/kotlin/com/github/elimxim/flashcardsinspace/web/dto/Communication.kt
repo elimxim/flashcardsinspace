@@ -224,3 +224,25 @@ data class FlashcardSetSuspendResponse(
     val currDay: ChronodayDto,
     val chronodays: List<ChronodayDto>,
 )
+
+data class UserUpdateRequest(
+    @field:NotNull
+    @field:NotBlank
+    @field:Email
+    var email: String? = null,
+    @field:NotNull
+    @field:NotBlank
+    @field:Size(max = 64)
+    @field:Pattern(regexp="^[A-Za-z0-9 _-]+$")
+    var name: String? = null,
+    @field:NotNull
+    @field:NotBlank
+    @field:Pattern(regexp="^\\d+$")
+    var languageId: String? = null,
+)
+
+data class ValidUserUpdateRequest(
+    val email: String,
+    val name: String,
+    val languageId: Long,
+)
