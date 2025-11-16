@@ -14,12 +14,19 @@
               :invalid="usernameInvalid"
             />
           </AwesomeContainer>
-          <span v-if="usernameRegexMismatch" class="text-error">
-            Please use only letters, numbers, dashes, underscores, and spaces
-          </span>
-          <span v-else-if="usernameMaxLengthInvalid" class="text-error">
-            This username is expanding faster than the universe! Please keep it under 64 characters
-          </span>
+          <ErrorText
+            :show="usernameRegexMismatch"
+            :errors="[
+              {
+                when: usernameRegexMismatch,
+                text: 'Please use only letters, numbers, dashes, underscores, and spaces'
+              },
+              {
+                when: usernameMaxLengthInvalid,
+                text: 'This username is expanding faster than the universe! Please keep it under 64 characters'
+              },
+            ]"
+          />
         </div>
         <div class="user-info-item">
           <AwesomeContainer icon="fa-solid fa-envelope" class="user-info-icon">
@@ -31,9 +38,10 @@
               :invalid="userEmailInvalid"
             />
           </AwesomeContainer>
-          <span v-if="userEmailWrongFormat" class="text-error">
-            This email seems to be lost in a cosmic dust cloud. Please check the format
-          </span>
+          <ErrorText
+            :when="userEmailWrongFormat"
+            text="This email seems to be lost in a cosmic dust cloud. Please check the format"
+          />
         </div>
         <div class="user-info-item">
           <AwesomeContainer icon="fa-solid fa-globe" class="user-info-icon">
@@ -83,6 +91,7 @@ import SmartInput from '@/components/SmartInput.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
+import ErrorText from '@/components/ErrorText.vue'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'
