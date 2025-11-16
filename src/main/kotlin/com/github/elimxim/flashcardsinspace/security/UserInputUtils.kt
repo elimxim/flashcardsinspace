@@ -132,3 +132,15 @@ fun ChronoBulkUpdateRequest.escapeJava() = ChronoBulkUpdateRequest(
     ids = ids.map { ChronoBulkUpdateRequest.ChronodayId(it.id?.escapeJava()) },
     status = status?.escapeJava(),
 )
+
+fun UserUpdateRequest.normalize() = UserUpdateRequest(
+    email = email?.normalize()?.lowercase(),
+    name = name?.normalize(),
+    languageId = languageId?.normalize(),
+)
+
+fun UserUpdateRequest.escapeJava() = UserUpdateRequest(
+    email = email?.escapeJava(),
+    name = name?.escapeJava(),
+    languageId = languageId?.escapeJava(),
+)
