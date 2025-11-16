@@ -20,6 +20,7 @@
   - Review Session
   - User page: 
     - Show active sessions and devices
+    - Change password
   - Mobile friendly
       - Modals => pages
       - Don't know/Know the flashcard by swiping to the left of to the right
