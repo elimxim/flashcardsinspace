@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { type Chronoday } from '@/model/chrono.ts'
-import { asIsoDateStr } from '@/utils/date.ts'
 import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
+import { asIsoDateStr } from '@/utils/utils.ts';
 
 export interface ChronoState {
   chronodays: Chronoday[]

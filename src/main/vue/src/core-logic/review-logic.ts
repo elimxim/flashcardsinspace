@@ -8,11 +8,11 @@ import {
   stages,
 } from '@/core-logic/stage-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
-import { shuffle } from '@/utils/array.ts'
 import {
   chronodayStatusesToCompleteDay,
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
+import { shuffle } from '@/utils/utils.ts';
 
 export enum ReviewMode {
   LIGHTSPEED = 'LIGHTSPEED',
