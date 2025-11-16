@@ -151,7 +151,7 @@ onMounted(() => {
   --bar--item--count--color: var(--sidebar--item--count-color, rgba(20, 27, 106, 0.82));
   --bar--item--count--bg: var(--sidebar--item--count--bg, rgba(255, 255, 255, 0.6));
   --bar--language--text-color: var(--sidebar--language--text-color, #efe9ef);
-  --bar--language--icon-color: var(--sidebar--language--icon-color,rgba(255, 255, 255, 0.6));
+  --bar--language--icon-color: var(--sidebar--language--icon-color, rgba(255, 255, 255, 0.6));
   --bar--scrollbar--track-color: var(--sidebar--scrollbar--track-color, #575e68);
   --bar--scrollbar--thumb-color: var(--sidebar--scrollbar--thumb-color, #808daa);
   --bar--scrollbar--thumb-color--hover: var(--sidebar--scrollbar--thumb-hover-color, #98a9ca);
@@ -275,7 +275,7 @@ onMounted(() => {
 }
 
 .sidebar-item__language-container {
-  --awesome-container--icon--font-size: 0.8rem;
+  --awesome-container--icon--size: 0.8rem;
   --awesome-container--icon--color: var(--bar--language--icon-color);
   --awesome-container--gap: 4px;
 }

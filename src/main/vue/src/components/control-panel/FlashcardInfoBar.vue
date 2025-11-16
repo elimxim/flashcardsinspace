@@ -59,7 +59,7 @@ const flashcardCount = computed(() => flashcards.value.length)
 
 .language-info {
   display: flex;
-  --awesome-container--icon--font-size: 1.2rem;
+  --awesome-container--icon--size: 1.2rem;
   --awesome-container--icon--color: var(--f-bar--language--icon-color);
   --awesome-container--gap: 8px;
 }
