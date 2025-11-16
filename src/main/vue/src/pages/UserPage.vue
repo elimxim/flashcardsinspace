@@ -129,11 +129,7 @@ const daysPhrases = [
   (days: number) => `Floating in zero gravity for ${days} days (and somehow still haven't lost your keys)`,
   (days: number) => `You've been floating with us for ${days} days - that's ${days} days without doing laundry!`,
   (days: number) => `Floating majestically for ${days} days (like a graceful space walrus)`,
-  (days: number) => `You've been orbiting our space station for ${days} days - dizzy yet?`,
-  (days: number) => `${days} days aboard - don't panic, you're doing great!`,
   (days: number) => `You've survived ${days} days without a towel - impressive for a space traveler`,
-  (days: number) => `You've been here ${days} days - wow, such commitment (the logout button is right there, you know)`,
-  (days: number) => `You've been with us ${days} days - what an incredible space adventure we're sharing!`,
   (days: number) => `${days} days in space - congratulations, you're now 0.00001% closer to Mars`,
   (days: number) => `${days} days in space - your Earth insurance probably doesn't cover this`,
 ]
