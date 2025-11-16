@@ -42,6 +42,7 @@ import {
   faHeartPulse,
   faUserAstronaut,
   faShuttleSpace,
+  faEnvelope,
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faEye as faRegularEye,
@@ -95,6 +96,7 @@ export function applyFaIcons() {
     faHeartPulse,
     faUserAstronaut,
     faShuttleSpace,
+    faEnvelope,
 
     faRegularEye,
     faRegularCircle,
