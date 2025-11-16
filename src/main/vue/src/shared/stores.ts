@@ -14,6 +14,9 @@ import {
 } from '@/api/api-client.ts'
 import { loadSelectedSetId } from '@/shared/cookies.ts'
 import { sortFlashcardSets } from '@/core-logic/flashcard-logic.ts'
+import { onMounted } from 'vue';
+import { sendLanguagesGetRequest } from '@/api/public-api-client.ts';
+import { useLanguageStore } from '@/stores/language-store.ts';
 
 export function determineCurrFlashcardSet(): FlashcardSet | undefined {
   console.log('Determining current flashcard set')
@@ -116,6 +119,28 @@ export async function loadFlashcardSetStore(forced: boolean = false): Promise<bo
     })
     .catch((error) => {
       console.error(`Failed to load flashcard sets`, error)
+      toaster.bakeError(`Data fetching error`, error.response?.data)
+      return false
+    })
+}
+
+export async function loadLanguageStore(): Promise<boolean> {
+  console.log('Loading language store')
+
+  const languageStore = useLanguageStore()
+  const toaster = useSpaceToaster()
+
+  if (languageStore.loaded) {
+    console.log('Language store is already loaded')
+    return true
+  }
+
+  return await sendLanguagesGetRequest()
+    .then(response => {
+      languageStore.loadState(response.data)
+      return true
+    }).catch(error => {
+      console.error('Error loading languages:', error)
       toaster.bakeError(`Data fetching error`, error.response?.data)
       return false
     })

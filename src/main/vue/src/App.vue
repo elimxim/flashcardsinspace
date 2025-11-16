@@ -3,22 +3,17 @@
     <Navbar/>
     <router-view/>
   </div>
+  <SpaceToast/>
 </template>
 
 <script setup lang="ts">
 import Navbar from '@/components/Navbar.vue'
-import { useLanguageStore } from '@/stores/language-store.ts'
+import SpaceToast from '@/components/SpaceToast.vue'
 import { onMounted } from 'vue'
-import { loadLanguages } from '@/api/public-api-client.ts'
-
-const languageStore = useLanguageStore()
+import { loadLanguageStore } from '@/shared/stores.ts'
 
 onMounted(() => {
-  loadLanguages().then(response => {
-    languageStore.loadState(response.data)
-  }).catch(error => {
-    console.error('Error loading languages:', error)
-  })
+  loadLanguageStore()
 })
 
 </script>
