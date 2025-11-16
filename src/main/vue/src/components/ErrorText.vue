@@ -45,8 +45,8 @@ const firstErrorText = computed(() => {
 
 <style scoped>
 .error-text--theme {
-  --e-text--font-family: var(--error-font-family);
-  --e-text--color: var(--text--error--color, #c80f0f);
+  --e-text--font-family: var(--error-text--font-family);
+  --e-text--color: var(--error-text--color, #c80f0f);
 }
 
 .error-text {
