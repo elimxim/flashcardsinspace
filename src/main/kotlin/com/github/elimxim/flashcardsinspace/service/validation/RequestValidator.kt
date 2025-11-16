@@ -103,6 +103,17 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
+    fun validate(request: UserUpdateRequest): ValidUserUpdateRequest {
+        validateRequest<UserUpdateRequest>(request) { violations ->
+            throw InvalidRequestFieldsException(
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+                fields(violations)
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
     private inline fun <reified T> validateRequest(request: T, ifInvalid: (List<Violation>) -> Unit) {
         val constraintViolations = validator.validate(request)
         if (constraintViolations.isNotEmpty()) {
@@ -195,3 +206,8 @@ fun ChronoBulkUpdateRequest.toValidRequest() = ValidChronoBulkUpdateRequest(
     status = ChronodayStatus.valueOf(status!!),
 )
 
+fun UserUpdateRequest.toValidRequest() = ValidUserUpdateRequest(
+    email = email!!,
+    name = name!!,
+    languageId = languageId!!.toLong(),
+)
