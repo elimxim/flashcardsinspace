@@ -16,12 +16,18 @@
           :invalid="nameInvalid"
           placeholder="Name"
         />
-        <span v-if="nameMaxLengthInvalid" class="text-error">
-          Too long. Maximum 64 characters
-        </span>
-        <span v-else-if="nameRegexMismatch" class=text-error>
-          Please use only letters, numbers, dashes, underscores, and spaces
-        </span>
+        <ErrorText
+          :errors="[
+            {
+              when: nameMaxLengthInvalid,
+              text: 'Too long. Maximum 64 characters'
+            },
+            {
+              when: nameRegexMismatch,
+              text: 'Please use only letters, numbers, dashes, underscores, and spaces'
+            },
+          ]"
+        />
       </div>
       <div class="modal-main-area--inner">
         <AwesomeContainer icon="fa-solid fa-globe" class="awesome-globe">
@@ -61,6 +67,7 @@ import SmartInput from '@/components/SmartInput.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
+import ErrorText from '@/components/ErrorText.vue'
 import { computed, ref, watch } from 'vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
