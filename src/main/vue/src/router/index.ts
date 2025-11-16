@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { storeToRefs } from 'pinia'
-import HomeView from '@/pages/HomeView.vue'
+import HomePage from '@/pages/HomePage.vue'
 import ControlPanel from '@/pages/ControlPanel.vue'
 import SupportPage from '@/pages/SupportPage.vue'
 import UserPage from '@/pages/UserPage.vue'
@@ -43,7 +43,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/home',
     name: routeNames.home,
-    component: HomeView
+    component: HomePage
   },
   {
     path: '/support',
