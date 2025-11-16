@@ -14,9 +14,8 @@ import {
 } from '@/api/api-client.ts'
 import { loadSelectedSetId } from '@/shared/cookies.ts'
 import { sortFlashcardSets } from '@/core-logic/flashcard-logic.ts'
-import { onMounted } from 'vue';
-import { sendLanguagesGetRequest } from '@/api/public-api-client.ts';
-import { useLanguageStore } from '@/stores/language-store.ts';
+import { sendLanguagesGetRequest } from '@/api/public-api-client.ts'
+import { useLanguageStore } from '@/stores/language-store.ts'
 
 export function determineCurrFlashcardSet(): FlashcardSet | undefined {
   console.log('Determining current flashcard set')
