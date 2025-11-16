@@ -25,7 +25,7 @@
       />
     </div>
     <div
-      class="auth-container transition--border-color"
+      class="auth-container"
       :class="{ 'auth-container--error': loginFailed }"
     >
       <form class="auth-form" novalidate @submit.prevent="login">
@@ -52,7 +52,7 @@
         />
         <span
           v-if="userPasswordMaxLengthInvalid"
-          class="text-error transition--opacity">
+          class="text-error">
           This secret is expanding faster than the universe! Please keep it under 64 characters
         </span>
         <SmartButton

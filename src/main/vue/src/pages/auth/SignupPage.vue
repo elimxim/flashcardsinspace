@@ -8,7 +8,7 @@
     ]"
   >
     <div
-      class="auth-container transition--border-color"
+      class="auth-container"
       :class="{ 'auth-container--error': signupFailed }"
     >
       <form class="auth-form" novalidate @submit.prevent="signup">

@@ -8,7 +8,7 @@
       v-bind="$attrs"
       ref="textArea"
       v-model="model"
-      class="transition--border-color"
+      style="transition: border-color 0.2s ease-in-out;"
       :type="inputType"
       :toast-type="$props.type"
       :placeholder="inputPlaceholder"
@@ -17,7 +17,7 @@
       v-else-if="readonly"
       v-bind="$attrs"
       ref="readonlyInput"
-      class="transition--border-color"
+      style="transition: border-color 0.2s ease-in-out;"
       :value="value"
       :type="inputType"
       :placeholder="inputPlaceholder"
@@ -27,14 +27,14 @@
       ref="input"
       v-model="model"
       v-bind="$attrs"
-      class="transition--border-color"
+      style="transition: border-color 0.2s ease-in-out;"
       :type="inputType"
       :placeholder="inputPlaceholder"
     />
     <button
       v-if="!area && isPassword"
       ref="secretButton"
-      class="secret-button transition--color"
+      class="secret-button"
       type="button"
       tabindex="-1"
       @click="toggleShowPassword"
@@ -184,6 +184,7 @@ defineExpose({
   align-items: center;
   justify-content: center;
   background: transparent;
+  transition: color 0.2s ease-in-out;
 }
 
 .secret-button:hover,

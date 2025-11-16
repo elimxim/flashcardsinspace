@@ -1,6 +1,6 @@
 <template>
   <div class="user-container">
-    <font-awesome-icon icon="fa-solid fa-circle-user"/>
+    <font-awesome-icon icon="fa-solid fa-user-astronaut"/>
   </div>
 </template>
 

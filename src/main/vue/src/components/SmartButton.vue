@@ -1,7 +1,7 @@
 <template>
   <button
     ref="button"
-    class="smart-button smart-button--theme transition--bg-color"
+    class="smart-button smart-button--theme"
     :class="{
       'smart-button--disabled': disabled,
       'smart-button--rounded': rounded,
@@ -180,7 +180,7 @@ function handleGlobalMouseUp() {
   border-radius: var(--s-btn--border-radius);
   background: var(--s-btn--bg);
   position: relative;
-
+  transition: background-color 0.2s ease-in-out;
   width: var(--s-btn--width);
   height: var(--s-btn--height);
   cursor: pointer;

@@ -4,4 +4,5 @@
   color: var(--text--error--color);
   margin: 0;
   padding: 0;
+  transition: opacity 0.2s ease-in-out;
 }

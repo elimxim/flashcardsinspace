@@ -25,7 +25,7 @@
           />
         </template>
       </ControlBar>
-      <div class="control-scrollable">
+      <div class="control-panel-content scrollbar-hidden">
         <FlashcardInfoBar
           :hidden="!flashcardSet || isSidebarExpanded"
         />
@@ -101,7 +101,7 @@ function openFlashcardSetSettings() {
   height: 100%;
 }
 
-.control-scrollable {
+.control-panel-content {
   flex: 1;
   width: 100%;
   height: 100%;
@@ -110,12 +110,6 @@ function openFlashcardSetSettings() {
   gap: 12px;
   padding: 14px 10px 10px 10px;
   overflow: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-}
-
-.control-scrollable::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
 }
 
 .control-outer-space-panel {
