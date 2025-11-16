@@ -21,12 +21,18 @@
           :invalid="usernameInvalid"
           placeholder="Name"
         />
-        <span v-if="usernameRegexMismatch" class="text-error">
-          Please use only letters, numbers, dashes, underscores, and spaces
-        </span>
-        <span v-else-if="usernameMaxLengthInvalid" class="text-error">
-            This username is expanding faster than the universe! Please keep it under 64 characters
-        </span>
+        <ErrorText
+          :errors="[
+            {
+              when: usernameRegexMismatch,
+              text: 'Please use only letters, numbers, dashes, underscores, and spaces'
+            },
+            {
+              when: usernameMaxLengthInvalid,
+              text: 'This username is expanding faster than the universe! Please keep it under 64 characters'
+            },
+          ]"
+        />
         <SmartInput
           id="username"
           v-model="userEmail"
@@ -36,9 +42,10 @@
           :invalid="userEmailInvalid"
           placeholder="Email"
         />
-        <span v-if="userEmailWrongFormat" class="text-error">
-          This email seems to be lost in a cosmic dust cloud. Please check the format
-        </span>
+        <ErrorText
+          :when="userEmailWrongFormat"
+          text="This email seems to be lost in a cosmic dust cloud. Please check the format"
+        />
         <AwesomeContainer icon="fa-solid fa-globe" class="awesome-globe">
           <FuzzySelect
             id="language"
@@ -59,12 +66,18 @@
           :invalid="userPasswordInvalid"
           placeholder="Password"
         />
-        <span v-if="userPasswordMinLengthInvalid" class="text-error">
-          Your password must be stronger than a piece of space junk. Please use 6 or more characters
-        </span>
-        <span v-else-if="userPasswordMaxLengthInvalid" class="text-error">
-          This secret is expanding faster than the universe! Please keep it under 64 characters
-        </span>
+        <ErrorText
+          :errors="[
+            {
+              when: userPasswordMinLengthInvalid,
+              text: 'Your password must be stronger than a piece of space junk. Please use 6 or more characters'
+            },
+            {
+              when: userPasswordMaxLengthInvalid,
+              text: 'This secret is expanding faster than the universe! Please keep it under 64 characters'
+            }
+          ]"
+        />
         <SmartInput
           id="confirm-password"
           v-model="confirmedPassword"
@@ -74,9 +87,10 @@
           :invalid="confirmPasswordInvalid"
           placeholder="Confirm Password"
         />
-        <span v-if="confirmPasswordMismatch" class="text-error">
-          The passwords do not match. Please try again
-        </span>
+        <ErrorText
+          :when="confirmPasswordMismatch"
+          text="The passwords do not match. Please try again"
+        />
         <SmartButton
           class="auth-button"
           text="Sign Up"
@@ -101,6 +115,7 @@ import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import SmartInput from '@/components/SmartInput.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
+import ErrorText from '@/components/ErrorText.vue'
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"
