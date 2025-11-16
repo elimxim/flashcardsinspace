@@ -4,11 +4,12 @@ import com.github.elimxim.flashcardsinspace.entity.*
 
 fun User.toDto() = UserDto(
     id = id,
-    name = username,
+    name = name,
     email = email,
     roles = roles.split(",").toList(),
     registeredAt = registeredAt,
     timezone = timezone,
+    languageId = language.id,
 )
 
 fun Language.toDto() = LanguageDto(

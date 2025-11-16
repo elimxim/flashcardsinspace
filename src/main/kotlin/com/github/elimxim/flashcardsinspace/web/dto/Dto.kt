@@ -10,6 +10,7 @@ data class UserDto(
     val roles: List<String>,
     val registeredAt: ZonedDateTime,
     val timezone: String,
+    val languageId: Long,
 )
 
 data class LanguageDto(
