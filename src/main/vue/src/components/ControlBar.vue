@@ -82,7 +82,7 @@ withDefaults(defineProps<{
   text-align: left;
   color: var(--c-bar--title--color);
   font-size: var(--c-bar--title--font-size);
-  font-weight: normal;
+  font-weight: 300;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
