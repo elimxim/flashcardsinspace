@@ -3,39 +3,56 @@ import Cookies from 'js-cookie'
 const COOKIE_SELECTED_SET_ID = 'selectedSetId'
 const COOKIE_USER_SIGNED_UP = 'userSignedUp'
 
-export function saveUserSignedUp(value: boolean) {
-  Cookies.set(COOKIE_USER_SIGNED_UP, value.toString(), {
-    expires: 30, // 30 days
+function saveCookie(name: string, value: string, expires: number) {
+  Cookies.set(name, value, {
+    expires: expires,
     sameSite: 'Lax',
     secure: true,
     path: '/', // valid for the entire site
   })
-  console.log( `${value} => Cookie.${COOKIE_USER_SIGNED_UP}`)
+  console.log( `${value} => Cookie.${name}`)
 }
 
-export function loadUserSignedUp(): boolean {
-  const value = Cookies.get(COOKIE_USER_SIGNED_UP)
-  console.log(`Cookie.${COOKIE_USER_SIGNED_UP} => ${value}`)
+function loadCookie(name: string): string | undefined {
+  const value = Cookies.get(name)
+  console.log(`Cookie.${name} => ${value}`)
+  return value
+}
+
+function loadBooleanCookie(name: string): boolean {
+  const value = loadCookie(name)
   if (value) {
     return value === 'true'
   }
   return false
 }
 
-export function saveSelectedSetId(value: number) {
-  Cookies.set(COOKIE_SELECTED_SET_ID, value.toString(), {
-    expires: 30, // 30 days
-    sameSite: 'Lax',
-    secure: true,
-    path: '/', // valid for the entire site
-  })
-  console.log( `${value} => Cookie.${COOKIE_SELECTED_SET_ID}`)
-}
-
-export function loadSelectedSetId(): number | undefined {
-  const value = Cookies.get(COOKIE_SELECTED_SET_ID)
-  console.log(`Cookie.${COOKIE_SELECTED_SET_ID} => ${value}`)
+function loadNumberCookie(name: string): number | undefined {
+  const value = loadCookie(name)
   if (value) {
     return parseInt(value)
   }
+}
+
+function saveUserSignedUp(value: boolean) {
+  saveCookie(COOKIE_USER_SIGNED_UP, value.toString(), 30)
+}
+
+function loadUserSignedUp(): boolean {
+  return loadBooleanCookie(COOKIE_USER_SIGNED_UP)
+}
+
+function saveSelectedSetId(value: number) {
+  saveCookie(COOKIE_SELECTED_SET_ID, value.toString(), 30)
+}
+
+function loadSelectedSetId(): number | undefined {
+  return loadNumberCookie(COOKIE_SELECTED_SET_ID)
+}
+
+export {
+  saveUserSignedUp,
+  loadUserSignedUp,
+  saveSelectedSetId,
+  loadSelectedSetId,
 }
