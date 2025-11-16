@@ -162,7 +162,7 @@ onMounted(() => {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: clamp(200px, 40vw, 280px);
+  width: clamp(200px, 40vw, 260px);
   height: 100%;
   background: var(--bar--bg);
   transition: margin-left 0.35s ease-in-out;
@@ -170,7 +170,7 @@ onMounted(() => {
 }
 
 .sidebar--collapsed {
-  margin-left: clamp(-280px, -40vw, -200px);
+  margin-left: clamp(-260px, -40vw, -200px);
 }
 
 .sidebar-control-bar {
@@ -267,7 +267,7 @@ onMounted(() => {
 .sidebar-item__name {
   color: var(--bar--item--color);
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 400;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
