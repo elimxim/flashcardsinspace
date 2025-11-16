@@ -88,7 +88,7 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { sendChronoSyncNextDay, sendChronoSyncPrevDay } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useAuthStore, UserRole } from '@/stores/auth-store.ts'
-import { parseLocalDate } from '@/utils/utils.ts';
+import { parseLocalDate } from '@/utils/utils.ts'
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()

@@ -1,6 +1,6 @@
 import { toSortedOrderNumbers } from '@/core-logic/stage-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
-import { asIsoDateStr } from '@/utils/utils.ts';
+import { asIsoDateStr } from '@/utils/utils.ts'
 
 export const chronodayStatuses = {
   INITIAL: 'INITIAL',

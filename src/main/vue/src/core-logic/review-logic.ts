@@ -12,7 +12,7 @@ import {
   chronodayStatusesToCompleteDay,
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
-import { shuffle } from '@/utils/utils.ts';
+import { shuffle } from '@/utils/utils.ts'
 
 export enum ReviewMode {
   LIGHTSPEED = 'LIGHTSPEED',
