@@ -57,7 +57,6 @@
 
 <script setup lang="ts">
 import Starfield from '@/components/Starfield.vue'
-import AwesomeContainer from '@/components/AwesomeContainer.vue'
 </script>
 
 <style scoped>
