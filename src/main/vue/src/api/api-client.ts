@@ -18,6 +18,7 @@ import {
 import { Chronoday } from '@/model/chrono.ts'
 import { configureDateTransformers } from '@/api/axios-config.ts'
 import { configureTokenRefreshInterceptor } from '@/api/token-refresh.ts'
+import { User } from '@/model/user.ts'
 
 const apiClient = axios.create({
   baseURL: '/api',
@@ -167,4 +168,13 @@ export async function sendFlashcardAudioFetchByIdRequest(setId: number, flashcar
 export async function sendFlashcardAudioRemovalRequest(setId: number, flashcardId: number, audioId: number) {
   console.log(`[DELETE] request => audio ${audioId} for flashcard ${flashcardId} in set ${setId}`)
   return apiClient.delete(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
+}
+
+export async function sendUserUpdateRequest(username: string, userEmail: string, languageId: number | undefined) {
+  console.log(`[PUT] request => user`)
+  return apiClient.put<User>(`/users`, {
+    name: username,
+    email: userEmail,
+    languageId: languageId,
+  })
 }
