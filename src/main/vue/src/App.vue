@@ -23,7 +23,7 @@ onMounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(90deg, #0a0e1a 0%, #1a1f2e 50%, #2a2f3e 100%);
+  background: var(--app--bg, white);
 }
 
 </style>
