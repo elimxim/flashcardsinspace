@@ -44,6 +44,12 @@ import {
   faShuttleSpace,
   faEnvelope,
   faTools,
+  faBrain,
+  faChartLine,
+  faSatellite,
+  faSpaceShuttle,
+  faGraduationCap,
+  faCheck,
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faEye as faRegularEye,
@@ -99,6 +105,12 @@ export function applyFaIcons() {
     faShuttleSpace,
     faEnvelope,
     faTools,
+    faBrain,
+    faChartLine,
+    faSatellite,
+    faSpaceShuttle,
+    faGraduationCap,
+    faCheck,
 
     faRegularEye,
     faRegularCircle,
