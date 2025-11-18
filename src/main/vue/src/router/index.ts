@@ -112,6 +112,20 @@ router.beforeEach(async (to, _, next) => {
   }
 })
 
+router.beforeEach(async (to, _, next) => {
+  const authStore = useAuthStore()
+  const { isAuthenticated } = storeToRefs(authStore)
+
+  if (to.name === routeNames.login || to.name === routeNames.signup) {
+    if (isAuthenticated.value) {
+      next({ name: routeNames.user })
+    } else {
+      next()
+    }
+  }
+  next()
+})
+
 export default router
 
 function isOnAuthPage() {
