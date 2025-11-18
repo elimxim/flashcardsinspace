@@ -8,6 +8,10 @@
   overflow: auto;
 }
 
+.page--bg--light {
+  background: var(--page--bg--light);
+}
+
 .flex-column {
   display: flex;
   flex-direction: column;
