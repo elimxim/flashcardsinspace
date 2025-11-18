@@ -1,11 +1,12 @@
 <template>
   <div :class="[
     'page',
+    'page--bg--light',
     'flex-column',
     'padding-auto',
     'user-page',
-    'user-page--theme',
     'scrollbar-hidden',
+    'user-page--theme',
   ]">
     <h2>Welcome aboard, {{ user?.name ?? 'Unknown' }}!</h2>
     <div>{{ randomDayPhrase }}</div>
@@ -236,12 +237,10 @@ onMounted(() => {
 <style scoped>
 .user-page--theme {
   --u-page--icon--color: #6369d5;
-  --u-page--bg: var(--user-page--bg, #f5f5f5);
 }
 
 .user-page {
   gap: 10px;
-  background: var(--u-page--bg);
 }
 
 .user-page h2 {

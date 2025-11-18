@@ -1,6 +1,7 @@
 <template>
   <div :class="[
     'page',
+    'page--bg--light',
     'flex-row',
     'control-panel',
     'control-panel--theme',
@@ -81,12 +82,10 @@ function openFlashcardSetSettings() {
 <style scoped>
 .control-panel--theme {
   --c-panel--text-color: #333333;
-  --c-panel--bg: var(--control-panel--bg, #f5f5f5);
 }
 
 .control-panel {
   min-width: 420px;
-  background: var(--c-panel--bg);
 }
 
 .control-sidebar {

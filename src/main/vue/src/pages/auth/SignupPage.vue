@@ -2,11 +2,10 @@
   <div
     :class="[
       'page',
+      'page--bg--light',
       'flex-column',
       'flex-center',
       'padding-auto',
-      'signup-page',
-      'signup-page--theme',
       'scrollbar-hidden',
   ]">
     <div
@@ -275,11 +274,4 @@ async function signup() {
 </script>
 
 <style scoped>
-.signup-page--theme {
-  --s-page--bg: var(--signup-page--bg, #f5f5f5);
-}
-
-.signup-page {
-  background: var(--s-page--bg);
-}
 </style>

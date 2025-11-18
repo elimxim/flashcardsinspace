@@ -2,10 +2,11 @@
   <div
     :class="[
       'page',
+      'page--bg--light',
       'flex-column',
       'flex-center',
-      'review-page--theme',
       'scroll-none',
+      'review-page--theme',
   ]">
     <ControlBar :title="flashcardSetName" center-title>
       <template v-if="reviewTopic" #left>
