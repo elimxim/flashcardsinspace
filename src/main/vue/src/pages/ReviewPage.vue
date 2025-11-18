@@ -1,16 +1,13 @@
 <template>
   <div
     :class="[
-      'review-page--theme',
       'page',
-      'page--x-centered',
-      'page--y-centered',
-    ]"
-  >
-    <ControlBar
-      :title="flashcardSetName"
-      center-title
-    >
+      'flex-column',
+      'flex-center',
+      'review-page--theme',
+      'scroll-none',
+  ]">
+    <ControlBar :title="flashcardSetName" center-title>
       <template v-if="reviewTopic" #left>
         <div class="review-mode">
           {{ reviewTopic }}

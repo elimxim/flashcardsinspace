@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="app-container">
+  <div id="app" class="app">
     <Navbar/>
     <router-view/>
   </div>
@@ -19,10 +19,11 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.app-container {
+.app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: linear-gradient(90deg, #0a0e1a 0%, #1a1f2e 50%, #2a2f3e 100%);
 }
 
 </style>

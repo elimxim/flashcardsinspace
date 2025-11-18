@@ -100,7 +100,7 @@ function navigateToUser() {
 .navbar--theme {
   --nav--font-family: var(--navbar--font-family);
   --starfield--star--color: #dad0f8;
-  --nav--bg: #242124;
+  --nav--bg: transparent;
   --nav--title--color: #FAF9F6;
   --nav--title--color--hover: #dad0f8;
 }

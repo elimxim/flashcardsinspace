@@ -27,3 +27,8 @@
 .scrollbar-hidden::-webkit-scrollbar {
   display: none;             /* Safari, Chrome */
 }
+
+/* Stops scrolling */
+.scroll-none {
+  overflow: hidden;
+}

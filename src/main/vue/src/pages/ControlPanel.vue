@@ -1,5 +1,10 @@
 <template>
-  <div class="control-panel control-panel--theme">
+  <div :class="[
+    'page',
+    'flex-row',
+    'control-panel',
+    'control-panel--theme',
+  ]">
     <div class="control-sidebar">
       <SideBar ref="sidebar"/>
     </div>
@@ -76,17 +81,12 @@ function openFlashcardSetSettings() {
 <style scoped>
 .control-panel--theme {
   --c-panel--text-color: #333333;
-  --c-panel--bg-color: var(--control-panel--bg-color, #f5f5f5);
+  --c-panel--bg: var(--control-panel--bg, #f5f5f5);
 }
 
 .control-panel {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  width: 100%;
   min-width: 420px;
-  height: calc(100vh - var(--navbar-height));
-  background-color: var(--c-panel--bg-color);
+  background: var(--c-panel--bg);
 }
 
 .control-sidebar {
@@ -94,22 +94,21 @@ function openFlashcardSetSettings() {
 }
 
 .control-panel-layout {
+  flex: 1;
   position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
 }
 
 .control-panel-content {
   flex: 1;
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 14px 10px 10px 10px;
-  overflow: auto;
+  overflow: scroll;
 }
 
 .control-outer-space-panel {

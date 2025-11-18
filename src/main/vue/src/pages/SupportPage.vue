@@ -1,5 +1,5 @@
 <template>
-  <div class="page page--auto-padded support-page support-page--theme">
+  <div class="page padding-auto support-page support-page--theme">
     <Starfield
       :density="80"
       :star-size="2"

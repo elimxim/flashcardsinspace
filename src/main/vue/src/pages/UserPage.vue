@@ -1,22 +1,28 @@
 <template>
-  <div class="page page--auto-padded user-page--theme scrollbar-hidden">
-    <div class="user-page-layout">
-      <h2>Welcome aboard, {{ user?.name ?? 'Unknown' }}!</h2>
-      <div>{{ randomDayPhrase }}</div>
-      <div class="user-info">
-        <div class="user-info-item">
-          <AwesomeContainer icon="fa-solid fa-user-astronaut" class="user-info-icon">
-            <SmartInput
-              v-model="username"
-              type="text"
-              name="name"
-              placeholder="Name"
-              :invalid="usernameInvalid"
-            />
-          </AwesomeContainer>
-          <ErrorText
-            :show="usernameRegexMismatch"
-            :errors="[
+  <div :class="[
+    'page',
+    'flex-column',
+    'padding-auto',
+    'user-page',
+    'user-page--theme',
+    'scrollbar-hidden',
+  ]">
+    <h2>Welcome aboard, {{ user?.name ?? 'Unknown' }}!</h2>
+    <div>{{ randomDayPhrase }}</div>
+    <div class="user-info">
+      <div class="user-info-item">
+        <AwesomeContainer icon="fa-solid fa-user-astronaut" class="user-info-icon">
+          <SmartInput
+            v-model="username"
+            type="text"
+            name="name"
+            placeholder="Name"
+            :invalid="usernameInvalid"
+          />
+        </AwesomeContainer>
+        <ErrorText
+          :show="usernameRegexMismatch"
+          :errors="[
               {
                 when: usernameRegexMismatch,
                 text: 'Please use only letters, numbers, dashes, underscores, and spaces'
@@ -26,58 +32,57 @@
                 text: 'This username is expanding faster than the universe! Please keep it under 64 characters'
               },
             ]"
+        />
+      </div>
+      <div class="user-info-item">
+        <AwesomeContainer icon="fa-solid fa-envelope" class="user-info-icon">
+          <SmartInput
+            v-model="userEmail"
+            type="email"
+            name="username"
+            placeholder="Email"
+            :invalid="userEmailInvalid"
           />
-        </div>
-        <div class="user-info-item">
-          <AwesomeContainer icon="fa-solid fa-envelope" class="user-info-icon">
-            <SmartInput
-              v-model="userEmail"
-              type="email"
-              name="username"
-              placeholder="Email"
-              :invalid="userEmailInvalid"
-            />
-          </AwesomeContainer>
-          <ErrorText
-            :when="userEmailWrongFormat"
-            text="This email seems to be lost in a cosmic dust cloud. Please check the format"
+        </AwesomeContainer>
+        <ErrorText
+          :when="userEmailWrongFormat"
+          text="This email seems to be lost in a cosmic dust cloud. Please check the format"
+        />
+      </div>
+      <div class="user-info-item">
+        <AwesomeContainer icon="fa-solid fa-globe" class="user-info-icon">
+          <FuzzySelect
+            id="language"
+            v-model="language"
+            :options="languages"
+            :option-label="(lang) => lang.name"
+            :invalid="languageInvalid"
+            option-placeholder="Language"
+            search-placeholder="Search..."
           />
-        </div>
-        <div class="user-info-item">
-          <AwesomeContainer icon="fa-solid fa-globe" class="user-info-icon">
-            <FuzzySelect
-              id="language"
-              v-model="language"
-              :options="languages"
-              :option-label="(lang) => lang.name"
-              :invalid="languageInvalid"
-              option-placeholder="Language"
-              search-placeholder="Search..."
-            />
-          </AwesomeContainer>
-        </div>
-        <div class="user-info-item">
-          Registered at: {{ user?.registeredAt ?? 'Unknown' }}
-        </div>
-        <div class="user-info-item">
-          Timezone: {{ user?.timezone ?? 'Unknown' }}
-        </div>
-        <div class="user-controls">
-          <SmartButton
-            text="Logout"
-            class="cancel-button"
-            :on-click="logout"
-            fill-width
-            auto-blur
-          />
-          <SmartButton
-            text="Save"
-            class="update-button"
-            :on-click="save"
-            :disabled="!stateChanged || validationFailed"
-            auto-blur
-          />
-        </div>
+        </AwesomeContainer>
+      </div>
+      <div class="user-info-item">
+        Registered at: {{ user?.registeredAt ?? 'Unknown' }}
+      </div>
+      <div class="user-info-item">
+        Timezone: {{ user?.timezone ?? 'Unknown' }}
+      </div>
+      <div class="user-controls">
+        <SmartButton
+          text="Logout"
+          class="cancel-button"
+          :on-click="logout"
+          fill-width
+          auto-blur
+        />
+        <SmartButton
+          text="Save"
+          class="update-button"
+          :on-click="save"
+          :disabled="!stateChanged || validationFailed"
+          auto-blur
+        />
       </div>
     </div>
   </div>
@@ -231,30 +236,28 @@ onMounted(() => {
 <style scoped>
 .user-page--theme {
   --u-page--icon--color: #6369d5;
+  --u-page--bg: var(--user-page--bg, #f5f5f5);
 }
 
-.user-page-layout {
-  display: flex;
-  flex-direction: column;
+.user-page {
   gap: 10px;
-  width: 100%;
-  height: 100%;
+  background: var(--u-page--bg);
 }
 
-.user-page-layout h2 {
+.user-page h2 {
   margin: 0;
   padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-info {
-  flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: repeat(6, auto);
   grid-auto-flow: column;
-  gap: 8px;
-  width: 100%;
-  height: 100%;
+  gap: 10px;
 }
 
 .user-info-item {

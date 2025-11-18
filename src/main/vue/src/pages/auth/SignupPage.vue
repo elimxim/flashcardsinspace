@@ -2,11 +2,13 @@
   <div
     :class="[
       'page',
-      'page--x-centered',
-      'page--y-centered',
-      'page--auto-padded',
-    ]"
-  >
+      'flex-column',
+      'flex-center',
+      'padding-auto',
+      'signup-page',
+      'signup-page--theme',
+      'scrollbar-hidden',
+  ]">
     <div
       class="auth-container"
       :class="{ 'auth-container--error': signupFailed }"
@@ -273,4 +275,11 @@ async function signup() {
 </script>
 
 <style scoped>
+.signup-page--theme {
+  --s-page--bg: var(--signup-page--bg, #f5f5f5);
+}
+
+.signup-page {
+  background: var(--s-page--bg);
+}
 </style>

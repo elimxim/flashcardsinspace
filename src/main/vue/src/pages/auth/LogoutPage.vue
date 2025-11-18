@@ -2,10 +2,12 @@
   <div
     :class="[
       'page',
-      'logout-container',
-      'page--auto-padded',
-    ]"
-  >
+      'flex-column',
+      'padding-auto',
+      'logout-page',
+      'logout-page--theme',
+      'scrollbar-hidden',
+  ]">
     <Progressbar
       class="logout-progressbar"
       :duration="redirectDelay"
@@ -97,6 +99,14 @@ onBeforeUnmount(clearTimers)
 </script>
 
 <style scoped>
+.logout-page--theme {
+  --o-page--bg: var(--logout-page--bg, #f5f5f5);
+}
+
+.logout-page {
+  background: var(--o-page--bg);
+}
+
 .logout-progressbar {
   flex: 1;
   width: 100%;

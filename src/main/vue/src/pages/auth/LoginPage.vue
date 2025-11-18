@@ -2,11 +2,13 @@
   <div
     :class="[
       'page',
-      'page--x-centered',
-      'page--y-centered',
-      'page--auto-padded',
-    ]"
-  >
+      'flex-column',
+      'flex-center',
+      'padding-auto',
+      'login-page',
+      'login-page--theme',
+      'scrollbar-hidden',
+  ]">
     <div
       ref="lilrocket"
       class="lilrocket"
@@ -225,6 +227,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.login-page--theme {
+  --n-page--bg: var(--login-page--bg, #f5f5f5);
+}
+
+.login-page {
+  background: var(--n-page--bg);
+}
+
 .lilrocket {
   position: relative;
   width: fit-content;

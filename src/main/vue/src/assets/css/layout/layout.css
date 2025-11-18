@@ -1,22 +1,28 @@
 .page {
   position: relative;
-  display: flex;
-  flex-direction: column;
   width: 100%;
   min-height: calc(100vh - var(--navbar-height));
   max-height: calc(100vh - var(--navbar-height));
   padding: 0;
   margin: 0;
+  overflow: auto;
 }
 
-.page--x-centered {
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-center {
   align-items: center;
-}
-
-.page--y-centered {
   justify-content: center;
 }
 
-.page--auto-padded {
+.padding-auto {
   padding: clamp(0.5rem, 1vh, 1rem) clamp(0.5rem, 1vw, 1rem);
 }
