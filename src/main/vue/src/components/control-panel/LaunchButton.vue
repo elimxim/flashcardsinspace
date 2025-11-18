@@ -4,10 +4,11 @@
     :class="{ 'launch-button--disabled': disabled }"
   >
     <Starfield
-      twinkle
+      class="launch-button-starfield"
       :star-size="4"
       :density="16"
       vertical-drift="6px"
+      twinkle
     />
     <AwesomeButton
       v-bind="$attrs"
@@ -52,6 +53,10 @@ withDefaults(defineProps<{
   --awesome-button--icon--color--disabled: var(--launch-button--color--disabled);
   --awesome-button--bg--disabled: var(--launch-button--bg--disabled);
   --awesome-button--border-radius: 6px;
+}
+
+.launch-button-starfield {
+  z-index: 1;
 }
 
 .launch-button {
