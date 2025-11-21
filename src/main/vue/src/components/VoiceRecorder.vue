@@ -10,7 +10,7 @@
       square
     />
     <transition name="voice-controls-slide">
-      <template v-if="isControlsExpanded">
+      <div v-if="isControlsExpanded" class="voice-recorder-controls-wrapper">
         <div v-if="!isSupported" class="voice-warning-text">
           Your browser doesn’t support voice recording
         </div>
@@ -44,7 +44,7 @@
             :on-click="removeRecording"
           />
         </div>
-      </template>
+      </div>
     </transition>
     <VoicePlayer
       class="voice-recorder-button voice-recorder-button--play"
@@ -254,7 +254,7 @@ onBeforeUnmount(() => {
   width: fit-content;
   height: 32px;
   border-radius: 999px;
-  transition: all 0.3s;
+  transition: width 0.3s ease-out;
 }
 
 .voice-warning-text {
@@ -303,40 +303,34 @@ onBeforeUnmount(() => {
   padding: 3px 16px;
 }
 
-.voice-controls-slide-enter-active {
-  animation: slideIn 0.3s ease-out;
+.voice-recorder-controls-wrapper {
+  overflow: hidden;
+  max-width: max-content;
 }
 
+.voice-controls-slide-enter-active,
 .voice-controls-slide-leave-active {
-  animation: slideOut 0.3s ease-in;
+  transition: max-width 0.3s ease-out, opacity 0.3s ease-out;
 }
 
-@keyframes slideIn {
-  0% {
-    opacity: 1;
-    max-width: 0;
-    margin: 0;
-    padding: 0;
-  }
-  100% {
-    opacity: 1;
-    max-width: 500px;
-    padding: 3px 16px;
-  }
+.voice-controls-slide-enter-from {
+  max-width: 0;
+  opacity: 0;
 }
 
-@keyframes slideOut {
-  0% {
-    opacity: 1;
-    max-width: 500px;
-    padding: 3px 16px;
-  }
-  100% {
-    opacity: 0;
-    max-width: 0;
-    margin: 0;
-    padding: 0;
-  }
+.voice-controls-slide-enter-to {
+  max-width: 200px;
+  opacity: 1;
+}
+
+.voice-controls-slide-leave-from {
+  max-width: 200px;
+  opacity: 1;
+}
+
+.voice-controls-slide-leave-to {
+  max-width: 0;
+  opacity: 0;
 }
 
 </style>
