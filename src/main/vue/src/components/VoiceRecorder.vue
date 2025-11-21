@@ -6,7 +6,7 @@
       style="height: 100%;"
       :on-click="toggleControls"
       :active="isControlsExpanded"
-      click-ripple
+      :click-ripple="!expanded"
       square
     />
     <transition name="voice-controls-slide">
@@ -61,11 +61,13 @@ const audioBlob = defineModel<Blob | undefined>()
 
 const props = withDefaults(defineProps<{
   maxDuration?: number
+  expanded?: boolean
 }>(), {
-  maxDuration: 20 * 1000
+  maxDuration: 20 * 1000,
+  expanded: false,
 })
 
-const isControlsExpanded = ref(false)
+const isControlsExpanded = ref(props.expanded)
 const isRecording = ref(false)
 const isPaused = ref(false)
 
@@ -132,6 +134,7 @@ function stopTimer() {
 
 function toggleControls() {
   if (isRecording.value) pauseRecording()
+  if (props.expanded) return
   isControlsExpanded.value = !isControlsExpanded.value
 }
 
