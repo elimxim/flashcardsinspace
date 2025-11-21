@@ -59,6 +59,7 @@ import {
   fa7,
   faInfinity,
   faArrowRightLong,
+  faPalette
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faEye as faRegularEye,
@@ -129,6 +130,7 @@ export function applyFaIcons() {
     fa7,
     faInfinity,
     faArrowRightLong,
+    faPalette,
 
     faRegularEye,
     faRegularCircle,
