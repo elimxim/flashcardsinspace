@@ -2,7 +2,7 @@
   <div class="voice-recorder voice-recorder--theme">
     <AwesomeButton
       icon="fa-solid fa-microphone"
-      class="voice-recorder-button"
+      class="voice-recorder-button voice-recorder-button--mic"
       style="height: 100%;"
       :on-click="toggleControls"
       :active="isControlsExpanded"
@@ -46,7 +46,7 @@
       </template>
     </transition>
     <VoicePlayer
-      class="voice-recorder-button"
+      class="voice-recorder-button voice-recorder-button--play"
       :audio-blob="audioBlob"
     />
   </div>
@@ -229,14 +229,16 @@ onBeforeUnmount(() => {
 <style scoped>
 .voice-recorder--theme {
   --v-recorder--time--color: var(--voice-recorder--time--color, rgba(0, 0, 0, 0.9));
-  --v-recorder--time--bg: var(--voice-recorder--controls--bg, rgba(255, 255, 255, 0.52));
+  --v-recorder--time--bg: var(--voice-recorder--time--bg, rgba(255, 255, 255, 0.52));
   --v-recorder--controls--bg: var(--voice-recorder--controls--bg, rgba(87, 87, 87, 0.15));
-  --v-recorder--button--color: var(--voice-recorder--controls--color, rgba(87, 87, 87, 0.86));
-  --v-recorder--button--color--hover: var(--voice-recorder--controls--color--hover, rgba(0, 0, 0, 0.9));
-  --v-recorder--button--color--active: var(--voice-recorder--controls--color--active, rgba(0, 0, 0, 0.9));
-  --v-recorder--button--color--disabled: var(--voice-recorder--controls--color--disabled, rgba(202, 202, 202, 0.9));
-  --v-recorder--button--bg--hover: var(--voice-recorder--button--bg, rgba(87, 87, 87, 0.12));
-  --v-recorder--button--bg--active: var(--voice-recorder--button--bg--active, rgba(87, 87, 87, 0.18));
+  --v-recorder--button--color: var(--voice-recorder--button--color, rgba(87, 87, 87, 0.86));
+  --v-recorder--button--color--hover: var(--voice-recorder--button--color--hover, rgba(0, 0, 0, 0.9));
+  --v-recorder--button--color--active: var(--voice-recorder--button--color--active, rgba(0, 0, 0, 0.9));
+  --v-recorder--button--color--disabled: var(--voice-recorder--button--color--disabled, rgba(202, 202, 202, 0.9));
+  --v-recorder--mic-button--bg--hover: var(--voice-recorder--mic-button--bg--hover, rgba(87, 87, 87, 0.12));
+  --v-recorder--mic-button--bg--active: var(--voice-recorder--mic-button--bg--active, rgba(87, 87, 87, 0.18));
+  --v-recorder--play-button--bg--hover: var(--voice-recorder--play-button--bg--hover, rgba(87, 87, 87, 0.12));
+  --v-recorder--play-button--bg--active: var(--voice-recorder--play-button--bg--active, rgba(87, 87, 87, 0.18));
   --v-recorder--warning-text--color: var(--voice-recorder--warning-text--color, #404040);
 }
 
@@ -264,7 +266,7 @@ onBeforeUnmount(() => {
   gap: 10px;
   background: var(--v-recorder--controls--bg);
   border-radius: 999px;
-  padding: 3px 16px;
+  padding: 3px 12px;
 }
 
 .voice-recorder-button {
@@ -273,9 +275,18 @@ onBeforeUnmount(() => {
   --awesome-button--icon--color--hover: var(--v-recorder--button--color--hover);
   --awesome-button--icon--color--active: var(--v-recorder--button--color--active);
   --awesome-button--icon--color--disabled: var(--v-recorder--button--color--disabled);
-  --awesome-button--bg--hover: var(--v-recorder--button--bg--hover);
-  --awesome-button--bg--active: var(--v-recorder--button--bg--active);
   --awesome-button--border-radius: 999px;
+  --awesome-button--padding: 2px;
+}
+
+.voice-recorder-button--mic {
+  --awesome-button--bg--hover: var(--v-recorder--mic-button--bg--hover);
+  --awesome-button--bg--active: var(--v-recorder--mic-button--bg--active);
+}
+
+.voice-recorder-button--play {
+  --awesome-button--bg--hover: var(--v-recorder--play-button--bg--hover);
+  --awesome-button--bg--active: var(--v-recorder--play-button--bg--active);
 }
 
 .voice-recorder-time {
