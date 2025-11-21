@@ -334,7 +334,8 @@ const stages = [
   text-align: center;
 }
 
-.science-stat .stat-number {
+.stat-number {
+  font-family: var(--day-streak--font-family);
   display: block;
   font-size: 2rem;
   font-weight: 700;
