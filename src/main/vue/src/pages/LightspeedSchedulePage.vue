@@ -12,11 +12,22 @@
       twinkle
       vertical-drift="3px"
     />
+
     <h2 class="lightspeed-header">
       <span class="lightspeed-title">
         Lightspeed Schedule
       </span>
     </h2>
+
+    <p class="lightspeed-description">
+      <strong>What is spaced repetition?</strong><br/>
+      Spaced repetition is a science-based method of learning new concepts or vocabulary
+      in a manageable amount of time. Instead of spending hours at a desk studying the
+      same words repeatedly, you can use spaced repetition to learn the same concepts
+      in a fraction of the time. It gives you a straightforward way to know what to study
+      and when to study it. All you have to do is create flashcards and follow the spaced
+      repetition schedule.
+    </p>
 
     <div class="learning-timeline">
       <div class="timeline-stage" v-for="(stage, index) in stages" :key="index">
@@ -131,6 +142,23 @@ const stages = [
   line-height: 1.1;
   color: #a0c4ff;
   text-align: center;
+}
+
+.lightspeed-description {
+  font-family: var(--h-page--font-family);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.6;
+  color: #e2e8f0;
+}
+
+.lightspeed-description strong {
+  color: #ffd700;
+}
+
+.lightspeed-description em {
+  color: #00d4ff;
+  font-style: normal;
+  font-weight: 600;
 }
 
 .learning-timeline {
