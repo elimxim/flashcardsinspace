@@ -66,32 +66,6 @@
   --awesome-button--bg--hover: var(--control-bar--button--bg--hover);
 }
 
-.voice-recorder-play-button {
-  --awesome-button--icon--size: 18px;
-  --awesome-button--icon--color: rgba(87, 87, 87, 0.86);
-  --awesome-button--icon--color--hover: rgba(0, 0, 0, 0.9);
-  --awesome-button--icon--color--active: rgba(0, 0, 0, 0.9);
-  --awesome-button--bg--hover: rgba(87, 87, 87, 0.12);
-  --awesome-button--bg--active: rgba(87, 87, 87, 0.2);
-  --awesome-button--border-radius: 999px;
-}
-
-.voice-recorder-mic-button {
-  --awesome-button--icon--size: 18px;
-  --awesome-button--icon--color: rgba(87, 87, 87, 0.86);
-  --awesome-button--icon--color--hover: rgba(0, 0, 0, 0.9);
-  --awesome-button--icon--color--active: rgba(0, 0, 0, 0.9);
-  --awesome-button--bg--hover: rgba(87, 87, 87, 0.12);
-  --awesome-button--bg--active: rgba(87, 87, 87, 0.18);
-  --awesome-button--border-radius: 999px;
-}
-
-.voice-recorder-control-button {
-  --awesome-button--icon--size: 18px;
-  --awesome-button--icon--color: rgba(87, 87, 87, 0.86);
-  --awesome-button--icon--color--hover: rgba(0, 0, 0, 0.9);
-}
-
 .outer-space-button {
   --smart-button--bg: #242124;
   --smart-button--bg--hover: #34324a;
