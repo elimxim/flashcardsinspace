@@ -140,19 +140,15 @@
 
         <div class="feature-card">
           <div class="feature-icon">
-            <font-awesome-icon icon="fa-solid fa-chart-line"/>
+            <font-awesome-icon icon="fa-solid fa-palette"/>
           </div>
-          <h3 class="feature-title">Mission Progress</h3>
+          <h3 class="feature-title">Engaging Visual Interface</h3>
           <p class="feature-description">
-            Track your learning journey with detailed statistics,
-            day streaks, and stage progression analytics.
+            Experience learning through our thoughtfully crafted interface that makes everything
+            feel like piloting a spaceship. With intuitive visual elements and interactive features,
+            every element is designed to be simple, fun, and engaging, transforming your study
+            sessions into an enjoyable adventure.
           </p>
-          <div class="progress-demo">
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: 68%"></div>
-            </div>
-            <span class="progress-text">68% to Outer Space</span>
-          </div>
         </div>
       </div>
     </section>
@@ -582,7 +578,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   margin-bottom: 1.5rem;
-  font-size: 1.5rem;
+  font-size: 34px;
   color: #ffffff;
 }
 
@@ -683,33 +679,6 @@ onUnmounted(() => {
 .demo-text {
   color: #94a3b8;
   font-size: 0.9rem;
-}
-
-.progress-demo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #00d4ff 0%, #7c3aed 100%);
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
-
-.progress-text {
-  color: #94a3b8;
-  font-size: 0.9rem;
-  text-align: center;
 }
 
 /* How It Works Section */
