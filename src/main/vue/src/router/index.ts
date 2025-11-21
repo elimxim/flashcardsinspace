@@ -10,6 +10,7 @@ import LoginPage from '@/pages/auth/LoginPage.vue'
 import LogoutPage from '@/pages/auth/LogoutPage.vue'
 import PasswordResetView from '@/pages/auth/PasswordResetView.vue'
 import ReviewPage from '@/pages/ReviewPage.vue'
+import LightspeedSchedulePage from '@/pages/LightspeedSchedulePage.vue'
 import { toStage } from '@/core-logic/stage-logic.ts'
 import { loadUserSignedUp } from '@/shared/cookies.ts'
 
@@ -24,6 +25,7 @@ export const routeNames = {
   logout: 'logout',
   passwordReset: 'passwordReset',
   review: 'review',
+  lightspeedSchedule: 'lightspeedSchedule',
 }
 
 const routes: RouteRecordRaw[] = [
@@ -48,7 +50,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/support',
     name: routeNames.support,
-    component: SupportPage
+    component: SupportPage,
   },
   {
     path: '/user',
@@ -88,6 +90,11 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
     },
+  },
+  {
+    path: '/lightspeed-schedule',
+    name: routeNames.lightspeedSchedule,
+    component: LightspeedSchedulePage,
   },
 ]
 
