@@ -37,6 +37,7 @@
             {{ recordingTime }}
           </div>
           <AwesomeButton
+            v-if="!noTrash"
             icon="fa-solid fa-trash"
             class="voice-recorder-button"
             :disabled="!audioBlob"
@@ -62,9 +63,11 @@ const audioBlob = defineModel<Blob | undefined>()
 const props = withDefaults(defineProps<{
   maxDuration?: number
   expanded?: boolean
+  noTrash?: boolean
 }>(), {
   maxDuration: 20 * 1000,
   expanded: false,
+  noTrash: false,
 })
 
 const isControlsExpanded = ref(props.expanded)
@@ -249,7 +252,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 6px;
   width: fit-content;
-  height: 30px;
+  height: 32px;
   border-radius: 999px;
   transition: all 0.3s;
 }
@@ -266,7 +269,7 @@ onBeforeUnmount(() => {
   gap: 10px;
   background: var(--v-recorder--controls--bg);
   border-radius: 999px;
-  padding: 3px 12px;
+  padding: 4px 8px;
 }
 
 .voice-recorder-button {
