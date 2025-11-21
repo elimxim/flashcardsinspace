@@ -35,11 +35,15 @@
           <font-awesome-icon
             v-if="pressed && spinnable"
             :icon="spinIcon || icon"
-            class="awesome-spinning-icon"
+            class="awesome-icon awesome--icon--spinning"
+          />
+          <font-awesome-icon
+            v-else-if="fade"
+            :icon="icon"
+            class="awesome-icon awesome--icon--fading"
           />
           <font-awesome-icon
             v-else
-            :fade="fade"
             :icon="icon"
             class="awesome-icon"
           />
@@ -227,8 +231,7 @@ defineExpose({
   font-size: min(var(--a-btn--icon--size), 100cqw, 100cqh);
 }
 
-.awesome-spinning-icon {
-  font-size: min(var(--a-btn--icon--size), 100cqw, 100cqh);
+.awesome--icon--spinning {
   animation: spin 2s linear infinite;
 }
 
@@ -238,6 +241,22 @@ defineExpose({
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+.awesome--icon--fading {
+  animation: fade 1.5s linear infinite;
+}
+
+@keyframes fade {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+  100% {
+    opacity: 1;
   }
 }
 
@@ -262,7 +281,7 @@ defineExpose({
 }
 
 .awesome-button--click-ripple.awesome-button--ripple-active::before {
-  animation: growing-circle 0.3s ease-out;
+  animation: growing-circle 0.5s ease-out;
 }
 
 @keyframes growing-circle {
