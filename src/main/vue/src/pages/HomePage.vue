@@ -2,7 +2,9 @@
   <div :class="[
     'page',
     'flex-column',
-    'scrollbar-hidden'
+    'scrollbar-hidden',
+    'home-page',
+    'home-page--theme',
   ]">
     <Starfield
       :density="120"
@@ -10,134 +12,146 @@
       twinkle
       vertical-drift="3px"
     />
-    <section class="hero-section">
-      <h1 class="hero-title">
-        <span class="hero-title-main">
+    <section class="what-section">
+      <h1 class="section-header">
+        <span class="section-title section-title--main">
           Welcome to<br/>
           Flashcards In Space
         </span>
-        <span class="hero-title-sub">
+        <span class="section-title section-title--sub">
           Launch Learning Into Outer Space
         </span>
       </h1>
 
-      <p class="hero-description">
+      <p class="section-description section-description--short">
         <strong>What is Flashcards in Space?</strong><br>
         Flashcards in Space is a super fun and efficient spaced repetition system
         that helps you learn vocabulary or any other concept you can put into flashcards.
-        <em>Lightspeed Schedule</em>
       </p>
 
-      <div class="hero-actions">
+      <div class="what-actions">
         <SmartButton
           text="Signup"
-          class="hero-cta hero-cta--signup"
+          class="what-action-button what-action-button--signup"
           :on-click="navigateToSignup"
           rounded
         />
         <SmartButton
           text="Login"
-          class="hero-cta hero-cta--login"
+          class="what-action-button what-action-button--login"
           :on-click="navigateToLogin"
           rounded
         />
       </div>
 
-      <div class="hero-tagline">
-        <span class="tagline-text">Comet Get Your Knowledge Here</span>
+      <div class="what-tagline">
+        <span class="what-tagline-text">Spacing Out Never Felt So Smart</span>
       </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features-section">
-      <div class="features-container">
-        <div class="section-header">
-          <h2 class="section-title">Mission Capabilities</h2>
-          <p class="section-subtitle">
-            Advanced technology for accelerated learning
+    <section class="why-section">
+      <h2 class="section-header">
+        <span class="section-title section-title--centered">
+          Why Flashcards in Space?
+        </span>
+      </h2>
+
+      <div class="section-description">
+        <p class="description-paragraph">
+          Flashcards in Space was born from a simple dream: we envisioned a spaced repetition
+          system that we'd genuinely love to use every single day. We searched through already
+          existing options like Anki, Quizlet, SuperMemo, and countless other apps, but couldn't
+          find anything that sparked our imagination or made learning feel truly exciting.
+          It was then that we realized our dream system didn't exist yet.
+        </p>
+        <p class="description-paragraph">
+          Instead of settling for outdated interfaces and boring experiences, we decided
+          to create our own system, complete with our own <em>Lightspeed Schedule</em> to help
+          you learn new concepts at lightspeed. With fun visuals and graphics, streak counters,
+          and motivation pages, plus a load of other exciting and one-of-a-kind features,
+          you are bound to have a unique and engaging experience at Flashcards in Space.
+        </p>
+        <p class="description-paragraph">
+          And, just like space explorers, we are always excited to push beyond the limits
+          to create new and improved experiences for you and all the other learners out there.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card feature-card--primary">
+          <div class="feature-icon">
+            <font-awesome-icon icon="fa-solid fa-rocket"/>
+          </div>
+          <h3 class="feature-title">Lightspeed Schedule</h3>
+          <p class="feature-description">
+            We created our own spaced repetition algorithm based on Leitner's System
+            (thus giving us the name Lightspeed) that accelerates learning through 7
+            optimized stages, launching knowledge into outer space.
           </p>
+          <div class="schedule-stages">
+            <div class="schedule-stage" v-for="stage in 7" :key="stage">
+              <font-awesome-icon :icon="`fa-solid fa-${stage}`"/>
+            </div>
+            <div class="schedule-stage schedule-stage--transparent">
+              <font-awesome-icon icon="fa-solid fa-arrow-right-long"/>
+            </div>
+            <div class="schedule-stage schedule-stage--final">
+              <font-awesome-icon icon="fa-solid fa-infinity"/>
+            </div>
+          </div>
         </div>
 
-        <div class="features-grid">
-          <!-- Lightspeed Schedule Feature -->
-          <div class="feature-card feature-card--primary">
-            <div class="feature-icon">
-              <font-awesome-icon icon="fa-solid fa-rocket"/>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <font-awesome-icon icon="fa-solid fa-brain"/>
+          </div>
+          <h3 class="feature-title">Scientific Method</h3>
+          <p class="feature-description">
+            Thanks to the brilliant minds who pioneered spaced repetition - Hermann Ebbinghaus,
+            Cecil Mace, Sebastian Leitner, and others - our work builds on their foundation.
+            Their groundbreaking work proved that spaced learning delivers remarkable results.
+          </p>
+          <div class="feature-stats">
+            <div class="stat">
+              <span class="stat-value">80%</span>
+              <span class="stat-label">Better Retention</span>
             </div>
-            <h3 class="feature-title">Lightspeed Schedule</h3>
-            <p class="feature-description">
-              Our proprietary spaced repetition algorithm accelerates learning
-              through 7 optimized stages, launching knowledge into permanent orbit.
-            </p>
-            <div class="feature-stages">
-              <div class="stage-indicator" v-for="stage in 7" :key="stage">
-                <span class="stage-number">S{{ stage }}</span>
-              </div>
-              <div class="stage-arrow">→</div>
-              <div class="stage-indicator stage-indicator--final">
-                <span class="stage-number">∞</span>
-              </div>
+            <div class="stat">
+              <span class="stat-value">50%</span>
+              <span class="stat-label">Less Time</span>
             </div>
           </div>
+        </div>
 
-          <!-- Spaced Repetition Feature -->
-          <div class="feature-card">
-            <div class="feature-icon">
-              <font-awesome-icon icon="fa-solid fa-brain"/>
-            </div>
-            <h3 class="feature-title">Scientific Method</h3>
-            <p class="feature-description">
-              Based on proven spaced repetition research, our system optimizes
-              review intervals to maximize long-term retention.
-            </p>
-            <div class="feature-stats">
-              <div class="stat">
-                <span class="stat-value">85%</span>
-                <span class="stat-label">Better Retention</span>
-              </div>
-              <div class="stat">
-                <span class="stat-value">50%</span>
-                <span class="stat-label">Less Time</span>
-              </div>
-            </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <font-awesome-icon icon="fa-solid fa-volume-high"/>
           </div>
-
-          <!-- Audio Support Feature -->
-          <div class="feature-card">
-            <div class="feature-icon">
-              <font-awesome-icon icon="fa-solid fa-volume-high"/>
-            </div>
-            <h3 class="feature-title">Audio Mission Logs</h3>
-            <p class="feature-description">
-              Record and play audio for both sides of your flashcards.
-              Perfect for language learning and pronunciation practice.
-            </p>
-            <div class="feature-demo">
-              <AwesomeButton
-                icon="fa-solid fa-play"
-                class="audio-demo-button"
-                tooltip="Play Demo Audio"
-              />
-              <span class="demo-text">Try the audio feature</span>
-            </div>
+          <h3 class="feature-title">Audio Mission Logs</h3>
+          <p class="feature-description">
+            Record and play audio for both sides of your flashcards.
+            Perfect for language learning and pronunciation practice.
+          </p>
+          <div class="feature-demo">
+            <VoiceRecorder v-model="audioDemo" expanded/>
+            <span class="demo-text">Try the audio feature</span>
           </div>
+        </div>
 
-          <!-- Progress Tracking Feature -->
-          <div class="feature-card">
-            <div class="feature-icon">
-              <font-awesome-icon icon="fa-solid fa-chart-line"/>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <font-awesome-icon icon="fa-solid fa-chart-line"/>
+          </div>
+          <h3 class="feature-title">Mission Progress</h3>
+          <p class="feature-description">
+            Track your learning journey with detailed statistics,
+            day streaks, and stage progression analytics.
+          </p>
+          <div class="progress-demo">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 68%"></div>
             </div>
-            <h3 class="feature-title">Mission Progress</h3>
-            <p class="feature-description">
-              Track your learning journey with detailed statistics,
-              day streaks, and stage progression analytics.
-            </p>
-            <div class="progress-demo">
-              <div class="progress-bar">
-                <div class="progress-fill" style="width: 68%"></div>
-              </div>
-              <span class="progress-text">68% to Outer Space</span>
-            </div>
+            <span class="progress-text">68% to Outer Space</span>
           </div>
         </div>
       </div>
@@ -147,7 +161,7 @@
     <section class="how-it-works-section">
       <div class="how-it-works-container">
         <div class="section-header">
-          <h2 class="section-title">Mission Protocol</h2>
+          <h2 class="section-header">Mission Protocol</h2>
           <p class="section-subtitle">
             From rookie astronaut to space commander in 7 stages
           </p>
@@ -181,6 +195,8 @@
                 Spaced repetition leverages the psychological spacing effect -
                 the phenomenon where information is better retained when
                 learning sessions are spaced out over time rather than massed together.
+                Modern meta-analyses confirm what Ebbinghaus discovered: distributed
+                practice is significantly more effective than cramming.
               </p>
               <div class="science-stats">
                 <div class="science-stat">
@@ -188,8 +204,12 @@
                   <span class="stat-label">First discovered by Hermann Ebbinghaus</span>
                 </div>
                 <div class="science-stat">
-                  <span class="stat-number">100+</span>
-                  <span class="stat-label">Years of research validation</span>
+                  <span class="stat-number">140+</span>
+                  <span class="stat-label">Years of continuous research validation</span>
+                </div>
+                <div class="science-stat">
+                  <span class="stat-number">2-3x</span>
+                  <span class="stat-label">More effective than cramming</span>
                 </div>
               </div>
             </div>
@@ -280,11 +300,14 @@
 import Starfield from '@/components/Starfield.vue'
 import GlowLamp from '@/components/control-panel/GlowLamp.vue'
 import SmartButton from '@/components/SmartButton.vue'
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import VoiceRecorder from '@/components/VoiceRecorder.vue'
 import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
+import { onUnmounted, ref } from 'vue'
 
 const router = useRouter()
+
+const audioDemo = ref<Blob | undefined>()
 
 const missionSteps = [
   {
@@ -331,61 +354,84 @@ function navigateToSignup() {
 function navigateToLogin() {
   router.push({ name: routeNames.login })
 }
+
+onUnmounted(() => {
+  audioDemo.value = undefined
+})
 </script>
 
 <style scoped>
-.hero-section {
+.home-page--theme {
+  --h-page--font-family: var(--home-page--font-family);
+}
+
+.section-header {
+  margin: 0;
+  padding: 0;
+}
+
+.section-title {
+  font-family: var(--h-page--font-family);
+  display: block;
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #a0c4ff;
+}
+
+.section-title--main {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+}
+
+.section-title--sub {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1;
+  color: #b0c4de;
+}
+
+.section-title--centered {
+  text-align: center;
+}
+
+.section-description {
+  font-family: var(--h-page--font-family);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.6;
+  color: #e2e8f0;
+}
+
+.section-description--short {
+  max-width: 500px;
+  text-indent: unset;
+}
+
+.section-description strong {
+  color: #ffd700;
+}
+
+.section-description em {
+  color: #00d4ff;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.description-paragraph {
+  font-family: var(--h-page--font-family);
+  text-indent: 2rem;
+  text-align: justify;
+}
+
+.what-section {
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-content: center;
-  padding: 1rem 2rem;
-  gap: 10px;
+  padding: 20px 40px;
+  gap: 20px;
   color: #ffffff;
-}
-
-.hero-title {
-  margin: 0;
-  padding: 0;
-}
-
-.hero-title-main {
-  display: block;
-  font-family: var(--navbar--font-family);
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 800;
-  line-height: 1.1;
-  background: #a0c4ff;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.hero-title-sub {
-  display: block;
-  font-family: var(--navbar--font-family);
-  font-size: clamp(1rem, 2.5vw, 1.5rem);
-  font-weight: 300;
-  color: #b0c4de;
-  font-style: italic;
-}
-
-.hero-description {
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  line-height: 1.6;
-  color: #e2e8f0;
-  max-width: 500px;
-}
-
-.hero-description strong {
-  color: #ffd700;
-}
-
-.hero-description em {
-  color: #00d4ff;
-  font-style: normal;
-  font-weight: 600;
 }
 
 .stat-number {
@@ -404,13 +450,13 @@ function navigateToLogin() {
   margin-top: 0.25rem;
 }
 
-.hero-actions {
+.what-actions {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
 }
 
-.hero-cta {
+.what-action-button {
   --smart-button--title--color: #ffffff;
   --smart-button--border-color: rgba(255, 255, 255, 0.2);
   --smart-button--width: 180px;
@@ -420,69 +466,50 @@ function navigateToLogin() {
   transition: all 0.3s ease;
 }
 
-.hero-cta:hover {
+.what-action-button:hover {
   transform: translateY(-2px);
 }
 
-.hero-cta--signup {
+.what-action-button--signup {
   --smart-button--bg: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
   --smart-button--bg--hover: linear-gradient(135deg, #8b5cf6 0%, #c084fc 100%);
   box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
 }
 
-.hero-cta--signup:hover {
+.what-action-button--signup:hover {
   box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
 }
 
-.hero-cta--login {
+.what-action-button--login {
   --smart-button--bg: linear-gradient(135deg, #3a64ed 0%, #558ef7 100%);
   --smart-button--bg--hover: linear-gradient(135deg, #5cbbf6 0%, #84a0fc 100%);
   box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
 }
 
-.hero-cta--login:hover {
+.what-action-button--login:hover {
   box-shadow: 0 8px 30px rgba(58, 121, 237, 0.4);
 }
 
-.hero-tagline {
+.what-tagline {
   text-align: center;
   margin-top: 1rem;
 }
 
-.tagline-text {
+.what-tagline-text {
+  font-family: var(--h-page--font-family);
   font-size: 0.9rem;
   color: #94a3b8;
   font-style: italic;
 }
 
-.features-section {
+.why-section {
   position: relative;
-  z-index: 1;
-  padding: 4rem clamp(1rem, 5vw, 4rem);
-  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
-}
-
-.features-container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.section-header {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.section-title {
-  font-family: var(--navbar--font-family);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 1rem;
-  background: linear-gradient(135deg, #ffffff 0%, #00d4ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  padding: 20px 40px;
+  gap: 20px;
 }
 
 .section-subtitle {
@@ -494,9 +521,9 @@ function navigateToLogin() {
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
   gap: 2rem;
-  margin-top: 3rem;
 }
 
 .feature-card {
@@ -542,6 +569,10 @@ function navigateToLogin() {
   box-shadow: 0 10px 40px rgba(124, 58, 237, 0.2);
 }
 
+.feature-card--primary::before {
+  background: linear-gradient(90deg, transparent, rgba(200, 0, 255, 0.5), transparent);
+}
+
 .feature-icon {
   width: 60px;
   height: 60px;
@@ -560,7 +591,7 @@ function navigateToLogin() {
 }
 
 .feature-title {
-  font-family: var(--button--font-family);
+  font-family: var(--h-page--font-family);
   font-size: 1.3rem;
   font-weight: 600;
   color: #ffffff;
@@ -568,19 +599,19 @@ function navigateToLogin() {
 }
 
 .feature-description {
+  font-family: var(--h-page--font-family);
   color: #cbd5e1;
   line-height: 1.6;
-  margin-bottom: 1.5rem;
 }
 
-.feature-stages {
+.schedule-stages {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
-.stage-indicator {
+.schedule-stage {
   width: 32px;
   height: 32px;
   background: rgba(0, 212, 255, 0.2);
@@ -594,25 +625,24 @@ function navigateToLogin() {
   color: #00d4ff;
 }
 
-.stage-indicator--final {
+.schedule-stage--final {
   background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
   border-color: #7c3aed;
   color: #ffffff;
 }
 
-.stage-arrow {
-  color: #64748b;
-  font-size: 1.2rem;
-  margin: 0 0.5rem;
+.schedule-stage--transparent {
+  background: none;
+  border: none;
 }
 
 .feature-stats {
-  display: flex;
-  gap: 2rem;
-}
-
-.stat {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto;
+  align-items: center;
   text-align: center;
+  gap: 20px;
 }
 
 .stat-value {
@@ -628,6 +658,16 @@ function navigateToLogin() {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+.stat-source {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-style: italic;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+
 
 .feature-demo {
   display: flex;
@@ -769,7 +809,6 @@ function navigateToLogin() {
 }
 
 .step-title {
-  font-family: var(--button--font-family);
   font-size: 1.4rem;
   font-weight: 600;
   color: #ffffff;
@@ -825,7 +864,6 @@ function navigateToLogin() {
 }
 
 .summary-content h3 {
-  font-family: var(--button--font-family);
   font-size: 1.5rem;
   font-weight: 600;
   color: #ffffff;
@@ -860,6 +898,8 @@ function navigateToLogin() {
   color: #94a3b8;
   line-height: 1.3;
 }
+
+
 
 /* Call to Action Section */
 .cta-section {
@@ -901,7 +941,6 @@ function navigateToLogin() {
 }
 
 .cta-badge-text {
-  font-family: var(--button--font-family);
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -910,7 +949,6 @@ function navigateToLogin() {
 }
 
 .cta-title {
-  font-family: var(--navbar--font-family);
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
   color: #ffffff;
