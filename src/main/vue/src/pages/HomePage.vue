@@ -127,14 +127,14 @@
           <div class="feature-icon">
             <font-awesome-icon icon="fa-solid fa-volume-high"/>
           </div>
-          <h3 class="feature-title">Audio Mission Logs</h3>
+          <h3 class="feature-title">Audio Recording</h3>
           <p class="feature-description">
             Record and play audio for both sides of your flashcards.
             Perfect for language learning and pronunciation practice.
           </p>
           <div class="feature-demo">
-            <VoiceRecorder v-model="audioDemo" expanded/>
             <span class="demo-text">Try the audio feature</span>
+            <VoiceRecorder v-model="audioDemo" expanded no-trash/>
           </div>
         </div>
 
@@ -659,28 +659,25 @@ onUnmounted(() => {
   letter-spacing: 0.05em;
 }
 
-.stat-source {
-  font-size: 0.7rem;
-  color: #64748b;
-  font-style: italic;
-  margin-top: 0.25rem;
-  display: block;
-}
-
-
 
 .feature-demo {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: start;
   gap: 1rem;
-}
 
-.audio-demo-button {
-  --awesome-button--icon--size: 1rem;
-  --awesome-button--icon--color: #00d4ff;
-  --awesome-button--icon--color--hover: #ffffff;
-  --awesome-button--bg--hover: rgba(0, 212, 255, 0.2);
-  --awesome-button--border-radius: 8px;
+  --voice-recorder--time--color: #ffffff;
+  --voice-recorder--time--bg: rgba(0, 212, 255, 0.2);
+  --voice-recorder--controls--bg: rgba(0, 212, 255, 0.15);
+  --voice-recorder--button--color: #00d4ff;
+  --voice-recorder--button--color--hover: #ffffff;
+  --voice-recorder--button--color--active: #ffffff;
+  --voice-recorder--button--color--disabled: #94a3b8;
+  --voice-recorder--mic-button--bg--hover: rgba(0, 212, 255, 0.2);
+  --voice-recorder--mic-button--bg--active: rgba(0, 212, 255, 0.2);
+  --voice-recorder--play-button--bg--hover: rgba(0, 212, 255, 0.2);
+  --voice-recorder--play-button--bg--active: rgba(0, 212, 255, 0.2);
+  --voice-recorder--warning-text--color: #cbd5e1;
 }
 
 .demo-text {
