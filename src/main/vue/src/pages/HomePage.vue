@@ -609,4 +609,13 @@ onUnmounted(() => {
   color: #ffffff;
 }
 
+@media (max-width: 1000px) {
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 2rem;
+  }
+}
+
 </style>
