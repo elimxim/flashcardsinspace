@@ -21,7 +21,7 @@
           Flashcards In Space
         </span>
         <span class="section-title section-title--sub">
-          Launch Learning Into Outer Space
+          Launch Your Learning Into Outer Space
         </span>
       </h1>
 
