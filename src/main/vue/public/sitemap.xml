@@ -1,15 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://sitemaps.org/schemas/sitemap/0.9">
+
     <url>
         <loc>https://flashcardsinspace.com/</loc>
-        <lastmod>2025-08-26</lastmod>
+        <lastmod>2025-11-22</lastmod>
         <changefreq>monthly</changefreq>
         <priority>1.00</priority>
     </url>
     <url>
         <loc>https://flashcardsinspace.com/home</loc>
-        <lastmod>2025-08-26</lastmod>
+        <lastmod>2025-11-22</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.90</priority>
+    </url>
+    <url>
+        <loc>https://flashcardsinspace.com/support</loc>
+        <lastmod>2025-11-22</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.60</priority>
+    </url>
+    <url>
+        <loc>https://flashcardsinspace.com/lightspeed-schedule</loc>
+        <lastmod>2025-11-22</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.80</priority>
+    </url>
+
+
+    <url>
+        <loc>https://flashcardsinspace.com/signup</loc>
+        <lastmod>2025-11-22</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.70</priority>
+    </url>
+    <url>
+        <loc>https://flashcardsinspace.com/login</loc>
+        <lastmod>2025-11-22</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.70</priority>
+    </url>
+    <url>
+        <loc>https://flashcardsinspace.com/password-reset</loc>
+        <lastmod>2025-11-22</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.30</priority>
     </url>
 </urlset>
