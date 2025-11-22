@@ -15,7 +15,7 @@
     - Welcoming emails after signing up
   - Indexable for robots (searchable improvements)
   - Footer
-  - Bugreport form
+  - Feedback form (bugs, wishes, suggestions, etc.)
   - Review Session
   - User page: 
     - Show active sessions and devices
