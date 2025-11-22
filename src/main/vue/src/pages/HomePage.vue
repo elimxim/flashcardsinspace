@@ -31,13 +31,13 @@
 
       <div class="what-actions">
         <SmartButton
-          text="Signup"
+          text="New to the galaxy?"
           class="what-action-button what-action-button--signup"
           :on-click="navigateToSignup"
           rounded
         />
         <SmartButton
-          text="Login"
+          text="Been abducted by us before?"
           class="what-action-button what-action-button--login"
           :on-click="navigateToLogin"
           rounded
@@ -322,7 +322,7 @@ onUnmounted(() => {
 .what-action-button {
   --smart-button--title--color: #ffffff;
   --smart-button--border-color: rgba(255, 255, 255, 0.2);
-  --smart-button--width: 180px;
+  --smart-button--width: 200px;
   --smart-button--height: 50px;
   --smart-button--title--font-size: 0.9rem;
   --smart-button--title--letter-spacing: 0.05em;
