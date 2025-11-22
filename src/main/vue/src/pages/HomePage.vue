@@ -162,16 +162,22 @@
 
       <div class="section-description">
         <p class="description-paragraph">
-          Flashcards in Space uses spaced repetition to help you learn new words and concepts.
-          Flashcards in space uses our <em>Lightspeed Schedule</em> to help you learn new
-          concepts without wasting time studying things you don't need to. We make it super
-          simple for you to get started and to keep going so that you can learn exactly what
-          you need, when you need it. You simply follow a review schedule and watch as your
-          knowledge improves! It's straightforward and simple while being fun and effective!
+          Flashcards in Space uses spaced repetition to help you learn new concepts
+          without wasting time studying things you don't need to. We make it super simple
+          for you to get started and to keep going so that you can learn exactly what you need,
+          when you need it.
+        </p>
+        <p class="description-paragraph">
+          Here's how your learning journey unfolds: You create flashcards for whatever you
+          want to master, then simply follow our <em>Lightspeed Schedule</em>. Cards you struggle
+          with come back sooner, while ones you nail get spaced out further. The magic happens
+          behind the scenes as your cards automatically move through our 7-stage system,
+          graduating from daily reviews all the way to long-term memory. No cramming, no
+          guesswork - just consistent progress as you watch your knowledge launch into orbit!
         </p>
         <p class="description-paragraph">
           If you are a new astronaut looking to improve your vocabulary or memory skills,
-          fly on over to the "support" page to learn exactly how to use flashcards in space!
+          fly on over to the "support" page to learn exactly how to use Flashcards in Space!
         </p>
       </div>
 
