@@ -32,3 +32,10 @@
 .scroll-none {
   overflow: hidden;
 }
+
+/* Hides default browser styles */
+.appearance-none {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
