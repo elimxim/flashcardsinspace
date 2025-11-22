@@ -1,11 +1,13 @@
 <template>
-  <div :class="[
-    'page',
-    'page--bg--light',
-    'flex-row',
-    'control-panel',
-    'control-panel--theme',
-  ]">
+  <div
+    :class="[
+      'page',
+      'page--bg--light',
+      'flex-row',
+      'control-panel',
+      'control-panel--theme',
+    ]"
+  >
     <div class="control-sidebar">
       <SideBar ref="sidebar"/>
     </div>

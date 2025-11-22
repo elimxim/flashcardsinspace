@@ -1,12 +1,14 @@
 <template>
-  <div :class="[
-    'page',
-    'flex-column',
-    'flex-center',
-    'padding-auto',
-    'support-page',
-    'support-page--theme'
-  ]">
+  <div
+    :class="[
+      'page',
+      'flex-column',
+      'flex-center',
+      'padding-auto',
+      'support-page',
+      'support-page--theme'
+    ]"
+  >
     <Starfield
       :density="80"
       :star-size="2"

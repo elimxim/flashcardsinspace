@@ -1,11 +1,13 @@
 <template>
-  <div :class="[
-    'page',
-    'flex-column',
-    'padding-auto',
-    'scrollbar-hidden',
-    'lightspeed-page',
-  ]">
+  <div
+    :class="[
+      'page',
+      'flex-column',
+      'padding-auto',
+      'scrollbar-hidden',
+      'lightspeed-page',
+    ]"
+  >
     <Starfield
       :density="120"
       :star-size="1.8"
@@ -30,15 +32,15 @@
     </p>
 
     <div class="learning-timeline">
-      <div class="timeline-stage" v-for="(stage, index) in stages" :key="index">
-        <div class="stage-connector" v-if="index < stages.length - 1"></div>
+      <div v-for="(stage, index) in stages" :key="index" class="timeline-stage">
+        <div v-if="index < stages.length - 1" class="stage-connector"></div>
         <div class="stage-icon" :class="stage.iconClass">
           <font-awesome-icon :icon="stage.icon"/>
         </div>
         <div class="stage-content">
           <h3 class="stage-title">{{ stage.title }}</h3>
           <p class="step-description">{{ stage.description }}</p>
-          <div class="step-timing" v-if="stage.timing">
+          <div v-if="stage.timing" class="step-timing">
             <span>{{ stage.timing }}</span>
           </div>
         </div>
@@ -82,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import Starfield from '@/components/Starfield.vue';
+import Starfield from '@/components/Starfield.vue'
 
 const stages = [
   {

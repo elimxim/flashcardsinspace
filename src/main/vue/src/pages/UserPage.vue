@@ -1,13 +1,15 @@
 <template>
-  <div :class="[
-    'page',
-    'page--bg--light',
-    'flex-column',
-    'padding-auto',
-    'user-page',
-    'scrollbar-hidden',
-    'user-page--theme',
-  ]">
+  <div
+    :class="[
+      'page',
+      'page--bg--light',
+      'flex-column',
+      'padding-auto',
+      'user-page',
+      'scrollbar-hidden',
+      'user-page--theme',
+    ]"
+  >
     <h2>Welcome aboard, {{ user?.name ?? 'Unknown' }}!</h2>
     <div>{{ randomDayPhrase }}</div>
     <div class="user-info">

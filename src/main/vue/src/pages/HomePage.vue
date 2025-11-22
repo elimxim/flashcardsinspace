@@ -1,11 +1,13 @@
 <template>
-  <div :class="[
-    'page',
-    'flex-column',
-    'scrollbar-hidden',
-    'home-page',
-    'home-page--theme',
-  ]">
+  <div
+    :class="[
+      'page',
+      'flex-column',
+      'scrollbar-hidden',
+      'home-page',
+      'home-page--theme',
+    ]"
+  >
     <Starfield
       :density="120"
       :star-size="1.8"
@@ -89,7 +91,7 @@
             optimized stages, launching knowledge into outer space.
           </p>
           <div class="schedule-stages">
-            <div class="schedule-stage" v-for="stage in 7" :key="stage">
+            <div v-for="stage in 7" :key="stage" class="schedule-stage">
               <font-awesome-icon :icon="`fa-solid fa-${stage}`"/>
             </div>
             <div class="schedule-stage schedule-stage--transparent">
