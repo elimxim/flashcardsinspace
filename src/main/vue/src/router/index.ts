@@ -114,23 +114,15 @@ router.beforeEach(async (to, _, next) => {
     } else {
       next({ name: routeNames.signup })
     }
-  } else {
-    next()
-  }
-})
-
-router.beforeEach(async (to, _, next) => {
-  const authStore = useAuthStore()
-  const { isAuthenticated } = storeToRefs(authStore)
-
-  if (to.name === routeNames.login || to.name === routeNames.signup) {
+  } else if (to.name === routeNames.login || to.name === routeNames.signup) {
     if (isAuthenticated.value) {
       next({ name: routeNames.user })
     } else {
       next()
     }
+  } else {
+    next()
   }
-  next()
 })
 
 export default router
