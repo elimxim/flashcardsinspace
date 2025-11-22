@@ -1,7 +1,7 @@
 <template>
   <button
     ref="button"
-    class="smart-button smart-button--theme"
+    class="smart-button smart-button--theme appearance-none"
     :class="{
       'smart-button--disabled': disabled,
       'smart-button--rounded': rounded,
@@ -176,14 +176,19 @@ function handleGlobalMouseUp() {
 .smart-button {
   color: var(--s-btn--title--color);
   padding: var(--s-btn--padding);
-  border: 1px solid var(--s-btn--border-color);
+  border: none;
   border-radius: var(--s-btn--border-radius);
   background: var(--s-btn--bg);
+  outline: 1px solid var(--s-btn--border-color);
   position: relative;
-  transition: background-color 0.2s ease-in-out;
+  transition:
+    background-color 0.2s ease-in-out,
+    outline 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
   width: var(--s-btn--width);
   height: var(--s-btn--height);
   cursor: pointer;
+  overflow: hidden;
   z-index: 1;
 }
 
@@ -198,6 +203,7 @@ function handleGlobalMouseUp() {
   border-radius: var(--s-btn--border-radius);
   transition: width 0.05s linear;
   z-index: -1;
+  overflow: hidden;
 }
 
 .smart-button-title {
