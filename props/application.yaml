@@ -10,5 +10,5 @@ app:
   security:
     jwt:
       secret: ${APP_SECURITY_JWT_SECRET}
-      access-token-expiration-ms: 7200000 # 2 hours
-      refresh-token-expiration-ms: 86400000 # 24 hours
+      access-token-expiration-ms: 14400000 # 4 hours
+      refresh-token-expiration-ms: 691200000 # 8 days
