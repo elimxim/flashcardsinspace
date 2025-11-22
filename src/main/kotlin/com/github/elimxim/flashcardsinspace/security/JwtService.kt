@@ -49,7 +49,7 @@ class JwtService(private val securityProperties: SecurityProperties) {
         response.addCookie(refreshTokenCookie)
     }
 
-    fun clearCookies(response: HttpServletResponse) {
+    fun clearAccessTokenCookie(response: HttpServletResponse) {
         val accessTokenCookie = Cookie("accessToken", null).apply {
             isHttpOnly = true
             secure = true
@@ -57,15 +57,7 @@ class JwtService(private val securityProperties: SecurityProperties) {
             maxAge = 0
         }
 
-        val refreshTokenCookie = Cookie("refreshToken", null).apply {
-            isHttpOnly = true
-            secure = true
-            path = "/auth/refresh"
-            maxAge = 0
-        }
-
         response.addCookie(accessTokenCookie)
-        response.addCookie(refreshTokenCookie)
     }
 
     private fun <T> extractClaim(token: String, claimsResolver: (Claims) -> T): T {

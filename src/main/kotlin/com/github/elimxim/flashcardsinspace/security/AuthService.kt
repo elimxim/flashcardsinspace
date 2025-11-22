@@ -102,7 +102,12 @@ class AuthService(
     }
 
     @Transactional
-    fun refreshToken(refreshToken: String): User {
+    fun refreshToken(refreshToken: String?): User? {
+        if (refreshToken == null) {
+            log.error("Refresh token is null, can't refresh")
+            return null
+        }
+
         val email = jwtService.extractUsername(refreshToken)
         val user = userRepository.findByEmail(email).orElseThrow {
             UsernameNotFoundException("User not found ${maskSecret(email.escapeJava())}")
