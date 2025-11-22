@@ -38,7 +38,7 @@ class AuthController(
     @PostMapping("/logout")
     fun logout(response: HttpServletResponse): ResponseEntity<Unit> {
         authService.logout()
-        jwtService.clearAccessTokenCookie(response)
+        jwtService.clearCookies(response)
         return ResponseEntity.ok().build()
     }
 
