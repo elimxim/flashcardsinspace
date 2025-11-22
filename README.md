@@ -5,7 +5,6 @@
 - README
   - Describe the project
 - UX:
-  - Home page
   - Support page
     - Emotional support
     - Website support
