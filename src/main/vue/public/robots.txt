@@ -1,4 +1,21 @@
 User-agent: *
-Disallow:
+Crawl-delay: 1
+
+# Allow all pages except private user areas
+Disallow: /control-panel
+Disallow: /user
+Disallow: /review
+Disallow: /logout
+
+# Allow authentication pages for SEO
+Allow: /signup
+Allow: /login
+Allow: /password-reset
+
+# Allow main public pages
+Allow: /
+Allow: /home
+Allow: /support
+Allow: /lightspeed-schedule
 
 Sitemap: https://flashcardsinspace.com/sitemap.xml
