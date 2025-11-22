@@ -164,6 +164,7 @@ function handleGlobalMouseUp() {
   --s-btn--title--word-spacing: var(--smart-button--title--word-spacing, 0.05rem);
   --s-btn--title--letter-spacing: var(--smart-button--title--letter-spacing, 0.05rem);
   --s-btn--border-color: var(--smart-button--border-color, transparent);
+  --s-btn--border-color--hover: var(--smart-button--border-color--hover, transparent);
   --s-btn--border-radius: var(--smart-button--border-radius, 3px);
   --s-btn--width: var(--smart-button--width, 100px);
   --s-btn--height: var(--smart-button--height, 40px);
@@ -223,7 +224,7 @@ function handleGlobalMouseUp() {
 
 .smart-button:not(.smart-button--disabled):hover,
 .smart-button:not(.smart-button--disabled):focus {
-  outline: none;
+  outline: 1px solid var(--s-btn--border-color--hover);
   color: var(--s-btn--title--color--hover);
   background: var(--s-btn--bg--hover);
 }
