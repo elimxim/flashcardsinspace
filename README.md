@@ -15,6 +15,7 @@
     - Welcoming emails after signing up
   - Indexable for robots (searchable improvements)
   - Footer
+  - Admin page
   - Feedback form (bugs, wishes, suggestions, etc.)
   - Review Session
   - User page: 
