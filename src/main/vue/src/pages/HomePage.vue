@@ -188,17 +188,6 @@
         rounded
       />
     </section>
-
-    <footer class="home-footer">
-      <div class="footer-content">
-        <p class="footer-text">
-          Made with 🚀 for space explorers everywhere
-        </p>
-        <div class="footer-links">
-
-        </div>
-      </div>
-    </footer>
   </div>
 </template>
 
@@ -515,7 +504,6 @@ onUnmounted(() => {
   letter-spacing: 0.05em;
 }
 
-
 .feature-demo {
   display: flex;
   flex-direction: column;
@@ -570,43 +558,6 @@ onUnmounted(() => {
 .help-action-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(58, 121, 237, 0.4);
-}
-
-.home-footer {
-  position: relative;
-  padding: 20px 40px;
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.footer-text {
-  color: #94a3b8;
-  font-size: 0.9rem;
-}
-
-.footer-links {
-  display: flex;
-  gap: 2rem;
-}
-
-.footer-link {
-  color: #00d4ff;
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: color 0.3s ease;
-}
-
-.footer-link:hover {
-  color: #ffffff;
 }
 
 @media (max-width: 1000px) {
