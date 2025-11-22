@@ -2,6 +2,24 @@
 
 ## TODOS
 
+- images:
+  - /android-chrome-192x192.png
+  - /android-chrome-512x512.png
+  - https://flashcardsinspace.com/screenshot.png
+  - https://flashcardsinspace.com/logo.svg
+  - /safari-pinned-tab.svg (tricky - look up for instructions)
+  - /favicon-16x16.png
+  - /favicon-32x32.png
+  - /apple-touch-icon.png (180x180)
+  - /favicon.ico (update)
+  - @/assets/logo.svg (update)
+  - https://flashcardsinspace.com/assets/preview.png
+  - todo: 
+    - logo
+    - preview
+    - rocket
+    - screenshot
+
 - README
   - Describe the project
 - UX:
