@@ -46,6 +46,7 @@
     </div>
   </div>
   <FlashcardSetSettingsModal/>
+  <FlashcardSetCreationModal/>
 </template>
 
 <script setup lang="ts">
@@ -57,6 +58,7 @@ import LearningStagesWidget from '@/components/control-panel/LearningStagesWidge
 import OuterSpaceWidget from '@/components/control-panel/OuterSpaceWidget.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/modals/FlashcardSetSettingsModal.vue'
+import FlashcardSetCreationModal from '@/modals/FlashcardSetCreationModal.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
