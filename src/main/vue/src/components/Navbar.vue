@@ -2,7 +2,7 @@
   <nav class="navbar navbar--theme">
     <Starfield twinkle :density="100" :star-size="1.6" vertical-drift="2px"/>
     <div class="logo-container">
-      <img src="@/assets/logo.svg" alt="Logo" class="logo-image"/>
+      <img src="@/assets/rocket.svg" alt="Logo" class="logo-image"/>
       <div class="title-text" @click="navigateToControlPanel">
         Flashcards in Space
       </div>
@@ -143,7 +143,7 @@ function navigateToUser() {
 }
 
 .logo-image {
-  height: 69px;
+  height: 60px;
   z-index: 1001;
 }
 
