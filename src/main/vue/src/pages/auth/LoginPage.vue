@@ -175,7 +175,6 @@ const rockets = [
   "chromium",
   "diamond",
   "bluegem",
-  "glass",
 ]
 
 const lilrocket = ref<HTMLElement>()
