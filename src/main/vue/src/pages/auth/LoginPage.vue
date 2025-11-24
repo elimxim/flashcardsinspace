@@ -168,13 +168,7 @@ async function login() {
 // lilrocket>
 
 const rockets = [
-  "clay",
-  "crochet",
-  "original",
-  "toy",
-  "chromium",
-  "diamond",
-  "bluegem",
+  "authentic",
 ]
 
 const lilrocket = ref<HTMLElement>()
