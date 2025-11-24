@@ -217,6 +217,8 @@ async function addNewFlashcard(): Promise<boolean> {
           response.data.currDay,
           0,
         )
+        flashcardSetStore.addExtra(setId)
+        flashcardSetStore.incrementFlashcardsNumber(setId)
         return sendFlashcardAudioMetadataGetRequest(setId)
       })
       .then((response) => {

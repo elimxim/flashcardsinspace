@@ -4,7 +4,7 @@ import { mapFlashcardSetExtra } from '@/core-logic/flashcard-logic.ts'
 
 export interface FlashcardSetsState {
   flashcardSets: FlashcardSet[]
-  extra: Map<number,FlashcardSetExtra>
+  extra: Map<number, FlashcardSetExtra>
   loaded: boolean
 }
 
@@ -69,6 +69,11 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     },
     findSet(id: number): FlashcardSet | undefined {
       return this.flashcardSets.find(v => v.id === id)
+    },
+    addExtra(id: number) {
+      if (!this.extra.has(id)) {
+        this.extra.set(id, { id: id, flashcardsNumber: 0 })
+      }
     },
     findExtra(id: number): FlashcardSetExtra | undefined {
       return this.extra.get(id)
