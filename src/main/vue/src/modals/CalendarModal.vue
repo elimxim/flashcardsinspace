@@ -52,14 +52,14 @@
     </div>
     <div v-if="hasAccess" class="modal-control-buttons">
       <SmartButton
-        class="calendar-button"
+        class="dangerous-button"
         text="Prev"
         :on-click="goPrevDay"
         :disabled="!isDaySwitchPossible"
         auto-blur
       />
       <SmartButton
-        class="calendar-button"
+        class="dangerous-button"
         text="Next"
         :on-click="goNextDay"
         :disabled="!isDaySwitchPossible"

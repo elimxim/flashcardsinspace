@@ -44,20 +44,20 @@
     </div>
     <div class="modal-control-buttons">
       <SmartButton
-        class="cancel-button"
+        class="off-button"
         text="Cancel"
         :on-click="cancel"
         auto-blur
       />
       <SmartButton
-        class="remove-button"
+        class="dangerous-button"
         text="Remove"
         :hold-time="1.2"
         :on-click="remove"
         auto-blur
       />
       <SmartButton
-        class="update-button"
+        class="calm-button"
         text="Save"
         :on-click="update"
         :disabled="!stateChanged || formInvalid"

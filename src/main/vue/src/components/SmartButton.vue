@@ -215,6 +215,7 @@ function handleGlobalMouseUp() {
   word-spacing: var(--s-btn--title--word-spacing);
   letter-spacing: var(--s-btn--title--letter-spacing);
   text-transform: uppercase;
+  text-wrap: nowrap;
   transition: transform 0.1s ease-in-out;
 }
 

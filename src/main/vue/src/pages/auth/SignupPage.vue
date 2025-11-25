@@ -93,7 +93,7 @@
           text="The passwords do not match. Please try again"
         />
         <SmartButton
-          class="auth-button"
+          class="calm-button"
           text="Sign Up"
           type="submit"
           :disabled="formInvalid"

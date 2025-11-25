@@ -1,40 +1,21 @@
-.cancel-button {
-  --smart-button--bg: var(--cancel-button--bg-color);
-  --smart-button--bg--hover: var(--cancel-button--bg-color--hover)
+.off-button {
+  --smart-button--bg: var(--off-button--bg-color);
+  --smart-button--bg--hover: var(--off-button--bg-color--hover)
 }
 
-.remove-button {
-  --smart-button--bg: var(--remove-button--bg-color);
-  --smart-button--bg--hover: var(--remove-button--bg-color--hover)
+.dangerous-button {
+  --smart-button--bg: var(--dangerous-button--bg-color);
+  --smart-button--bg--hover: var(--dangerous-button--bg-color--hover)
 }
 
-.update-button {
-  --smart-button--bg: var(--update-button--bg-color);
-  --smart-button--bg--hover: var(--update-button--bg-color--hover)
+.calm-button {
+  --smart-button--bg: var(--calm-button--bg-color);
+  --smart-button--bg--hover: var(--calm-button--bg-color--hover);
 }
 
-.create-button {
-  --smart-button--bg: var(--create-button--bg-color);
-  --smart-button--bg--hover: var(--create-button--bg-color--hover)
-}
-
-.auth-button {
-  --smart-button--bg: var(--auth-button--bg-color);
-  --smart-button--bg--hover: var(--auth-button--bg-color--hover);
-}
-
-.calendar-button {
-  --smart-button--bg: var(--calendar-button--bg-color);
-  --smart-button--bg--hover: var(--calendar-button--bg-color--hover);
-}
-
-.review-button {
-  --smart-button--width: 120px;
-}
-
-.move-back-button {
-  --smart-button--bg: var(--move-back-button--bg-color);
-  --smart-button--bg--hover: var(--move-back-button--bg-color--hover);
+.safe-button {
+  --smart-button--bg: var(--safe-button--bg-color);
+  --smart-button--bg--hover: var(--safe-button--bg-color--hover)
 }
 
 .calendar-widget-button {

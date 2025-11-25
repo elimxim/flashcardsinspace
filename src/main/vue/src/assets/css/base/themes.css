@@ -8,10 +8,12 @@
 
 :root {
   /* global */
+
   --navbar-height: 8vh;
   --border-radius: 4px;
 
   /* fonts */
+
   --main--font-family: Lato, sans-serif;
   --button--font-family: Quicksand, sans-serif;
   --error-text--font-family: Rubik, sans-serif;
@@ -21,10 +23,12 @@
   --home-page--font-family: Quicksand, sans-serif;
 
   /* pages */
+
   --app--bg: linear-gradient(90deg, #0a0e1a 0%, #1a1f2e 50%, #2a2f3e 100%);
   --page--bg--light: #f5f5f5;
 
   /* inputs */
+
   --input--color: #45454a;
   --input--bg-color: #f9f9f9;
   --input__placeholder-color: #b8c4d6;
@@ -46,44 +50,30 @@
   --smart-input--secret-button--color--hover: #007bff;
 
   /* buttons */
+
   --button--color: white;
   --button--color--disabled: #cacaca;
   --button--bg-color--action: #007bff;
   --button--bg-color--action--focus: #0056b3;
   --button--bg-color--disabled: #ededed;
 
-  /*--smart-button--title--color: white;*/
-  /*--smart-button--title--color--hover: white;*/
-  /*--smart-button--border-color: transparent;*/
-  /*--smart-button--border-width: 0;*/
-  /*--smart-button--border-radius: 3px;*/
-  /*--smart-button--width: 100px;*/
-
   --smart-button--title--color--disabled: #a3a3a3;
   --smart-button--bg--disabled: #C8C8C8FF;
 
-  --cancel-button--bg-color: #4e4e4e;
-  --cancel-button--bg-color--hover: #7e7e7e;
+  --off-button--bg-color: #4e4e4e;
+  --off-button--bg-color--hover: #7e7e7e;
 
-  --remove-button--bg-color: #830000;
-  --remove-button--bg-color--hover: #aa0000;
+  --dangerous-button--bg-color: #830000;
+  --dangerous-button--bg-color--hover: #aa0000;
 
-  --update-button--bg-color: #004883;
-  --update-button--bg-color--hover: #0070bd;
+  --safe-button--bg-color: #118300;
+  --safe-button--bg-color--hover: #00bd10;
 
-  --create-button--bg-color: #118300;
-  --create-button--bg-color--hover: #00bd10;
-
-  --auth-button--bg-color: #0056b3;
-  --auth-button--bg-color--hover: #0070e6;
-
-  --calendar-button--bg-color: #3f0083;
-  --calendar-button--bg-color--hover: #5b00bd;
-
-  --move-back-button--bg-color: #0d124a;
-  --move-back-button--bg-color--hover: #171e87;
+  --calm-button--bg-color: #0056b3;
+  --calm-button--bg-color--hover: #0070e6;
 
   /* calendar */
+
   --calendar--weekday--color: #6b7280;
   --calendar--weekday--border-color: rgba(0, 0, 0, 0.06);
   --calendar--day--border-color: rgba(0, 0, 0, 0.06);
@@ -110,24 +100,30 @@
   --calendar--day--off--stripe-color: rgba(234, 112, 175, 0.51);
 
   /* icons */
+
   --fa-icon--color--globe: #007bff;
 
   /* text */
+
   --text--error--color: #c80f0f;
 
   /* hyper-links */
+
   --link--color: #474757;
   --a--color: #007bff;
 
   /* auth */
+
   --auth-container--bg-color: #f9f9f9;
   --auth-container--box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 
   /* secret-input */
+
   --secret-input__button--color: #b8c4d6;
   --secret-input__button--hover--color: #007bff;
 
   /* fuzzy-select */
+
   --fuzzy-select--drop-down--color: #45454a;
   --fuzzy-select--drop-down--border-color: #007bff;
   --fuzzy-select--drop-down--bg-color--hover: rgb(from var(--fuzzy-select--drop-down--border-color) r g b / 0.1);

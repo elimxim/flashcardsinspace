@@ -54,13 +54,13 @@
     </div>
     <div class="modal-control-buttons">
       <SmartButton
-        class="cancel-button"
+        class="off-button"
         text="Cancel"
         :on-click="cancel"
         auto-blur
       />
       <SmartButton
-        class="create-button"
+        class="safe-button"
         text="Create"
         :on-click="create"
         :disabled="formInvalid"

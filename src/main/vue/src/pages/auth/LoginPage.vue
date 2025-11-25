@@ -57,7 +57,7 @@
           text="This secret is expanding faster than the universe! Please keep it under 64 characters"
         />
         <SmartButton
-          class="auth-button"
+          class="calm-button"
           text="Log in"
           type="submit"
           :disabled="formInvalid"

@@ -74,14 +74,14 @@
       <div class="user-controls">
         <SmartButton
           text="Logout"
-          class="cancel-button"
+          class="off-button"
           :on-click="logout"
           fill-width
           auto-blur
         />
         <SmartButton
           text="Save"
-          class="update-button"
+          class="calm-button"
           :on-click="save"
           :disabled="!stateChanged || validationFailed"
           auto-blur

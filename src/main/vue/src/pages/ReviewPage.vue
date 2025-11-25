@@ -55,7 +55,7 @@
           v-if="reviewMode === ReviewMode.LIGHTSPEED"
           ref="stageDownButton"
           text="Don't know"
-          class="review-button remove-button"
+          class="decision-button dangerous-button"
           :disabled="noNextAvailable"
           :hidden="noNextAvailable"
           :on-click="stageDown"
@@ -66,7 +66,7 @@
           v-if="reviewMode === ReviewMode.LIGHTSPEED"
           ref="stageUpButton"
           text="Know"
-          class="review-button create-button"
+          class="decision-button safe-button"
           :disabled="noNextAvailable"
           :hidden="noNextAvailable"
           :on-click="stageUp"
@@ -76,7 +76,7 @@
         <SmartButton
           v-if="reviewMode === ReviewMode.SPECIAL"
           ref="prevButton"
-          class="review-button update-button"
+          class="calm-button"
           text="Prev"
           :disabled="noPrevAvailable"
           :on-click="prev"
@@ -86,7 +86,7 @@
         <SmartButton
           v-if="reviewMode === ReviewMode.SPECIAL"
           ref="nextButton"
-          class="review-button update-button"
+          class="calm-button"
           text="Next"
           :disabled="noNextAvailable"
           :on-click="next"
@@ -96,7 +96,7 @@
         <SmartButton
           v-if="reviewMode === ReviewMode.SPACE"
           ref="prevButton"
-          class="review-button update-button"
+          class="calm-button"
           text="Prev"
           :disabled="noPrevAvailable"
           :on-click="prev"
@@ -105,7 +105,7 @@
         />
         <SmartButton
           v-if="reviewMode === ReviewMode.SPACE"
-          class="review-button move-back-button"
+          class="decision-button dangerous-button"
           text="Move back"
           :disabled="noNextAvailable"
           :hidden="noNextAvailable"
@@ -117,7 +117,7 @@
         <SmartButton
           v-if="reviewMode === ReviewMode.SPACE"
           ref="nextButton"
-          class="review-button update-button"
+          class="calm-button"
           text="Next"
           :disabled="noNextAvailable"
           :on-click="next"
@@ -552,6 +552,10 @@ function handleKeydown(event: KeyboardEvent) {
   padding: 2px;
   width: 50px;
   text-align: center;
+}
+
+.decision-button {
+  --smart-button--width: 130px;
 }
 
 </style>
