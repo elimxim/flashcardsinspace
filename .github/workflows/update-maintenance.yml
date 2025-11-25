@@ -1,4 +1,4 @@
-name: Deploy Maintenance Mode
+name: Update Maintenance Page
 
 on:
   workflow_dispatch:
