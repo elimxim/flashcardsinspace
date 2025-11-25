@@ -32,7 +32,12 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: routeNames.base,
-    redirect: { name: routeNames.home },
+    redirect: () => {
+      const authStore = useAuthStore()
+      return authStore.isAuthenticated
+        ? { name: routeNames.controlPanel }
+        : { name: routeNames.home }
+    },
   },
   {
     path: '/control-panel',
