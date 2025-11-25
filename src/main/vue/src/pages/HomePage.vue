@@ -33,13 +33,13 @@
 
       <div class="what-actions">
         <SmartButton
-          text="New to the galaxy?"
+          text="Ready to start your journey?"
           class="what-action-button what-action-button--signup"
           :on-click="navigateToSignup"
           rounded
         />
         <SmartButton
-          text="Been abducted by us before?"
+          text="Experienced space traveller?"
           class="what-action-button what-action-button--login"
           :on-click="navigateToLogin"
           rounded
