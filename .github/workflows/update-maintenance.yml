@@ -1,0 +1,66 @@
+name: Deploy Maintenance Mode
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-maintenance:
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+    if: github.actor == 'elimxim'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Copy maintenance files
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: 22
+          source: "maintenance/*"
+          target: "/tmp/maintenance_upload"
+          strip_components: 1
+
+      - name: Update maintenance directory
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            # --- Configuration ---
+            MAINTENANCE_DIR="/var/www/html/maintenance"
+            TEMP_UPLOAD_DIR="/tmp/maintenance_upload"
+            # --- End Configuration ---
+  
+            echo "----> Starting maintenance mode deployment"
+
+            # 1. Create maintenance directory if it doesn't exist
+            echo "----> Creating maintenance directory"
+            mkdir -p "${MAINTENANCE_DIR}"
+
+            # 2. Clear existing maintenance files
+            echo "----> Clearing existing maintenance files"
+            rm -rf "${MAINTENANCE_DIR}"/*
+
+            # 3. Copy new maintenance files
+            echo "----> Copying new maintenance files"
+            cp -r "${TEMP_UPLOAD_DIR}"/* "${MAINTENANCE_DIR}/"
+
+            # 4. Set permissions
+            echo "----> Setting permissions"
+            chmod -R 644 "${MAINTENANCE_DIR}"/*
+            find "${MAINTENANCE_DIR}" -type d -exec chmod 755 {} \;
+
+            # 5. Clean up temporary files
+            echo "----> Cleaning up temporary files"
+            rm -rf "${TEMP_UPLOAD_DIR}"
+
+            # 6. Verify deployment
+            echo "----> Verifying maintenance files"
+            ls -la "${MAINTENANCE_DIR}"
+
+            echo "----> Maintenance mode deployment completed successfully!"
