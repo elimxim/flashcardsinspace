@@ -55,6 +55,8 @@ const flashcardCount = computed(() => flashcards.value.length)
   align-items: center;
   background: var(--f-bar--bg-color);
   gap: 40px;
+  height: fit-content;
+  max-height: max-content;
 }
 
 .language-info {
@@ -104,16 +106,26 @@ const flashcardCount = computed(() => flashcards.value.length)
 
 .fade-slide-enter-active,
 .fade-slide-leave-active {
-  transition: all 0.3s ease;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
 }
 
 .fade-slide-enter-from {
+  max-height: 0;
   opacity: 0;
-  transform: translateY(-10px);
+}
+
+.fade-slide-enter-to {
+  max-height: 100px;
+  opacity: 0;
+}
+
+.fade-slide-leave-from {
+  max-height: 100px;
+  opacity: 1;
 }
 
 .fade-slide-leave-to {
+  max-height: 0;
   opacity: 0;
-  transform: translateY(-10px);
 }
 </style>
