@@ -18,6 +18,7 @@
         text="VIEW"
         class="special-stage-button"
         :on-click="startReview"
+        :disabled="flashcardsCount === 0"
         :title-scale="1.1"
         fill-width
         fill-height
@@ -54,6 +55,7 @@ const flashcardsCount = computed(() =>
 )
 
 function startReview() {
+  if (flashcardsCount.value === 0) return
   router.push({ name: routeNames.review, query: { stage: props.stage.name } })
 }
 
@@ -68,6 +70,7 @@ function startReview() {
   --s-widget--number--bg: var(--special-stage-widget--number--bg, rgba(255, 255, 255, 0.6));
   --s-widget--button--bg: var(--special-stage-widget--button--bg, rgba(0, 0, 0, 0.22));
   --s-widget--button--bg--hover: var(--special-stage-widget--button--bg--hover, rgba(0, 0, 0, 0.35));
+  --s-widget--button--bg--disabled: var(--special-stage-widget--button--bg--disabled, rgba(0, 0, 0, 0.1));
 }
 
 .special-stage-widget {
@@ -141,6 +144,7 @@ function startReview() {
   --smart-button--border-radius: 6px;
   --smart-button--bg: var(--s-widget--button--bg);
   --smart-button--bg--hover: var(--s-widget--button--bg--hover);
+  --smart-button--bg--disabled: var(--s-widget--button--bg--disabled);
 }
 
 .special-stage-widget:hover .special-stage-icon {
