@@ -11,9 +11,8 @@
     <div
       ref="lilrocket"
       class="lilrocket"
-      @mousedown="onMouseDown"
-      @mouseup="onMouseUp"
-      @mouseleave="onMouseUp"
+      @mouseenter="onMouseEnter"
+      @mouseleave="onMouseLeave"
     >
       <SmartPicture
         alt="Lilrocket"
@@ -97,6 +96,12 @@ const toaster = useSpaceToaster()
 const userEmail = ref('')
 const userPassword = ref('')
 const loginFailed = ref(false)
+const rocketVerticalAngle = ref(50)
+const rocketVerticalAngleDeg = computed(() => `${rocketVerticalAngle.value}deg`)
+const rocketVerticalAnglePlusOneDeg = computed(() => `${rocketVerticalAngle.value + 1}deg`)
+const rocketVerticalAngleMinusOneDeg = computed(() => `${rocketVerticalAngle.value - 1}deg`)
+const rocketHorizontalAngle = ref(-40)
+const rocketHorizontalAngleDeg = computed(() => `${rocketHorizontalAngle.value}deg`)
 
 const $v = useVuelidate({
   userEmail: { required, email },
@@ -174,7 +179,7 @@ const rockets = [
 const lilrocket = ref<HTMLElement>()
 const currRocketIdx = ref(0)
 const currRocketImg = computed(() => `/assets/rocket/${rockets[currRocketIdx.value]}`)
-let pressTimer: number | undefined
+let flyTimer: number | undefined
 
 function setRandomLilrocket() {
   currRocketIdx.value = Math.floor(Math.random() * rockets.length)
@@ -188,8 +193,8 @@ function setNextLilrocket() {
   currRocketIdx.value = nextIdx
 }
 
-function onMouseDown() {
-  pressTimer = window.setTimeout(() => {
+function onMouseEnter() {
+  flyTimer = window.setTimeout(() => {
     if (!lilrocket.value) return
     lilrocket.value.classList.add('fly-away')
     setTimeout(() => {
@@ -200,14 +205,14 @@ function onMouseDown() {
         setNextLilrocket()
       })
     }, 4000)
-  }, 500)
+  }, 1000)
 }
 
-function onMouseUp() {
+function onMouseLeave() {
   if (lilrocket.value) {
     lilrocket.value.classList.remove('powering-up')
   }
-  clearTimeout(pressTimer)
+  clearTimeout(flyTimer)
 }
 
 onMounted(() => {
@@ -227,10 +232,6 @@ onMounted(() => {
   animation: shake 4s infinite ease-in-out;
   margin: 0 auto;
   z-index: 100;
-}
-
-.lilrocket.initial-bounce {
-  animation: shake 4s infinite 1s ease-in-out;
 }
 
 .lilrocket:hover {
@@ -283,72 +284,74 @@ onMounted(() => {
     transform: rotate(0deg);
   }
   10% {
-    transform: rotate(70deg);
+    transform: rotate(v-bind(rocketVerticalAngleDeg)deg);
   }
 
   /* 2. Powering-up */
   12% {
-    transform: translate(1px, 1px) rotate(71deg) scale(1.0);
+    transform: translate(1px, 1px) rotate(v-bind(rocketVerticalAnglePlusOneDeg)) scale(1.0);
   }
   14% {
-    transform: translate(-1px, -2px) rotate(69deg) scale(1.02);
+    transform: translate(-1px, -2px) rotate(v-bind(rocketVerticalAngleMinusOneDeg)) scale(1.02);
   }
   16% {
-    transform: translate(-3px, 0px) rotate(71deg) scale(1.04);
+    transform: translate(-3px, 0px) rotate(v-bind(rocketVerticalAnglePlusOneDeg)) scale(1.04);
   }
   18% {
-    transform: translate(3px, 2px) rotate(70deg) scale(1.06);
+    transform: translate(3px, 2px) rotate(v-bind(rocketVerticalAngleDeg)) scale(1.06);
   }
   20% {
-    transform: translate(1px, -1px) rotate(71deg) scale(1.08);
+    transform: translate(1px, -1px) rotate(v-bind(rocketVerticalAnglePlusOneDeg)) scale(1.08);
   }
   22% {
-    transform: translate(-1px, 2px) rotate(69deg) scale(1.1);
+    transform: translate(-1px, 2px) rotate(v-bind(rocketVerticalAngleMinusOneDeg)) scale(1.1);
   }
   24% {
-    transform: translate(-3px, 1px) rotate(70deg) scale(1.08);
+    transform: translate(-3px, 1px) rotate(v-bind(rocketVerticalAngleDeg)) scale(1.08);
   }
   26% {
-    transform: translate(3px, 1px) rotate(69deg) scale(1.06);
+    transform: translate(3px, 1px) rotate(v-bind(rocketVerticalAngleMinusOneDeg)) scale(1.06);
   }
   28% {
-    transform: translate(-1px, -1px) rotate(71deg) scale(1.04);
+    transform: translate(-1px, -1px) rotate(v-bind(rocketVerticalAnglePlusOneDeg)) scale(1.04);
   }
   30% {
-    transform: translate(1px, 2px) rotate(70deg) scale(1.02);
+    transform: translate(1px, 2px) rotate(v-bind(rocketVerticalAngleDeg)) scale(1.02);
   }
   32% {
-    transform: translate(1px, -2px) rotate(69deg) scale(1.0);
+    transform: translate(1px, -2px) rotate(v-bind(rocketVerticalAngleMinusOneDeg)) scale(1.0);
   }
   34% {
-    transform: translate(3px, 1px) rotate(69deg) scale(1.06);
+    transform: translate(3px, 1px) rotate(v-bind(rocketVerticalAngleMinusOneDeg)) scale(1.06);
   }
   36% {
-    transform: translate(-1px, -1px) rotate(71deg) scale(1.04);
+    transform: translate(-1px, -1px) rotate(v-bind(rocketVerticalAnglePlusOneDeg)) scale(1.04);
   }
   38% {
-    transform: translate(1px, 2px) rotate(69deg) scale(1.02);
+    transform: translate(1px, 2px) rotate(v-bind(rocketVerticalAngleMinusOneDeg)) scale(1.02);
   }
   40% {
-    transform: translate(1px, -2px) rotate(70deg) scale(1.0);
+    transform: translate(1px, -2px) rotate(v-bind(rocketVerticalAngleDeg)) scale(1.0);
   }
 
   /* 3. Flies to the top of the screen */
   55% {
-    transform: translateY(-55vh) rotate(70deg) scale(1.0);
+    transform: translateY(-60vh) rotate(v-bind(rocketVerticalAngleDeg)) scale(1.0);
   }
 
   /* 5. Teleportation to the right and awaiting */
   55.01% {
-    transform: translateX(65vw) translateY(0vh) rotate(-20deg) scale(1.0);
-  }
-  65% {
-    transform: translateX(65vw) translateY(0vh) rotate(-20deg) scale(1.0);
+    transform: translateX(70vw) translateY(0vh) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1.0);
   }
 
-  /* 4. Flies from the right to the left */
+  /* 6. Wait for a little bit */
+  65% {
+    transform: translateX(70vw) translateY(0vh) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1.0);
+  }
+
+  /* 7. Flies from the right to the left */
   100% {
-    transform: translateX(-65vw) rotate(-20deg) scale(1.0);
+    transform: translateX(-70vw) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1.0);
   }
 }
 
