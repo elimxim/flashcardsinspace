@@ -1,9 +1,19 @@
+/*
+ * Copyright (c) 2025 Maksim Eliseev. All rights reserved.
+ *
+ * This file is part of Flashcards in Space.
+ *
+ * This software is proprietary and confidential. Unauthorized copying,
+ * distribution, or use is strictly prohibited.
+ *
+ * For licensing information, see LICENSE file in the project root.
+ */
+
 package com.github.elimxim.flashcardsinspace.schedule
 
 import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
 import com.github.elimxim.flashcardsinspace.entity.FlashcardStage.*
 import com.github.elimxim.flashcardsinspace.entity.TERMINAL_STAGE_NAME
-import kotlin.collections.joinToString
 
 val lightspeedCfg = mapOf(
     S1 to interval(delay = 0, gap = 1),
