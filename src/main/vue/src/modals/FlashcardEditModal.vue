@@ -170,7 +170,7 @@ async function fetchAudio() {
   await Promise.all([
     (async function () {
       if (frontSideAudioId.value) {
-        return await fetchFlashcardAudioBlob(set, card, true)
+        return await fetchFlashcardAudioBlob(set.id, card.id, true)
           .then((blob) => {
             frontSideAudio.value = blob
             frontSideAudioSize.value = blob?.size
@@ -182,7 +182,7 @@ async function fetchAudio() {
     })(),
     (async function () {
       if (backSideAudioId.value) {
-        return await fetchFlashcardAudioBlob(set, card, false)
+        return await fetchFlashcardAudioBlob(set.id, card.id, false)
           .then((blob) => {
             backSideAudio.value = blob
             backSideAudioSize.value = blob?.size

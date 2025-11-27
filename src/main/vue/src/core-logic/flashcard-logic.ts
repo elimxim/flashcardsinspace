@@ -14,6 +14,7 @@ import {
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useAudioCache } from '@/stores/audio-cache.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
+import { Ref } from 'vue'
 
 export const flashcardSetStatuses = {
   ACTIVE: 'ACTIVE',
@@ -106,31 +107,29 @@ export function mapFlashcardSetExtra(flashcardSetExtras: FlashcardSetExtra[]): M
 }
 
 export async function fetchFlashcardAudioBlob(
-  flashcardSet: FlashcardSet | undefined,
-  flashcard: Flashcard | undefined,
+  flashcardSetId: number,
+  flashcardId: number,
   isFrontSide: boolean,
 ): Promise<Blob | undefined> {
-  if (!flashcardSet || !flashcard) return undefined
-
   const audioStore = useAudioStore()
   const audioCache = useAudioCache()
   const toaster = useSpaceToaster()
 
-  const cachedAudio = audioCache.getAudio(flashcard.id, isFrontSide)
+  const cachedAudio = audioCache.getAudio(flashcardId, isFrontSide)
   if (cachedAudio) {
-    console.log(`Returning cached audio for flashcard ${flashcard.id}, isFrontSide: ${isFrontSide}`)
+    console.log(`Returning cached audio for flashcard ${flashcardId}, isFrontSide: ${isFrontSide}`)
     return cachedAudio
   }
 
-  return await sendFlashcardAudioFetchRequest(flashcardSet.id, flashcard.id, getFlashcardSide(isFrontSide))
+  return await sendFlashcardAudioFetchRequest(flashcardSetId, flashcardId, getFlashcardSide(isFrontSide))
     .then((response) => {
       const audioId = Number(response.headers['x-audio-id'])
-      audioStore.setAudioId(flashcard.id, getFlashcardSide(isFrontSide), audioId)
-      audioCache.addAudio(flashcard.id, response.data, isFrontSide)
+      audioStore.setAudioId(flashcardId, getFlashcardSide(isFrontSide), audioId)
+      audioCache.addAudio(flashcardId, response.data, isFrontSide)
       return response.data
     })
     .catch((error) => {
-      console.error(`Failed to fetch audio for flashcard ${flashcard.id}, isFrontSide: ${isFrontSide}`, error)
+      console.error(`Failed to fetch audio for flashcard ${flashcardId}, isFrontSide: ${isFrontSide}`, error)
       toaster.bakeError(`Couldn't fetch audio`, error.response?.data)
       return undefined
     })
@@ -183,4 +182,44 @@ export async function removeFlashcardAudioBlob(
       toaster.bakeError(`Couldn't remove audio`, error.response?.data)
       return false
     })
+}
+
+export async function fetchFlashcardAudio(
+  flashcardSetId: number | undefined,
+  flashcardId: number | undefined,
+  flashcardFrontSideAudioBlob: Ref<Blob | undefined>,
+  flashcardBackSideAudioBlob: Ref<Blob | undefined>,
+) {
+  if (!flashcardSetId || !flashcardId) {
+    flashcardFrontSideAudioBlob.value = undefined
+    flashcardBackSideAudioBlob.value = undefined
+    return
+  }
+
+  const audioStore = useAudioStore()
+
+  await Promise.all([
+    (async function () {
+      const frontSideAudioId = audioStore.getAudioId(flashcardId, flashcardSides.FRONT)
+      if (frontSideAudioId) {
+        return await fetchFlashcardAudioBlob(flashcardSetId, flashcardId, true)
+          .then((blob) => {
+            flashcardFrontSideAudioBlob.value = blob
+          })
+      } else {
+        flashcardFrontSideAudioBlob.value = undefined
+      }
+    })(),
+    (async function () {
+      const backSideAudioId = audioStore.getAudioId(flashcardId, flashcardSides.BACK)
+      if (backSideAudioId) {
+        return await fetchFlashcardAudioBlob(flashcardSetId, flashcardId, false)
+          .then((blob) => {
+            flashcardBackSideAudioBlob.value = blob
+          })
+      } else {
+        flashcardBackSideAudioBlob.value = undefined
+      }
+    })(),
+  ])
 }

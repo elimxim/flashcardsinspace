@@ -142,8 +142,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import {
   copyFlashcard,
-  fetchFlashcardAudioBlob,
-  flashcardSides,
+  fetchFlashcardAudio,
   updateFlashcard
 } from '@/core-logic/flashcard-logic.ts'
 import { nextStage, prevStage, Stage, stages } from '@/core-logic/stage-logic.ts'
@@ -172,7 +171,6 @@ import {
   markDaysAsCompleted,
   markDaysAsInProgress,
 } from '@/core-logic/chrono-logic.ts'
-import { useAudioStore } from '@/stores/audio-store.ts'
 
 const props = defineProps<{
   stage?: Stage,
@@ -183,7 +181,6 @@ const toaster = useSpaceToaster()
 const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
 const flashcardStore = useFlashcardStore()
-const audioStore = useAudioStore()
 
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
@@ -361,39 +358,12 @@ async function markDaysAndGoNext(flashcardSet: FlashcardSet) {
 }
 
 async function fetchAudio() {
-  const set = flashcardSet.value
-  const card = currFlashcard.value
-
-  if (!set || !card) {
-    flashcardFrontSideAudioBlob.value = undefined
-    flashcardBackSideAudioBlob.value = undefined
-    return
-  }
-
-  await Promise.all([
-    (async function () {
-      const frontSideAudioId = audioStore.getAudioId(card.id, flashcardSides.FRONT)
-      if (frontSideAudioId) {
-        return await fetchFlashcardAudioBlob(set, card, true)
-          .then((blob) => {
-            flashcardFrontSideAudioBlob.value = blob
-          })
-      } else {
-        flashcardFrontSideAudioBlob.value = undefined
-      }
-    })(),
-    (async function () {
-      const backSideAudioId = audioStore.getAudioId(card.id, flashcardSides.BACK)
-      if (backSideAudioId) {
-        return await fetchFlashcardAudioBlob(set, card, false)
-          .then((blob) => {
-            flashcardBackSideAudioBlob.value = blob
-          })
-      } else {
-        flashcardBackSideAudioBlob.value = undefined
-      }
-    })(),
-  ])
+  await fetchFlashcardAudio(
+    flashcardSet.value?.id,
+    currFlashcard.value?.id,
+    flashcardFrontSideAudioBlob,
+    flashcardBackSideAudioBlob,
+  )
 }
 
 function onFlashcardRemoved() {
