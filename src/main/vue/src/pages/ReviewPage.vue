@@ -16,7 +16,6 @@
       </template>
       <template #right>
         <AwesomeButton
-          ref="escapeButton"
           icon="fa-solid fa-circle-xmark"
           class="control-bar-button"
           tooltip="Finish review and leave"
@@ -51,79 +50,55 @@
         :flashcard-back-side-audio="flashcardBackSideAudioBlob"
       />
       <div class="review-nav">
-        <SmartButton
-          v-if="reviewMode === ReviewMode.LIGHTSPEED"
-          ref="stageDownButton"
-          text="Don't know"
-          class="decision-button dangerous-button"
-          :disabled="noNextAvailable"
-          :hidden="noNextAvailable"
-          :on-click="stageDown"
-          auto-blur
-          rounded
-        />
-        <SmartButton
-          v-if="reviewMode === ReviewMode.LIGHTSPEED"
-          ref="stageUpButton"
-          text="Know"
-          class="decision-button safe-button"
-          :disabled="noNextAvailable"
-          :hidden="noNextAvailable"
-          :on-click="stageUp"
-          auto-blur
-          rounded
-        />
-        <SmartButton
-          v-if="reviewMode === ReviewMode.SPECIAL"
-          ref="prevButton"
-          class="calm-button"
-          text="Prev"
-          :disabled="noPrevAvailable"
-          :on-click="prev"
-          auto-blur
-          rounded
-        />
-        <SmartButton
-          v-if="reviewMode === ReviewMode.SPECIAL"
-          ref="nextButton"
-          class="calm-button"
-          text="Next"
-          :disabled="noNextAvailable"
-          :on-click="next"
-          auto-blur
-          rounded
-        />
-        <SmartButton
-          v-if="reviewMode === ReviewMode.SPACE"
-          ref="prevButton"
-          class="calm-button"
-          text="Prev"
-          :disabled="noPrevAvailable"
-          :on-click="prev"
-          auto-blur
-          rounded
-        />
-        <SmartButton
-          v-if="reviewMode === ReviewMode.SPACE"
-          class="decision-button dangerous-button"
-          text="Move back"
-          :disabled="noNextAvailable"
-          :hidden="noNextAvailable"
-          :on-click="moveBack"
-          :hold-time="1.2"
-          auto-blur
-          rounded
-        />
-        <SmartButton
-          v-if="reviewMode === ReviewMode.SPACE"
-          ref="nextButton"
-          class="calm-button"
-          text="Next"
-          :disabled="noNextAvailable"
-          :on-click="next"
-          auto-blur
-          rounded
-        />
+        <template v-if="isLightspeedMode">
+          <SmartButton
+            text="Don't know"
+            class="decision-button dangerous-button"
+            :disabled="noNextAvailable"
+            :hidden="noNextAvailable"
+            :on-click="stageDown"
+            auto-blur
+            rounded
+          />
+          <SmartButton
+            text="Know"
+            class="decision-button safe-button"
+            :disabled="noNextAvailable"
+            :hidden="noNextAvailable"
+            :on-click="stageUp"
+            auto-blur
+            rounded
+          />
+        </template>
+        <template v-if="isSpecialOrSpaceMode">
+          <SmartButton
+            class="calm-button"
+            text="Prev"
+            :disabled="noPrevAvailable"
+            :on-click="prev"
+            auto-blur
+            rounded
+          />
+          <SmartButton
+            v-if="isSpaceMode"
+            class="decision-button dangerous-button"
+            text="Move back"
+            :disabled="noNextAvailable"
+            :hidden="noNextAvailable"
+            :on-click="moveBack"
+            :hold-time="1.2"
+            auto-blur
+            rounded
+          />
+          <SmartButton
+            class="calm-button"
+            text="Next"
+            :disabled="noNextAvailable"
+            :on-click="next"
+            auto-blur
+            rounded
+          />
+        </template>
       </div>
     </div>
   </div>
@@ -138,7 +113,7 @@ import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import {
   copyFlashcard,
@@ -160,17 +135,10 @@ import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { loadSelectedSetId } from '@/shared/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
-import {
-  loadFlashcardRelatedStoresById
-} from '@/shared/stores.ts'
-import {
-  sendFlashcardUpdateRequest
-} from '@/api/api-client.ts'
+import { loadFlashcardRelatedStoresById } from '@/shared/stores.ts'
+import { sendFlashcardUpdateRequest } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import {
-  markDaysAsCompleted,
-  markDaysAsInProgress,
-} from '@/core-logic/chrono-logic.ts'
+import { markDaysAsCompleted, markDaysAsInProgress } from '@/core-logic/chrono-logic.ts'
 
 const props = defineProps<{
   stage?: Stage,
@@ -185,17 +153,16 @@ const flashcardStore = useFlashcardStore()
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
 
+const reviewMode = computed(() => toReviewMode(props.stage))
+const isLightspeedMode = computed(() => reviewMode.value === ReviewMode.LIGHTSPEED)
+const isSpaceMode = computed(() => reviewMode.value === ReviewMode.SPACE)
+const isSpecialMode = computed(() => reviewMode.value === ReviewMode.SPECIAL)
+const isSpecialOrSpaceMode = computed(() => isSpecialMode.value || isSpaceMode.value)
+
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
-const escapeButton = ref<InstanceType<typeof AwesomeButton>>()
-const stageDownButton = ref<InstanceType<typeof SmartButton>>()
-const stageUpButton = ref<InstanceType<typeof SmartButton>>()
-const prevButton = ref<InstanceType<typeof SmartButton>>()
-const nextButton = ref<InstanceType<typeof SmartButton>>()
 
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 const reviewTopic = computed(() => props.stage?.displayName)
-const reviewMode = computed(() => toReviewMode(props.stage))
-const isLightspeedMode = computed(() => reviewMode.value === ReviewMode.LIGHTSPEED)
 const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
 const flashcardsTotal = ref(0)
 const flashcardsRemaining = computed(() => {
@@ -403,15 +370,15 @@ function handleKeydown(event: KeyboardEvent) {
 
   if (event.key === 'Escape') {
     event.stopPropagation()
-    escapeButton.value?.press()
+    finishReviewAndLeave()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
-    stageDownButton.value?.click()
-    prevButton.value?.click()
+    if (isLightspeedMode.value) stageDown()
+    if (isSpecialOrSpaceMode.value) prev()
   } else if (event.key === 'ArrowRight') {
     event.stopPropagation()
-    stageUpButton.value?.click()
-    nextButton.value?.click()
+    if (isLightspeedMode.value) stageUp()
+    if (isSpecialOrSpaceMode.value) next()
   }
 }
 
