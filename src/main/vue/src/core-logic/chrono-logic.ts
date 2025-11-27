@@ -1,6 +1,11 @@
 import { toSortedOrderNumbers } from '@/core-logic/stage-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 import { asIsoDateStr } from '@/utils/utils.ts'
+import { sendChronoBulkUpdateRequest } from '@/api/api-client.ts'
+import { storeToRefs } from 'pinia'
+import { useChronoStore } from '@/stores/chrono-store.ts'
+import { useSpaceToaster } from '@/stores/toast-store.ts'
+import { FlashcardSet } from '@/model/flashcard.ts'
 
 export const chronodayStatuses = {
   INITIAL: 'INITIAL',
@@ -137,4 +142,47 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
 
 function totalDays(year: number, month: number): number {
   return new Date(year, month, 0).getDate()
+}
+
+export async function markDaysAs(
+  flashcardSetId: number,
+  status: string,
+  acceptedStatuses: Set<string>,
+) {
+  const chronoStore = useChronoStore()
+  const toaster = useSpaceToaster()
+
+  const { chronodays, currDay } = storeToRefs(chronoStore)
+
+  if (!acceptedStatuses.has(currDay.value.status)) {
+    return
+  }
+
+  const days = selectConsecutiveDaysBefore(chronodays.value, currDay.value, acceptedStatuses)
+  if (days.length === 0) {
+    console.error(
+      `No days to mark as ${status}`,
+      `flashcard set ${flashcardSetId}`,
+      `current day: ${JSON.stringify(currDay.value)}`
+    )
+    return
+  }
+
+  await sendChronoBulkUpdateRequest(flashcardSetId, status, days)
+    .then((response) => {
+      chronoStore.updateDays(response.data.chronodays)
+      chronoStore.updateDayStreak(response.data.dayStreak)
+    })
+    .catch((error) => {
+      console.error(`Failed to mark days as ${status} for ${flashcardSetId}`, error.response?.data)
+      toaster.bakeError(`Couldn't move a flashcard`, error.response?.data)
+    })
+}
+
+export async function markDaysAsInProgress(flashcardSet: FlashcardSet) {
+  await markDaysAs(flashcardSet.id, chronodayStatuses.IN_PROGRESS, chronodayStatusesToProgressDay)
+}
+
+export async function markDaysAsCompleted(flashcardSet: FlashcardSet) {
+  await markDaysAs(flashcardSet.id, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
 }

@@ -165,15 +165,12 @@ import {
   loadFlashcardRelatedStoresById
 } from '@/shared/stores.ts'
 import {
-  sendChronoBulkUpdateRequest,
   sendFlashcardUpdateRequest
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import {
-  chronodayStatuses,
-  chronodayStatusesToCompleteDay,
-  chronodayStatusesToProgressDay,
-  selectConsecutiveDaysBefore
+  markDaysAsCompleted,
+  markDaysAsInProgress,
 } from '@/core-logic/chrono-logic.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
 
@@ -361,44 +358,6 @@ async function markDaysAndGoNext(flashcardSet: FlashcardSet) {
   } else if (isLightspeedMode.value) {
     await markDaysAsCompleted(flashcardSet)
   }
-}
-
-async function markDaysAsInProgress(flashcardSet: FlashcardSet) {
-  if (chronodayStatusesToProgressDay.has(currDay.value.status)) {
-    await markDaysAs(flashcardSet, chronodayStatuses.IN_PROGRESS, chronodayStatusesToProgressDay)
-  }
-}
-
-async function markDaysAsCompleted(flashcardSet: FlashcardSet) {
-  if (chronodayStatusesToCompleteDay.has(currDay.value.status)) {
-    await markDaysAs(flashcardSet, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
-  }
-}
-
-async function markDaysAs(
-  flashcardSet: FlashcardSet,
-  status: string,
-  acceptedStatuses: Set<string>,
-) {
-  const days = selectConsecutiveDaysBefore(chronodays.value, currDay.value, acceptedStatuses)
-  if (days.length === 0) {
-    console.error(
-      `No days to mark as ${status}`,
-      `flashcard set ${flashcardSet.id}`,
-      `current day: ${JSON.stringify(currDay.value)}`
-    )
-    return
-  }
-
-  await sendChronoBulkUpdateRequest(flashcardSet.id, status, days)
-    .then((response) => {
-      chronoStore.updateDays(response.data.chronodays)
-      chronoStore.updateDayStreak(response.data.dayStreak)
-    })
-    .catch((error) => {
-      console.error(`Failed to mark days as ${status} for ${flashcardSet.id}`, error.response?.data)
-      toaster.bakeError(`Couldn't move a flashcard`, error.response?.data)
-    })
 }
 
 async function fetchAudio() {
