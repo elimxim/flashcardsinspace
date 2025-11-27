@@ -367,19 +367,12 @@ async function fetchAudio() {
 }
 
 function onFlashcardRemoved() {
-  console.log('onFlashcardRemoved')
   nextFlashcard()
 }
 
 function onAudioChanged() {
-  console.log('onAudioChanged')
   fetchAudio()
 }
-
-watch(currFlashcard, (newVal) => {
-  console.log('Watch.currFlashcard', newVal?.id)
-  fetchAudio()
-})
 
 onMounted(async () => {
   if (!flashcardStore.loaded) {
