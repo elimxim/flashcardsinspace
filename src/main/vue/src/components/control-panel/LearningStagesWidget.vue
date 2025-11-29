@@ -87,9 +87,9 @@ const isStageInCurrentDay = (stage: Stage) => {
   return currDay.value?.stages?.includes(stage.name) ?? false
 }
 
-const captureOriginalHeights = () => {
+function captureOriginalHeights(force: boolean = false) {
   if (!gridRef.value || stageElements.value.length === 0) return
-  if (isHovering.value || isTransitioning.value) return
+  if ((isHovering.value || isTransitioning.value) && !force) return
 
   if (captureHeightTimeout.value) {
     clearTimeout(captureHeightTimeout.value)
@@ -97,7 +97,7 @@ const captureOriginalHeights = () => {
   }
 
   captureHeightTimeout.value = window.setTimeout(() => {
-    if (!isHovering.value && !isTransitioning.value) {
+    if ((!isHovering.value && !isTransitioning.value) || force) {
       const stageEl = stageElements.value[0]
       if (stageEl) {
         originalStageHeight.value = stageEl.offsetHeight
@@ -192,7 +192,7 @@ const handleResize = () => {
 
 onMounted(() => {
   nextTick().then(() => {
-    captureOriginalHeights()
+    captureOriginalHeights(true)
   })
 
   window.addEventListener('resize', handleResize)
