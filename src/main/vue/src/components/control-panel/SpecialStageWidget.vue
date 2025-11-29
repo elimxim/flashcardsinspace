@@ -71,6 +71,7 @@ function startReview() {
   --s-widget--button--bg: var(--special-stage-widget--button--bg, rgba(0, 0, 0, 0.22));
   --s-widget--button--bg--hover: var(--special-stage-widget--button--bg--hover, rgba(0, 0, 0, 0.35));
   --s-widget--button--bg--disabled: var(--special-stage-widget--button--bg--disabled, rgba(0, 0, 0, 0.1));
+  --s-widget--button--color--disabled: var(--special-stage-widget--button--color--disabled, rgba(255, 255, 255, 0.15));
 }
 
 .special-stage-widget {
@@ -145,6 +146,7 @@ function startReview() {
   --smart-button--bg: var(--s-widget--button--bg);
   --smart-button--bg--hover: var(--s-widget--button--bg--hover);
   --smart-button--bg--disabled: var(--s-widget--button--bg--disabled);
+  --smart-button--title--color--disabled: var(--s-widget--button--color--disabled);
 }
 
 .special-stage-widget:hover .special-stage-icon {
