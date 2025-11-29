@@ -161,19 +161,15 @@ const isSpecialOrSpaceMode = computed(() => isSpecialMode.value || isSpaceMode.v
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
-const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 const reviewTopic = computed(() => props.stage?.displayName)
+const flashcardSetName = computed(() => flashcardSet.value?.name || '')
+
 const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
 const flashcardsTotal = ref(0)
 const flashcardsRemaining = computed(() => {
   if (noNextAvailable.value) return 0
   return reviewQueue.value.remaining() + 1
 })
-const currFlashcard = ref<Flashcard>()
-const flashcardFrontSideAudioBlob = ref<Blob | undefined>()
-const flashcardBackSideAudioBlob = ref<Blob | undefined>()
-const autoPlayVoice = ref(false)
-const autoRepeatVoice = ref(false)
 const flashcardsSeen = computed(() =>
   Math.max(0, flashcardsTotal.value - flashcardsRemaining.value)
 )
@@ -185,13 +181,21 @@ const progress = computed(() => {
     return 0
   }
 })
+
+const noNextAvailable = computed(() => currFlashcard.value === undefined)
 const noPrevAvailable = computed(() => {
   if (flashcardsTotal.value === 1) {
     return !noNextAvailable.value
   }
   return flashcardsTotal.value === flashcardsRemaining.value
 })
-const noNextAvailable = computed(() => currFlashcard.value === undefined)
+
+const currFlashcard = ref<Flashcard>()
+const flashcardFrontSideAudioBlob = ref<Blob | undefined>()
+const flashcardBackSideAudioBlob = ref<Blob | undefined>()
+
+const autoPlayVoice = ref(false)
+const autoRepeatVoice = ref(false)
 
 async function prevFlashcard(): Promise<boolean> {
   currFlashcard.value = reviewQueue.value.prev()
@@ -242,36 +246,36 @@ async function finishReviewAndLeave() {
 }
 
 async function stageDown() {
-  if (flashcardSet.value && currFlashcard.value) {
-    spaceDeck.value?.willSlideToLeft()
-    const flashcard = copyFlashcard(currFlashcard.value)
-    updateFlashcard(flashcard, prevStage(flashcard.stage), currDay.value.chronodate)
-    const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
-    if (success) {
-      await markDaysAndGoNext(flashcardSet.value)
-    }
-  } else {
+  if (!flashcardSet.value || !currFlashcard.value) {
     console.error(`stageDown's impossible:`,
       `flashcard set ${flashcardSet.value?.id ?? 'undefined'}`,
       `flashcard ${currFlashcard.value?.id ?? 'undefined'}`
     )
+    return
+  }
+  spaceDeck.value?.willSlideToLeft()
+  const flashcard = copyFlashcard(currFlashcard.value)
+  updateFlashcard(flashcard, prevStage(flashcard.stage), currDay.value.chronodate)
+  const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
+  if (success) {
+    await getNextAndMarkDays(flashcardSet.value)
   }
 }
 
 async function stageUp() {
-  if (flashcardSet.value && currFlashcard.value) {
-    spaceDeck.value?.willSlideToRight()
-    const flashcard = copyFlashcard(currFlashcard.value)
-    updateFlashcard(flashcard, nextStage(flashcard.stage), currDay.value.chronodate)
-    const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
-    if (success) {
-      await markDaysAndGoNext(flashcardSet.value)
-    }
-  } else {
+  if (!flashcardSet.value || !currFlashcard.value) {
     console.error(`stageUp's impossible:`,
       `flashcard set ${flashcardSet.value?.id ?? 'undefined'}`,
       `flashcard ${currFlashcard.value?.id ?? 'undefined'}`
     )
+    return
+  }
+  spaceDeck.value?.willSlideToRight()
+  const flashcard = copyFlashcard(currFlashcard.value)
+  updateFlashcard(flashcard, nextStage(flashcard.stage), currDay.value.chronodate)
+  const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
+  if (success) {
+    await getNextAndMarkDays(flashcardSet.value)
   }
 }
 
@@ -286,19 +290,19 @@ async function next() {
 }
 
 async function moveBack() {
-  if (flashcardSet.value && currFlashcard.value) {
-    spaceDeck.value?.willSlideToLeft()
-    const flashcard = copyFlashcard(currFlashcard.value)
-    updateFlashcard(flashcard, stages.S1, currDay.value.chronodate)
-    const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
-    if (success) {
-      await nextFlashcard()
-    }
-  } else {
+  if (!flashcardSet.value || !currFlashcard.value) {
     console.error(`moveBack's impossible:`,
       `flashcard set ${flashcardSet.value?.id ?? 'undefined'}`,
       `flashcard ${currFlashcard.value?.id ?? 'undefined'}`
     )
+    return
+  }
+  spaceDeck.value?.willSlideToLeft()
+  const flashcard = copyFlashcard(currFlashcard.value)
+  updateFlashcard(flashcard, stages.S1, currDay.value.chronodate)
+  const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
+  if (success) {
+    await nextFlashcard()
   }
 }
 
@@ -316,7 +320,7 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
     })
 }
 
-async function markDaysAndGoNext(flashcardSet: FlashcardSet) {
+async function getNextAndMarkDays(flashcardSet: FlashcardSet) {
   if (await nextFlashcard() && isLightspeedMode.value) {
     await markDaysAsInProgress(flashcardSet)
   } else if (isLightspeedMode.value) {
