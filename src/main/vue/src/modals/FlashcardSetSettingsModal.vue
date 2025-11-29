@@ -73,7 +73,6 @@
       />
     </div>
   </Modal>
-  <SpaceToast/>
 </template>
 
 <script setup lang="ts">
@@ -83,7 +82,6 @@ import SmartButton from '@/components/SmartButton.vue'
 import SmartCheckbox from '@/components/SmartCheckbox.vue'
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
-import SpaceToast from '@/components/SpaceToast.vue'
 import ErrorText from '@/components/ErrorText.vue'
 import { computed, ref, watch } from 'vue'
 import { helpers, maxLength, required } from '@vuelidate/validators'

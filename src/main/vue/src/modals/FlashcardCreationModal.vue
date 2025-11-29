@@ -68,7 +68,6 @@
       />
     </div>
   </Modal>
-  <SpaceToast/>
 </template>
 
 <script setup lang="ts">
@@ -76,7 +75,6 @@ import Modal from '@/components/Modal.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import SmartInput from '@/components/SmartInput.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import SpaceToast from '@/components/SpaceToast.vue'
 import VoiceRecorder from '@/components/VoiceRecorder.vue'
 import ErrorText from '@/components/ErrorText.vue'
 import { computed, nextTick, ref, watch } from 'vue'

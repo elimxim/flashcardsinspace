@@ -67,14 +67,12 @@
       />
     </div>
   </Modal>
-  <SpaceToast/>
 </template>
 
 <script setup lang="ts">
 import Modal from '@/components/Modal.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import SpaceToast from '@/components/SpaceToast.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
