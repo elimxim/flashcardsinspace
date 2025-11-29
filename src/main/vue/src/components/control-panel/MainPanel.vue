@@ -34,26 +34,24 @@ import {
   onMounted,
   onUnmounted,
   ref,
-  watch,
   type Component,
   ComputedRef,
 } from 'vue'
 import { loadFlashcardSetStore } from '@/shared/stores.ts'
-import { useControlStore } from '@/stores/control-store.ts'
 import { specialStages } from '@/core-logic/stage-logic.ts'
 import { useFlip } from '@/utils/flip.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 
-const controlStore = useControlStore()
 const chronoStore = useChronoStore()
 
-const { isSidebarExpanded } = storeToRefs(controlStore)
 const { isInitialDay, isDayOff } = storeToRefs(chronoStore)
 
 const mainPanel = ref<HTMLElement>()
 const mainPanelWidth = ref(0)
 
 const { setupAuto } = useFlip(mainPanel)
+
+let resizeObserver: ResizeObserver | null = null
 
 setupAuto()
 
@@ -178,24 +176,21 @@ function updateMainPanelWidth() {
   }
 }
 
-function handleResize() {
-  updateMainPanelWidth()
-}
-
-watch(isSidebarExpanded, () => {
-  setTimeout(() => {
-    updateMainPanelWidth()
-  }, 300) // Match sidebar transition duration
-})
-
 onMounted(() => {
   loadFlashcardSetStore()
   updateMainPanelWidth()
-  window.addEventListener('resize', handleResize)
+
+  resizeObserver = new ResizeObserver(() => {
+    updateMainPanelWidth()
+  })
+
+  if (mainPanel.value) {
+    resizeObserver.observe(mainPanel.value)
+  }
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
+  resizeObserver?.disconnect()
 })
 </script>
 
