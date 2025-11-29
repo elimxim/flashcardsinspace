@@ -68,7 +68,7 @@ import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import {
   loadFlashcardRelatedStores,
   loadFlashcardSetStore,
@@ -77,6 +77,8 @@ import {
 import { saveSelectedSetId } from '@/shared/cookies.ts'
 import { FlashcardSet } from '@/model/flashcard.ts'
 import { useControlStore } from '@/stores/control-store.ts'
+
+const OVERLAY_BREAKPOINT = 660
 
 const flashcardStore = useFlashcardStore()
 const flashcardSetStore = useFlashcardSetStore()
@@ -90,6 +92,11 @@ const { isSidebarExpanded } = storeToRefs(controlStore)
 
 let animationTimeout: number | undefined
 const animating = ref(false)
+const isOverlay = ref(window.innerWidth <= OVERLAY_BREAKPOINT)
+
+function updateOverlayMode() {
+  isOverlay.value = window.innerWidth <= OVERLAY_BREAKPOINT
+}
 
 function toggle() {
   if (animationTimeout) {
@@ -125,15 +132,21 @@ function getLanguageName(set: FlashcardSet): string {
 
 defineExpose({
   toggle,
+  isOverlay,
 })
 
 onMounted(() => {
+  window.addEventListener('resize', updateOverlayMode)
   loadFlashcardSetStore()
     .then(async (loaded) => {
       if (loaded) {
         return reloadFlashcardRelatedStores()
       }
     })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateOverlayMode)
 })
 </script>
 
@@ -311,12 +324,12 @@ onMounted(() => {
   margin-left: 0.75rem;
 }
 
-@media (max-width: 660px) {
+@media (max-width: 660px) { /* same as overlayBreakpoint */
   .sidebar {
     position: absolute;
     left: 0;
     top: 0;
-    width: 330px;
+    width: clamp(200px, 50vw, 330px);
     z-index: 10;
     transform: translateX(0);
     margin-left: 0;
