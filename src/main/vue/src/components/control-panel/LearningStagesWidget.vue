@@ -233,7 +233,6 @@ onUnmounted(() => {
   --l-widget--bg: var(--stages-widget--bg, linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%));
   --l-widget--hex-line--color: var(--stages-widget--hex-line--color, rgba(0, 255, 255, 0.05));
   --l-widget--title--color: var(--stages-widget--title--color, rgba(13, 18, 74, 0.6));
-  --l-widget--stage--border-color: var(--stages-widget--stage--border-color, rgba(0, 178, 255, 0.6));
   --l-widget--stage--bg: var(--stages-widget--stage--bg, rgba(0, 0, 0, 0.22));
   --l-widget--stage--name--color: var(--stages-widget--stage--name--color, rgba(250, 249, 246, 0.7));
   --l-widget--stage--count--color: var(--stages-widget--stage--count--color, rgba(13, 18, 74, 0.6));
@@ -302,7 +301,6 @@ onUnmounted(() => {
 .stage {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--l-widget--stage--border-color);
   background: var(--l-widget--stage--bg);
   border-radius: 6px;
   justify-content: center;
