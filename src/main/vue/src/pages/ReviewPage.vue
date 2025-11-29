@@ -24,15 +24,15 @@
         />
       </template>
     </ControlBar>
+    <div class="review-progressbar">
+      <Progressbar
+        :progress="progress"
+        height="16px"
+      />
+    </div>
     <div class="review-info">
       <div class="review-count review-count--left">
         {{ flashcardsSeen }}
-      </div>
-      <div class="review-progressbar">
-        <Progressbar
-          :progress="progress"
-          height="16px"
-        />
       </div>
       <div class="review-count review-count--right">
         {{ flashcardsRemaining }}
@@ -391,7 +391,7 @@ function handleKeydown(event: KeyboardEvent) {
 <style scoped>
 .review-page--theme {
   --r-page--review-count--color: var(--review-page--review-count--color, rgba(17, 33, 85, 0.92));
-  --r-page--review-count--bg: var(--review-page--review-count--border-color, rgba(0, 0, 0, 0.1));
+  --r-page--review-count--bg: var(--review-page--review-count--border-color, rgba(88, 114, 209, 0.13));
   --progressbar--from: var(--review-progressbar--from);
   --progressbar--via: var(--review-progressbar--via);
   --progressbar--to: var(--review-progressbar--to);
@@ -434,15 +434,17 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .review-progressbar {
-  flex: 1;
+  width: 100%;
 }
 
 .review-count {
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--r-page--review-count--color);
   background: var(--r-page--review-count--bg);
   padding: 2px;
+  margin: 2px;
+  border-radius: 6px;
   width: 50px;
   text-align: center;
 }
