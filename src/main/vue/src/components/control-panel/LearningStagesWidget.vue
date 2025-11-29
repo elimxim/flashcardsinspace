@@ -4,8 +4,8 @@
     :class="{
       'stages-widget--hex-grid': isHovering,
     }"
-    @mouseenter="isHovering = true"
-    @mouseleave="isHovering = false"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
   >
     <div class="stages-title">
       Learning Stages
@@ -67,6 +67,7 @@ const stageHeights = ref<number[]>(Array(7).fill(0))
 const stageElements = ref<HTMLElement[]>([])
 const resizeObserver = ref<ResizeObserver>()
 const isHovering = ref(false)
+const hoverDelayTimeout = ref<number>()
 const originalStageHeight = ref<number>(0)
 const originalGridHeight = ref<number>(0)
 const captureHeightTimeout = ref<number>()
@@ -183,6 +184,20 @@ watch(isHovering, (newVal, oldVal) => {
   calculateStageOffsets()
 })
 
+function handleMouseEnter() {
+  hoverDelayTimeout.value = window.setTimeout(() => {
+    isHovering.value = true
+  }, 150)
+}
+
+function handleMouseLeave() {
+  if (hoverDelayTimeout.value) {
+    clearTimeout(hoverDelayTimeout.value)
+    hoverDelayTimeout.value = undefined
+  }
+  isHovering.value = false
+}
+
 const handleResize = () => {
   if (!isHovering.value && !isTransitioning.value) {
     captureOriginalHeights()
@@ -219,6 +234,11 @@ onUnmounted(() => {
   if (transitionTimeout.value) {
     clearTimeout(transitionTimeout.value)
     transitionTimeout.value = undefined
+  }
+
+  if (hoverDelayTimeout.value) {
+    clearTimeout(hoverDelayTimeout.value)
+    hoverDelayTimeout.value = undefined
   }
 
   isHovering.value = false
