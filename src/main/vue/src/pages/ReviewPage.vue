@@ -122,6 +122,7 @@ import SpaceDeck from '@/components/SpaceDeck.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
+import Starfield from '@/components/Starfield.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -149,7 +150,6 @@ import { loadFlashcardRelatedStoresById } from '@/shared/stores.ts'
 import { sendFlashcardUpdateRequest } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { markDaysAsCompleted, markDaysAsInProgress } from '@/core-logic/chrono-logic.ts'
-import Starfield from '@/components/Starfield.vue';
 
 const props = defineProps<{
   stage?: Stage,
