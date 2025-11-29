@@ -25,81 +25,90 @@
         />
       </template>
     </ControlBar>
-    <div class="review-progressbar">
-      <Progressbar
-        :progress="progress"
-        height="16px"
+    <div class="review-layout">
+      <Starfield
+        v-if="isSpaceMode"
+        :density="120"
+        :star-size="1.8"
+        twinkle
+        vertical-drift="3px"
       />
-    </div>
-    <div class="review-info">
-      <div class="review-count review-count--left">
-        {{ flashcardsSeen }}
+      <div class="review-progressbar">
+        <Progressbar
+          :progress="progress"
+          height="16px"
+        />
       </div>
-      <div class="review-count review-count--right">
-        {{ flashcardsRemaining }}
+      <div class="review-info">
+        <div class="review-count review-count--left">
+          {{ flashcardsSeen }}
+        </div>
+        <div class="review-count review-count--right">
+          {{ flashcardsRemaining }}
+        </div>
       </div>
-    </div>
-    <div class="review-body">
-      <SpaceDeck
-        ref="spaceDeck"
-        v-model:flashcard="currFlashcard"
-        v-model:auto-play-voice="autoPlayVoice"
-        v-model:auto-repeat-voice="autoRepeatVoice"
-        :on-flashcard-removed="onFlashcardRemoved"
-        :on-audio-changed="onAudioChanged"
-        :flashcard-front-side-audio="flashcardFrontSideAudioBlob"
-        :flashcard-back-side-audio="flashcardBackSideAudioBlob"
-      />
-      <div class="review-nav">
-        <template v-if="isLightspeedMode">
-          <SmartButton
-            text="Don't know"
-            class="decision-button dangerous-button"
-            :disabled="noNextAvailable"
-            :hidden="noNextAvailable"
-            :on-click="stageDown"
-            auto-blur
-            rounded
-          />
-          <SmartButton
-            text="Know"
-            class="decision-button safe-button"
-            :disabled="noNextAvailable"
-            :hidden="noNextAvailable"
-            :on-click="stageUp"
-            auto-blur
-            rounded
-          />
-        </template>
-        <template v-if="isSpecialOrSpaceMode">
-          <SmartButton
-            class="calm-button"
-            text="Prev"
-            :disabled="noPrevAvailable"
-            :on-click="prev"
-            auto-blur
-            rounded
-          />
-          <SmartButton
-            v-if="isSpaceMode"
-            class="decision-button dangerous-button"
-            text="Move back"
-            :disabled="noNextAvailable"
-            :hidden="noNextAvailable"
-            :on-click="moveBack"
-            :hold-time="1.2"
-            auto-blur
-            rounded
-          />
-          <SmartButton
-            class="calm-button"
-            text="Next"
-            :disabled="noNextAvailable"
-            :on-click="next"
-            auto-blur
-            rounded
-          />
-        </template>
+      <div class="review-body">
+        <SpaceDeck
+          ref="spaceDeck"
+          v-model:flashcard="currFlashcard"
+          v-model:auto-play-voice="autoPlayVoice"
+          v-model:auto-repeat-voice="autoRepeatVoice"
+          :on-flashcard-removed="onFlashcardRemoved"
+          :on-audio-changed="onAudioChanged"
+          :flashcard-front-side-audio="flashcardFrontSideAudioBlob"
+          :flashcard-back-side-audio="flashcardBackSideAudioBlob"
+        />
+        <div class="review-nav">
+          <template v-if="isLightspeedMode">
+            <SmartButton
+              text="Don't know"
+              class="decision-button dangerous-button"
+              :disabled="noNextAvailable"
+              :hidden="noNextAvailable"
+              :on-click="stageDown"
+              auto-blur
+              rounded
+            />
+            <SmartButton
+              text="Know"
+              class="decision-button safe-button"
+              :disabled="noNextAvailable"
+              :hidden="noNextAvailable"
+              :on-click="stageUp"
+              auto-blur
+              rounded
+            />
+          </template>
+          <template v-if="isSpecialOrSpaceMode">
+            <SmartButton
+              class="calm-button"
+              text="Prev"
+              :disabled="noPrevAvailable"
+              :on-click="prev"
+              auto-blur
+              rounded
+            />
+            <SmartButton
+              v-if="isSpaceMode"
+              class="decision-button dangerous-button"
+              text="Move back"
+              :disabled="noNextAvailable"
+              :hidden="noNextAvailable"
+              :on-click="moveBack"
+              :hold-time="1.2"
+              auto-blur
+              rounded
+            />
+            <SmartButton
+              class="calm-button"
+              text="Next"
+              :disabled="noNextAvailable"
+              :on-click="next"
+              auto-blur
+              rounded
+            />
+          </template>
+        </div>
       </div>
     </div>
   </div>
@@ -140,6 +149,7 @@ import { loadFlashcardRelatedStoresById } from '@/shared/stores.ts'
 import { sendFlashcardUpdateRequest } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { markDaysAsCompleted, markDaysAsInProgress } from '@/core-logic/chrono-logic.ts'
+import Starfield from '@/components/Starfield.vue';
 
 const props = defineProps<{
   stage?: Stage,
@@ -413,6 +423,16 @@ function handleKeydown(event: KeyboardEvent) {
   word-spacing: 0.05rem;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+.review-layout {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .review-body {
