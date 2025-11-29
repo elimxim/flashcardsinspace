@@ -18,8 +18,8 @@
             icon="fa-solid fa-bars"
             class="control-bar-button"
             :on-click="sidebar?.toggle"
-            :hidden="isSidebarExpanded"
-            :disabled="isSidebarExpanded"
+            :hidden="isSidebarExpanded && !isSidebarOverlay"
+            :disabled="isSidebarExpanded && !isSidebarOverlay"
           />
         </template>
         <template #right>
@@ -35,7 +35,7 @@
       </ControlBar>
       <div class="control-panel-content scrollbar-hidden">
         <FlashcardInfoBar
-          :hidden="!flashcardSet || isSidebarExpanded"
+          :hidden="!flashcardSet || (isSidebarExpanded && !isSidebarOverlay)"
         />
         <MainPanel/>
         <LearningStagesWidget :grow-multiplier="3"/>
@@ -77,6 +77,8 @@ const { flashcardSet } = storeToRefs(flashcardStore)
 const { isSidebarExpanded } = storeToRefs(controlStore)
 
 const sidebar = ref<InstanceType<typeof SideBar>>()
+const isSidebarOverlay = computed(() => sidebar.value?.isOverlay ?? false)
+
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 function openFlashcardSetSettings() {
