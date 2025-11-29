@@ -236,7 +236,7 @@ onUnmounted(() => {
   --l-widget--stage--bg: var(--stages-widget--stage--bg, rgba(0, 0, 0, 0.22));
   --l-widget--stage--name--color: var(--stages-widget--stage--name--color, rgba(250, 249, 246, 0.7));
   --l-widget--stage--count--color: var(--stages-widget--stage--count--color, rgba(13, 18, 74, 0.6));
-  --l-widget--stage--count--bg: var(--stages-widget--stage--count--bg, rgb(225, 228, 240));
+  --l-widget--stage--count--bg: var(--stages-widget--stage--count--bg, rgba(255, 255, 255, 0.6));
 }
 
 .stages-widget {
