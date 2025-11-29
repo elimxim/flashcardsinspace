@@ -1,13 +1,18 @@
 <template>
-  <div
-    class="sidebar-overlay"
-    :class="{ 'sidebar-overlay--visible': isSidebarExpanded }"
-    @click="toggle"
-  />
-  <div
-    class="sidebar sidebar--theme"
-    :class="{ 'sidebar--collapsed': !isSidebarExpanded }"
-  >
+  <div class="sidebar-wrapper">
+    <div
+      class="sidebar-overlay"
+      :class="{ 'sidebar-overlay--visible': isSidebarExpanded && isOverlay }"
+      @click="toggle"
+    />
+    <div
+      class="sidebar sidebar--theme"
+      :class="{
+        'sidebar--collapsed': !isSidebarExpanded,
+        'sidebar--overlay': isOverlay,
+        'sidebar--no-transition': isTransitioning
+      }"
+    >
     <ControlBar
       class="sidebar-control-bar"
       title="FLASHCARD SETS"
@@ -55,7 +60,7 @@
       </div>
     </div>
   </div>
-  <SpaceToast/>
+</div>
 </template>
 
 <script setup lang="ts">
@@ -90,23 +95,26 @@ const { flashcardSet } = storeToRefs(flashcardStore)
 const { flashcardSets } = storeToRefs(flashcardSetStore)
 const { isSidebarExpanded } = storeToRefs(controlStore)
 
-let animationTimeout: number | undefined
-const animating = ref(false)
 const isOverlay = ref(window.innerWidth <= OVERLAY_BREAKPOINT)
+const isTransitioning = ref(false)
 
 function updateOverlayMode() {
-  isOverlay.value = window.innerWidth <= OVERLAY_BREAKPOINT
+  const wasOverlay = isOverlay.value
+  const nowOverlay = window.innerWidth <= OVERLAY_BREAKPOINT
+
+  if (wasOverlay !== nowOverlay) {
+    isTransitioning.value = true
+    isOverlay.value = nowOverlay
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        isTransitioning.value = false
+      })
+    })
+  }
 }
 
 function toggle() {
-  if (animationTimeout) {
-    window.clearTimeout(animationTimeout)
-  }
-  animating.value = true
   controlStore.toggleSidebar()
-  animationTimeout = window.setTimeout(() => {
-    animating.value = false
-  }, 400)
 }
 
 async function selectFlashcardSet(setId: number) {
@@ -176,21 +184,58 @@ onUnmounted(() => {
 
 .sidebar-overlay {
   display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease-in-out;
+}
+
+.sidebar-overlay--visible {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar-wrapper {
+  position: relative;
+  align-self: stretch;
+  flex-shrink: 0;
 }
 
 .sidebar {
-  position: relative;
   display: flex;
   flex-direction: column;
   width: clamp(200px, 40vw, 260px);
   height: 100%;
   background: var(--bar--bg);
-  transition: margin-left 0.35s ease-in-out, transform 0.35s ease-in-out, width 0.35s ease-in-out;
   overflow: hidden;
+  transition: margin-left 0.35s ease-in-out;
 }
 
 .sidebar--collapsed {
-  margin-left: clamp(-260px, -40vw, -200px);
+  margin-left: calc(-1 * clamp(200px, 40vw, 260px));
+}
+
+.sidebar--overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: clamp(200px, 50vw, 330px);
+  margin-left: 0;
+  transition: transform 0.35s ease-in-out;
+}
+
+.sidebar--overlay.sidebar--collapsed {
+  transform: translateX(-100%);
+}
+
+.sidebar--no-transition {
+  transition: none !important;
 }
 
 .sidebar-control-bar {
@@ -324,39 +369,4 @@ onUnmounted(() => {
   margin-left: 0.75rem;
 }
 
-@media (max-width: 660px) { /* same as overlayBreakpoint */
-  .sidebar {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: clamp(200px, 50vw, 330px);
-    z-index: 10;
-    transform: translateX(0);
-    margin-left: 0;
-  }
-
-  .sidebar--collapsed {
-    margin-left: 0;
-    transform: translateX(-100%);
-  }
-
-  .sidebar-overlay {
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 9;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.35s ease-in-out;
-  }
-
-  .sidebar-overlay--visible {
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
 </style>

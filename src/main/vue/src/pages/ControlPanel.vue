@@ -8,9 +8,7 @@
       'control-panel--theme',
     ]"
   >
-    <div class="control-sidebar">
-      <SideBar ref="sidebar"/>
-    </div>
+    <SideBar ref="sidebar" style="z-index: 200;"/>
     <div class="control-panel-layout">
       <ControlBar :title="flashcardSetName" shadow>
         <template #left>
@@ -96,10 +94,6 @@ function openFlashcardSetSettings() {
 
 .control-panel {
   min-width: 420px;
-}
-
-.control-sidebar {
-  z-index: 200;
 }
 
 .control-panel-layout {
