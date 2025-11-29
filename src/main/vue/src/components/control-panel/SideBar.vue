@@ -1,5 +1,10 @@
 <template>
   <div
+    class="sidebar-overlay"
+    :class="{ 'sidebar-overlay--visible': isSidebarExpanded }"
+    @click="toggle"
+  />
+  <div
     class="sidebar sidebar--theme"
     :class="{ 'sidebar--collapsed': !isSidebarExpanded }"
   >
@@ -156,6 +161,10 @@ onMounted(() => {
   --bar--scrollbar--thumb-color--active: var(--sidebar--scrollbar--thumb-active-color, #98a9ca);
 }
 
+.sidebar-overlay {
+  display: none;
+}
+
 .sidebar {
   position: relative;
   display: flex;
@@ -163,7 +172,7 @@ onMounted(() => {
   width: clamp(200px, 40vw, 260px);
   height: 100%;
   background: var(--bar--bg);
-  transition: margin-left 0.35s ease-in-out;
+  transition: margin-left 0.35s ease-in-out, transform 0.35s ease-in-out, width 0.35s ease-in-out;
   overflow: hidden;
 }
 
@@ -300,5 +309,41 @@ onMounted(() => {
   font-size: 0.85rem;
   font-weight: 600;
   margin-left: 0.75rem;
+}
+
+@media (max-width: 660px) {
+  .sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 330px;
+    z-index: 10;
+    transform: translateX(0);
+    margin-left: 0;
+  }
+
+  .sidebar--collapsed {
+    margin-left: 0;
+    transform: translateX(-100%);
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease-in-out;
+  }
+
+  .sidebar-overlay--visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 </style>
