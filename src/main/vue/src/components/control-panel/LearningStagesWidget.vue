@@ -258,7 +258,7 @@ onUnmounted(() => {
   background: var(--l-widget--bg);
   border-radius: 6px;
   width: 100%;
-  min-width: 360px;
+  min-width: 380px;
   flex-grow: 0;
   transition: background 0.3s ease-in-out;
 }
