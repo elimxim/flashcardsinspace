@@ -320,8 +320,7 @@ onUnmounted(() => {
   padding: 4px;
   gap: 4px;
   container-type: size;
-  transition: transform v-bind(transitionDuration) ease-in-out,
-              height v-bind(transitionDuration) ease-in-out
+  transition: transform v-bind(transitionDuration) ease-in-out, height v-bind(transitionDuration) ease-in-out
 }
 
 .stage-name {
