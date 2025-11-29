@@ -24,8 +24,7 @@
           }"
           :style="{
             transform: `translateY(${stageOffsets[index]}px)`,
-            height: `${stageHeights[index]}px`,
-            maxHeight: `${stageHeights[index]}px`,
+            height: `${stageHeights[index]}px`
           }"
         >
           <div class="stage-name">
@@ -158,7 +157,7 @@ const calculateStageOffsets = () => {
       const expandedHeight = referenceHeight + (gridHeight - referenceHeight - offset)
       heights.push(expandedHeight)
     } else {
-      heights.push(0)
+      heights.push(referenceHeight)
     }
   }
 
@@ -316,13 +315,11 @@ onUnmounted(() => {
   min-width: 50px;
   height: auto;
   min-height: clamp(52px, 8cqw, 80px);
-  max-height: 80px;
   padding: 4px;
   gap: 4px;
   container-type: size;
   transition: transform v-bind(transitionDuration) ease-in-out,
-              height v-bind(transitionDuration) ease-in-out,
-              max-height v-bind(transitionDuration) ease-in-out
+              height v-bind(transitionDuration) ease-in-out
 }
 
 .stage-name {
