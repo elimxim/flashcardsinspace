@@ -83,7 +83,7 @@ const flashcardCount = computed(() => flashcards.value.length)
 }
 
 .flashcards-info-text {
-  font-size: clamp(0.6rem, 1.5vw, 0.7rem);
+  font-size: 0.7rem;
   color: var(--f-bar--flashcards--text-color);
   word-spacing: 0.05rem;
   letter-spacing: 0.05rem;
@@ -93,13 +93,13 @@ const flashcardCount = computed(() => flashcards.value.length)
 }
 
 .flashcards-info-number {
-  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--f-bar--flashcards--number--color);
   background-color: var(--f-bar--flashcards--number--bg-color);
   border-radius: 3px;
   padding: 2px;
-  width: clamp(40px, 4vw, 50px);
+  width: 50px;
   height: fit-content;
   text-align: center;
 }
