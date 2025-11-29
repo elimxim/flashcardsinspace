@@ -47,6 +47,8 @@
   </div>
   <FlashcardSetSettingsModal/>
   <FlashcardSetCreationModal/>
+  <FlashcardCreationModal/>
+  <CalendarModal/>
 </template>
 
 <script setup lang="ts">
@@ -59,6 +61,8 @@ import OuterSpaceWidget from '@/components/control-panel/OuterSpaceWidget.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/modals/FlashcardSetSettingsModal.vue'
 import FlashcardSetCreationModal from '@/modals/FlashcardSetCreationModal.vue'
+import FlashcardCreationModal from '@/modals/FlashcardCreationModal.vue'
+import CalendarModal from '@/modals/CalendarModal.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
