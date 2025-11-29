@@ -2,12 +2,13 @@
   <div
     :class="[
       'page',
-      'page--bg--light',
+      { 'page--bg--light': !isSpaceMode },
       'flex-column',
       'flex-center',
       'scroll-none',
       'review-page--theme',
-  ]">
+    ]"
+  >
     <ControlBar :title="flashcardSetName" center-title>
       <template v-if="reviewTopic" #left>
         <div class="review-mode">
@@ -391,7 +392,7 @@ function handleKeydown(event: KeyboardEvent) {
 <style scoped>
 .review-page--theme {
   --r-page--review-count--color: var(--review-page--review-count--color, rgba(17, 33, 85, 0.92));
-  --r-page--review-count--bg: var(--review-page--review-count--border-color, rgba(88, 114, 209, 0.13));
+  --r-page--review-count--bg: var(--review-page--review-count--border-color, rgb(225, 228, 240));
   --progressbar--from: var(--review-progressbar--from);
   --progressbar--via: var(--review-progressbar--via);
   --progressbar--to: var(--review-progressbar--to);

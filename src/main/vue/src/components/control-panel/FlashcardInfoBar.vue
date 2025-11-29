@@ -45,7 +45,7 @@ const flashcardCount = computed(() => flashcards.value.length)
   --f-bar--language--icon-color: var(--flashcard-info-bar--language--icon-color, #007bff);
   --f-bar--flashcards--text-color: var(--flashcard-info-bar--flashcards--text-color, rgba(43, 69, 142, 0.88));
   --f-bar--flashcards--number--color: var(--flashcard-info-bar--flashcards--number--color, rgba(17, 33, 85, 0.92));
-  --f-bar--flashcards--number--bg-color: var(--flashcard-info-bar--flashcards--number--bg-color, rgba(88, 114, 209, 0.13));
+  --f-bar--flashcards--number--bg-color: var(--flashcard-info-bar--flashcards--number--bg-color, rgb(225, 228, 240));
 }
 
 .flashcard-info-bar {
