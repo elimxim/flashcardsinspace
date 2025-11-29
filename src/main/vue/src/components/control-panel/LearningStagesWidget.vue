@@ -292,6 +292,8 @@ onUnmounted(() => {
   position: relative;
   align-items: start;
   margin: 10px;
+  container-type: inline-size;
+  container-name: stage-grid;
 }
 
 .stage-wrapper {
@@ -323,7 +325,7 @@ onUnmounted(() => {
 }
 
 .stage-name {
-  font-size: clamp(0.55rem, 24cqw, 0.9rem);
+  font-size: clamp(0.55rem, 20cqi, 0.9rem);
   font-weight: 600;
   color: var(--l-widget--stage--name--color);
   letter-spacing: 0.05rem;
@@ -331,6 +333,8 @@ onUnmounted(() => {
   text-transform: uppercase;
   text-align: center;
   white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .stage-count-wrapper {
@@ -342,7 +346,7 @@ onUnmounted(() => {
 }
 
 .stage-count {
-  font-size: clamp(0.6rem, 24cqw, 0.85rem);
+  font-size: clamp(0.6rem, 20cqi, 0.85rem);
   font-weight: 600;
   color: var(--l-widget--stage--count--color);
   background: var(--l-widget--stage--count--bg);
