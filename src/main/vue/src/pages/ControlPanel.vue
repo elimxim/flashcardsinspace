@@ -97,7 +97,7 @@ function openFlashcardSetSettings() {
 }
 
 .control-sidebar {
-  z-index: 1;
+  z-index: 200;
 }
 
 .control-panel-layout {
