@@ -314,7 +314,8 @@ onUnmounted(() => {
   padding: 4px;
   gap: 4px;
   container-type: size;
-  transition: transform v-bind(transitionDuration) ease-in-out, height v-bind(transitionDuration) ease-in-out
+  transition: transform v-bind(transitionDuration) ease-in-out, height v-bind(transitionDuration) ease-in-out;
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.4), inset 0 -2px 4px rgba(255, 255, 255, 0.2);
 }
 
 .stage-name {
