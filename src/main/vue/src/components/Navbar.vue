@@ -12,76 +12,87 @@
     </div>
 
     <div class="nav-items">
-      <div v-if="showIcons" class="nav-item-icon">
-        <AwesomeButton
-          class="navigation-button"
-          icon="fa-solid fa-rocket"
-          :disabled="!isAuthenticated"
-          :on-click="navigateToControlPanel"
-          :scale-factor="1.2"
-          fill-space
-          square
-        />
-      </div>
-      <div v-else class="nav-item-text">
-        <div class="nav-text nav-text--item" @click="navigateToControlPanel">
-          Control Panel
+      <transition name="pop" mode="out-in">
+        <div v-if="showIcons" key="icon" class="nav-item-icon">
+          <AwesomeButton
+            class="navigation-button"
+            icon="fa-solid fa-rocket"
+            :disabled="!isAuthenticated"
+            :on-click="navigateToControlPanel"
+            :scale-factor="1.2"
+            fill-space
+            square
+          />
         </div>
-      </div>
-      <div v-if="!showIcons" class="nav-item-partition">
-        <font-awesome-icon icon="fa-solid fa-circle"/>
-      </div>
-      <div v-if="showIcons" class="nav-item-icon">
-        <AwesomeButton
-          class="navigation-button"
-          icon="fa-solid fa-house"
-          :on-click="navigateToHome"
-          :scale-factor="1.2"
-          fill-space
-          square
-        />
-      </div>
-      <div v-else class="nav-item-text">
-        <div class="nav-text nav-text--item" @click="navigateToHome">
-          Home
+        <div v-else key="text" class="nav-item-text">
+          <div class="nav-text nav-text--item" @click="navigateToControlPanel">
+            Control Panel
+          </div>
+          <div class="nav-item-partition">
+            <font-awesome-icon icon="fa-solid fa-circle"/>
+          </div>
         </div>
-      </div>
-      <div v-if="!showIcons" class="nav-item-partition">
-        <font-awesome-icon icon="fa-solid fa-circle"/>
-      </div>
-      <div v-if="showIcons" class="nav-item-icon">
-        <AwesomeButton
-          class="navigation-button"
-          icon="fa-solid fa-heart-pulse"
-          :on-click="navigateToSupport"
-          :scale-factor="1.2"
-          fill-space
-          square
-        />
-      </div>
-      <div v-else class="nav-item-text">
-        <div class="nav-text nav-text--item" @click="navigateToSupport">
-          Support
+      </transition>
+
+      <transition name="pop" mode="out-in">
+        <div v-if="showIcons" key="icon" class="nav-item-icon">
+          <AwesomeButton
+            class="navigation-button"
+            icon="fa-solid fa-house"
+            :on-click="navigateToHome"
+            :scale-factor="1.2"
+            fill-space
+            square
+          />
         </div>
-      </div>
-      <div v-if="!showIcons" class="nav-item-partition">
-        <font-awesome-icon icon="fa-solid fa-circle"/>
-      </div>
-      <div v-if="showIcons" class="nav-item-icon">
-        <AwesomeButton
-          class="navigation-button"
-          icon="fa-solid fa-user-astronaut"
-          :on-click="navigateToUser"
-          :scale-factor="1.2"
-          fill-space
-          square
-        />
-      </div>
-      <div v-else class="nav-item-text">
-        <div class="nav-text nav-text--item" @click="navigateToUser">
-          User
+        <div v-else key="text" class="nav-item-text">
+          <div class="nav-text nav-text--item" @click="navigateToHome">
+            Home
+          </div>
+          <div class="nav-item-partition">
+            <font-awesome-icon icon="fa-solid fa-circle"/>
+          </div>
         </div>
-      </div>
+      </transition>
+
+      <transition name="pop" mode="out-in">
+        <div v-if="showIcons" key="icon" class="nav-item-icon">
+          <AwesomeButton
+            class="navigation-button"
+            icon="fa-solid fa-heart-pulse"
+            :on-click="navigateToSupport"
+            :scale-factor="1.2"
+            fill-space
+            square
+          />
+        </div>
+        <div v-else key="text" class="nav-item-text">
+          <div class="nav-text nav-text--item" @click="navigateToSupport">
+            Support
+          </div>
+          <div class="nav-item-partition">
+            <font-awesome-icon icon="fa-solid fa-circle"/>
+          </div>
+        </div>
+      </transition>
+
+      <transition name="pop" mode="out-in">
+        <div v-if="showIcons" key="icon" class="nav-item-icon">
+          <AwesomeButton
+            class="navigation-button"
+            icon="fa-solid fa-user-astronaut"
+            :on-click="navigateToUser"
+            :scale-factor="1.2"
+            fill-space
+            square
+          />
+        </div>
+        <div v-else key="text" class="nav-item-text">
+          <div class="nav-text nav-text--item" @click="navigateToUser">
+            User
+          </div>
+        </div>
+      </transition>
     </div>
   </nav>
 </template>
@@ -169,6 +180,11 @@ onUnmounted(() => {
 
 .nav-item-text {
   width: fit-content;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .nav-item-icon {
@@ -223,6 +239,27 @@ onUnmounted(() => {
 .logo-image {
   height: 60px;
   z-index: 1001;
+}
+
+.pop-enter-active,
+.pop-leave-active {
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.pop-enter-from {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.pop-leave-to {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.pop-enter-to,
+.pop-leave-from {
+  opacity: 1;
+  transform: scale(1);
 }
 
 </style>
