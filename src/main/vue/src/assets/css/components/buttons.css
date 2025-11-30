@@ -58,6 +58,7 @@
 
 .navigation-button {
   --awesome-button--icon--size: 1.3rem;
+  --awesome-button--icon--width: 40px;
   --awesome-button--icon--color: #FAF9F6;
   --awesome-button--icon--color--hover: #dad0f8;
   --awesome-button--icon--color--disabled: rgba(250, 249, 246, 0.15);
