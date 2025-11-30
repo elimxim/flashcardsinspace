@@ -139,6 +139,7 @@ defineExpose({
 <style scoped>
 .awesome-button--theme {
   --a-btn--icon--size: var(--awesome-button--icon--size, 1.2rem);
+  --a-btn--icon--width: var(--awesome-button--icon--width, auto);
   --a-btn--icon--color: var(--awesome-button--icon--color, #818181);
   --a-btn--icon--color--hover: var(--awesome-button--icon--color--hover, #404040);
   --a-btn--icon--color--disabled: var(--awesome-button--icon--color--disabled, #cacaca);
@@ -229,6 +230,7 @@ defineExpose({
 
 .awesome-icon {
   font-size: min(var(--a-btn--icon--size), 100cqw, 100cqh);
+  width: var(--a-btn--icon--width);
 }
 
 .awesome--icon--spinning {
