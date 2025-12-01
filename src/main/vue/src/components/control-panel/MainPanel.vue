@@ -28,6 +28,7 @@ import ReviewInfoWidget from '@/components/control-panel/ReviewInfoWidget.vue'
 import SpecialStageWidget from '@/components/control-panel/SpecialStageWidget.vue'
 import DayStreakWidget from '@/components/control-panel/DayStreakWidget.vue'
 import LaunchWidget from '@/components/control-panel/LaunchWidget.vue'
+import QuizWidget from '@/components/control-panel/QuizWidget.vue'
 import { storeToRefs } from 'pinia'
 import {
   computed,
@@ -41,6 +42,10 @@ import { loadFlashcardSetStore } from '@/shared/stores.ts'
 import { specialStages } from '@/core-logic/stage-logic.ts'
 import { useFlip } from '@/utils/flip.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
+
+const FIRST_REARRANGE_BREAKPOINT = 1040
+const SECOND_REARRANGE_BREAKPOINT = 540
+const THIRD_REARRANGE_BREAKPOINT = 434
 
 const chronoStore = useChronoStore()
 
@@ -119,16 +124,40 @@ const widgets: Record<string, Widget> = {
     props: {},
     hidden: isInitialDay,
   },
+  quiz: {
+    id: 'quiz-widget',
+    component: QuizWidget,
+    className: 'main-panel-square-widget',
+    props: {},
+    hidden: computed(() => false),
+  },
 }
 
 const widgetRows = computed(() => {
   const width = mainPanelWidth.value
 
-  if (width < 540) {
+  if (width < THIRD_REARRANGE_BREAKPOINT) {
     return [
       {
         id: 'row-1',
-        widgets: [widgets.flashcard, widgets.calendar, widgets.dayStreak],
+        widgets: [widgets.flashcard, widgets.calendar, widgets.quiz],
+      },
+      {
+        id: 'row-2',
+        widgets: [widgets.reviewInfo, widgets.launch, widgets.dayStreak],
+      },
+      {
+        id: 'row-3',
+        widgets: [widgets.unknown, widgets.attempted],
+      },
+    ]
+  }
+
+  if (width < SECOND_REARRANGE_BREAKPOINT) {
+    return [
+      {
+        id: 'row-1',
+        widgets: [widgets.flashcard, widgets.calendar, widgets.quiz, widgets.dayStreak],
       },
       {
         id: 'row-2',
@@ -141,7 +170,7 @@ const widgetRows = computed(() => {
     ]
   }
 
-  if (width < 1000) {
+  if (width < FIRST_REARRANGE_BREAKPOINT) {
     return [
       {
         id: 'row-1',
@@ -149,7 +178,7 @@ const widgetRows = computed(() => {
       },
       {
         id: 'row-2',
-        widgets: [widgets.unknown, widgets.attempted, widgets.dayStreak],
+        widgets: [widgets.unknown, widgets.attempted, widgets.dayStreak, widgets.quiz],
       },
     ]
   }
@@ -165,6 +194,7 @@ const widgetRows = computed(() => {
         widgets.unknown,
         widgets.attempted,
         widgets.dayStreak,
+        widgets.quiz,
       ],
     },
   ]
