@@ -61,6 +61,8 @@ import {
   faArrowRightLong,
   faPalette,
   faCircle,
+  faClipboardQuestion,
+  faListCheck,
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faEye as faRegularEye,
@@ -133,6 +135,8 @@ export function applyFaIcons() {
     faArrowRightLong,
     faPalette,
     faCircle,
+    faClipboardQuestion,
+    faListCheck,
 
     faRegularEye,
     faRegularCircle,
