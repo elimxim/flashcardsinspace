@@ -40,6 +40,17 @@
   --awesome-button--border-radius: 6px;
 }
 
+.quiz-widget-button {
+  --awesome-button--icon--size: 50px;
+  --awesome-button--icon--color: var(--flashcard-widget-button--color);
+  --awesome-button--icon--color--hover: var(--flashcard-widget-button--color--hover);
+  --awesome-button--bg: var(--flashcard-widget-button--bg);
+  --awesome-button--bg--hover: var(--flashcard-widget-button--bg--hover);
+  --awesome-button--bg--disabled: var(--flashcard-widget-button--bg--disabled);
+  --awesome-button--border: 1px solid var(--flashcard-widget-button--border-color);
+  --awesome-button--border-radius: 6px;
+}
+
 .control-bar-button {
   --awesome-button--icon--color: var(--control-bar--button--color);
   --awesome-button--icon--color--hover: var(--control-bar--button--color--hover);
