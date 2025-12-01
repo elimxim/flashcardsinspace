@@ -5,7 +5,7 @@ import {
   type Stage,
   stageNameMap,
   stageOrderMap,
-  stages,
+  learningStages,
 } from '@/core-logic/stage-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 import {
@@ -69,7 +69,7 @@ export class MultiStageReviewQueue implements ReviewQueue {
     flashcards.forEach((flashcards, stage) => {
       this.flashcardMap.set(stage, [...flashcards])
     })
-    this.currStage = stages.S7
+    this.currStage = learningStages.S7
   }
 
   public shuffle() {
@@ -96,7 +96,7 @@ export class MultiStageReviewQueue implements ReviewQueue {
   }
 
   private nextStage(): Stage | undefined  {
-    for (let i = this.currStage.order - 1; i >= stages.S1.order; i--) {
+    for (let i = this.currStage.order - 1; i >= learningStages.S1.order; i--) {
       const stage = stageOrderMap.get(i)
       if (stage !== undefined && this.flashcardMap.has(stage)) {
         const flashcards = this.flashcardMap.get(stage)
@@ -164,7 +164,7 @@ export function createReviewQueue(
   const result = new Map<Stage, Flashcard[]>()
   flashcards.filter(f => {
     const isStageAvailable = stagesForReview.has(f.stage)
-    if (f.stage === stages.S1.name) {
+    if (f.stage === learningStages.S1.name) {
       return isStageAvailable
         && !isUnknownFlashcard(f, currDay)
         && !isReviewedFlashcard(f, currDay)
@@ -188,11 +188,11 @@ export function createReviewQueueForStage(flashcards: Flashcard[], stage: Stage,
   let result: Flashcard[]
   if (stage === specialStages.UNKNOWN) {
     result = flashcards.filter(f =>
-      f.stage === stages.S1.name && isUnknownFlashcard(f, currDay)
+      f.stage === learningStages.S1.name && isUnknownFlashcard(f, currDay)
     )
   } else if (stage === specialStages.ATTEMPTED) {
     result = flashcards.filter(f =>
-      f.stage === stages.S1.name && isReviewedFlashcard(f, currDay)
+      f.stage === learningStages.S1.name && isReviewedFlashcard(f, currDay)
     )
   } else {
     result = flashcards.filter(f => f.stage === stage.name)
@@ -214,15 +214,15 @@ function isReviewedFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
 export function countFlashcards(flashcards: Flashcard[], stage: Stage, currDay: Chronoday): number {
   if (stage === specialStages.UNKNOWN) {
     return flashcards.filter(f =>
-      f.stage === stages.S1.name && isUnknownFlashcard(f, currDay)
+      f.stage === learningStages.S1.name && isUnknownFlashcard(f, currDay)
     ).length
   } else if (stage === specialStages.ATTEMPTED) {
     return flashcards.filter(f =>
-      f.stage === stages.S1.name && isReviewedFlashcard(f, currDay)
+      f.stage === learningStages.S1.name && isReviewedFlashcard(f, currDay)
     ).length
-  } else if (stage == stages.S1) {
+  } else if (stage == learningStages.S1) {
     return flashcards.filter(f =>
-      f.stage === stages.S1.name && !isUnknownFlashcard(f, currDay) && !isReviewedFlashcard(f, currDay)
+      f.stage === learningStages.S1.name && !isUnknownFlashcard(f, currDay) && !isReviewedFlashcard(f, currDay)
     ).length
   } else {
     return flashcards.filter(f => f.stage === stage.name).length

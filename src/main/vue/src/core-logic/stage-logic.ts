@@ -10,7 +10,7 @@ export const specialStages = {
   OUTER_SPACE: { name: 'OUTER_SPACE', displayName: 'Outer space', order: 8 } as Stage,
 }
 
-export const stages = {
+export const learningStages = {
   S1: { name: 'S1', displayName: 'Stage 1', order: 1 } as Stage,
   S2: { name: 'S2', displayName: 'Stage 2', order: 2 } as Stage,
   S3: { name: 'S3', displayName: 'Stage 3', order: 3 } as Stage,
@@ -23,48 +23,48 @@ export const stages = {
 export const allStages: Stage[] = [
   specialStages.UNKNOWN,
   specialStages.ATTEMPTED,
-  stages.S1,
-  stages.S2,
-  stages.S3,
-  stages.S4,
-  stages.S5,
-  stages.S6,
-  stages.S7,
+  learningStages.S1,
+  learningStages.S2,
+  learningStages.S3,
+  learningStages.S4,
+  learningStages.S5,
+  learningStages.S6,
+  learningStages.S7,
   specialStages.OUTER_SPACE,
 ]
 
 export const stageOrderMap = new Map<number, Stage>([
-  [stages.S1.order, stages.S1],
-  [stages.S2.order, stages.S2],
-  [stages.S3.order, stages.S3],
-  [stages.S4.order, stages.S4],
-  [stages.S5.order, stages.S5],
-  [stages.S6.order, stages.S6],
-  [stages.S7.order, stages.S7],
+  [learningStages.S1.order, learningStages.S1],
+  [learningStages.S2.order, learningStages.S2],
+  [learningStages.S3.order, learningStages.S3],
+  [learningStages.S4.order, learningStages.S4],
+  [learningStages.S5.order, learningStages.S5],
+  [learningStages.S6.order, learningStages.S6],
+  [learningStages.S7.order, learningStages.S7],
   [specialStages.OUTER_SPACE.order, specialStages.OUTER_SPACE],
 ])
 
 export const stageNameMap = new Map<string, Stage>([
   [specialStages.UNKNOWN.name, specialStages.UNKNOWN],
   [specialStages.ATTEMPTED.name, specialStages.ATTEMPTED],
-  [stages.S1.name, stages.S1],
-  [stages.S2.name, stages.S2],
-  [stages.S3.name, stages.S3],
-  [stages.S4.name, stages.S4],
-  [stages.S5.name, stages.S5],
-  [stages.S6.name, stages.S6],
-  [stages.S7.name, stages.S7],
+  [learningStages.S1.name, learningStages.S1],
+  [learningStages.S2.name, learningStages.S2],
+  [learningStages.S3.name, learningStages.S3],
+  [learningStages.S4.name, learningStages.S4],
+  [learningStages.S5.name, learningStages.S5],
+  [learningStages.S6.name, learningStages.S6],
+  [learningStages.S7.name, learningStages.S7],
   [specialStages.OUTER_SPACE.name, specialStages.OUTER_SPACE],
 ])
 
 export const mainStageArray = [
-  stages.S1,
-  stages.S2,
-  stages.S3,
-  stages.S4,
-  stages.S5,
-  stages.S6,
-  stages.S7,
+  learningStages.S1,
+  learningStages.S2,
+  learningStages.S3,
+  learningStages.S4,
+  learningStages.S5,
+  learningStages.S6,
+  learningStages.S7,
 ]
 
 export const specialStageSet = new Set([
@@ -114,7 +114,7 @@ export function prevStage(name: string): Stage {
     return stage
   }
 
-  return stages.S1
+  return learningStages.S1
 }
 
 export function getStage(name: string): Stage {

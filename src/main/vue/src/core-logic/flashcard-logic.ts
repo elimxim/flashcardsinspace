@@ -4,7 +4,7 @@ import {
   FlashcardSetExtra,
   type ReviewInfo
 } from '@/model/flashcard.ts'
-import { type Stage, stages } from '@/core-logic/stage-logic.ts'
+import { type Stage, learningStages } from '@/core-logic/stage-logic.ts'
 import type { Language } from '@/model/language.ts'
 import {
   sendFlashcardAudioFetchRequest,
@@ -32,7 +32,7 @@ export function newFlashcard(frontSide: string, backSide: string, chronodate: st
     id: 0,
     frontSide: frontSide,
     backSide: backSide,
-    stage: stages.S1.name,
+    stage: learningStages.S1.name,
     timesReviewed: 0,
     reviewHistory: { history: [] },
     creationDate: chronodate,

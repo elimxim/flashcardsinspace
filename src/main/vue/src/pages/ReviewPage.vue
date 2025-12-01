@@ -131,7 +131,7 @@ import {
   fetchFlashcardAudio,
   updateFlashcard
 } from '@/core-logic/flashcard-logic.ts'
-import { nextStage, prevStage, Stage, stages } from '@/core-logic/stage-logic.ts'
+import { nextStage, prevStage, Stage, learningStages } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
   createReviewQueue,
@@ -310,7 +310,7 @@ async function moveBack() {
   }
   spaceDeck.value?.willSlideToLeft()
   const flashcard = copyFlashcard(currFlashcard.value)
-  updateFlashcard(flashcard, stages.S1, currDay.value.chronodate)
+  updateFlashcard(flashcard, learningStages.S1, currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   if (success) {
     await nextFlashcard()
