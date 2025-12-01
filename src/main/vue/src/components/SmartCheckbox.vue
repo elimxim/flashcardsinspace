@@ -61,7 +61,7 @@ const currentLabel = computed(() => {
 }
 
 .smart-checkbox {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
