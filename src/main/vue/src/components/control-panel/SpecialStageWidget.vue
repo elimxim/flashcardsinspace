@@ -32,7 +32,7 @@ import SmartButton from '@/components/SmartButton.vue'
 import { Stage } from '@/core-logic/stage-logic.ts'
 import { computed } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { countFlashcards } from '@/core-logic/review-logic.ts'
+import { countFlashcards, ReviewMethod } from '@/core-logic/review-logic.ts'
 import { storeToRefs } from 'pinia'
 import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
@@ -56,7 +56,10 @@ const flashcardsCount = computed(() =>
 
 function startReview() {
   if (flashcardsCount.value === 0) return
-  router.push({ name: routeNames.review, query: { stage: props.stage.name } })
+  router.push({
+    name: routeNames.review,
+    query: { mode: ReviewMethod.SPECIAL, stages: [props.stage.name] }
+  })
 }
 
 </script>

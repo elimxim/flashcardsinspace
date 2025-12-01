@@ -10,9 +10,9 @@
     ]"
   >
     <ControlBar :title="flashcardSetName" center-title>
-      <template v-if="reviewTopic" #left>
+      <template v-if="reviewMode.topic" #left>
         <div class="review-mode">
-          {{ reviewTopic }}
+          {{ reviewMode.topic }}
         </div>
       </template>
       <template #right>
@@ -131,15 +131,21 @@ import {
   fetchFlashcardAudio,
   updateFlashcard
 } from '@/core-logic/flashcard-logic.ts'
-import { nextStage, prevStage, Stage, learningStages } from '@/core-logic/stage-logic.ts'
+import {
+  nextStage,
+  prevStage,
+  Stage,
+  learningStages,
+  specialStages
+} from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
   createReviewQueue,
-  createReviewQueueForStage,
+  createReviewQueueForStages,
   EmptyReviewQueue,
-  ReviewMode,
+  ReviewMethod,
   ReviewQueue,
-  toReviewMode
+  determineReviewMode
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
@@ -152,7 +158,8 @@ import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { markDaysAsCompleted, markDaysAsInProgress } from '@/core-logic/chrono-logic.ts'
 
 const props = defineProps<{
-  stage?: Stage,
+  mode?: string,
+  stages: Stage[],
 }>()
 
 const router = useRouter()
@@ -164,15 +171,14 @@ const flashcardStore = useFlashcardStore()
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
 
-const reviewMode = computed(() => toReviewMode(props.stage))
-const isLightspeedMode = computed(() => reviewMode.value === ReviewMode.LIGHTSPEED)
-const isSpaceMode = computed(() => reviewMode.value === ReviewMode.SPACE)
-const isSpecialMode = computed(() => reviewMode.value === ReviewMode.SPECIAL)
+const reviewMode = computed(() => determineReviewMode(props.mode, props.stages))
+const isLightspeedMode = computed(() => reviewMode.value.method === ReviewMethod.LIGHTSPEED)
+const isSpecialMode = computed(() => reviewMode.value.method === ReviewMethod.SPECIAL)
+const isSpaceMode = computed(() => reviewMode.value.method === ReviewMethod.SPACE)
 const isSpecialOrSpaceMode = computed(() => isSpecialMode.value || isSpaceMode.value)
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
-const reviewTopic = computed(() => props.stage?.displayName)
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
@@ -221,11 +227,13 @@ async function nextFlashcard(): Promise<boolean> {
 }
 
 function startReview() {
-  console.log(`Starting review on stage: ${props.stage?.displayName ?? 'default'}`)
-  if (props.stage) {
-    reviewQueue.value = createReviewQueueForStage(flashcards.value, props.stage, currDay.value)
-  } else {
+  console.log(`Starting review: ${JSON.stringify(reviewMode.value)}`)
+  if (isLightspeedMode.value) {
     reviewQueue.value = createReviewQueue(flashcards.value, currDay.value, chronodays.value)
+  } else if (isSpaceMode.value) {
+    reviewQueue.value = createReviewQueueForStages(flashcards.value, [specialStages.OUTER_SPACE], currDay.value)
+  } else {
+    reviewQueue.value = createReviewQueueForStages(flashcards.value, props.stages, currDay.value)
   }
   flashcardsTotal.value = reviewQueue.value.remaining()
   nextFlashcard()
@@ -233,7 +241,7 @@ function startReview() {
 }
 
 async function finishReview() {
-  console.log(`Finishing review on stage: ${props.stage?.displayName ?? 'default'}`)
+  console.log(`Finishing review: ${JSON.stringify(reviewMode.value)}`)
   reviewQueue.value = new EmptyReviewQueue()
   flashcardsTotal.value = 0
   flashcardFrontSideAudioBlob.value = undefined

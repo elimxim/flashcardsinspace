@@ -57,7 +57,7 @@ export const stageNameMap = new Map<string, Stage>([
   [specialStages.OUTER_SPACE.name, specialStages.OUTER_SPACE],
 ])
 
-export const mainStageArray = [
+export const learningStageArray = [
   learningStages.S1,
   learningStages.S2,
   learningStages.S3,
@@ -125,9 +125,23 @@ export function getStage(name: string): Stage {
   return stage
 }
 
-export function toStage(value: unknown): Stage | undefined {
-  if (typeof value === 'string') {
-    const str = String(value).trim().toUpperCase()
-    return stageNameMap.get(str)
+export function toLearningStages(value: unknown): Stage[] {
+  if (value === undefined || value === null) {
+    return []
+  } else if (typeof value === 'string') {
+    return String(value).trim().toUpperCase().split(',')
+      .filter(s => s.trim() !== '')
+      .map(s => s.trim())
+      .map(s => stageNameMap.get(s))
+      .filter(s => s !== undefined)
+  } else if (Array.isArray(value)) {
+    return value
+      .filter(v => typeof v === 'string')
+      .map(s => String(s).trim().toUpperCase())
+      .filter(s => s !== '')
+      .map(s => stageNameMap.get(s))
+      .filter(s => s !== undefined)
+  } else {
+    return []
   }
 }

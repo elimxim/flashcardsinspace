@@ -12,7 +12,7 @@
     </div>
     <div ref="gridRef" class="stage-grid">
       <div
-        v-for="(stage, index) in mainStageArray"
+        v-for="(stage, index) in learningStageArray"
         :key="stage.name"
         class="stage-wrapper select-none"
       >
@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { mainStageArray, Stage } from '@/core-logic/stage-logic.ts'
+import { learningStageArray, Stage } from '@/core-logic/stage-logic.ts'
 import { countFlashcards } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
@@ -128,7 +128,7 @@ const calculateStageOffsets = () => {
     return
   }
 
-  const flashcardCounts = mainStageArray.map(stage =>
+  const flashcardCounts = learningStageArray.map(stage =>
     countFlashcards(flashcards.value, stage, currDay.value)
   )
 

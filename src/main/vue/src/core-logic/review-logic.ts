@@ -1,11 +1,12 @@
 import { type Flashcard } from '@/model/flashcard.ts'
 import {
+  type Stage,
   getStage,
   specialStages,
-  type Stage,
   stageNameMap,
   stageOrderMap,
   learningStages,
+  specialStageSet,
 } from '@/core-logic/stage-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 import {
@@ -14,23 +15,62 @@ import {
 } from '@/core-logic/chrono-logic.ts'
 import { shuffle } from '@/utils/utils.ts'
 
-export enum ReviewMode {
+export enum ReviewMethod {
   LIGHTSPEED = 'LIGHTSPEED',
   SPECIAL = 'SPECIAL',
   SPACE = 'SPACE',
+  QUIZ = 'QUIZ',
 }
 
-export function toReviewMode(stage: Stage | undefined) {
-  if (stage === specialStages.UNKNOWN) {
-    return ReviewMode.SPECIAL
+export interface ReviewMode {
+  method: ReviewMethod
+  topic: string
+}
+
+export function determineReviewMode(mode: string | undefined, stages: Stage[]): ReviewMode {
+  if (mode === ReviewMethod.SPECIAL) return stagesToReviewMode(stages)
+
+  if (mode === ReviewMethod.SPACE) return {
+    method: ReviewMethod.SPACE,
+    topic: specialStages.OUTER_SPACE.displayName,
   }
-  if (stage === specialStages.ATTEMPTED) {
-    return ReviewMode.SPECIAL
+
+  if (mode === ReviewMethod.LIGHTSPEED) return {
+    method: ReviewMethod.LIGHTSPEED,
+    topic: '',
   }
-  if (stage === specialStages.OUTER_SPACE) {
-    return ReviewMode.SPACE
+
+  if (mode === ReviewMethod.QUIZ && stages.length > 0
+    && stages.every(s => specialStageSet.has(s))
+  ) return {
+    method: ReviewMethod.QUIZ,
+    topic: 'Quiz',
   }
-  return ReviewMode.LIGHTSPEED
+
+  return stagesToReviewMode(stages)
+}
+
+function stagesToReviewMode(stages: Stage[]): ReviewMode {
+  if (stages.length === 1) {
+    const stage = stages[0]
+    if (stage === specialStages.UNKNOWN) return {
+      method: ReviewMethod.SPECIAL,
+      topic: specialStages.UNKNOWN.displayName,
+    }
+    if (stage === specialStages.ATTEMPTED) return {
+      method: ReviewMethod.SPECIAL,
+      topic: specialStages.ATTEMPTED.displayName,
+    }
+    if (stage === specialStages.OUTER_SPACE) return {
+      method: ReviewMethod.SPACE,
+      topic: specialStages.OUTER_SPACE.displayName,
+    }
+  }
+
+  return {
+    method: ReviewMethod.LIGHTSPEED,
+    topic: '',
+  }
 }
 
 export interface ReviewQueue {
@@ -95,7 +135,7 @@ export class MultiStageReviewQueue implements ReviewQueue {
     }
   }
 
-  private nextStage(): Stage | undefined  {
+  private nextStage(): Stage | undefined {
     for (let i = this.currStage.order - 1; i >= learningStages.S1.order; i--) {
       const stage = stageOrderMap.get(i)
       if (stage !== undefined && this.flashcardMap.has(stage)) {
@@ -184,18 +224,20 @@ export function createReviewQueue(
   return queue
 }
 
-export function createReviewQueueForStage(flashcards: Flashcard[], stage: Stage, currDay: Chronoday): ReviewQueue {
-  let result: Flashcard[]
-  if (stage === specialStages.UNKNOWN) {
-    result = flashcards.filter(f =>
+export function createReviewQueueForStages(flashcards: Flashcard[], stages: Stage[], currDay: Chronoday): ReviewQueue {
+  const stageNameSet = new Set(stages.map(s => s.name))
+
+  const result: Flashcard[] = []
+  if (stageNameSet.has(specialStages.UNKNOWN.name)) {
+    result.push(...flashcards.filter(f =>
       f.stage === learningStages.S1.name && isUnknownFlashcard(f, currDay)
-    )
-  } else if (stage === specialStages.ATTEMPTED) {
-    result = flashcards.filter(f =>
+    ))
+  } else if (stageNameSet.has(specialStages.ATTEMPTED.name)) {
+    result.push(...flashcards.filter(f =>
       f.stage === learningStages.S1.name && isReviewedFlashcard(f, currDay)
-    )
+    ))
   } else {
-    result = flashcards.filter(f => f.stage === stage.name)
+    result.push(...flashcards.filter(f => stageNameSet.has(f.stage)))
   }
 
   const queue = new MonoStageReviewQueue(result)

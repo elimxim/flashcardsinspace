@@ -27,7 +27,7 @@
 import Starfield from '@/components/Starfield.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import { computed } from 'vue'
-import { countFlashcards } from '@/core-logic/review-logic.ts'
+import { countFlashcards, ReviewMethod } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
@@ -49,7 +49,10 @@ const isDisabled = computed(() => flashcardCount.value === 0)
 
 
 function startReview() {
-  router.push({ name: routeNames.review, query: { stage: specialStages.OUTER_SPACE.name } })
+  router.push({
+    name: routeNames.review,
+    query: { mode: ReviewMethod.SPACE }
+  })
 }
 
 </script>

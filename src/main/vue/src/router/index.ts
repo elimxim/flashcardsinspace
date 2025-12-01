@@ -11,7 +11,7 @@ import LogoutPage from '@/pages/auth/LogoutPage.vue'
 import PasswordResetView from '@/pages/auth/PasswordResetView.vue'
 import ReviewPage from '@/pages/ReviewPage.vue'
 import LightspeedSchedulePage from '@/pages/LightspeedSchedulePage.vue'
-import { toStage } from '@/core-logic/stage-logic.ts'
+import { toLearningStages } from '@/core-logic/stage-logic.ts'
 import { loadUserSignedUp } from '@/shared/cookies.ts'
 
 export const routeNames = {
@@ -90,7 +90,8 @@ const routes: RouteRecordRaw[] = [
     name: routeNames.review,
     component: ReviewPage,
     props: (route) => ({
-      stage: toStage(route.query.stage),
+      mode: route.query.mode,
+      stages: toLearningStages(route.query.stages),
     }),
     meta: {
       requiresAuth: true,
