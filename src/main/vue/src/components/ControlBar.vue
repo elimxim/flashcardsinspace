@@ -44,7 +44,7 @@ withDefaults(defineProps<{
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 12px;
-  padding: 10px;
+  padding: 4px 10px;
   background-color: var(--c-bar--bg-color);
   width: 100%;
   height: 40px;
