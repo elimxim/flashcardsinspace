@@ -7,10 +7,12 @@ import { createPinia } from 'pinia'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { sendWhoAmIRequest } from '@/api/auth-client.ts'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { applyFaIcons } from '@/fa.ts'
+import { applyFaSolidIcons } from '@/fa-solid.ts'
+import { applyFaRegularIcons } from '@/fa-regular.ts'
 import { attemptTokenRefresh } from '@/api/token-refresh.ts'
 
-applyFaIcons()
+applyFaRegularIcons()
+applyFaSolidIcons()
 
 const app = createApp(App)
 app.component('FontAwesomeIcon', FontAwesomeIcon)
