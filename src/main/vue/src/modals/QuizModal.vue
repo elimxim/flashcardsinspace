@@ -11,57 +11,57 @@
         Doing this will help those tough cards stick better into your long-term memory.
       </p>
       <div class="modal-main-area--inner">
-        <div class="stage-check-grid">
+        <div class="quiz-stage-grid">
           <div
-            class="stage-check-grid-row"
-            :class="{ 'stage-check-grid-row--selected': includeUnknown }"
+            class="quiz-stage-grid-row"
+            :class="{ 'quiz-stage-grid-row--selected': includeUnknown }"
           >
-            <div class="stage-checkbox">
+            <div class="quiz-stage-checkbox">
               <SmartCheckbox
                 v-model="includeUnknown"
                 :label="specialStages.UNKNOWN.displayName"
               />
             </div>
-            <div class="stage-flashcard-count">
+            <div class="quiz-stage-flashcard-count">
               {{ unknownCount }}
             </div>
           </div>
           <div
-            class="stage-check-grid-row"
-            :class="{ 'stage-check-grid-row--selected': includeAttempted }"
+            class="quiz-stage-grid-row"
+            :class="{ 'quiz-stage-grid-row--selected': includeAttempted }"
           >
-            <div class="stage-checkbox">
+            <div class="quiz-stage-checkbox">
               <SmartCheckbox
                 v-model="includeAttempted"
                 :label="specialStages.ATTEMPTED.displayName"
               />
             </div>
-            <div class="stage-flashcard-count">
+            <div class="quiz-stage-flashcard-count">
               {{ attemptedCount }}
             </div>
           </div>
           <div
-            class="stage-check-grid-row"
-            :class="{ 'stage-check-grid-row--selected': includeOuterSpace }"
+            class="quiz-stage-grid-row"
+            :class="{ 'quiz-stage-grid-row--selected': includeOuterSpace }"
           >
-            <div class="stage-checkbox">
+            <div class="quiz-stage-checkbox">
               <SmartCheckbox
                 v-model="includeOuterSpace"
                 :label="specialStages.OUTER_SPACE.displayName"
               />
             </div>
-            <div class="stage-flashcard-count">
+            <div class="quiz-stage-flashcard-count">
               {{ outerSpaceCount }}
             </div>
           </div>
           <div
-            class="stage-check-grid-row stage-check-grid-row--total"
-            :class="{ 'stage-check-grid-row--selected': reviewCount > 0 }"
+            class="quiz-stage-grid-row quiz-stage-grid-row--total"
+            :class="{ 'quiz-stage-grid-row--selected': reviewCount > 0 }"
           >
-            <div class="stage-flashcard-total">
+            <div class="quiz-stage-flashcard-total">
               Total
             </div>
-            <div class="stage-flashcard-count">
+            <div class="quiz-stage-flashcard-count">
               {{ reviewCount }}
             </div>
           </div>
@@ -201,14 +201,26 @@ function start() {
   gap: 10px;
 }
 
-.stage-check-grid {
+.quiz-description {
+  margin: 0;
+  padding: 6px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #4a5568;
+  background: #f0f4f8;
+  border-radius: 6px;
+  border-left: 3px solid #007bff;
+  border-right: 3px solid #007bff;
+}
+
+.quiz-stage-grid {
   display: grid;
   grid-template-rows: repeat(4, 1fr);
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
-.stage-check-grid-row {
+.quiz-stage-grid-row {
   grid-column: span 2;
   display: flex;
   flex-direction: row;
@@ -221,29 +233,29 @@ function start() {
   transition: border-color 0.2s ease-in-out;
 }
 
-.stage-check-grid-row--total {
+.quiz-stage-grid-row--total {
   grid-column: 2;
   margin-top: 4px;
 }
 
-.stage-check-grid-row:not(.stage-check-grid-row--selected):not(.stage-check-grid-row--total):hover {
+.quiz-stage-grid-row:not(.quiz-stage-grid-row--selected):not(.quiz-stage-grid-row--total):hover {
   border-color: #007bff;
 }
 
-.stage-check-grid-row:has(.stage-check-grid-row--selected):hover {
+.quiz-stage-grid-row:has(.quiz-stage-grid-row--selected):hover {
   border-color: #0056b3;
 }
 
-.stage-check-grid-row--selected {
+.quiz-stage-grid-row--selected {
   border-color: #007bff;
 }
 
-.stage-checkbox {
+.quiz-stage-checkbox {
   flex: 1;
   font-size: 1rem;
 }
 
-.stage-flashcard-count {
+.quiz-stage-flashcard-count {
   font-size: 0.85rem;
   font-weight: 600;
   color: rgba(13, 18, 74, 0.6);
@@ -254,23 +266,11 @@ function start() {
   text-align: center;
 }
 
-.stage-flashcard-total {
+.quiz-stage-flashcard-total {
   color: #45454a;
   font-size: 1rem;
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
-}
-
-.quiz-description {
-  margin: 0;
-  padding: 6px;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  color: #4a5568;
-  background: #f0f4f8;
-  border-radius: 6px;
-  border-left: 3px solid #007bff;
-  border-right: 3px solid #007bff;
 }
 </style>
