@@ -187,25 +187,21 @@ function start() {
   align-items: center;
   gap: 10px;
   padding: 4px;
-  border: 1px solid rgb(225, 228, 240);
+  border: 1px solid #b8c4d6;
   border-radius: 6px;
-  transition: background 0.2s ease-in-out;
+  transition: border-color 0.2s ease-in-out;
 }
 
 .stage-checkbox-wrapper:not(.stage-checkbox-wrapper--selected):hover {
-  background: rgb(225, 228, 240);
+  border-color: #007bff;
 }
 
-.stage-checkbox-wrapper:not(.stage-checkbox-wrapper--selected):hover .stage-flashcard-count {
-  background: #fff;
+.stage-checkbox-wrapper:has(.stage-checkbox-wrapper--selected):hover {
+  border-color: #0056b3;
 }
 
 .stage-checkbox-wrapper--selected {
-  background: rgb(225, 228, 240);
-}
-
-.stage-checkbox-wrapper--selected .stage-flashcard-count {
-  background: #fff;
+  border-color: #007bff;
 }
 
 .stage-checkbox {
@@ -222,6 +218,5 @@ function start() {
   padding: 2px;
   width: 40px;
   text-align: center;
-  transition: background 0.2s ease-in-out;
 }
 </style>
