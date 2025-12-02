@@ -6,10 +6,10 @@
   >
     <div class="modal-main-area">
       <div class="modal-main-area--inner">
-        <div class="stage-checklist">
+        <div class="stage-check-grid">
           <div
-            class="stage-checkbox-wrapper"
-            :class="{ 'stage-checkbox-wrapper--selected': includeUnknown }"
+            class="stage-check-grid-row"
+            :class="{ 'stage-check-grid-row--selected': includeUnknown }"
           >
             <div class="stage-checkbox">
               <SmartCheckbox
@@ -22,8 +22,8 @@
             </div>
           </div>
           <div
-            class="stage-checkbox-wrapper"
-            :class="{ 'stage-checkbox-wrapper--selected': includeAttempted }"
+            class="stage-check-grid-row"
+            :class="{ 'stage-check-grid-row--selected': includeAttempted }"
           >
             <div class="stage-checkbox">
               <SmartCheckbox
@@ -36,8 +36,8 @@
             </div>
           </div>
           <div
-            class="stage-checkbox-wrapper"
-            :class="{ 'stage-checkbox-wrapper--selected': includeOuterSpace }"
+            class="stage-check-grid-row"
+            :class="{ 'stage-check-grid-row--selected': includeOuterSpace }"
           >
             <div class="stage-checkbox">
               <SmartCheckbox
@@ -47,6 +47,17 @@
             </div>
             <div class="stage-flashcard-count">
               {{ outerSpaceCount }}
+            </div>
+          </div>
+          <div
+            class="stage-check-grid-row stage-check-grid-row--total"
+            :class="{ 'stage-check-grid-row--selected': reviewCount > 0 }"
+          >
+            <div class="stage-flashcard-total">
+              Total
+            </div>
+            <div class="stage-flashcard-count">
+              {{ reviewCount }}
             </div>
           </div>
         </div>
@@ -62,7 +73,7 @@
           class="calm-button"
           text="Start"
           :on-click="start"
-          :disabled="totalCount <= 0"
+          :disabled="reviewCount <= 0"
           auto-blur
         />
       </div>
@@ -119,9 +130,20 @@ const attemptedCount = computed(() =>
 const outerSpaceCount = computed(() =>
   countFlashcards(flashcards.value, specialStages.OUTER_SPACE, currDay.value)
 )
-const totalCount = computed(() =>
-  unknownCount.value + attemptedCount.value + outerSpaceCount.value
-)
+
+const reviewCount = computed(() => {
+  let count = 0
+  if (includeUnknown.value) {
+    count += unknownCount.value
+  }
+  if (includeAttempted.value) {
+    count += attemptedCount.value
+  }
+  if (includeOuterSpace.value) {
+    count += outerSpaceCount.value
+  }
+  return count
+})
 
 function toggleModalForm() {
   toggleStore.toggleQuiz()
@@ -174,13 +196,15 @@ function start() {
   gap: 10px;
 }
 
-.stage-checklist {
-  display: flex;
-  flex-direction: column;
+.stage-check-grid {
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
-.stage-checkbox-wrapper {
+.stage-check-grid-row {
+  grid-column: span 2;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -192,15 +216,20 @@ function start() {
   transition: border-color 0.2s ease-in-out;
 }
 
-.stage-checkbox-wrapper:not(.stage-checkbox-wrapper--selected):hover {
+.stage-check-grid-row--total {
+  grid-column: 2;
+  margin-top: 4px;
+}
+
+.stage-check-grid-row:not(.stage-check-grid-row--selected):not(.stage-check-grid-row--total):hover {
   border-color: #007bff;
 }
 
-.stage-checkbox-wrapper:has(.stage-checkbox-wrapper--selected):hover {
+.stage-check-grid-row:has(.stage-check-grid-row--selected):hover {
   border-color: #0056b3;
 }
 
-.stage-checkbox-wrapper--selected {
+.stage-check-grid-row--selected {
   border-color: #007bff;
 }
 
@@ -218,5 +247,13 @@ function start() {
   padding: 2px;
   width: 40px;
   text-align: center;
+}
+
+.stage-flashcard-total {
+  color: #45454a;
+  font-size: 1rem;
+  letter-spacing: 0.05rem;
+  word-spacing: 0.05rem;
+  text-transform: uppercase;
 }
 </style>
