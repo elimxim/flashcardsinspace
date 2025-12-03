@@ -19,13 +19,16 @@
           :front-side-audio="flashcardFrontSideAudio"
           :back-side-audio="flashcardBackSideAudio"
         />
-        <SpaceCard
-          v-else
-          front-side="No more flashcards for review"
-          unflippable
-          text-only
-          transparent
-        />
+        <template v-else>
+          <slot v-if="hasSlot"/>
+          <SpaceCard
+            v-else
+            front-side="No more flashcards for review"
+            unflippable
+            text-only
+            transparent
+          />
+        </template>
       </transition>
     </div>
   </div>
@@ -39,7 +42,7 @@
 <script setup lang="ts">
 import SpaceCard from '@/components/SpaceCard.vue'
 import FlashcardEditModal from '@/modals/FlashcardEditModal.vue'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 
@@ -61,6 +64,7 @@ const props = withDefaults(defineProps<{
   },
 })
 
+const slots = useSlots()
 const toggleStore = useToggleStore()
 
 const deckReady = ref(false)
@@ -69,6 +73,7 @@ const audioWasChanged = ref(false)
 const spaceCard = ref<InstanceType<typeof SpaceCard>>()
 const cardTransition = ref('')
 
+const hasSlot = computed(() => !!slots.default)
 const viewedTimes = computed(() => (flashcard.value?.timesReviewed ?? 0) + 1)
 
 function setDeckReady() {
