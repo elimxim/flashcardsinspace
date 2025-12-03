@@ -23,7 +23,7 @@
           <slot v-if="hasSlot"/>
           <SpaceCard
             v-else
-            front-side="No more flashcards for review"
+            :front-side="deckEmptyMessage()"
             unflippable
             text-only
             transparent
@@ -45,6 +45,7 @@ import FlashcardEditModal from '@/modals/FlashcardEditModal.vue'
 import { computed, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
+import { deckEmptyMessage } from '@/core-logic/review-logic.ts'
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })

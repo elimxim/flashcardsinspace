@@ -295,3 +295,17 @@ export function calcStageReviews(
       }
     })
 }
+
+export const deckEmptyMessages = [
+  'Mission complete! No cards in orbit.',
+  'The deck is empty. Time to refuel!',
+  'Orbit cleared. All flashcards reviewed!',
+  'All caught up! Check back later.',
+  'Nothing left to review. Well done!',
+  'No flashcards to review.',
+]
+
+export const deckEmptyMessage = (): string => {
+  const index = Math.floor(Math.random() * deckEmptyMessages.length)
+  return deckEmptyMessages[index]
+}
