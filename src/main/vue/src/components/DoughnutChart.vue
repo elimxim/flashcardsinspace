@@ -1,0 +1,204 @@
+<template>
+  <div class="doughnut-chart--wrapper doughnut-chart--theme">
+    <div class="doughnut-chart">
+      <svg class="doughnut-circle" viewBox="0 0 100 100">
+        <circle
+          class="arc-right"
+          cx="50"
+          cy="50"
+          :r="radius"
+          fill="none"
+          :stroke-dasharray="rightDashArray"
+          transform="rotate(-90, 50, 50)"
+        />
+        <g transform="translate(100, 0) scale(-1, 1)">
+          <circle
+            class="arc-left"
+            cx="50"
+            cy="50"
+            :r="radius"
+            fill="none"
+            :stroke-dasharray="leftDashArray"
+            transform="rotate(-90, 50, 50)"
+          />
+        </g>
+      </svg>
+      <div class="doughnut-center">
+        <div class="doughnut-total">
+          {{ total }}
+        </div>
+        <div class="doughnut-total-label">
+          Total
+        </div>
+      </div>
+    </div>
+    <div class="doughnut-legend">
+      <div class="doughnut-legend-item">
+        <span class="doughnut-legend-color right"></span>
+        <span class="legend-text">
+          {{ rightPlaceholder }}: {{ rightCount }} ({{rightPercentage }}%)
+        </span>
+      </div>
+      <div class="doughnut-legend-item">
+        <span class="doughnut-legend-color left"></span>
+        <span class="legend-text">
+          {{ leftPlaceholder }}: {{ leftCount }} ({{leftPercentage }}%)
+        </span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+
+import { computed } from 'vue';
+
+const props = withDefaults(defineProps<{
+  total: number
+  left: number
+  leftPlaceholder?: string
+  rightPlaceholder?: string
+  showLegend?: boolean
+  radius?: number
+}>(), {
+  showLegend: true,
+  leftPlaceholder: 'Left',
+  rightPlaceholder: 'Right',
+  radius: 42,
+})
+
+const circumference = 2 * Math.PI * props.radius
+
+const rightCount = computed(() => props.total - props.left)
+const leftCount = computed(() => props.left)
+
+const rightRatio = computed(() => {
+  if (props.total === 0) return 0
+  if (leftCount.value === 0) return 1
+  return rightCount.value / props.total
+})
+
+const leftRatio = computed(() => {
+  if (props.total === 0) return 0
+  if (rightCount.value === 0) return 1
+  return leftCount.value / props.total
+})
+
+const rightPercentage = computed(() => {
+  return (rightRatio.value * 100).toFixed(0)
+})
+
+const leftPercentage = computed(() => {
+  if (props.total === 0) return 0
+  return (leftRatio.value * 100).toFixed(0)
+})
+
+const rightDashArray = computed(() => {
+  const arcLength = rightRatio.value * circumference
+  const gap = circumference - arcLength
+  return `${arcLength} ${gap}`
+})
+
+const leftDashArray = computed(() => {
+  const arcLength = leftRatio.value * circumference
+  const gap = circumference - arcLength
+  return `${arcLength} ${gap}`
+})
+
+</script>
+
+<style scoped>
+.doughnut-chart--theme {
+  --d-chart--size: var(--doughnut-chart--size, 180px);
+  --d-chart--arc--thickness: var(--doughnut-chart--arc--thickness, 12px);
+  --d-chart--arc--right--color: var(--doughnut-chart--arc--right--color, #4caf50);
+  --d-chart--arc--left--color: var(--doughnut-chart--arc--left--color, #f44336);
+  --d-chart--text--color: var(--doughnut-chart--text--color, #666);
+  --d-chart--total--color: var(--doughnut-chart--total--color, #333);
+}
+
+.doughnut-chart--wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.doughnut-chart {
+  position: relative;
+  width: var(--d-chart--size);
+  height: var(--d-chart--size);
+  margin: 0 auto;
+}
+
+.doughnut-circle {
+  width: 100%;
+  height: 100%;
+}
+
+.arc-right {
+  stroke: var(--d-chart--arc--right--color);
+  stroke-width: var(--d-chart--arc--thickness);
+  stroke-linecap: butt;
+}
+
+.arc-left {
+  stroke: var(--d-chart--arc--left--color);
+  stroke-width: var(--d-chart--arc--thickness);
+  stroke-linecap: butt;
+}
+
+.doughnut-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.doughnut-total {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--d-chart--total--color);
+}
+
+.doughnut-total-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--d-chart--text--color);
+}
+
+.doughnut-legend {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.doughnut-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.doughnut-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.doughnut-legend-color.right {
+  background: var(--d-chart--arc--right--color);
+}
+
+.doughnut-legend-color.left {
+  background: var(--d-chart--arc--left--color);
+}
+
+.legend-text {
+  font-size: 0.85rem;
+  color: var(--d-chart--text--color);
+}
+</style>
