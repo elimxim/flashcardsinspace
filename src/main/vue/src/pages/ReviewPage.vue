@@ -57,7 +57,16 @@
           :on-audio-changed="onAudioChanged"
           :flashcard-front-side-audio="flashcardFrontSideAudioBlob"
           :flashcard-back-side-audio="flashcardBackSideAudioBlob"
-        />
+          :show-slot="isQuizMode"
+        >
+          <QuizResult
+            v-if="isQuizMode"
+            :round="quizRound"
+            :flashcards-total="flashcardsTotal"
+            :flashcards-failed="failedFlashcards.length"
+            :on-next-round="startNextQuizRound"
+          />
+        </SpaceDeck>
         <div class="review-nav">
           <template v-if="isLightspeedMode">
             <SmartButton
@@ -108,6 +117,26 @@
               rounded
             />
           </template>
+          <template v-if="isQuizMode">
+            <SmartButton
+              class="decision-button dangerous-button"
+              text="Don't know"
+              :disabled="noNextAvailable"
+              :hidden="noNextAvailable"
+              :on-click="() => quizAnswer(false)"
+              auto-blur
+              rounded
+            />
+            <SmartButton
+              class="decision-button safe-button"
+              text="Know"
+              :disabled="noNextAvailable"
+              :hidden="noNextAvailable"
+              :on-click="() => quizAnswer(true)"
+              auto-blur
+              rounded
+            />
+          </template>
         </div>
       </div>
     </div>
@@ -123,6 +152,7 @@ import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import Starfield from '@/components/Starfield.vue'
+import QuizResult from '@/components/QuizResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -145,7 +175,8 @@ import {
   EmptyReviewQueue,
   ReviewMethod,
   ReviewQueue,
-  determineReviewMode
+  determineReviewMode,
+  MonoStageReviewQueue
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
@@ -176,6 +207,7 @@ const isLightspeedMode = computed(() => reviewMode.value.method === ReviewMethod
 const isSpecialMode = computed(() => reviewMode.value.method === ReviewMethod.SPECIAL)
 const isSpaceMode = computed(() => reviewMode.value.method === ReviewMethod.SPACE)
 const isSpecialOrSpaceMode = computed(() => isSpecialMode.value || isSpaceMode.value)
+const isQuizMode = computed(() => reviewMode.value.method === ReviewMethod.QUIZ)
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
@@ -214,6 +246,9 @@ const flashcardBackSideAudioBlob = ref<Blob | undefined>()
 const autoPlayVoice = ref(false)
 const autoRepeatVoice = ref(false)
 
+const quizRound = ref(1)
+const failedFlashcards = ref<Flashcard[]>([])
+
 async function prevFlashcard(): Promise<boolean> {
   currFlashcard.value = reviewQueue.value.prev()
   await fetchAudio()
@@ -243,6 +278,7 @@ function startReview() {
 async function finishReview() {
   console.log(`Finishing review: ${JSON.stringify(reviewMode.value)}`)
   reviewQueue.value = new EmptyReviewQueue()
+  failedFlashcards.value = []
   flashcardsTotal.value = 0
   flashcardFrontSideAudioBlob.value = undefined
   flashcardBackSideAudioBlob.value = undefined
@@ -298,6 +334,36 @@ async function stageUp() {
   }
 }
 
+async function quizAnswer(know: boolean) {
+  if (know) {
+    spaceDeck.value?.willSlideToRight()
+    await nextFlashcard()
+  } else {
+    spaceDeck.value?.willSlideToLeft()
+    if (currFlashcard.value) {
+      failedFlashcards.value.push(currFlashcard.value)
+    }
+    await nextFlashcard()
+  }
+}
+
+async function startNextQuizRound() {
+  if (failedFlashcards.value.length === 0) {
+    console.error('Cannot start new round: no failed flashcards')
+    return
+  }
+
+  const newQueue = new MonoStageReviewQueue(failedFlashcards.value)
+  newQueue.shuffle()
+
+  reviewQueue.value = newQueue
+  quizRound.value = quizRound.value + 1
+  failedFlashcards.value = []
+  flashcardsTotal.value = reviewQueue.value.remaining()
+
+  await nextFlashcard()
+}
+
 async function prev() {
   spaceDeck.value?.willSlideToLeft()
   await prevFlashcard()
@@ -305,7 +371,9 @@ async function prev() {
 
 async function next() {
   spaceDeck.value?.willSlideToRight()
+  console.log('Next flashcard')
   await nextFlashcard()
+  console.log(currFlashcard.value)
 }
 
 async function moveBack() {
@@ -398,10 +466,12 @@ function handleKeydown(event: KeyboardEvent) {
     event.stopPropagation()
     if (isLightspeedMode.value) stageDown()
     if (isSpecialOrSpaceMode.value) prev()
+    if (isQuizMode.value) quizAnswer(false)
   } else if (event.key === 'ArrowRight') {
     event.stopPropagation()
     if (isLightspeedMode.value) stageUp()
     if (isSpecialOrSpaceMode.value) next()
+    if (isQuizMode.value) quizAnswer(true)
   }
 }
 
