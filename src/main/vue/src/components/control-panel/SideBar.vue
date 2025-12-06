@@ -78,7 +78,7 @@ import {
   loadFlashcardSetStore,
   reloadFlashcardRelatedStores,
 } from '@/utils/stores.ts'
-import { saveSelectedSetId } from '@/utils/cookies.ts'
+import { saveSelectedSetIdToCookies } from '@/utils/cookies.ts'
 import { FlashcardSet } from '@/model/flashcard.ts'
 import { useControlStore } from '@/stores/control-store.ts'
 
@@ -122,7 +122,7 @@ async function selectFlashcardSet(setId: number) {
     await loadFlashcardRelatedStores(set)
       .then((loaded) => {
         if (loaded) {
-          saveSelectedSetId(set.id)
+          saveSelectedSetIdToCookies(set.id)
         }
       })
   }

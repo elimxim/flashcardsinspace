@@ -34,25 +34,25 @@ function loadNumberCookie(name: string): number | undefined {
   }
 }
 
-function saveUserSignedUp(value: boolean) {
+function saveUserSignedUpToCookies(value: boolean) {
   saveCookie(COOKIE_USER_SIGNED_UP, value.toString(), 30)
 }
 
-function loadUserSignedUp(): boolean {
+function loadUserSignedUpFromCookies(): boolean {
   return loadBooleanCookie(COOKIE_USER_SIGNED_UP)
 }
 
-function saveSelectedSetId(value: number) {
+function saveSelectedSetIdToCookies(value: number) {
   saveCookie(COOKIE_SELECTED_SET_ID, value.toString(), 30)
 }
 
-function loadSelectedSetId(): number | undefined {
+function loadSelectedSetIdFromCookies(): number | undefined {
   return loadNumberCookie(COOKIE_SELECTED_SET_ID)
 }
 
 export {
-  saveUserSignedUp,
-  loadUserSignedUp,
-  saveSelectedSetId,
-  loadSelectedSetId,
+  saveUserSignedUpToCookies,
+  loadUserSignedUpFromCookies,
+  saveSelectedSetIdToCookies,
+  loadSelectedSetIdFromCookies,
 }

@@ -128,7 +128,7 @@ import { useVuelidate } from '@vuelidate/core'
 import { required, email, minLength, helpers, maxLength } from '@vuelidate/validators'
 import { sendSignupRequest } from '@/api/auth-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { saveUserSignedUp } from '@/utils/cookies.ts'
+import { saveUserSignedUpToCookies } from '@/utils/cookies.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -257,7 +257,7 @@ async function signup() {
   ).then(async (response) => {
     console.log('Successfully signed up: ', authStore.user?.id)
     authStore.setUser(response.data)
-    saveUserSignedUp(true)
+    saveUserSignedUpToCookies(true)
     await router.push({ name: routeNames.controlPanel })
   }).catch(error => {
     signupFailed.value = true

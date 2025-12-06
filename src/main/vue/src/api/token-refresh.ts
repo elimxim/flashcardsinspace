@@ -7,13 +7,13 @@ import {
 import { sendRefreshTokenRequest } from '@/api/auth-client.ts'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { redirectToLoginPage } from '@/router/index.ts'
-import { loadUserSignedUp } from '@/utils/cookies.ts'
+import { loadUserSignedUpFromCookies } from '@/utils/cookies.ts'
 
 export function configureTokenRefreshInterceptor(axiosInstance: AxiosInstance) {
   axiosInstance.interceptors.response.use(
     (response: AxiosResponse) => response,
     async (error: AxiosError) => {
-      if (!loadUserSignedUp()) {
+      if (!loadUserSignedUpFromCookies()) {
         return Promise.reject(error)
       } else {
         return handleUnauthorizedError(error, axiosInstance)

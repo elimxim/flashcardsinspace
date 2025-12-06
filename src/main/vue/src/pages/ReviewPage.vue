@@ -180,7 +180,7 @@ import {
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
-import { loadSelectedSetId } from '@/utils/cookies.ts'
+import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { loadFlashcardRelatedStoresById } from '@/utils/stores.ts'
@@ -422,7 +422,7 @@ function onAudioChanged() {
 onMounted(async () => {
   if (!flashcardStore.loaded) {
     console.log('Flashcard set not loaded, loading...')
-    const selectedSetId = loadSelectedSetId()
+    const selectedSetId = loadSelectedSetIdFromCookies()
     if (selectedSetId) {
       await loadFlashcardRelatedStoresById(selectedSetId)
     } else {

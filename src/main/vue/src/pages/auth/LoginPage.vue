@@ -87,7 +87,7 @@ import { useAuthStore } from "@/stores/auth-store.ts"
 import { routeNames } from "@/router"
 import { sendLoginRequest } from '@/api/auth-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { saveUserSignedUp } from '@/utils/cookies.ts'
+import { saveUserSignedUpToCookies } from '@/utils/cookies.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -151,7 +151,7 @@ async function login() {
   await sendLoginRequest(userEmail.value, userPassword.value).then(async (response) => {
     console.log('Successfully logged in: ', authStore.user?.id)
     authStore.setUser(response.data)
-    saveUserSignedUp(true)
+    saveUserSignedUpToCookies(true)
     await router.push({ name: routeNames.controlPanel })
   }).catch(error => {
     loginFailed.value = true

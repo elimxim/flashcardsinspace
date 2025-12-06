@@ -12,7 +12,7 @@ import PasswordResetView from '@/pages/auth/PasswordResetView.vue'
 import ReviewPage from '@/pages/ReviewPage.vue'
 import LightspeedSchedulePage from '@/pages/LightspeedSchedulePage.vue'
 import { toLearningStages } from '@/core-logic/stage-logic.ts'
-import { loadUserSignedUp } from '@/utils/cookies.ts'
+import { loadUserSignedUpFromCookies } from '@/utils/cookies.ts'
 
 export const routeNames = {
   base: 'base',
@@ -114,7 +114,7 @@ router.beforeEach(async (to, _, next) => {
   const { isAuthenticated } = storeToRefs(authStore)
 
   if (to.meta.requiresAuth && !isAuthenticated.value) {
-    const isUserSignedUp = loadUserSignedUp()
+    const isUserSignedUp = loadUserSignedUpFromCookies()
     if (isUserSignedUp) {
       next({ name: routeNames.login })
     } else {
