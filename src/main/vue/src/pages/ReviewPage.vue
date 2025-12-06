@@ -301,13 +301,7 @@ async function finishReviewAndLeave() {
 }
 
 async function stageDown() {
-  if (!flashcardSet.value || !currFlashcard.value) {
-    console.error(`stageDown's impossible:`,
-      `flashcard set ${flashcardSet.value?.id ?? 'undefined'}`,
-      `flashcard ${currFlashcard.value?.id ?? 'undefined'}`
-    )
-    return
-  }
+  if (!flashcardSet.value || !currFlashcard.value) return
   spaceDeck.value?.willSlideToLeft()
   const flashcard = copyFlashcard(currFlashcard.value)
   updateFlashcard(flashcard, prevStage(flashcard.stage), currDay.value.chronodate)
@@ -318,13 +312,7 @@ async function stageDown() {
 }
 
 async function stageUp() {
-  if (!flashcardSet.value || !currFlashcard.value) {
-    console.error(`stageUp's impossible:`,
-      `flashcard set ${flashcardSet.value?.id ?? 'undefined'}`,
-      `flashcard ${currFlashcard.value?.id ?? 'undefined'}`
-    )
-    return
-  }
+  if (!flashcardSet.value || !currFlashcard.value) return
   spaceDeck.value?.willSlideToRight()
   const flashcard = copyFlashcard(currFlashcard.value)
   updateFlashcard(flashcard, nextStage(flashcard.stage), currDay.value.chronodate)
@@ -335,16 +323,16 @@ async function stageUp() {
 }
 
 async function quizAnswer(know: boolean) {
+  if (!currFlashcard.value) return
   if (know) {
     spaceDeck.value?.willSlideToRight()
-    await nextFlashcard()
   } else {
     spaceDeck.value?.willSlideToLeft()
     if (currFlashcard.value) {
       failedFlashcards.value.push(currFlashcard.value)
     }
-    await nextFlashcard()
   }
+  await nextFlashcard()
 }
 
 async function startNextQuizRound() {
@@ -365,15 +353,15 @@ async function startNextQuizRound() {
 }
 
 async function prev() {
+  if (noPrevAvailable.value) return
   spaceDeck.value?.willSlideToLeft()
   await prevFlashcard()
 }
 
 async function next() {
+  if (noNextAvailable.value) return
   spaceDeck.value?.willSlideToRight()
-  console.log('Next flashcard')
   await nextFlashcard()
-  console.log(currFlashcard.value)
 }
 
 async function moveBack() {
