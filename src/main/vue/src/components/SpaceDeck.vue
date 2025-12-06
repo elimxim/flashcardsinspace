@@ -80,11 +80,8 @@ const hasSlot = computed(() => !!slots.default)
 const viewedTimes = computed(() => (flashcard.value?.timesReviewed ?? 0) + 1)
 
 function setDeckReady() {
-  console.log(`FlashcardDeck.ready`)
   deckReady.value = true
-  if (deckReady.value) {
-    cardTransition.value = 'drop-down'
-  }
+  cardTransition.value = 'drop-down'
 }
 
 function willSlideToLeft() {

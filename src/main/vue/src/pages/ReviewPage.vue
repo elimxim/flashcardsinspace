@@ -343,12 +343,11 @@ async function startNextQuizRound() {
 
   const newQueue = new MonoStageReviewQueue(failedFlashcards.value)
   newQueue.shuffle()
-
   reviewQueue.value = newQueue
   quizRound.value = quizRound.value + 1
   failedFlashcards.value = []
   flashcardsTotal.value = reviewQueue.value.remaining()
-
+  spaceDeck.value?.setDeckReady()
   await nextFlashcard()
 }
 
