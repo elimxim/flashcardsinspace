@@ -187,9 +187,17 @@ import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { loadFlashcardRelatedStoresById } from '@/utils/stores.ts'
-import { sendFlashcardUpdateRequest } from '@/api/api-client.ts'
+import {
+  sendChronoBulkUpdateRequest,
+  sendFlashcardUpdateRequest
+} from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { markDaysAsCompleted, markDaysAsInProgress } from '@/core-logic/chrono-logic.ts'
+import {
+  chronodayStatuses,
+  chronodayStatusesToCompleteDay,
+  chronodayStatusesToProgressDay,
+  selectConsecutiveDaysBefore
+} from '@/core-logic/chrono-logic.ts';
 
 const props = defineProps<{
   mode?: string,
@@ -418,6 +426,44 @@ async function fetchAudio() {
     flashcardFrontSideAudioBlob,
     flashcardBackSideAudioBlob,
   )
+}
+
+export async function markDaysAs(
+  flashcardSetId: number,
+  status: string,
+  acceptedStatuses: Set<string>,
+) {
+  if (!acceptedStatuses.has(currDay.value.status)) {
+    return
+  }
+
+  const days = selectConsecutiveDaysBefore(chronodays.value, currDay.value, acceptedStatuses)
+  if (days.length === 0) {
+    console.error(
+      `No days to mark as ${status}`,
+      `flashcard set ${flashcardSetId}`,
+      `current day: ${JSON.stringify(currDay.value)}`
+    )
+    return
+  }
+
+  await sendChronoBulkUpdateRequest(flashcardSetId, status, days)
+    .then((response) => {
+      chronoStore.updateDays(response.data.chronodays)
+      chronoStore.updateDayStreak(response.data.dayStreak)
+    })
+    .catch((error) => {
+      console.error(`Failed to mark days as ${status} for ${flashcardSetId}`, error.response?.data)
+      toaster.bakeError(`Couldn't move a flashcard`, error.response?.data)
+    })
+}
+
+export async function markDaysAsInProgress(flashcardSet: FlashcardSet) {
+  await markDaysAs(flashcardSet.id, chronodayStatuses.IN_PROGRESS, chronodayStatusesToProgressDay)
+}
+
+export async function markDaysAsCompleted(flashcardSet: FlashcardSet) {
+  await markDaysAs(flashcardSet.id, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
 }
 
 function onFlashcardRemoved() {
