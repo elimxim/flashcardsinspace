@@ -62,9 +62,12 @@
           <QuizResult
             v-if="isQuizMode"
             :round="quizRound"
-            :flashcards-total="flashcardsTotal"
-            :flashcards-failed="failedFlashcards.length"
+            :overall-total="quizOverallTotal"
+            :overall-correct="quizOverallCorrect"
+            :round-total="flashcardsTotal"
+            :round-failed="failedFlashcards.length"
             :on-next-round="startNextQuizRound"
+            :on-finish="finishReviewAndLeave"
           />
         </SpaceDeck>
         <div class="review-nav">
@@ -247,6 +250,8 @@ const autoPlayVoice = ref(false)
 const autoRepeatVoice = ref(false)
 
 const quizRound = ref(1)
+const quizOverallTotal = ref(0)
+const quizOverallCorrect = ref(0)
 const failedFlashcards = ref<Flashcard[]>([])
 
 async function prevFlashcard(): Promise<boolean> {
@@ -271,6 +276,7 @@ function startReview() {
     reviewQueue.value = createReviewQueueForStages(flashcards.value, props.stages, currDay.value)
   }
   flashcardsTotal.value = reviewQueue.value.remaining()
+  quizOverallTotal.value = flashcardsTotal.value
   nextFlashcard()
   console.log(`Flashcards TOTAL: ${flashcardsTotal.value}`)
 }
@@ -284,6 +290,8 @@ async function finishReview() {
   flashcardBackSideAudioBlob.value = undefined
   autoPlayVoice.value = false
   autoRepeatVoice.value = false
+  quizOverallTotal.value = 0
+  quizOverallCorrect.value = 0
   if (flashcardSet.value) {
     if (noNextAvailable.value && isLightspeedMode.value) {
       await markDaysAsCompleted(flashcardSet.value)
@@ -325,6 +333,7 @@ async function stageUp() {
 async function quizAnswer(know: boolean) {
   if (!currFlashcard.value) return
   if (know) {
+    quizOverallCorrect.value = quizOverallCorrect.value + 1
     spaceDeck.value?.willSlideToRight()
   } else {
     spaceDeck.value?.willSlideToLeft()
