@@ -1,38 +1,31 @@
 <template>
   <div class="quiz-result">
     <div class="quiz-title">
-      Quiz Round {{ round }} Results
+      Quiz Round {{ round }}
     </div>
-    <div class="quiz-curr-round-grid">
-      <div class="quiz-curr-round-text">
-        Flashcards Known
-      </div>
-      <div class="quiz-curr-round-number">
-        {{ flashcardsTotal - flashcardsFailed }}
-      </div>
-      <div class="quiz-curr-round-text">
-        Flashcards Unknown
-      </div>
-      <div class="quiz-curr-round-number">
-        {{ flashcardsFailed }}
-      </div>
-      <div class="quiz-next-round-button">
-        <SmartButton
-          text="Ready for Next Round?"
-          class="calm-button"
-          :on-click="onNextRound"
-          fill-width
-          auto-blur
-        />
-      </div>
+    <DoughnutChart
+      :total="flashcardsTotal"
+      :left="flashcardsFailed"
+      left-placeholder="Unknown"
+      right-placeholder="Known"
+    />
+    <div class="quiz-next-round-button">
+      <SmartButton
+        text="Ready for the Next Round?"
+        class="calm-button"
+        :on-click="onNextRound"
+        fill-width
+        auto-blur
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import DoughnutChart from '@/components/DoughnutChart.vue'
 import SmartButton from '@/components/SmartButton.vue'
 
-defineProps<{
+const props = defineProps<{
   round: number
   flashcardsTotal: number
   flashcardsFailed: number
@@ -66,39 +59,7 @@ defineProps<{
   padding: 4px;
 }
 
-.quiz-curr-round-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: repeat(3, 1fr);
-  grid-auto-flow: row;
-  align-items: center;
-  gap: 10px;
-}
-
-.quiz-curr-round-text {
-  font-size: 1rem;
-  color: #45454a;
-  letter-spacing: 0.05rem;
-  word-spacing: 0.05rem;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: nowrap;
-  justify-self: start;
-}
-
-.quiz-curr-round-number {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: orangered;
-  background: gray;
-  border-radius: 3px;
-  padding: 2px;
-  width: 50px;
-  text-align: center;
-  justify-self: end;
-}
-
 .quiz-next-round-button {
-  grid-column: 1 / -1;
+  margin-top: auto;
 }
 </style>
