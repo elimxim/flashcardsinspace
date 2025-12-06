@@ -6,7 +6,7 @@
           class="arc-right"
           cx="50"
           cy="50"
-          :r="radius"
+          :r="RADIUS"
           fill="none"
           :stroke-dasharray="rightDashArray"
           transform="rotate(-90, 50, 50)"
@@ -16,7 +16,7 @@
             class="arc-left"
             cx="50"
             cy="50"
-            :r="radius"
+            :r="RADIUS"
             fill="none"
             :stroke-dasharray="leftDashArray"
             transform="rotate(-90, 50, 50)"
@@ -52,21 +52,22 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+// Fixed radius in viewBox coordinates (viewBox is 100x100)
+// Radius of 42 leaves room for stroke width of ~16 (42 + 8 = 50, centered)
+const RADIUS = 42
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS
+
 const props = withDefaults(defineProps<{
   total: number
   left: number
   showLegend?: boolean
   legendLeft?: string
   legendRight?: string
-  radius?: number
 }>(), {
   showLegend: true,
   legendLeft: 'Left',
   legendRight: 'Right',
-  radius: 42,
 })
-
-const circumference = 2 * Math.PI * props.radius
 
 const rightCount = computed(() => props.total - props.left)
 const leftCount = computed(() => props.left)
@@ -93,14 +94,14 @@ const leftPercentage = computed(() => {
 })
 
 const rightDashArray = computed(() => {
-  const arcLength = rightRatio.value * circumference
-  const gap = circumference - arcLength
+  const arcLength = rightRatio.value * CIRCUMFERENCE
+  const gap = CIRCUMFERENCE - arcLength
   return `${arcLength} ${gap}`
 })
 
 const leftDashArray = computed(() => {
-  const arcLength = leftRatio.value * circumference
-  const gap = circumference - arcLength
+  const arcLength = leftRatio.value * CIRCUMFERENCE
+  const gap = CIRCUMFERENCE - arcLength
   return `${arcLength} ${gap}`
 })
 
@@ -108,8 +109,7 @@ const leftDashArray = computed(() => {
 
 <style scoped>
 .doughnut-chart--theme {
-  --d-chart--size: var(--doughnut-chart--size, 180px);
-  --d-chart--arc--thickness: var(--doughnut-chart--arc--thickness, 12px);
+  --d-chart--arc--thickness: var(--doughnut-chart--arc--thickness, 16);
   --d-chart--arc--right--color: var(--doughnut-chart--arc--right--color, #4caf50);
   --d-chart--arc--left--color: var(--doughnut-chart--arc--left--color, #f44336);
   --d-chart--text--color: var(--doughnut-chart--text--color, #666);
@@ -122,13 +122,15 @@ const leftDashArray = computed(() => {
   align-items: center;
   justify-content: center;
   gap: 10px;
+  width: 100%;
+  height: 100%;
 }
 
 .doughnut-chart {
+  flex: 1;
   position: relative;
-  width: var(--d-chart--size);
-  height: var(--d-chart--size);
-  margin: 0 auto;
+  aspect-ratio: 1;
+  container-type: inline-size;
 }
 
 .doughnut-circle {
