@@ -86,9 +86,9 @@ const seconds = computed(() => {
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 100%;
+  height: auto;
   background: var(--sw--bg);
-  container-type: size;
+  container-type: inline-size;
 }
 
 .classic-display {
