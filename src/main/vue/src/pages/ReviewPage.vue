@@ -61,6 +61,7 @@
         >
           <QuizResult
             v-if="isQuizMode"
+            :elapsed-time="elapsedTime"
             :round="quizRound"
             :overall-total="quizOverallTotal"
             :overall-correct="quizOverallCorrect"
@@ -157,6 +158,7 @@ import SpaceToast from '@/components/SpaceToast.vue'
 import Starfield from '@/components/Starfield.vue'
 import QuizResult from '@/components/QuizResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
+import { useStopWatch } from '@/utils/stop-watch.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import {
@@ -262,6 +264,13 @@ const quizOverallTotal = ref(0)
 const quizOverallCorrect = ref(0)
 const failedFlashcards = ref<Flashcard[]>([])
 
+const {
+  elapsedTime,
+  startWatch,
+  stopWatch,
+  resetWatch
+} = useStopWatch()
+
 async function prevFlashcard(): Promise<boolean> {
   currFlashcard.value = reviewQueue.value.prev()
   await fetchAudio()
@@ -271,6 +280,9 @@ async function prevFlashcard(): Promise<boolean> {
 async function nextFlashcard(): Promise<boolean> {
   currFlashcard.value = reviewQueue.value.next()
   await fetchAudio()
+  if (!currFlashcard.value) {
+    stopWatch()
+  }
   return currFlashcard.value !== undefined
 }
 
@@ -286,11 +298,14 @@ function startReview() {
   flashcardsTotal.value = reviewQueue.value.remaining()
   quizOverallTotal.value = flashcardsTotal.value
   nextFlashcard()
+  resetWatch()
+  startWatch()
   console.log(`Flashcards TOTAL: ${flashcardsTotal.value}`)
 }
 
 async function finishReview() {
   console.log(`Finishing review: ${JSON.stringify(reviewMode.value)}`)
+  stopWatch()
   reviewQueue.value = new EmptyReviewQueue()
   failedFlashcards.value = []
   flashcardsTotal.value = 0
@@ -365,6 +380,7 @@ async function startNextQuizRound() {
   failedFlashcards.value = []
   flashcardsTotal.value = reviewQueue.value.remaining()
   spaceDeck.value?.setDeckReady()
+  startWatch()
   await nextFlashcard()
 }
 

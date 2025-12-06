@@ -33,6 +33,10 @@
           </div>
         </div>
       </div>
+      <Clock
+        :time="elapsedTime"
+        clock-style="modern"
+      />
     </div>
     <div class="quiz-chart">
       <DoughnutChart
@@ -71,8 +75,10 @@
 <script setup lang="ts">
 import DoughnutChart from '@/components/DoughnutChart.vue'
 import SmartButton from '@/components/SmartButton.vue'
+import Clock from '@/components/Clock.vue'
 
 withDefaults(defineProps<{
+  elapsedTime: number
   round: number
   overallTotal: number
   overallCorrect: number
@@ -96,6 +102,7 @@ withDefaults(defineProps<{
   display: grid;
   grid-template-rows: auto 1fr auto;
   grid-template-columns: repeat(5, 1fr);
+  align-items: center;
   gap: 10px;
   padding: 10px;
   border-radius: 6px;
@@ -119,18 +126,16 @@ withDefaults(defineProps<{
 
 .quiz-info {
   grid-column: 1 / 3;
-  flex: 0 0 38%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr;
   align-items: center;
-  gap: 10px;
   padding: 10px;
+  gap: 16px;
 }
 
 .quiz-chart {
   grid-column: 3 / -1;
-  flex: 0 0 58%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -140,11 +145,10 @@ withDefaults(defineProps<{
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: fit-content;
-  gap: 10px;
-  padding: 10px;
+  gap: 4px;
+  padding: 6px;
   border: 2px solid rgb(225, 228, 240);
-  border-radius: 6px;
+  border-radius: 14px;
 }
 
 .quiz-stats-title {
@@ -168,7 +172,7 @@ withDefaults(defineProps<{
 }
 
 .quiz-stats-text {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #45454a;
   letter-spacing: 0.05rem;
@@ -179,7 +183,7 @@ withDefaults(defineProps<{
 }
 
 .quiz-stats-number {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: rgba(17, 33, 85, 0.92);
   background: rgb(225, 228, 240);
