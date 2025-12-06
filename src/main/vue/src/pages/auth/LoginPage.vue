@@ -87,7 +87,7 @@ import { useAuthStore } from "@/stores/auth-store.ts"
 import { routeNames } from "@/router"
 import { sendLoginRequest } from '@/api/auth-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { saveUserSignedUp } from '@/shared/cookies.ts'
+import { saveUserSignedUp } from '@/utils/cookies.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()

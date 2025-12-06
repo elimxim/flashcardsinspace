@@ -7,7 +7,7 @@ import {
 import { sendRefreshTokenRequest } from '@/api/auth-client.ts'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { redirectToLoginPage } from '@/router/index.ts'
-import { loadUserSignedUp } from '@/shared/cookies.ts'
+import { loadUserSignedUp } from '@/utils/cookies.ts'
 
 export function configureTokenRefreshInterceptor(axiosInstance: AxiosInstance) {
   axiosInstance.interceptors.response.use(

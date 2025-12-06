@@ -180,7 +180,7 @@ import {
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
-import { loadSelectedSetId } from '@/shared/cookies.ts'
+import { loadSelectedSetId } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { loadFlashcardRelatedStoresById } from '@/shared/stores.ts'

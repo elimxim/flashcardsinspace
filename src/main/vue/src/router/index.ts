@@ -12,7 +12,7 @@ import PasswordResetView from '@/pages/auth/PasswordResetView.vue'
 import ReviewPage from '@/pages/ReviewPage.vue'
 import LightspeedSchedulePage from '@/pages/LightspeedSchedulePage.vue'
 import { toLearningStages } from '@/core-logic/stage-logic.ts'
-import { loadUserSignedUp } from '@/shared/cookies.ts'
+import { loadUserSignedUp } from '@/utils/cookies.ts'
 
 export const routeNames = {
   base: 'base',

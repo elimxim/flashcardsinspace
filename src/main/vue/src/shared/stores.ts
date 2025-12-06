@@ -12,7 +12,7 @@ import {
   sendFlashcardSetsGetRequest,
   sendFlashcardsGetRequest,
 } from '@/api/api-client.ts'
-import { loadSelectedSetId } from '@/shared/cookies.ts'
+import { loadSelectedSetId } from '@/utils/cookies.ts'
 import { sortFlashcardSets } from '@/core-logic/flashcard-logic.ts'
 import { sendLanguagesGetRequest } from '@/api/public-api-client.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'

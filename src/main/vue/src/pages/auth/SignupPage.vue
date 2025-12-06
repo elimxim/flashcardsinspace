@@ -128,7 +128,7 @@ import { useVuelidate } from '@vuelidate/core'
 import { required, email, minLength, helpers, maxLength } from '@vuelidate/validators'
 import { sendSignupRequest } from '@/api/auth-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { saveUserSignedUp } from '@/shared/cookies.ts'
+import { saveUserSignedUp } from '@/utils/cookies.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()
