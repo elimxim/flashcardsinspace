@@ -225,6 +225,7 @@ export function createReviewQueue(
 }
 
 export function createReviewQueueForStages(flashcards: Flashcard[], stages: Stage[], currDay: Chronoday): ReviewQueue {
+  console.log(`Creating review queue for stages: ${stages.map(s => s.name).join(', ')}`)
   const stageNameSet = new Set(stages.map(s => s.name))
 
   const result: Flashcard[] = []
@@ -232,13 +233,18 @@ export function createReviewQueueForStages(flashcards: Flashcard[], stages: Stag
     result.push(...flashcards.filter(f =>
       f.stage === learningStages.S1.name && isUnknownFlashcard(f, currDay)
     ))
-  } else if (stageNameSet.has(specialStages.ATTEMPTED.name)) {
+  }
+  if (stageNameSet.has(specialStages.ATTEMPTED.name)) {
     result.push(...flashcards.filter(f =>
       f.stage === learningStages.S1.name && isReviewedFlashcard(f, currDay)
     ))
-  } else {
-    result.push(...flashcards.filter(f => stageNameSet.has(f.stage)))
   }
+  if (stageNameSet.has(learningStages.S1.name)) {
+    result.push(...flashcards.filter(f =>
+      f.stage === learningStages.S1.name && !isUnknownFlashcard(f, currDay) && !isReviewedFlashcard(f, currDay)
+    ))
+  }
+  result.push(...flashcards.filter(f => stageNameSet.has(f.stage)))
 
   const queue = new MonoStageReviewQueue(result)
   queue.shuffle()
