@@ -38,7 +38,7 @@ import {
   type Component,
   ComputedRef,
 } from 'vue'
-import { loadFlashcardSetStore } from '@/shared/stores.ts'
+import { loadFlashcardSetStore } from '@/utils/stores.ts'
 import { specialStages } from '@/core-logic/stage-logic.ts'
 import { useFlip } from '@/utils/flip.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'

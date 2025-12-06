@@ -77,7 +77,7 @@ import {
   loadFlashcardRelatedStores,
   loadFlashcardSetStore,
   reloadFlashcardRelatedStores,
-} from '@/shared/stores.ts'
+} from '@/utils/stores.ts'
 import { saveSelectedSetId } from '@/utils/cookies.ts'
 import { FlashcardSet } from '@/model/flashcard.ts'
 import { useControlStore } from '@/stores/control-store.ts'

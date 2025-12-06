@@ -10,7 +10,7 @@
 import Navbar from '@/components/Navbar.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import { onMounted } from 'vue'
-import { loadLanguageStore } from '@/shared/stores.ts'
+import { loadLanguageStore } from '@/utils/stores.ts'
 
 onMounted(() => {
   loadLanguageStore()
