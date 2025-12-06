@@ -2,6 +2,7 @@ import Cookies from 'js-cookie'
 
 const COOKIE_SELECTED_SET_ID = 'selectedSetId'
 const COOKIE_USER_SIGNED_UP = 'userSignedUp'
+const COOKIE_SIDEBAR_EXPANDED = 'sidebarExpanded'
 
 function saveCookie(name: string, value: string, expires: number) {
   Cookies.set(name, value, {
@@ -50,9 +51,19 @@ function loadSelectedSetIdFromCookies(): number | undefined {
   return loadNumberCookie(COOKIE_SELECTED_SET_ID)
 }
 
+function setSidebarExpandedToCookies(value: boolean) {
+  saveCookie(COOKIE_SIDEBAR_EXPANDED, value.toString(), 30)
+}
+
+function loadSidebarExpandedFromCookies(): boolean {
+  return loadBooleanCookie(COOKIE_SIDEBAR_EXPANDED)
+}
+
 export {
   saveUserSignedUpToCookies,
   loadUserSignedUpFromCookies,
   saveSelectedSetIdToCookies,
   loadSelectedSetIdFromCookies,
+  setSidebarExpandedToCookies,
+  loadSidebarExpandedFromCookies,
 }
