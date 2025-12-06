@@ -33,18 +33,22 @@
           </div>
         </div>
       </div>
-      <Clock
-        :time="elapsedTime"
-        clock-style="modern"
-      />
+      <div class="quiz-clock">
+        <Clock
+          :time="elapsedTime"
+          clock-style="modern"
+        />
+      </div>
     </div>
-    <div class="quiz-chart">
-      <DoughnutChart
-        :total="roundTotal"
-        :left="roundFailed"
-        legend-left="Incorrect"
-        legend-right="Correct"
-      />
+    <div class="quiz-chart-wrapper">
+      <div class="quiz-chart">
+        <DoughnutChart
+          :total="roundTotal"
+          :left="roundFailed"
+          legend-left="Incorrect"
+          legend-right="Correct"
+        />
+      </div>
     </div>
     <div
       :class="{
@@ -126,40 +130,63 @@ withDefaults(defineProps<{
 
 .quiz-info {
   grid-column: 1 / 3;
+  width: 100%;
+  height: 100%;
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: auto auto;
   grid-template-columns: 1fr;
-  align-items: center;
   padding: 10px;
   gap: 16px;
 }
 
-.quiz-chart {
+.quiz-chart-wrapper {
   grid-column: 3 / -1;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 10px;
+}
+
+.quiz-chart {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  border-radius: 14px;
 }
 
 .quiz-stats {
   display: flex;
   flex-direction: column;
   align-items: center;
+  align-self: flex-end;
   gap: 4px;
   padding: 6px;
-  border: 2px solid rgb(225, 228, 240);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
   border-radius: 14px;
 }
 
+.quiz-clock {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
 .quiz-stats-title {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: clamp(0.5rem, 2vw, 0.75rem);
+  font-weight: 400;
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
   text-align: center;
   white-space: nowrap;
-  color: rgb(159, 164, 182);
+  color: #9fa4b6;
 }
 
 .quiz-stats-row {
@@ -174,7 +201,7 @@ withDefaults(defineProps<{
 .quiz-stats-text {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #45454a;
+  color: #1a1a2e;
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -187,7 +214,7 @@ withDefaults(defineProps<{
   font-weight: 600;
   color: rgba(17, 33, 85, 0.92);
   background: rgb(225, 228, 240);
-  padding: 2px;
+  padding: 3px;
   margin: 2px;
   border-radius: 6px;
   width: 40px;
