@@ -91,10 +91,17 @@ tasks.register<NpmTask>("npmRunBuild") {
     outputs.dir(project.layout.buildDirectory.dir("resources/main/static/").get().asFile.toString())
 }
 
+tasks.register<NpmTask>("npmRunTest") {
+    dependsOn("npmInstall")
+    npmCommand.set(listOf("run", "test", "--", "--run"))
+    inputs.dir("src/main/vue/src")
+}
+
 tasks.named("processResources") {
     dependsOn("npmRunBuild")
 }
 
 tasks.withType<Test> {
+    dependsOn("npmRunTest")
     useJUnitPlatform()
 }
