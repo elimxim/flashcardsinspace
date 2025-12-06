@@ -145,17 +145,22 @@ const seconds = computed(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: clamp(2px, 3cqi, 8px);
   padding: clamp(4px, 6cqi, 14px) clamp(6px, 8cqi, 18px);
   background: var(--sw--modern--bg);
   border-radius: clamp(4px, 6cqi, 14px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  height: fit-content;
 }
 
 .modern-time {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: clamp(4px, 5cqi, 12px);
+  width: 100%;
 }
 
 .modern-segment-group {
@@ -163,10 +168,12 @@ const seconds = computed(() => {
   flex-direction: column;
   align-items: center;
   gap: clamp(0.05rem, 1cqi, 0.2rem);
+  flex: 1;
+  container-type: inline-size;
 }
 
 .modern-value {
-  font-size: clamp(0.75rem, 18cqi, 3rem);
+  font-size: clamp(0.75rem, 50cqi, 3rem);
   font-weight: 300;
   color: var(--sw--modern--text-color);
   font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -174,8 +181,8 @@ const seconds = computed(() => {
 }
 
 .modern-label {
-  font-size: clamp(0.3rem, 5cqi, 0.75rem);
-  font-weight: 600;
+  font-size: clamp(0.5rem, 14cqi, 0.75rem);
+  font-weight: 400;
   letter-spacing: 0.1em;
   color: var(--sw--modern--label--color);
 }
@@ -187,8 +194,8 @@ const seconds = computed(() => {
 }
 
 .modern-elapsed-label {
-  font-size: clamp(0.3rem, 5cqi, 0.75rem);
-  font-weight: 600;
+  font-size: clamp(0.5rem, 5cqi, 0.75rem);
+  font-weight: 400;
   letter-spacing: 0.1em;
   color: var(--sw--modern--label--color);
 }
