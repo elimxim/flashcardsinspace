@@ -6,8 +6,8 @@
     <DoughnutChart
       :total="flashcardsTotal"
       :left="flashcardsFailed"
-      left-placeholder="Incorrect"
-      right-placeholder="Correct"
+      legend-left="Incorrect"
+      legend-right="Correct"
     />
     <div class="quiz-next-round-button">
       <SmartButton

@@ -36,13 +36,13 @@
       <div class="doughnut-legend-item">
         <span class="doughnut-legend-color right"></span>
         <span class="legend-text">
-          {{ rightPlaceholder }}: {{ rightCount }} ({{rightPercentage }}%)
+          {{ legendRight }}: {{ rightCount }} ({{ rightPercentage }}%)
         </span>
       </div>
       <div class="doughnut-legend-item">
         <span class="doughnut-legend-color left"></span>
         <span class="legend-text">
-          {{ leftPlaceholder }}: {{ leftCount }} ({{leftPercentage }}%)
+          {{ legendLeft }}: {{ leftCount }} ({{ leftPercentage }}%)
         </span>
       </div>
     </div>
@@ -55,14 +55,14 @@ import { computed } from 'vue'
 const props = withDefaults(defineProps<{
   total: number
   left: number
-  leftPlaceholder?: string
-  rightPlaceholder?: string
   showLegend?: boolean
+  legendLeft?: string
+  legendRight?: string
   radius?: number
 }>(), {
   showLegend: true,
-  leftPlaceholder: 'Left',
-  rightPlaceholder: 'Right',
+  legendLeft: 'Left',
+  legendRight: 'Right',
   radius: 42,
 })
 
