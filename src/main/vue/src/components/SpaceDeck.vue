@@ -20,7 +20,7 @@
           :back-side-audio="flashcardBackSideAudio"
         />
         <template v-else>
-          <slot v-if="hasSlot"/>
+          <slot v-if="hasSlot && showSlot"/>
           <SpaceCard
             v-else
             :front-side="deckEmptyMessage()"
@@ -52,11 +52,13 @@ const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })
 const autoRepeatVoice = defineModel<boolean>('autoRepeatVoice', { default: false })
 
 const props = withDefaults(defineProps<{
+  showSlot?: boolean
   flashcardFrontSideAudio?: Blob | undefined
   flashcardBackSideAudio?: Blob | undefined
   onFlashcardRemoved?: () => void
   onAudioChanged?: () => void
 }>(), {
+  showSlot: true,
   flashcardFrontSideAudio: undefined,
   flashcardBackSideAudio: undefined,
   onFlashcardRemoved: () => {
