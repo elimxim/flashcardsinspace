@@ -428,7 +428,7 @@ async function fetchAudio() {
   )
 }
 
-export async function markDaysAs(
+async function markDaysAs(
   flashcardSetId: number,
   status: string,
   acceptedStatuses: Set<string>,
@@ -458,11 +458,11 @@ export async function markDaysAs(
     })
 }
 
-export async function markDaysAsInProgress(flashcardSet: FlashcardSet) {
+async function markDaysAsInProgress(flashcardSet: FlashcardSet) {
   await markDaysAs(flashcardSet.id, chronodayStatuses.IN_PROGRESS, chronodayStatusesToProgressDay)
 }
 
-export async function markDaysAsCompleted(flashcardSet: FlashcardSet) {
+async function markDaysAsCompleted(flashcardSet: FlashcardSet) {
   await markDaysAs(flashcardSet.id, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
 }
 
