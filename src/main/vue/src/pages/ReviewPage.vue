@@ -197,7 +197,7 @@ import {
   chronodayStatusesToCompleteDay,
   chronodayStatusesToProgressDay,
   selectConsecutiveDaysBefore
-} from '@/core-logic/chrono-logic.ts';
+} from '@/core-logic/chrono-logic.ts'
 
 const props = defineProps<{
   mode?: string,

@@ -1,11 +1,6 @@
 import { toSortedOrderNumbers } from '@/core-logic/stage-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 import { asIsoDateStr } from '@/utils/utils.ts'
-import { sendChronoBulkUpdateRequest } from '@/api/api-client.ts'
-import { storeToRefs } from 'pinia'
-import { useChronoStore } from '@/stores/chrono-store.ts'
-import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { FlashcardSet } from '@/model/flashcard.ts'
 
 export const chronodayStatuses = {
   INITIAL: 'INITIAL',
