@@ -16,8 +16,8 @@
             icon="fa-solid fa-bars"
             class="control-bar-button"
             :on-click="sidebar?.toggle"
-            :hidden="isSidebarExpanded && !isSidebarOverlay"
-            :disabled="isSidebarExpanded && !isSidebarOverlay"
+            :hidden="sidebarExpandedCookie && !isSidebarOverlay"
+            :disabled="sidebarExpandedCookie && !isSidebarOverlay"
           />
         </template>
         <template #right>
@@ -33,7 +33,7 @@
       </ControlBar>
       <div class="control-panel-content scrollbar-hidden">
         <FlashcardInfoBar
-          :hidden="!flashcardSet || (isSidebarExpanded && !isSidebarOverlay)"
+          :hidden="!flashcardSet || (sidebarExpandedCookie && !isSidebarOverlay)"
         />
         <MainPanel/>
         <LearningStagesWidget :grow-multiplier="3"/>
@@ -69,14 +69,12 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
-import { useControlStore } from '@/stores/control-store.ts'
+import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
 
 const flashcardStore = useFlashcardStore()
 const toggleStore = useToggleStore()
-const controlStore = useControlStore()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
-const { isSidebarExpanded } = storeToRefs(controlStore)
 
 const sidebar = ref<InstanceType<typeof SideBar>>()
 const isSidebarOverlay = computed(() => sidebar.value?.isOverlay ?? false)

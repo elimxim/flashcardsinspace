@@ -2,13 +2,13 @@
   <div class="sidebar-wrapper">
     <div
       class="sidebar-overlay"
-      :class="{ 'sidebar-overlay--visible': isSidebarExpanded && isOverlay }"
+      :class="{ 'sidebar-overlay--visible': sidebarExpandedCookie && isOverlay }"
       @click="toggle"
     />
     <div
       class="sidebar sidebar--theme"
       :class="{
-        'sidebar--collapsed': !isSidebarExpanded,
+        'sidebar--collapsed': !sidebarExpandedCookie,
         'sidebar--overlay': isOverlay,
         'sidebar--no-transition': isTransitioning
       }"
@@ -80,7 +80,7 @@ import {
 } from '@/utils/stores.ts'
 import { saveSelectedSetIdToCookies } from '@/utils/cookies.ts'
 import { FlashcardSet } from '@/model/flashcard.ts'
-import { useControlStore } from '@/stores/control-store.ts'
+import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
 
 const OVERLAY_BREAKPOINT = 660
 
@@ -88,11 +88,9 @@ const flashcardStore = useFlashcardStore()
 const flashcardSetStore = useFlashcardSetStore()
 const languageStore = useLanguageStore()
 const toggleStore = useToggleStore()
-const controlStore = useControlStore()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
 const { flashcardSets } = storeToRefs(flashcardSetStore)
-const { isSidebarExpanded } = storeToRefs(controlStore)
 
 const isOverlay = ref(window.innerWidth <= OVERLAY_BREAKPOINT)
 const isTransitioning = ref(false)
@@ -113,7 +111,7 @@ function updateOverlayMode() {
 }
 
 function toggle() {
-  controlStore.toggleSidebar()
+  sidebarExpandedCookie.value = !sidebarExpandedCookie.value
 }
 
 async function selectFlashcardSet(setId: number) {
