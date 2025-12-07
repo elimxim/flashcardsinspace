@@ -1,14 +1,12 @@
 package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
 import com.github.elimxim.flashcardsinspace.web.dto.*
-import com.github.elimxim.flashcardsinspace.web.exception.ChronodayHasReviewsException
-import com.github.elimxim.flashcardsinspace.web.exception.ChronodayIsDayOff
-import com.github.elimxim.flashcardsinspace.web.exception.CorruptedChronoStateException
-import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetNotStartedException
+import com.github.elimxim.flashcardsinspace.web.exception.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -26,6 +24,7 @@ class ChronoService(
     private val lightspeedService: LightspeedService,
     private val requestValidator: RequestValidator,
     private val dayStreakService: DayStreakService,
+    private val chronodayRepository: ChronodayRepository,
 ) {
     @Transactional
     fun sync(user: User, setId: Long, request: ChronoSyncRequest): ChronoSyncResponse {
@@ -184,6 +183,13 @@ class ChronoService(
             chronodays = updatedDays,
             dayStreak = dayStreak,
         )
+    }
+
+    @Transactional
+    fun getEntity(id: Long): Chronoday {
+        return chronodayRepository.findById(id).orElseThrow {
+            throw ChronodayNotFoundException("Chronoday $id not found")
+        }
     }
 
     private fun applySchedule(flashcardSet: FlashcardSet): Pair<ChronodayDto, List<ChronodayDto>> {
