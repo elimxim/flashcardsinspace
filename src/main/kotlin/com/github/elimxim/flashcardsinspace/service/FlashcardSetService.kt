@@ -6,6 +6,7 @@ import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetReposi
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetNotFoundException
+import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetNotStartedException
 import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetSuspendedException
 import com.github.elimxim.flashcardsinspace.web.exception.UserOperationNotAllowedException
 import org.slf4j.LoggerFactory
@@ -142,6 +143,14 @@ class FlashcardSetService(
     fun verifyUserHasAccess(user: User, id: Long) {
         if (getEntity(id).user.id != user.id) {
             throw UserOperationNotAllowedException("User ${user.id} does not have access to flashcard set $id")
+        }
+    }
+
+    @Transactional
+    fun verifyInitialized(id: Long) {
+        val flashcardSet = getEntity(id)
+        if (flashcardSet.chronodays.isEmpty()) {
+            throw FlashcardSetNotStartedException("Flashcard set $id is not started")
         }
     }
 
