@@ -1,5 +1,8 @@
-package com.github.elimxim.flashcardsinspace.web.exception
+package com.github.elimxim.flashcardsinspace.util
 
+import com.github.elimxim.flashcardsinspace.web.exception.ErrorCode
+import com.github.elimxim.flashcardsinspace.web.exception.ExceptionHttpStatus
+import com.github.elimxim.flashcardsinspace.web.exception.HttpException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus
 import kotlin.reflect.KClass
