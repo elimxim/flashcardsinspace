@@ -3,6 +3,7 @@ package com.github.elimxim.flashcardsinspace.service.validation
 import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
 import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
+import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
 import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
@@ -165,5 +166,52 @@ class TimezoneValidator : ConstraintValidator<ValidTimezone, String> {
             // Catch all exceptions including DateTimeException, IllegalArgumentException, etc.
             return false
         }
+    }
+}
+
+@Target(
+    AnnotationTarget.FIELD,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.VALUE_PARAMETER
+)
+@Retention(AnnotationRetention.RUNTIME)
+@Constraint(validatedBy = [ReviewSessionTypeValidator::class])
+annotation class ValidReviewSessionType(
+    val message: String = "{jakarta.validation.constraints.reviewSession.type.invalid.message}",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = [],
+)
+
+class ReviewSessionTypeValidator : ConstraintValidator<ValidReviewSessionType, String> {
+    override fun isValid(value: String?, context: ConstraintValidatorContext?): Boolean {
+        if (value == null) return true
+        try {
+            ReviewSessionType.valueOf(value)
+            return true
+        } catch (_: IllegalArgumentException) {
+            return false
+        }
+    }
+}
+
+@Target(
+    AnnotationTarget.FIELD,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.VALUE_PARAMETER
+)
+@Retention(AnnotationRetention.RUNTIME)
+@Constraint(validatedBy = [MetadataValidator::class])
+annotation class ValidMetadata(
+    val message: String = "{jakarta.validation.constraints.metadata.invalid.message}",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = [],
+)
+
+class MetadataValidator : ConstraintValidator<ValidMetadata, Map<String, String>> {
+    private val pattern = Regex("^[A-Za-z0-9 _\\[,\\]-]+$")
+
+    override fun isValid(value: Map<String, String>?, context: ConstraintValidatorContext?): Boolean {
+        if (value == null) return true
+        return value.all { (key, v) -> pattern.matches(key) && pattern.matches(v) }
     }
 }
