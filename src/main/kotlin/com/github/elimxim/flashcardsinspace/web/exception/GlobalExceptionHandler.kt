@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.elimxim.flashcardsinspace.Messages
 import com.github.elimxim.flashcardsinspace.security.escapeHtml
+import com.github.elimxim.flashcardsinspace.util.getErrorCode
+import com.github.elimxim.flashcardsinspace.util.getHttpStatus
 import com.github.elimxim.flashcardsinspace.util.printApplicationStackTrace
 import com.github.elimxim.flashcardsinspace.util.withLoggingContext
 import org.slf4j.LoggerFactory
