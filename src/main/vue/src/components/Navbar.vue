@@ -13,18 +13,17 @@
 
     <div class="nav-items">
       <transition name="pop" mode="out-in">
-        <div v-if="showIcons" key="icon" class="nav-item-icon">
+        <div v-if="showIcons && isAuthenticated" key="icon" class="nav-item-icon">
           <AwesomeButton
             class="navigation-button"
             icon="fa-solid fa-rocket"
-            :disabled="!isAuthenticated"
             :on-click="navigateToControlPanel"
             :scale-factor="1.2"
             fill-space
             square
           />
         </div>
-        <div v-else key="text" class="nav-item-text">
+        <div v-else-if="isAuthenticated" key="text" class="nav-item-text">
           <div class="nav-text nav-text--item" @click="navigateToControlPanel">
             Control Panel
           </div>
@@ -116,6 +115,7 @@ const { isAuthenticated } = storeToRefs(authStore)
 const showIcons = ref(window.innerWidth <= ICONS_SWITCH_BREAKPOINT)
 
 function navigateToControlPanel() {
+  if (!isAuthenticated.value) return
   router.push({ name: routeNames.controlPanel })
 }
 
