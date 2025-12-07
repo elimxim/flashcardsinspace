@@ -57,6 +57,18 @@ class FlashcardNotFoundException(msg: String) : BadRequestException(msg)
 @UserMessageCode("user.message.error.language.notFound")
 class LanguageNotFoundException(msg: String) : BadRequestException(msg)
 
+@ErrorCode("CNF400")
+@UserMessageCode("user.message.error.chronoday.notFound")
+class ChronodayNotFoundException(msg: String) : BadRequestException(msg)
+
+@ErrorCode("RSN400")
+@UserMessageCode("user.message.error.reviewSession.notFound")
+class ReviewSessionNotFoundException(msg: String) : BadRequestException(msg)
+
+@ErrorCode("PRQ400")
+@UserMessageCode("user.message.error.reviewSession.parentNotQuiz")
+class ParentReviewSessionIsNotQuizException(msg: String) : BadRequestException(msg)
+
 @ErrorCode("FSI400")
 @UserMessageCode("user.message.error.flashcardSet.alreadyStarted")
 class FlashcardsSetAlreadyStartedException(msg: String) : BadRequestException(msg)
