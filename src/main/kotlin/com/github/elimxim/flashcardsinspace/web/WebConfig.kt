@@ -21,7 +21,7 @@ class WebConfig : WebMvcConfigurer {
                 // Disable adjusting dates to context timezone during deserialization
                 .featuresToDisable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 // Enable JavaTimeModule for proper LocalDate and ZonedDateTime serialization
-                .modules(JavaTimeModule())
+                .modulesToInstall(JavaTimeModule())
         }
     }
 
