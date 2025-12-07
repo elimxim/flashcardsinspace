@@ -2,7 +2,7 @@ package com.github.elimxim.flashcardsinspace
 
 import com.github.elimxim.flashcardsinspace.web.exception.HttpException
 import com.github.elimxim.flashcardsinspace.web.exception.UserMessageCode
-import com.github.elimxim.flashcardsinspace.web.exception.findAnnotationInClassHierarchy
+import com.github.elimxim.flashcardsinspace.util.findAnnotationInClassHierarchy
 import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.context.NoSuchMessageException
