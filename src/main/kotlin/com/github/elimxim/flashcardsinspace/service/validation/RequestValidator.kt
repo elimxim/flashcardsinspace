@@ -3,6 +3,7 @@ package com.github.elimxim.flashcardsinspace.service.validation
 import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
 import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
+import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
 import com.github.elimxim.flashcardsinspace.security.escapeJava
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.InvalidRequestFieldsException
@@ -114,6 +115,28 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
+    fun validate(request: ReviewSessionCreateRequest): ValidReviewSessionCreateRequest {
+        validateRequest<ReviewSessionCreateRequest>(request) { violations ->
+            throw InvalidRequestFieldsException(
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+                fields(violations)
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
+    fun validate(request: ReviewSessionUpdateRequest): ValidReviewSessionUpdateRequest {
+        validateRequest<ReviewSessionUpdateRequest>(request) { violations ->
+            throw InvalidRequestFieldsException(
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+                fields(violations)
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
     private inline fun <reified T> validateRequest(request: T, ifInvalid: (List<Violation>) -> Unit) {
         val constraintViolations = validator.validate(request)
         if (constraintViolations.isNotEmpty()) {
@@ -210,4 +233,17 @@ fun UserUpdateRequest.toValidRequest() = ValidUserUpdateRequest(
     email = email!!,
     name = name!!,
     languageId = languageId!!.toLong(),
+)
+
+fun ReviewSessionCreateRequest.toValidRequest() = ValidReviewSessionCreateRequest(
+    type = ReviewSessionType.valueOf(type!!),
+    chronodayId = chronodayId!!.toLong(),
+    flashcardIds = flashcardIds?.map { it.id!!.toLong() }?.toSet() ?: emptySet(),
+)
+
+fun ReviewSessionUpdateRequest.toValidRequest() = ValidReviewSessionUpdateRequest(
+    elapsedTime = elapsedTime!!.toLong(),
+    flashcardIds = flashcardIds?.map { it.id!!.toLong() }?.toSet() ?: emptySet(),
+    finished = finished?.toBoolean() ?: false,
+    metadata = metadata ?: emptyMap(),
 )
