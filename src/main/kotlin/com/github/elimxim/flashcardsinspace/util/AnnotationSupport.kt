@@ -1,11 +1,13 @@
 package com.github.elimxim.flashcardsinspace.util
 
+import com.github.elimxim.flashcardsinspace.entity.MetadataField
 import com.github.elimxim.flashcardsinspace.web.exception.ErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.ExceptionHttpStatus
 import com.github.elimxim.flashcardsinspace.web.exception.HttpException
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.http.HttpStatus
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.superclasses
 
@@ -36,4 +38,13 @@ inline fun <reified T : Annotation> findAnnotationInClassHierarchy(kClass: KClas
         currentClass?.let { classHierarchy.add(it) }
     }
     return null
+}
+
+fun getMetadataFieldName(field: KProperty1<*, *>): String? {
+    val anno = getAnnotationFromField<MetadataField>(field)
+    return anno?.name
+}
+
+inline fun <reified T: Annotation> getAnnotationFromField(property: KProperty1<*, *>): T? {
+    return property.findAnnotation<T>()
 }
