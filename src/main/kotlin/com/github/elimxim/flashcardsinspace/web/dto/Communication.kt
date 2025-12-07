@@ -3,6 +3,7 @@ package com.github.elimxim.flashcardsinspace.web.dto
 import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
 import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
+import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
 import com.github.elimxim.flashcardsinspace.security.ConfidentialLength
 import com.github.elimxim.flashcardsinspace.security.Password
 import com.github.elimxim.flashcardsinspace.security.RequiredConfidential
@@ -245,4 +246,61 @@ data class ValidUserUpdateRequest(
     val email: String,
     val name: String,
     val languageId: Long,
+)
+
+data class ReviewSessionCreateRequest(
+    @field:NotNull
+    @field:NotBlank
+    @field:ValidReviewSessionType
+    var type: String? = null,
+    @field:NotNull
+    @field:NotBlank
+    @field:Pattern(regexp="^\\d+$")
+    var chronodayId: String? = null,
+    @field:Valid
+    var flashcardIds: List<FlashcardId>? = null,
+) {
+    class FlashcardId(
+        @field:NotNull
+        @field:NotBlank
+        @field:Pattern(regexp = "^\\d+$")
+        var id: String? = null,
+    )
+}
+
+data class ValidReviewSessionCreateRequest(
+    val type: ReviewSessionType,
+    val chronodayId: Long,
+    val flashcardIds: Set<Long>,
+)
+
+data class ReviewSessionResponse(
+    val reviewSessionId: Long,
+)
+
+data class ReviewSessionUpdateRequest(
+    @field:NotNull
+    @field:NotBlank
+    @field:Pattern(regexp="^\\d+$")
+    var elapsedTime: String? = null,
+    @field:Valid
+    var flashcardIds: List<FlashcardId>? = null,
+    @field:Pattern(regexp="^(true|false)$")
+    var finished: String? = null,
+    @field:ValidMetadata
+    var metadata: Map<String, String>? = null,
+) {
+    class FlashcardId(
+        @field:NotNull
+        @field:NotBlank
+        @field:Pattern(regexp = "^\\d+$")
+        var id: String? = null,
+    )
+}
+
+data class ValidReviewSessionUpdateRequest(
+    val elapsedTime: Long,
+    val flashcardIds: Set<Long>,
+    val finished: Boolean,
+    val metadata: Map<String, String>,
 )
