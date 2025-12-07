@@ -144,3 +144,27 @@ fun UserUpdateRequest.escapeJava() = UserUpdateRequest(
     name = name?.escapeJava(),
     languageId = languageId?.escapeJava(),
 )
+
+fun ReviewSessionCreateRequest.normalize() = ReviewSessionCreateRequest(
+    type = type?.normalize(),
+    chronodayId = chronodayId?.normalize(),
+    flashcardIds = flashcardIds?.map { ReviewSessionCreateRequest.FlashcardId(it.id?.normalize()) },
+)
+
+fun ReviewSessionCreateRequest.escapeJava() = ReviewSessionCreateRequest(
+    type = type?.escapeJava(),
+    chronodayId = chronodayId?.escapeJava(),
+    flashcardIds = flashcardIds?.map { ReviewSessionCreateRequest.FlashcardId(it.id?.escapeJava()) },
+)
+
+fun ReviewSessionUpdateRequest.normalize() = ReviewSessionUpdateRequest(
+    elapsedTime = elapsedTime?.normalize(),
+    flashcardIds = flashcardIds?.map { ReviewSessionUpdateRequest.FlashcardId(it.id?.normalize()) },
+    metadata = metadata?.map { (k, v) -> k.escapeJava() to v.escapeJava() }?.toMap(),
+)
+
+fun ReviewSessionUpdateRequest.escapeJava() = ReviewSessionUpdateRequest(
+    elapsedTime = elapsedTime?.escapeJava(),
+    flashcardIds = flashcardIds?.map { ReviewSessionUpdateRequest.FlashcardId(it.id?.escapeJava()) },
+    metadata = metadata?.map { (k, v) -> k.escapeJava() to v.escapeJava() }?.toMap(),
+)
