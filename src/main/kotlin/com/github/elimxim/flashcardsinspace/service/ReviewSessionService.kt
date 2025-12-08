@@ -115,6 +115,13 @@ class ReviewSessionService(
     }
 
     @Transactional
+    fun getReviewSession(user: User, setId: Long, id: Long): ReviewSessionDto {
+        log.info("Getting review session $id for set $setId")
+        flashcardSetService.verifyUserHasAccess(user, setId)
+        return getEntity(id).toDto()
+    }
+
+    @Transactional
     fun getEntity(id: Long): ReviewSession {
         return reviewSessionRepository.findById(id).orElseThrow {
             ReviewSessionNotFoundException("Review session $id not found")

@@ -4,6 +4,7 @@ import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.ReviewSessionService
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionCreateRequest
+import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionDto
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionResponse
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionUpdateRequest
 import org.springframework.http.ResponseEntity
@@ -47,5 +48,15 @@ class ReviewSessionController(
     ): ResponseEntity<ReviewSessionResponse> {
         val response = reviewSessionService.createChild(user, setId, parentId, request.normalize())
         return ResponseEntity.ok(response)
+    }
+
+    @GetMapping("/{id:\\d+}")
+    fun getReviewSession(
+        @AuthenticationPrincipal user: User,
+        @PathVariable setId: Long,
+        @PathVariable id: Long,
+    ): ResponseEntity<ReviewSessionDto> {
+        val dto = reviewSessionService.getReviewSession(user, setId, id)
+        return ResponseEntity.ok(dto)
     }
 }
