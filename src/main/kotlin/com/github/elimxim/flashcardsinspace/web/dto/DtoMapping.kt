@@ -1,6 +1,7 @@
 package com.github.elimxim.flashcardsinspace.web.dto
 
 import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.util.getMetadataFieldName
 
 fun User.toDto() = UserDto(
     id = id,
@@ -57,3 +58,33 @@ fun FlashcardAudio.toDto() = FlashcardAudioDto(
     flashcardId = flashcard.id,
     uploadedAt = uploadedAt,
 )
+
+fun ReviewSession.toDto() = ReviewSessionDto(
+    id = id,
+    type = type.name,
+    flashcardIds = flashcardIds?.toList(),
+    elapsedTime = elapsedTime,
+    startedAt = startedAt,
+    finishedAt = finishedAt,
+    lastUpdatedAt = lastUpdatedAt,
+    metadata = metadata?.toDto(),
+)
+
+fun ReviewSessionMetadata.toDto(): Map<String, Any>? = when (this) {
+    is QuizMetadata -> {
+        buildMap {
+            getMetadataFieldName(QuizMetadata::round)?.let {
+                put(it, round)
+            }
+            getMetadataFieldName(QuizMetadata::nextRoundFlashcardIds)?.let {
+                put(it, nextRoundFlashcardIds)
+            }
+            getMetadataFieldName(QuizMetadata::overallCorrectCount)?.let {
+                put(it, overallCorrectCount)
+            }
+            getMetadataFieldName(QuizMetadata::overallTotalCount)?.let {
+                put(it, overallTotalCount)
+            }
+        }
+    }
+}
