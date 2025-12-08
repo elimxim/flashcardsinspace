@@ -65,10 +65,13 @@ enum class ReviewSessionType {
 sealed class ReviewSessionMetadata
 
 data class QuizMetadata(
+    @field:MetadataField("round")
     var round: Int,
     @field:MetadataField("nextRoundFlashcardIds")
     var nextRoundFlashcardIds: MutableList<Long> = mutableListOf(),
+    @field:MetadataField("overallCorrectCount")
     var overallCorrectCount: Int,
+    @field:MetadataField("overallTotalCount")
     var overallTotalCount: Int,
 ) : ReviewSessionMetadata()
 
