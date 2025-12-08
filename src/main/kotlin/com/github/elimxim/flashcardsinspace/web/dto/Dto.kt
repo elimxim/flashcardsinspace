@@ -71,3 +71,14 @@ data class ChronodayDto(
     val status: String,
     val stages: List<String>,
 )
+
+data class ReviewSessionDto(
+    val id: Long,
+    val type: String,
+    val flashcardIds: List<Long>?,
+    val elapsedTime: Long,
+    val startedAt: ZonedDateTime,
+    val finishedAt: ZonedDateTime?,
+    val lastUpdatedAt: ZonedDateTime?,
+    val metadata: Map<String, Any>?,
+)
