@@ -2,7 +2,7 @@
   <div
     :class="[
       'page',
-      { 'page--bg--light': !isSpaceMode },
+      { 'page--bg--light': !reviewMode.isOuterSpace() },
       'flex-column',
       'flex-center',
       'scroll-none',
@@ -27,7 +27,7 @@
     </ControlBar>
     <div class="review-layout">
       <Starfield
-        v-if="isSpaceMode"
+        v-if="reviewMode.isOuterSpace()"
         :density="120"
         :star-size="1.8"
         twinkle
@@ -57,10 +57,10 @@
           :on-audio-changed="onAudioChanged"
           :flashcard-front-side-audio="flashcardFrontSideAudioBlob"
           :flashcard-back-side-audio="flashcardBackSideAudioBlob"
-          :show-slot="isQuizMode"
+          :show-slot="reviewMode.isQuiz()"
         >
           <QuizResult
-            v-if="isQuizMode"
+            v-if="reviewMode.isQuiz()"
             :elapsed-time="elapsedTime"
             :round="quizRound"
             :overall-total="quizOverallTotal"
@@ -72,7 +72,7 @@
           />
         </SpaceDeck>
         <div class="review-nav">
-          <template v-if="isLightspeedMode">
+          <template v-if="reviewMode.isLightspeed()">
             <SmartButton
               text="Don't know"
               class="decision-button dangerous-button"
@@ -92,7 +92,7 @@
               rounded
             />
           </template>
-          <template v-if="isSpecialOrSpaceMode">
+          <template v-if="reviewMode.isSpecial()">
             <SmartButton
               class="calm-button"
               text="Prev"
@@ -102,7 +102,7 @@
               rounded
             />
             <SmartButton
-              v-if="isSpaceMode"
+              v-if="reviewMode.isOuterSpace()"
               class="decision-button dangerous-button"
               text="Move back"
               :disabled="noNextAvailable"
@@ -121,7 +121,7 @@
               rounded
             />
           </template>
-          <template v-if="isQuizMode">
+          <template v-if="reviewMode.isQuiz()">
             <SmartButton
               class="decision-button dangerous-button"
               text="Don't know"
@@ -171,17 +171,15 @@ import {
   prevStage,
   Stage,
   learningStages,
-  specialStages
 } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
   createReviewQueue,
   createReviewQueueForStages,
   EmptyReviewQueue,
-  ReviewMethod,
   ReviewQueue,
   determineReviewMode,
-  MonoStageReviewQueue
+  MonoStageReviewQueue, sessionToSpecialStage
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
@@ -202,7 +200,7 @@ import {
 } from '@/core-logic/chrono-logic.ts'
 
 const props = defineProps<{
-  mode?: string,
+  session?: string,
   stages: Stage[],
 }>()
 
@@ -215,13 +213,7 @@ const flashcardStore = useFlashcardStore()
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
 
-const reviewMode = computed(() => determineReviewMode(props.mode, props.stages))
-const isLightspeedMode = computed(() => reviewMode.value.method === ReviewMethod.LIGHTSPEED)
-const isSpecialMode = computed(() => reviewMode.value.method === ReviewMethod.SPECIAL)
-const isSpaceMode = computed(() => reviewMode.value.method === ReviewMethod.SPACE)
-const isSpecialOrSpaceMode = computed(() => isSpecialMode.value || isSpaceMode.value)
-const isQuizMode = computed(() => reviewMode.value.method === ReviewMethod.QUIZ)
-
+const reviewMode = computed(() => determineReviewMode(props.session, props.stages))
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
@@ -288,10 +280,13 @@ async function nextFlashcard(): Promise<boolean> {
 
 function startReview() {
   console.log(`Starting review: ${JSON.stringify(reviewMode.value)}`)
-  if (isLightspeedMode.value) {
+  if (reviewMode.value.isLightspeed()) {
     reviewQueue.value = createReviewQueue(flashcards.value, currDay.value, chronodays.value)
-  } else if (isSpaceMode.value) {
-    reviewQueue.value = createReviewQueueForStages(flashcards.value, [specialStages.OUTER_SPACE], currDay.value)
+  } else if (reviewMode.value.isSpecial()) {
+    const stage = sessionToSpecialStage(reviewMode.value.session)
+    if (stage) {
+      reviewQueue.value = createReviewQueueForStages(flashcards.value, [stage], currDay.value)
+    }
   } else {
     reviewQueue.value = createReviewQueueForStages(flashcards.value, props.stages, currDay.value)
   }
@@ -316,7 +311,7 @@ async function finishReview() {
   quizOverallTotal.value = 0
   quizOverallCorrect.value = 0
   if (flashcardSet.value) {
-    if (noNextAvailable.value && isLightspeedMode.value) {
+    if (noNextAvailable.value && reviewMode.value.isLightspeed()) {
       await markDaysAsCompleted(flashcardSet.value)
     }
   } else {
@@ -428,9 +423,9 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
 }
 
 async function getNextAndMarkDays(flashcardSet: FlashcardSet) {
-  if (await nextFlashcard() && isLightspeedMode.value) {
+  if (await nextFlashcard() && reviewMode.value.isLightspeed()) {
     await markDaysAsInProgress(flashcardSet)
-  } else if (isLightspeedMode.value) {
+  } else if (reviewMode.value.isLightspeed()) {
     await markDaysAsCompleted(flashcardSet)
   }
 }
@@ -522,14 +517,14 @@ function handleKeydown(event: KeyboardEvent) {
     finishReviewAndLeave()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
-    if (isLightspeedMode.value) stageDown()
-    if (isSpecialOrSpaceMode.value) prev()
-    if (isQuizMode.value) quizAnswer(false)
+    if (reviewMode.value.isLightspeed()) stageDown()
+    if (reviewMode.value.isSpecial()) prev()
+    if (reviewMode.value.isQuiz()) quizAnswer(false)
   } else if (event.key === 'ArrowRight') {
     event.stopPropagation()
-    if (isLightspeedMode.value) stageUp()
-    if (isSpecialOrSpaceMode.value) next()
-    if (isQuizMode.value) quizAnswer(true)
+    if (reviewMode.value.isLightspeed()) stageUp()
+    if (reviewMode.value.isSpecial()) next()
+    if (reviewMode.value.isQuiz()) quizAnswer(true)
   }
 }
 

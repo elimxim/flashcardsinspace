@@ -98,7 +98,7 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
-import { countFlashcards, ReviewMethod } from '@/core-logic/review-logic.ts'
+import { countFlashcards, ReviewSession } from '@/core-logic/review-logic.ts'
 
 const router = useRouter()
 const toggleStore = useToggleStore()
@@ -172,7 +172,7 @@ async function cancel() {
 function start() {
   router.push({
     name: routeNames.review,
-    query: { mode: ReviewMethod.QUIZ, stages: reviewStages() }
+    query: { session: ReviewSession.QUIZ, stages: reviewStages() }
   })
   exit()
 }

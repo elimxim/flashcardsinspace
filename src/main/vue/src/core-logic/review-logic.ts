@@ -15,62 +15,82 @@ import {
 } from '@/core-logic/chrono-logic.ts'
 import { shuffle } from '@/utils/utils.ts'
 
-export enum ReviewMethod {
+export enum ReviewSession {
   LIGHTSPEED = 'LIGHTSPEED',
-  SPECIAL = 'SPECIAL',
-  SPACE = 'SPACE',
+  UNKNOWN = 'UNKNOWN',
+  ATTEMPTED = 'ATTEMPTED',
+  OUTER_SPACE = 'OUTER_SPACE',
   QUIZ = 'QUIZ',
 }
 
-export interface ReviewMode {
-  method: ReviewMethod
-  topic: string
+export class ReviewMode {
+  constructor(
+    public session: ReviewSession,
+    public topic: string
+  ) {}
+
+  isLightspeed(): boolean {
+    return this.session === ReviewSession.LIGHTSPEED
+  }
+  isUnknown(): boolean {
+    return this.session === ReviewSession.UNKNOWN
+  }
+  isAttempted(): boolean {
+    return this.session === ReviewSession.ATTEMPTED
+  }
+  isOuterSpace(): boolean {
+    return this.session === ReviewSession.OUTER_SPACE
+  }
+  isQuiz(): boolean {
+    return this.session === ReviewSession.QUIZ
+  }
+  isSpecial(): boolean {
+    return this.isUnknown() || this.isAttempted() || this.isOuterSpace()
+  }
 }
 
-export function determineReviewMode(mode: string | undefined, stages: Stage[]): ReviewMode {
-  if (mode === ReviewMethod.SPECIAL) return stagesToReviewMode(stages)
-
-  if (mode === ReviewMethod.SPACE) return {
-    method: ReviewMethod.SPACE,
-    topic: specialStages.OUTER_SPACE.displayName,
+export function determineReviewMode(session: string | undefined, stages: Stage[]): ReviewMode {
+  if (session) {
+    const reviewMode = sessionToReviewMode(session, stages)
+    if (reviewMode) {
+      return reviewMode
+    }
   }
 
-  if (mode === ReviewMethod.LIGHTSPEED) return {
-    method: ReviewMethod.LIGHTSPEED,
-    topic: '',
-  }
-
-  if (mode === ReviewMethod.QUIZ && stages.length > 0
-    && stages.every(s => specialStageSet.has(s))
-  ) return {
-    method: ReviewMethod.QUIZ,
-    topic: 'Quiz',
-  }
-
-  return stagesToReviewMode(stages)
+  return new ReviewMode(ReviewSession.LIGHTSPEED, '')
 }
 
-function stagesToReviewMode(stages: Stage[]): ReviewMode {
-  if (stages.length === 1) {
-    const stage = stages[0]
-    if (stage === specialStages.UNKNOWN) return {
-      method: ReviewMethod.SPECIAL,
-      topic: specialStages.UNKNOWN.displayName,
-    }
-    if (stage === specialStages.ATTEMPTED) return {
-      method: ReviewMethod.SPECIAL,
-      topic: specialStages.ATTEMPTED.displayName,
-    }
-    if (stage === specialStages.OUTER_SPACE) return {
-      method: ReviewMethod.SPACE,
-      topic: specialStages.OUTER_SPACE.displayName,
-    }
+export function sessionToReviewMode(session: string, stages: Stage[]): ReviewMode | undefined {
+  switch (session) {
+    case ReviewSession.LIGHTSPEED:
+      return new ReviewMode(ReviewSession.LIGHTSPEED, '')
+    case ReviewSession.UNKNOWN:
+      return new ReviewMode(ReviewSession.UNKNOWN, specialStages.UNKNOWN.displayName)
+    case ReviewSession.ATTEMPTED:
+      return new ReviewMode(ReviewSession.ATTEMPTED, specialStages.ATTEMPTED.displayName)
+    case ReviewSession.OUTER_SPACE:
+      return new ReviewMode(ReviewSession.OUTER_SPACE, specialStages.OUTER_SPACE.displayName)
+    case ReviewSession.QUIZ:
+      if (stages.length > 0 && stages.every(s => specialStageSet.has(s))) {
+        return new ReviewMode(ReviewSession.QUIZ, 'Quiz')
+      }
   }
 
-  return {
-    method: ReviewMethod.LIGHTSPEED,
-    topic: '',
-  }
+  return undefined
+}
+
+export function specialStageToReviewSession(stage: Stage): ReviewSession | undefined {
+  if (stage === specialStages.UNKNOWN) return ReviewSession.UNKNOWN
+  if (stage === specialStages.ATTEMPTED) return ReviewSession.ATTEMPTED
+  if (stage === specialStages.OUTER_SPACE) return ReviewSession.OUTER_SPACE
+  return undefined
+}
+
+export function sessionToSpecialStage(session: string): Stage | undefined {
+  if (session === ReviewSession.UNKNOWN) return specialStages.UNKNOWN
+  if (session === ReviewSession.ATTEMPTED) return specialStages.ATTEMPTED
+  if (session === ReviewSession.OUTER_SPACE) return specialStages.OUTER_SPACE
+  return undefined
 }
 
 export interface ReviewQueue {
