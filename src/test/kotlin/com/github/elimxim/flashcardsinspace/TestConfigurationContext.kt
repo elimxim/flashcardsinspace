@@ -45,4 +45,7 @@ class TestConfigurationContext {
 
     @Bean
     fun dayStreakRepository() = mockk<DayStreakRepository>()
+
+    @Bean
+    fun reviewSessionRepository() = mockk<ReviewSessionRepository>()
 }
