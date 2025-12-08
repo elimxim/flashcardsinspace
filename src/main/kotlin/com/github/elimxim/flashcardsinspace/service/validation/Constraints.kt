@@ -207,11 +207,26 @@ annotation class ValidMetadata(
     val payload: Array<KClass<out Payload>> = [],
 )
 
-class MetadataValidator : ConstraintValidator<ValidMetadata, Map<String, String>> {
-    private val pattern = Regex("^[A-Za-z0-9 _\\[,\\]-]+$")
+class MetadataValidator : ConstraintValidator<ValidMetadata, Map<String, Any>> {
+    private val keyPattern = Regex("^[A-Za-z0-9]+$")
+    private val stringPattern = Regex("^[A-Za-z0-9 _\\[,\\]-]+$")
 
-    override fun isValid(value: Map<String, String>?, context: ConstraintValidatorContext?): Boolean {
+    override fun isValid(value: Map<String, Any>?, context: ConstraintValidatorContext?): Boolean {
         if (value == null) return true
-        return value.all { (key, v) -> pattern.matches(key) && pattern.matches(v) }
+        return value.all { (key, v) -> keyPattern.matches(key) && isValidValue(v) }
+    }
+
+    private fun isValidValue(value: Any?): Boolean {
+        return when (value) {
+            null -> true
+            is String -> stringPattern.matches(value)
+            is Number -> true
+            is Boolean -> true
+            is List<*> -> value.all { isValidValue(it) }
+            is Map<*, *> -> value.all { (k, v) ->
+                k is String && keyPattern.matches(k) && isValidValue(v)
+            }
+            else -> false
+        }
     }
 }

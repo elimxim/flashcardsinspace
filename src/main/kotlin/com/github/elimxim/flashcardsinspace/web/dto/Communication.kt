@@ -288,7 +288,7 @@ data class ReviewSessionUpdateRequest(
     @field:Pattern(regexp="^(true|false)$")
     var finished: String? = null,
     @field:ValidMetadata
-    var metadata: Map<String, String>? = null,
+    var metadata: Map<String, Any>? = null,
 ) {
     class FlashcardId(
         @field:NotNull
@@ -302,5 +302,5 @@ data class ValidReviewSessionUpdateRequest(
     val elapsedTime: Long,
     val flashcardIds: Set<Long>,
     val finished: Boolean,
-    val metadata: Map<String, String>,
+    val metadata: Map<String, Any>,
 )

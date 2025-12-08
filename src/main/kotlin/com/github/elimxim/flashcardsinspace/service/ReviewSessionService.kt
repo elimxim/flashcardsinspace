@@ -157,7 +157,7 @@ class ReviewSessionService(
         session.metadata = metadata
     }
 
-    private fun updateQuizMetadata(session: ReviewSession, metadata: Map<String, String>): Boolean {
+    private fun updateQuizMetadata(session: ReviewSession, metadata: Map<String, Any>): Boolean {
         val sessionMetadata = session.metadata
         if (sessionMetadata == null) {
             log.warn("Review session ${session.id} has no metadata")
@@ -173,15 +173,28 @@ class ReviewSessionService(
         if (nextRoundFlashcardIdsFieldName != null) {
             val nextRoundFlashcardIds = metadata[nextRoundFlashcardIdsFieldName]
             if (nextRoundFlashcardIds != null) {
-                val ids = nextRoundFlashcardIds.split(",")
-                    .filter { it.matches(numbersOnlyPattern) }
-                    .map { it.toLong() }
-
+                val ids = parseFlashcardIds(nextRoundFlashcardIds)
                 sessionMetadata.nextRoundFlashcardIds.addAll(ids)
                 return ids.isNotEmpty()
             }
         }
 
         return false
+    }
+
+    private fun parseFlashcardIds(value: Any): List<Long> {
+        return when (value) {
+            is String -> value.split(",")
+                .filter { it.matches(numbersOnlyPattern) }
+                .map { it.toLong() }
+            is List<*> -> value.mapNotNull { item ->
+                when (item) {
+                    is Number -> item.toLong()
+                    is String -> if (item.matches(numbersOnlyPattern)) item.toLong() else null
+                    else -> null
+                }
+            }
+            else -> emptyList()
+        }
     }
 }

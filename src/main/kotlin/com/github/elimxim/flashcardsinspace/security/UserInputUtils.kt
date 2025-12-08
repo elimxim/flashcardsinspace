@@ -160,11 +160,33 @@ fun ReviewSessionCreateRequest.escapeJava() = ReviewSessionCreateRequest(
 fun ReviewSessionUpdateRequest.normalize() = ReviewSessionUpdateRequest(
     elapsedTime = elapsedTime?.normalize(),
     flashcardIds = flashcardIds?.map { ReviewSessionUpdateRequest.FlashcardId(it.id?.normalize()) },
-    metadata = metadata?.map { (k, v) -> k.escapeJava() to v.escapeJava() }?.toMap(),
+    metadata = metadata?.map { (k, v) -> k.escapeJava() to escapeReviewSessionMetadataValue(v) }?.toMap(),
 )
+
+private fun normalizeReviewSessionMetadataValue(value: Any): Any {
+    return when (value) {
+        is String -> value.normalize()
+        is List<*> -> value.map { v -> v?.let { normalizeReviewSessionMetadataValue(it) } }
+        is Map<*, *> -> value.map { (k, v) ->
+            (if (k is String) k.normalize() else k) to (if (v != null) normalizeReviewSessionMetadataValue(v) else v)
+        }.toMap()
+        else -> value
+    }
+}
 
 fun ReviewSessionUpdateRequest.escapeJava() = ReviewSessionUpdateRequest(
     elapsedTime = elapsedTime?.escapeJava(),
     flashcardIds = flashcardIds?.map { ReviewSessionUpdateRequest.FlashcardId(it.id?.escapeJava()) },
-    metadata = metadata?.map { (k, v) -> k.escapeJava() to v.escapeJava() }?.toMap(),
+    metadata = metadata?.map { (k, v) -> k.escapeJava() to escapeReviewSessionMetadataValue(v) }?.toMap(),
 )
+
+private fun escapeReviewSessionMetadataValue(value: Any): Any {
+    return when (value) {
+        is String -> value.escapeJava()
+        is List<*> -> value.map { v -> v?.let { escapeReviewSessionMetadataValue(it) } }
+        is Map<*, *> -> value.map { (k, v) ->
+            (if (k is String) k.escapeJava() else k) to (v?.let { escapeReviewSessionMetadataValue(it) })
+        }.toMap()
+        else -> value
+    }
+}
