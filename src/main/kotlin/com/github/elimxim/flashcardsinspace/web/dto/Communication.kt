@@ -274,10 +274,6 @@ data class ValidReviewSessionCreateRequest(
     val flashcardIds: Set<Long>,
 )
 
-data class ReviewSessionResponse(
-    val reviewSessionId: Long,
-)
-
 data class ReviewSessionUpdateRequest(
     @field:NotNull
     @field:NotBlank
