@@ -5,7 +5,6 @@ import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.ReviewSessionService
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionCreateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionDto
-import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionResponse
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionUpdateRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -23,9 +22,9 @@ class ReviewSessionController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @RequestBody request: ReviewSessionCreateRequest,
-    ): ResponseEntity<ReviewSessionResponse> {
-        val response = reviewSessionService.create(user, setId, request.normalize())
-        return ResponseEntity.ok(response)
+    ): ResponseEntity<ReviewSessionDto> {
+        val dto = reviewSessionService.createReviewSession(user, setId, request.normalize())
+        return ResponseEntity.ok(dto)
     }
 
     @PutMapping("/{id:\\d+}")
@@ -35,19 +34,19 @@ class ReviewSessionController(
         @PathVariable id: Long,
         @RequestBody request: ReviewSessionUpdateRequest,
     ): ResponseEntity<Unit> {
-        reviewSessionService.update(user, setId, id, request.normalize())
+        reviewSessionService.updateReviewSession(user, setId, id, request.normalize())
         return ResponseEntity.ok().build()
     }
 
-    @PostMapping("/{parentId:\\d+}/childs")
+    @PostMapping("/{parentId:\\d+}/children")
     fun createChildReviewSession(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @PathVariable parentId: Long,
         @RequestBody request: ReviewSessionCreateRequest,
-    ): ResponseEntity<ReviewSessionResponse> {
-        val response = reviewSessionService.createChild(user, setId, parentId, request.normalize())
-        return ResponseEntity.ok(response)
+    ): ResponseEntity<ReviewSessionDto> {
+        val dto = reviewSessionService.createChildReviewSession(user, setId, parentId, request.normalize())
+        return ResponseEntity.ok(dto)
     }
 
     @GetMapping("/{id:\\d+}")

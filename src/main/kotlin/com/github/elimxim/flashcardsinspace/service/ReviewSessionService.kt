@@ -27,38 +27,37 @@ class ReviewSessionService(
 ) {
 
     @Transactional
-    fun create(user: User, setId: Long, request: ReviewSessionCreateRequest): ReviewSessionResponse {
+    fun createReviewSession(user: User, setId: Long, request: ReviewSessionCreateRequest): ReviewSessionDto {
         log.info("Creating a new review session for set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         flashcardSetService.verifyInitialized(setId)
-        return create(setId, requestValidator.validate(request))
+        return createReviewSession(setId, requestValidator.validate(request))
     }
 
     @Transactional
-    fun create(setId: Long, request: ValidReviewSessionCreateRequest): ReviewSessionResponse {
-        val session = createReviewSession(setId, request)
-        val savedSession = reviewSessionRepository.save(session)
-        if (savedSession.type == ReviewSessionType.QUIZ) {
-            addQuizMetadata(savedSession)
+    fun createReviewSession(setId: Long, request: ValidReviewSessionCreateRequest): ReviewSessionDto {
+        val session = createNewReviewSession(setId, request)
+        if (session.type == ReviewSessionType.QUIZ) {
+            addQuizMetadata(session)
         }
-        return ReviewSessionResponse(
-            reviewSessionId = savedSession.id,
-        )
+        val savedSession = reviewSessionRepository.save(session)
+        return savedSession.toDto()
     }
 
     @Transactional
-    fun update(user: User, setId: Long, id: Long, request: ReviewSessionUpdateRequest) {
+    fun updateReviewSession(user: User, setId: Long, id: Long, request: ReviewSessionUpdateRequest) {
         log.info("Updating review session $id for set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         flashcardSetService.verifyInitialized(setId)
-        update(id, requestValidator.validate(request))
+        updateReviewSession(id, requestValidator.validate(request))
     }
 
     @Transactional
-    fun update(id: Long, request: ValidReviewSessionUpdateRequest) {
+    fun updateReviewSession(id: Long, request: ValidReviewSessionUpdateRequest) {
         val session = getEntity(id)
         val changed = mergeReviewSession(session, request)
         if (changed) {
+            session.lastUpdatedAt = ZonedDateTime.now()
             reviewSessionRepository.save(session)
         }
     }
@@ -84,20 +83,20 @@ class ReviewSessionService(
     }
 
     @Transactional
-    fun createChild(
+    fun createChildReviewSession(
         user: User, setId: Long, parentId: Long,
         request: ReviewSessionCreateRequest
-    ): ReviewSessionResponse {
+    ): ReviewSessionDto {
         log.info("Creating a child review session of $parentId for set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         flashcardSetService.verifyInitialized(setId)
-        return createChild(setId, parentId, requestValidator.validate(request))
+        return createChildReviewSession(setId, parentId, requestValidator.validate(request))
     }
 
     @Transactional
-    fun createChild(setId: Long, parentId: Long, request: ValidReviewSessionCreateRequest): ReviewSessionResponse {
+    fun createChildReviewSession(setId: Long, parentId: Long, request: ValidReviewSessionCreateRequest): ReviewSessionDto {
         val parentSession = getEntity(parentId)
-        val session = createReviewSession(setId, request).apply {
+        val session = createNewReviewSession(setId, request).apply {
             parentSessionId = parentSession.id
         }
         if (session.type == ReviewSessionType.QUIZ) {
@@ -109,9 +108,7 @@ class ReviewSessionService(
             addQuizMetadata(session)
         }
         val savedSession = reviewSessionRepository.save(session)
-        return ReviewSessionResponse(
-            reviewSessionId = savedSession.id,
-        )
+        return savedSession.toDto()
     }
 
     @Transactional
@@ -128,7 +125,7 @@ class ReviewSessionService(
         }
     }
 
-    private fun createReviewSession(setId: Long, request: ValidReviewSessionCreateRequest): ReviewSession {
+    private fun createNewReviewSession(setId: Long, request: ValidReviewSessionCreateRequest): ReviewSession {
         return ReviewSession(
             type = request.type,
             flashcardIds = request.flashcardIds.toLongArray(),
