@@ -14,7 +14,7 @@ import { routeNames } from '@/router'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { createReviewQueue, ReviewSession } from '@/core-logic/review-logic.ts'
+import { createReviewQueue, ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 
 const router = useRouter()
@@ -36,7 +36,7 @@ const isDisabled = computed(() =>
 function startReview() {
   router.push({
     name: routeNames.review,
-    query: { session: ReviewSession.LIGHTSPEED }
+    query: { sessionType: ReviewSessionType.LIGHTSPEED }
   })
 }
 </script>

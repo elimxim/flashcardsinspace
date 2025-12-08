@@ -15,7 +15,7 @@ import {
 } from '@/core-logic/chrono-logic.ts'
 import { shuffle } from '@/utils/utils.ts'
 
-export enum ReviewSession {
+export enum ReviewSessionType {
   LIGHTSPEED = 'LIGHTSPEED',
   UNKNOWN = 'UNKNOWN',
   ATTEMPTED = 'ATTEMPTED',
@@ -25,71 +25,71 @@ export enum ReviewSession {
 
 export class ReviewMode {
   constructor(
-    public session: ReviewSession,
+    public sessionType: ReviewSessionType,
     public topic: string
   ) {}
 
   isLightspeed(): boolean {
-    return this.session === ReviewSession.LIGHTSPEED
+    return this.sessionType === ReviewSessionType.LIGHTSPEED
   }
   isUnknown(): boolean {
-    return this.session === ReviewSession.UNKNOWN
+    return this.sessionType === ReviewSessionType.UNKNOWN
   }
   isAttempted(): boolean {
-    return this.session === ReviewSession.ATTEMPTED
+    return this.sessionType === ReviewSessionType.ATTEMPTED
   }
   isOuterSpace(): boolean {
-    return this.session === ReviewSession.OUTER_SPACE
+    return this.sessionType === ReviewSessionType.OUTER_SPACE
   }
   isQuiz(): boolean {
-    return this.session === ReviewSession.QUIZ
+    return this.sessionType === ReviewSessionType.QUIZ
   }
   isSpecial(): boolean {
     return this.isUnknown() || this.isAttempted() || this.isOuterSpace()
   }
 }
 
-export function determineReviewMode(session: string | undefined, stages: Stage[]): ReviewMode {
-  if (session) {
-    const reviewMode = sessionToReviewMode(session, stages)
+export function determineReviewMode(sessionType: string | undefined, stages: Stage[]): ReviewMode {
+  if (sessionType) {
+    const reviewMode = sessionToReviewMode(sessionType, stages)
     if (reviewMode) {
       return reviewMode
     }
   }
 
-  return new ReviewMode(ReviewSession.LIGHTSPEED, '')
+  return new ReviewMode(ReviewSessionType.LIGHTSPEED, '')
 }
 
-export function sessionToReviewMode(session: string, stages: Stage[]): ReviewMode | undefined {
-  switch (session) {
-    case ReviewSession.LIGHTSPEED:
-      return new ReviewMode(ReviewSession.LIGHTSPEED, '')
-    case ReviewSession.UNKNOWN:
-      return new ReviewMode(ReviewSession.UNKNOWN, specialStages.UNKNOWN.displayName)
-    case ReviewSession.ATTEMPTED:
-      return new ReviewMode(ReviewSession.ATTEMPTED, specialStages.ATTEMPTED.displayName)
-    case ReviewSession.OUTER_SPACE:
-      return new ReviewMode(ReviewSession.OUTER_SPACE, specialStages.OUTER_SPACE.displayName)
-    case ReviewSession.QUIZ:
+export function sessionToReviewMode(sessionType: string, stages: Stage[]): ReviewMode | undefined {
+  switch (sessionType) {
+    case ReviewSessionType.LIGHTSPEED:
+      return new ReviewMode(ReviewSessionType.LIGHTSPEED, '')
+    case ReviewSessionType.UNKNOWN:
+      return new ReviewMode(ReviewSessionType.UNKNOWN, specialStages.UNKNOWN.displayName)
+    case ReviewSessionType.ATTEMPTED:
+      return new ReviewMode(ReviewSessionType.ATTEMPTED, specialStages.ATTEMPTED.displayName)
+    case ReviewSessionType.OUTER_SPACE:
+      return new ReviewMode(ReviewSessionType.OUTER_SPACE, specialStages.OUTER_SPACE.displayName)
+    case ReviewSessionType.QUIZ:
       if (stages.length > 0 && stages.every(s => specialStageSet.has(s))) {
-        return new ReviewMode(ReviewSession.QUIZ, 'Quiz')
+        return new ReviewMode(ReviewSessionType.QUIZ, 'Quiz')
       }
   }
 
   return undefined
 }
 
-export function specialStageToReviewSession(stage: Stage): ReviewSession | undefined {
-  if (stage === specialStages.UNKNOWN) return ReviewSession.UNKNOWN
-  if (stage === specialStages.ATTEMPTED) return ReviewSession.ATTEMPTED
-  if (stage === specialStages.OUTER_SPACE) return ReviewSession.OUTER_SPACE
+export function specialStageToReviewSessionType(stage: Stage): ReviewSessionType | undefined {
+  if (stage === specialStages.UNKNOWN) return ReviewSessionType.UNKNOWN
+  if (stage === specialStages.ATTEMPTED) return ReviewSessionType.ATTEMPTED
+  if (stage === specialStages.OUTER_SPACE) return ReviewSessionType.OUTER_SPACE
   return undefined
 }
 
-export function sessionToSpecialStage(session: string): Stage | undefined {
-  if (session === ReviewSession.UNKNOWN) return specialStages.UNKNOWN
-  if (session === ReviewSession.ATTEMPTED) return specialStages.ATTEMPTED
-  if (session === ReviewSession.OUTER_SPACE) return specialStages.OUTER_SPACE
+export function reviewSessionTypeToSpecialStage(sessionType: ReviewSessionType): Stage | undefined {
+  if (sessionType === ReviewSessionType.UNKNOWN) return specialStages.UNKNOWN
+  if (sessionType === ReviewSessionType.ATTEMPTED) return specialStages.ATTEMPTED
+  if (sessionType === ReviewSessionType.OUTER_SPACE) return specialStages.OUTER_SPACE
   return undefined
 }
 

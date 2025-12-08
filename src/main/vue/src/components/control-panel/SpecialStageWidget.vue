@@ -34,7 +34,7 @@ import { computed } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import {
   countFlashcards,
-  specialStageToReviewSession
+  specialStageToReviewSessionType
 } from '@/core-logic/review-logic.ts'
 import { storeToRefs } from 'pinia'
 import { routeNames } from '@/router'
@@ -59,10 +59,10 @@ const flashcardsCount = computed(() =>
 
 function startReview() {
   if (flashcardsCount.value === 0) return
-  const session = specialStageToReviewSession(props.stage)
+  const sessionType = specialStageToReviewSessionType(props.stage)
   router.push({
     name: routeNames.review,
-    query: { session: session }
+    query: { sessionType: sessionType }
   })
 }
 

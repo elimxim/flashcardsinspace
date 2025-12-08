@@ -179,7 +179,8 @@ import {
   EmptyReviewQueue,
   ReviewQueue,
   determineReviewMode,
-  MonoStageReviewQueue, sessionToSpecialStage
+  MonoStageReviewQueue,
+  reviewSessionTypeToSpecialStage
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
@@ -200,7 +201,7 @@ import {
 } from '@/core-logic/chrono-logic.ts'
 
 const props = defineProps<{
-  session?: string,
+  sessionType?: string,
   stages: Stage[],
 }>()
 
@@ -213,7 +214,7 @@ const flashcardStore = useFlashcardStore()
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
 
-const reviewMode = computed(() => determineReviewMode(props.session, props.stages))
+const reviewMode = computed(() => determineReviewMode(props.sessionType, props.stages))
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
@@ -283,7 +284,7 @@ function startReview() {
   if (reviewMode.value.isLightspeed()) {
     reviewQueue.value = createReviewQueue(flashcards.value, currDay.value, chronodays.value)
   } else if (reviewMode.value.isSpecial()) {
-    const stage = sessionToSpecialStage(reviewMode.value.session)
+    const stage = reviewSessionTypeToSpecialStage(reviewMode.value.sessionType)
     if (stage) {
       reviewQueue.value = createReviewQueueForStages(flashcards.value, [stage], currDay.value)
     }

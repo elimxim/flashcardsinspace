@@ -178,3 +178,7 @@ export async function sendUserUpdateRequest(username: string, userEmail: string,
     languageId: languageId,
   })
 }
+
+export async function sendReviewSessionCreateRequest(setId: number, type: string, chronodayId: number, flashcardIds: number[]) {
+
+}

@@ -90,7 +90,7 @@ const routes: RouteRecordRaw[] = [
     name: routeNames.review,
     component: ReviewPage,
     props: (route) => ({
-      session: route.query.session,
+      sessionType: route.query.sessionType,
       stages: toLearningStages(route.query.stages),
     }),
     meta: {
