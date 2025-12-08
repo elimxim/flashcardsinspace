@@ -19,6 +19,7 @@ import { Chronoday } from '@/model/chrono.ts'
 import { configureDateTransformers } from '@/api/axios-config.ts'
 import { configureTokenRefreshInterceptor } from '@/api/token-refresh.ts'
 import { User } from '@/model/user.ts'
+import { ReviewSession } from '@/model/review.ts'
 
 const apiClient = axios.create({
   baseURL: '/api',
@@ -179,6 +180,22 @@ export async function sendUserUpdateRequest(username: string, userEmail: string,
   })
 }
 
-export async function sendReviewSessionCreateRequest(setId: number, type: string, chronodayId: number, flashcardIds: number[]) {
+export async function sendReviewSessionGetRequest(setId: number, id: number) {
+  console.log(`[GET] request => review session ${id} for set ${setId}`)
+  return apiClient.get<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${id}`)
+}
 
+export async function sendReviewSessionCreateRequest(setId: number, session: ReviewSession) {
+  console.log(`[POST] request => create review session for set ${setId}`)
+  return apiClient.post<ReviewSession>(`/flashcard-sets/${setId}/review-sessions`, session)
+}
+
+export async function sendReviewSessionChildCreateRequest(setId: number, parentId: number, session: ReviewSession) {
+  console.log(`[POST] request => child review session ${parentId} for set ${setId}`)
+  return apiClient.post<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${parentId}/children`, session)
+}
+
+export async function sendReviewSessionUpdateRequest(setId: number, id: number, session: ReviewSession) {
+  console.log(`[PUT] request => review session ${id} for set ${setId}`)
+  return apiClient.put<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${id}`, session)
 }
