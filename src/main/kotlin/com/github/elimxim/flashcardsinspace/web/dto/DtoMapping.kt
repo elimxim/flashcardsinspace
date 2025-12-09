@@ -79,6 +79,9 @@ fun ReviewSessionMetadata.toDto(): Map<String, Any>? = when (this) {
             getMetadataFieldName(QuizMetadata::nextRoundFlashcardIds)?.let {
                 put(it, nextRoundFlashcardIds)
             }
+            getMetadataFieldName(QuizMetadata::overallFlashcardIds)?.let {
+                put(it, overallFlashcardIds)
+            }
             getMetadataFieldName(QuizMetadata::overallCorrectCount)?.let {
                 put(it, overallCorrectCount)
             }
