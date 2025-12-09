@@ -1,5 +1,6 @@
 import type { Chronoday } from '@/model/chrono.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
+import { ReviewSession } from '@/model/review.ts'
 
 export interface ErrorResponseBody {
   timestamp: Date
@@ -44,4 +45,24 @@ export interface FlashcardSetSuspendResponse {
   flashcardSet: FlashcardSet,
   currDay: Chronoday,
   chronodays: Chronoday[],
+}
+
+export interface ReviewSessionCreateRequest {
+  type: string,
+  chronodayId: number,
+  flashcardIds: number[],
+}
+
+export interface ReviewSessionUpdateRequest {
+  elapsedTime: number,
+  flashcardIds?: number[],
+  finished?: boolean,
+  metadata?: Record<string, unknown>,
+}
+
+export interface QuizSessionGetResponse {
+  session: ReviewSession,
+  flashcards: Flashcard[],
+  nextRoundFlashcards: Flashcard[],
+  reviewedFlashcardIds: number[],
 }
