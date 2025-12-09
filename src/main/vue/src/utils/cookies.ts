@@ -3,6 +3,7 @@ import Cookies from 'js-cookie'
 const COOKIE_SELECTED_SET_ID = 'selectedSetId'
 const COOKIE_USER_SIGNED_UP = 'userSignedUp'
 const COOKIE_SIDEBAR_EXPANDED = 'sidebarExpanded'
+const COOKIE_QUIZ_SESSION_ID = 'quizSessionId'
 
 function saveCookie(name: string, value: string, expires: number) {
   Cookies.set(name, value, {
@@ -11,13 +12,18 @@ function saveCookie(name: string, value: string, expires: number) {
     secure: true,
     path: '/', // valid for the entire site
   })
-  console.log( `${value} => Cookie.${name}`)
+  console.log( `${value} => Cookies.${name}`)
 }
 
 function loadCookie(name: string): string | undefined {
   const value = Cookies.get(name)
-  console.log(`Cookie.${name} => ${value}`)
+  console.log(`Cookies.${name} => ${value}`)
   return value
+}
+
+function removeCookie(name: string) {
+  console.log(`Cookies.${name} => x_x`)
+  Cookies.remove(name)
 }
 
 function loadBooleanCookie(name: string): boolean {
@@ -59,6 +65,18 @@ function loadSidebarExpandedFromCookies(): boolean {
   return loadBooleanCookie(COOKIE_SIDEBAR_EXPANDED)
 }
 
+function saveQuizSessionIdToCookies(value: number) {
+  saveCookie(COOKIE_QUIZ_SESSION_ID, value.toString(), 30)
+}
+
+function loadQuizSessionIdFromCookies(): number | undefined {
+  return loadNumberCookie(COOKIE_QUIZ_SESSION_ID)
+}
+
+function removeQuizSessionIdFromCookies() {
+  removeCookie(COOKIE_QUIZ_SESSION_ID)
+}
+
 export {
   saveUserSignedUpToCookies,
   loadUserSignedUpFromCookies,
@@ -66,4 +84,7 @@ export {
   loadSelectedSetIdFromCookies,
   setSidebarExpandedToCookies,
   loadSidebarExpandedFromCookies,
+  saveQuizSessionIdToCookies,
+  loadQuizSessionIdFromCookies,
+  removeQuizSessionIdFromCookies,
 }
