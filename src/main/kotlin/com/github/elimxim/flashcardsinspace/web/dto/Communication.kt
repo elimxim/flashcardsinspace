@@ -300,10 +300,3 @@ data class ValidReviewSessionUpdateRequest(
     val finished: Boolean,
     val metadata: Map<String, Any>,
 )
-
-data class QuizSessionGetResponse(
-    val session: ReviewSessionDto,
-    val flashcards: List<FlashcardDto>,
-    val nextRoundFlashcards: List<FlashcardDto>,
-    val reviewedFlashcardIds: List<Long>,
-)

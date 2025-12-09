@@ -7,7 +7,6 @@ import {
   ChronoUpdateResponse,
   FlashcardSetInitResponse,
   FlashcardSetSuspendResponse,
-  QuizSessionGetResponse,
   ReviewSessionCreateRequest,
   ReviewSessionUpdateRequest,
 } from '@/api/communication.ts'
@@ -186,11 +185,6 @@ export async function sendUserUpdateRequest(username: string, userEmail: string,
 export async function sendReviewSessionGetRequest(setId: number, id: number) {
   console.log(`[GET] request => review session ${id} for set ${setId}`)
   return apiClient.get<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${id}`)
-}
-
-export async function sendQuizSessionGetRequest(setId: number, id: number) {
-  console.log(`[GET] request => quiz session ${id} for set ${setId}`)
-  return apiClient.get<QuizSessionGetResponse>(`/flashcard-sets/${setId}/quiz-sessions/${id}`)
 }
 
 export async function sendReviewSessionCreateRequest(setId: number, request: ReviewSessionCreateRequest) {
