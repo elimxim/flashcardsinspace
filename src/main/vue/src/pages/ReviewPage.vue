@@ -215,11 +215,9 @@ const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
 
 const reviewMode = computed(() => determineReviewMode(props.sessionType, props.stages))
-const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
-
-const flashcardSetName = computed(() => flashcardSet.value?.name || '')
-
 const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
+const flashcardSetName = computed(() => flashcardSet.value?.name || '')
+const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 const flashcardsTotal = ref(0)
 const flashcardsRemaining = computed(() => {
   if (noNextAvailable.value) return 0
