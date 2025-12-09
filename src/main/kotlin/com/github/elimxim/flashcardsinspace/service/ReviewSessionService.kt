@@ -4,6 +4,7 @@ import com.github.elimxim.flashcardsinspace.entity.QuizMetadata
 import com.github.elimxim.flashcardsinspace.entity.ReviewSession
 import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
 import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.ReviewSessionRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.getMetadataFieldName
@@ -24,6 +25,7 @@ class ReviewSessionService(
     private val flashcardSetService: FlashcardSetService,
     private val chronoService: ChronoService,
     private val reviewSessionRepository: ReviewSessionRepository,
+    private val flashcardRepository: FlashcardRepository,
 ) {
 
     @Transactional
@@ -38,7 +40,7 @@ class ReviewSessionService(
     fun createReviewSession(setId: Long, request: ValidReviewSessionCreateRequest): ReviewSessionDto {
         val session = createNewReviewSession(setId, request)
         if (session.type == ReviewSessionType.QUIZ) {
-            addQuizMetadata(session)
+            addQuizMetadata(session, request)
         }
         val savedSession = reviewSessionRepository.save(session)
         return savedSession.toDto()
@@ -75,6 +77,14 @@ class ReviewSessionService(
             changed = true
         }
 
+        if (request.finished) {
+            if (session.finishedAt != null) {
+                throw IllegalStateException("Review session ${session.id} is already finished")
+            }
+            session.finishedAt = ZonedDateTime.now()
+            changed = true
+        }
+
         if (session.type == ReviewSessionType.QUIZ) {
             changed = updateQuizMetadata(session, request.metadata)
         }
@@ -94,7 +104,11 @@ class ReviewSessionService(
     }
 
     @Transactional
-    fun createChildReviewSession(setId: Long, parentId: Long, request: ValidReviewSessionCreateRequest): ReviewSessionDto {
+    fun createChildReviewSession(
+        setId: Long,
+        parentId: Long,
+        request: ValidReviewSessionCreateRequest
+    ): ReviewSessionDto {
         val parentSession = getEntity(parentId)
         val session = createNewReviewSession(setId, request).apply {
             parentSessionId = parentSession.id
@@ -105,7 +119,7 @@ class ReviewSessionService(
                     "Parent session ${parentSession.id} type is not ${ReviewSessionType.QUIZ}"
                 )
             }
-            addQuizMetadata(session)
+            addQuizMetadata(session, request, parentSession)
         }
         val savedSession = reviewSessionRepository.save(session)
         return savedSession.toDto()
@@ -115,6 +129,7 @@ class ReviewSessionService(
     fun getReviewSession(user: User, setId: Long, id: Long): ReviewSessionDto {
         log.info("Getting review session $id for set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
+        // todo actualize flashcards ids (some of them might be deleted at this moment)
         return getEntity(id).toDto()
     }
 
@@ -128,7 +143,7 @@ class ReviewSessionService(
     private fun createNewReviewSession(setId: Long, request: ValidReviewSessionCreateRequest): ReviewSession {
         return ReviewSession(
             type = request.type,
-            flashcardIds = request.flashcardIds.toLongArray(),
+            flashcardIds = null,
             elapsedTime = 0,
             startedAt = ZonedDateTime.now(),
             flashcardSet = flashcardSetService.getEntity(setId),
@@ -136,7 +151,11 @@ class ReviewSessionService(
         )
     }
 
-    private fun addQuizMetadata(session: ReviewSession, parentSession: ReviewSession? = null) {
+    private fun addQuizMetadata(
+        session: ReviewSession,
+        request: ValidReviewSessionCreateRequest,
+        parentSession: ReviewSession? = null
+    ) {
         val metadata = if (parentSession != null && parentSession.metadata != null) {
             val parentMetadata = parentSession.metadata
             if (parentMetadata !is QuizMetadata) {
@@ -147,12 +166,16 @@ class ReviewSessionService(
 
             QuizMetadata(
                 round = parentMetadata.round + 1,
+                currRoundFlashcardIds = request.flashcardIds.toMutableList(),
+                nextRoundFlashcardIds = mutableListOf(),
                 overallCorrectCount = parentMetadata.overallCorrectCount,
                 overallTotalCount = parentMetadata.overallTotalCount,
             )
         } else {
             QuizMetadata(
                 round = 1,
+                currRoundFlashcardIds = request.flashcardIds.toMutableList(),
+                nextRoundFlashcardIds = mutableListOf(),
                 overallCorrectCount = 0,
                 overallTotalCount = session.flashcardIds!!.size,
             )
@@ -173,13 +196,20 @@ class ReviewSessionService(
             return false
         }
 
-        val nextRoundFlashcardIdsFieldName = getMetadataFieldName(QuizMetadata::nextRoundFlashcardIds)
-        if (nextRoundFlashcardIdsFieldName != null) {
-            val nextRoundFlashcardIds = metadata[nextRoundFlashcardIdsFieldName]
+        getMetadataFieldName(QuizMetadata::nextRoundFlashcardIds)?.let {
+            val nextRoundFlashcardIds = metadata[it]
             if (nextRoundFlashcardIds != null) {
                 val ids = parseFlashcardIds(nextRoundFlashcardIds)
                 sessionMetadata.nextRoundFlashcardIds.addAll(ids)
                 return ids.isNotEmpty()
+            }
+        }
+
+        getMetadataFieldName(QuizMetadata::overallCorrectCount)?.let {
+            val overallCorrectCount = metadata[it]
+            if (overallCorrectCount != null && overallCorrectCount is Int && overallCorrectCount > 0) {
+                sessionMetadata.overallCorrectCount = overallCorrectCount
+                return true
             }
         }
 
@@ -191,6 +221,7 @@ class ReviewSessionService(
             is String -> value.split(",")
                 .filter { it.matches(numbersOnlyPattern) }
                 .map { it.toLong() }
+
             is List<*> -> value.mapNotNull { item ->
                 when (item) {
                     is Number -> item.toLong()
@@ -198,6 +229,7 @@ class ReviewSessionService(
                     else -> null
                 }
             }
+
             else -> emptyList()
         }
     }
