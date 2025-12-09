@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface FlashcardRepository : JpaRepository<Flashcard, Long> {
+    fun findAllByFlashcardSetIdAndIdIn(flashcardSetId: Long, ids: List<Long>): List<Flashcard>
 }
