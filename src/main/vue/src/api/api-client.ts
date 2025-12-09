@@ -7,6 +7,9 @@ import {
   ChronoUpdateResponse,
   FlashcardSetInitResponse,
   FlashcardSetSuspendResponse,
+  QuizSessionGetResponse,
+  ReviewSessionCreateRequest,
+  ReviewSessionUpdateRequest,
 } from '@/api/communication.ts'
 import {
   Flashcard,
@@ -185,17 +188,22 @@ export async function sendReviewSessionGetRequest(setId: number, id: number) {
   return apiClient.get<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${id}`)
 }
 
-export async function sendReviewSessionCreateRequest(setId: number, session: ReviewSession) {
+export async function sendQuizSessionGetRequest(setId: number, id: number) {
+  console.log(`[GET] request => quiz session ${id} for set ${setId}`)
+  return apiClient.get<QuizSessionGetResponse>(`/flashcard-sets/${setId}/quiz-sessions/${id}`)
+}
+
+export async function sendReviewSessionCreateRequest(setId: number, request: ReviewSessionCreateRequest) {
   console.log(`[POST] request => create review session for set ${setId}`)
-  return apiClient.post<ReviewSession>(`/flashcard-sets/${setId}/review-sessions`, session)
+  return apiClient.post<ReviewSession>(`/flashcard-sets/${setId}/review-sessions`, request)
 }
 
-export async function sendReviewSessionChildCreateRequest(setId: number, parentId: number, session: ReviewSession) {
+export async function sendReviewSessionChildCreateRequest(setId: number, parentId: number, request: ReviewSessionCreateRequest) {
   console.log(`[POST] request => child review session ${parentId} for set ${setId}`)
-  return apiClient.post<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${parentId}/children`, session)
+  return apiClient.post<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${parentId}/children`, request)
 }
 
-export async function sendReviewSessionUpdateRequest(setId: number, id: number, session: ReviewSession) {
+export async function sendReviewSessionUpdateRequest(setId: number, id: number, request: ReviewSessionUpdateRequest) {
   console.log(`[PUT] request => review session ${id} for set ${setId}`)
-  return apiClient.put<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${id}`, session)
+  return apiClient.put<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${id}`, request)
 }
