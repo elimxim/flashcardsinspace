@@ -66,7 +66,7 @@
             :overall-total="quizOverallTotal"
             :overall-correct="quizOverallCorrect"
             :round-total="flashcardsTotal"
-            :round-failed="failedFlashcards.length"
+            :round-failed="incorrectFlashcards.length"
             :on-next-round="startNextQuizRound"
             :on-finish="finishReviewAndLeave"
           />
@@ -159,7 +159,7 @@ import Starfield from '@/components/Starfield.vue'
 import QuizResult from '@/components/QuizResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useStopWatch } from '@/utils/stop-watch.ts'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import {
   copyFlashcard,
@@ -180,17 +180,27 @@ import {
   ReviewQueue,
   determineReviewMode,
   MonoStageReviewQueue,
-  reviewSessionTypeToSpecialStage
+  reviewSessionTypeToSpecialStage,
+  ReviewSessionType
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
-import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
+import {
+  loadQuizSessionIdFromCookies,
+  loadSelectedSetIdFromCookies,
+  removeQuizSessionIdFromCookies,
+  saveQuizSessionIdToCookies
+} from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { loadFlashcardRelatedStoresById } from '@/utils/stores.ts'
 import {
   sendChronoBulkUpdateRequest,
-  sendFlashcardUpdateRequest
+  sendFlashcardUpdateRequest,
+  sendReviewSessionChildCreateRequest,
+  sendReviewSessionCreateRequest,
+  sendReviewSessionGetRequest,
+  sendReviewSessionUpdateRequest,
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import {
@@ -216,8 +226,10 @@ const { chronodays, currDay } = storeToRefs(chronoStore)
 
 const reviewMode = computed(() => determineReviewMode(props.sessionType, props.stages))
 const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
+const reviewSessionId = ref<number | undefined>()
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
-const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
+const reviewedFlashcardIds = ref<number[]>([])
+const incorrectFlashcards = ref<Flashcard[]>([])
 const flashcardsTotal = ref(0)
 const flashcardsRemaining = computed(() => {
   if (noNextAvailable.value) return 0
@@ -243,17 +255,15 @@ const noPrevAvailable = computed(() => {
   return flashcardsTotal.value === flashcardsRemaining.value
 })
 
+const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 const currFlashcard = ref<Flashcard>()
 const flashcardFrontSideAudioBlob = ref<Blob | undefined>()
 const flashcardBackSideAudioBlob = ref<Blob | undefined>()
-
 const autoPlayVoice = ref(false)
 const autoRepeatVoice = ref(false)
-
 const quizRound = ref(1)
 const quizOverallTotal = ref(0)
 const quizOverallCorrect = ref(0)
-const failedFlashcards = ref<Flashcard[]>([])
 
 const {
   elapsedTime,
@@ -277,7 +287,7 @@ async function nextFlashcard(): Promise<boolean> {
   return currFlashcard.value !== undefined
 }
 
-function startReview() {
+async function startReview() {
   console.log(`Starting review: ${JSON.stringify(reviewMode.value)}`)
   if (reviewMode.value.isLightspeed()) {
     reviewQueue.value = createReviewQueue(flashcards.value, currDay.value, chronodays.value)
@@ -291,17 +301,29 @@ function startReview() {
   }
   flashcardsTotal.value = reviewQueue.value.remaining()
   quizOverallTotal.value = flashcardsTotal.value
-  nextFlashcard()
+  await startReviewSession()
+  await nextFlashcard()
   resetWatch()
   startWatch()
   console.log(`Flashcards TOTAL: ${flashcardsTotal.value}`)
+}
+
+async function startReviewSession() {
+  if (reviewMode.value.isQuiz()) {
+    await loadOrCreateQuizSession()
+  } else {
+    await createReviewSession()
+  }
 }
 
 async function finishReview() {
   console.log(`Finishing review: ${JSON.stringify(reviewMode.value)}`)
   stopWatch()
   reviewQueue.value = new EmptyReviewQueue()
-  failedFlashcards.value = []
+  reviewSessionId.value = undefined
+  removeQuizSessionIdFromCookies()
+  reviewedFlashcardIds.value = []
+  incorrectFlashcards.value = []
   flashcardsTotal.value = 0
   flashcardFrontSideAudioBlob.value = undefined
   flashcardBackSideAudioBlob.value = undefined
@@ -331,6 +353,7 @@ async function stageDown() {
   const flashcard = copyFlashcard(currFlashcard.value)
   updateFlashcard(flashcard, prevStage(flashcard.stage), currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
+  incorrectFlashcards.value.push(currFlashcard.value)
   if (success) {
     await getNextAndMarkDays(flashcardSet.value)
   }
@@ -351,31 +374,52 @@ async function quizAnswer(know: boolean) {
   if (!currFlashcard.value) return
   if (know) {
     quizOverallCorrect.value = quizOverallCorrect.value + 1
+    await updateQuizSession([])
     spaceDeck.value?.willSlideToRight()
   } else {
     spaceDeck.value?.willSlideToLeft()
     if (currFlashcard.value) {
-      failedFlashcards.value.push(currFlashcard.value)
+      incorrectFlashcards.value.push(currFlashcard.value)
+      await updateQuizSession([currFlashcard.value.id])
     }
   }
   await nextFlashcard()
 }
 
 async function startNextQuizRound() {
-  if (failedFlashcards.value.length === 0) {
-    console.error('Cannot start new round: no failed flashcards')
+  if (!flashcardSet.value || !reviewSessionId.value) return
+  if (incorrectFlashcards.value.length === 0) {
+    console.error('Cannot start new round: no incorrect flashcards')
     return
   }
 
-  const newQueue = new MonoStageReviewQueue(failedFlashcards.value)
-  newQueue.shuffle()
-  reviewQueue.value = newQueue
-  quizRound.value = quizRound.value + 1
-  failedFlashcards.value = []
-  flashcardsTotal.value = reviewQueue.value.remaining()
-  spaceDeck.value?.setDeckReady()
-  startWatch()
-  await nextFlashcard()
+  await sendReviewSessionChildCreateRequest(flashcardSet.value.id, reviewSessionId.value, {
+    type: ReviewSessionType.QUIZ,
+    chronodayId: currDay.value.id,
+    flashcardIds: incorrectFlashcards.value.map(f => f.id),
+  })
+    .then((response) => {
+      reviewSessionId.value = response.data.id
+      saveQuizSessionIdToCookies(response.data.id)
+
+      const newQueue = new MonoStageReviewQueue(incorrectFlashcards.value)
+      newQueue.shuffle()
+
+      reviewQueue.value = newQueue
+      quizRound.value = quizRound.value + 1
+      incorrectFlashcards.value = []
+      flashcardsTotal.value = reviewQueue.value.remaining()
+
+      spaceDeck.value?.setDeckReady()
+
+      startWatch()
+
+      return nextFlashcard()
+    })
+    .catch((error) => {
+      console.error(`Failed to create child review session`, error.response?.data)
+      toaster.bakeError(`Couldn't start a new round`, error.response?.data)
+    })
 }
 
 async function prev() {
@@ -484,6 +528,102 @@ function onAudioChanged() {
   fetchAudio()
 }
 
+watch(currFlashcard, async (newVal, oldVal) => {
+  if (!flashcardSet.value || !reviewSessionId.value) return
+  if (oldVal) {
+    reviewedFlashcardIds.value.push(oldVal.id)
+    await updateReviewSession([oldVal.id])
+  }
+  if (!newVal) {
+    if (reviewMode.value.isQuiz()) {
+      await updateQuizSession(incorrectFlashcards.value.map(f => f.id), true)
+    } else {
+      await updateReviewSession(reviewedFlashcardIds.value, true)
+    }
+  }
+})
+
+async function createReviewSession(flashcardIds: number[] = []) {
+  if (!flashcardSet.value) return
+  await sendReviewSessionCreateRequest(flashcardSet.value.id, {
+    type: reviewMode.value.sessionType,
+    chronodayId: currDay.value.id,
+    flashcardIds: flashcardIds,
+  })
+    .then((response) => {
+      reviewSessionId.value = response.data.id
+      console.log(`Review session ${reviewSessionId.value} created`)
+    })
+    .catch((error) => {
+      console.error(`Failed to create review session`, error.response?.data)
+      toaster.bakeError(`Couldn't start a review session`, error.response?.data)
+    })
+}
+
+async function loadOrCreateQuizSession() {
+  if (!flashcardSet.value) return
+  const sessionId = loadQuizSessionIdFromCookies()
+  if (sessionId) {
+    await sendReviewSessionGetRequest(flashcardSet.value.id, sessionId)
+      .then((response) => {
+        if (!response.data.finished) {
+          reviewSessionId.value = response.data.id
+          quizOverallCorrect.value = response.data.metadata?.overallCorrectCount ?? 0
+          quizOverallTotal.value = response.data.metadata?.overallTotalCount ?? 0
+          flashcardsTotal.value = response.data.metadata?.currRoundFlashcardIds?.length ?? 0
+          reviewedFlashcardIds.value = response.data.flashcardIds ?? []
+          incorrectFlashcards.value = [] // todo
+          reviewQueue.value = new EmptyReviewQueue() // todo
+          console.log(`Review session ${reviewSessionId.value} retrieved`)
+        }
+        console.log(`Retreived review session ${reviewSessionId.value} is finished`)
+      })
+      .catch((error) => {
+        console.error(`Failed to retrieve review session ${sessionId}`, error.response?.data)
+        toaster.bakeError(`Couldn't retrieve a review session`, error.response?.data)
+      })
+  } else {
+    await createReviewSession().then(() => {
+      if (reviewSessionId.value) {
+        saveQuizSessionIdToCookies(reviewSessionId.value)
+      }
+    })
+  }
+}
+
+async function updateReviewSession(flashcardIds: number[], finished: boolean = false) {
+  if (!flashcardSet.value || !reviewSessionId.value) return
+  await sendReviewSessionUpdateRequest(flashcardSet.value.id, reviewSessionId.value, {
+    elapsedTime: elapsedTime.value,
+    flashcardIds: flashcardIds,
+    finished: finished,
+  })
+    .then(() => {
+      console.log(`Review session ${reviewSessionId.value} updated`)
+    })
+    .catch((error) => {
+      console.error(`Failed to updated review session ${reviewSessionId.value}`, error.response?.data)
+    })
+}
+
+async function updateQuizSession(incorrectFlashcardIds?: number[], finished: boolean = false) {
+  if (!flashcardSet.value || !reviewSessionId.value) return
+  await sendReviewSessionUpdateRequest(flashcardSet.value.id, reviewSessionId.value, {
+    elapsedTime: elapsedTime.value,
+    finished: finished,
+    metadata: {
+      nextRoundFlashcardIds: incorrectFlashcardIds,
+      overallCorrectCount: quizOverallCorrect.value,
+    },
+  })
+    .then(() => {
+      console.log(`Review session ${reviewSessionId.value} updated`)
+    })
+    .catch((error) => {
+      console.error(`Failed to update review session ${reviewSessionId.value}`, error.response?.data)
+    })
+}
+
 onMounted(async () => {
   if (!flashcardStore.loaded) {
     console.log('Flashcard set not loaded, loading...')
@@ -494,7 +634,7 @@ onMounted(async () => {
       console.log('Flashcard set not found in cookies')
     }
   }
-  startReview()
+  await startReview()
   spaceDeck.value?.setDeckReady()
   document.addEventListener('keydown', handleKeydown)
 })
