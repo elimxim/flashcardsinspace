@@ -101,6 +101,8 @@ export interface ReviewQueue {
   next(): Flashcard | undefined
 
   remaining(stage?: Stage): number
+
+  remainingFlashcards(): Flashcard[]
 }
 
 export class EmptyReviewQueue implements ReviewQueue {
@@ -117,6 +119,10 @@ export class EmptyReviewQueue implements ReviewQueue {
 
   public remaining(): number {
     return 0
+  }
+
+  public remainingFlashcards(): Flashcard[] {
+    return []
   }
 }
 
@@ -178,6 +184,10 @@ export class MultiStageReviewQueue implements ReviewQueue {
     })
     return total
   }
+
+  public remainingFlashcards(): Flashcard[] {
+    return [...this.flashcardMap.values()].flat()
+  }
 }
 
 export class MonoStageReviewQueue implements ReviewQueue {
@@ -207,6 +217,10 @@ export class MonoStageReviewQueue implements ReviewQueue {
   public remaining(): number {
     if (this.index >= this.flashcards.length) return 0
     return this.flashcards.length - (this.index + 1)
+  }
+
+  public remainingFlashcards(): Flashcard[] {
+    return [...this.flashcards]
   }
 }
 

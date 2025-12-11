@@ -238,7 +238,7 @@ fun UserUpdateRequest.toValidRequest() = ValidUserUpdateRequest(
 fun ReviewSessionCreateRequest.toValidRequest() = ValidReviewSessionCreateRequest(
     type = ReviewSessionType.valueOf(type!!),
     chronodayId = chronodayId!!.toLong(),
-    flashcardIds = flashcardIds?.map { it.id!!.toLong() }?.toSet() ?: emptySet(),
+    metadata = metadata ?: emptyMap(),
 )
 
 fun ReviewSessionUpdateRequest.toValidRequest() = ValidReviewSessionUpdateRequest(

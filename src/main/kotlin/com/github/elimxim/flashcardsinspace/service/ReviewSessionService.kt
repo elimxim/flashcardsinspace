@@ -10,7 +10,7 @@ import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.getMetadataFieldName
 import com.github.elimxim.flashcardsinspace.util.numbersOnlyPattern
 import com.github.elimxim.flashcardsinspace.web.dto.*
-import com.github.elimxim.flashcardsinspace.web.exception.ParentReviewSessionIsNotQuizException
+import com.github.elimxim.flashcardsinspace.web.exception.ChildSessionIllegalRequestException
 import com.github.elimxim.flashcardsinspace.web.exception.ReviewSessionNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -72,9 +72,10 @@ class ReviewSessionService(
         }
 
         if (request.flashcardIds.isNotEmpty()) {
-            val flashcardIds = (session.flashcardIds?.toSet() ?: emptySet()) + request.flashcardIds
-            session.flashcardIds = flashcardIds.toLongArray()
-            changed = true
+            val sessionFlashcardIds = session.flashcardIds?.toSet() ?: emptySet()
+            val totalFlashcardIds = sessionFlashcardIds + request.flashcardIds
+            session.flashcardIds = totalFlashcardIds.toLongArray()
+            changed = sessionFlashcardIds.size != totalFlashcardIds.size
         }
 
         if (request.finished) {
@@ -86,7 +87,9 @@ class ReviewSessionService(
         }
 
         if (session.type == ReviewSessionType.QUIZ) {
-            changed = updateQuizMetadata(session, request.metadata)
+            if (updateQuizMetadata(session, request.metadata)) {
+                changed = true
+            }
         }
 
         return changed
@@ -110,14 +113,16 @@ class ReviewSessionService(
         request: ValidReviewSessionCreateRequest
     ): ReviewSessionDto {
         val parentSession = getEntity(parentId)
+        if (request.type != parentSession.type) {
+            throw ChildSessionIllegalRequestException("Child session type ${request.type} is not the same as parent session type ${parentSession.type}")
+        }
+
         val session = createNewReviewSession(setId, request).apply {
             parentSessionId = parentSession.id
         }
         if (session.type == ReviewSessionType.QUIZ) {
             if (parentSession.type != ReviewSessionType.QUIZ) {
-                throw ParentReviewSessionIsNotQuizException(
-                    "Parent session ${parentSession.id} type is not ${ReviewSessionType.QUIZ}"
-                )
+                throw ChildSessionIllegalRequestException("Parent session ${parentSession.id} is not ${ReviewSessionType.QUIZ}")
             }
             addQuizMetadata(session, request, parentSession)
         }
@@ -129,7 +134,6 @@ class ReviewSessionService(
     fun getReviewSession(user: User, setId: Long, id: Long): ReviewSessionDto {
         log.info("Getting review session $id for set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
-        // todo actualize flashcards ids (some of them might be deleted at this moment)
         return getEntity(id).toDto()
     }
 
@@ -159,25 +163,33 @@ class ReviewSessionService(
         val metadata = if (parentSession != null && parentSession.metadata != null) {
             val parentMetadata = parentSession.metadata
             if (parentMetadata !is QuizMetadata) {
-                throw ParentReviewSessionIsNotQuizException(
+                throw ChildSessionIllegalRequestException(
                     "Parent session ${parentSession.id} metadata is not ${ReviewSessionType.QUIZ}"
                 )
             }
 
             QuizMetadata(
                 round = parentMetadata.round + 1,
-                currRoundFlashcardIds = request.flashcardIds.toMutableList(),
-                nextRoundFlashcardIds = mutableListOf(),
+                currRoundFlashcardIds = parentMetadata.nextRoundFlashcardIds,
+                nextRoundFlashcardIds = mutableSetOf(),
                 overallCorrectCount = parentMetadata.overallCorrectCount,
                 overallTotalCount = parentMetadata.overallTotalCount,
             )
         } else {
+            val currRoundFlashcardIds = getMetadataFieldName(QuizMetadata::currRoundFlashcardIds)?.let { fieldName ->
+                request.metadata[fieldName]?.let { parseFlashcardIds(it) }?.toMutableSet()
+            } ?: mutableSetOf()
+
+            val overallTotalCount = getMetadataFieldName(QuizMetadata::overallTotalCount)?.let { fieldName ->
+                request.metadata[fieldName]?.let { it as? Int ?: 0 }
+            } ?: 0
+
             QuizMetadata(
                 round = 1,
-                currRoundFlashcardIds = request.flashcardIds.toMutableList(),
-                nextRoundFlashcardIds = mutableListOf(),
+                currRoundFlashcardIds = currRoundFlashcardIds,
+                nextRoundFlashcardIds = mutableSetOf(),
                 overallCorrectCount = 0,
-                overallTotalCount = session.flashcardIds!!.size,
+                overallTotalCount = overallTotalCount,
             )
         }
 
@@ -196,24 +208,25 @@ class ReviewSessionService(
             return false
         }
 
-        getMetadataFieldName(QuizMetadata::nextRoundFlashcardIds)?.let {
-            val nextRoundFlashcardIds = metadata[it]
+        var changed = false
+        getMetadataFieldName(QuizMetadata::nextRoundFlashcardIds)?.let { fieldName ->
+            val nextRoundFlashcardIds = metadata[fieldName]
             if (nextRoundFlashcardIds != null) {
                 val ids = parseFlashcardIds(nextRoundFlashcardIds)
                 sessionMetadata.nextRoundFlashcardIds.addAll(ids)
-                return ids.isNotEmpty()
+                changed = ids.isNotEmpty()
             }
         }
 
-        getMetadataFieldName(QuizMetadata::overallCorrectCount)?.let {
-            val overallCorrectCount = metadata[it]
+        getMetadataFieldName(QuizMetadata::overallCorrectCount)?.let { fieldName ->
+            val overallCorrectCount = metadata[fieldName]
             if (overallCorrectCount != null && overallCorrectCount is Int && overallCorrectCount > 0) {
                 sessionMetadata.overallCorrectCount = overallCorrectCount
-                return true
+                changed = true
             }
         }
 
-        return false
+        return changed
     }
 
     private fun parseFlashcardIds(value: Any): List<Long> {

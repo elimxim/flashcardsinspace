@@ -65,9 +65,9 @@ class ChronodayNotFoundException(msg: String) : BadRequestException(msg)
 @UserMessageCode("user.message.error.reviewSession.notFound")
 class ReviewSessionNotFoundException(msg: String) : BadRequestException(msg)
 
-@ErrorCode("PRQ400")
-@UserMessageCode("user.message.error.reviewSession.parentNotQuiz")
-class ParentReviewSessionIsNotQuizException(msg: String) : BadRequestException(msg)
+@ErrorCode("CSI400")
+@UserMessageCode("user.message.error.reviewSession.child.illegal")
+class ChildSessionIllegalRequestException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("FSI400")
 @UserMessageCode("user.message.error.flashcardSet.alreadyStarted")

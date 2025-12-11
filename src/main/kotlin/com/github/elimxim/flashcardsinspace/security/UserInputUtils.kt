@@ -148,18 +148,26 @@ fun UserUpdateRequest.escapeJava() = UserUpdateRequest(
 fun ReviewSessionCreateRequest.normalize() = ReviewSessionCreateRequest(
     type = type?.normalize(),
     chronodayId = chronodayId?.normalize(),
-    flashcardIds = flashcardIds?.map { ReviewSessionCreateRequest.FlashcardId(it.id?.normalize()) },
+    metadata = metadata?.map { (k, v) -> k.escapeJava() to escapeReviewSessionMetadataValue(v) }?.toMap(),
 )
 
 fun ReviewSessionCreateRequest.escapeJava() = ReviewSessionCreateRequest(
     type = type?.escapeJava(),
     chronodayId = chronodayId?.escapeJava(),
-    flashcardIds = flashcardIds?.map { ReviewSessionCreateRequest.FlashcardId(it.id?.escapeJava()) },
+    metadata = metadata?.map { (k, v) -> k.escapeJava() to escapeReviewSessionMetadataValue(v) }?.toMap(),
 )
 
 fun ReviewSessionUpdateRequest.normalize() = ReviewSessionUpdateRequest(
     elapsedTime = elapsedTime?.normalize(),
     flashcardIds = flashcardIds?.map { ReviewSessionUpdateRequest.FlashcardId(it.id?.normalize()) },
+    finished = finished?.normalize(),
+    metadata = metadata?.map { (k, v) -> k.escapeJava() to escapeReviewSessionMetadataValue(v) }?.toMap(),
+)
+
+fun ReviewSessionUpdateRequest.escapeJava() = ReviewSessionUpdateRequest(
+    elapsedTime = elapsedTime?.escapeJava(),
+    flashcardIds = flashcardIds?.map { ReviewSessionUpdateRequest.FlashcardId(it.id?.escapeJava()) },
+    finished = finished?.escapeJava(),
     metadata = metadata?.map { (k, v) -> k.escapeJava() to escapeReviewSessionMetadataValue(v) }?.toMap(),
 )
 
@@ -173,12 +181,6 @@ private fun normalizeReviewSessionMetadataValue(value: Any): Any {
         else -> value
     }
 }
-
-fun ReviewSessionUpdateRequest.escapeJava() = ReviewSessionUpdateRequest(
-    elapsedTime = elapsedTime?.escapeJava(),
-    flashcardIds = flashcardIds?.map { ReviewSessionUpdateRequest.FlashcardId(it.id?.escapeJava()) },
-    metadata = metadata?.map { (k, v) -> k.escapeJava() to escapeReviewSessionMetadataValue(v) }?.toMap(),
-)
 
 private fun escapeReviewSessionMetadataValue(value: Any): Any {
     return when (value) {

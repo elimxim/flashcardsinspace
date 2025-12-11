@@ -257,21 +257,14 @@ data class ReviewSessionCreateRequest(
     @field:NotBlank
     @field:Pattern(regexp="^\\d+$")
     var chronodayId: String? = null,
-    @field:Valid
-    var flashcardIds: List<FlashcardId>? = null,
-) {
-    class FlashcardId(
-        @field:NotNull
-        @field:NotBlank
-        @field:Pattern(regexp = "^\\d+$")
-        var id: String? = null,
-    )
-}
+    @field:ValidMetadata
+    var metadata: Map<String, Any>? = null,
+)
 
 data class ValidReviewSessionCreateRequest(
     val type: ReviewSessionType,
     val chronodayId: Long,
-    val flashcardIds: Set<Long>,
+    val metadata: Map<String, Any>,
 )
 
 data class ReviewSessionUpdateRequest(

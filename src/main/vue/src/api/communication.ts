@@ -49,12 +49,16 @@ export interface FlashcardSetSuspendResponse {
 export interface ReviewSessionCreateRequest {
   type: string,
   chronodayId: number,
-  flashcardIds: number[],
+  metadata?: Record<string, unknown>,
 }
 
 export interface ReviewSessionUpdateRequest {
   elapsedTime: number,
-  flashcardIds?: number[],
+  flashcardIds?: FlashcardId[],
   finished?: boolean,
   metadata?: Record<string, unknown>,
+}
+
+export interface FlashcardId {
+  id: number
 }

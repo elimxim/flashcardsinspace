@@ -10,6 +10,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.superclasses
+import kotlin.reflect.jvm.javaField
 
 private val log = getLogger("AnnotationSupport")
 
@@ -41,10 +42,11 @@ inline fun <reified T : Annotation> findAnnotationInClassHierarchy(kClass: KClas
 }
 
 fun getMetadataFieldName(field: KProperty1<*, *>): String? {
-    val anno = getAnnotationFromField<MetadataField>(field)
+    val anno = getAnnotationFrom<MetadataField>(field)
     return anno?.name
 }
 
-inline fun <reified T: Annotation> getAnnotationFromField(property: KProperty1<*, *>): T? {
-    return property.findAnnotation<T>()
+inline fun <reified T: Annotation> getAnnotationFrom(property: KProperty1<*, *>): T? {
+    property.findAnnotation<T>()?.let { return it } // kotlin property
+    return property.javaField?.getAnnotation(T::class.java) // java field
 }

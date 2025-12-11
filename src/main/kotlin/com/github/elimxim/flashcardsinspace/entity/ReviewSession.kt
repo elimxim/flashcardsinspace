@@ -68,9 +68,9 @@ data class QuizMetadata(
     @field:MetadataField("round")
     var round: Int,
     @field:MetadataField("nextRoundFlashcardIds")
-    var nextRoundFlashcardIds: MutableList<Long> = mutableListOf(),
+    var nextRoundFlashcardIds: MutableSet<Long> = mutableSetOf(),
     @field:MetadataField("currRoundFlashcardIds")
-    var currRoundFlashcardIds: MutableList<Long> = mutableListOf(),
+    var currRoundFlashcardIds: MutableSet<Long> = mutableSetOf(),
     @field:MetadataField("overallCorrectCount")
     var overallCorrectCount: Int,
     @field:MetadataField("overallTotalCount")
