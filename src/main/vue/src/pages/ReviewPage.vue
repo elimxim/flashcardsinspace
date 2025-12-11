@@ -574,14 +574,14 @@ async function loadOrCreateQuizSession(createIfNotFound: boolean) {
         quizRound.value = response.data.metadata?.round ?? 1
         quizOverallCorrect.value = response.data.metadata?.overallCorrectCount ?? 0
         quizOverallTotal.value = response.data.metadata?.overallTotalCount ?? 0
-        flashcardsTotal.value = response.data.metadata?.currRoundFlashcardIds?.length ?? 0
         const reviewedFlashcardIdSet = new Set(response.data.flashcardIds ?? [])
-        const nextRoundFlashcardIds = new Set(response.data.metadata?.nextRoundFlashcardIds ?? [])
-        const currRoundFlashcardIds = new Set(response.data.metadata?.currRoundFlashcardIds ?? [])
-        const currRoundFlashcards = flashcards.value.filter(f => currRoundFlashcardIds.has(f.id))
+        const nextRoundFlashcardIdSet = new Set(response.data.metadata?.nextRoundFlashcardIds ?? [])
+        const currRoundFlashcardIdSet = new Set(response.data.metadata?.currRoundFlashcardIds ?? [])
+        const currRoundFlashcards = flashcards.value.filter(f => currRoundFlashcardIdSet.has(f.id))
         const flashcardsForReview = currRoundFlashcards.filter(f => !reviewedFlashcardIdSet.has(f.id))
+        flashcardsTotal.value = currRoundFlashcardIdSet.size
         reviewedFlashcardIds.value = [...reviewedFlashcardIdSet]
-        incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIds.has(f.id))
+        incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIdSet.has(f.id))
         reviewQueue.value = new MonoStageReviewQueue(flashcardsForReview)
         reviewQueue.value.shuffle()
         console.log(`Review session ${reviewSessionId.value} retrieved`)
