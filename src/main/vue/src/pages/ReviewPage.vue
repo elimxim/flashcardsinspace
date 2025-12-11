@@ -616,7 +616,6 @@ async function updateReviewSession(flashcardIds: number[], finished: boolean = f
 
 async function updateQuizSession(reviewedFlashcardIds: number[], nextRoundFlashcardIds: number[], finished: boolean = false) {
   if (!flashcardSet.value || !reviewSessionId.value) return
-  console.log('finished: ', finished)
   await sendReviewSessionUpdateRequest(flashcardSet.value.id, reviewSessionId.value, {
     elapsedTime: elapsedTime.value,
     flashcardIds: reviewedFlashcardIds.map(id => ({ id: id })),
