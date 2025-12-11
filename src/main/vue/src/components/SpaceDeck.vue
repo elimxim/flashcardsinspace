@@ -20,7 +20,7 @@
           :back-side-audio="flashcardBackSideAudio"
         />
         <template v-else>
-          <slot v-if="hasSlot && showSlot"/>
+          <slot v-if="hasSlot && showSlot && deckReady"/>
           <SpaceCard
             v-else
             :front-side="deckEmptyMessage()"
