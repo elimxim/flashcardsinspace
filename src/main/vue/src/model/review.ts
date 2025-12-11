@@ -4,7 +4,6 @@ export interface ReviewSession {
   flashcardIds: number[]
   elapsedTime: number
   startedAt: Date // ZonedDateTime
-  finished: boolean | undefined
   finishedAt?: Date | undefined // ZonedDateTime
   lastUpdatedAt?: Date | undefined // ZonedDateTime
   metadata?: QuizMetadata // use discriminated union if there is more than one type

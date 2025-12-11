@@ -569,27 +569,22 @@ async function loadOrCreateQuizSession(createIfNotFound: boolean) {
   if (sessionId) {
     await sendReviewSessionGetRequest(flashcardSet.value.id, sessionId)
       .then((response) => {
-        if (!response.data.finished) {
-          reviewSessionId.value = response.data.id
-          elapsedTime.value = response.data.elapsedTime
-          quizRound.value = response.data.metadata?.round ?? 1
-          quizOverallCorrect.value = response.data.metadata?.overallCorrectCount ?? 0
-          quizOverallTotal.value = response.data.metadata?.overallTotalCount ?? 0
-          flashcardsTotal.value = response.data.metadata?.currRoundFlashcardIds?.length ?? 0
-          const reviewedFlashcardIdSet = new Set(response.data.flashcardIds ?? [])
-          const nextRoundFlashcardIds = new Set(response.data.metadata?.nextRoundFlashcardIds ?? [])
-          const currRoundFlashcardIds = new Set(response.data.metadata?.currRoundFlashcardIds ?? [])
-          const currRoundFlashcards = flashcards.value.filter(f => currRoundFlashcardIds.has(f.id))
-          const flashcardsForReview = currRoundFlashcards.filter(f => !reviewedFlashcardIdSet.has(f.id))
-          reviewedFlashcardIds.value = [...reviewedFlashcardIdSet]
-          incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIds.has(f.id))
-          reviewQueue.value = new MonoStageReviewQueue(flashcardsForReview)
-          reviewQueue.value.shuffle()
-          console.log(`Review session ${reviewSessionId.value} retrieved`)
-        } else {
-          console.log(`Retrieved review session ${response.data.id} is finished`)
-          // todo show the retrieved session
-        }
+        reviewSessionId.value = response.data.id
+        elapsedTime.value = response.data.elapsedTime
+        quizRound.value = response.data.metadata?.round ?? 1
+        quizOverallCorrect.value = response.data.metadata?.overallCorrectCount ?? 0
+        quizOverallTotal.value = response.data.metadata?.overallTotalCount ?? 0
+        flashcardsTotal.value = response.data.metadata?.currRoundFlashcardIds?.length ?? 0
+        const reviewedFlashcardIdSet = new Set(response.data.flashcardIds ?? [])
+        const nextRoundFlashcardIds = new Set(response.data.metadata?.nextRoundFlashcardIds ?? [])
+        const currRoundFlashcardIds = new Set(response.data.metadata?.currRoundFlashcardIds ?? [])
+        const currRoundFlashcards = flashcards.value.filter(f => currRoundFlashcardIds.has(f.id))
+        const flashcardsForReview = currRoundFlashcards.filter(f => !reviewedFlashcardIdSet.has(f.id))
+        reviewedFlashcardIds.value = [...reviewedFlashcardIdSet]
+        incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIds.has(f.id))
+        reviewQueue.value = new MonoStageReviewQueue(flashcardsForReview)
+        reviewQueue.value.shuffle()
+        console.log(`Review session ${reviewSessionId.value} retrieved`)
       })
       .catch((error) => {
         console.error(`Failed to retrieve review session ${sessionId}`, error.response?.data)
