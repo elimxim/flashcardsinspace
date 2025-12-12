@@ -61,19 +61,18 @@ databaseChangeLog:
                     validateForeignKey: true
         - createIndex:
             tableName: review_session
-            indexName: idx_review_session_flashcard_set_id
+            indexName: idx_review_session_flashcard_set_id_type_started_at
             columns:
               - column:
                   name: flashcard_set_id
+              - column:
+                  name: type
+              - column:
+                  name: started_at
+                  descending: true
         - createIndex:
             tableName: review_session
             indexName: idx_review_session_chronoday_id
             columns:
               - column:
                   name: chronoday_id
-        - createIndex:
-            tableName: review_session
-            indexName: idx_review_session_started_at
-            columns:
-              - column:
-                  name: started_at
