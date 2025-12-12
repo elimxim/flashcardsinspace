@@ -158,8 +158,7 @@ function handleKeydown(event: KeyboardEvent) {
   grid-area: 1 / 1;
   position: relative;
   width: clamp(200px, 90vw, 600px);
-  height: clamp(250px, 50vh, 450px);
-  background-color: transparent;
+  height: clamp(290px, 50vh, 450px);
 }
 
 .slide-to-right-enter-active,
