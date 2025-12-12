@@ -283,7 +283,7 @@ async function nextFlashcard(): Promise<boolean> {
   return currFlashcard.value !== undefined
 }
 
-async function startReview(pageReloaded: boolean) {
+async function startReview() {
   console.log(`Starting review: ${JSON.stringify(reviewMode.value)}`)
   if (reviewMode.value.isLightspeed()) {
     reviewQueue.value = createReviewQueue(flashcards.value, currDay.value, chronodays.value)
@@ -629,9 +629,7 @@ async function updateQuizSession(reviewedFlashcardIds: number[], nextRoundFlashc
 }
 
 onMounted(async () => {
-  let pageReloaded = false
   if (!flashcardStore.loaded) {
-    pageReloaded = true
     console.log('Flashcard set not loaded, loading...')
     const selectedSetId = loadSelectedSetIdFromCookies()
     if (selectedSetId) {
@@ -640,7 +638,7 @@ onMounted(async () => {
       console.log('Flashcard set not found in cookies')
     }
   }
-  await startReview(pageReloaded)
+  await startReview()
   spaceDeck.value?.setDeckReady()
   document.addEventListener('keydown', handleKeydown)
 })

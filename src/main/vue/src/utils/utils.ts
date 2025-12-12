@@ -44,7 +44,7 @@ export function parseLocalDate(dateStr: string): Date {
   return new Date(year, month - 1, day)
 }
 
-export function parseNumber(value?: unknown): Number | undefined {
+export function parseNumber(value?: unknown): number | undefined {
   if (value === undefined || value === null) return undefined
   return Number(value)
 }
