@@ -1,8 +1,11 @@
 package com.github.elimxim.flashcardsinspace.web
 
+import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
 import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.security.escapeJava
 import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.ReviewSessionService
+import com.github.elimxim.flashcardsinspace.service.validation.ValidReviewSessionType
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionCreateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionDto
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionUpdateRequest
@@ -56,6 +59,17 @@ class ReviewSessionController(
         @PathVariable id: Long,
     ): ResponseEntity<ReviewSessionDto> {
         val dto = reviewSessionService.getReviewSession(user, setId, id)
+        return ResponseEntity.ok(dto)
+    }
+
+    @GetMapping("/latest")
+    fun getLatestReviewSession(
+        @AuthenticationPrincipal user: User,
+        @PathVariable setId: Long,
+        @RequestParam @ValidReviewSessionType type: String,
+    ): ResponseEntity<ReviewSessionDto> {
+        val type = ReviewSessionType.valueOf(type.normalize().escapeJava())
+        val dto = reviewSessionService.getLatestReviewSession(user, setId, type)
         return ResponseEntity.ok(dto)
     }
 }

@@ -4,7 +4,6 @@ import com.github.elimxim.flashcardsinspace.entity.QuizMetadata
 import com.github.elimxim.flashcardsinspace.entity.ReviewSession
 import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
 import com.github.elimxim.flashcardsinspace.entity.User
-import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.ReviewSessionRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.getMetadataFieldName
@@ -25,7 +24,6 @@ class ReviewSessionService(
     private val flashcardSetService: FlashcardSetService,
     private val chronoService: ChronoService,
     private val reviewSessionRepository: ReviewSessionRepository,
-    private val flashcardRepository: FlashcardRepository,
 ) {
 
     @Transactional
@@ -135,6 +133,15 @@ class ReviewSessionService(
         log.info("Getting review session $id for set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         return getEntity(id).toDto()
+    }
+
+    @Transactional
+    fun getLatestReviewSession(user: User, setId: Long, type: ReviewSessionType): ReviewSessionDto {
+        log.info("Getting latest review session for set $setId")
+        flashcardSetService.verifyUserHasAccess(user, setId)
+        return reviewSessionRepository.findTopByFlashcardSetIdAndTypeOrderByStartedAtDesc(setId, type)
+            .orElseThrow { ReviewSessionNotFoundException("No review session found for set $setId") }
+            .toDto()
     }
 
     @Transactional

@@ -22,6 +22,7 @@ import { configureDateTransformers } from '@/api/axios-config.ts'
 import { configureTokenRefreshInterceptor } from '@/api/token-refresh.ts'
 import { User } from '@/model/user.ts'
 import { ReviewSession } from '@/model/review.ts'
+import { ReviewSessionType } from '@/core-logic/review-logic.ts'
 
 const apiClient = axios.create({
   baseURL: '/api',
@@ -180,6 +181,11 @@ export async function sendUserUpdateRequest(username: string, userEmail: string,
     email: userEmail,
     languageId: languageId,
   })
+}
+
+export async function sendLatestReviewSessionGetRequest(setId: number, type: ReviewSessionType) {
+  console.log(`[GET] request => latest review session for set ${setId}`)
+  return apiClient.get<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/latest?type=${type}`)
 }
 
 export async function sendReviewSessionGetRequest(setId: number, id: number) {
