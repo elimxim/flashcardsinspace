@@ -32,7 +32,6 @@ Please see the [LICENSE](LICENSE) file for the complete terms and conditions.
   - Footer
   - Admin page
   - Feedback form (bugs, wishes, suggestions, etc.)
-  - Review Session
   - User page: 
     - Show active sessions and devices
     - Change password
