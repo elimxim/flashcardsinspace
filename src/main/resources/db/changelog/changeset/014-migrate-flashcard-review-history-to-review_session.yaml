@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 014-migrate-flashcard-review-history-to-review_session
+      author: elimxim
+      changes:
+        - sql:
+            comment: Create review sessions from flashcard review history
+            sql: |
+              INSERT INTO review_session (
+                type,
+                flashcard_ids,
+                elapsed_time,
+                started_at,
+                finished_at,
+                last_updated_at,
+                flashcard_set_id,
+                chronoday_id
+              )
+              SELECT
+                'LIGHTSPEED' AS type,
+                ARRAY_AGG(f.id) AS flashcard_ids,
+                COUNT(f.id) * 2000 AS elapsed_time,
+                ((review_info->>'reviewDate')::DATE::TIMESTAMP + INTERVAL '12 hours') AT TIME ZONE 'UTC' AS started_at,
+                ((review_info->>'reviewDate')::DATE::TIMESTAMP + INTERVAL '20 hours') AT TIME ZONE 'UTC' AS finished_at,
+                ((review_info->>'reviewDate')::DATE::TIMESTAMP + INTERVAL '20 hours') AT TIME ZONE 'UTC' AS last_updated_at,
+                f.flashcard_set_id,
+                c.id AS chronoday_id
+              FROM flashcard f
+              CROSS JOIN LATERAL jsonb_array_elements(f.review_history->'history') AS review_info
+              INNER JOIN chronoday c ON c.chronodate = (review_info->>'reviewDate')::DATE
+                AND c.flashcard_set_id = f.flashcard_set_id
+              WHERE f.review_history IS NOT NULL
+                AND f.review_history->'history' IS NOT NULL
+                AND jsonb_array_length(f.review_history->'history') > 0
+              GROUP BY f.flashcard_set_id, c.id, review_info->>'reviewDate'
+              ORDER BY started_at;
