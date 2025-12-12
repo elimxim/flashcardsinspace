@@ -3,6 +3,7 @@ package com.github.elimxim.flashcardsinspace
 import com.github.elimxim.flashcardsinspace.entity.repository.*
 import com.github.elimxim.flashcardsinspace.security.SecurityProperties
 import io.mockk.mockk
+import jakarta.persistence.EntityManager
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
@@ -48,4 +49,7 @@ class TestConfigurationContext {
 
     @Bean
     fun reviewSessionRepository() = mockk<ReviewSessionRepository>()
+
+    @Bean
+    fun entityManager() = mockk<EntityManager>()
 }
