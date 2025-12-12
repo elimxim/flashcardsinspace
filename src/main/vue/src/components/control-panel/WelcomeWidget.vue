@@ -24,7 +24,7 @@ const flashcardSetStore = useFlashcardSetStore()
 
 const { isNoFlashcardSets } = storeToRefs(flashcardSetStore)
 
-function welcomeText(): String {
+function welcomeText(): string {
   if (isNoFlashcardSets.value) {
     return 'Welcome to Control Panel! We wish you a happy journey!'
   } else {
