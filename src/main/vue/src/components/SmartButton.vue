@@ -166,6 +166,7 @@ function handleGlobalMouseUp() {
   --s-btn--border-color: var(--smart-button--border-color, transparent);
   --s-btn--border-color--hover: var(--smart-button--border-color--hover, transparent);
   --s-btn--border-radius: var(--smart-button--border-radius, 3px);
+  --s-btn--border-width: var(--smart-button--border-width, 1px);
   --s-btn--width: var(--smart-button--width, 100px);
   --s-btn--height: var(--smart-button--height, 40px);
   --s-btn--padding: var(--smart-button--padding, 0);
@@ -180,7 +181,7 @@ function handleGlobalMouseUp() {
   border: none;
   border-radius: var(--s-btn--border-radius);
   background: var(--s-btn--bg);
-  outline: 1px solid var(--s-btn--border-color);
+  outline: var(--s-btn--border-width) solid var(--s-btn--border-color);
   position: relative;
   transition:
     background-color 0.2s ease-in-out,
