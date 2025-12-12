@@ -3,12 +3,14 @@ package com.github.elimxim.flashcardsinspace.service
 import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.DayStreakRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
+import com.github.elimxim.flashcardsinspace.entity.repository.ReviewSessionRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetNotFoundException
 import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetNotStartedException
 import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetSuspendedException
 import com.github.elimxim.flashcardsinspace.web.exception.UserOperationNotAllowedException
+import jakarta.persistence.EntityManager
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,6 +24,8 @@ class FlashcardSetService(
     private val languageService: LanguageService,
     private val requestValidator: RequestValidator,
     private val dayStreakRepository: DayStreakRepository,
+    private val reviewSessionRepository: ReviewSessionRepository,
+    private val entityManager: EntityManager,
 ) {
     @Transactional
     fun getAll(user: User): List<FlashcardSetDto> {
@@ -127,9 +131,11 @@ class FlashcardSetService(
             flashcardSet.status = FlashcardSetStatus.DELETED
             flashcardSetRepository.save(flashcardSet)
         } else {
-            flashcardSet.dayStreak = null
             dayStreakRepository.deleteByFlashcardSetId(id)
-            flashcardSetRepository.delete(flashcardSet)
+            reviewSessionRepository.deleteByFlashcardSetId(id)
+            entityManager.flush()
+            entityManager.clear()
+            flashcardSetRepository.deleteById(id)
         }
     }
 

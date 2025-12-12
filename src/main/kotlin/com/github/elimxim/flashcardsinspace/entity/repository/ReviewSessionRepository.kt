@@ -7,4 +7,5 @@ import java.util.*
 
 interface ReviewSessionRepository : JpaRepository<ReviewSession, Long> {
     fun findTopByFlashcardSetIdAndTypeOrderByStartedAtDesc(flashcardSetId: Long, type: ReviewSessionType): Optional<ReviewSession>
+    fun deleteByFlashcardSetId(flashcardSetId: Long)
 }
