@@ -95,7 +95,7 @@
           auto-blur
         />
         <SmartButton
-          class="quiz-start-button"
+          class="calm-button"
           text="Start"
           :on-click="startNew"
           :disabled="reviewCount <= 0"
@@ -282,8 +282,8 @@ onMounted(async () => {
   color: #4a5568;
   background: #f0f4f8;
   border-radius: 6px;
-  border-left: 3px solid #ffae00;
-  border-right: 3px solid #ffae00;
+  border-left: 3px solid #007bff;
+  border-right: 3px solid #007bff;
 }
 
 .quiz-stage-grid {
@@ -312,31 +312,31 @@ onMounted(async () => {
 }
 
 .quiz-stage-grid-row:not(.quiz-stage-grid-row--selected):not(.quiz-stage-grid-row--total):hover {
-  border-color: #ffae00;
+  border-color: #007BFFFF;
 }
 
 .quiz-stage-grid-row:has(.quiz-stage-grid-row--selected):hover {
-  border-color: #bf6e00;
+  border-color: #0056B3FF;
 }
 
 .quiz-stage-grid-row--selected {
-  border-color: #ffae00;
+  border-color: #007BFFFF;
 }
 
 .quiz-stage-checkbox {
   flex: 1;
   font-size: 1rem;
-  --smart-checkbox--color-unchecked: #d6c7b8;
-  --smart-checkbox--color-unchecked--hover: #ffae00;
-  --smart-checkbox--color-checked: #ffae00;
-  --smart-checkbox--color-checked--hover: #bf6e00;
+  --smart-checkbox--color-unchecked: #007BFFFF;
+  --smart-checkbox--color-unchecked--hover: #0056B3FF;
+  --smart-checkbox--color-checked: #0056B3FF;
+  --smart-checkbox--color-checked--hover: #007BFFFF;
 }
 
 .quiz-stage-flashcard-count {
   font-size: 0.85rem;
   font-weight: 600;
-  color: rgba(74, 48, 13, 0.6);
-  background: rgb(240, 235, 225);
+  color: rgba(13, 18, 74, 0.6);
+  background: rgb(225, 228, 240);
   border-radius: 3px;
   padding: 2px;
   width: 40px;
@@ -351,11 +351,6 @@ onMounted(async () => {
   text-transform: uppercase;
 }
 
-.quiz-start-button {
-  --smart-button--bg: #bf6e00;
-  --smart-button--bg--hover: #8a4a00;
-}
-
 .quiz-banner {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr auto;
@@ -363,7 +358,7 @@ onMounted(async () => {
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
-  background: #ffae00;
+  background: #4098f6;
   border-radius: 6px;
   padding: 4px;
 }
@@ -379,15 +374,18 @@ onMounted(async () => {
 .quiz-banner-button {
   width: 100%;
   height: 100%;
-  --smart-button--bg: #bf6e00;
-  --smart-button--bg--hover: #8a4a00;
+  --smart-button--bg: transparent;
+  --smart-button--border-color: #236bbc;
+  --smart-button--border-width: 2px;
+  --smart-button--border-radius: 6px;
+  --smart-button--bg--hover: #236bbc;
   padding: 4px;
 }
 
 .quiz-banner-exit {
   align-self: flex-start;
   --awesome-button--icon--size: 1rem;
-  --awesome-button--icon--color: #ffd39b;
-  --awesome-button--icon--color--hover: #fbeacf;
+  --awesome-button--icon--color: #9bcdff;
+  --awesome-button--icon--color--hover: #cfe9fb;
 }
 </style>
