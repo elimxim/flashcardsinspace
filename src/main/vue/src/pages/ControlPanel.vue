@@ -32,14 +32,17 @@
         </template>
       </ControlBar>
       <div class="control-panel-content scrollbar-hidden">
-        <FlashcardInfoBar
-          :hidden="!flashcardSet || (sidebarExpandedCookie && !isSidebarOverlay)"
-        />
-        <MainPanel/>
-        <LearningStagesWidget :grow-multiplier="3"/>
-        <div class="control-outer-space-panel">
-          <OuterSpaceWidget/>
-        </div>
+        <WelcomeWidget v-if="!flashcardSet" class="control-welcome"/>
+        <template v-else>
+          <FlashcardInfoBar
+            :hidden="!flashcardSet || (sidebarExpandedCookie && !isSidebarOverlay)"
+          />
+          <MainPanel/>
+          <LearningStagesWidget :grow-multiplier="3"/>
+          <div class="control-outer-space-panel">
+            <OuterSpaceWidget/>
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -58,6 +61,7 @@ import FlashcardInfoBar from '@/components/control-panel/FlashcardInfoBar.vue'
 import MainPanel from '@/components/control-panel/MainPanel.vue'
 import LearningStagesWidget from '@/components/control-panel/LearningStagesWidget.vue'
 import OuterSpaceWidget from '@/components/control-panel/OuterSpaceWidget.vue'
+import WelcomeWidget from '@/components/control-panel/WelcomeWidget.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/modals/FlashcardSetSettingsModal.vue'
 import FlashcardSetCreationModal from '@/modals/FlashcardSetCreationModal.vue'
@@ -119,6 +123,10 @@ function openFlashcardSetSettings() {
 .control-outer-space-panel {
   flex: 0 0 14%;
   overflow: hidden;
+}
+
+.control-welcome {
+  margin: auto;
 }
 
 </style>
