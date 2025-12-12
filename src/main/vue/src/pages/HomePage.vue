@@ -34,13 +34,13 @@
       <div class="what-actions">
         <SmartButton
           text="Ready to start your journey?"
-          class="what-action-button what-action-button--signup"
+          class="action-button action-button--signup"
           :on-click="navigateToSignup"
           rounded
         />
         <SmartButton
           text="Experienced space traveller?"
-          class="what-action-button what-action-button--login"
+          class="action-button action-button--login"
           :on-click="navigateToLogin"
           rounded
         />
@@ -185,7 +185,7 @@
 
       <SmartButton
         text="Go to Support Page"
-        class="help-action-button"
+        class="action-button action-button--help"
         :on-click="navigateToSupport"
         rounded
       />
@@ -239,6 +239,7 @@ onUnmounted(() => {
   font-weight: 800;
   line-height: 1.1;
   color: #a0c4ff;
+  margin-bottom: 10px;
 }
 
 .section-title--main {
@@ -310,7 +311,7 @@ onUnmounted(() => {
   flex-wrap: wrap;
 }
 
-.what-action-button {
+.action-button {
   --smart-button--title--color: #ffffff;
   --smart-button--border-color: rgba(255, 255, 255, 0.2);
   --smart-button--width: 200px;
@@ -320,27 +321,27 @@ onUnmounted(() => {
   transition: all 0.3s ease;
 }
 
-.what-action-button:hover {
+.action-button:hover {
   transform: translateY(-2px);
 }
 
-.what-action-button--signup {
+.action-button--signup {
   --smart-button--bg: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
   --smart-button--bg--hover: linear-gradient(135deg, #8b5cf6 0%, #c084fc 100%);
   box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
 }
 
-.what-action-button--signup:hover {
+.action-button--signup:hover {
   box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
 }
 
-.what-action-button--login {
+.action-button--login {
   --smart-button--bg: linear-gradient(135deg, #3a64ed 0%, #558ef7 100%);
   --smart-button--bg--hover: linear-gradient(135deg, #5cbbf6 0%, #84a0fc 100%);
   box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
 }
 
-.what-action-button--login:hover {
+.action-button--login:hover {
   box-shadow: 0 8px 30px rgba(58, 121, 237, 0.4);
 }
 
@@ -542,23 +543,14 @@ onUnmounted(() => {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.help-action-button {
-  --smart-button--bg: linear-gradient(135deg, #00f7ff 0%, #00d4ff 100%);
-  --smart-button--bg--hover: linear-gradient(135deg, #00ffff 0%, #3a49ed 100%);
-  --smart-button--title--color: #000000;
-  --smart-button--title--color--hover: #ffffff;
-  --smart-button--width: 200px;
-  --smart-button--height: 50px;
-  --smart-button--title--font-size: 0.9rem;
-  --smart-button--title--letter-spacing: 0.05em;
-  font-weight: 700;
+.action-button--help {
+  --smart-button--bg: linear-gradient(135deg, #3a64ed 0%, #558ef7 100%);
+  --smart-button--bg--hover: linear-gradient(135deg, #5cbbf6 0%, #84a0fc 100%);
   box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
-  transition: all 0.3s ease;
   align-self: center;
 }
 
-.help-action-button:hover {
-  transform: translateY(-2px);
+.action-button--help:hover {
   box-shadow: 0 8px 30px rgba(58, 121, 237, 0.4);
 }
 
