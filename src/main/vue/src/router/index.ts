@@ -13,6 +13,7 @@ import ReviewPage from '@/pages/ReviewPage.vue'
 import LightspeedSchedulePage from '@/pages/LightspeedSchedulePage.vue'
 import { toLearningStages } from '@/core-logic/stage-logic.ts'
 import { loadUserSignedUpFromCookies } from '@/utils/cookies.ts'
+import { parseNumber } from '@/utils/utils.ts';
 
 export const routeNames = {
   base: 'base',
@@ -91,6 +92,7 @@ const routes: RouteRecordRaw[] = [
     component: ReviewPage,
     props: (route) => ({
       sessionType: route.query.sessionType,
+      sessionId: parseNumber(route.query.sessionId),
       stages: toLearningStages(route.query.stages),
     }),
     meta: {

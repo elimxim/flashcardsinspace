@@ -186,10 +186,7 @@ import {
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import {
-  loadQuizSessionIdFromCookies,
   loadSelectedSetIdFromCookies,
-  removeQuizSessionIdFromCookies,
-  saveQuizSessionIdToCookies
 } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
@@ -210,9 +207,11 @@ import {
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
 import { ReviewSessionCreateRequest } from '@/api/communication.ts'
+import { quizSessionIdCookie } from '@/utils/cookies-ref.ts'
 
 const props = defineProps<{
   sessionType?: string,
+  sessionId?: number,
   stages: Stage[],
 }>()
 
@@ -227,7 +226,7 @@ const { chronodays, currDay } = storeToRefs(chronoStore)
 
 const reviewMode = computed(() => determineReviewMode(props.sessionType, props.stages))
 const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
-const reviewSessionId = ref<number | undefined>()
+const reviewSessionId = ref<number>()
 const elapsedTime = ref(0)
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 const reviewedFlashcardIds = ref<number[]>([])
@@ -298,18 +297,25 @@ async function startReview(pageReloaded: boolean) {
   }
   flashcardsTotal.value = reviewQueue.value.remaining()
   quizOverallTotal.value = flashcardsTotal.value
-  await startReviewSession(!pageReloaded)
+  if (reviewMode.value.isQuiz()) {
+    await loadOrCreateQuizSession()
+  } else {
+    await createReviewSession()
+  }
   if (await nextFlashcard()) {
     startWatch()
   }
   console.log(`Flashcards TOTAL: ${flashcardsTotal.value}`)
 }
 
-async function startReviewSession(createQuizIfNotFound: boolean) {
-  if (reviewMode.value.isQuiz()) {
-    await loadOrCreateQuizSession(createQuizIfNotFound)
-  } else if (reviewMode.value.isLightspeed()) {
-    await createReviewSession()
+async function loadOrCreateQuizSession() {
+  console.log(`DEBUG ${props.sessionId}`)
+  if (props.sessionId) {
+    await loadQuizSession(props.sessionId)
+  } else  {
+    await createReviewSession(true).then(() => {
+      quizSessionIdCookie.value = reviewSessionId.value
+    })
   }
 }
 
@@ -318,7 +324,6 @@ async function finishReview() {
   stopWatch()
   reviewQueue.value = new EmptyReviewQueue()
   reviewSessionId.value = undefined
-  removeQuizSessionIdFromCookies()
   reviewedFlashcardIds.value = []
   incorrectFlashcards.value = []
   flashcardsTotal.value = 0
@@ -394,7 +399,7 @@ async function startNextQuizRound() {
   })
     .then((response) => {
       reviewSessionId.value = response.data.id
-      saveQuizSessionIdToCookies(response.data.id)
+      quizSessionIdCookie.value = response.data.id
 
       const newQueue = new MonoStageReviewQueue(incorrectFlashcards.value)
       newQueue.shuffle()
@@ -563,40 +568,30 @@ async function createReviewSession(quiz: boolean = false) {
     })
 }
 
-async function loadOrCreateQuizSession(createIfNotFound: boolean) {
+async function loadQuizSession(sessionId: number) {
   if (!flashcardSet.value) return
-  const sessionId = loadQuizSessionIdFromCookies()
-  if (sessionId) {
-    await sendReviewSessionGetRequest(flashcardSet.value.id, sessionId)
-      .then((response) => {
-        reviewSessionId.value = response.data.id
-        elapsedTime.value = response.data.elapsedTime
-        quizRound.value = response.data.metadata?.round ?? 1
-        quizOverallCorrect.value = response.data.metadata?.overallCorrectCount ?? 0
-        quizOverallTotal.value = response.data.metadata?.overallTotalCount ?? 0
-        const reviewedFlashcardIdSet = new Set(response.data.flashcardIds ?? [])
-        const nextRoundFlashcardIdSet = new Set(response.data.metadata?.nextRoundFlashcardIds ?? [])
-        const currRoundFlashcardIdSet = new Set(response.data.metadata?.currRoundFlashcardIds ?? [])
-        const currRoundFlashcards = flashcards.value.filter(f => currRoundFlashcardIdSet.has(f.id))
-        const flashcardsForReview = currRoundFlashcards.filter(f => !reviewedFlashcardIdSet.has(f.id))
-        flashcardsTotal.value = currRoundFlashcardIdSet.size
-        reviewedFlashcardIds.value = [...reviewedFlashcardIdSet]
-        incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIdSet.has(f.id))
-        reviewQueue.value = new MonoStageReviewQueue(flashcardsForReview)
-        reviewQueue.value.shuffle()
-        console.log(`Review session ${reviewSessionId.value} retrieved`)
-      })
-      .catch((error) => {
-        console.error(`Failed to retrieve review session ${sessionId}`, error.response?.data)
-        toaster.bakeError(`Couldn't retrieve a review session`, error.response?.data)
-      })
-  } else if (createIfNotFound) {
-    await createReviewSession(true).then(() => {
-      if (reviewSessionId.value) {
-        saveQuizSessionIdToCookies(reviewSessionId.value)
-      }
+  await sendReviewSessionGetRequest(flashcardSet.value.id, sessionId)
+    .then((response) => {
+      reviewSessionId.value = response.data.id
+      elapsedTime.value = response.data.elapsedTime
+      quizRound.value = response.data.metadata?.round ?? 1
+      quizOverallCorrect.value = response.data.metadata?.overallCorrectCount ?? 0
+      quizOverallTotal.value = response.data.metadata?.overallTotalCount ?? 0
+      const reviewedFlashcardIdSet = new Set(response.data.flashcardIds ?? [])
+      const nextRoundFlashcardIdSet = new Set(response.data.metadata?.nextRoundFlashcardIds ?? [])
+      const currRoundFlashcardIdSet = new Set(response.data.metadata?.currRoundFlashcardIds ?? [])
+      const currRoundFlashcards = flashcards.value.filter(f => currRoundFlashcardIdSet.has(f.id))
+      const flashcardsForReview = currRoundFlashcards.filter(f => !reviewedFlashcardIdSet.has(f.id))
+      flashcardsTotal.value = currRoundFlashcardIdSet.size
+      reviewedFlashcardIds.value = [...reviewedFlashcardIdSet]
+      incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIdSet.has(f.id))
+      reviewQueue.value = new MonoStageReviewQueue(flashcardsForReview)
+      reviewQueue.value.shuffle()
+      console.log(`Review session ${reviewSessionId.value} retrieved`)
     })
-  }
+    .catch((error) => {
+      console.error(`Failed to retrieve review session ${sessionId}`, error.response?.data)
+    })
 }
 
 async function updateReviewSession(flashcardIds: number[], finished: boolean = false) {

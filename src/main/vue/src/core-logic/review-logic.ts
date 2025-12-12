@@ -71,7 +71,7 @@ export function sessionToReviewMode(sessionType: string, stages: Stage[]): Revie
     case ReviewSessionType.OUTER_SPACE:
       return new ReviewMode(ReviewSessionType.OUTER_SPACE, specialStages.OUTER_SPACE.displayName)
     case ReviewSessionType.QUIZ:
-      if (stages.length > 0 && stages.every(s => specialStageSet.has(s))) {
+      if (stages.every(s => specialStageSet.has(s))) {
         return new ReviewMode(ReviewSessionType.QUIZ, 'Quiz')
       }
   }
