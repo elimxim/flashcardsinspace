@@ -283,7 +283,6 @@ onUnmounted(() => {
 .description-paragraph {
   font-family: var(--h-page--font-family);
   text-indent: 2rem;
-  text-align: justify;
 }
 
 .what-section {
