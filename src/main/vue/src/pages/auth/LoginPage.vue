@@ -88,6 +88,7 @@ import { routeNames } from "@/router"
 import { sendLoginRequest } from '@/api/auth-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { saveUserSignedUpToCookies } from '@/utils/cookies.ts'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -139,17 +140,17 @@ watch(userPassword, () => {
 })
 
 async function login() {
-  console.log('Logging in...')
+  Log.log(LogTag.LOGIC, 'Logging in...')
   toaster.dismiss()
   loginFailed.value = false
   $v.value.$touch()
   if (formInvalid.value) {
-    console.log('Form is invalid')
+    Log.error(LogTag.LOGIC, 'Form is invalid')
     return
   }
 
   await sendLoginRequest(userEmail.value, userPassword.value).then(async (response) => {
-    console.log('Successfully logged in: ', authStore.user?.id)
+    Log.log(LogTag.LOGIC, 'Successfully logged in: ', authStore.user?.id)
     authStore.setUser(response.data)
     saveUserSignedUpToCookies(true)
     await router.push({ name: routeNames.controlPanel })
@@ -166,7 +167,7 @@ async function login() {
       toaster.bakeError('System error', error.response?.data)
     }
 
-    console.error('Failed to log in: ', error)
+    Log.error(LogTag.LOGIC, 'Failed to log in: ', error)
   })
 }
 

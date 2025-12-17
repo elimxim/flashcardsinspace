@@ -112,6 +112,7 @@ import { sendUserUpdateRequest } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 const authStore = useAuthStore()
 const languageStore = useLanguageStore()
@@ -124,8 +125,6 @@ const { languages } = storeToRefs(languageStore)
 const username = ref(user.value?.name ?? 'Unknown')
 const userEmail = ref(user.value?.email ?? 'Unknown')
 const language = ref<Language | undefined>()
-
-console.log('User language id: ', JSON.stringify(language.value))
 
 const stateChanged = computed(() => {
   return username.value !== user.value?.name ||
@@ -185,10 +184,10 @@ const userEmailWrongFormat = computed(() =>
 const languageInvalid = computed(() => $v.value.language.$errors.length > 0)
 
 async function save() {
-  console.log('Saving user info...')
+  Log.log(LogTag.LOGIC, 'Saving user info...')
   $v.value.$touch()
   if (validationFailed.value) {
-    console.error('User info is invalid')
+    Log.error(LogTag.LOGIC, 'User info is invalid')
     return
   }
 
@@ -198,7 +197,7 @@ async function save() {
       console.log(`User ${response.data.id} info saved`)
     })
     .catch((error) => {
-      console.error('Failed to save user info: ', error)
+      Log.error(LogTag.LOGIC, 'Failed to save user info: ', error)
       toaster.bakeError(`Couldn't update user info`, error.response?.data)
     })
 }

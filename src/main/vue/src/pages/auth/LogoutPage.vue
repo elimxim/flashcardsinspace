@@ -36,6 +36,7 @@ import { useAuthStore } from '@/stores/auth-store.ts'
 import { routeNames } from '@/router'
 import { sendLogoutRequest } from '@/api/auth-client.ts'
 import Progressbar from '@/components/Progressbar.vue'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -86,7 +87,7 @@ onMounted(() => {
       authStore.resetUser()
     })
     .catch(error => {
-      console.error('Failed to log out: ', error)
+      Log.error(LogTag.LOGIC, 'Failed to log out: ', error)
     })
     .finally(() => {
       startCountdown()

@@ -129,6 +129,7 @@ import { required, email, minLength, helpers, maxLength } from '@vuelidate/valid
 import { sendSignupRequest } from '@/api/auth-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { saveUserSignedUpToCookies } from '@/utils/cookies.ts'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -241,11 +242,11 @@ watch(confirmedPassword, () => {
 })
 
 async function signup() {
-  console.log('Signing up...')
+  Log.log(LogTag.LOGIC, 'Signing up...')
   signupFailed.value = false
   $v.value.$touch()
   if (formInvalid.value) {
-    console.error('The form is invalid')
+    Log.error(LogTag.LOGIC, 'The form is invalid')
     return
   }
 
@@ -255,7 +256,7 @@ async function signup() {
     userPassword.value,
     language.value?.id
   ).then(async (response) => {
-    console.log('Successfully signed up: ', authStore.user?.id)
+    Log.log(LogTag.LOGIC, 'Successfully signed up: ', authStore.user?.id)
     authStore.setUser(response.data)
     saveUserSignedUpToCookies(true)
     await router.push({ name: routeNames.controlPanel })
@@ -268,7 +269,7 @@ async function signup() {
       toaster.bakeError('System error', error.response?.data)
     }
 
-    console.error('Failed to sign up: ', error)
+    Log.error(LogTag.LOGIC, 'Failed to sign up: ', error)
   })
 }
 </script>
