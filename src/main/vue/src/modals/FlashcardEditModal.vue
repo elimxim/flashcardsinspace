@@ -96,6 +96,7 @@ import {
   sendFlashcardRemovalRequest,
   sendFlashcardUpdateRequest,
 } from '@/api/api-client.ts'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const removed = defineModel<boolean>('removed', { default: false })
@@ -200,7 +201,7 @@ async function uploadAudioIfRelevant(): Promise<boolean> {
   const card = flashcard.value
 
   if (!set || !card) {
-    console.error('Cannot upload audio: flashcard set or flashcard is undefined')
+    Log.error(LogTag.LOGIC, `Cannot upload audio: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`)
     return true
   }
 
@@ -240,7 +241,7 @@ async function removeAudioIfRelevant(): Promise<boolean> {
   const card = flashcard.value
 
   if (!set || !card) {
-    console.error('Cannot remove audio blobs: flashcard set or flashcard is undefined')
+    Log.error(LogTag.LOGIC, `Cannot remove audio blobs: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`)
     return true
   }
 
@@ -342,7 +343,7 @@ async function updateFlashcard(): Promise<boolean> {
       return true
     })
     .catch((error) => {
-      console.error(`Failed to update flashcard ${updatedFlashcard.id}`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to update Flashcard.id=${updatedFlashcard.id}`, error.response?.data)
       toaster.bakeError(`Couldn't change a flashcard`, error.response?.data)
       return false
     })
@@ -353,7 +354,7 @@ function toggleModalForm() {
 }
 
 async function resetState() {
-  console.log('Resetting state')
+  Log.log(LogTag.LOGIC, 'Resetting state...')
   frontSide.value = flashcard.value?.frontSide ?? ''
   frontSideAudioId.value = audioStore.getAudioId(flashcard.value?.id, flashcardSides.FRONT)
   backSide.value = flashcard.value?.backSide ?? ''
@@ -366,7 +367,7 @@ async function resetState() {
 }
 
 watch(flashcard, async (newVal) => {
-  console.log('Watch.flashcard', newVal)
+  Log.log(LogTag.DEBUG, 'watch.flashcard', newVal)
   frontSide.value = newVal?.frontSide ?? ''
   frontSideAudioId.value = audioStore.getAudioId(newVal?.id, flashcardSides.FRONT)
   backSide.value = newVal?.backSide ?? ''

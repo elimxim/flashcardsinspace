@@ -97,6 +97,7 @@ import {
   sendFlashcardSetInitRequest,
 } from '@/api/api-client.ts'
 import { Flashcard } from '@/model/flashcard.ts'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
@@ -142,7 +143,7 @@ async function uploadAudioIfRelevant(): Promise<boolean> {
   const card = createdFlashcard.value
 
   if (!set || !card) {
-    console.error('Cannot upload audio: flashcard set or flashcard is undefined')
+    Log.log(LogTag.LOGIC, `Cannot upload audio: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`)
     return true
   }
 
@@ -199,7 +200,7 @@ async function addNewFlashcard(): Promise<boolean> {
         return true
       })
       .catch((error) => {
-        console.error(`Failed to add a flashcard to set ${setId}`, error.response?.data)
+        Log.error(LogTag.LOGIC, `Failed to add a flashcard to FlashcardSet.id=${setId}`, error.response?.data)
         toaster.bakeError(`Couldn't add a flashcard`, error.response?.data)
         return false
       })
@@ -224,7 +225,7 @@ async function addNewFlashcard(): Promise<boolean> {
         return true
       })
       .catch((error) => {
-        console.error(`Failed to init flashcard set ${setId}`, error.response?.data)
+        Log.error(LogTag.LOGIC, `Failed to init FlashcardSet.id=${setId}`, error.response?.data)
         toaster.bakeError(`Couldn't add a flashcard`, error.response?.data)
         return false
       })

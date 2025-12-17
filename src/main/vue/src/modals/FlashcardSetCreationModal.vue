@@ -84,6 +84,7 @@ import {
   sendFlashcardSetCreationRequest
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
@@ -161,7 +162,7 @@ async function createNewFlashcardSet(): Promise<boolean> {
       return true
     })
     .catch((error) => {
-      console.error(`Failed to create flashcard set`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to create FlashcardSet`, error.response?.data)
       toaster.bakeError(`Couldn't create a flashcard set`, error.response?.data)
       return false
     })

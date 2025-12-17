@@ -101,6 +101,7 @@ import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { reloadFlashcardRelatedStores } from '@/utils/stores.ts'
 import { copyFlashcardSet, flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
@@ -203,7 +204,7 @@ async function removeFlashcardSet(): Promise<boolean> {
       return true
     })
     .catch((error) => {
-      console.error(`Failed to remove flashcard set ${removedSet.id}`, error)
+      Log.error(LogTag.LOGIC, `Failed to remove FlashcardSet.id=${removedSet.id}`, error)
       toaster.bakeError(`Couldn't remove flashcard set`, error.response?.data)
       return false
     })
