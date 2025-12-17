@@ -23,6 +23,7 @@
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import { ref, onBeforeUnmount, watch, onMounted } from 'vue'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 const props = withDefaults(defineProps<{
   audioBlob?: Blob | undefined,
@@ -48,7 +49,7 @@ function play() {
   audio.currentTime = 0
   audio.play()
     .catch((error) => {
-      console.error('Audio play failed:', error)
+      Log.error(LogTag.LOGIC, 'Audio play failed:', error)
     })
 }
 
@@ -73,14 +74,14 @@ function updateAudioUrl(blob: Blob | undefined) {
       if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
       audioUrl.value = URL.createObjectURL(blob)
     } catch (error) {
-      console.error('Failed to create object URL', error, blob)
+      Log.error(LogTag.LOGIC, 'Failed to create object URL', error, blob)
       audioUrl.value = undefined
     }
   } else {
     if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
     audioUrl.value = undefined
     if (blob) {
-      console.log('Invalid blob provided:', blob)
+      Log.error(LogTag.LOGIC, 'Invalid blob provided:', blob)
     }
   }
 }

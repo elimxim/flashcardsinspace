@@ -57,6 +57,7 @@
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import VoicePlayer from '@/components/VoicePlayer.vue'
 import { ref, computed, onBeforeUnmount, watch } from 'vue'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 const audioBlob = defineModel<Blob | undefined>()
 
@@ -187,7 +188,7 @@ function stopRecording() {
   isRecording.value = false
   isPaused.value = false
   stopTimer()
-  console.log(`Audio recorded: ${audioSize()} KB`)
+  Log.log(LogTag.LOGIC, `Audio recorded: ${audioSize()} KB`)
 }
 
 function removeRecording() {
