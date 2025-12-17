@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import type { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
+import { Log, LogTag } from '@/utils/logger.ts'
 
 export interface FlashcardSetState {
   flashcardSet: FlashcardSet | undefined
@@ -37,7 +38,6 @@ export const useFlashcardStore = defineStore('flashcard', {
     },
     isStarted(): boolean {
       const r = this.flashcardSet?.startedAt !== undefined
-      console.log(`Checking if flashcard set ${this.flashcardSet?.id} is started ${r} ${this.flashcardSet?.startedAt}`)
       return r
     },
     isSuspended(): boolean {
@@ -46,15 +46,15 @@ export const useFlashcardStore = defineStore('flashcard', {
   },
   actions: {
     loadState(flashcardSet: FlashcardSet, flashcards: Flashcard[]) {
-      console.log(`Loading flashcard set ${flashcardSet.id} with ${flashcards.length} flashcards`)
+      Log.log(LogTag.STORE, `flashcard.loadState: FlashcardSet.id=${flashcardSet.id} + ${flashcards.length} flashcards`)
       this.resetState()
       this.flashcardSet = flashcardSet
       this.flashcardMap = new Map(flashcards.map(v => [v.id, v]))
       this.loaded = true
     },
     checkStateLoaded() {
-      if (!this.flashcardSet) throw Error(`State check: flashcard set must be set`)
-      if (!this.loaded) throw Error(`State check: flashcard store isn't loaded`)
+      if (!this.flashcardSet) throw Error(`flashcard.checkStateLoaded: !flashcardSet`)
+      if (!this.loaded) throw Error(`flashcard.checkStateLoaded: !loaded`)
     },
     resetState() {
       this.flashcardSet = undefined
@@ -62,31 +62,31 @@ export const useFlashcardStore = defineStore('flashcard', {
       this.loaded = false
     },
     changeSet(flashcardSet: FlashcardSet) {
-      console.log(`Changing flashcard set ${flashcardSet.id}`)
+      Log.log(LogTag.STORE, `flashcard.changeSet: FlashcardSet.id=${flashcardSet.id}`)
       this.checkStateLoaded()
       if (this.flashcardSet?.id !== flashcardSet.id) {
-        throw Error(`Can't change flashcard set: (current id) ${this.flashcardSet?.id} != ${flashcardSet.id} (new id)`)
+        throw Error(`flashcard.changeSet: (current FlashcardSet.id) ${this.flashcardSet?.id} != ${flashcardSet.id} (new FlashcardSet.id)`)
       }
       this.flashcardSet = flashcardSet
     },
     addFlashcards(flashcards: Flashcard[]) {
-      console.log(`Adding ${flashcards.length} flashcards to set ${this.flashcardSet?.id}`)
+      Log.log(LogTag.STORE, `flashcard.addFlashcards: FlashcardSet.id=${this.flashcardSet?.id} + ${flashcards.length} flashcards`)
       this.checkStateLoaded()
       this.flashcardMap = new Map(flashcards.map(v => [v.id, v]))
     },
     addNewFlashcard(flashcard: Flashcard) {
-      console.log(`Adding flashcard ${flashcard.id} to set ${this.flashcardSet?.id}`)
+      Log.log(LogTag.STORE, `flashcard.addNewFlashcard: FlashcardSet.id=${this.flashcardSet?.id} + Flashcard.id=${flashcard.id}`)
       this.checkStateLoaded()
       this.flashcardMap.set(flashcard.id, flashcard)
     },
     changeFlashcard(flashcard: Flashcard) {
-      console.log(`Updating flashcard ${flashcard.id} in set ${this.flashcardSet?.id}`)
+      Log.log(LogTag.STORE, `flashcard.changeFlashcard: FlashcardSet.id=${this.flashcardSet?.id} + Flashcard.id=${flashcard.id}`)
       this.checkStateLoaded()
       const currFlashcard = this.flashcardMap.get(flashcard.id) as Flashcard | undefined
       if (!currFlashcard) {
-        console.error(`Couldn't find flashcard ${flashcard.id} in the store to update it`)
+        Log.error(LogTag.STORE, `flashcard.changeFlashcard: Flashcard.id=${flashcard.id} not found`)
       } else if (currFlashcard.id !== flashcard.id) {
-        console.error(`Flashcard id mismatch: ${currFlashcard.id} != ${flashcard.id}`)
+        Log.error(LogTag.STORE, `flashcard.changeFlashcard: (current Flashcard.id) ${currFlashcard.id} != ${flashcard.id} (new Flashcard.id)`)
       } else {
         this.flashcardMap.set(flashcard.id, flashcard)
       }
