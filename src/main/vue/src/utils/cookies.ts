@@ -1,9 +1,11 @@
 import Cookies from 'js-cookie'
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const COOKIE_SELECTED_SET_ID = 'selectedSetId'
 const COOKIE_USER_SIGNED_UP = 'userSignedUp'
 const COOKIE_SIDEBAR_EXPANDED = 'sidebarExpanded'
 const COOKIE_QUIZ_SESSION_ID = 'quizSessionId'
+const COOKIE_LOGGING_ENABLED = 'loggingEnabled'
 
 function saveCookie(name: string, value: string, expires: number) {
   Cookies.set(name, value, {
@@ -77,6 +79,14 @@ function removeQuizSessionIdFromCookies() {
   removeCookie(COOKIE_QUIZ_SESSION_ID)
 }
 
+function loadLoggingEnabledFromCookies(): boolean {
+  return loadBooleanCookie(COOKIE_LOGGING_ENABLED)
+}
+
+function saveLoggingEnabledToCookies(value: boolean) {
+  saveCookie(COOKIE_LOGGING_ENABLED, value.toString(), 1)
+}
+
 export {
   saveUserSignedUpToCookies,
   loadUserSignedUpFromCookies,
@@ -87,4 +97,6 @@ export {
   saveQuizSessionIdToCookies,
   loadQuizSessionIdFromCookies,
   removeQuizSessionIdFromCookies,
+  loadLoggingEnabledFromCookies,
+  saveLoggingEnabledToCookies,
 }
