@@ -80,11 +80,20 @@ function removeQuizSessionIdFromCookies() {
 }
 
 function loadLoggingEnabledFromCookies(): boolean {
-  return loadBooleanCookie(COOKIE_LOGGING_ENABLED)
+  const value = Cookies.get(COOKIE_LOGGING_ENABLED)
+  if (value) {
+    return value === 'true'
+  }
+  return false
 }
 
 function saveLoggingEnabledToCookies(value: boolean) {
-  saveCookie(COOKIE_LOGGING_ENABLED, value.toString(), 1)
+  Cookies.set(COOKIE_LOGGING_ENABLED, value.toString(), {
+    expires: 1,
+    sameSite: 'Lax',
+    secure: true,
+    path: '/', // valid for the entire site
+  })
 }
 
 export {

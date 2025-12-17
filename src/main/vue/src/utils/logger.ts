@@ -1,10 +1,20 @@
-import { loggingEnabledCookie } from '@/utils/cookies-ref.ts'
+import { ref, watch } from 'vue'
+import {
+  loadLoggingEnabledFromCookies,
+  saveLoggingEnabledToCookies
+} from '@/utils/cookies.ts'
 
 declare global {
   interface Window {
     loggingEnabled: boolean
   }
 }
+
+const loggingEnabledCookie = ref(loadLoggingEnabledFromCookies())
+
+watch(loggingEnabledCookie, (newVal) => {
+  saveLoggingEnabledToCookies(newVal)
+})
 
 Object.defineProperty(window, 'loggingEnabled', {
   get() {
