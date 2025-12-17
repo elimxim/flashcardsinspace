@@ -150,7 +150,7 @@ export async function uploadFlashcardAudioBlob(
 
   return await sendFlashcardAudioUploadRequest(flashcardSet.id, flashcard.id, side, audioBlob)
     .then((response) => {
-      console.log(`Audio.id=${response.data.id} uploaded, Audio.size: ${response.data.audioSize}, Audio.mime: ${response.data.mimeType}`)
+      Log.log(LogTag.LOGIC, `Audio.id=${response.data.id} uploaded, Audio.size: ${response.data.audioSize}, Audio.mime: ${response.data.mimeType}`)
       audioStore.setAudioId(flashcard.id, side, response.data.id)
       audioCache.addAudio(flashcard.id, audioBlob, isFrontSide)
       return true
