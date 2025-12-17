@@ -8,6 +8,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import authClient from '@/api/auth-client.ts'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 const email = ref('')
 
@@ -19,7 +20,7 @@ async function handleForgotPassword() {
 
     alert(response.data)
   } catch (error) {
-    console.log('Failed to send reset email: ', error)
+    Log.error(LogTag.LOGIC, 'Failed to send reset email: ', error)
   }
 }
 </script>
