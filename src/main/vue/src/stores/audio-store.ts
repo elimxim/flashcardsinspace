@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { FlashcardAudioMetadata } from '@/model/flashcard.ts'
+import { Log, LogTag } from '@/utils/logger.ts'
 
 export interface AudioState {
   audioIdMap: Map<string, number>
@@ -15,6 +16,7 @@ export const useAudioStore = defineStore('audio', {
   },
   actions: {
     loadState(audioMetadata: FlashcardAudioMetadata[]) {
+      Log.log(LogTag.STORE, `audio.loadState: ${audioMetadata.length} metadata size`)
       this.resetState()
       this.audioIdMap = new Map(
         audioMetadata.map(metadata => [
@@ -25,25 +27,25 @@ export const useAudioStore = defineStore('audio', {
       this.loaded = true
     },
     checkStateLoaded() {
-      if (!this.loaded) throw Error(`State check: audio store isn't loaded`)
+      if (!this.loaded) throw Error(`audio.checkStateLoaded: !loaded`)
     },
     resetState() {
       this.audioIdMap.clear()
       this.loaded = false
     },
     setAudioId(flashcardId: number, side: string, audioId: number) {
-      console.log(`Setting audio id ${audioId} for flashcard ${flashcardId} side ${side}`)
+      Log.log(LogTag.STORE, `audio.setAudioId: Audio.id=${audioId}, Flashcard.id=${flashcardId}, Flashcard.side=${side}`)
       this.checkStateLoaded()
       this.audioIdMap.set(audioMapKey(flashcardId, side), audioId)
     },
     getAudioId(flashcardId: number | undefined, side: string): number | undefined {
-      console.log(`Getting audio id for flashcard ${flashcardId} side ${side}`)
+      Log.log(LogTag.STORE, `audio.getAudioId: Flashcard.id=${flashcardId}, Flashcard.side=${side}`)
       if (!flashcardId) return undefined
       this.checkStateLoaded()
       return this.audioIdMap.get(audioMapKey(flashcardId, side))
     },
     removeAudioId(flashcardId: number, side: string) {
-      console.log(`Removing audio id for flashcard ${flashcardId} side ${side}`)
+      Log.log(LogTag.STORE, `audio.removeAudioId: Flashcard.id=${flashcardId}, Flashcard.side=${side}`)
       this.checkStateLoaded()
       this.audioIdMap.delete(audioMapKey(flashcardId, side))
     },
