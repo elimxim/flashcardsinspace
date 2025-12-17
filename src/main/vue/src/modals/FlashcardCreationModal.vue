@@ -97,7 +97,7 @@ import {
   sendFlashcardSetInitRequest,
 } from '@/api/api-client.ts'
 import { Flashcard } from '@/model/flashcard.ts'
-import { Log, LogTag } from '@/utils/logger.ts';
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()

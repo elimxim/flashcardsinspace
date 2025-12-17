@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import { ref, onBeforeUnmount, watch, onMounted } from 'vue'
-import { Log, LogTag } from '@/utils/logger.ts';
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const props = withDefaults(defineProps<{
   audioBlob?: Blob | undefined,

@@ -84,7 +84,7 @@ import {
   sendFlashcardSetCreationRequest
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { Log, LogTag } from '@/utils/logger.ts';
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()

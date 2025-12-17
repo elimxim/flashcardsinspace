@@ -101,7 +101,7 @@ import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { reloadFlashcardRelatedStores } from '@/utils/stores.ts'
 import { copyFlashcardSet, flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
-import { Log, LogTag } from '@/utils/logger.ts';
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()

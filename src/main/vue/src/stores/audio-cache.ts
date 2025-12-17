@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { Log, LogTag } from '@/utils/logger.ts';
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const MAX_AUDIO_STORAGE_BYTES = 40 * 1024 * 1024 // 40 MB
 

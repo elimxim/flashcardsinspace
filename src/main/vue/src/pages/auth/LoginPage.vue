@@ -88,7 +88,7 @@ import { routeNames } from "@/router"
 import { sendLoginRequest } from '@/api/auth-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { saveUserSignedUpToCookies } from '@/utils/cookies.ts'
-import { Log, LogTag } from '@/utils/logger.ts';
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()

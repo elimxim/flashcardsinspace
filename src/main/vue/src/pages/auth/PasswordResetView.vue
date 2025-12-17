@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import authClient from '@/api/auth-client.ts'
-import { Log, LogTag } from '@/utils/logger.ts';
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const email = ref('')
 

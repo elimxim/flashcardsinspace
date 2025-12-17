@@ -112,7 +112,7 @@ import { sendUserUpdateRequest } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
-import { Log, LogTag } from '@/utils/logger.ts';
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const authStore = useAuthStore()
 const languageStore = useLanguageStore()

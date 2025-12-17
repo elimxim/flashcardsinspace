@@ -57,7 +57,7 @@
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import VoicePlayer from '@/components/VoicePlayer.vue'
 import { ref, computed, onBeforeUnmount, watch } from 'vue'
-import { Log, LogTag } from '@/utils/logger.ts';
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const audioBlob = defineModel<Blob | undefined>()
 

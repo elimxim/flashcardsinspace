@@ -208,7 +208,7 @@ import {
 } from '@/core-logic/chrono-logic.ts'
 import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { quizSessionIdCookie } from '@/utils/cookies-ref.ts'
-import { Log, LogTag } from '@/utils/logger.ts';
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const props = defineProps<{
   sessionType?: string,

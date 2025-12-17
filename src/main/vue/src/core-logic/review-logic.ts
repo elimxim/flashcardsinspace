@@ -14,7 +14,7 @@ import {
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
 import { shuffle } from '@/utils/utils.ts'
-import { Log, LogTag } from '@/utils/logger.ts';
+import { Log, LogTag } from '@/utils/logger.ts'
 
 export enum ReviewSessionType {
   LIGHTSPEED = 'LIGHTSPEED',

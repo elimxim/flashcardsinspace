@@ -96,7 +96,7 @@ import {
   sendFlashcardRemovalRequest,
   sendFlashcardUpdateRequest,
 } from '@/api/api-client.ts'
-import { Log, LogTag } from '@/utils/logger.ts';
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const removed = defineModel<boolean>('removed', { default: false })

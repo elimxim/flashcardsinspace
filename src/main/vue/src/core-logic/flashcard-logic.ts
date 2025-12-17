@@ -15,7 +15,7 @@ import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useAudioCache } from '@/stores/audio-cache.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
 import { Ref } from 'vue'
-import { Log, LogTag } from '@/utils/logger.ts';
+import { Log, LogTag } from '@/utils/logger.ts'
 
 export const flashcardSetStatuses = {
   ACTIVE: 'ACTIVE',
