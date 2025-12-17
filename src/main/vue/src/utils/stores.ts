@@ -16,9 +16,9 @@ import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
 import { sortFlashcardSets } from '@/core-logic/flashcard-logic.ts'
 import { sendLanguagesGetRequest } from '@/api/public-api-client.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
+import { Log, LogTag } from '@/utils/logger.ts'
 
 export function determineCurrFlashcardSet(): FlashcardSet | undefined {
-  console.log('Determining current flashcard set')
   const flashcardSetStore = useFlashcardSetStore()
 
   let flashcardSet
@@ -34,10 +34,10 @@ export function determineCurrFlashcardSet(): FlashcardSet | undefined {
 }
 
 export async function reloadFlashcardRelatedStores(forced: boolean = false): Promise<boolean> {
-  console.log('Reloading flashcard related stores')
   const flashcardStore = useFlashcardStore()
 
   const currFlashcardSet = determineCurrFlashcardSet()
+  Log.log(LogTag.STORE, `Current FlashcardSet.id=${currFlashcardSet?.id}`)
   if (currFlashcardSet) {
     return await loadFlashcardRelatedStores(currFlashcardSet, forced)
   } else {
@@ -47,7 +47,6 @@ export async function reloadFlashcardRelatedStores(forced: boolean = false): Pro
 }
 
 export async function loadFlashcardRelatedStores(flashcardSet: FlashcardSet, forced: boolean = false): Promise<boolean> {
-  console.log(`Loading flashcard related stores for ${flashcardSet.id}, forced: ${forced}`)
   const toaster = useSpaceToaster()
   const flashcardStore = useFlashcardStore()
   const chronoStore = useChronoStore()
@@ -55,7 +54,7 @@ export async function loadFlashcardRelatedStores(flashcardSet: FlashcardSet, for
 
   const currSetId = flashcardStore.flashcardSet?.id
   if (flashcardStore.loaded && flashcardSet.id === currSetId && !forced) {
-    console.log(`Flashcard store for flashcard set id ${flashcardSet.id} is already loaded`)
+    Log.log(LogTag.STORE, `Stores are already loaded, FlashcardSet.id=${flashcardSet.id}`)
     return true
   }
 
@@ -77,14 +76,13 @@ export async function loadFlashcardRelatedStores(flashcardSet: FlashcardSet, for
       return true
     })
     .catch((error) => {
-      console.error(`Failed to load flashcard set ${flashcardSet.id}`, error)
+      Log.error(LogTag.STORE, `Failed to load store for FlashcardSet.id=${flashcardSet.id}`, error)
       toaster.bakeError(`Data fetching error`, error.response?.data)
       return false
     })
 }
 
 export async function loadFlashcardRelatedStoresById(setId: number, forced: boolean = false): Promise<boolean> {
-  console.log(`Loading flashcard related stores for ${setId}, forced: ${forced}`)
   const toaster = useSpaceToaster()
 
   return await sendFlashcardSetGetRequest(setId)
@@ -92,19 +90,18 @@ export async function loadFlashcardRelatedStoresById(setId: number, forced: bool
       return loadFlashcardRelatedStores(response.data, forced)
     })
     .catch((error) => {
-      console.error(`Failed to get flashcard set ${setId}`, error)
+      Log.error(LogTag.STORE, `Failed to load store for FlashcardSet.id=${setId}`, error)
       toaster.bakeError(`Data fetching error`, error.response?.data)
       return false
     })
 }
 
 export async function loadFlashcardSetStore(forced: boolean = false): Promise<boolean> {
-  console.log(`Loading flashcard set store, forced: ${forced}`)
   const flashcardSetStore = useFlashcardSetStore()
   const toaster = useSpaceToaster()
 
   if (flashcardSetStore.loaded && !forced) {
-    console.log('Flashcard set store is already loaded')
+    Log.log(LogTag.STORE, `flashcard-set store is already loaded`)
     return true
   }
 
@@ -117,20 +114,18 @@ export async function loadFlashcardSetStore(forced: boolean = false): Promise<bo
         })
     })
     .catch((error) => {
-      console.error(`Failed to load flashcard sets`, error)
+      Log.error(LogTag.STORE, `Failed to load flashcard-set store`, error)
       toaster.bakeError(`Data fetching error`, error.response?.data)
       return false
     })
 }
 
 export async function loadLanguageStore(): Promise<boolean> {
-  console.log('Loading language store')
-
   const languageStore = useLanguageStore()
   const toaster = useSpaceToaster()
 
   if (languageStore.loaded) {
-    console.log('Language store is already loaded')
+    Log.log(LogTag.STORE, `language store is already loaded`)
     return true
   }
 
@@ -139,7 +134,7 @@ export async function loadLanguageStore(): Promise<boolean> {
       languageStore.loadState(response.data)
       return true
     }).catch(error => {
-      console.error('Error loading languages:', error)
+      Log.error(LogTag.STORE, `Failed to load language store`, error)
       toaster.bakeError(`Data fetching error`, error.response?.data)
       return false
     })
