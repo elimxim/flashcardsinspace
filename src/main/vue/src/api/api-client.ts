@@ -23,6 +23,7 @@ import { configureTokenRefreshInterceptor } from '@/api/token-refresh.ts'
 import { User } from '@/model/user.ts'
 import { ReviewSession } from '@/model/review.ts'
 import { ReviewSessionType } from '@/core-logic/review-logic.ts'
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const apiClient = axios.create({
   baseURL: '/api',
@@ -35,62 +36,62 @@ configureTokenRefreshInterceptor(apiClient)
 export default apiClient
 
 export async function sendFlashcardSetsGetRequest() {
-  console.log(`[GET] request => flashcard sets`)
+  Log.log(LogTag.GET, `/flashcard-sets`)
   return apiClient.get<FlashcardSet[]>('/flashcard-sets')
 }
 
 export async function sendFlashcardSetExtraRequest() {
-  console.log(`[GET] request => flashcard sets extra`)
+  Log.log(LogTag.GET, `/flashcard-sets/extra`)
   return apiClient.get<FlashcardSetExtra[]>('/flashcard-sets/extra')
 }
 
 export async function sendFlashcardSetInitRequest(id: number, flashcard: Flashcard) {
-  console.log(`[POST] request => init flashcard set ${id}`)
+  Log.log(LogTag.POST, `/flashcard-sets/${id}/init`)
   return apiClient.post<FlashcardSetInitResponse>(`/flashcard-sets/${id}/init`, flashcard)
 }
 
 export async function sendFlashcardSetSuspendRequest(id: number, flashcardSet: FlashcardSet) {
-  console.log(`[POST] request => suspend flashcard set ${id}`)
+  Log.log(LogTag.POST, `/flashcard-sets/${id}/suspend`)
   return apiClient.post<FlashcardSetSuspendResponse>(`/flashcard-sets/${id}/suspend`, flashcardSet)
 }
 
 export async function sendFlashcardSetGetRequest(id: number) {
-  console.log(`[GET] request => flashcard set ${id}`)
+  Log.log(LogTag.GET, `flashcard-sets/${id}`)
   return apiClient.get<FlashcardSet>(`/flashcard-sets/${id}`)
 }
 
 export async function sendFlashcardSetUpdateRequest(id: number, flashcardSet: FlashcardSet) {
-  console.log(`[PUT] request => flashcard set ${id}`)
+  Log.log(LogTag.PUT, `flashcard-sets/${id}`)
   return apiClient.put<FlashcardSet>(`/flashcard-sets/${id}`, flashcardSet)
 }
 
 export async function sendFlashcardSetRemovalRequest(id: number) {
-  console.log(`[DELETE] request => flashcard set ${id}`)
+  Log.log(LogTag.POST, `/flashcard-sets/${id}`)
   return apiClient.delete(`/flashcard-sets/${id}`)
 }
 
 export async function sendFlashcardSetCreationRequest(flashcardSet: FlashcardSet) {
-  console.log(`[POST] request => create flashcard set`)
+  Log.log(LogTag.POST, `/flashcard-sets`)
   return apiClient.post<FlashcardSet>(`/flashcard-sets`, flashcardSet)
 }
 
 export async function sendFlashcardsGetRequest(setId: number) {
-  console.log(`[GET] request => flashcards for set ${setId}`)
+  Log.log(LogTag.GET, `flashcards-sets/${setId}/flashcards`)
   return apiClient.get<Flashcard[]>(`/flashcard-sets/${setId}/flashcards`)
 }
 
 export async function sendFlashcardCreationRequest(setId: number, flashcard: Flashcard) {
-  console.log(`[POST] request => add flashcard to set ${setId}`)
+  Log.log(LogTag.POST, `/flashcard-sets/${setId}/flashcards`)
   return apiClient.post<Flashcard>(`/flashcard-sets/${setId}/flashcards`, flashcard)
 }
 
 export async function sendFlashcardUpdateRequest(setId: number, flashcard: Flashcard) {
-  console.log(`[PUT] request => flashcard ${flashcard.id} in set ${setId}`)
+  Log.log(LogTag.PUT, `/flashcard-sets/${setId}/flashcards/${flashcard.id}`)
   return apiClient.put<Flashcard>(`/flashcard-sets/${setId}/flashcards/${flashcard.id}`, flashcard)
 }
 
 export async function sendFlashcardRemovalRequest(setId: number, id: number) {
-  console.log(`[DELETE] request => flashcard ${id} from set ${setId}`)
+  Log.log(LogTag.DELETE, `/flashcard-sets/${setId}/flashcards/${id}`)
   return apiClient.delete(`/flashcard-sets/${setId}/flashcards/${id}`)
 }
 
@@ -99,22 +100,22 @@ export async function sendChronoSyncRequest(setId: number) {
     clientDatetime: new Date()
   }
 
-  console.log(`[POST] request => chrono sync for set ${setId}`)
+  Log.log(LogTag.POST, `/flashcard-sets/${setId}/chrono/sync`)
   return apiClient.post<ChronoSyncResponse>(`/flashcard-sets/${setId}/chrono/sync`, request)
 }
 
 export async function sendChronoSyncNextDay(setId: number) {
-  console.log(`[POST] request => chrono sync next for set ${setId}`)
+  Log.log(LogTag.POST, `/flashcard-sets/${setId}/chrono/sync/next`)
   return apiClient.post<ChronoSyncResponse>(`/flashcard-sets/${setId}/chrono/sync/next`)
 }
 
 export async function sendChronoSyncPrevDay(setId: number) {
-  console.log(`[POST] request => chrono sync prev for set ${setId}`)
+  Log.log(LogTag.POST, `/flashcard-sets/${setId}/chrono/sync/prev`)
   return apiClient.post<ChronoSyncResponse>(`/flashcard-sets/${setId}/chrono/sync/prev`)
 }
 
 export async function sendChronoBulkUpdateRequest(setId: number, status: string, days: Chronoday[]) {
-  console.log(`[PUT] request => bulk update days ${status} for set ${setId}`)
+  Log.log(LogTag.PUT, `/flashcard-sets/${setId}/chrono/bulk`)
   const request: ChronoBulkUpdateRequest = {
     ids: days.map((v): ChronodayId => ({ id: v.id })),
     status: status
@@ -124,7 +125,7 @@ export async function sendChronoBulkUpdateRequest(setId: number, status: string,
 }
 
 export async function sendFlashcardAudioMetadataGetRequest(setId: number) {
-  console.log(`[GET] request => audio metadata for flashcard set ${setId}`)
+  Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/audio/metadata`)
   return apiClient.get<FlashcardAudioMetadata[]>(`/flashcard-sets/${setId}/flashcards/audio/metadata`)
 }
 
@@ -142,7 +143,7 @@ export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId
     })
   )
 
-  console.log(`[POST] request => upload audio for flashcard ${flashcardId} / ${side} in set ${setId}`)
+  Log.log(LogTag.POST, `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio?side=${side}`)
   return apiClient.post<FlashcardAudio>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio`,
     form,
     {
@@ -153,7 +154,7 @@ export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId
 }
 
 export async function sendFlashcardAudioFetchRequest(setId: number, flashcardId: number, side: string) {
-  console.log(`[GET] request => audio for flashcard ${flashcardId} / ${side} in set ${setId}`)
+  Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio?side=${side}`)
   return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio`, {
     responseType: 'blob',
     params: {
@@ -163,19 +164,19 @@ export async function sendFlashcardAudioFetchRequest(setId: number, flashcardId:
 }
 
 export async function sendFlashcardAudioFetchByIdRequest(setId: number, flashcardId: number, audioId: number) {
-  console.log(`[GET] request => audio ${audioId} for flashcard ${flashcardId} in set ${setId}`)
+  Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
   return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`, {
     responseType: 'blob'
   })
 }
 
 export async function sendFlashcardAudioRemovalRequest(setId: number, flashcardId: number, audioId: number) {
-  console.log(`[DELETE] request => audio ${audioId} for flashcard ${flashcardId} in set ${setId}`)
+  Log.log(LogTag.DELETE, `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
   return apiClient.delete(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
 }
 
 export async function sendUserUpdateRequest(username: string, userEmail: string, languageId: number | undefined) {
-  console.log(`[PUT] request => user`)
+  Log.log(LogTag.PUT, `/users`)
   return apiClient.put<User>(`/users`, {
     name: username,
     email: userEmail,
@@ -184,26 +185,26 @@ export async function sendUserUpdateRequest(username: string, userEmail: string,
 }
 
 export async function sendLatestReviewSessionGetRequest(setId: number, type: ReviewSessionType) {
-  console.log(`[GET] request => latest review session for set ${setId}`)
+  Log.log(LogTag.GET, `/flashcard-sets/${setId}/review-sessions/latest?type=${type}`)
   return apiClient.get<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/latest?type=${type}`)
 }
 
 export async function sendReviewSessionGetRequest(setId: number, id: number) {
-  console.log(`[GET] request => review session ${id} for set ${setId}`)
+  Log.log(LogTag.GET, `/flashcard-sets/${setId}/review-sessions/${id}`)
   return apiClient.get<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${id}`)
 }
 
 export async function sendReviewSessionCreateRequest(setId: number, request: ReviewSessionCreateRequest) {
-  console.log(`[POST] request => create review session for set ${setId}`)
+  Log.log(LogTag.POST, `/flashcard-sets/${setId}/review-sessions`)
   return apiClient.post<ReviewSession>(`/flashcard-sets/${setId}/review-sessions`, request)
 }
 
 export async function sendReviewSessionChildCreateRequest(setId: number, parentId: number, request: ReviewSessionCreateRequest) {
-  console.log(`[POST] request => child review session ${parentId} for set ${setId}`)
+  Log.log(LogTag.POST, `/flashcard-sets/${setId}/review-sessions/${parentId}/children`)
   return apiClient.post<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${parentId}/children`, request)
 }
 
 export async function sendReviewSessionUpdateRequest(setId: number, id: number, request: ReviewSessionUpdateRequest) {
-  console.log(`[PUT] request => review session ${id} for set ${setId}`)
+  Log.log(LogTag.PUT, `/flashcard-sets/${setId}/review-sessions/${id}`)
   return apiClient.put<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${id}`, request)
 }
