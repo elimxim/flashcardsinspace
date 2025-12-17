@@ -1,6 +1,7 @@
 import { type FlashcardSet, FlashcardSetExtra } from '@/model/flashcard.ts'
 import { defineStore } from 'pinia'
 import { mapFlashcardSetExtra } from '@/core-logic/flashcard-logic.ts'
+import { Log, LogTag } from '@/utils/logger.ts'
 
 export interface FlashcardSetsState {
   flashcardSets: FlashcardSet[]
@@ -35,7 +36,7 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       this.loaded = true
     },
     checkStateLoaded() {
-      if (!this.loaded) throw Error(`State check: flashcard set store isn't loaded`)
+      if (!this.loaded) throw Error(`flashcard-set.checkStateLoaded: !loaded`)
     },
     resetState() {
       this.flashcardSets = []
@@ -43,28 +44,28 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       this.loaded = false
     },
     addSet(flashcardSet: FlashcardSet) {
-      console.log(`Adding flashcard set ${flashcardSet.id}`)
+      Log.log(LogTag.STORE, `flashcard-set.addSet: FlashcardSet.id=${flashcardSet.id}`)
       this.checkStateLoaded()
       this.flashcardSets.push(flashcardSet)
     },
     removeSet(flashcardSet: FlashcardSet) {
-      console.log(`Removing flashcard set ${flashcardSet.id}`)
+      Log.log(LogTag.STORE, `flashcard-set.removeSet: FlashcardSet.id=${flashcardSet.id}`)
       this.checkStateLoaded()
       const idx = this.flashcardSets.findIndex((v: FlashcardSet) => v.id == flashcardSet.id)
       if (idx !== -1) {
         this.flashcardSets.splice(idx, 1)
       } else {
-        throw Error(`Couldn't find flashcard set ${flashcardSet.id} in the store to remove`)
+        throw Error(`flashcard-set.removeSet: FlashcardSet.id=${flashcardSet.id} not found`)
       }
     },
     updateSet(flashcardSet: FlashcardSet) {
-      console.log(`Updating flashcard set ${flashcardSet.id}`)
+      Log.log(LogTag.STORE, `flashcard-set.updateSet: FlashcardSet.id=${flashcardSet.id}`)
       this.checkStateLoaded()
       const idx = this.flashcardSets.findIndex((v: FlashcardSet) => v.id == flashcardSet.id)
       if (idx !== -1) {
         this.flashcardSets[idx] = flashcardSet
       } else {
-        throw Error(`Couldn't find flashcard set ${flashcardSet.id} in the store to update`)
+        throw Error(`flashcard-set.updateSet: FlashcardSet.id=${flashcardSet.id} not found`)
       }
     },
     findSet(id: number): FlashcardSet | undefined {
