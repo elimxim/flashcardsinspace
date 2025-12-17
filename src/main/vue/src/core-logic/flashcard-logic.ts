@@ -15,6 +15,7 @@ import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useAudioCache } from '@/stores/audio-cache.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
 import { Ref } from 'vue'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 export const flashcardSetStatuses = {
   ACTIVE: 'ACTIVE',
@@ -117,7 +118,7 @@ export async function fetchFlashcardAudioBlob(
 
   const cachedAudio = audioCache.getAudio(flashcardId, isFrontSide)
   if (cachedAudio) {
-    console.log(`Returning cached audio for flashcard ${flashcardId}, isFrontSide: ${isFrontSide}`)
+    Log.error(LogTag.LOGIC, `Returning cached audio for Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}`)
     return cachedAudio
   }
 
@@ -129,7 +130,7 @@ export async function fetchFlashcardAudioBlob(
       return response.data
     })
     .catch((error) => {
-      console.error(`Failed to fetch audio for flashcard ${flashcardId}, isFrontSide: ${isFrontSide}`, error)
+      Log.error(LogTag.LOGIC, `Failed to fetch audio for Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}`, error)
       toaster.bakeError(`Couldn't fetch audio`, error.response?.data)
       return undefined
     })
@@ -149,13 +150,13 @@ export async function uploadFlashcardAudioBlob(
 
   return await sendFlashcardAudioUploadRequest(flashcardSet.id, flashcard.id, side, audioBlob)
     .then((response) => {
-      console.log(`Audio uploaded ${response.data.id}, size: ${response.data.audioSize}, mime: ${response.data.mimeType}`)
+      console.log(`Audio.id=${response.data.id} uploaded, Audio.size: ${response.data.audioSize}, Audio.mime: ${response.data.mimeType}`)
       audioStore.setAudioId(flashcard.id, side, response.data.id)
       audioCache.addAudio(flashcard.id, audioBlob, isFrontSide)
       return true
     })
     .catch((error) => {
-      console.error(`Failed to upload audio for flashcard ${flashcard.id}`, error)
+      Log.error(LogTag.LOGIC, `Failed to upload audio for Flashcard.id=${flashcard.id}`, error)
       toaster.bakeError(`Couldn't upload audio`, error.response?.data)
       return false
     })
@@ -178,7 +179,7 @@ export async function removeFlashcardAudioBlob(
       return true
     })
     .catch((error) => {
-      console.error(`Failed to remove audio ${audioId} for flashcard ${flashcard.id}`, error)
+      Log.error(LogTag.LOGIC, `Failed to remove Audio.id=${audioId} for Flashcard.id=${flashcard.id}`, error)
       toaster.bakeError(`Couldn't remove audio`, error.response?.data)
       return false
     })

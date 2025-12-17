@@ -14,6 +14,7 @@ import {
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
 import { shuffle } from '@/utils/utils.ts'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 export enum ReviewSessionType {
   LIGHTSPEED = 'LIGHTSPEED',
@@ -259,7 +260,7 @@ export function createReviewQueue(
 }
 
 export function createReviewQueueForStages(flashcards: Flashcard[], stages: Stage[], currDay: Chronoday): ReviewQueue {
-  console.log(`Creating review queue for stages: ${stages.map(s => s.name).join(', ')}`)
+  Log.log(LogTag.LOGIC, `Creating review queue for stages: ${stages.map(s => s.name).join(', ')}`)
   const stageNameSet = new Set(stages.map(s => s.name))
 
   const result: Flashcard[] = []
