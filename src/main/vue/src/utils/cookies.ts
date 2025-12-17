@@ -14,17 +14,17 @@ function saveCookie(name: string, value: string, expires: number) {
     secure: true,
     path: '/', // valid for the entire site
   })
-  console.log( `${value} => Cookies.${name}`)
+  Log.log(LogTag.COOKIES, `${value} => ${name}`)
 }
 
 function loadCookie(name: string): string | undefined {
   const value = Cookies.get(name)
-  console.log(`Cookies.${name} => ${value}`)
+  Log.log(LogTag.COOKIES,`${name} => ${value}`)
   return value
 }
 
 function removeCookie(name: string) {
-  console.log(`Cookies.${name} => x_x`)
+  Log.log(LogTag.COOKIES,`${name} => x_x`)
   Cookies.remove(name)
 }
 
