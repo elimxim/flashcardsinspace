@@ -8,6 +8,7 @@ import { sendRefreshTokenRequest } from '@/api/auth-client.ts'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { redirectToLoginPage } from '@/router/index.ts'
 import { loadUserSignedUpFromCookies } from '@/utils/cookies.ts'
+import { Log, LogTag } from '@/utils/logger.ts'
 
 export function configureTokenRefreshInterceptor(axiosInstance: AxiosInstance) {
   axiosInstance.interceptors.response.use(
@@ -34,7 +35,7 @@ let failedQueue: QueuedRequest[] = []
 
 function rejectQueuedRequests(error: AxiosError) {
   failedQueue.forEach(({ reject, config }) => {
-    console.log(`Rejecting request ${config.url}`)
+    Log.log(LogTag.SYSTEM, `Reject request ${config.url}`)
     reject(error)
   })
 
@@ -43,7 +44,7 @@ function rejectQueuedRequests(error: AxiosError) {
 
 function processQueuedRequests(axiosInstance: AxiosInstance) {
   failedQueue.forEach(({ resolve, config }) => {
-    console.log(`Replaying request ${config.url}`)
+    Log.log(LogTag.SYSTEM, `Replay request ${config.url}`)
     resolve(axiosInstance.request(config))
   })
 
@@ -53,9 +54,9 @@ function processQueuedRequests(axiosInstance: AxiosInstance) {
 export async function attemptTokenRefresh(): Promise<boolean> {
   const authStore = useAuthStore()
   try {
-    console.log('Refreshing token...')
+    Log.log(LogTag.SYSTEM, 'Refreshing token...')
     const response = await sendRefreshTokenRequest()
-    console.log('Token refresh successful')
+    Log.log(LogTag.SYSTEM, 'Token refresh successful')
     authStore.setUser(response.data)
     return true
   } catch (error) {
@@ -63,10 +64,10 @@ export async function attemptTokenRefresh(): Promise<boolean> {
     if (error instanceof AxiosError) {
       const axiosError = error as AxiosError
       if (axiosError.response?.status === 401 || axiosError.response?.status === 403) {
-        console.info(`Refresh token expired: ${axiosError}`)
+        Log.log(LogTag.SYSTEM, `Token expired: ${axiosError}`)
       }
     }
-    console.error('Token refresh failed:', error)
+    Log.error(LogTag.SYSTEM, 'Token refresh failed', error)
     return false
   }
 }
@@ -88,10 +89,10 @@ async function refreshToken(): Promise<boolean> {
 
 async function handleUnauthorizedError(error: AxiosError, axiosInstance: AxiosInstance): Promise<AxiosResponse> {
   if (error.response?.status === 401 || error.response?.status === 403) {
-    console.log('Handling 401/403 error')
+    Log.log(LogTag.SYSTEM, `Handling ${error.response?.status} error`)
     const originalRequest = error.config as InternalAxiosRequestConfig
     return new Promise<AxiosResponse>((resolve, reject) => {
-      console.log(`Request '${originalRequest.baseURL}' was queued`)
+      Log.log(LogTag.SYSTEM, `Request '${originalRequest.baseURL}' was queued`)
       failedQueue.push({ resolve, reject, config: originalRequest })
       if (!isRefreshing) {
         refreshToken().then(async (success) => {
