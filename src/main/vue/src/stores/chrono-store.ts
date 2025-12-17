@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { type Chronoday } from '@/model/chrono.ts'
 import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 import { asIsoDateStr } from '@/utils/utils.ts'
+import { Log, LogTag } from '@/utils/logger.ts'
 
 export interface ChronoState {
   chronodays: Chronoday[]
@@ -29,7 +30,7 @@ export const useChronoStore = defineStore('chrono', {
   },
   actions: {
     loadState(chronodays: Chronoday[], currDay: Chronoday, dayStreak: number) {
-      console.log(`Loading ${chronodays.length} chronodays with curr day ${currDay.chronodate}`)
+      Log.log(LogTag.STORE, `chrono.loadState: currDay.chronodate=${currDay.chronodate} + ${chronodays.length} chronodays, dayStreak=${dayStreak} `)
       this.resetState()
       this.chronodays = chronodays
       this.currDay = currDay
@@ -37,7 +38,7 @@ export const useChronoStore = defineStore('chrono', {
       this.loaded = true
     },
     checkStateLoaded() {
-      if (!this.loaded) throw Error(`State check: chrono store isn't loaded`)
+      if (!this.loaded) throw Error(`chrono.checkStateLoaded: !loaded`)
     },
     resetState() {
       this.chronodays = []
@@ -48,13 +49,13 @@ export const useChronoStore = defineStore('chrono', {
     canGoPrev(): boolean {
       this.checkStateLoaded()
       if (this.currDay.seqNumber === undefined || this.currDay.seqNumber === 0) {
-        console.log('No prev day: current is initial or OFF')
+        Log.log(LogTag.STORE, `chrono.canGoPrev: no prev day, currDay.status=${this.currDay.status}`)
         return false
       }
 
       const prevIdx = this.currDay.seqNumber - 1
       if (!this.chronodays[prevIdx]) {
-        console.log(`No prev day: couldn't find prev ${prevIdx}`)
+        Log.log(LogTag.STORE, `chrono.canGoPrev: no prev day, chronoday.idx=${prevIdx} not found`)
         return false
       } else {
         return true
@@ -74,7 +75,7 @@ export const useChronoStore = defineStore('chrono', {
         if (idx !== -1) {
           this.chronodays[idx] = newDay
         } else {
-          console.error(`Couldn't find day ${newDay.id} in the store to update status to ${newDay.status}`)
+          Log.error(LogTag.STORE, `chrono.updateDays: chronoday.id=${newDay.id} not found`)
         }
       })
     },
