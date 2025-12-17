@@ -208,6 +208,7 @@ import {
 } from '@/core-logic/chrono-logic.ts'
 import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { quizSessionIdCookie } from '@/utils/cookies-ref.ts'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 const props = defineProps<{
   sessionType?: string,
@@ -284,7 +285,7 @@ async function nextFlashcard(): Promise<boolean> {
 }
 
 async function startReview() {
-  console.log(`Starting review: ${JSON.stringify(reviewMode.value)}`)
+  Log.log(LogTag.LOGIC, `Starting review: ${JSON.stringify(reviewMode.value)}`)
   if (reviewMode.value.isLightspeed()) {
     reviewQueue.value = createReviewQueue(flashcards.value, currDay.value, chronodays.value)
   } else if (reviewMode.value.isSpecial()) {
@@ -305,11 +306,10 @@ async function startReview() {
   if (await nextFlashcard()) {
     startWatch()
   }
-  console.log(`Flashcards TOTAL: ${flashcardsTotal.value}`)
+  Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
 }
 
 async function loadOrCreateQuizSession() {
-  console.log(`DEBUG ${props.sessionId}`)
   if (props.sessionId) {
     await loadQuizSession(props.sessionId)
   } else  {
@@ -320,7 +320,7 @@ async function loadOrCreateQuizSession() {
 }
 
 async function finishReview() {
-  console.log(`Finishing review: ${JSON.stringify(reviewMode.value)}`)
+  Log.log(LogTag.LOGIC, `Finishing review: ${JSON.stringify(reviewMode.value)}`)
   stopWatch()
   reviewQueue.value = new EmptyReviewQueue()
   reviewSessionId.value = undefined
@@ -338,7 +338,7 @@ async function finishReview() {
       await markDaysAsCompleted(flashcardSet.value)
     }
   } else {
-    console.error(`Can't gracefully finish review: flashcard set is undefined`)
+    Log.error(LogTag.LOGIC, `Can't gracefully finish review: FlashcardSet is undefined`)
   }
 }
 
@@ -389,7 +389,7 @@ async function quizAnswer(know: boolean) {
 async function startNextQuizRound() {
   if (!flashcardSet.value || !reviewSessionId.value) return
   if (incorrectFlashcards.value.length === 0) {
-    console.error('Cannot start new round: no incorrect flashcards')
+    Log.error(LogTag.LOGIC, 'Cannot start new round: no incorrect flashcards')
     return
   }
 
@@ -416,7 +416,7 @@ async function startNextQuizRound() {
       return nextFlashcard()
     })
     .catch((error) => {
-      console.error(`Failed to create child review session`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to create child review session`, error.response?.data)
       toaster.bakeError(`Couldn't start a new round`, error.response?.data)
     })
 }
@@ -435,9 +435,9 @@ async function next() {
 
 async function moveBack() {
   if (!flashcardSet.value || !currFlashcard.value) {
-    console.error(`moveBack's impossible:`,
-      `flashcard set ${flashcardSet.value?.id ?? 'undefined'}`,
-      `flashcard ${currFlashcard.value?.id ?? 'undefined'}`
+    Log.error(LogTag.LOGIC, `moveBack is impossible:`,
+      `FlashcardSet.id=${flashcardSet.value?.id ?? 'undefined'}`,
+      `current Flashcard.id=${currFlashcard.value?.id ?? 'undefined'}`
     )
     return
   }
@@ -458,7 +458,7 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
       return true
     })
     .catch((error) => {
-      console.error(`Failed to update flashcard ${flashcard.id}`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to update Flashcard.id=${flashcard.id}`, error.response?.data)
       toaster.bakeError(`Couldn't move a flashcard`, error.response?.data)
       return false
     })
@@ -492,10 +492,10 @@ async function markDaysAs(
 
   const days = selectConsecutiveDaysBefore(chronodays.value, currDay.value, acceptedStatuses)
   if (days.length === 0) {
-    console.error(
+    Log.error(LogTag.LOGIC,
       `No days to mark as ${status}`,
-      `flashcard set ${flashcardSetId}`,
-      `current day: ${JSON.stringify(currDay.value)}`
+      `FlashcardSet.id=${flashcardSetId}`,
+      `currDay=${JSON.stringify(currDay.value)}`
     )
     return
   }
@@ -506,7 +506,7 @@ async function markDaysAs(
       chronoStore.updateDayStreak(response.data.dayStreak)
     })
     .catch((error) => {
-      console.error(`Failed to mark days as ${status} for ${flashcardSetId}`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to mark days as ${status} for FlashcardSet.id=${flashcardSetId}`, error.response?.data)
       toaster.bakeError(`Couldn't move a flashcard`, error.response?.data)
     })
 }
@@ -560,10 +560,10 @@ async function createReviewSession(quiz: boolean = false) {
   await sendReviewSessionCreateRequest(flashcardSet.value.id, request)
     .then((response) => {
       reviewSessionId.value = response.data.id
-      console.log(`Review session ${reviewSessionId.value} created`)
+      Log.log(LogTag.LOGIC, `Review session ${reviewSessionId.value} created`)
     })
     .catch((error) => {
-      console.error(`Failed to create review session`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to create a review session`, error.response?.data)
       toaster.bakeError(`Couldn't start a review session`, error.response?.data)
     })
 }
@@ -587,10 +587,10 @@ async function loadQuizSession(sessionId: number) {
       incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIdSet.has(f.id))
       reviewQueue.value = new MonoStageReviewQueue(flashcardsForReview)
       reviewQueue.value.shuffle()
-      console.log(`Review session ${reviewSessionId.value} retrieved`)
+      Log.log(LogTag.LOGIC, `Review session ${reviewSessionId.value} retrieved`)
     })
     .catch((error) => {
-      console.error(`Failed to retrieve review session ${sessionId}`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to retrieve review session ${sessionId}`, error.response?.data)
     })
 }
 
@@ -602,10 +602,10 @@ async function updateReviewSession(flashcardIds: number[], finished: boolean = f
     finished: finished,
   })
     .then(() => {
-      console.log(`Review session ${reviewSessionId.value} updated`)
+      Log.log(LogTag.LOGIC, `Review session ${reviewSessionId.value} updated`)
     })
     .catch((error) => {
-      console.error(`Failed to updated review session ${reviewSessionId.value}`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to updated review session ${reviewSessionId.value}`, error.response?.data)
     })
 }
 
@@ -621,21 +621,21 @@ async function updateQuizSession(reviewedFlashcardIds: number[], nextRoundFlashc
     },
   })
     .then(() => {
-      console.log(`Review session ${reviewSessionId.value} updated`)
+      Log.log(LogTag.LOGIC, `Review session ${reviewSessionId.value} updated`)
     })
     .catch((error) => {
-      console.error(`Failed to update review session ${reviewSessionId.value}`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to update review session ${reviewSessionId.value}`, error.response?.data)
     })
 }
 
 onMounted(async () => {
   if (!flashcardStore.loaded) {
-    console.log('Flashcard set not loaded, loading...')
+    Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
     const selectedSetId = loadSelectedSetIdFromCookies()
     if (selectedSetId) {
       await loadFlashcardRelatedStoresById(selectedSetId)
     } else {
-      console.log('Flashcard set not found in cookies')
+      Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
     }
   }
   await startReview()
