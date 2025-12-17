@@ -24,6 +24,7 @@ export enum LogTag {
   COOKIES = 'COOKIES',
   LOGIC = 'LOGIC',
   SYSTEM = 'SYSTEM',
+  DEBUG = 'DEBUG',
 }
 
 export class Log {
@@ -38,6 +39,7 @@ export class Log {
     [LogTag.COOKIES]: '#795548',
     [LogTag.LOGIC]: '#009669',
     [LogTag.SYSTEM]: '#3F51B5',
+    [LogTag.DEBUG]: '#883f3f',
   }
 
   static info(message?: unknown, ...optionalParams: unknown[]) {
