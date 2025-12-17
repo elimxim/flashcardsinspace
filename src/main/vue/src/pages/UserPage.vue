@@ -194,7 +194,7 @@ async function save() {
   await sendUserUpdateRequest(username.value, userEmail.value, language.value?.id)
     .then((response) => {
       authStore.setUser(response.data)
-      console.log(`User ${response.data.id} info saved`)
+      Log.log(LogTag.LOGIC, `User.id=${response.data.id} info saved`)
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, 'Failed to save user info: ', error)

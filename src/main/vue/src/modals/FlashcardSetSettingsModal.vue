@@ -230,7 +230,7 @@ async function updateFlashcardSet(): Promise<boolean> {
         )
         return true
       }).catch((error) => {
-        console.error(`Failed to suspend flashcard set ${updatedSet.id}`, error)
+        Log.error(LogTag.LOGIC, `Failed to suspend FlashcardSet.id=${updatedSet.id}`, error)
         toaster.bakeError(`Couldn't suspend flashcard set`, error.response?.data)
         return false
       })
@@ -242,7 +242,7 @@ async function updateFlashcardSet(): Promise<boolean> {
         return true
       })
       .catch((error) => {
-        console.error(`Failed to update flashcard set ${updatedSet.id}`, error)
+        Log.error(LogTag.LOGIC, `Failed to update FlashcardSet.id=${updatedSet.id}`, error)
         toaster.bakeError(`Couldn't update flashcard set`, error.response?.data)
         return false
       })
