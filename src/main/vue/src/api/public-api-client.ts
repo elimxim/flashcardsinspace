@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { Language } from '@/model/language.ts'
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const publicApiClient = axios.create({
   baseURL: '/api-public',
@@ -7,6 +8,6 @@ const publicApiClient = axios.create({
 })
 
 export async function sendLanguagesGetRequest() {
-  console.log('[GET] request => languages')
+  Log.log(LogTag.GET, '/languages')
   return await publicApiClient.get<Language[]>('/languages')
 }
