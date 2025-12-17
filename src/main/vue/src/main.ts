@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { applyFaSolidIcons } from '@/fa-solid.ts'
 import { applyFaRegularIcons } from '@/fa-regular.ts'
 import { attemptTokenRefresh } from '@/api/token-refresh.ts'
+import { LogTag, Log } from '@/utils/logger.ts'
 
 applyFaRegularIcons()
 applyFaSolidIcons()
@@ -23,10 +24,10 @@ const authStore = useAuthStore()
 sendWhoAmIRequest()
   .then(async (response) => {
     if (response.status === 200) {
-      console.log('Who Am I: ', response.data)
+      Log.log(LogTag.API, `Who Am I: ${response.data}`)
       authStore.setUser(response.data)
     } else {
-      console.log('Who Am I: ', response.status)
+      Log.log(LogTag.API, `Who Am I: ${response.status}`)
       await attemptTokenRefresh()
     }
   })
