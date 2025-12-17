@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
+import { Log, LogTag } from '@/utils/logger.ts';
 
 const MAX_AUDIO_STORAGE_BYTES = 40 * 1024 * 1024 // 40 MB
 
@@ -70,7 +71,7 @@ export const useAudioCache = defineStore('audio-cache', () => {
 
   function printCacheSize() {
     const sizeInKB = (totalSize.value / 1024).toFixed(1)
-    console.log(`Cache size: ${sizeInKB} KB`)
+    Log.log(LogTag.STORE, `audio-cache.cacheSize: ${sizeInKB} KB`)
   }
 
   function sizeInKB(blob: Blob | undefined): string {
@@ -78,7 +79,7 @@ export const useAudioCache = defineStore('audio-cache', () => {
   }
 
   function addAudio(flashcardId: number, audioBlob: Blob, isFrontSide: boolean) {
-    console.log(`Caching audio for flashcard ${flashcardId}, isFrontSide: ${isFrontSide}, size: ${sizeInKB(audioBlob)}`)
+    Log.log(LogTag.STORE, `audio-cache.addAudio: Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}, Audio.size=${sizeInKB(audioBlob)}`)
 
     const now = performance.now()
 
@@ -110,7 +111,7 @@ export const useAudioCache = defineStore('audio-cache', () => {
   }
 
   function getAudio(flashcardId: number, isFrontSide: boolean): Blob | undefined {
-    console.log(`Getting cached audio for flashcard ${flashcardId}, isFrontSide: ${isFrontSide}`)
+    Log.log(LogTag.STORE, `audio-cache.getAudio: Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}`)
 
     const entry = audioMap.value.get(flashcardId)
     if (!entry) return undefined
@@ -133,7 +134,7 @@ export const useAudioCache = defineStore('audio-cache', () => {
   }
 
   function deleteAudio(flashcardId: number, isFrontSide: boolean): boolean {
-    console.log(`Deleting cached audio for flashcard ${flashcardId}, isFrontSide: ${isFrontSide}`)
+    Log.log(LogTag.STORE, `audio-cache.deleteAudio: Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}`)
 
     const entry = audioMap.value.get(flashcardId)
     if (!entry) return false
