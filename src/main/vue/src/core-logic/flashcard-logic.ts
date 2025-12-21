@@ -16,6 +16,7 @@ import { useAudioCache } from '@/stores/audio-cache.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
 import { Ref } from 'vue'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { userApiErrors } from '@/api/user-api-error.ts'
 
 export const flashcardSetStatuses = {
   ACTIVE: 'ACTIVE',
@@ -131,7 +132,7 @@ export async function fetchFlashcardAudioBlob(
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to fetch audio for Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}`, error)
-      toaster.bakeError(`Couldn't fetch audio`, error.response?.data)
+      toaster.bakeError(userApiErrors.AUDIO__FETCHING_FAILED, error.response?.data)
       return undefined
     })
 }
@@ -157,7 +158,7 @@ export async function uploadFlashcardAudioBlob(
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to upload audio for Flashcard.id=${flashcard.id}`, error)
-      toaster.bakeError(`Couldn't upload audio`, error.response?.data)
+      toaster.bakeError(userApiErrors.AUDIO__UPLOADING_FAILED, error.response?.data)
       return false
     })
 }
@@ -180,7 +181,7 @@ export async function removeFlashcardAudioBlob(
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to remove Audio.id=${audioId} for Flashcard.id=${flashcard.id}`, error)
-      toaster.bakeError(`Couldn't remove audio`, error.response?.data)
+      toaster.bakeError(userApiErrors.AUDIO__REMOVAL_FAILED, error.response?.data)
       return false
     })
 }
