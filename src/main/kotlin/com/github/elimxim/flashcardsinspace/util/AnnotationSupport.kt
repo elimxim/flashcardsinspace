@@ -1,7 +1,6 @@
 package com.github.elimxim.flashcardsinspace.util
 
 import com.github.elimxim.flashcardsinspace.entity.MetadataField
-import com.github.elimxim.flashcardsinspace.web.exception.ErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.ExceptionHttpStatus
 import com.github.elimxim.flashcardsinspace.web.exception.HttpException
 import org.slf4j.LoggerFactory.getLogger
@@ -22,11 +21,6 @@ fun getHttpStatus(e: HttpException): HttpStatus {
     } else {
         anno.value
     }
-}
-
-fun getErrorCode(e: HttpException): String {
-    val anno = findAnnotationInClassHierarchy<ErrorCode>(e::class)
-    return anno?.value ?: "000042"
 }
 
 inline fun <reified T : Annotation> findAnnotationInClassHierarchy(kClass: KClass<*>): T? {

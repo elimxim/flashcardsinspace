@@ -2,7 +2,6 @@ package com.github.elimxim.flashcardsinspace.web.exception
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.github.elimxim.flashcardsinspace.util.getErrorCode
 import com.github.elimxim.flashcardsinspace.util.getHttpStatus
 import com.github.elimxim.flashcardsinspace.util.printApplicationStackTrace
 import com.github.elimxim.flashcardsinspace.util.withLoggingContext
@@ -33,7 +32,7 @@ class GlobalExceptionHandler {
             e.printApplicationStackTrace()
             val body = buildErrorBody(
                 status = HttpStatus.INTERNAL_SERVER_ERROR,
-                exception = UnexpectedException("Unexpected error occurred", e)
+                exception = HttpInternalServerErrorException(ApiErrorCode.UNE500, "Unexpected error occurred", e)
             )
 
             ResponseEntity(body, body.httpStatus)
@@ -64,7 +63,7 @@ private fun buildErrorBody(
         httpStatus = status,
         statusCode = status.value(),
         statusError = status.reasonPhrase,
-        errorCode = getErrorCode(exception),
+        errorCode = exception.apiErrorCode.name,
     )
 }
 
