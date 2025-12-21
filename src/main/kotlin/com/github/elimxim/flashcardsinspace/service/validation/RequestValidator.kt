@@ -6,7 +6,7 @@ import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
 import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
 import com.github.elimxim.flashcardsinspace.security.escapeJava
 import com.github.elimxim.flashcardsinspace.web.dto.*
-import com.github.elimxim.flashcardsinspace.web.exception.InvalidRequestFieldsException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpInvalidRequestFieldsException
 import jakarta.validation.ConstraintViolation
 import jakarta.validation.Validator
 import org.springframework.stereotype.Service
@@ -18,9 +18,9 @@ import java.time.format.DateTimeFormatter
 class RequestValidator(private val validator: Validator) {
     fun validate(request: LoginRequest): ValidLoginRequest {
         validateRequest<LoginRequest>(request) { violations ->
-            throw InvalidRequestFieldsException(
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
-                fields(violations)
             )
         }
 
@@ -29,9 +29,9 @@ class RequestValidator(private val validator: Validator) {
 
     fun validate(request: SignUpRequest): ValidSignUpRequest {
         validateRequest<SignUpRequest>(request) { violations ->
-            throw InvalidRequestFieldsException(
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
-                fields(violations)
             )
         }
 
@@ -40,9 +40,9 @@ class RequestValidator(private val validator: Validator) {
 
     fun validate(request: FlashcardCreationRequest): ValidFlashcardCreationRequest {
         validateRequest<FlashcardCreationRequest>(request) { violations ->
-            throw InvalidRequestFieldsException(
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
-                fields(violations)
             )
         }
 
@@ -51,9 +51,9 @@ class RequestValidator(private val validator: Validator) {
 
     fun validate(request: FlashcardUpdateRequest): ValidFlashcardUpdateRequest {
         validateRequest<FlashcardUpdateRequest>(request) { violations ->
-            throw InvalidRequestFieldsException(
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
-                fields(violations)
             )
         }
 
@@ -62,9 +62,9 @@ class RequestValidator(private val validator: Validator) {
 
     fun validate(request: FlashcardSetCreationRequest): ValidFlashcardSetCreationRequest {
         validateRequest<FlashcardSetCreationRequest>(request) { violations ->
-            throw InvalidRequestFieldsException(
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
-                fields(violations)
             )
         }
 
@@ -73,9 +73,9 @@ class RequestValidator(private val validator: Validator) {
 
     fun validate(request: FlashcardSetUpdateRequest): ValidFlashcardSetUpdateRequest {
         validateRequest<FlashcardSetUpdateRequest>(request) { violations ->
-            throw InvalidRequestFieldsException(
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
-                fields(violations)
             )
         }
 
@@ -84,9 +84,9 @@ class RequestValidator(private val validator: Validator) {
 
     fun validate(request: ChronoSyncRequest): ValidChronoSyncRequest {
         validateRequest<ChronoSyncRequest>(request) { violations ->
-            throw InvalidRequestFieldsException(
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
-                fields(violations)
             )
         }
 
@@ -95,9 +95,9 @@ class RequestValidator(private val validator: Validator) {
 
     fun validate(request: ChronoBulkUpdateRequest): ValidChronoBulkUpdateRequest {
         validateRequest<ChronoBulkUpdateRequest>(request) { violations ->
-            throw InvalidRequestFieldsException(
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
-                fields(violations)
             )
         }
 
@@ -106,9 +106,9 @@ class RequestValidator(private val validator: Validator) {
 
     fun validate(request: UserUpdateRequest): ValidUserUpdateRequest {
         validateRequest<UserUpdateRequest>(request) { violations ->
-            throw InvalidRequestFieldsException(
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
-                fields(violations)
             )
         }
 
@@ -117,9 +117,9 @@ class RequestValidator(private val validator: Validator) {
 
     fun validate(request: ReviewSessionCreateRequest): ValidReviewSessionCreateRequest {
         validateRequest<ReviewSessionCreateRequest>(request) { violations ->
-            throw InvalidRequestFieldsException(
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
-                fields(violations)
             )
         }
 
@@ -128,9 +128,9 @@ class RequestValidator(private val validator: Validator) {
 
     fun validate(request: ReviewSessionUpdateRequest): ValidReviewSessionUpdateRequest {
         validateRequest<ReviewSessionUpdateRequest>(request) { violations ->
-            throw InvalidRequestFieldsException(
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
-                fields(violations)
             )
         }
 
