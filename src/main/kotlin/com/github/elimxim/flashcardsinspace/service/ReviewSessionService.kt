@@ -9,8 +9,9 @@ import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.getMetadataFieldName
 import com.github.elimxim.flashcardsinspace.util.numbersOnlyPattern
 import com.github.elimxim.flashcardsinspace.web.dto.*
-import com.github.elimxim.flashcardsinspace.web.exception.ChildSessionIllegalRequestException
-import com.github.elimxim.flashcardsinspace.web.exception.ReviewSessionNotFoundException
+import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
+import com.github.elimxim.flashcardsinspace.web.exception.HttpBadRequestException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -78,7 +79,7 @@ class ReviewSessionService(
 
         if (request.finished) {
             if (session.finishedAt != null) {
-                throw IllegalStateException("Review session ${session.id} is already finished")
+                throw HttpBadRequestException(ApiErrorCode.SAF400, "Review session ${session.id} is already finished")
             }
             session.finishedAt = ZonedDateTime.now()
             changed = true
@@ -112,7 +113,10 @@ class ReviewSessionService(
     ): ReviewSessionDto {
         val parentSession = getEntity(parentId)
         if (request.type != parentSession.type) {
-            throw ChildSessionIllegalRequestException("Child session type ${request.type} is not the same as parent session type ${parentSession.type}")
+            throw HttpBadRequestException(
+                ApiErrorCode.STM400,
+                "Child session type ${request.type} is not the same as parent session type ${parentSession.type}"
+            )
         }
 
         val session = createNewReviewSession(setId, request).apply {
@@ -120,7 +124,10 @@ class ReviewSessionService(
         }
         if (session.type == ReviewSessionType.QUIZ) {
             if (parentSession.type != ReviewSessionType.QUIZ) {
-                throw ChildSessionIllegalRequestException("Parent session ${parentSession.id} is not ${ReviewSessionType.QUIZ}")
+                throw HttpBadRequestException(
+                    ApiErrorCode.STM400,
+                    "Parent session ${parentSession.id} is not ${ReviewSessionType.QUIZ}"
+                )
             }
             addQuizMetadata(session, request, parentSession)
         }
@@ -148,7 +155,7 @@ class ReviewSessionService(
     @Transactional
     fun getEntity(id: Long): ReviewSession {
         return reviewSessionRepository.findById(id).orElseThrow {
-            ReviewSessionNotFoundException("Review session $id not found")
+            HttpNotFoundException(ApiErrorCode.RES404, "Review session $id not found")
         }
     }
 
@@ -171,7 +178,8 @@ class ReviewSessionService(
         val metadata = if (parentSession != null && parentSession.metadata != null) {
             val parentMetadata = parentSession.metadata
             if (parentMetadata !is QuizMetadata) {
-                throw ChildSessionIllegalRequestException(
+                throw HttpBadRequestException(
+                    ApiErrorCode.SMM400,
                     "Parent session ${parentSession.id} metadata is not ${ReviewSessionType.QUIZ}"
                 )
             }
@@ -206,14 +214,16 @@ class ReviewSessionService(
 
     private fun updateQuizMetadata(session: ReviewSession, metadata: Map<String, Any>): Boolean {
         val sessionMetadata = session.metadata
-        if (sessionMetadata == null) {
-            log.warn("Review session ${session.id} has no metadata")
-            return false
-        }
+            ?: throw HttpBadRequestException(
+                ApiErrorCode.SNM400,
+                "Review session ${session.id} has no metadata"
+            )
 
         if (sessionMetadata !is QuizMetadata) {
-            log.warn("Review session ${session.id} metadata is not ${ReviewSessionType.QUIZ}")
-            return false
+            throw HttpBadRequestException(
+                ApiErrorCode.NQM400,
+                "Review session ${session.id} metadata is not ${ReviewSessionType.QUIZ}"
+            )
         }
 
         var changed = false
