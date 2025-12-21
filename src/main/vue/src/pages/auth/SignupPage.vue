@@ -266,6 +266,8 @@ async function signup() {
 
     if (error.response?.status === 400) {
       toaster.bakeError(userApiErrors.AUTH_BAD_DATA, error.response?.data)
+    } else if (error.response?.status === 409) {
+      toaster.bakeError(userApiErrors.USER__ALREADY_EXISTS, error.response?.data)
     } else {
       toaster.bakeError(userApiErrors.AUTH_FAILED, error.response?.data)
     }

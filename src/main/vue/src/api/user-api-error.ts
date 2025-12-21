@@ -32,6 +32,10 @@ export const userApiErrors = {
     title: 'Could not update the user',
     message: 'Please try to repeat the action.'
   } as UserApiError,
+  USER__ALREADY_EXISTS: {
+    title: 'This email is already taken',
+    message: 'Please use a different email.'
+  } as UserApiError,
   FLASHCARD_SET__SUSPENDING_FAILED: {
     title: 'Could not suspend the flashcard set',
     message: 'Please refresh the page and repeat the action.'
