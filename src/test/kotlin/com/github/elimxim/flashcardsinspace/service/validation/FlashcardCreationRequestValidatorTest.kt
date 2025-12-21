@@ -2,7 +2,7 @@ package com.github.elimxim.flashcardsinspace.service.validation
 
 import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardCreationRequest
-import com.github.elimxim.flashcardsinspace.web.exception.InvalidRequestFieldsException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpInvalidRequestFieldsException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -38,7 +38,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -54,7 +54,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -70,7 +70,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -86,7 +86,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -102,7 +102,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -118,7 +118,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -134,7 +134,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -150,7 +150,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -166,7 +166,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -182,7 +182,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -198,7 +198,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -214,7 +214,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -230,7 +230,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -246,7 +246,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -262,7 +262,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -278,7 +278,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
@@ -297,7 +297,7 @@ class FlashcardCreationRequestValidatorTest {
         }
 
         // when:
-        val exception = assertThrows<InvalidRequestFieldsException> {
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 

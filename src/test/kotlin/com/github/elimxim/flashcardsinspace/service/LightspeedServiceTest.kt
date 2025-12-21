@@ -1,7 +1,7 @@
 package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
-import com.github.elimxim.flashcardsinspace.web.exception.CorruptedChronoStateException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpInternalServerErrorException
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
@@ -327,7 +327,7 @@ class LightspeedServiceTest {
             )
 
             assertThatThrownBy { service.createSchedule(chronodays, daysAhead = 0) }
-                .isInstanceOf(CorruptedChronoStateException::class.java)
+                .isInstanceOf(HttpInternalServerErrorException::class.java)
                 .hasMessageContaining("Duplicated dates")
                 .hasMessageContaining("2024-01-02")
         }
