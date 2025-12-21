@@ -4,8 +4,9 @@ import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardAudioRepository
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardAudioDto
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
-import com.github.elimxim.flashcardsinspace.web.exception.AudioNotFoundException
-import com.github.elimxim.flashcardsinspace.web.exception.InvalidRequestException
+import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
+import com.github.elimxim.flashcardsinspace.web.exception.HttpBadRequestException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -35,11 +36,12 @@ class FlashcardAudioService(
     }
 
     @Transactional
-    fun fetchAudio(user: User, setId: Long, flashcardId: Long, side: String): FlashcardAudio {
+    fun fetchAudio(user: User, setId: Long, flashcardId: Long, side: String): FlashcardAudio? {
         log.info("Fetching audio for flashcard $flashcardId in set $setId, side: $side")
         flashcardSetService.verifyUserHasAccess(user, setId)
         flashcardService.verifyUserOperation(user, setId, flashcardId)
-        return getEntity(flashcardId, parseSide(side))
+        val side = parseSide(side)
+        return flashcardAudioRepository.findByFlashcardIdAndSide(flashcardId, side)
     }
 
     @Transactional
@@ -109,17 +111,12 @@ class FlashcardAudioService(
     @Transactional
     fun getEntity(id: Long): FlashcardAudio =
         flashcardAudioRepository.findById(id).orElseThrow {
-            AudioNotFoundException("Audio with id $id not found")
+            HttpNotFoundException(ApiErrorCode.FAU404, "Audio with id $id not found")
         }
-
-    @Transactional
-    fun getEntity(flashcardId: Long, side: FlashcardSide): FlashcardAudio =
-        flashcardAudioRepository.findByFlashcardIdAndSide(flashcardId, side)
-            ?: throw AudioNotFoundException("Audio not found for flashcard $flashcardId, side: $side")
 
     private fun parseSide(side: String) = when {
         FlashcardSide.FRONT.name.equals(side, ignoreCase = true) -> FlashcardSide.FRONT
         FlashcardSide.BACK.name.equals(side, ignoreCase = true) -> FlashcardSide.BACK
-        else -> throw InvalidRequestException("Invalid side $side for uploading audio")
+        else -> throw HttpBadRequestException(ApiErrorCode.WFS400, "Invalid side $side for uploading audio")
     }
 }

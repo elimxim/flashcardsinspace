@@ -4,13 +4,13 @@ import com.github.elimxim.flashcardsinspace.entity.Flashcard
 import com.github.elimxim.flashcardsinspace.entity.ReviewHistory
 import com.github.elimxim.flashcardsinspace.entity.ReviewInfo
 import com.github.elimxim.flashcardsinspace.entity.User
-import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardAudioRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.*
 import com.github.elimxim.flashcardsinspace.web.dto.*
-import com.github.elimxim.flashcardsinspace.web.exception.FlashcardNotFoundException
-import com.github.elimxim.flashcardsinspace.web.exception.UnmatchedFlashcardSetIdException
+import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
+import com.github.elimxim.flashcardsinspace.web.exception.HttpConflictException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,7 +22,6 @@ private val log = LoggerFactory.getLogger(FlashcardService::class.java)
 class FlashcardService(
     private val flashcardSetService: FlashcardSetService,
     private val flashcardRepository: FlashcardRepository,
-    private val flashcardAudioRepository: FlashcardAudioRepository,
     private val requestValidator: RequestValidator,
 ) {
     @Transactional
@@ -141,17 +140,18 @@ class FlashcardService(
     @Transactional
     fun getEntity(id: Long): Flashcard =
         flashcardRepository.findById(id).orElseThrow {
-            FlashcardNotFoundException("Flashcard with id $id not found")
+            HttpNotFoundException(ApiErrorCode.FLA404, "Flashcard with id $id not found")
         }
 
     @Transactional
     fun verifyUserOperation(user: User, setId: Long, id: Long) {
         if (getEntity(id).flashcardSet.id != setId) {
-            throw UnmatchedFlashcardSetIdException(
+            throw HttpConflictException(
+                ApiErrorCode.FSF409,
                 """
-                    User ${user.id} requested flashcard $id 
-                    doesn't belong to the requested set $setId
-                    """.trimIndent()
+                User ${user.id} requested flashcard $id 
+                doesn't belong to the requested set $setId
+                """.trimOneLine()
             )
         }
     }

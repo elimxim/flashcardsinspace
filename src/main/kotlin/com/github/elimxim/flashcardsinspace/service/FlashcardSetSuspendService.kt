@@ -8,9 +8,9 @@ import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetSuspendResponse
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetUpdateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ValidFlashcardSetUpdateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
-import com.github.elimxim.flashcardsinspace.web.exception.CorruptedChronoStateException
-import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetAlreadySuspendedException
-import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetCannotBeSuspendedException
+import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
+import com.github.elimxim.flashcardsinspace.web.exception.HttpBadRequestException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpInternalServerErrorException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -36,11 +36,11 @@ class FlashcardSetSuspendService(
         val flashcardSet = flashcardSetService.getEntity(id)
 
         if (flashcardSet.isSuspended()) {
-            throw FlashcardSetAlreadySuspendedException("Flashcard set $id is already suspended")
+            throw HttpBadRequestException(ApiErrorCode.FAS400, "Flashcard set $id is already suspended")
         }
 
         val lastChronoday = flashcardSet.lastChronoday()
-            ?: throw FlashcardSetCannotBeSuspendedException("Flashcard set $id has no chronodays")
+            ?: throw HttpBadRequestException(ApiErrorCode.FNC400, "Flashcard set $id has no chronodays")
 
         flashcardSetService.mergeFlashcardSet(flashcardSet, request)
         flashcardSet.status = FlashcardSetStatus.SUSPENDED
@@ -56,7 +56,8 @@ class FlashcardSetSuspendService(
             schedule.first()
         } else {
             schedule.find { it.chronodate.isEqual(lastChronoday.chronodate) }
-                ?: throw CorruptedChronoStateException(
+                ?: throw HttpInternalServerErrorException(
+                    ApiErrorCode.LCF500,
                     """
                     Can't find last chrono day ${lastChronoday.chronodate}
                     in schedule for flashcard set ${flashcardSet.id}

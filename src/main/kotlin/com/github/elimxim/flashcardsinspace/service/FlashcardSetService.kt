@@ -6,10 +6,10 @@ import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetReposi
 import com.github.elimxim.flashcardsinspace.entity.repository.ReviewSessionRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.*
-import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetNotFoundException
-import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetNotStartedException
-import com.github.elimxim.flashcardsinspace.web.exception.FlashcardSetSuspendedException
-import com.github.elimxim.flashcardsinspace.web.exception.UserOperationNotAllowedException
+import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
+import com.github.elimxim.flashcardsinspace.web.exception.HttpBadRequestException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpForbiddenException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpNotFoundException
 import jakarta.persistence.EntityManager
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -142,13 +142,13 @@ class FlashcardSetService(
     @Transactional
     fun getEntity(id: Long): FlashcardSet =
         flashcardSetRepository.findById(id).orElseThrow {
-            FlashcardSetNotFoundException("Flashcard set with id $id not found")
+            HttpNotFoundException(ApiErrorCode.FSE404, "Flashcard set with id $id not found")
         }
 
     @Transactional
     fun verifyUserHasAccess(user: User, id: Long) {
         if (getEntity(id).user.id != user.id) {
-            throw UserOperationNotAllowedException("User ${user.id} does not have access to flashcard set $id")
+            throw HttpForbiddenException(ApiErrorCode.FSU403, "User ${user.id} does not have access to flashcard set $id")
         }
     }
 
@@ -156,7 +156,7 @@ class FlashcardSetService(
     fun verifyInitialized(id: Long) {
         val flashcardSet = getEntity(id)
         if (flashcardSet.chronodays.isEmpty()) {
-            throw FlashcardSetNotStartedException("Flashcard set $id is not started")
+            throw HttpBadRequestException(ApiErrorCode.FSI400,"Flashcard set $id is not started")
         }
     }
 
@@ -164,7 +164,7 @@ class FlashcardSetService(
     fun verifyNotSuspended(id: Long) {
         val flashcardSet = getEntity(id)
         if (flashcardSet.isSuspended()) {
-            throw FlashcardSetSuspendedException("Flashcard set $id is suspended")
+            throw HttpBadRequestException(ApiErrorCode.FSS400, "Flashcard set $id is suspended")
         }
     }
 }
