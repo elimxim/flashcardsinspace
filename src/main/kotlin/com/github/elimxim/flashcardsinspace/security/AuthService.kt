@@ -8,9 +8,10 @@ import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
 import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ValidLoginRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ValidSignUpRequest
-import com.github.elimxim.flashcardsinspace.web.exception.AuthenticationFailedException
-import com.github.elimxim.flashcardsinspace.web.exception.EmailIsAlreadyTakenException
-import com.github.elimxim.flashcardsinspace.web.exception.UserNotFoundException
+import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
+import com.github.elimxim.flashcardsinspace.web.exception.HttpConflictException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpNotFoundException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpUnauthorizedException
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -41,8 +42,9 @@ class AuthService(
     fun signUp(request: ValidSignUpRequest): User {
         if (userRepository.findByEmail(request.email).isPresent) {
             log.info("Email ${maskSecret(request.email)} is already taken")
-            throw EmailIsAlreadyTakenException(
-                "Email ${maskSecret(request.email)} is already exists"
+            throw HttpConflictException(
+                ApiErrorCode.EAT409,
+                "Email ${maskSecret(request.email)} is already taken"
             )
         }
 
@@ -76,13 +78,13 @@ class AuthService(
             val token = UsernamePasswordAuthenticationToken(request.email, request.secret.unmasked())
             authenticationManager.authenticate(token)
         } catch (e: Exception) {
-            throw AuthenticationFailedException(
-                "Failed to authenticate user: ${maskSecret(request.email.escapeJava())}", e
+            throw HttpUnauthorizedException(
+                ApiErrorCode.AUF401, "Failed to authenticate user: ${maskSecret(request.email.escapeJava())}", e
             )
         }
 
         val user = userRepository.findByEmail(request.email).orElseThrow {
-            UserNotFoundException("User not found: ${maskSecret(request.email.escapeJava())}")
+            HttpNotFoundException(ApiErrorCode.USR404, "User not found: ${maskSecret(request.email.escapeJava())}")
         }
 
         user.lastLoginAt = ZonedDateTime.now()
