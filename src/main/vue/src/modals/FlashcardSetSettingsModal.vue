@@ -102,6 +102,7 @@ import { reloadFlashcardRelatedStores } from '@/utils/stores.ts'
 import { copyFlashcardSet, flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { userApiErrors } from '@/api/user-api-error.ts'
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
@@ -205,7 +206,7 @@ async function removeFlashcardSet(): Promise<boolean> {
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to remove FlashcardSet.id=${removedSet.id}`, error)
-      toaster.bakeError(`Couldn't remove flashcard set`, error.response?.data)
+      toaster.bakeError(userApiErrors.FLASHCARD_SET__REMOVING_FAILED, error.response?.data)
       return false
     })
 }
@@ -231,7 +232,7 @@ async function updateFlashcardSet(): Promise<boolean> {
         return true
       }).catch((error) => {
         Log.error(LogTag.LOGIC, `Failed to suspend FlashcardSet.id=${updatedSet.id}`, error)
-        toaster.bakeError(`Couldn't suspend flashcard set`, error.response?.data)
+        toaster.bakeError(userApiErrors.FLASHCARD_SET__SUSPENDING_FAILED, error.response?.data)
         return false
       })
   } else {
@@ -243,7 +244,7 @@ async function updateFlashcardSet(): Promise<boolean> {
       })
       .catch((error) => {
         Log.error(LogTag.LOGIC, `Failed to update FlashcardSet.id=${updatedSet.id}`, error)
-        toaster.bakeError(`Couldn't update flashcard set`, error.response?.data)
+        toaster.bakeError(userApiErrors.FLASHCARD_SET__UPDATING_FAILED, error.response?.data)
         return false
       })
   }

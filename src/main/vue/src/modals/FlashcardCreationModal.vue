@@ -98,6 +98,7 @@ import {
 } from '@/api/api-client.ts'
 import { Flashcard } from '@/model/flashcard.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { userApiErrors } from '@/api/user-api-error.ts'
 
 const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
@@ -201,7 +202,7 @@ async function addNewFlashcard(): Promise<boolean> {
       })
       .catch((error) => {
         Log.error(LogTag.LOGIC, `Failed to add a flashcard to FlashcardSet.id=${setId}`, error.response?.data)
-        toaster.bakeError(`Couldn't add a flashcard`, error.response?.data)
+        toaster.bakeError(userApiErrors.FLASHCARD__CREATION_FAILED, error.response?.data)
         return false
       })
   } else {
@@ -226,7 +227,7 @@ async function addNewFlashcard(): Promise<boolean> {
       })
       .catch((error) => {
         Log.error(LogTag.LOGIC, `Failed to init FlashcardSet.id=${setId}`, error.response?.data)
-        toaster.bakeError(`Couldn't add a flashcard`, error.response?.data)
+        toaster.bakeError(userApiErrors.FLASHCARD__CREATION_FAILED, error.response?.data)
         return false
       })
   }

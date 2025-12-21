@@ -88,6 +88,7 @@ import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useAuthStore, UserRole } from '@/stores/auth-store.ts'
 import { parseLocalDate } from '@/utils/utils.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { userApiErrors } from '@/api/user-api-error.ts'
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
@@ -192,7 +193,7 @@ async function goPrevDay() {
     })
     .catch((error) => {
       Log.log(LogTag.LOGIC, 'Failed to sync prev day:', error)
-      toaster.bakeError(`Couldn't go to prev day`, error.response?.data)
+      toaster.bakeError(userApiErrors.SCHEDULE__PREV_FAILED, error.response?.data)
     })
 }
 
@@ -210,7 +211,7 @@ async function goNextDay() {
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, 'Failed to sync next day:', error)
-      toaster.bakeError(`Couldn't go to next day`, error.response?.data)
+      toaster.bakeError(userApiErrors.SCHEDULE__NEXT_FAILED, error.response?.data)
     })
 }
 

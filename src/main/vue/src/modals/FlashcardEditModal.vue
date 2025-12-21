@@ -97,6 +97,7 @@ import {
   sendFlashcardUpdateRequest,
 } from '@/api/api-client.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { userApiErrors } from '@/api/user-api-error.ts'
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const removed = defineModel<boolean>('removed', { default: false })
@@ -325,7 +326,7 @@ async function removeFlashcard(): Promise<boolean> {
       toaster.bakeSuccess('Success', 'Flashcard removed', 200)
       return true
     }).catch((error) => {
-      toaster.bakeError('System error', error.response?.data)
+      toaster.bakeError(userApiErrors.FLASHCARD__REMOVING_FAILED, error.response?.data)
       return false
     })
 }
@@ -344,7 +345,7 @@ async function updateFlashcard(): Promise<boolean> {
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to update Flashcard.id=${updatedFlashcard.id}`, error.response?.data)
-      toaster.bakeError(`Couldn't change a flashcard`, error.response?.data)
+      toaster.bakeError(userApiErrors.FLASHCARD__UPDATING_FAILED, error.response?.data)
       return false
     })
 }
