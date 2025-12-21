@@ -113,6 +113,7 @@ import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { userApiErrors } from '@/api/user-api-error.ts'
 
 const authStore = useAuthStore()
 const languageStore = useLanguageStore()
@@ -198,7 +199,7 @@ async function save() {
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, 'Failed to save user info: ', error)
-      toaster.bakeError(`Couldn't update user info`, error.response?.data)
+      toaster.bakeError(userApiErrors.USER__UPDATING_FAILED, error.response?.data)
     })
 }
 
