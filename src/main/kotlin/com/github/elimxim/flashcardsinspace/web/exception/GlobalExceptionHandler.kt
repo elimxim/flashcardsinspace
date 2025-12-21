@@ -2,7 +2,6 @@ package com.github.elimxim.flashcardsinspace.web.exception
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.github.elimxim.flashcardsinspace.Messages
 import com.github.elimxim.flashcardsinspace.util.getErrorCode
 import com.github.elimxim.flashcardsinspace.util.getHttpStatus
 import com.github.elimxim.flashcardsinspace.util.printApplicationStackTrace
@@ -19,7 +18,7 @@ import java.time.LocalDateTime
 private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
 @ControllerAdvice
-class GlobalExceptionHandler(private val messages: Messages) {
+class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException::class)
     fun handleNoResourceFoundException(e: NoResourceFoundException, request: WebRequest): ResponseEntity<Any> =
         withLoggingContext {
@@ -32,7 +31,7 @@ class GlobalExceptionHandler(private val messages: Messages) {
         withLoggingContext {
             log.error("UNEXPECTED exception occurred: ${e.message}", e)
             e.printApplicationStackTrace()
-            val body = errorBody(
+            val body = buildErrorBody(
                 status = HttpStatus.INTERNAL_SERVER_ERROR,
                 exception = UnexpectedException("Unexpected error occurred", e)
             )
@@ -40,27 +39,13 @@ class GlobalExceptionHandler(private val messages: Messages) {
             ResponseEntity(body, body.httpStatus)
         }
 
-    @ExceptionHandler(Http5xxException::class)
-    fun handle5xxException(e: Http5xxException, request: WebRequest): ResponseEntity<ErrorResponseBody> =
-        withLoggingContext {
-            val httpStatus = getHttpStatus(e)
-            log.error("${httpStatus.name} exception occurred: ${e.message}", e)
-            e.printApplicationStackTrace()
-            val body = errorBody(
-                status = httpStatus,
-                exception = e,
-            )
-
-            ResponseEntity(body, httpStatus)
-        }
-
-    @ExceptionHandler(Http4xxException::class)
-    fun handle4xxException(e: Http4xxException, request: WebRequest): ResponseEntity<ErrorResponseBody> =
+    @ExceptionHandler(HttpException::class)
+    fun handleHttpException(e: HttpException, request: WebRequest): ResponseEntity<ErrorResponseBody> =
         withLoggingContext {
             val httpStatus = getHttpStatus(e)
             log.info("${httpStatus.name} exception occurred: ${e.message}", e.cause)
             e.printApplicationStackTrace()
-            val body = errorBody(
+            val body = buildErrorBody(
                 status = httpStatus,
                 exception = e,
             )
@@ -68,19 +53,19 @@ class GlobalExceptionHandler(private val messages: Messages) {
             ResponseEntity(body, httpStatus)
         }
 
-    private fun errorBody(
-        status: HttpStatus,
-        exception: HttpException,
-    ): ErrorResponseBody {
-        return ErrorResponseBody(
-            timestamp = LocalDateTime.now(),
-            httpStatus = status,
-            statusCode = status.value(),
-            statusError = status.reasonPhrase,
-            errorCode = getErrorCode(exception),
-        )
-    }
+}
 
+private fun buildErrorBody(
+    status: HttpStatus,
+    exception: HttpException,
+): ErrorResponseBody {
+    return ErrorResponseBody(
+        timestamp = LocalDateTime.now(),
+        httpStatus = status,
+        statusCode = status.value(),
+        statusError = status.reasonPhrase,
+        errorCode = getErrorCode(exception),
+    )
 }
 
 data class ErrorResponseBody(
