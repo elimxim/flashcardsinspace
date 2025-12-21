@@ -49,7 +49,11 @@ class FlashcardAudioController(
         @RequestParam side: String,
     ): ResponseEntity<ByteArray> = withLoggingContext(user) {
         val audio = flashcardAudioService.fetchAudio(user, setId, flashcardId, side.normalize().escapeJava())
-        return fetchAudioResponseEntity(audio)
+        return if (audio != null) {
+            fetchAudioResponseEntity(audio)
+        } else {
+            ResponseEntity.noContent().build()
+        }
     }
 
 
