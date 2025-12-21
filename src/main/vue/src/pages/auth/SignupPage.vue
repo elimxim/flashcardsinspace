@@ -130,6 +130,7 @@ import { sendSignupRequest } from '@/api/auth-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { saveUserSignedUpToCookies } from '@/utils/cookies.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { userApiErrors } from '@/api/user-api-error.ts'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -264,9 +265,9 @@ async function signup() {
     signupFailed.value = true
 
     if (error.response?.status === 400) {
-      toaster.bakeError('Anomaly detected', error.response?.data)
+      toaster.bakeError(userApiErrors.AUTH_BAD_DATA, error.response?.data)
     } else {
-      toaster.bakeError('System error', error.response?.data)
+      toaster.bakeError(userApiErrors.AUTH_FAILED, error.response?.data)
     }
 
     Log.error(LogTag.LOGIC, 'Failed to sign up: ', error)
