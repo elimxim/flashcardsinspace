@@ -209,6 +209,7 @@ import {
 import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { quizSessionIdCookie } from '@/utils/cookies-ref.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { userApiErrors } from '@/api/user-api-error.ts'
 
 const props = defineProps<{
   sessionType?: string,
@@ -319,8 +320,7 @@ async function loadOrCreateQuizSession() {
   }
 }
 
-async function finishReview() {
-  Log.log(LogTag.LOGIC, `Finishing review: ${JSON.stringify(reviewMode.value)}`)
+function resetState() {
   stopWatch()
   reviewQueue.value = new EmptyReviewQueue()
   reviewSessionId.value = undefined
@@ -333,12 +333,17 @@ async function finishReview() {
   autoRepeatVoice.value = false
   quizOverallTotal.value = 0
   quizOverallCorrect.value = 0
+}
+
+async function finishReview() {
+  Log.log(LogTag.LOGIC, `Finishing review: ${JSON.stringify(reviewMode.value)}`)
+  resetState()
   if (flashcardSet.value) {
     if (noNextAvailable.value && reviewMode.value.isLightspeed()) {
       await markDaysAsCompleted(flashcardSet.value)
     }
   } else {
-    Log.error(LogTag.LOGIC, `Can't gracefully finish review: FlashcardSet is undefined`)
+    Log.error(LogTag.LOGIC, 'Couldn\'t gracefully finish review: FlashcardSet is undefined')
   }
 }
 
@@ -417,7 +422,7 @@ async function startNextQuizRound() {
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to create child review session`, error.response?.data)
-      toaster.bakeError(`Couldn't start a new round`, error.response?.data)
+      toaster.bakeError(userApiErrors.QUIZ_SESSION__NEXT_ROUND_FAILED, error.response?.data)
     })
 }
 
@@ -459,7 +464,7 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to update Flashcard.id=${flashcard.id}`, error.response?.data)
-      toaster.bakeError(`Couldn't move a flashcard`, error.response?.data)
+      toaster.bakeError(userApiErrors.FLASHCARD__PROGRESSION_FAILED, error.response?.data)
       return false
     })
 }
@@ -507,7 +512,7 @@ async function markDaysAs(
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to mark days as ${status} for FlashcardSet.id=${flashcardSetId}`, error.response?.data)
-      toaster.bakeError(`Couldn't move a flashcard`, error.response?.data)
+      toaster.bakeError(userApiErrors.SCHEDULE__UPDATING_FAILED, error.response?.data)
     })
 }
 
@@ -564,7 +569,7 @@ async function createReviewSession(quiz: boolean = false) {
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to create a review session`, error.response?.data)
-      toaster.bakeError(`Couldn't start a review session`, error.response?.data)
+      toaster.bakeError(userApiErrors.REVIEW_SESSION__CREATION_FAILED, error.response?.data)
     })
 }
 
@@ -590,7 +595,9 @@ async function loadQuizSession(sessionId: number) {
       Log.log(LogTag.LOGIC, `Review session ${reviewSessionId.value} retrieved`)
     })
     .catch((error) => {
+      resetState()
       Log.error(LogTag.LOGIC, `Failed to retrieve review session ${sessionId}`, error.response?.data)
+      toaster.bakeError(userApiErrors.REVIEW_SESSION__FETCHING_FAILED, error.response?.data)
     })
 }
 
@@ -606,6 +613,7 @@ async function updateReviewSession(flashcardIds: number[], finished: boolean = f
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to updated review session ${reviewSessionId.value}`, error.response?.data)
+      toaster.bakeError(userApiErrors.REVIEW_SESSION__UPDATING_FAILED, error.response?.data)
     })
 }
 
@@ -625,6 +633,7 @@ async function updateQuizSession(reviewedFlashcardIds: number[], nextRoundFlashc
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to update review session ${reviewSessionId.value}`, error.response?.data)
+      toaster.bakeError(userApiErrors.REVIEW_SESSION__UPDATING_FAILED, error.response?.data)
     })
 }
 
