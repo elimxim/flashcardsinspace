@@ -5,7 +5,8 @@ import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
 import com.github.elimxim.flashcardsinspace.schedule.LightspeedSchedule
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
-import com.github.elimxim.flashcardsinspace.web.exception.CorruptedChronoStateException
+import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
+import com.github.elimxim.flashcardsinspace.web.exception.HttpInternalServerErrorException
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 
@@ -67,7 +68,8 @@ class LightspeedService {
 
             if (chronoday != null) {
                 if (chronoday.chronodate.isEqual(prevChronoday?.chronodate)) {
-                    throw CorruptedChronoStateException(
+                    throw HttpInternalServerErrorException(
+                        ApiErrorCode.DCD500,
                         """
                         Duplicated dates ${chronoday.chronodate} were detected
                         in flashcard set with id=${chronoday.flashcardSet.id}

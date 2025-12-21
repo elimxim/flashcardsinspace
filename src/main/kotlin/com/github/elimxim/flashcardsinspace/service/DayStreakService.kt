@@ -2,7 +2,8 @@ package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
-import com.github.elimxim.flashcardsinspace.web.exception.CorruptedChronoStateException
+import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
+import com.github.elimxim.flashcardsinspace.web.exception.HttpInternalServerErrorException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -159,7 +160,7 @@ class DayStreakService {
     private fun getChronoIndex(day: Chronoday, chronodays: List<Chronoday>): Int {
         val idx = chronodays.indexOfFirst { it.id == day.id }
         if (idx == -1) {
-            throw CorruptedChronoStateException("Chronoday ${day.id} not found in chronodays")
+            throw HttpInternalServerErrorException(ApiErrorCode.CNF500, "Chronoday ${day.id} not found in chronodays")
         }
         return idx
     }

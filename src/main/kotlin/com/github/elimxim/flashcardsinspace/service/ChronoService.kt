@@ -6,7 +6,10 @@ import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetReposi
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
 import com.github.elimxim.flashcardsinspace.web.dto.*
-import com.github.elimxim.flashcardsinspace.web.exception.*
+import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
+import com.github.elimxim.flashcardsinspace.web.exception.HttpBadRequestException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpInternalServerErrorException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -44,7 +47,8 @@ class ChronoService(
         if (flashcardSet.chronodays.isEmpty()) {
             val schedule = lightspeedService.createSchedule(startDatetime = clientDatetime)
             val currDay = schedule.find { it.chronodate.isEqual(currDate) }
-                ?: throw CorruptedChronoStateException(
+                ?: throw HttpInternalServerErrorException(
+                    ApiErrorCode.CCF500,
                     "Can't find current day $currDate in schedule"
                 )
             return ChronoSyncResponse(
@@ -96,10 +100,10 @@ class ChronoService(
         val flashcardSet = flashcardSetService.getEntity(setId)
 
         val lastChronoday = flashcardSet.lastChronoday()
-            ?: throw FlashcardSetNotStartedException("Flashcard set $setId is not started")
+            ?: throw HttpBadRequestException(ApiErrorCode.FSI400, "Flashcard set $setId is not started")
 
         if (flashcardSet.flashcards.isEmpty()) {
-            throw FlashcardSetNotStartedException("Flashcard set $setId has no flashcards")
+            throw HttpBadRequestException(ApiErrorCode.FNC400, "Flashcard set $setId has no flashcards")
         }
 
         when (day) {
@@ -112,24 +116,27 @@ class ChronoService(
 
                 flashcardSet.chronodays.add(chronoday)
             }
+
             ChronoSyncDay.PREV -> {
                 val hasReviews = flashcardSet.flashcards.any {
                     it.lastReviewDate != null && !lastChronoday.chronodate.isAfter(it.lastReviewDate)
                 }
 
                 if (hasReviews) {
-                    throw ChronodayHasReviewsException(
+                    throw HttpBadRequestException(
+                        ApiErrorCode.CDU400,
                         """
-                    Can't remove last chronoday ${lastChronoday.id} from 
-                    flashcard set $setId with flashcards get reviewed on this date
-                    """.trimOneLine()
+                        Can't remove last chronoday ${lastChronoday.id} from 
+                        flashcard set $setId with flashcards get reviewed on this date
+                        """.trimOneLine()
                     )
                 } else if (lastChronoday.status == ChronodayStatus.OFF) {
-                    throw ChronodayIsDayOff(
+                    throw HttpBadRequestException(
+                        ApiErrorCode.CDO400,
                         """
-                    Can't remove last chronoday ${lastChronoday.id} from 
-                    flashcard set $setId with status ${lastChronoday.status}
-                    """.trimOneLine()
+                        Can't remove last chronoday ${lastChronoday.id} from 
+                        flashcard set $setId with status ${lastChronoday.status}
+                        """.trimOneLine()
                     )
                 }
 
@@ -188,7 +195,7 @@ class ChronoService(
     @Transactional
     fun getEntity(id: Long): Chronoday {
         return chronodayRepository.findById(id).orElseThrow {
-            throw ChronodayNotFoundException("Chronoday $id not found")
+            throw HttpNotFoundException(ApiErrorCode.CHR404, "Chronoday $id not found")
         }
     }
 
@@ -196,11 +203,12 @@ class ChronoService(
         val schedule = lightspeedService.createSchedule(flashcardSet.chronodays)
         val lastChronoDate = flashcardSet.lastChronoday()?.chronodate
         val currDay = schedule.find { it.chronodate.isEqual(lastChronoDate) }
-            ?: throw CorruptedChronoStateException(
+            ?: throw HttpInternalServerErrorException(
+                ApiErrorCode.LCF500,
                 """
-                    Can't find last chrono day $lastChronoDate
-                    in schedule for flashcard set ${flashcardSet.id}
-                    """.trimOneLine()
+                Can't find last chrono day $lastChronoDate
+                in schedule for flashcard set ${flashcardSet.id}
+                """.trimOneLine()
             )
         return currDay to schedule
     }
