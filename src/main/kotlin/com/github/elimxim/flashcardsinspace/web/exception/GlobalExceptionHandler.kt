@@ -3,7 +3,6 @@ package com.github.elimxim.flashcardsinspace.web.exception
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.elimxim.flashcardsinspace.Messages
-import com.github.elimxim.flashcardsinspace.security.escapeHtml
 import com.github.elimxim.flashcardsinspace.util.getErrorCode
 import com.github.elimxim.flashcardsinspace.util.getHttpStatus
 import com.github.elimxim.flashcardsinspace.util.printApplicationStackTrace
@@ -79,7 +78,6 @@ class GlobalExceptionHandler(private val messages: Messages) {
             statusCode = status.value(),
             statusError = status.reasonPhrase,
             errorCode = getErrorCode(exception),
-            message = messages.getMessage(exception)?.escapeHtml(),
         )
     }
 
@@ -93,5 +91,4 @@ data class ErrorResponseBody(
     val statusCode: Int,
     val statusError: String,
     val errorCode: String,
-    val message: String?,
 )

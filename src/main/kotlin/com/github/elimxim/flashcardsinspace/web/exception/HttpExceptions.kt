@@ -4,7 +4,6 @@ import org.springframework.http.HttpStatus
 
 annotation class ExceptionHttpStatus(val value: HttpStatus)
 annotation class ErrorCode(val value: String)
-annotation class UserMessageCode(val value: String)
 
 sealed class HttpException(val args: List<Any>, msg: String, cause: Exception?) : Exception(msg, cause)
 sealed class Http4xxException(args: List<Any>, msg: String, cause: Exception?) : HttpException(args, msg, cause)
@@ -38,103 +37,79 @@ sealed class InternalServerErrorException(
 // 400 - BAD REQUEST
 
 @ErrorCode("IRF400")
-@UserMessageCode("user.message.error.request.fields.invalid")
 class InvalidRequestFieldsException(msg: String, val fields: List<String>) : BadRequestException(msg)
 
 @ErrorCode("IRE400")
-@UserMessageCode("user.message.error.request.fields.invalid")
 class InvalidRequestException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("FSN400")
-@UserMessageCode("user.message.error.flashcardSet.notFound")
 class FlashcardSetNotFoundException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("FCN400")
-@UserMessageCode("user.message.error.flashcard.notFound")
 class FlashcardNotFoundException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("LNF400")
-@UserMessageCode("user.message.error.language.notFound")
 class LanguageNotFoundException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("CNF400")
-@UserMessageCode("user.message.error.chronoday.notFound")
 class ChronodayNotFoundException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("CSI400")
-@UserMessageCode("user.message.error.reviewSession.child.illegal")
 class ChildSessionIllegalRequestException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("FSI400")
-@UserMessageCode("user.message.error.flashcardSet.alreadyStarted")
 class FlashcardsSetAlreadyStartedException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("FSS400")
-@UserMessageCode("user.message.error.flashcardSet.suspended")
 class FlashcardSetSuspendedException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("FAS400")
-@UserMessageCode("user.message.error.flashcardSet.alreadySuspended")
 class FlashcardSetAlreadySuspendedException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("FMS400")
-@UserMessageCode("user.message.error.flashcardSet.cannotBeSuspended")
 class FlashcardSetCannotBeSuspendedException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("FNS400")
-@UserMessageCode("user.message.error.flashcardSet.notStarted")
 class FlashcardSetNotStartedException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("PI4SP6")
-@UserMessageCode("user.message.error.auth.email.alreadyTaken")
 class EmailIsAlreadyTakenException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("NRC400")
-@UserMessageCode("user.message.error.chronoday.hasReviews")
 class ChronodayHasReviewsException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("CDO400")
-@UserMessageCode("user.message.error.chronoday.isOffDay")
 class ChronodayIsDayOff(msg: String) : BadRequestException(msg)
 
 @ErrorCode("89023F")
-@UserMessageCode("user.message.error.flashcard.setId.unmatched")
 class UnmatchedFlashcardSetIdException(msg: String) : BadRequestException(msg)
 
 @ErrorCode("AUB400")
-@UserMessageCode("user.message.error.audio.uploadBusy")
 class AudioUploadBusyException(msg: String, cause: Exception? = null) : BadRequestException(msg, cause = cause)
 
 // 401 - UNAUTHORIZED
 
 @ErrorCode("AFE401")
-@UserMessageCode("user.message.error.auth.failed")
 class AuthenticationFailedException(msg: String, cause: Exception) : UnauthorizedException(msg, cause = cause)
 
 @ErrorCode("ONA401")
-@UserMessageCode("user.message.error.auth.forbidden")
 class UserOperationNotAllowedException(msg: String) : UnauthorizedException(msg)
 
 // 404 - NOT FOUND
 
 @ErrorCode("UNF404")
-@UserMessageCode("user.message.error.auth.user.notFound")
 class UserNotFoundException(msg: String) : NotFoundException(msg)
 
 @ErrorCode("ANF404")
-@UserMessageCode("user.message.error.audio.notFound")
 class AudioNotFoundException(msg: String) : NotFoundException(msg)
 
 @ErrorCode("RSN404")
-@UserMessageCode("user.message.error.reviewSession.notFound")
 class ReviewSessionNotFoundException(msg: String) : NotFoundException(msg)
 
 // 500 - INTERNAL SERVER ERROR
 
 @ErrorCode("UE0500")
-@UserMessageCode("user.message.error.unexpected")
 class UnexpectedException(msg: String, cause: Exception) : InternalServerErrorException(msg, cause = cause)
 
 @ErrorCode("CCS500")
-@UserMessageCode("user.message.error.chronodays.corrupted")
 class CorruptedChronoStateException(msg: String) : InternalServerErrorException(msg)
