@@ -6,6 +6,7 @@ import com.github.elimxim.flashcardsinspace.security.escapeJava
 import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.ReviewSessionService
 import com.github.elimxim.flashcardsinspace.service.validation.ValidReviewSessionType
+import com.github.elimxim.flashcardsinspace.util.withLoggingContext
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionCreateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionDto
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionUpdateRequest
@@ -25,7 +26,7 @@ class ReviewSessionController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @RequestBody request: ReviewSessionCreateRequest,
-    ): ResponseEntity<ReviewSessionDto> {
+    ): ResponseEntity<ReviewSessionDto> = withLoggingContext(user) {
         val dto = reviewSessionService.createReviewSession(user, setId, request.normalize())
         return ResponseEntity.ok(dto)
     }
@@ -36,7 +37,7 @@ class ReviewSessionController(
         @PathVariable setId: Long,
         @PathVariable id: Long,
         @RequestBody request: ReviewSessionUpdateRequest,
-    ): ResponseEntity<Unit> {
+    ): ResponseEntity<Unit> = withLoggingContext(user) {
         reviewSessionService.updateReviewSession(user, setId, id, request.normalize())
         return ResponseEntity.ok().build()
     }
@@ -47,7 +48,7 @@ class ReviewSessionController(
         @PathVariable setId: Long,
         @PathVariable parentId: Long,
         @RequestBody request: ReviewSessionCreateRequest,
-    ): ResponseEntity<ReviewSessionDto> {
+    ): ResponseEntity<ReviewSessionDto> = withLoggingContext(user) {
         val dto = reviewSessionService.createChildReviewSession(user, setId, parentId, request.normalize())
         return ResponseEntity.ok(dto)
     }
@@ -57,7 +58,7 @@ class ReviewSessionController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @PathVariable id: Long,
-    ): ResponseEntity<ReviewSessionDto> {
+    ): ResponseEntity<ReviewSessionDto> = withLoggingContext(user) {
         val dto = reviewSessionService.getReviewSession(user, setId, id)
         return ResponseEntity.ok(dto)
     }
@@ -67,7 +68,7 @@ class ReviewSessionController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @RequestParam @ValidReviewSessionType type: String,
-    ): ResponseEntity<ReviewSessionDto> {
+    ): ResponseEntity<ReviewSessionDto> = withLoggingContext(user) {
         val type = ReviewSessionType.valueOf(type.normalize().escapeJava())
         val dto = reviewSessionService.getLatestReviewSession(user, setId, type)
         return ResponseEntity.ok(dto)
