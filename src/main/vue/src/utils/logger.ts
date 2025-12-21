@@ -16,16 +16,18 @@ watch(loggingEnabledCookie, (newVal) => {
   saveLoggingEnabledToCookies(newVal)
 })
 
-Object.defineProperty(window, 'loggingEnabled', {
-  get() {
-    return loggingEnabledCookie.value
-  },
-  set(value: boolean) {
-    loggingEnabledCookie.value = value
-  },
-  configurable: true,
-  enumerable: true,
-})
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'loggingEnabled', {
+    get() {
+      return loggingEnabledCookie.value
+    },
+    set(value: boolean) {
+      loggingEnabledCookie.value = value
+    },
+    configurable: true,
+    enumerable: true,
+  })
+}
 
 export enum LogTag {
   DEFAULT = 'DEFAULT',
@@ -57,12 +59,12 @@ export class Log {
   }
 
   static log(tag: LogTag, message?: unknown, ...optionalParams: unknown[]) {
-    if (!window.loggingEnabled) return
+    if (typeof window === 'undefined' || !window.loggingEnabled) return
     console.log(`%c${tag}`, this.tagStyle(tag), message, optionalParams)
   }
 
   static error(tag: LogTag, message?: string, ...optionalParams: unknown[]) {
-    if (!window.loggingEnabled) return
+    if (typeof window === 'undefined' || !window.loggingEnabled) return
     console.error(`%c${tag}`, this.tagStyle(tag), message, optionalParams)
   }
 
