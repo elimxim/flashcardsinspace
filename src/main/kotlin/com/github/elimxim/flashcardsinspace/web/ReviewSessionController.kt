@@ -71,6 +71,10 @@ class ReviewSessionController(
     ): ResponseEntity<ReviewSessionDto> = withLoggingContext(user) {
         val type = ReviewSessionType.valueOf(type.normalize().escapeJava())
         val dto = reviewSessionService.getLatestReviewSession(user, setId, type)
-        return ResponseEntity.ok(dto)
+        return if (dto != null) {
+            ResponseEntity.ok(dto)
+        } else {
+            ResponseEntity.noContent().build()
+        }
     }
 }

@@ -221,6 +221,7 @@ async function getLatestUncompletedQuizSessionId(): Promise<number | undefined> 
   if (!flashcardSet.value) return undefined
   return await sendLatestReviewSessionGetRequest(flashcardSet.value.id, ReviewSessionType.QUIZ)
     .then((response) => {
+      if (response.status === 204) return undefined
       const overallTotal = response.data.metadata?.overallTotalCount ?? 0
       const overallCorrect = response.data.metadata?.overallCorrectCount ?? 0
       if (overallTotal != overallCorrect) {
@@ -228,7 +229,7 @@ async function getLatestUncompletedQuizSessionId(): Promise<number | undefined> 
       }
     })
     .catch((error) => {
-      console.info(`There is no latest review session`, error.response?.data)
+      console.error(`Failed to fetch latest quiz session`, error.response?.data)
       return undefined
     })
 }

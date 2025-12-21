@@ -136,12 +136,13 @@ class ReviewSessionService(
     }
 
     @Transactional
-    fun getLatestReviewSession(user: User, setId: Long, type: ReviewSessionType): ReviewSessionDto {
+    fun getLatestReviewSession(user: User, setId: Long, type: ReviewSessionType): ReviewSessionDto? {
         log.info("Getting latest review session for set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
-        return reviewSessionRepository.findTopByFlashcardSetIdAndTypeOrderByStartedAtDesc(setId, type)
-            .orElseThrow { ReviewSessionNotFoundException("No review session found for set $setId") }
-            .toDto()
+        return reviewSessionRepository
+            .findTopByFlashcardSetIdAndTypeOrderByStartedAtDesc(setId, type)
+            .map { it.toDto() }
+            .orElse(null)
     }
 
     @Transactional
