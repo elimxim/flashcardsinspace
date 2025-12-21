@@ -61,10 +61,6 @@ class LanguageNotFoundException(msg: String) : BadRequestException(msg)
 @UserMessageCode("user.message.error.chronoday.notFound")
 class ChronodayNotFoundException(msg: String) : BadRequestException(msg)
 
-@ErrorCode("RSN400")
-@UserMessageCode("user.message.error.reviewSession.notFound")
-class ReviewSessionNotFoundException(msg: String) : BadRequestException(msg)
-
 @ErrorCode("CSI400")
 @UserMessageCode("user.message.error.reviewSession.child.illegal")
 class ChildSessionIllegalRequestException(msg: String) : BadRequestException(msg)
@@ -128,6 +124,10 @@ class UserNotFoundException(msg: String) : NotFoundException(msg)
 @ErrorCode("ANF404")
 @UserMessageCode("user.message.error.audio.notFound")
 class AudioNotFoundException(msg: String) : NotFoundException(msg)
+
+@ErrorCode("RSN404")
+@UserMessageCode("user.message.error.reviewSession.notFound")
+class ReviewSessionNotFoundException(msg: String) : NotFoundException(msg)
 
 // 500 - INTERNAL SERVER ERROR
 
