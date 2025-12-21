@@ -153,7 +153,7 @@ export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId
   )
 }
 
-export async function sendFlashcardAudioFetchRequest(setId: number, flashcardId: number, side: string) {
+export async function sendFlashcardAudioGetRequest(setId: number, flashcardId: number, side: string) {
   Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio?side=${side}`)
   return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio`, {
     responseType: 'blob',

@@ -7,7 +7,7 @@ import {
 import { type Stage, learningStages } from '@/core-logic/stage-logic.ts'
 import type { Language } from '@/model/language.ts'
 import {
-  sendFlashcardAudioFetchRequest,
+  sendFlashcardAudioGetRequest,
   sendFlashcardAudioRemovalRequest,
   sendFlashcardAudioUploadRequest
 } from '@/api/api-client.ts'
@@ -123,8 +123,9 @@ export async function fetchFlashcardAudioBlob(
     return cachedAudio
   }
 
-  return await sendFlashcardAudioFetchRequest(flashcardSetId, flashcardId, getFlashcardSide(isFrontSide))
+  return await sendFlashcardAudioGetRequest(flashcardSetId, flashcardId, getFlashcardSide(isFrontSide))
     .then((response) => {
+      if (response.status === 204) return undefined
       const audioId = Number(response.headers['x-audio-id'])
       audioStore.setAudioId(flashcardId, getFlashcardSide(isFrontSide), audioId)
       audioCache.addAudio(flashcardId, response.data, isFrontSide)
