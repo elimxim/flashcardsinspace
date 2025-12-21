@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ErrorResponseBody } from '@/api/communication.ts'
+import { UserApiError } from '@/api/user-api-error.ts'
 
 export enum ToastType {
   SUCCESS = 'success',
@@ -38,11 +39,11 @@ export const useSpaceToaster = defineStore('space-toaster', {
     }
   },
   actions: {
-    bakeError(title: string, error: ErrorResponseBody | undefined) {
+    bakeError(apiError: UserApiError, error: ErrorResponseBody | undefined) {
       const toast: Toast = {
         type: ToastType.ERROR,
-        title: title,
-        message: error?.message,
+        title: apiError.title,
+        message: apiError.message,
         footer: error?.errorCode,
         duration: 4000,
       }
