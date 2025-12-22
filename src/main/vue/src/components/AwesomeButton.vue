@@ -195,6 +195,7 @@ defineExpose({
   padding: var(--a-btn--padding);
   transition: all 0.3s ease-in-out;
   overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (hover: hover) {

@@ -256,6 +256,7 @@ onUnmounted(() => toaster.reset())
   opacity: 1;
   background: transparent;
   border: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (hover: hover) {

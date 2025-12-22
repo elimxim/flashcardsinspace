@@ -190,6 +190,7 @@ onUnmounted(() => {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease-in-out;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .sidebar-overlay--visible {
@@ -287,6 +288,7 @@ onUnmounted(() => {
   border-radius: 6px;
   box-shadow: 2px 2px 3px var(--bar--item--shadow-color);
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .sidebar-item:hover {

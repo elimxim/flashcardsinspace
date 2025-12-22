@@ -206,6 +206,7 @@ function handleGlobalMouseUp() {
   transition: width 0.05s linear;
   z-index: -1;
   overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .smart-button-title {

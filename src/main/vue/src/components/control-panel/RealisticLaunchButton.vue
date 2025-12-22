@@ -100,6 +100,7 @@ function createRipple(event: MouseEvent) {
   background: radial-gradient(80% 60% at 50% 40%, var(--r-launch--bg-color--from), var(--r-launch--bg-color--via) 90%);
   box-shadow: 0 2px 4px var(--r-launch--shadow-color);
   transition: transform .12s ease, filter .25s ease, box-shadow .25s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .launch-button:not(.disabled):active {

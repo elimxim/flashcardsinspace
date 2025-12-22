@@ -204,13 +204,12 @@ async function scrollHighlightedOptionIntoView() {
   cursor: pointer;
   color: var(--drop-down--color);
   transition: background-color 0.1s ease-in-out;
+  -webkit-tap-highlight-color: transparent;
 }
 
-@media (hover: hover) {
-  .drop-down li:hover,
-  .drop-down li.highlighted {
-    background-color: var(--drop-down--bg-color--hover);
-  }
+.drop-down li:hover,
+.drop-down li.highlighted {
+  background-color: var(--drop-down--bg-color--hover);
 }
 
 .drop-down::-webkit-scrollbar {

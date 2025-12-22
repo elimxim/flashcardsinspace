@@ -272,6 +272,7 @@ defineExpose({
   transform-style: preserve-3d;
   perspective: 1000px;
   z-index: 10;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .space-card--flipped .space-card-flipper {

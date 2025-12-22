@@ -206,6 +206,7 @@ onUnmounted(() => {
   color: var(--nav--text--color);
   cursor: pointer;
   transition: color 0.3s ease-in-out;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (hover: hover) {
