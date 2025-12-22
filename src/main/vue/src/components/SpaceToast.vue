@@ -258,9 +258,11 @@ onUnmounted(() => toaster.reset())
   border: none;
 }
 
-.space-toast__content__button:hover {
-  color: var(--button--hover--color);
-  background: var(--button--hover--bg);
+@media (hover: hover) {
+  .space-toast__content__button:hover {
+    color: var(--button--hover--color);
+    background: var(--button--hover--bg);
+  }
 }
 
 .space-toast__footer {

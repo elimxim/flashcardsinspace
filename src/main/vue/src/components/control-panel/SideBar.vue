@@ -267,8 +267,10 @@ onUnmounted(() => {
   border-radius: 0;
 }
 
-.sidebar-content--scrollable::-webkit-scrollbar-thumb:hover {
-  background: var(--bar--scrollbar--thumb-color--hover);
+@media (hover: hover) {
+  .sidebar-content--scrollable::-webkit-scrollbar-thumb:hover {
+    background: var(--bar--scrollbar--thumb-color--hover);
+  }
 }
 
 .sidebar-content--scrollable::-webkit-scrollbar-thumb:active {

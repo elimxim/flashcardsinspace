@@ -208,8 +208,10 @@ onUnmounted(() => {
   transition: color 0.3s ease-in-out;
 }
 
-.nav-text:hover {
-  color: var(--nav--text--color--hover);
+@media (hover: hover) {
+  .nav-text:hover {
+    color: var(--nav--text--color--hover);
+  }
 }
 
 .nav-text--title {
@@ -224,8 +226,10 @@ onUnmounted(() => {
   transition: background 0.3s ease-in-out;
 }
 
-.nav-text--item:hover {
-  background: rgba(250, 249, 246, 0.15);
+@media (hover: hover) {
+  .nav-text--item:hover {
+    background: rgba(250, 249, 246, 0.15);
+  }
 }
 
 .logo-container {

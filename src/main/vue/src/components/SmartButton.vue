@@ -17,7 +17,7 @@
     @mouseleave="onMouseLeave"
     @touchstart.prevent="onTouchStart"
     @touchend="onTouchEnd"
-    @click="click"
+    @click.stop="click"
   >
     <span class="smart-button-title">
       {{ text }}

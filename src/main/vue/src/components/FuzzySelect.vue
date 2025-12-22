@@ -206,9 +206,11 @@ async function scrollHighlightedOptionIntoView() {
   transition: background-color 0.1s ease-in-out;
 }
 
-.drop-down li:hover,
-.drop-down li.highlighted {
-  background-color: var(--drop-down--bg-color--hover);
+@media (hover: hover) {
+  .drop-down li:hover,
+  .drop-down li.highlighted {
+    background-color: var(--drop-down--bg-color--hover);
+  }
 }
 
 .drop-down::-webkit-scrollbar {
@@ -224,7 +226,9 @@ async function scrollHighlightedOptionIntoView() {
   border-radius: 4px;
 }
 
-.drop-down::-webkit-scrollbar-thumb:hover {
-  background-color: var(--scrollbar--color--hover);
+@media (hover: hover) {
+  .drop-down::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar--color--hover);
+  }
 }
 </style>

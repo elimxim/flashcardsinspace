@@ -197,9 +197,11 @@ defineExpose({
   overflow: hidden;
 }
 
-.awesome-button:not(.awesome-button--disabled):not(.awesome-button--active):hover {
-  color: var(--a-btn--icon--color--hover);
-  background: var(--a-btn--bg--hover);
+@media (hover: hover) {
+  .awesome-button:not(.awesome-button--disabled):not(.awesome-button--active):hover {
+    color: var(--a-btn--icon--color--hover);
+    background: var(--a-btn--bg--hover);
+  }
 }
 
 .awesome-button--disabled {
@@ -262,8 +264,10 @@ defineExpose({
   }
 }
 
-.awesome-button-wrapper:has(.awesome-button:not(.awesome-button--disabled):hover) .awesome-icon-wrapper {
-  transform: scale(v-bind(scaleFactor));
+@media (hover: hover) {
+  .awesome-button-wrapper:has(.awesome-button:not(.awesome-button--disabled):hover) .awesome-icon-wrapper {
+    transform: scale(v-bind(scaleFactor));
+  }
 }
 
 .awesome-button--click-ripple::before {

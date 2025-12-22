@@ -320,18 +320,10 @@ onUnmounted(() => {
   transition: all 0.3s ease;
 }
 
-.action-button:hover {
-  transform: translateY(-2px);
-}
-
 .action-button--signup {
   --smart-button--bg: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
   --smart-button--bg--hover: linear-gradient(135deg, #8b5cf6 0%, #c084fc 100%);
   box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
-}
-
-.action-button--signup:hover {
-  box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
 }
 
 .action-button--login {
@@ -340,8 +332,18 @@ onUnmounted(() => {
   box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
 }
 
-.action-button--login:hover {
-  box-shadow: 0 8px 30px rgba(58, 121, 237, 0.4);
+@media (hover: hover) {
+  .action-button:hover {
+    transform: translateY(-2px);
+  }
+
+  .action-button--signup:hover {
+    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
+  }
+
+  .action-button--login:hover {
+    box-shadow: 0 8px 30px rgba(58, 121, 237, 0.4);
+  }
 }
 
 .what-tagline {
@@ -549,8 +551,10 @@ onUnmounted(() => {
   align-self: center;
 }
 
-.action-button--help:hover {
-  box-shadow: 0 8px 30px rgba(58, 121, 237, 0.4);
+@media (hover: hover) {
+  .action-button--help:hover {
+    box-shadow: 0 8px 30px rgba(58, 121, 237, 0.4);
+  }
 }
 
 @media (max-width: 1000px) {

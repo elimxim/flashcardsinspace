@@ -312,12 +312,14 @@ onMounted(async () => {
   margin-top: 4px;
 }
 
-.quiz-stage-grid-row:not(.quiz-stage-grid-row--selected):not(.quiz-stage-grid-row--total):hover {
-  border-color: #007BFFFF;
-}
+@media (hover: hover) {
+  .quiz-stage-grid-row:not(.quiz-stage-grid-row--selected):not(.quiz-stage-grid-row--total):hover {
+    border-color: #007BFFFF;
+  }
 
-.quiz-stage-grid-row:has(.quiz-stage-grid-row--selected):hover {
-  border-color: #0056B3FF;
+  .quiz-stage-grid-row:has(.quiz-stage-grid-row--selected):hover {
+    border-color: #0056B3FF;
+  }
 }
 
 .quiz-stage-grid-row--selected {

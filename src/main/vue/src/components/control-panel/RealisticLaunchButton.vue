@@ -148,9 +148,11 @@ function createRipple(event: MouseEvent) {
   opacity: .9;
 }
 
-.launch-button:not(.disabled):hover {
-  filter: saturate(1.2) brightness(1.2);
-  box-shadow: 0 2px 4px var(--r-launch--shadow-color--hover)
+@media (hover: hover) {
+  .launch-button:not(.disabled):hover {
+    filter: saturate(1.2) brightness(1.2);
+    box-shadow: 0 2px 4px var(--r-launch--shadow-color--hover)
+  }
 }
 
 .launch-button:not(.disabled):hover .label-glow {
