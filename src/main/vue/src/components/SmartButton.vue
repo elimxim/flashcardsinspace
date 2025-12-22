@@ -15,10 +15,11 @@
     @mousedown="onMouseDown"
     @mouseup="onMouseUp"
     @mouseleave="onMouseLeave"
-    @touchstart.prevent="onTouchStart"
+    @touchstart="onTouchStart"
     @touchend="onTouchEnd"
     @click.stop="click"
   >
+    <span class="smart-button-progress" :style="{ width: progressPercentage }"></span>
     <span class="smart-button-title">
       {{ text }}
     </span>
@@ -172,6 +173,7 @@ function handleGlobalMouseUp() {
   --s-btn--padding: var(--smart-button--padding, 0);
   --s-btn--bg: var(--smart-button--bg, #323232);
   --s-btn--bg--hover: var(--smart-button--bg--hover, #515151);
+  --s-btn--bg--progress: var(--smart-button--bg--progress, #515151);
   --s-btn--bg--disabled: var(--smart-button--bg--disabled, #C8C8C8FF);
 }
 
@@ -191,25 +193,23 @@ function handleGlobalMouseUp() {
   height: var(--s-btn--height);
   cursor: pointer;
   overflow: hidden;
-  z-index: 1;
+  -webkit-tap-highlight-color: transparent;
+  isolation: isolate;
 }
 
-.smart-button::before {
-  content: '';
+.smart-button-progress {
   position: absolute;
   top: 0;
   left: 0;
-  width: v-bind(progressPercentage);
   height: 100%;
-  background-color: var(--s-btn--bg);
+  background-color: var(--s-btn--bg--progress);
   border-radius: var(--s-btn--border-radius);
   transition: width 0.05s linear;
-  z-index: -1;
-  overflow: hidden;
-  -webkit-tap-highlight-color: transparent;
+  z-index: 0;
 }
 
 .smart-button-title {
+  position: relative;
   display: inline-block;
   font-family: var(--s-btn--font-family);
   font-weight: 600;
@@ -218,6 +218,7 @@ function handleGlobalMouseUp() {
   letter-spacing: var(--s-btn--title--letter-spacing);
   text-transform: uppercase;
   transition: transform 0.1s ease-in-out;
+  z-index: 1;
 }
 
 .smart-button:not(.smart-button--disabled):active {

@@ -5,7 +5,8 @@
 
 .dangerous-button {
   --smart-button--bg: var(--dangerous-button--bg-color);
-  --smart-button--bg--hover: var(--dangerous-button--bg-color--hover)
+  --smart-button--bg--hover: var(--dangerous-button--bg-color--hover);
+  --smart-button--bg--progress: var(--dangerous-button--bg-color--progress);
 }
 
 .calm-button {
