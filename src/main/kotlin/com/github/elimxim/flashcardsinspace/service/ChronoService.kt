@@ -169,16 +169,16 @@ class ChronoService(
     fun bulkUpdate(setId: Long, request: ValidChronoBulkUpdateRequest): ChronoUpdateResponse {
         val flashcardSet = flashcardSetService.getEntity(setId)
 
-        var changed = false
-        flashcardSet.chronodays.forEach { chronoday ->
-            if (chronoday.id in request.ids) {
-                chronoday.status = request.status
-                changed = true
-            }
-        }
+        val chronodaysToUpdate = flashcardSet.chronodays
+            .filter { it.id in request.ids }
+            .sortedBy { it.chronodate }
+            .toMutableList()
 
-        val updatedFlashcardSet = if (changed) {
+        val lastChronoday = chronodaysToUpdate.removeLastOrNull()
+        val updatedFlashcardSet = if (lastChronoday != null) {
+            lastChronoday.status = request.status
             dayStreakService.calcDayStreak(flashcardSet)
+            chronodaysToUpdate.forEach { it.status = request.status }
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
