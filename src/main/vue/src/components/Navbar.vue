@@ -18,13 +18,18 @@
             class="navigation-button"
             icon="fa-solid fa-rocket"
             :on-click="navigateToControlPanel"
+            :active="controlPanelActive"
             :scale-factor="1.2"
             fill-space
             square
           />
         </div>
         <div v-else-if="isAuthenticated" key="text" class="nav-item-text">
-          <div class="nav-text nav-text--item" @click="navigateToControlPanel">
+          <div
+            class="nav-text nav-text--item"
+            :class="{ 'nav-text--active': controlPanelActive }"
+            @click="navigateToControlPanel"
+          >
             Control Panel
           </div>
           <div class="nav-item-partition">
@@ -39,13 +44,18 @@
             class="navigation-button"
             icon="fa-solid fa-house"
             :on-click="navigateToHome"
+            :active="homeActive"
             :scale-factor="1.2"
             fill-space
             square
           />
         </div>
         <div v-else key="text" class="nav-item-text">
-          <div class="nav-text nav-text--item" @click="navigateToHome">
+          <div
+            class="nav-text nav-text--item"
+            :class="{ 'nav-text--active': homeActive }"
+            @click="navigateToHome"
+          >
             Home
           </div>
           <div class="nav-item-partition">
@@ -60,13 +70,18 @@
             class="navigation-button"
             icon="fa-solid fa-heart-pulse"
             :on-click="navigateToSupport"
+            :active="supportActive"
             :scale-factor="1.2"
             fill-space
             square
           />
         </div>
         <div v-else key="text" class="nav-item-text">
-          <div class="nav-text nav-text--item" @click="navigateToSupport">
+          <div
+            class="nav-text nav-text--item"
+            :class="{ 'nav-text--active': supportActive }"
+            @click="navigateToSupport"
+          >
             Support
           </div>
           <div class="nav-item-partition">
@@ -81,13 +96,18 @@
             class="navigation-button"
             icon="fa-solid fa-user-astronaut"
             :on-click="navigateToUser"
+            :active="userActive"
             :scale-factor="1.2"
             fill-space
             square
           />
         </div>
         <div v-else key="text" class="nav-item-text">
-          <div class="nav-text nav-text--item" @click="navigateToUser">
+          <div
+            class="nav-text nav-text--item"
+            :class="{ 'nav-text--active': userActive }"
+            @click="navigateToUser"
+          >
             User
           </div>
         </div>
@@ -103,7 +123,7 @@ import { useAuthStore } from '@/stores/auth-store.ts'
 import { storeToRefs } from 'pinia'
 import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 const ICONS_SWITCH_BREAKPOINT = 800
 
@@ -113,6 +133,11 @@ const router = useRouter()
 const { isAuthenticated } = storeToRefs(authStore)
 
 const showIcons = ref(window.innerWidth <= ICONS_SWITCH_BREAKPOINT)
+
+const controlPanelActive = computed(() => router.currentRoute.value.name === routeNames.controlPanel)
+const homeActive = computed(() => router.currentRoute.value.name === routeNames.home)
+const supportActive = computed(() => router.currentRoute.value.name === routeNames.support)
+const userActive = computed(() => router.currentRoute.value.name === routeNames.user)
 
 function navigateToControlPanel() {
   if (!isAuthenticated.value) return
@@ -213,6 +238,10 @@ onUnmounted(() => {
   .nav-text:hover {
     color: var(--nav--text--color--hover);
   }
+}
+
+.nav-text--active {
+  color: var(--nav--text--color--hover);
 }
 
 .nav-text--title {
