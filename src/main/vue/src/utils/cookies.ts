@@ -89,7 +89,7 @@ function loadLoggingEnabledFromCookies(): boolean {
 
 function saveLoggingEnabledToCookies(value: boolean) {
   Cookies.set(COOKIE_LOGGING_ENABLED, value.toString(), {
-    expires: 1,
+    expires: 30,
     sameSite: 'Lax',
     secure: true,
     path: '/', // valid for the entire site
