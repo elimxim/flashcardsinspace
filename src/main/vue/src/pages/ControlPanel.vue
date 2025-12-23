@@ -4,7 +4,6 @@
       'page',
       'page--bg--light',
       'flex-row',
-      'control-panel',
       'control-panel--theme',
     ]"
   >
@@ -96,10 +95,6 @@ function openFlashcardSetSettings() {
 <style scoped>
 .control-panel--theme {
   --c-panel--text-color: #333333;
-}
-
-.control-panel {
-  min-width: 420px;
 }
 
 .control-panel-layout {
