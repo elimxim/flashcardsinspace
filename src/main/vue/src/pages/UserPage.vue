@@ -242,6 +242,8 @@ onMounted(() => {
 }
 
 .user-page {
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
@@ -254,11 +256,19 @@ onMounted(() => {
 }
 
 .user-info {
+  flex: 0 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   grid-template-rows: repeat(6, auto);
   grid-auto-flow: column;
   gap: 10px;
+  max-width: 600px;
+}
+
+@media (max-width: 600px) {
+  .user-info {
+    max-width: 100%;
+  }
 }
 
 .user-info-item {
@@ -274,7 +284,7 @@ onMounted(() => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
   margin-top: 20px;
 }
 
