@@ -79,6 +79,8 @@ const transitionTimeout = ref<number>()
 const transitionDurationMs = 300
 const transitionDuration = `${transitionDurationMs / 1000.0}s`
 const transitionDelayMs = transitionDurationMs + 50
+const stageWidthPercentage = ref(80)
+const stageWidthPercentageCss = computed(() => `${stageWidthPercentage.value}%`)
 
 const createFlashcardCountComputed = (stage: Stage) => {
   return computed(() => {
@@ -213,8 +215,12 @@ const handleResize = () => {
 onMounted(() => {
   nextTick().then(() => {
     captureOriginalHeights(true)
-    if (gridRef.value) {
-      isNarrowGrid.value = gridRef.value.clientWidth < NAME_SHORT_GRID_WIDTH_THRESHOLD
+    if (gridRef.value && gridRef.value.clientWidth < NAME_SHORT_GRID_WIDTH_THRESHOLD) {
+      isNarrowGrid.value = true
+      stageWidthPercentage.value = 95
+    } else {
+      isNarrowGrid.value = false
+      stageWidthPercentage.value = 80
     }
   })
 
@@ -333,7 +339,7 @@ onUnmounted(() => {
   border-radius: 6px;
   justify-content: center;
   align-items: center;
-  width: 80%;
+  width: v-bind(stageWidthPercentageCss);
   min-width: 20px;
   height: auto;
   min-height: clamp(52px, 8cqw, 80px);
@@ -373,7 +379,7 @@ onUnmounted(() => {
   border-radius: 3px;
   padding: 2px;
   width: 60%;
-  min-width: 20px;
+  min-width: 30px;
   max-width: 40px;
   text-align: center;
 }
