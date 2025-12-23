@@ -9,7 +9,7 @@
 :root {
   /* global */
 
-  --navbar-height: 8vh;
+  --navbar-height: 8dvh;
   --border-radius: 4px;
 
   /* fonts */
@@ -227,4 +227,10 @@
   --flashcard-widget-button--bg: linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%);
   --flashcard-widget-button--bg--hover: linear-gradient(135deg, rgb(142, 110, 189) 0%, rgb(215, 91, 209) 100%);
   --flashcard-widget-button--bg--disabled: linear-gradient(135deg, rgb(121, 121, 121) 0%, rgb(64, 64, 64) 100%);
+}
+
+@media (max-width: 400px) {
+  :root {
+    --navbar-height: 6dvh;
+  }
 }

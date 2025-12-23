@@ -185,7 +185,7 @@ onUnmounted(() => {
   top: var(--navbar-height);
   left: 0;
   width: 100vw;
-  height: calc(100vh - var(--navbar-height));
+  height: calc(100dvh - var(--navbar-height));
   background: rgba(0, 0, 0, 0.5);
   opacity: 0;
   pointer-events: none;

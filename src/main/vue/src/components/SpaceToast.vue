@@ -72,7 +72,7 @@ onUnmounted(() => toaster.reset())
   left: 0;
   right: 0;
   bottom: 0;
-  height: calc(100vh - var(--navbar-height));
+  height: calc(100dvh - var(--navbar-height));
   width: 100%;
   display: flex;
   flex-direction: column;
