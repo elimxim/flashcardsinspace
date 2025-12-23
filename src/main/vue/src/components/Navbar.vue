@@ -187,10 +187,8 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   background: var(--nav--bg);
-  padding: 10px;
+  padding: clamp(4px, 1.5vw, 10px);
   height: var(--navbar-height);
-  min-height: var(--navbar-height);
-  max-height: var(--navbar-height);
   z-index: 1000;
 }
 
@@ -245,7 +243,7 @@ onUnmounted(() => {
 }
 
 .nav-text--title {
-  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-size: clamp(0.85rem, 2vw, 1.5rem);
 }
 
 .nav-text--item {
@@ -267,12 +265,12 @@ onUnmounted(() => {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: clamp(4px, 1.5vw, 10px);
 }
 
 .logo-image {
-  height: 60px;
-  z-index: 1001;
+  height: clamp(40px, 10vw, 60px);
+  z-index: 1;
 }
 
 .pop-enter-active,
