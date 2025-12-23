@@ -5,20 +5,23 @@
     @mouseleave="hide"
   >
     <slot/>
-    <transition name="tooltip-fade">
-      <div
-        v-if="visible && text"
-        :class="['tooltip-message', `tooltip--${position}`]"
-      >
-        {{ text }}
-        <div class="tooltip-arrow"/>
-      </div>
-    </transition>
+    <template v-if="isHoverSupported">
+      <transition name="tooltip-fade">
+        <div
+          v-if="visible && text"
+          :class="['tooltip-message', `tooltip--${position}`]"
+        >
+          {{ text }}
+          <div class="tooltip-arrow"/>
+        </div>
+      </transition>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { isHoverSupported } from '@/utils/utils.ts'
 
 const props = withDefaults(defineProps<{
   text?: string

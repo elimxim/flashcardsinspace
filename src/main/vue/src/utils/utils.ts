@@ -48,3 +48,6 @@ export function parseNumber(value?: unknown): number | undefined {
   if (value === undefined || value === null) return undefined
   return Number(value)
 }
+
+export const isHoverSupported = window.matchMedia('(hover: hover)').matches
+
