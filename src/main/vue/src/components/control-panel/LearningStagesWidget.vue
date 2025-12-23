@@ -28,7 +28,7 @@
           }"
         >
           <div class="stage-name">
-            {{ stage.displayName }}
+            {{ isNarrowGrid ? stage.order : stage.displayName }}
           </div>
           <div class="stage-count-wrapper">
             <div class="stage-count">
@@ -55,6 +55,8 @@ const props = withDefaults(defineProps<{
   growMultiplier: 2,
 })
 
+const NAME_SHORT_GRID_WIDTH_THRESHOLD = 600
+
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 
@@ -67,6 +69,7 @@ const stageHeights = ref<number[]>(Array(7).fill(0))
 const stageElements = ref<HTMLElement[]>([])
 const resizeObserver = ref<ResizeObserver>()
 const isHovering = ref(false)
+const isNarrowGrid = ref(false)
 const hoverDelayTimeout = ref<number>()
 const originalStageHeight = ref<number>(0)
 const originalGridHeight = ref<number>(0)
@@ -199,6 +202,9 @@ function handleMouseLeave() {
 }
 
 const handleResize = () => {
+  if (gridRef.value) {
+    isNarrowGrid.value = gridRef.value.clientWidth < NAME_SHORT_GRID_WIDTH_THRESHOLD
+  }
   if (!isHovering.value && !isTransitioning.value) {
     captureOriginalHeights()
   }
@@ -207,6 +213,9 @@ const handleResize = () => {
 onMounted(() => {
   nextTick().then(() => {
     captureOriginalHeights(true)
+    if (gridRef.value) {
+      isNarrowGrid.value = gridRef.value.clientWidth < NAME_SHORT_GRID_WIDTH_THRESHOLD
+    }
   })
 
   window.addEventListener('resize', handleResize)
@@ -271,7 +280,6 @@ onUnmounted(() => {
   background: var(--l-widget--bg);
   border-radius: 6px;
   width: 100%;
-  min-width: 380px;
   flex-grow: 0;
   transition: background 0.3s ease-in-out;
 }
@@ -326,10 +334,10 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   width: 80%;
-  min-width: 50px;
+  min-width: 20px;
   height: auto;
   min-height: clamp(52px, 8cqw, 80px);
-  padding: 4px;
+  padding: clamp(2px, 20cqi, 4px);
   gap: 4px;
   container-type: size;
   transition: transform v-bind(transitionDuration) ease-in-out, height v-bind(transitionDuration) ease-in-out;
@@ -337,7 +345,7 @@ onUnmounted(() => {
 }
 
 .stage-name {
-  font-size: clamp(0.55rem, 20cqi, 0.9rem);
+  font-size: clamp(0.7rem, 20cqi, 0.9rem);
   font-weight: 600;
   color: var(--l-widget--stage--name--color);
   letter-spacing: 0.05rem;
@@ -365,7 +373,7 @@ onUnmounted(() => {
   border-radius: 3px;
   padding: 2px;
   width: 60%;
-  min-width: 30px;
+  min-width: 20px;
   max-width: 40px;
   text-align: center;
 }
