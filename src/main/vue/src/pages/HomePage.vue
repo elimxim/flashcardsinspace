@@ -291,7 +291,7 @@ onUnmounted(() => {
   flex-direction: column;
   justify-content: center;
   align-content: center;
-  padding: 20px 40px;
+  padding: clamp(10px, 5vw ,20px) clamp(20px, 5vw, 40px);
   gap: 20px;
   color: #ffffff;
 }
