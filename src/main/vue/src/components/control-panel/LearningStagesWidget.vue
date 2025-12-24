@@ -224,9 +224,9 @@ const handleResize = () => {
 
 watch(isNarrowGrid, (newVal) => {
   if (newVal) {
-    stageWidthPercentage.value = 80
-  } else {
     stageWidthPercentage.value = 100
+  } else {
+    stageWidthPercentage.value = 80
   }
 })
 
@@ -357,7 +357,7 @@ onUnmounted(() => {
   min-width: 20px;
   height: auto;
   min-height: clamp(52px, 8cqw, 80px);
-  padding: clamp(2px, 20cqi, 4px);
+  padding: clamp(2px, 4cqw, 4px);
   gap: 4px;
   container-type: size;
   transition: transform v-bind(transitionDuration) ease-in-out, height v-bind(transitionDuration) ease-in-out;
