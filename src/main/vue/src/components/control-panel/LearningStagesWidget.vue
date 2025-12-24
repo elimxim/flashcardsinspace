@@ -212,15 +212,19 @@ const handleResize = () => {
   }
 }
 
+watch(isNarrowGrid, (newVal) => {
+  if (newVal) {
+    stageWidthPercentage.value = 80
+  } else {
+    stageWidthPercentage.value = 100
+  }
+})
+
 onMounted(() => {
   nextTick().then(() => {
     captureOriginalHeights(true)
-    if (gridRef.value && gridRef.value.clientWidth < NAME_SHORT_GRID_WIDTH_THRESHOLD) {
-      isNarrowGrid.value = true
-      stageWidthPercentage.value = 95
-    } else {
-      isNarrowGrid.value = false
-      stageWidthPercentage.value = 80
+    if (gridRef.value) {
+      isNarrowGrid.value = gridRef.value.clientWidth < NAME_SHORT_GRID_WIDTH_THRESHOLD
     }
   })
 
