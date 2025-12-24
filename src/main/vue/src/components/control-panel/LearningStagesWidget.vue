@@ -57,7 +57,7 @@ const props = withDefaults(defineProps<{
   growMultiplier: 2,
 })
 
-const NAME_SHORT_GRID_WIDTH_THRESHOLD = 600
+const NAME_SHORT_GRID_WIDTH_THRESHOLD = 480
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
