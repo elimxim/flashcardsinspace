@@ -291,19 +291,21 @@ onUnmounted(() => {
   -webkit-tap-highlight-color: transparent;
 }
 
-.sidebar-item:hover {
-  background: var(--bar--item--bg--hover);
-  box-shadow: 8px 3px 3px var(--bar--item--shadow-color);
-  backdrop-filter: none;
-  transform: translateX(-6px);
-}
+@media (hover: hover) {
+  .sidebar-item:hover {
+    background: var(--bar--item--bg--hover);
+    box-shadow: 8px 3px 3px var(--bar--item--shadow-color);
+    backdrop-filter: none;
+    transform: translateX(-6px);
+  }
 
-.sidebar-item:hover .sidebar-item__name {
-  color: var(--bar--item--color--hover);
-}
+  .sidebar-item:hover .sidebar-item__name {
+    color: var(--bar--item--color--hover);
+  }
 
-.sidebar-item:hover .sidebar-item__language {
-  color: var(--bar--item--color--hover);
+  .sidebar-item:hover .sidebar-item__language {
+    color: var(--bar--item--color--hover);
+  }
 }
 
 .sidebar-item--active {
