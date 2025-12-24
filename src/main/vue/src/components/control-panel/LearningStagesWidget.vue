@@ -2,10 +2,11 @@
   <div
     class="stages-widget stages-widget--theme"
     :class="{
-      'stages-widget--hex-grid': isHovering,
+      'stages-widget--hex-grid': isExpanded,
     }"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
+    @click="handleClick"
   >
     <div class="stages-title">
       Learning Stages
@@ -48,6 +49,7 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { isHoverSupported } from '@/utils/utils.ts'
 
 const props = withDefaults(defineProps<{
   growMultiplier?: number
@@ -68,7 +70,7 @@ const stageOffsets = ref<number[]>(Array(7).fill(0))
 const stageHeights = ref<number[]>(Array(7).fill(0))
 const stageElements = ref<HTMLElement[]>([])
 const resizeObserver = ref<ResizeObserver>()
-const isHovering = ref(false)
+const isExpanded = ref(false)
 const isNarrowGrid = ref(false)
 const hoverDelayTimeout = ref<number>()
 const originalStageHeight = ref<number>(0)
@@ -94,7 +96,7 @@ const isStageInCurrentDay = (stage: Stage) => {
 
 function captureOriginalHeights(force: boolean = false) {
   if (!gridRef.value || stageElements.value.length === 0) return
-  if ((isHovering.value || isTransitioning.value) && !force) return
+  if ((isExpanded.value || isTransitioning.value) && !force) return
 
   if (captureHeightTimeout.value) {
     clearTimeout(captureHeightTimeout.value)
@@ -102,7 +104,7 @@ function captureOriginalHeights(force: boolean = false) {
   }
 
   captureHeightTimeout.value = window.setTimeout(() => {
-    if ((!isHovering.value && !isTransitioning.value) || force) {
+    if ((!isExpanded.value && !isTransitioning.value) || force) {
       const stageEl = stageElements.value[0]
       if (stageEl) {
         originalStageHeight.value = stageEl.offsetHeight
@@ -127,7 +129,7 @@ const calculateStageOffsets = () => {
   const gridHeight = originalGridHeight.value * props.growMultiplier
   const referenceHeight = originalStageHeight.value
 
-  if (!isHovering.value) {
+  if (!isExpanded.value) {
     stageOffsets.value = Array(7).fill(0)
     stageHeights.value = Array(7).fill(referenceHeight)
     return
@@ -171,7 +173,7 @@ const calculateStageOffsets = () => {
   stageHeights.value = heights
 }
 
-watch(isHovering, (newVal, oldVal) => {
+watch(isExpanded, (newVal, oldVal) => {
   if (newVal !== oldVal) {
     isTransitioning.value = true
 
@@ -190,24 +192,32 @@ watch(isHovering, (newVal, oldVal) => {
 })
 
 function handleMouseEnter() {
+  if (!isHoverSupported) return
   hoverDelayTimeout.value = window.setTimeout(() => {
-    isHovering.value = true
+    isExpanded.value = true
   }, 150)
 }
 
 function handleMouseLeave() {
+  if (!isHoverSupported) return
   if (hoverDelayTimeout.value) {
     clearTimeout(hoverDelayTimeout.value)
     hoverDelayTimeout.value = undefined
   }
-  isHovering.value = false
+  isExpanded.value = false
+}
+
+// fallback for touch devices
+function handleClick() {
+  if (isHoverSupported) return
+  isExpanded.value = !isExpanded.value
 }
 
 const handleResize = () => {
   if (gridRef.value) {
     isNarrowGrid.value = gridRef.value.clientWidth < NAME_SHORT_GRID_WIDTH_THRESHOLD
   }
-  if (!isHovering.value && !isTransitioning.value) {
+  if (!isExpanded.value && !isTransitioning.value) {
     captureOriginalHeights()
   }
 }
@@ -260,7 +270,7 @@ onUnmounted(() => {
     hoverDelayTimeout.value = undefined
   }
 
-  isHovering.value = false
+  isExpanded.value = false
   isTransitioning.value = false
 })
 
@@ -383,7 +393,7 @@ onUnmounted(() => {
   border-radius: 3px;
   padding: 2px;
   width: 60%;
-  min-width: 30px;
+  min-width: 26px;
   max-width: 40px;
   text-align: center;
 }
