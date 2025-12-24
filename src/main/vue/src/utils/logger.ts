@@ -60,12 +60,20 @@ export class Log {
 
   static log(tag: LogTag, message?: unknown, ...optionalParams: unknown[]) {
     if (typeof window === 'undefined' || !window.loggingEnabled) return
-    console.log(`%c${tag}`, this.tagStyle(tag), message, optionalParams)
+    if (optionalParams.length > 0) {
+      console.log(`%c${tag}`, this.tagStyle(tag), message, optionalParams)
+    } else {
+      console.log(`%c${tag}`, this.tagStyle(tag), message)
+    }
   }
 
   static error(tag: LogTag, message?: string, ...optionalParams: unknown[]) {
     if (typeof window === 'undefined' || !window.loggingEnabled) return
-    console.error(`%c${tag}`, this.tagStyle(tag), message, optionalParams)
+    if (optionalParams.length > 0) {
+      console.error(`%c${tag}`, this.tagStyle(tag), message, optionalParams)
+    } else {
+      console.error(`%c${tag}`, this.tagStyle(tag), message)
+    }
   }
 
   private static tagStyle(tag: LogTag): string {
