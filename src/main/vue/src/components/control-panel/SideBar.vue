@@ -208,7 +208,7 @@ onUnmounted(() => {
 .sidebar {
   display: flex;
   flex-direction: column;
-  width: clamp(200px, 40vw, 260px);
+  width: 260px;
   height: 100%;
   background: var(--bar--bg);
   overflow: hidden;
@@ -216,14 +216,14 @@ onUnmounted(() => {
 }
 
 .sidebar--collapsed {
-  margin-left: calc(-1 * clamp(200px, 40vw, 260px));
+  margin-left: calc(-1 * 260px);
 }
 
 .sidebar--overlay {
   position: absolute;
   left: 0;
   top: 0;
-  width: clamp(200px, 50vw, 330px);
+  width: 260px;
   margin-left: 0;
   transition: transform 0.35s ease-in-out;
 }
