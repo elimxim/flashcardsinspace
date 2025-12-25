@@ -1,5 +1,5 @@
 <template>
-  <div class="flashcard-widget flashcard-widget--theme">
+  <div class="flashcard-widget">
     <AwesomeButton
       icon="fa-solid fa-rectangle-list"
       class="flashcard-widget-button"
