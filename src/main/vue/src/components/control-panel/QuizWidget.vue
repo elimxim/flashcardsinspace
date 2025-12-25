@@ -1,7 +1,7 @@
 <template>
   <div class="quiz-widget quiz-widget--theme">
     <AwesomeButton
-      icon="fa-solid fa-clipboard-question"
+      icon="fa-solid fa-q"
       class="quiz-widget-button"
       :disabled="!flashcardSet"
       :on-click="toggleStore.toggleQuiz"
