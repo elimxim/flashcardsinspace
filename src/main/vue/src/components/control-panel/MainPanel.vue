@@ -122,7 +122,7 @@ const widgets: Record<string, Widget> = {
   dayStreak: {
     id: 'day-streak',
     component: DayStreakWidget,
-    className: 'main-panel-widget',
+    className: 'main-panel-square-widget',
     props: {},
     hidden: isInitialDay,
   },
