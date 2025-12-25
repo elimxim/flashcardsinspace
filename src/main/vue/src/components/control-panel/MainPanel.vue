@@ -53,6 +53,8 @@ const { isInitialDay, isDayOff } = storeToRefs(chronoStore)
 
 const mainPanel = ref<HTMLElement>()
 const mainPanelWidth = ref(0)
+const rowHeight = ref(106)
+const rowHeightPx = computed(() => `${rowHeight.value}px`)
 
 const { setupAuto } = useFlip(mainPanel)
 
@@ -100,7 +102,7 @@ const widgets: Record<string, Widget> = {
   unknown: {
     id: 'unknown',
     component: SpecialStageWidget,
-    className: 'main-panel-stretching-widget',
+    className: 'main-panel-square-widget',
     props: {
       stage: specialStages.UNKNOWN,
       icon: 'fa-regular fa-circle-question',
@@ -110,7 +112,7 @@ const widgets: Record<string, Widget> = {
   attempted: {
     id: 'attempted',
     component: SpecialStageWidget,
-    className: 'main-panel-stretching-widget',
+    className: 'main-panel-square-widget',
     props: {
       stage: specialStages.ATTEMPTED,
       icon: 'fa-solid fa-rotate-right',
@@ -236,7 +238,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: flex-start;
   gap: 12px;
-  height: 106px;
+  height: v-bind(rowHeightPx);
 }
 
 .main-panel-widget {
@@ -249,6 +251,7 @@ onUnmounted(() => {
   flex: 0 0 auto;
   height: 100%;
   aspect-ratio: 1 / 1; /* Fallback for old browsers that miscalculate the width */
+  overflow: hidden;
 }
 
 .main-panel-stretching-widget {
