@@ -43,9 +43,9 @@ import { specialStages } from '@/core-logic/stage-logic.ts'
 import { useFlip } from '@/utils/flip.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 
-const FIRST_REARRANGE_BREAKPOINT = 1040
-const SECOND_REARRANGE_BREAKPOINT = 540
-const THIRD_REARRANGE_BREAKPOINT = 434
+const FIRST_REARRANGE_BREAKPOINT = 1000
+const SECOND_REARRANGE_BREAKPOINT = 490
+const THIRD_REARRANGE_BREAKPOINT = 342
 
 const chronoStore = useChronoStore()
 
@@ -56,7 +56,7 @@ const mainPanelWidth = ref(0)
 const rowHeight = ref(106)
 const rowHeightPx = computed(() => `${rowHeight.value}px`)
 
-const { setupAuto } = useFlip(mainPanel)
+const { setupAuto } = useFlip(mainPanel, { duration: 1 })
 
 let resizeObserver: ResizeObserver | null = null
 
@@ -142,16 +142,33 @@ const widgetRows = computed(() => {
     return [
       {
         id: 'row-1',
-        widgets: [widgets.flashcard, widgets.calendar, widgets.quiz],
+        widgets: [
+          widgets.flashcard,
+          widgets.calendar,
+        ],
       },
       {
         id: 'row-2',
-        widgets: [widgets.reviewInfo, widgets.launch, widgets.dayStreak],
+        widgets: [
+          widgets.reviewInfo,
+          widgets.dayStreak,
+        ],
       },
       {
         id: 'row-3',
-        widgets: [widgets.unknown, widgets.attempted],
+        widgets: [
+          widgets.launch,
+          widgets.quiz,
+        ],
       },
+      {
+        id: 'row-4',
+        widgets: [
+          widgets.unknown,
+          widgets.attempted,
+        ],
+      },
+
     ]
   }
 
@@ -159,15 +176,26 @@ const widgetRows = computed(() => {
     return [
       {
         id: 'row-1',
-        widgets: [widgets.flashcard, widgets.calendar, widgets.quiz, widgets.dayStreak],
+        widgets: [
+          widgets.flashcard,
+          widgets.calendar,
+          widgets.dayStreak,
+        ],
       },
       {
         id: 'row-2',
-        widgets: [widgets.reviewInfo, widgets.launch],
+        widgets: [
+          widgets.reviewInfo,
+          widgets.launch,
+        ],
       },
       {
         id: 'row-3',
-        widgets: [widgets.unknown, widgets.attempted],
+        widgets: [
+          widgets.unknown,
+          widgets.attempted,
+          widgets.quiz,
+        ],
       },
     ]
   }
@@ -176,11 +204,21 @@ const widgetRows = computed(() => {
     return [
       {
         id: 'row-1',
-        widgets: [widgets.flashcard, widgets.calendar, widgets.reviewInfo, widgets.launch],
+        widgets: [
+          widgets.flashcard,
+          widgets.calendar,
+          widgets.dayStreak,
+          widgets.reviewInfo,
+        ],
       },
       {
         id: 'row-2',
-        widgets: [widgets.unknown, widgets.attempted, widgets.dayStreak, widgets.quiz],
+        widgets: [
+          widgets.unknown,
+          widgets.attempted,
+          widgets.quiz,
+          widgets.launch,
+        ],
       },
     ]
   }
@@ -191,11 +229,11 @@ const widgetRows = computed(() => {
       widgets: [
         widgets.flashcard,
         widgets.calendar,
+        widgets.dayStreak,
         widgets.reviewInfo,
         widgets.launch,
         widgets.unknown,
         widgets.attempted,
-        widgets.dayStreak,
         widgets.quiz,
       ],
     },
