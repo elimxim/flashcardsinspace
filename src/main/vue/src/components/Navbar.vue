@@ -189,7 +189,6 @@ onUnmounted(() => {
   background: var(--nav--bg);
   padding: clamp(4px, 1.5vw, 10px);
   height: var(--navbar-height);
-  z-index: 1000;
 }
 
 .nav-items {
