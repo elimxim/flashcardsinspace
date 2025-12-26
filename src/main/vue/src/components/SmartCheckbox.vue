@@ -67,6 +67,7 @@ const currentLabel = computed(() => {
   cursor: pointer;
   user-select: none;
   position: relative;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .checkbox-input {
