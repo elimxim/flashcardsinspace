@@ -1,10 +1,16 @@
 import { nextTick, onBeforeUpdate, onUpdated, type Ref } from 'vue'
 
+export interface FlipOptions {
+  /** Transform duration in seconds (default: 0.5) */
+  duration?: number
+}
+
 /**
  * FLIP (First, Last, Invert, Play) animation
  * Smoothly animates elements when they change position in the DOM
  */
-export function useFlip(containerRef: Ref<HTMLElement | null | undefined>) {
+export function useFlip(containerRef: Ref<HTMLElement | null | undefined>, options: FlipOptions = {}) {
+  const { duration = 0.5 } = options
   const positions = new Map<string, DOMRect>()
   let isAnimating = false
 
@@ -58,7 +64,7 @@ export function useFlip(containerRef: Ref<HTMLElement | null | undefined>) {
 
           // Play: Transition to the new position
           requestAnimationFrame(() => {
-            element.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)'
+            element.style.transition = `transform ${duration}s cubic-bezier(0.25, 1, 0.5, 1)`
             element.style.transform = 'translate(0, 0)'
           })
         }
@@ -69,7 +75,7 @@ export function useFlip(containerRef: Ref<HTMLElement | null | undefined>) {
       isAnimating = true
       setTimeout(() => {
         isAnimating = false
-      }, 500) // Match transition duration
+      }, duration * 1000)
     }
   }
 
