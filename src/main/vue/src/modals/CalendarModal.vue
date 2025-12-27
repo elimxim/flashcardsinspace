@@ -33,20 +33,16 @@
           class="calendar-day"
           :class="dayCssClasses(day)"
         >
-          <div class="calendar-day__top">
-            <div class="calendar-day__top__number">
-              {{ day.number }}
-            </div>
-            <div v-if="canShowSeq(day)" class="calendar-day__top__seq">
-              {{ day.seqNumber }}
-            </div>
+          <div v-if="canShowSeq(day)" class="calendar-cell-seq">
+            {{ day.seqNumber }}
           </div>
-          <div v-if="isVacationDay(day)" class="calendar-day__vacation">
+          <div v-if="isVacationDay(day)" class="calendar-cell-vacation">
             🌴
           </div>
-          <div v-else-if="canShowStages(day)" class="calendar-day__stages">
+          <div v-else-if="canShowStages(day)" class="calendar-cell-stages">
             {{ day.stages }}
           </div>
+          <span class="calendar-cell-number"> {{ day.number }} </span>
         </div>
       </div>
     </div>
@@ -369,9 +365,9 @@ function handleKeydown(event: KeyboardEvent) {
 .calendar-day--completed::before {
   content: "✔";
   position: absolute;
-  right: 6px;
-  bottom: 4px;
-  font-size: 0.8rem;
+  bottom: 1px;
+  left: 1px;
+  font-size: 0.65rem;
   line-height: 1;
   color: var(--day--checkmark--color);
   pointer-events: none;
@@ -411,41 +407,49 @@ function handleKeydown(event: KeyboardEvent) {
   );
 }
 
-.calendar-day:hover:not(.calendar-day--another) {
-  transform: scale(1.08);
+@media (hover: hover) {
+  .calendar-day:hover:not(.calendar-day--another) {
+    transform: scale(1.08);
+  }
 }
 
-.calendar-day__top {
+.calendar-cell-number {
+  position: absolute;
+  top: 2px;
+  left: 0;
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.calendar-day__top__number {
+  align-items: start;
+  justify-content: center;
+  font-size: 1.8rem;
   font-weight: 800;
-  font-size: clamp(0.8rem, 2vw, 1rem);
+  height: 100%;
+  width: 100%;
+  opacity: 0.4;
 }
 
-.calendar-day__top__seq {
-  font-size: clamp(0.65rem, 1.6vw, 0.85rem);
-  padding: 2px 6px;
-  border-radius: 10px;
-  background-color: var(--day--seq--bg);
+.calendar-cell-seq {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  font-size: clamp(0.65rem, 1.8vw, 0.75rem);
   line-height: 1;
+  align-self: end;
 }
 
-.calendar-day__stages {
-  font-weight: 550;
-  font-size: clamp(0.7rem, 1.8vw, 0.8rem);
+.calendar-cell-stages {
+  position: absolute;
+  bottom: 2px;
+  font-weight: 800;
+  font-size: 0.75rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   margin-top: 2px;
   color: var(--day--stages--color);
+  align-self: center;
 }
 
-.calendar-day__vacation {
+.calendar-cell-vacation {
   font-size: clamp(1rem, 1.8vw, 1.6rem);
   display: flex;
   align-items: center;
