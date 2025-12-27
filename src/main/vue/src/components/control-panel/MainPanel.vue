@@ -289,7 +289,6 @@ onUnmounted(() => {
   flex: 0 0 auto;
   height: 100%;
   aspect-ratio: 1 / 1; /* Fallback for old browsers that miscalculate the width */
-  overflow: hidden;
 }
 
 .main-panel-stretching-widget {
