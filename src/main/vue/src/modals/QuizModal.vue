@@ -12,7 +12,13 @@
       </p>
       <div v-if="latestUncompletedSessionId && showBanner" class="quiz-banner">
         <div class="quiz-banner-text">
-          You have an uncompleted quiz session. Do you want to continue?
+          You have an uncompleted quiz session
+        </div>
+        <div class="quiz-banner-exit">
+          <AwesomeButton
+            icon="fa-solid fa-xmark"
+            :on-click="hideBanner"
+          />
         </div>
         <div class="quiz-banner-button">
           <SmartButton
@@ -21,12 +27,6 @@
             fill-height
             fill-width
             auto-blur
-          />
-        </div>
-        <div class="quiz-banner-exit">
-          <AwesomeButton
-            icon="fa-solid fa-xmark"
-            :on-click="hideBanner"
           />
         </div>
       </div>
@@ -74,17 +74,6 @@
               {{ outerSpaceCount }}
             </div>
           </div>
-          <div
-            class="quiz-stage-grid-row quiz-stage-grid-row--total"
-            :class="{ 'quiz-stage-grid-row--selected': reviewCount > 0 }"
-          >
-            <div class="quiz-stage-flashcard-total">
-              Total
-            </div>
-            <div class="quiz-stage-flashcard-count">
-              {{ reviewCount }}
-            </div>
-          </div>
         </div>
       </div>
       <div class="modal-control-buttons">
@@ -95,12 +84,21 @@
           auto-blur
         />
         <SmartButton
-          class="calm-button"
+          class="calm-button quiz-start-button"
           text="Start"
           :on-click="startNew"
           :disabled="reviewCount <= 0"
           auto-blur
-        />
+        >
+          <span class="quiz-start-button-title">
+            <span class="quiz-start-button-text">
+              Start
+            </span>
+            <span class="quiz-stage-flashcard-count">
+              {{ reviewCount }}
+            </span>
+          </span>
+        </SmartButton>
       </div>
     </div>
   </Modal>
@@ -307,13 +305,8 @@ onMounted(async () => {
   transition: border-color 0.2s ease-in-out;
 }
 
-.quiz-stage-grid-row--total {
-  grid-column: 2;
-  margin-top: 4px;
-}
-
 @media (hover: hover) {
-  .quiz-stage-grid-row:not(.quiz-stage-grid-row--selected):not(.quiz-stage-grid-row--total):hover {
+  .quiz-stage-grid-row:not(.quiz-stage-grid-row--selected):hover {
     border-color: #007BFFFF;
   }
 
@@ -346,35 +339,26 @@ onMounted(async () => {
   text-align: center;
 }
 
-.quiz-stage-flashcard-total {
-  color: #45454a;
-  font-size: 1rem;
-  letter-spacing: 0.05rem;
-  word-spacing: 0.05rem;
-  text-transform: uppercase;
-}
-
 .quiz-banner {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
-  grid-template-rows: auto;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
+  gap: 4px;
   background: #4098f6;
   border-radius: 6px;
-  padding: 4px;
+  padding: 6px;
 }
 
 .quiz-banner-text {
-  grid-column: 1 / 3;
-  padding: 6px;
   font-size: 0.9rem;
   line-height: 1.4;
   color: #373737;
+  text-align: center;
 }
 
 .quiz-banner-button {
+  grid-column: 1 / -1;
   width: 100%;
   height: 100%;
   --smart-button--bg: transparent;
@@ -382,6 +366,7 @@ onMounted(async () => {
   --smart-button--border-width: 2px;
   --smart-button--border-radius: 6px;
   --smart-button--bg--hover: #236bbc;
+  --smart-button--padding: 4px;
   padding: 4px;
 }
 
@@ -390,5 +375,24 @@ onMounted(async () => {
   --awesome-button--icon--size: 1rem;
   --awesome-button--icon--color: #9bcdff;
   --awesome-button--icon--color--hover: #cfe9fb;
+}
+
+.quiz-start-button {
+  --smart-button--width: fit-content;
+  --smart-button--padding: 4px;
+}
+
+.quiz-start-button-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 4px;
+}
+
+.quiz-start-button-text {
+  font-weight: 600;
+  text-transform: uppercase;
 }
 </style>
