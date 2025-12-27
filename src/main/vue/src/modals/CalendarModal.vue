@@ -415,16 +415,17 @@ function handleKeydown(event: KeyboardEvent) {
 
 .calendar-cell-number {
   position: absolute;
-  top: 2px;
+  top: 0;
   left: 0;
+  padding-bottom: 6px;
   display: flex;
-  align-items: start;
+  align-items: center;
   justify-content: center;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   font-weight: 800;
   height: 100%;
   width: 100%;
-  opacity: 0.4;
+  opacity: 0.9;
 }
 
 .calendar-cell-seq {
