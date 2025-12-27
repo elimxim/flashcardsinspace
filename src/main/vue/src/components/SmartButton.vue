@@ -19,18 +19,21 @@
     @touchend="onTouchEnd"
     @click.stop="click"
   >
-    <span class="smart-button-progress" :style="{ width: progressPercentage }"></span>
-    <span class="smart-button-title">
-      {{ text }}
+    <span class="smart-button-progress" :style="{ width: progressPercentage }"/>
+    <span class="smart-button-title-wrapper">
+      <slot v-if="hasSlot"/>
+      <span v-else class="smart-button-title">
+        {{ text }}
+      </span>
     </span>
   </button>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, useSlots } from 'vue'
 
 const props = withDefaults(defineProps<{
-  text: string
+  text?: string
   disabled?: boolean
   hidden?: boolean
   rounded?: boolean
@@ -42,6 +45,7 @@ const props = withDefaults(defineProps<{
   titleScale?: number
   onClick?: () => void
 }>(), {
+  text: '',
   disabled: false,
   hidden: false,
   rounded: false,
@@ -54,6 +58,9 @@ const props = withDefaults(defineProps<{
   onClick: () => {
   },
 })
+
+const slots = useSlots()
+const hasSlot = computed(() => !!slots.default)
 
 let holdTimeout: ReturnType<typeof setTimeout> | null = null
 let animationFrame: number | null = null
@@ -208,17 +215,20 @@ function handleGlobalMouseUp() {
   z-index: 0;
 }
 
-.smart-button-title {
+.smart-button-title-wrapper {
   position: relative;
   display: inline-block;
   font-family: var(--s-btn--font-family);
-  font-weight: 600;
   font-size: var(--s-btn--title--font-size);
   word-spacing: var(--s-btn--title--word-spacing);
   letter-spacing: var(--s-btn--title--letter-spacing);
-  text-transform: uppercase;
   transition: transform 0.1s ease-in-out;
   z-index: 1;
+}
+
+.smart-button-title {
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .smart-button:not(.smart-button--disabled):active {
