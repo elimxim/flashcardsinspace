@@ -11,8 +11,7 @@
     <div
       ref="lilrocket"
       class="lilrocket"
-      @mouseenter="onMouseEnter"
-      @mouseleave="onMouseLeave"
+      @click="onClickRocket"
     >
       <SmartPicture
         alt="Lilrocket"
@@ -181,7 +180,7 @@ const rockets = [
 const lilrocket = ref<HTMLElement>()
 const currRocketIdx = ref(0)
 const currRocketImg = computed(() => `/assets/rocket/${rockets[currRocketIdx.value]}`)
-let flyTimer: number | undefined
+let flyTimeout: number | undefined
 
 function setRandomLilrocket() {
   currRocketIdx.value = Math.floor(Math.random() * rockets.length)
@@ -195,26 +194,19 @@ function setNextLilrocket() {
   currRocketIdx.value = nextIdx
 }
 
-function onMouseEnter() {
-  flyTimer = window.setTimeout(() => {
+function onClickRocket() {
+  if (flyTimeout !== undefined) return
+  flyTimeout = window.setTimeout(() => {
     if (!lilrocket.value) return
     lilrocket.value.classList.add('fly-away')
     setTimeout(() => {
-      if (lilrocket.value) {
-        lilrocket.value.classList.remove('fly-away')
-      }
+      lilrocket.value?.classList?.remove('fly-away')
       nextTick(() => {
         setNextLilrocket()
+        flyTimeout = undefined
       })
     }, 4000)
   }, 1000)
-}
-
-function onMouseLeave() {
-  if (lilrocket.value) {
-    lilrocket.value.classList.remove('powering-up')
-  }
-  clearTimeout(flyTimer)
 }
 
 onMounted(() => {
@@ -230,14 +222,17 @@ onMounted(() => {
   position: relative;
   width: fit-content;
   height: fit-content;
-  cursor: pointer;
+  cursor: default;
   animation: shake 4s infinite ease-in-out;
   margin: 0 auto;
   z-index: 100;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.lilrocket:hover {
-  animation: none ease-in-out;
+@media (hover: hover) {
+  .lilrocket:hover {
+    animation: none ease-in-out;
+  }
 }
 
 @keyframes shake {
@@ -283,10 +278,10 @@ onMounted(() => {
 @keyframes fly-away {
   /* 1. Smoothly goes to the vertical position */
   0% {
-    transform: rotate(0deg);
+    transform: rotate(0);
   }
   10% {
-    transform: rotate(v-bind(rocketVerticalAngleDeg)deg);
+    transform: rotate(v-bind(rocketVerticalAngleDeg));
   }
 
   /* 2. Powering-up */
