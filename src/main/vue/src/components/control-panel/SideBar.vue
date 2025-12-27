@@ -82,7 +82,7 @@ import { saveSelectedSetIdToCookies } from '@/utils/cookies.ts'
 import { FlashcardSet } from '@/model/flashcard.ts'
 import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
 
-const OVERLAY_BREAKPOINT = 660
+const OVERLAY_BREAKPOINT = 620
 
 const flashcardStore = useFlashcardStore()
 const flashcardSetStore = useFlashcardSetStore()
