@@ -338,17 +338,17 @@ onMounted(() => {
 
   /* 5. Teleportation to the right and awaiting */
   55.01% {
-    transform: translateX(70vw) translateY(0vh) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1.0);
+    transform: translateX(80vw) translateY(0vh) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1.0);
   }
 
   /* 6. Wait for a little bit */
   65% {
-    transform: translateX(70vw) translateY(0vh) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1.0);
+    transform: translateX(80vw) translateY(0vh) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1.0);
   }
 
   /* 7. Flies from the right to the left */
   100% {
-    transform: translateX(-70vw) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1.0);
+    transform: translateX(-80vw) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1.0);
   }
 }
 
