@@ -29,7 +29,6 @@ import SpecialStageWidget from '@/components/control-panel/SpecialStageWidget.vu
 import DayStreakWidget from '@/components/control-panel/DayStreakWidget.vue'
 import LaunchWidget from '@/components/control-panel/LaunchWidget.vue'
 import QuizWidget from '@/components/control-panel/QuizWidget.vue'
-import { storeToRefs } from 'pinia'
 import {
   computed,
   onMounted,
