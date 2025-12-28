@@ -240,8 +240,9 @@ const calendarIcon = computed(() => {
 
 .calendar-popup {
   position: absolute;
-  top: 36%;
-  left: -30%;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: transparent;
   backdrop-filter: blur(40px);
   border: 1px solid var(--c-widget--border-color);
