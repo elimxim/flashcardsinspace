@@ -112,7 +112,8 @@ function openFlashcardSetSettings() {
   flex-direction: column;
   gap: 12px;
   padding: 14px 10px 10px 10px;
-  overflow: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .control-outer-space-panel {

@@ -128,7 +128,6 @@ defineExpose({
   position: relative;
   display: flex;
   width: 100%;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .smart-input textarea,
@@ -186,7 +185,6 @@ defineExpose({
   justify-content: center;
   background: transparent;
   transition: color 0.2s ease-in-out;
-  -webkit-tap-highlight-color: transparent;
 }
 
 @media (hover: hover) {

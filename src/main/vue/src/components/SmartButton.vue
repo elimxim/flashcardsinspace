@@ -200,7 +200,6 @@ function handleGlobalMouseUp() {
   height: var(--s-btn--height);
   cursor: pointer;
   overflow: hidden;
-  -webkit-tap-highlight-color: transparent;
   isolation: isolate;
 }
 

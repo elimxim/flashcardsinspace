@@ -6,6 +6,10 @@
   padding: 0;
   margin: 0;
   overflow: auto;
+  /* Prevent overscroll bounce on mobile */
+  overscroll-behavior: contain;
+  /* Allow only vertical scrolling, prevent horizontal drag */
+  touch-action: pan-y;
 }
 
 .page--bg--light {

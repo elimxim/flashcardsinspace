@@ -226,7 +226,6 @@ onMounted(() => {
   animation: shake 4s infinite ease-in-out;
   margin: 0 auto;
   z-index: 100;
-  -webkit-tap-highlight-color: transparent;
 }
 
 @media (hover: hover) {

@@ -1,10 +1,26 @@
+html {
+  /* Prevent overscroll/bounce effect on mobile */
+  overscroll-behavior: none;
+  /* Prevent pull-to-refresh */
+  overflow: hidden;
+  height: 100%;
+}
+
 body {
   margin: 0;
   padding: 0;
+  /* Prevent overscroll/bounce effect on mobile */
+  overscroll-behavior: none;
+  overflow: hidden;
+  height: 100%;
+  user-select: none;
 }
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  /* Prevent touch callout (context menu on long press) */
+  -webkit-touch-callout: none;
 }
 
 button {

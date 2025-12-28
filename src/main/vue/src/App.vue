@@ -20,10 +20,13 @@ onMounted(() => {
 
 <style scoped>
 .app {
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--app--bg, white);
+  overflow: hidden;
+  /* Prevent touch move on the app container */
+  touch-action: none;
 }
 
 </style>
