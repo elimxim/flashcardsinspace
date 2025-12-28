@@ -41,15 +41,10 @@ import {
 import { loadFlashcardSetStore } from '@/utils/stores.ts'
 import { specialStages } from '@/core-logic/stage-logic.ts'
 import { useFlip } from '@/utils/flip.ts'
-import { useChronoStore } from '@/stores/chrono-store.ts'
 
 const FIRST_REARRANGE_BREAKPOINT = 1000
 const SECOND_REARRANGE_BREAKPOINT = 490
 const THIRD_REARRANGE_BREAKPOINT = 342
-
-const chronoStore = useChronoStore()
-
-const { isInitialDay, isDayOff } = storeToRefs(chronoStore)
 
 const mainPanel = ref<HTMLElement>()
 const mainPanelWidth = ref(0)
@@ -90,7 +85,7 @@ const widgets: Record<string, Widget> = {
     component: ReviewInfoWidget,
     className: 'main-panel-stretching-widget',
     props: {},
-    hidden: computed(() => isInitialDay.value || isDayOff.value),
+    hidden: computed(() => false),
   },
   launch: {
     id: 'launch',
@@ -124,7 +119,7 @@ const widgets: Record<string, Widget> = {
     component: DayStreakWidget,
     className: 'main-panel-square-widget',
     props: {},
-    hidden: isInitialDay,
+    hidden: computed(() => false),
   },
   quiz: {
     id: 'quiz-widget',
