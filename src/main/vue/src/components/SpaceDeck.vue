@@ -51,7 +51,7 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import { deckEmptyMessage } from '@/core-logic/review-logic.ts'
 import { useSwipe } from '@/utils/use-swipe.ts'
-import { isTouchDevice } from '@/utils/utils.ts';
+import { isTouchDevice } from '@/utils/utils.ts'
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })

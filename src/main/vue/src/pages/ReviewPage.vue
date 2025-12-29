@@ -163,7 +163,6 @@ import Starfield from '@/components/Starfield.vue'
 import QuizResult from '@/components/QuizResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useStopWatch } from '@/utils/stop-watch.ts'
-import { isTouchDevice } from '@/utils/utils.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import {
