@@ -99,18 +99,17 @@ withDefaults(defineProps<{
 <style scoped>
 .quiz-result {
   width: 100%;
-  height: 100%;
+  height: auto;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  grid-template-columns: repeat(5, 1fr);
-  align-items: center;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: start;
   gap: clamp(4px, 1.5cqw, 8px);
-  padding: clamp(4px, 1.2cqw, 8px);
+  padding: clamp(8px, 1.2cqw, 12px);
   border-radius: 6px;
   border: 1px solid rgb(225, 228, 240);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  container-type: size;
+  container-type: inline-size;
 }
 
 .quiz-title {
@@ -132,27 +131,20 @@ withDefaults(defineProps<{
   display: grid;
   grid-template-rows: auto 1fr;
   grid-template-columns: 1fr;
-  gap: clamp(4px, 1.8cqw, 10px);
+  gap: clamp(8px, 1.8cqw, 12px);
 }
 
 .quiz-chart-wrapper {
   grid-column: 3 / -1;
   width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .quiz-chart {
   width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  aspect-ratio: 1 / 1;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border-radius: 6px;
-  padding: 10px;
+  padding: clamp(4px, 1.8cqw, 10px);
 }
 
 .quiz-stats {
