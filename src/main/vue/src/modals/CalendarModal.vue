@@ -365,9 +365,9 @@ function handleKeydown(event: KeyboardEvent) {
 .calendar-day--completed::before {
   content: "✔";
   position: absolute;
-  top: 1px;
-  left: 1px;
-  font-size: 0.65rem;
+  top: 0;
+  left: 0;
+  font-size:clamp(0.45rem, 1.8vw, 0.65rem);
   line-height: 1;
   color: var(--day--checkmark--color);
   pointer-events: none;
