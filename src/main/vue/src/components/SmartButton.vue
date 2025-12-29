@@ -8,6 +8,7 @@
       'smart-button--fill-width': fillWidth,
       'smart-button--fill-height': fillHeight,
       'smart-button--fit-content': fitContent,
+      'smart-button--tapped': animatingOnTap,
     }"
     :disabled="disabled"
     :hidden="hidden"
@@ -17,7 +18,7 @@
     @mouseleave="onMouseLeave"
     @touchstart="onTouchStart"
     @touchend="onTouchEnd"
-    @click.stop="click"
+    @click.stop="handleClick"
   >
     <span class="smart-button-progress" :style="{ width: progressPercentage }"/>
     <span class="smart-button-title-wrapper">
@@ -31,6 +32,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, useSlots } from 'vue'
+import { hoverSupported } from '@/utils/utils.ts'
 
 const props = withDefaults(defineProps<{
   text?: string
@@ -43,6 +45,8 @@ const props = withDefaults(defineProps<{
   fillHeight?: boolean
   fitContent?: boolean
   titleScale?: number
+  animateTap?: boolean
+  tapDuration?: number
   onClick?: () => void
 }>(), {
   text: '',
@@ -55,6 +59,8 @@ const props = withDefaults(defineProps<{
   fillHeight: false,
   fitContent: false,
   titleScale: 1,
+  animateTap: true,
+  tapDuration: 200,
   onClick: () => {
   },
 })
@@ -67,13 +73,28 @@ let animationFrame: number | null = null
 let pressStartTime: number | null = null
 
 const button = ref<HTMLButtonElement>()
+const animatingOnTap = ref(false)
 const progress = ref(0)
 const progressPercentage = computed(() => `${progress.value * 100}%`)
 
-function click() {
+function handleClick() {
   if (props.disabled) return
   if (props.autoBlur) button.value?.blur()
-  if (props.holdTime <= 0) props.onClick()
+  if (props.holdTime <= 0) {
+    if (!hoverSupported && props.animateTap) {
+      startTapAnimation()
+    } else {
+      props.onClick()
+    }
+  }
+}
+
+function startTapAnimation() {
+  animatingOnTap.value = true
+  setTimeout(() => {
+    animatingOnTap.value = false
+    props.onClick()
+  }, props.tapDuration)
 }
 
 function onMouseDown(event: Event) {
@@ -143,7 +164,7 @@ function updateProgress() {
 }
 
 defineExpose({
-  click
+  click: handleClick
 })
 
 onMounted(() => {
@@ -234,14 +255,26 @@ function handleGlobalMouseUp() {
   transform: translateY(1px);
 }
 
-.smart-button:not(.smart-button--disabled):hover,
-.smart-button:not(.smart-button--disabled):focus {
+@media (hover: hover) {
+  .smart-button:not(.smart-button--disabled):hover,
+  .smart-button:not(.smart-button--disabled):focus {
+    outline: 1px solid var(--s-btn--border-color--hover);
+    color: var(--s-btn--title--color--hover);
+    background: var(--s-btn--bg--hover);
+  }
+
+  .smart-button:not(.smart-button--disabled):hover .smart-button-title {
+    transform: scale(v-bind(titleScale));
+  }
+}
+
+.smart-button--tapped:not(.smart-button--disabled) {
   outline: 1px solid var(--s-btn--border-color--hover);
   color: var(--s-btn--title--color--hover);
   background: var(--s-btn--bg--hover);
 }
 
-.smart-button:not(.smart-button--disabled):hover .smart-button-title {
+.smart-button:has(.smart-button--tapped:not(.smart-button--disabled)) .smart-button-title {
   transform: scale(v-bind(titleScale));
 }
 
