@@ -3,9 +3,27 @@ package com.github.elimxim.flashcardsinspace.entity.repository
 import com.github.elimxim.flashcardsinspace.entity.ReviewSession
 import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
 import org.springframework.data.jpa.repository.JpaRepository
-import java.util.*
+import org.springframework.data.jpa.repository.Query
 
 interface ReviewSessionRepository : JpaRepository<ReviewSession, Long> {
-    fun findTopByFlashcardSetIdAndTypeOrderByStartedAtDesc(flashcardSetId: Long, type: ReviewSessionType): Optional<ReviewSession>
+    @Query("""
+        SELECT parent
+        FROM ReviewSession parent
+        WHERE parent.flashcardSet.id = :flashcardSetId
+          AND parent.type = :type
+          AND parent.startedAt >= CURRENT_TIMESTAMP - :depthDays DAY
+          AND NOT EXISTS (
+              SELECT 1
+              FROM ReviewSession child
+              WHERE child.flashcardSet.id = :flashcardSetId
+                AND child.type = :type
+                AND child.startedAt > parent.startedAt
+                AND child.parentSessionId = parent.id
+          )
+        ORDER BY parent.startedAt DESC
+        LIMIT 10
+    """)
+    fun findLatestUncompletedReviewSessions(flashcardSetId: Long, type: ReviewSessionType, depthDays: Int): List<ReviewSession>
+
     fun deleteByFlashcardSetId(flashcardSetId: Long)
 }

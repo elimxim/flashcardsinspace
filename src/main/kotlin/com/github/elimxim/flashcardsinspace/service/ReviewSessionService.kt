@@ -1,5 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service
 
+import com.github.elimxim.flashcardsinspace.entity.QuizMetadata
 import com.github.elimxim.flashcardsinspace.entity.ReviewSession
 import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
 import com.github.elimxim.flashcardsinspace.entity.User
@@ -131,6 +132,7 @@ class ReviewSessionService(
             addQuizMetadata(session, request, parentSession)
         }
         val savedSession = reviewSessionRepository.save(session)
+        log.info("Created child review session ${savedSession.id} of $parentId for set $setId")
         return savedSession.toDto()
     }
 
@@ -142,13 +144,22 @@ class ReviewSessionService(
     }
 
     @Transactional
-    fun getLatestReviewSession(user: User, setId: Long, type: ReviewSessionType): ReviewSessionDto? {
-        log.info("Getting latest review session for set $setId")
+    fun getLatestUncompletedReviewSession(user: User, setId: Long, type: ReviewSessionType): ReviewSessionDto? {
+        log.info("Getting latest uncompleted review session for set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
-        return reviewSessionRepository
-            .findTopByFlashcardSetIdAndTypeOrderByStartedAtDesc(setId, type)
-            .map { it.toDto() }
-            .orElse(null)
+        val topUncompletedSessions = reviewSessionRepository
+            .findLatestUncompletedReviewSessions(setId, type, 30)
+            .filter {
+                val metadata = it.metadata
+                if (metadata != null && metadata is QuizMetadata) {
+                    metadata.overallTotalCount != metadata.overallCorrectCount
+                } else {
+                    false
+                }
+            }
+
+        val latestUncompletedSession = topUncompletedSessions.maxByOrNull { it.startedAt }
+        return latestUncompletedSession?.toDto()
     }
 
     @Transactional

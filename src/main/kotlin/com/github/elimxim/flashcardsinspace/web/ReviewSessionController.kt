@@ -63,14 +63,14 @@ class ReviewSessionController(
         return ResponseEntity.ok(dto)
     }
 
-    @GetMapping("/latest")
-    fun getLatestReviewSession(
+    @GetMapping("/latest-uncompleted")
+    fun getLatestUncompletedReviewSession(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @RequestParam @ValidReviewSessionType type: String,
     ): ResponseEntity<ReviewSessionDto> = withLoggingContext(user) {
         val type = ReviewSessionType.valueOf(type.normalize().escapeJava())
-        val dto = reviewSessionService.getLatestReviewSession(user, setId, type)
+        val dto = reviewSessionService.getLatestUncompletedReviewSession(user, setId, type)
         return if (dto != null) {
             ResponseEntity.ok(dto)
         } else {

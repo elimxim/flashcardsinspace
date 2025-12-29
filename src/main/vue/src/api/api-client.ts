@@ -184,9 +184,9 @@ export async function sendUserUpdateRequest(username: string, userEmail: string,
   })
 }
 
-export async function sendLatestReviewSessionGetRequest(setId: number, type: ReviewSessionType) {
-  Log.log(LogTag.GET, `/flashcard-sets/${setId}/review-sessions/latest?type=${type}`)
-  return apiClient.get<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/latest?type=${type}`)
+export async function sendLatestUncompletedReviewSessionGetRequest(setId: number, type: ReviewSessionType) {
+  Log.log(LogTag.GET, `/flashcard-sets/${setId}/review-sessions/latest-uncompleted?type=${type}`)
+  return apiClient.get<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/latest-uncompleted?type=${type}`)
 }
 
 export async function sendReviewSessionGetRequest(setId: number, id: number) {
