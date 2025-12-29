@@ -118,8 +118,7 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref, watch } from 'vue'
 import { countFlashcards, ReviewSessionType } from '@/core-logic/review-logic.ts'
-import { sendLatestReviewSessionGetRequest } from '@/api/api-client.ts'
-import { quizSessionIdCookie } from '@/utils/cookies-ref.ts'
+import { sendLatestUncompletedReviewSessionGetRequest } from '@/api/api-client.ts'
 
 const router = useRouter()
 const toggleStore = useToggleStore()
@@ -217,12 +216,11 @@ function hideBanner() {
 
 async function getLatestUncompletedQuizSessionId(): Promise<number | undefined> {
   if (!flashcardSet.value) return undefined
-  return await sendLatestReviewSessionGetRequest(flashcardSet.value.id, ReviewSessionType.QUIZ)
+  return await sendLatestUncompletedReviewSessionGetRequest(flashcardSet.value.id, ReviewSessionType.QUIZ)
     .then((response) => {
-      if (response.status === 204) return undefined
-      const overallTotal = response.data.metadata?.overallTotalCount ?? 0
-      const overallCorrect = response.data.metadata?.overallCorrectCount ?? 0
-      if (overallTotal != overallCorrect) {
+      if (response.status === 204) {
+        return undefined
+      } else {
         return response.data.id
       }
     })
@@ -232,14 +230,8 @@ async function getLatestUncompletedQuizSessionId(): Promise<number | undefined> 
     })
 }
 
-watch(flashcardSet, async (newVal) => {
-  if (newVal) {
-    latestUncompletedSessionId.value = await getLatestUncompletedQuizSessionId()
-  }
-})
-
-watch(quizSessionIdCookie, async (newVal) => {
-  if (newVal) {
+watch(flashcardSet, async (newVal, oldValue) => {
+  if (newVal && !oldValue) {
     latestUncompletedSessionId.value = await getLatestUncompletedQuizSessionId()
   }
 })
