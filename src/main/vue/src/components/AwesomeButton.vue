@@ -22,6 +22,7 @@
         'awesome-button--invisible': invisible,
         'awesome-button--click-ripple': clickRipple,
         'awesome-button--ripple-active': rippleActive,
+        'awesome-button--tapped': animatingOnTap,
       }"
         :disabled="disabled"
         v-bind="$attrs"
@@ -57,6 +58,7 @@
 <script setup lang="ts">
 import Tooltip from '@/components/Tooltip.vue'
 import { ref } from 'vue'
+import { hoverSupported } from '@/utils/utils.ts'
 
 const props = withDefaults(defineProps<{
   icon: string
@@ -71,6 +73,8 @@ const props = withDefaults(defineProps<{
   square?: boolean
   fillSpace?: boolean
   clickRipple?: boolean
+  animateTap?: boolean,
+  tapDuration?: number
   tooltip?: string
   tooltipPosition?: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
   tooltipDelay?: number
@@ -89,6 +93,8 @@ const props = withDefaults(defineProps<{
   square: false,
   fillSpace: false,
   clickRipple: false,
+  animateTap: true,
+  tapDuration: 300,
   tooltip: undefined,
   tooltipPosition: 'top',
   tooltipDelay: 1000,
@@ -102,6 +108,7 @@ const props = withDefaults(defineProps<{
 
 const pressed = ref(false)
 const rippleActive = ref(false)
+const animatingOnTap = ref(false)
 
 function press() {
   pressed.value = !pressed.value
@@ -112,9 +119,19 @@ function handleClick() {
   if (props.disabled) return
   if (props.clickRipple) {
     triggerRipple()
+  } else if (!hoverSupported && props.animateTap) {
+    startTapAnimation()
   } else {
     press()
   }
+}
+
+function startTapAnimation() {
+  animatingOnTap.value = true
+  setTimeout(() => {
+    animatingOnTap.value = false
+    press()
+  }, props.tapDuration)
 }
 
 function triggerRipple() {
@@ -204,6 +221,11 @@ defineExpose({
   }
 }
 
+.awesome-button--tapped:not(.awesome-button--disabled):not(.awesome-button--active) {
+  color: var(--a-btn--icon--color--hover);
+  background: var(--a-btn--bg--hover);
+}
+
 .awesome-button--disabled {
   color: var(--a-btn--icon--color--disabled);
   background: var(--a-btn--bg--disabled);
@@ -219,6 +241,16 @@ defineExpose({
 
 .awesome-button--invisible {
   visibility: hidden;
+}
+
+@media (hover: hover) {
+  .awesome-button-wrapper:has(.awesome-button:not(.awesome-button--disabled):hover) .awesome-icon-wrapper {
+    transform: scale(v-bind(scaleFactor));
+  }
+}
+
+.awesome-button-wrapper:has(.awesome-button--tapped:not(.awesome-button--disabled)) .awesome-icon-wrapper {
+  transform: scale(v-bind(scaleFactor));
 }
 
 .awesome-icon-wrapper {
@@ -261,12 +293,6 @@ defineExpose({
   }
   100% {
     opacity: 1;
-  }
-}
-
-@media (hover: hover) {
-  .awesome-button-wrapper:has(.awesome-button:not(.awesome-button--disabled):hover) .awesome-icon-wrapper {
-    transform: scale(v-bind(scaleFactor));
   }
 }
 
