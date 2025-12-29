@@ -365,7 +365,7 @@ function handleKeydown(event: KeyboardEvent) {
 .calendar-day--completed::before {
   content: "✔";
   position: absolute;
-  bottom: 1px;
+  top: 1px;
   left: 1px;
   font-size: 0.65rem;
   line-height: 1;
