@@ -207,7 +207,6 @@ import {
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
 import { ReviewSessionCreateRequest } from '@/api/communication.ts'
-import { quizSessionIdCookie } from '@/utils/cookies-ref.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 
@@ -228,7 +227,6 @@ const { chronodays, currDay } = storeToRefs(chronoStore)
 
 const reviewMode = computed(() => determineReviewMode(props.sessionType, props.stages))
 const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
-const reviewSessionId = ref<number>()
 const elapsedTime = ref(0)
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 const reviewedFlashcardIds = ref<number[]>([])
@@ -297,13 +295,15 @@ async function startReview() {
   } else {
     reviewQueue.value = createReviewQueueForStages(flashcards.value, props.stages, currDay.value)
   }
+
   flashcardsTotal.value = reviewQueue.value.remaining()
   quizOverallTotal.value = flashcardsTotal.value
   if (reviewMode.value.isQuiz()) {
     await loadOrCreateQuizSession()
-  } else {
+  } else if (reviewMode.value.isLightspeed()) {
     await createReviewSession()
   }
+
   if (await nextFlashcard()) {
     startWatch()
   }
@@ -314,16 +314,13 @@ async function loadOrCreateQuizSession() {
   if (props.sessionId) {
     await loadQuizSession(props.sessionId)
   } else  {
-    await createReviewSession(true).then(() => {
-      quizSessionIdCookie.value = reviewSessionId.value
-    })
+    await createReviewSession(true)
   }
 }
 
 function resetState() {
   stopWatch()
   reviewQueue.value = new EmptyReviewQueue()
-  reviewSessionId.value = undefined
   reviewedFlashcardIds.value = []
   incorrectFlashcards.value = []
   flashcardsTotal.value = 0
@@ -392,19 +389,24 @@ async function quizAnswer(know: boolean) {
 }
 
 async function startNextQuizRound() {
-  if (!flashcardSet.value || !reviewSessionId.value) return
+  if (!flashcardSet.value || !props.sessionId) return
   if (incorrectFlashcards.value.length === 0) {
     Log.error(LogTag.LOGIC, 'Cannot start new round: no incorrect flashcards')
     return
   }
 
-  await sendReviewSessionChildCreateRequest(flashcardSet.value.id, reviewSessionId.value, {
+  await sendReviewSessionChildCreateRequest(flashcardSet.value.id, props.sessionId, {
     type: ReviewSessionType.QUIZ,
     chronodayId: currDay.value.id,
   })
     .then((response) => {
-      reviewSessionId.value = response.data.id
-      quizSessionIdCookie.value = response.data.id
+      Log.log(LogTag.LOGIC, `Child review session ${response.data.id} created, parent: ${props.sessionId}`)
+      router.replace({
+        query: {
+          ...router.currentRoute.value.query,
+          sessionId: response.data.id,
+        }
+      })
 
       const newQueue = new MonoStageReviewQueue(incorrectFlashcards.value)
       newQueue.shuffle()
@@ -533,7 +535,7 @@ function onAudioChanged() {
 }
 
 watch(currFlashcard, async (newVal, oldVal) => {
-  if (!flashcardSet.value || !reviewSessionId.value) return
+  if (!flashcardSet.value || !props.sessionId) return
   if (oldVal && reviewMode.value.isLightspeed()) {
     reviewedFlashcardIds.value.push(oldVal.id)
     await updateReviewSession([oldVal.id])
@@ -564,8 +566,13 @@ async function createReviewSession(quiz: boolean = false) {
 
   await sendReviewSessionCreateRequest(flashcardSet.value.id, request)
     .then((response) => {
-      reviewSessionId.value = response.data.id
-      Log.log(LogTag.LOGIC, `Review session ${reviewSessionId.value} created`)
+      Log.log(LogTag.LOGIC, `Review session ${response.data.id} created`)
+      router.replace({
+        query: {
+          ...router.currentRoute.value.query,
+          sessionId: response.data.id,
+        }
+      })
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to create a review session`, error.response?.data)
@@ -577,7 +584,6 @@ async function loadQuizSession(sessionId: number) {
   if (!flashcardSet.value) return
   await sendReviewSessionGetRequest(flashcardSet.value.id, sessionId)
     .then((response) => {
-      reviewSessionId.value = response.data.id
       elapsedTime.value = response.data.elapsedTime
       quizRound.value = response.data.metadata?.round ?? 1
       quizOverallCorrect.value = response.data.metadata?.overallCorrectCount ?? 0
@@ -592,7 +598,7 @@ async function loadQuizSession(sessionId: number) {
       incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIdSet.has(f.id))
       reviewQueue.value = new MonoStageReviewQueue(flashcardsForReview)
       reviewQueue.value.shuffle()
-      Log.log(LogTag.LOGIC, `Review session ${reviewSessionId.value} retrieved`)
+      Log.log(LogTag.LOGIC, `Review session ${sessionId} retrieved`)
     })
     .catch((error) => {
       resetState()
@@ -602,24 +608,24 @@ async function loadQuizSession(sessionId: number) {
 }
 
 async function updateReviewSession(flashcardIds: number[], finished: boolean = false) {
-  if (!flashcardSet.value || !reviewSessionId.value) return
-  await sendReviewSessionUpdateRequest(flashcardSet.value.id, reviewSessionId.value, {
+  if (!flashcardSet.value || !props.sessionId) return
+  await sendReviewSessionUpdateRequest(flashcardSet.value.id, props.sessionId, {
     elapsedTime: elapsedTime.value,
     flashcardIds: flashcardIds.map(id => ({ id: id })),
     finished: finished,
   })
     .then(() => {
-      Log.log(LogTag.LOGIC, `Review session ${reviewSessionId.value} updated`)
+      Log.log(LogTag.LOGIC, `Review session ${props.sessionId} updated`)
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to updated review session ${reviewSessionId.value}`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to updated review session ${props.sessionId}`, error.response?.data)
       toaster.bakeError(userApiErrors.REVIEW_SESSION__UPDATING_FAILED, error.response?.data)
     })
 }
 
 async function updateQuizSession(reviewedFlashcardIds: number[], nextRoundFlashcardIds: number[], finished: boolean = false) {
-  if (!flashcardSet.value || !reviewSessionId.value) return
-  await sendReviewSessionUpdateRequest(flashcardSet.value.id, reviewSessionId.value, {
+  if (!flashcardSet.value || !props.sessionId) return
+  await sendReviewSessionUpdateRequest(flashcardSet.value.id, props.sessionId, {
     elapsedTime: elapsedTime.value,
     flashcardIds: reviewedFlashcardIds.map(id => ({ id: id })),
     finished: finished,
@@ -629,10 +635,10 @@ async function updateQuizSession(reviewedFlashcardIds: number[], nextRoundFlashc
     },
   })
     .then(() => {
-      Log.log(LogTag.LOGIC, `Review session ${reviewSessionId.value} updated`)
+      Log.log(LogTag.LOGIC, `Review session ${props.sessionId} updated`)
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to update review session ${reviewSessionId.value}`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to update review session ${props.sessionId}`, error.response?.data)
       toaster.bakeError(userApiErrors.REVIEW_SESSION__UPDATING_FAILED, error.response?.data)
     })
 }
