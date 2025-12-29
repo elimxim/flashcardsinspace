@@ -1,5 +1,10 @@
 <template>
-  <div class="space-deck">
+  <div
+    class="space-deck"
+    @touchstart="onTouchStart"
+    @touchmove="onTouchMove"
+    @touchend="onTouchEnd"
+  >
     <div class="flashcard-deck">
       <transition
         :name="cardTransition"
@@ -18,6 +23,7 @@
           :on-edit="toggleStore.toggleFlashcardEdit"
           :front-side-audio="flashcardFrontSideAudio"
           :back-side-audio="flashcardBackSideAudio"
+          :style="swipeStyle"
         />
         <template v-else>
           <slot v-if="hasSlot && showSlot && deckReady"/>
@@ -55,15 +61,27 @@ const props = withDefaults(defineProps<{
   showSlot?: boolean
   flashcardFrontSideAudio?: Blob | undefined
   flashcardBackSideAudio?: Blob | undefined
+  swipeEnabled?: boolean
+  canSwipeLeft?: boolean
+  canSwipeRight?: boolean
   onFlashcardRemoved?: () => void
   onAudioChanged?: () => void
+  onSwipeLeft?: () => void
+  onSwipeRight?: () => void
 }>(), {
   showSlot: true,
   flashcardFrontSideAudio: undefined,
   flashcardBackSideAudio: undefined,
+  swipeEnabled: false,
+  canSwipeLeft: true,
+  canSwipeRight: true,
   onFlashcardRemoved: () => {
   },
   onAudioChanged: () => {
+  },
+  onSwipeLeft: () => {
+  },
+  onSwipeRight: () => {
   },
 })
 
@@ -78,6 +96,113 @@ const cardTransition = ref('')
 
 const hasSlot = computed(() => !!slots.default)
 const viewedTimes = computed(() => (flashcard.value?.timesReviewed ?? 0) + 1)
+
+// Swipe handling
+const SWIPE_THRESHOLD = 150 // minimum distance in pixels to trigger swipe
+const SWIPE_VELOCITY_THRESHOLD = 0.3 // minimum velocity in px/ms
+const MAX_ROTATION = 15 // maximum rotation in degrees during swipe
+
+let touchStartX = 0
+let touchStartY = 0
+let touchStartTime = 0
+let isSwiping = false
+
+const swipeOffset = ref(0)
+const isSwipeActive = ref(false)
+const isAnimatingOut = ref(false)
+
+const swipeStyle = computed(() => {
+  if (swipeOffset.value === 0 && !isSwipeActive.value && !isAnimatingOut.value) return {}
+  const rotation = (swipeOffset.value / 200) * MAX_ROTATION
+  return {
+    transform: `translateX(${swipeOffset.value}px) rotate(${rotation}deg)`,
+    // Match Vue transition timing for exit, use ease-out for snap-back
+    transition: isSwipeActive.value ? 'none' : 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
+  }
+})
+
+function canSwipe() {
+  return props.swipeEnabled && (props.canSwipeLeft || props.canSwipeRight)
+}
+
+function onTouchStart(event: TouchEvent) {
+  if (!canSwipe()) return
+  const touch = event.touches[0]
+  touchStartX = touch.clientX
+  touchStartY = touch.clientY
+  touchStartTime = Date.now()
+  isSwiping = false
+  isSwipeActive.value = true
+  isAnimatingOut.value = false
+  swipeOffset.value = 0
+}
+
+function onTouchMove(event: TouchEvent) {
+  if (!canSwipe()) return
+  const touch = event.touches[0]
+  const deltaX = touch.clientX - touchStartX
+  const deltaY = touch.clientY - touchStartY
+
+  // If horizontal movement is greater than vertical, it's a swipe attempt
+  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+    isSwiping = true
+    swipeOffset.value = deltaX
+    event.preventDefault() // Prevent scrolling when swiping
+  }
+}
+
+function onTouchEnd(event: TouchEvent) {
+  isSwipeActive.value = false
+
+  if (!canSwipe()) {
+    swipeOffset.value = 0
+    return
+  }
+
+  const touch = event.changedTouches[0]
+  const deltaX = touch.clientX - touchStartX
+  const deltaTime = Date.now() - touchStartTime
+  const velocity = Math.abs(deltaX) / deltaTime
+
+  // Check if swipe meets threshold (distance OR velocity) and direction is allowed
+  const meetsThreshold = Math.abs(deltaX) > SWIPE_THRESHOLD || velocity > SWIPE_VELOCITY_THRESHOLD
+  const isSwipeLeft = deltaX < 0
+  const directionAllowed = isSwipeLeft ? props.canSwipeLeft : props.canSwipeRight
+  const isValidSwipe = isSwiping && meetsThreshold && directionAllowed
+
+  if (isValidSwipe) {
+    // Animate card off-screen in the swipe direction, then trigger callback
+    isAnimatingOut.value = true
+    // Use same distance as Vue transition (200% of card width ~= 1200px max)
+    const exitOffset = deltaX > 0 ? 1200 : -1200
+    requestAnimationFrame(() => {
+      swipeOffset.value = exitOffset
+      setTimeout(() => {
+        // Reset state and trigger callback after animation completes
+        swipeOffset.value = 0
+        isAnimatingOut.value = false
+        if (deltaX > 0) {
+          props.onSwipeRight()
+        } else {
+          props.onSwipeLeft()
+        }
+      }, 200) // Match the transition duration
+    })
+  } else if (isSwiping) {
+    // Invalid swipe - snap back with animation
+    isAnimatingOut.value = true
+    requestAnimationFrame(() => {
+      swipeOffset.value = 0
+      setTimeout(() => {
+        isAnimatingOut.value = false
+      }, 200) // Match the transition duration
+    })
+  } else {
+    swipeOffset.value = 0
+  }
+
+  isSwiping = false
+}
 
 function setDeckReady() {
   deckReady.value = true

@@ -58,6 +58,11 @@
           :flashcard-front-side-audio="flashcardFrontSideAudioBlob"
           :flashcard-back-side-audio="flashcardBackSideAudioBlob"
           :show-slot="reviewMode.isQuiz()"
+          :swipe-enabled="isTouchDevice"
+          :can-swipe-left="!noPrevAvailable"
+          :can-swipe-right="!noNextAvailable"
+          :on-swipe-left="onSwipeLeft"
+          :on-swipe-right="onSwipeRight"
         >
           <QuizResult
             v-if="reviewMode.isQuiz()"
@@ -71,7 +76,7 @@
             :on-finish="finishReviewAndLeave"
           />
         </SpaceDeck>
-        <div class="review-nav">
+        <div v-if="!isTouchDevice" class="review-nav">
           <template v-if="reviewMode.isLightspeed()">
             <SmartButton
               text="Don't know"
@@ -159,6 +164,7 @@ import Starfield from '@/components/Starfield.vue'
 import QuizResult from '@/components/QuizResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useStopWatch } from '@/utils/stop-watch.ts'
+import { isTouchDevice } from '@/utils/utils.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import {
@@ -438,6 +444,18 @@ async function next() {
   if (noNextAvailable.value) return
   spaceDeck.value?.willSlideToRight()
   await nextFlashcard()
+}
+
+function onSwipeLeft() {
+  if (reviewMode.value.isLightspeed()) stageDown()
+  else if (reviewMode.value.isSpecial()) prev()
+  else if (reviewMode.value.isQuiz()) quizAnswer(false)
+}
+
+function onSwipeRight() {
+  if (reviewMode.value.isLightspeed()) stageUp()
+  else if (reviewMode.value.isSpecial()) next()
+  else if (reviewMode.value.isQuiz()) quizAnswer(true)
 }
 
 async function moveBack() {
