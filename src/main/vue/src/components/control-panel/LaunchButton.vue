@@ -14,6 +14,7 @@
       v-bind="$attrs"
       icon="fa-solid fa-rocket"
       :disabled="disabled"
+      :tap-duration="600"
       fill-space
     />
     <div class="curtain">
