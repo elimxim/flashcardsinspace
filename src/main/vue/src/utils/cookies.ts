@@ -4,7 +4,6 @@ import { Log, LogTag } from '@/utils/logger.ts'
 const COOKIE_SELECTED_SET_ID = 'selectedSetId'
 const COOKIE_USER_SIGNED_UP = 'userSignedUp'
 const COOKIE_SIDEBAR_EXPANDED = 'sidebarExpanded'
-const COOKIE_QUIZ_SESSION_ID = 'quizSessionId'
 const COOKIE_LOGGING_ENABLED = 'loggingEnabled'
 
 function saveCookie(name: string, value: string, expires: number) {
@@ -23,6 +22,7 @@ function loadCookie(name: string): string | undefined {
   return value
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function removeCookie(name: string) {
   Log.log(LogTag.COOKIES,`${name} => x_x`)
   Cookies.remove(name)
@@ -67,18 +67,6 @@ function loadSidebarExpandedFromCookies(): boolean {
   return loadBooleanCookie(COOKIE_SIDEBAR_EXPANDED)
 }
 
-function saveQuizSessionIdToCookies(value: number) {
-  saveCookie(COOKIE_QUIZ_SESSION_ID, value.toString(), 30)
-}
-
-function loadQuizSessionIdFromCookies(): number | undefined {
-  return loadNumberCookie(COOKIE_QUIZ_SESSION_ID)
-}
-
-function removeQuizSessionIdFromCookies() {
-  removeCookie(COOKIE_QUIZ_SESSION_ID)
-}
-
 function loadLoggingEnabledFromCookies(): boolean {
   const value = Cookies.get(COOKIE_LOGGING_ENABLED)
   if (value) {
@@ -103,9 +91,6 @@ export {
   loadSelectedSetIdFromCookies,
   setSidebarExpandedToCookies,
   loadSidebarExpandedFromCookies,
-  saveQuizSessionIdToCookies,
-  loadQuizSessionIdFromCookies,
-  removeQuizSessionIdFromCookies,
   loadLoggingEnabledFromCookies,
   saveLoggingEnabledToCookies,
 }
