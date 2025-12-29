@@ -58,11 +58,10 @@
           :flashcard-front-side-audio="flashcardFrontSideAudioBlob"
           :flashcard-back-side-audio="flashcardBackSideAudioBlob"
           :show-slot="reviewMode.isQuiz()"
-          :swipe-enabled="isTouchDevice"
-          :can-swipe-left="!noPrevAvailable"
-          :can-swipe-right="!noNextAvailable"
-          :on-swipe-left="onSwipeLeft"
-          :on-swipe-right="onSwipeRight"
+          :can-slide-left="!noPrevAvailable"
+          :can-slide-right="!noNextAvailable"
+          :on-slide-left="onSlideLeft"
+          :on-slide-right="onSlideRight"
         >
           <QuizResult
             v-if="reviewMode.isQuiz()"
@@ -76,14 +75,14 @@
             :on-finish="finishReviewAndLeave"
           />
         </SpaceDeck>
-        <div v-if="!isTouchDevice" class="review-nav">
+        <div class="review-nav">
           <template v-if="reviewMode.isLightspeed()">
             <SmartButton
               text="Don't know"
               class="decision-button dangerous-button"
               :disabled="noNextAvailable"
               :hidden="noNextAvailable"
-              :on-click="stageDown"
+              :on-click="spaceDeck?.slideLeft"
               auto-blur
               rounded
             />
@@ -92,7 +91,7 @@
               class="decision-button safe-button"
               :disabled="noNextAvailable"
               :hidden="noNextAvailable"
-              :on-click="stageUp"
+              :on-click="spaceDeck?.slideRight"
               auto-blur
               rounded
             />
@@ -102,7 +101,7 @@
               class="calm-button"
               text="Prev"
               :disabled="noPrevAvailable"
-              :on-click="prev"
+              :on-click="spaceDeck?.slideLeft"
               auto-blur
               rounded
             />
@@ -121,7 +120,7 @@
               class="calm-button"
               text="Next"
               :disabled="noNextAvailable"
-              :on-click="next"
+              :on-click="spaceDeck?.slideRight"
               auto-blur
               rounded
             />
@@ -132,7 +131,7 @@
               text="Don't know"
               :disabled="noNextAvailable"
               :hidden="noNextAvailable"
-              :on-click="() => quizAnswer(false)"
+              :on-click="spaceDeck?.slideLeft"
               auto-blur
               rounded
             />
@@ -141,7 +140,7 @@
               text="Know"
               :disabled="noNextAvailable"
               :hidden="noNextAvailable"
-              :on-click="() => quizAnswer(true)"
+              :on-click="spaceDeck?.slideRight"
               auto-blur
               rounded
             />
@@ -359,7 +358,6 @@ async function finishReviewAndLeave() {
 
 async function stageDown() {
   if (!flashcardSet.value || !currFlashcard.value) return
-  spaceDeck.value?.willSlideToLeft()
   const flashcard = copyFlashcard(currFlashcard.value)
   updateFlashcard(flashcard, prevStage(flashcard.stage), currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
@@ -371,7 +369,6 @@ async function stageDown() {
 
 async function stageUp() {
   if (!flashcardSet.value || !currFlashcard.value) return
-  spaceDeck.value?.willSlideToRight()
   const flashcard = copyFlashcard(currFlashcard.value)
   updateFlashcard(flashcard, nextStage(flashcard.stage), currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
@@ -384,10 +381,8 @@ async function quizAnswer(know: boolean) {
   if (!currFlashcard.value) return
   if (know) {
     quizOverallCorrect.value = quizOverallCorrect.value + 1
-    spaceDeck.value?.willSlideToRight()
     await updateQuizSession([currFlashcard.value.id], [])
   } else {
-    spaceDeck.value?.willSlideToLeft()
     incorrectFlashcards.value.push(currFlashcard.value)
     await updateQuizSession([currFlashcard.value.id], [currFlashcard.value.id])
   }
@@ -436,23 +431,23 @@ async function startNextQuizRound() {
 
 async function prev() {
   if (noPrevAvailable.value) return
-  spaceDeck.value?.willSlideToLeft()
+  // spaceDeck.value?.willSlideLeft()
   await prevFlashcard()
 }
 
 async function next() {
   if (noNextAvailable.value) return
-  spaceDeck.value?.willSlideToRight()
+  // spaceDeck.value?.willSlideRight()
   await nextFlashcard()
 }
 
-function onSwipeLeft() {
+function onSlideLeft() {
   if (reviewMode.value.isLightspeed()) stageDown()
   else if (reviewMode.value.isSpecial()) prev()
   else if (reviewMode.value.isQuiz()) quizAnswer(false)
 }
 
-function onSwipeRight() {
+function onSlideRight() {
   if (reviewMode.value.isLightspeed()) stageUp()
   else if (reviewMode.value.isSpecial()) next()
   else if (reviewMode.value.isQuiz()) quizAnswer(true)
@@ -466,7 +461,7 @@ async function moveBack() {
     )
     return
   }
-  spaceDeck.value?.willSlideToLeft()
+  spaceDeck.value?.willSlideLeft()
   const flashcard = copyFlashcard(currFlashcard.value)
   updateFlashcard(flashcard, learningStages.S1, currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
@@ -693,14 +688,10 @@ function handleKeydown(event: KeyboardEvent) {
     finishReviewAndLeave()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
-    if (reviewMode.value.isLightspeed()) stageDown()
-    if (reviewMode.value.isSpecial()) prev()
-    if (reviewMode.value.isQuiz()) quizAnswer(false)
+    spaceDeck?.value?.slideLeft()
   } else if (event.key === 'ArrowRight') {
     event.stopPropagation()
-    if (reviewMode.value.isLightspeed()) stageUp()
-    if (reviewMode.value.isSpecial()) next()
-    if (reviewMode.value.isQuiz()) quizAnswer(true)
+    spaceDeck?.value?.slideRight()
   }
 }
 

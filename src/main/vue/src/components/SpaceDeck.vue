@@ -51,6 +51,7 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import { deckEmptyMessage } from '@/core-logic/review-logic.ts'
 import { useSwipe } from '@/utils/use-swipe.ts'
+import { isTouchDevice } from '@/utils/utils.ts';
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })
@@ -60,27 +61,25 @@ const props = withDefaults(defineProps<{
   showSlot?: boolean
   flashcardFrontSideAudio?: Blob | undefined
   flashcardBackSideAudio?: Blob | undefined
-  swipeEnabled?: boolean
-  canSwipeLeft?: boolean
-  canSwipeRight?: boolean
+  canSlideLeft?: boolean
+  canSlideRight?: boolean
   onFlashcardRemoved?: () => void
   onAudioChanged?: () => void
-  onSwipeLeft?: () => void
-  onSwipeRight?: () => void
+  onSlideLeft?: () => void
+  onSlideRight?: () => void
 }>(), {
   showSlot: true,
   flashcardFrontSideAudio: undefined,
   flashcardBackSideAudio: undefined,
-  swipeEnabled: false,
-  canSwipeLeft: true,
-  canSwipeRight: true,
+  canSlideLeft: true,
+  canSlideRight: true,
   onFlashcardRemoved: () => {
   },
   onAudioChanged: () => {
   },
-  onSwipeLeft: () => {
+  onSlideLeft: () => {
   },
-  onSwipeRight: () => {
+  onSlideRight: () => {
   },
 })
 
@@ -99,11 +98,11 @@ const viewedTimes = computed(() => (flashcard.value?.timesReviewed ?? 0) + 1)
 
 const { swipeStyle } = useSwipe({
   element: spaceDeckElement,
-  enabled: () => props.swipeEnabled,
-  canSwipeLeft: () => props.canSwipeLeft,
-  canSwipeRight: () => props.canSwipeRight,
-  onSwipeLeft: () => props.onSwipeLeft(),
-  onSwipeRight: () => props.onSwipeRight(),
+  enabled: () => isTouchDevice,
+  canSwipeLeft: () => props.canSlideLeft,
+  canSwipeRight: () => props.canSlideRight,
+  onSwipeLeft: () => slideLeft(),
+  onSwipeRight: () => slideRight(),
 })
 
 function setDeckReady() {
@@ -111,12 +110,24 @@ function setDeckReady() {
   cardTransition.value = 'drop-down'
 }
 
-function willSlideToLeft() {
+function willSlideLeft() {
   prepareSlideTransition('slide-to-left')
 }
 
-function willSlideToRight() {
+function willSlideRight() {
   prepareSlideTransition('slide-to-right')
+}
+
+function slideLeft() {
+  if (!props.canSlideLeft) return
+  willSlideLeft()
+  props.onSlideLeft()
+}
+
+function slideRight() {
+  if (!props.canSlideRight) return
+  willSlideRight()
+  props.onSlideRight()
 }
 
 function prepareSlideTransition(value: string) {
@@ -138,8 +149,10 @@ function onCardTransitionComplete() {
 
 defineExpose({
   setDeckReady,
-  willSlideToLeft,
-  willSlideToRight,
+  willSlideLeft,
+  willSlideRight,
+  slideLeft,
+  slideRight,
 })
 
 watch(flashcardWasRemoved, (newVal) => {

@@ -36,8 +36,8 @@ export function useSwipe(options: SwipeOptions) {
     element,
     threshold = 100,
     velocityThreshold = 0.3,
-    maxRotation = 15,
-    animationSpeed = 2.5,
+    maxRotation = 10,
+    animationSpeed = 1.5,
     enabled = true,
     canSwipeLeft = true,
     canSwipeRight = true,
@@ -46,11 +46,27 @@ export function useSwipe(options: SwipeOptions) {
   } = options
 
   function getExitOffset(): number {
-    return window.innerWidth * 2
+    const el = element.value
+    const elementWidth = el?.offsetWidth ?? 0
+    return window.innerWidth + elementWidth
   }
 
   function getAnimationDuration(): number {
     return Math.round(getExitOffset() / animationSpeed)
+  }
+
+  /** Time until the element is no longer visible (exits viewport) */
+  function getInvisibleDuration(direction: 'left' | 'right'): number {
+    const el = element.value
+    if (!el) return getAnimationDuration()
+
+    const rect = el.getBoundingClientRect()
+    // Distance until the element is fully off-screen
+    const distance = direction === 'right'
+      ? window.innerWidth - rect.left
+      : rect.right
+
+    return Math.round(distance / animationSpeed)
   }
 
   let touchStartX = 0
@@ -93,6 +109,13 @@ export function useSwipe(options: SwipeOptions) {
     const deltaX = touch.clientX - touchStartX
     const deltaY = touch.clientY - touchStartY
 
+    // Once swiping, always update the offset smoothly
+    if (isSwiping) {
+      swipeOffset.value = deltaX
+      event.preventDefault()
+      return
+    }
+
     // If horizontal movement is greater than vertical, it's a swipe attempt
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
       isSwiping = true
@@ -122,8 +145,9 @@ export function useSwipe(options: SwipeOptions) {
     if (isValidSwipe) {
       // Animate card off-screen in the swipe direction, then trigger callback
       isAnimatingOut.value = true
+      const direction = deltaX > 0 ? 'right' : 'left'
       const exitOffset = getExitOffset()
-      const animationDuration = getAnimationDuration()
+      const invisibleDuration = getInvisibleDuration(direction)
       const offset = deltaX > 0 ? exitOffset : -exitOffset
       requestAnimationFrame(() => {
         swipeOffset.value = offset
@@ -135,7 +159,7 @@ export function useSwipe(options: SwipeOptions) {
           } else {
             onSwipeLeft()
           }
-        }, animationDuration)
+        }, invisibleDuration)
       })
     } else if (isSwiping) {
       // Invalid swipe - snap back with animation
