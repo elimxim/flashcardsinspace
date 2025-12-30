@@ -242,6 +242,7 @@ onUnmounted(() => {
 
 .nav-text--title {
   font-size: clamp(0.85rem, 2vw, 1.5rem);
+  text-wrap: balance;
 }
 
 .nav-text--item {
