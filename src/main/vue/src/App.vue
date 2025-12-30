@@ -25,8 +25,8 @@ onMounted(() => {
   flex-direction: column;
   background: var(--app--bg, white);
   overflow: hidden;
-  /* Prevent touch move on the app container */
-  touch-action: none;
+  /* Allows touch move on the app container */
+  touch-action: pan-y;
 }
 
 </style>
