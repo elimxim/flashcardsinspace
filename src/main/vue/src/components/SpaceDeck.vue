@@ -132,12 +132,6 @@ const swipeLabelText = computed(() => {
   return ''
 })
 
-const swipeDirection = computed(() => {
-  if (fingerOffset.value < 0) return 'swipe-indicator--left'
-  if (fingerOffset.value > 0) return 'swipe-indicator--right'
-  return ''
-})
-
 const swipeLineStyle = computed(() => {
   const progress = Math.abs(fingerProgress.value)
   const width = Math.abs(fingerOffset.value) * 0.5
