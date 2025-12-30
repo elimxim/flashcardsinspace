@@ -5,7 +5,7 @@
     @mouseleave="hide"
   >
     <slot/>
-    <template v-if="hoverSupported">
+    <template v-if="isHoverSupported">
       <transition name="tooltip-fade">
         <div
           v-if="visible && text"
@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { hoverSupported } from '@/utils/utils.ts'
+import { isHoverSupported } from '@/utils/utils.ts'
 
 const props = withDefaults(defineProps<{
   text?: string

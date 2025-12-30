@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, useSlots } from 'vue'
-import { hoverSupported } from '@/utils/utils.ts'
+import { isHoverSupported } from '@/utils/utils.ts'
 
 const props = withDefaults(defineProps<{
   text?: string
@@ -81,7 +81,7 @@ function handleClick() {
   if (props.disabled) return
   if (props.autoBlur) button.value?.blur()
   if (props.holdTime <= 0) {
-    if (!hoverSupported && props.animateTap) {
+    if (!isHoverSupported && props.animateTap) {
       startTapAnimation()
     } else {
       props.onClick()

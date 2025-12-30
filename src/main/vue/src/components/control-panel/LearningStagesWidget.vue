@@ -49,7 +49,7 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { hoverSupported } from '@/utils/utils.ts'
+import { isHoverSupported } from '@/utils/utils.ts'
 
 const props = withDefaults(defineProps<{
   growMultiplier?: number
@@ -192,14 +192,14 @@ watch(isExpanded, (newVal, oldVal) => {
 })
 
 function handleMouseEnter() {
-  if (!hoverSupported) return
+  if (!isHoverSupported) return
   hoverDelayTimeout.value = window.setTimeout(() => {
     isExpanded.value = true
   }, 150)
 }
 
 function handleMouseLeave() {
-  if (!hoverSupported) return
+  if (!isHoverSupported) return
   if (hoverDelayTimeout.value) {
     clearTimeout(hoverDelayTimeout.value)
     hoverDelayTimeout.value = undefined
@@ -209,7 +209,7 @@ function handleMouseLeave() {
 
 // fallback for touch devices
 function handleClick() {
-  if (hoverSupported) return
+  if (isHoverSupported) return
   isExpanded.value = !isExpanded.value
 }
 

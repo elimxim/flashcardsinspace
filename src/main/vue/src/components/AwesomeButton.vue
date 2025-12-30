@@ -58,7 +58,7 @@
 <script setup lang="ts">
 import Tooltip from '@/components/Tooltip.vue'
 import { ref } from 'vue'
-import { hoverSupported } from '@/utils/utils.ts'
+import { isHoverSupported } from '@/utils/utils.ts'
 
 const props = withDefaults(defineProps<{
   icon: string
@@ -119,7 +119,7 @@ function handleClick() {
   if (props.disabled) return
   if (props.clickRipple) {
     triggerRipple()
-  } else if (!hoverSupported && props.animateTap) {
+  } else if (!isHoverSupported && props.animateTap) {
     startTapAnimation()
   } else {
     press()
