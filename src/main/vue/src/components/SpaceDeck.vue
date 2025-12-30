@@ -4,6 +4,20 @@
     class="space-deck"
   >
     <div class="flashcard-deck">
+      <div
+        v-if="isTouchDevice && swipeLeftText"
+        class="swipe-label swipe-label--left"
+        :style="{ opacity: swipeLeftOpacity }"
+      >
+        {{ swipeLeftText }}
+      </div>
+      <div
+        v-if="isTouchDevice && swipeRightText"
+        class="swipe-label swipe-label--right"
+        :style="{ opacity: swipeRightOpacity }"
+      >
+        {{ swipeRightText }}
+      </div>
       <transition
         :name="cardTransition"
         @after-enter="onCardTransitionComplete"
@@ -63,6 +77,8 @@ const props = withDefaults(defineProps<{
   flashcardBackSideAudio?: Blob | undefined
   canSlideLeft?: boolean
   canSlideRight?: boolean
+  swipeLeftText?: string
+  swipeRightText?: string
   onFlashcardRemoved?: () => void
   onAudioChanged?: () => void
   onSlideLeft?: () => void
@@ -73,6 +89,8 @@ const props = withDefaults(defineProps<{
   flashcardBackSideAudio: undefined,
   canSlideLeft: true,
   canSlideRight: true,
+  swipeLeftText: undefined,
+  swipeRightText: undefined,
   onFlashcardRemoved: () => {
   },
   onAudioChanged: () => {
@@ -96,13 +114,23 @@ const cardTransition = ref('')
 const hasSlot = computed(() => !!slots.default)
 const viewedTimes = computed(() => (flashcard.value?.timesReviewed ?? 0) + 1)
 
-const { swipeStyle } = useSwipe({
+const { swipeStyle, swipeProgress } = useSwipe({
   element: spaceDeckElement,
   enabled: () => isTouchDevice,
   canSwipeLeft: () => props.canSlideLeft,
   canSwipeRight: () => props.canSlideRight,
   onSwipeLeft: () => slideLeft(),
   onSwipeRight: () => slideRight(),
+})
+
+const swipeLeftOpacity = computed(() => {
+  if (swipeProgress.value >= 0) return 0
+  return Math.abs(swipeProgress.value)
+})
+
+const swipeRightOpacity = computed(() => {
+  if (swipeProgress.value <= 0) return 0
+  return swipeProgress.value
 })
 
 function setDeckReady() {
@@ -199,6 +227,40 @@ function handleKeydown(event: KeyboardEvent) {
   position: relative;
   width: clamp(200px, 90vw, 600px);
   height: clamp(290px, 50vh, 450px);
+}
+
+.swipe-label {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4rem;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+  border-radius: 50%;
+  color: rgba(243, 239, 239, 0.6);
+  background: rgba(50, 51, 74, 0.6);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.swipe-label--left {
+  left: 0;
+}
+
+.swipe-label--right {
+  right: 0;
 }
 
 .slide-to-right-enter-active,
