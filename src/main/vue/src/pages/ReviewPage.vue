@@ -62,6 +62,8 @@
           :can-slide-right="!noNextAvailable"
           :on-slide-left="onSlideLeft"
           :on-slide-right="onSlideRight"
+          :swipe-left-text="swipeLeftText"
+          :swipe-right-text="swipeRightText"
         >
           <QuizResult
             v-if="reviewMode.isQuiz()"
@@ -464,6 +466,20 @@ function onSlideRight() {
   else if (reviewMode.value.isSpecial()) next()
   else if (reviewMode.value.isQuiz()) quizAnswer(true)
 }
+
+const swipeLeftText = computed(() => {
+  if (reviewMode.value.isLightspeed()) return 'Don\'t know'
+  if (reviewMode.value.isSpecial()) return 'Prev'
+  if (reviewMode.value.isQuiz()) return 'Don\'t know'
+  return undefined
+})
+
+const swipeRightText = computed(() => {
+  if (reviewMode.value.isLightspeed()) return 'Know'
+  if (reviewMode.value.isSpecial()) return 'Next'
+  if (reviewMode.value.isQuiz()) return 'Know'
+  return undefined
+})
 
 async function moveBack() {
   if (!flashcardSet.value || !currFlashcard.value) {
