@@ -1,0 +1,56 @@
+name: Cleanup Old Releases
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cleanup-releases:
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+    if: github.actor == 'elimxim'
+    steps:
+      - name: Remove old releases
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            # --- Configuration ---
+            APP_BASE_DIR="/opt/flashcardsinspace"
+            RELEASES_DIR="${APP_BASE_DIR}/releases"
+            CURRENT_RELEASE="${APP_BASE_DIR}/current"
+            # --- End Configuration ---
+
+            echo "----> Starting cleanup of old releases"
+
+            # 1. Check if current symlink exists
+            if [ ! -L "${CURRENT_RELEASE}" ]; then
+              echo "Error: Current release symlink not found at ${CURRENT_RELEASE}. Aborting."
+              exit 1
+            fi
+
+            # 2. Get the active release directory
+            ACTIVE_RELEASE=$(readlink -f "${CURRENT_RELEASE}")
+            ACTIVE_VERSION=$(basename "${ACTIVE_RELEASE}")
+            echo "----> Active version: ${ACTIVE_VERSION}"
+
+            # 3. Remove all releases except the active one
+            echo "----> Removing old releases from ${RELEASES_DIR}"
+            for release in "${RELEASES_DIR}"/*; do
+              if [ -d "${release}" ]; then
+                release_name=$(basename "${release}")
+                if [ "${release_name}" != "${ACTIVE_VERSION}" ]; then
+                  echo "----> Removing: ${release_name}"
+                  rm -rf "${release}"
+                else
+                  echo "----> Keeping active: ${release_name}"
+                fi
+              fi
+            done
+
+            echo "----> Cleanup completed!"
+            echo "----> Remaining releases:"
+            ls -la "${RELEASES_DIR}"
+
