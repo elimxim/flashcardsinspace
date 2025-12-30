@@ -244,6 +244,7 @@ onUnmounted(() => {
 
 .section-title--main {
   font-size: clamp(2.5rem, 6vw, 4rem);
+  text-wrap: balance;
 }
 
 .section-title--sub {
@@ -252,6 +253,7 @@ onUnmounted(() => {
   font-style: italic;
   line-height: 1;
   color: #b0c4de;
+  margin-top: 20px;
 }
 
 .section-title--centered {
@@ -307,7 +309,13 @@ onUnmounted(() => {
 .what-actions {
   display: flex;
   gap: 20px;
-  flex-wrap: wrap;
+}
+
+@media (max-width: 470px) {
+  .what-actions {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 .action-button {
