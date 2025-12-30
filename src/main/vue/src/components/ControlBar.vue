@@ -91,5 +91,6 @@ withDefaults(defineProps<{
 .control-bar-title.centered {
   grid-column: 1 / -1;
   text-align: center;
+  padding-inline: 100px;
 }
 </style>
