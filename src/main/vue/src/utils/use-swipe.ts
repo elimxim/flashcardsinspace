@@ -36,7 +36,7 @@ export function useSwipe(options: SwipeOptions) {
     element,
     threshold = 100,
     velocityThreshold = 0.3,
-    maxRotation = 10,
+    maxRotation = 5,
     animationSpeed = 1.5,
     enabled = true,
     canSwipeLeft = true,
@@ -75,6 +75,7 @@ export function useSwipe(options: SwipeOptions) {
   let isSwiping = false
 
   const swipeOffset = ref(0)
+  const fingerOffset = ref(0)
   const isSwipeActive = ref(false)
   const isAnimatingOut = ref(false)
 
@@ -91,8 +92,8 @@ export function useSwipe(options: SwipeOptions) {
     }
   })
 
-  const swipeProgress = computed(() => {
-    const progress = swipeOffset.value / threshold
+  const fingerProgress = computed(() => {
+    const progress = fingerOffset.value / threshold
     return Math.max(-1, Math.min(1, progress))
   })
 
@@ -106,6 +107,7 @@ export function useSwipe(options: SwipeOptions) {
     isSwipeActive.value = true
     isAnimatingOut.value = false
     swipeOffset.value = 0
+    fingerOffset.value = 0
   }
 
   function onTouchMove(event: TouchEvent) {
@@ -117,6 +119,7 @@ export function useSwipe(options: SwipeOptions) {
     // Once swiping, always update the offset smoothly
     if (isSwiping) {
       swipeOffset.value = deltaX
+      fingerOffset.value = deltaX
       event.preventDefault()
       return
     }
@@ -125,12 +128,14 @@ export function useSwipe(options: SwipeOptions) {
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
       isSwiping = true
       swipeOffset.value = deltaX
+      fingerOffset.value = deltaX
       event.preventDefault() // Prevent scrolling when swiping
     }
   }
 
   function onTouchEnd(event: TouchEvent) {
     isSwipeActive.value = false
+    fingerOffset.value = 0
 
     if (!canSwipe()) {
       swipeOffset.value = 0
@@ -204,7 +209,8 @@ export function useSwipe(options: SwipeOptions) {
   return {
     swipeStyle,
     swipeOffset,
-    swipeProgress,
+    fingerOffset,
+    fingerProgress,
     isSwipeActive,
     isAnimatingOut,
   }

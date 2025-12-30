@@ -5,18 +5,17 @@
   >
     <div class="flashcard-deck">
       <div
-        v-if="isTouchDevice && swipeLeftText"
-        class="swipe-label swipe-label--left"
-        :style="{ opacity: swipeLeftOpacity }"
+        v-if="isTouchDevice && swipeLabelText"
+        class="swipe-indicator"
+        :class="{
+          'swipe-indicator--left': fingerOffset < 0,
+          'swipe-indicator--right': fingerOffset > 0,
+        }"
       >
-        {{ swipeLeftText }}
-      </div>
-      <div
-        v-if="isTouchDevice && swipeRightText"
-        class="swipe-label swipe-label--right"
-        :style="{ opacity: swipeRightOpacity }"
-      >
-        {{ swipeRightText }}
+        <div class="swipe-indicator-line" :style="swipeLineStyle"/>
+        <span class="swipe-indicator-text" :style="swipeTextStyle">
+          {{ swipeLabelText }}
+        </span>
       </div>
       <transition
         :name="cardTransition"
@@ -114,7 +113,11 @@ const cardTransition = ref('')
 const hasSlot = computed(() => !!slots.default)
 const viewedTimes = computed(() => (flashcard.value?.timesReviewed ?? 0) + 1)
 
-const { swipeStyle, swipeProgress } = useSwipe({
+const {
+  swipeStyle,
+  fingerProgress,
+  fingerOffset,
+} = useSwipe({
   element: spaceDeckElement,
   enabled: () => isTouchDevice,
   canSwipeLeft: () => props.canSlideLeft,
@@ -123,14 +126,32 @@ const { swipeStyle, swipeProgress } = useSwipe({
   onSwipeRight: () => slideRight(),
 })
 
-const swipeLeftOpacity = computed(() => {
-  if (swipeProgress.value >= 0) return 0
-  return Math.abs(swipeProgress.value)
+const swipeLabelText = computed(() => {
+  if (fingerOffset.value < 0 && props.swipeLeftText) return props.swipeLeftText
+  if (fingerOffset.value > 0 && props.swipeRightText) return props.swipeRightText
+  return ''
 })
 
-const swipeRightOpacity = computed(() => {
-  if (swipeProgress.value <= 0) return 0
-  return swipeProgress.value
+const swipeDirection = computed(() => {
+  if (fingerOffset.value < 0) return 'swipe-indicator--left'
+  if (fingerOffset.value > 0) return 'swipe-indicator--right'
+  return ''
+})
+
+const swipeLineStyle = computed(() => {
+  const progress = Math.abs(fingerProgress.value)
+  const width = Math.abs(fingerOffset.value) * 0.5
+  return {
+    width: `${width}px`,
+    opacity: Math.min(1, progress),
+  }
+})
+
+const swipeTextStyle = computed(() => {
+  const progress = Math.abs(fingerProgress.value)
+  return {
+    opacity: progress,
+  }
 })
 
 function setDeckReady() {
@@ -229,38 +250,55 @@ function handleKeydown(event: KeyboardEvent) {
   height: clamp(290px, 50vh, 450px);
 }
 
-.swipe-label {
+.swipe-indicator {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4rem;
-  height: 4rem;
+  top: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  font-size: 1rem;
+  gap: 0.5rem;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.swipe-indicator--left {
+  flex-direction: row-reverse;
+}
+
+.swipe-indicator--right {
+  flex-direction: row;
+}
+
+.swipe-indicator-line {
+  height: 1px;
+  width: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(148, 163, 184, 0.6) 50%,
+    rgba(148, 163, 184, 0.8) 100%
+  );
+  transition: opacity 0.3s ease-out;
+}
+
+.swipe-indicator--left .swipe-indicator-line {
+  background: linear-gradient(
+    270deg,
+    transparent 0%,
+    rgba(148, 163, 184, 0.6) 50%,
+    rgba(148, 163, 184, 0.8) 100%
+  );
+}
+
+.swipe-indicator-text {
+  font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  pointer-events: none;
-  z-index: 20;
-  opacity: 0;
-  transition: opacity 0.2s ease-out;
-  border-radius: 50%;
-  color: rgba(243, 239, 239, 0.6);
-  background: rgba(50, 51, 74, 0.6);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  border: 1px solid rgba(148, 163, 184, 0.3);
-}
-
-.swipe-label--left {
-  left: 0;
-}
-
-.swipe-label--right {
-  right: 0;
+  white-space: nowrap;
+  color: rgba(100, 116, 139, 0.9);
+  transition: opacity 0.3s ease-out;
 }
 
 .slide-to-right-enter-active,
