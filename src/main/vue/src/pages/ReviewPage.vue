@@ -75,7 +75,7 @@
             :on-finish="finishReviewAndLeave"
           />
         </SpaceDeck>
-        <div class="review-nav">
+        <div v-if="!isTouchDevice" class="review-nav">
           <template v-if="reviewMode.isLightspeed()">
             <SmartButton
               text="Don't know"
@@ -146,6 +146,18 @@
             />
           </template>
         </div>
+        <div v-else-if="isTouchDevice && reviewMode.isOuterSpace()" class="review-nav review-nav--centered">
+          <SmartButton
+            class="decision-button dangerous-button"
+            text="Move back"
+            :disabled="noNextAvailable"
+            :hidden="noNextAvailable"
+            :on-click="moveBack"
+            :hold-time="1.2"
+            auto-blur
+            rounded
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -163,6 +175,7 @@ import Starfield from '@/components/Starfield.vue'
 import QuizResult from '@/components/QuizResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useStopWatch } from '@/utils/stop-watch.ts'
+import { isTouchDevice } from '@/utils/utils.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import {
@@ -317,7 +330,7 @@ async function startReview() {
 async function loadOrCreateQuizSession() {
   if (props.sessionId) {
     await loadQuizSession(props.sessionId)
-  } else  {
+  } else {
     await createReviewSession(true)
   }
 }
@@ -749,6 +762,10 @@ function handleKeydown(event: KeyboardEvent) {
   width: 100%;
   height: fit-content;
   gap: 10px;
+}
+
+.review-nav--centered {
+  justify-content: center;
 }
 
 .review-progressbar {
