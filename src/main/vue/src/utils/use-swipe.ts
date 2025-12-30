@@ -91,6 +91,11 @@ export function useSwipe(options: SwipeOptions) {
     }
   })
 
+  const swipeProgress = computed(() => {
+    const progress = swipeOffset.value / threshold
+    return Math.max(-1, Math.min(1, progress))
+  })
+
   function onTouchStart(event: TouchEvent) {
     if (!canSwipe()) return
     const touch = event.touches[0]
@@ -199,6 +204,7 @@ export function useSwipe(options: SwipeOptions) {
   return {
     swipeStyle,
     swipeOffset,
+    swipeProgress,
     isSwipeActive,
     isAnimatingOut,
   }
