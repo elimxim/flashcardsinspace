@@ -1,6 +1,7 @@
-# 🚀 Flashcards in Space
-
-💫 **Launch Your Learning Into Outer Space** 💫
+<h1>
+  <img src="src/main/vue/public/logo.svg" alt="Flashcards in Space Logo" width="30"/>
+  Flashcards in Space
+</h1>
 
 [![Deploy](https://github.com/elimxim/flashcardsinspace/actions/workflows/cd.yml/badge.svg)](https://github.com/elimxim/flashcardsinspace/actions/workflows/cd.yml)
 ![GitHub Issues](https://img.shields.io/github/issues/elimxim/flashcardsinspace)
@@ -11,15 +12,21 @@
 ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green)
 ![License](https://img.shields.io/badge/license-Proprietary-red)
 
-Flashcards in Space is a fun and efficient spaced repetition system that helps you learn vocabulary or any other concept you can put into flashcards. Built with a space-themed UI and powered by our custom **Lightspeed Schedule** algorithm.
+<p align="center">
+  <a href="https://flashcardsinspace.com"><img src="src/main/vue/src/assets/rocket.svg" alt="Visit flashcardsinspace.com" width="150"/></a>
+</p>
 
----
+Flashcards in Space is a fun and efficient spaced repetition system that helps you learn vocabulary or any other concept you can put into flashcards. Built with a space-themed UI, humor and powered by a custom **Lightspeed Schedule** algorithm.
 
-Visit [flashcardsinspace.com](https://flashcardsinspace.com) to see the app in action and explore all features!
+<a href="https://flashcardsinspace.com"><img src="https://img.shields.io/badge/Visit-flashcardsinspace.com-033270?style=for-the-badge&labelColor=4091c9" alt="Website" height="40"/></a>
 
----
+## 💡 Why Flashcards in Space?
 
-## 🎬 Getting Started
+Existing spaced repetition tools often prioritize function over form, resulting in dated interfaces that can make daily practice feel like a chore. Flashcards in Space was created to bridge this gap, combining proven learning science with a modern, engaging user experience.
+
+At its core is the **Lightspeed Schedule**, a custom spaced repetition algorithm designed to optimize retention while keeping sessions efficient. Built on the foundational research of Hermann Ebbinghaus, Sebastian Leitner, and other pioneers of spaced repetition science.
+
+## 🚀 Getting Started
 
 > ⚠️ **Note**: This project is shared for **educational purposes only**. You may clone and run it locally to learn from the code, but commercial use and redistribution are prohibited. See the [Licensing & Use](#%EF%B8%8F-licensing--use) section for details.
 
@@ -50,7 +57,14 @@ Visit [flashcardsinspace.com](https://flashcardsinspace.com) to see the app in a
    npm run dev
    ```
 
-## ⚠️ Licensing & Use
+## 🤝 Contributing
+
+This project is **not accepting pull requests** due to its proprietary license. However, you're welcome to:
+- 🐛 Report bugs via [Issues](https://github.com/elimxim/flashcardsinspace/issues)
+- 💡 Suggest features or improvements
+- ⭐ Star the repo if you find it interesting!
+
+## 📜 Licensing & Use
 
 Thank you for your interest in Flashcards in Space. This project is shared so you can read and learn from the code,
 but it is **not open-source**, and usage is subject to the license terms.
