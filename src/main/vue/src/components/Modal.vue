@@ -32,12 +32,14 @@ const props = withDefaults(defineProps<{
   visible: boolean
   title?: string
   focusOn?: HTMLElement
+  overflow?: string
   onPressExit?: () => void
   onPressEnter?: () => void
   onPressDelete?: () => void
 }>(), {
   title: '',
   focusOn: undefined,
+  overflow: 'auto',
   onPressExit: () => {
   },
   onPressEnter: () => {
@@ -132,7 +134,7 @@ function handleKeydown(event: KeyboardEvent) {
   min-width: 240px;
   height: clamp(360px, 90vh, 480px);
   min-height: 360px;
-  padding: 10px;
+  padding: 8px;
   margin: 10px 10px clamp(10px, 10vh, 100px);
   user-select: none;
   resize: none;
@@ -160,5 +162,7 @@ function handleKeydown(event: KeyboardEvent) {
   gap: 10px;
   min-height: 0;
   min-width: 0;
+  padding: 2px;
+  overflow: v-bind(overflow);
 }
 </style>
