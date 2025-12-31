@@ -2,19 +2,20 @@
   <Modal
     :visible="toggleStore.calendarOpen"
     :on-press-exit="exit"
+    overflow="hidden"
   >
     <div class="calendar calendar--theme">
       <div class="calendar-month">
         <AwesomeButton
           ref="prevMonthButton"
           icon="fa-solid fa-angle-left"
-          :on-click="navigatePrevMonth"
+          :on-click="navigatePrevMonthWithAnimation"
         />
         <span>{{ formattedCurrMonth }}</span>
         <AwesomeButton
           ref="nextMonthButton"
           icon="fa-solid fa-angle-right"
-          :on-click="navigateNextMonth"
+          :on-click="navigateNextMonthWithAnimation"
         />
       </div>
       <div class="calendar-weekdays">
@@ -26,23 +27,52 @@
           {{ day }}
         </div>
       </div>
-      <div class="calendar-days">
+      <div class="calendar-days-wrapper">
         <div
-          v-for="day in calendarPage"
-          :key="day.date"
-          class="calendar-day"
-          :class="dayCssClasses(day)"
+          ref="calendarDaysRef"
+          class="calendar-days"
+          :style="swipeStyle"
         >
-          <div v-if="canShowSeq(day)" class="calendar-cell-seq">
-            {{ day.seqNumber }}
+          <div
+            v-for="day in calendarPage"
+            :key="day.date"
+            class="calendar-day"
+            :class="dayCssClasses(day)"
+          >
+            <div v-if="canShowSeq(day)" class="calendar-cell-seq">
+              {{ day.seqNumber }}
+            </div>
+            <div v-if="isVacationDay(day)" class="calendar-cell-vacation">
+              🌴
+            </div>
+            <div v-else-if="canShowStages(day)" class="calendar-cell-stages">
+              {{ day.stages }}
+            </div>
+            <span class="calendar-cell-number"> {{ day.number }} </span>
           </div>
-          <div v-if="isVacationDay(day)" class="calendar-cell-vacation">
-            🌴
+        </div>
+        <div
+          v-if="adjacentPage"
+          class="calendar-days calendar-days--adjacent"
+          :style="adjacentStyle"
+        >
+          <div
+            v-for="day in adjacentPage"
+            :key="day.date"
+            class="calendar-day"
+            :class="dayCssClasses(day)"
+          >
+            <div v-if="canShowSeq(day)" class="calendar-cell-seq">
+              {{ day.seqNumber }}
+            </div>
+            <div v-if="isVacationDay(day)" class="calendar-cell-vacation">
+              🌴
+            </div>
+            <div v-else-if="canShowStages(day)" class="calendar-cell-stages">
+              {{ day.stages }}
+            </div>
+            <span class="calendar-cell-number"> {{ day.number }} </span>
           </div>
-          <div v-else-if="canShowStages(day)" class="calendar-cell-stages">
-            {{ day.stages }}
-          </div>
-          <span class="calendar-cell-number"> {{ day.number }} </span>
         </div>
       </div>
     </div>
@@ -85,6 +115,7 @@ import { useAuthStore, UserRole } from '@/stores/auth-store.ts'
 import { parseLocalDate } from '@/utils/utils.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
+import { useSwipe } from '@/utils/use-swipe.ts'
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
@@ -99,6 +130,7 @@ const hasAccess = computed(() => authStore.hasAccess(UserRole.COMMANDER))
 
 const prevMonthButton = ref<HTMLButtonElement>()
 const nextMonthButton = ref<HTMLButtonElement>()
+const calendarDaysRef = ref<HTMLElement>()
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const currMonth = ref(parseLocalDate(currDay.value.chronodate))
@@ -106,6 +138,77 @@ const currMonth = ref(parseLocalDate(currDay.value.chronodate))
 const calendarPage = computed(() =>
   calcCalendarPage(currMonth.value, currDay.value, chronodays.value)
 )
+
+const TAPE_SNAP_DURATION = 250
+
+const {
+  swipeStyle,
+  swipeOffset,
+  triggerSwipe,
+  isSwipeActive,
+  swipeDirection
+} = useSwipe({
+  element: calendarDaysRef,
+  threshold: 80,
+  maxRotation: 0,
+  tapeMode: true,
+  tapeSnapDuration: TAPE_SNAP_DURATION,
+  onSwipeLeft: () => {
+    navigateNextMonth()
+  },
+  onSwipeRight: () => {
+    navigatePrevMonth()
+  },
+})
+
+// Adjacent month for tape effect during swipe
+const adjacentMonth = computed<Date | null>(() => {
+  // Use swipeDirection for button-triggered animations (set before offset changes)
+  // Use swipeOffset for touch-based swiping
+  const direction = swipeDirection.value ?? (swipeOffset.value > 0 ? 'right' : swipeOffset.value < 0 ? 'left' : null)
+
+  if (!direction) return null
+
+  if (direction === 'right') {
+    // Swiping right - show previous month
+    const prev = new Date(currMonth.value)
+    prev.setMonth(prev.getMonth() - 1)
+    return prev
+  } else {
+    // Swiping left - show next month
+    const next = new Date(currMonth.value)
+    next.setMonth(next.getMonth() + 1)
+    return next
+  }
+})
+
+const adjacentPage = computed(() => {
+  if (!adjacentMonth.value) return null
+  return calcCalendarPage(adjacentMonth.value, currDay.value, chronodays.value)
+})
+
+// Computed style for adjacent month positioning
+const adjacentStyle = computed(() => {
+  const direction = swipeDirection.value ?? (swipeOffset.value > 0 ? 'right' : swipeOffset.value < 0 ? 'left' : null)
+  if (!calendarDaysRef.value || !direction) return { display: 'none' }
+
+  const width = calendarDaysRef.value.offsetWidth
+  const gap = 4
+  // Position the adjacent month on the opposite side, moving together with the main content
+  const offset = direction === 'right'
+    ? swipeOffset.value - width - gap // Previous month on the left
+    : swipeOffset.value + width + gap // Next month on the right
+
+  // Use the same transition as the main content
+  const transition = isSwipeActive.value
+    ? 'none'
+    : `transform ${TAPE_SNAP_DURATION}ms cubic-bezier(0.33, 0, 0.2, 1)`
+
+  return {
+    transform: `translateX(${offset}px)`,
+    transition,
+  }
+})
 
 const userDateFormatter = new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' })
 const formattedCurrMonth = computed(() => {
@@ -122,6 +225,14 @@ function navigateNextMonth() {
   const newMonth = new Date(currMonth.value)
   newMonth.setMonth(currMonth.value.getMonth() + 1)
   currMonth.value = newMonth
+}
+
+function navigatePrevMonthWithAnimation() {
+  triggerSwipe('right')
+}
+
+function navigateNextMonthWithAnimation() {
+  triggerSwipe('left')
 }
 
 function dayCssClasses(day: CalendarDay): string {
@@ -229,9 +340,9 @@ onUnmounted(() => {
 
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'ArrowLeft') {
-    navigatePrevMonth()
+    navigatePrevMonthWithAnimation()
   } else if (event.key === 'ArrowRight') {
-    navigateNextMonth()
+    navigateNextMonthWithAnimation()
   }
 }
 
@@ -306,13 +417,23 @@ function handleKeydown(event: KeyboardEvent) {
   color: var(--weekday--color);
 }
 
-.calendar-days {
+.calendar-days-wrapper {
   flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+.calendar-days {
+  position: absolute;
+  inset: 0;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(6, 1fr);
-  min-height: 0;
   gap: 4px;
+}
+
+.calendar-days--adjacent {
+  pointer-events: none;
 }
 
 .calendar-day {

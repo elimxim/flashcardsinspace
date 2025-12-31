@@ -1,8 +1,8 @@
 import {
   computed,
-  onMounted,
   onUnmounted,
   ref,
+  watch,
   type MaybeRefOrGetter,
   type Ref,
   toValue,
@@ -29,6 +29,15 @@ export interface SwipeOptions {
   onSwipeLeft?: () => void
   /** Callback when swiped right */
   onSwipeRight?: () => void
+  /**
+   * Tape mode: instead of animating off-screen, snaps back after triggering callback.
+   * Useful for carousel/tape-like navigation where content slides in from sides.
+   */
+  tapeMode?: boolean
+  /** Snap-back animation duration in ms for tape mode */
+  tapeSnapDuration?: number
+
+
 }
 
 export function useSwipe(options: SwipeOptions) {
@@ -43,6 +52,8 @@ export function useSwipe(options: SwipeOptions) {
     canSwipeRight = true,
     onSwipeLeft = () => {},
     onSwipeRight = () => {},
+    tapeMode = false,
+    tapeSnapDuration = 200,
   } = options
 
   function getExitOffset(): number {
@@ -78,6 +89,8 @@ export function useSwipe(options: SwipeOptions) {
   const fingerOffset = ref(0)
   const isSwipeActive = ref(false)
   const isAnimatingOut = ref(false)
+  /** Direction of pending/active swipe: 'left', 'right', or null */
+  const swipeDirection = ref<'left' | 'right' | null>(null)
 
   function canSwipe() {
     return toValue(enabled) && (toValue(canSwipeLeft) || toValue(canSwipeRight))
@@ -86,9 +99,13 @@ export function useSwipe(options: SwipeOptions) {
   const swipeStyle = computed(() => {
     if (swipeOffset.value === 0 && !isSwipeActive.value && !isAnimatingOut.value) return {}
     const rotation = maxRotation > 0 ? (swipeOffset.value / 200) * maxRotation : 0
+    const transitionDuration = tapeMode
+      ? tapeSnapDuration
+      : getAnimationDuration()
+
     return {
       transform: `translateX(${swipeOffset.value}px)${rotation ? ` rotate(${rotation}deg)` : ''}`,
-      transition: isSwipeActive.value ? 'none' : `transform ${getAnimationDuration()}ms cubic-bezier(0.33, 0, 0.2, 1)`,
+      transition: isSwipeActive.value ? 'none' : `transform ${transitionDuration}ms cubic-bezier(0.33, 0, 0.2, 1)`,
     }
   })
 
@@ -120,7 +137,9 @@ export function useSwipe(options: SwipeOptions) {
     if (isSwiping) {
       swipeOffset.value = deltaX
       fingerOffset.value = deltaX
-      event.preventDefault()
+      if (event.cancelable) {
+        event.preventDefault()
+      }
       return
     }
 
@@ -129,15 +148,17 @@ export function useSwipe(options: SwipeOptions) {
       isSwiping = true
       swipeOffset.value = deltaX
       fingerOffset.value = deltaX
-      event.preventDefault() // Prevent scrolling when swiping
+      if (event.cancelable) {
+        event.preventDefault() // Prevent scrolling when swiping
+      }
     }
   }
 
   function onTouchEnd(event: TouchEvent) {
-    isSwipeActive.value = false
     fingerOffset.value = 0
 
     if (!canSwipe()) {
+      isSwipeActive.value = false
       swipeOffset.value = 0
       return
     }
@@ -153,56 +174,148 @@ export function useSwipe(options: SwipeOptions) {
     const isValidSwipe = isSwiping && meetsThreshold && directionAllowed
 
     if (isValidSwipe) {
-      // Animate card off-screen in the swipe direction, then trigger callback
-      isAnimatingOut.value = true
-      const direction = deltaX > 0 ? 'right' : 'left'
-      const exitOffset = getExitOffset()
-      const invisibleDuration = getInvisibleDuration(direction)
-      const offset = deltaX > 0 ? exitOffset : -exitOffset
-      requestAnimationFrame(() => {
-        swipeOffset.value = offset
+      if (tapeMode) {
+        // Tape mode: animate current content out, then call callback
+        const el = element.value
+        const width = el?.offsetWidth ?? 300
+        const gap = 4
+        // Animate to full exit position
+        const exitOffset = deltaX > 0 ? width + gap : -width - gap
+
+        isSwipeActive.value = false
+        isAnimatingOut.value = true
+        swipeOffset.value = exitOffset
+
         setTimeout(() => {
-          swipeOffset.value = 0
-          isAnimatingOut.value = false
+          // After animation, call callback and reset
           if (deltaX > 0) {
             onSwipeRight()
           } else {
             onSwipeLeft()
           }
-        }, invisibleDuration)
-      })
+          // Snap back to center without animation
+          isSwipeActive.value = true
+          swipeOffset.value = 0
+          requestAnimationFrame(() => {
+            isSwipeActive.value = false
+            isAnimatingOut.value = false
+          })
+        }, tapeSnapDuration)
+      } else {
+        // Card mode: animate off-screen, then trigger callback
+        isSwipeActive.value = false
+        isAnimatingOut.value = true
+        const direction = deltaX > 0 ? 'right' : 'left'
+        const exitOffset = getExitOffset()
+        const invisibleDuration = getInvisibleDuration(direction)
+        const offset = deltaX > 0 ? exitOffset : -exitOffset
+        requestAnimationFrame(() => {
+          swipeOffset.value = offset
+          setTimeout(() => {
+            swipeOffset.value = 0
+            isAnimatingOut.value = false
+            if (deltaX > 0) {
+              onSwipeRight()
+            } else {
+              onSwipeLeft()
+            }
+          }, invisibleDuration)
+        })
+      }
     } else if (isSwiping) {
       // Invalid swipe - snap back with animation
+      isSwipeActive.value = false
       isAnimatingOut.value = true
-      const animationDuration = getAnimationDuration()
+      const snapDuration = tapeMode ? tapeSnapDuration : getAnimationDuration()
       requestAnimationFrame(() => {
         swipeOffset.value = 0
         setTimeout(() => {
           isAnimatingOut.value = false
-        }, animationDuration)
+        }, snapDuration)
       })
     } else {
+      isSwipeActive.value = false
       swipeOffset.value = 0
     }
 
     isSwiping = false
   }
 
-  onMounted(() => {
+  /**
+   * Programmatically trigger a swipe animation (for button navigation).
+   * In tape mode, animates from the opposite edge and calls the callback.
+   */
+  function triggerSwipe(direction: 'left' | 'right') {
+    if (isAnimatingOut.value) return
+
     const el = element.value
-    if (el) {
-      el.addEventListener('touchstart', onTouchStart)
-      el.addEventListener('touchmove', onTouchMove, { passive: false })
-      el.addEventListener('touchend', onTouchEnd)
+    if (!el) {
+      // No element, just call callback
+      if (direction === 'left') {
+        onSwipeLeft()
+      } else {
+        onSwipeRight()
+      }
+      return
     }
-  })
+
+    const width = el.offsetWidth
+    const exitOffset = direction === 'left' ? -width : width
+
+    // Set direction BEFORE animation so the adjacent month can position correctly
+    swipeDirection.value = direction
+    isSwipeActive.value = false
+    isAnimatingOut.value = true
+
+    // Use RAF to ensure the direction is set before offset changes
+    requestAnimationFrame(() => {
+      swipeOffset.value = exitOffset
+
+      setTimeout(() => {
+        // After animation, call callback and reset
+        if (direction === 'left') {
+          onSwipeLeft()
+        } else {
+          onSwipeRight()
+        }
+        // Snap back to center without animation
+        isSwipeActive.value = true
+        swipeOffset.value = 0
+        swipeDirection.value = null
+        requestAnimationFrame(() => {
+          isSwipeActive.value = false
+          isAnimatingOut.value = false
+        })
+      }, tapeSnapDuration)
+    })
+  }
+
+  function attachListeners(el: HTMLElement) {
+    el.addEventListener('touchstart', onTouchStart)
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    el.addEventListener('touchend', onTouchEnd)
+  }
+
+  function detachListeners(el: HTMLElement) {
+    el.removeEventListener('touchstart', onTouchStart)
+    el.removeEventListener('touchmove', onTouchMove)
+    el.removeEventListener('touchend', onTouchEnd)
+  }
+
+  // Watch for element changes to attach/detach listeners
+  watch(element, (newEl, oldEl) => {
+    if (oldEl) {
+      detachListeners(oldEl)
+    }
+    if (newEl) {
+      attachListeners(newEl)
+    }
+  }, { immediate: true })
 
   onUnmounted(() => {
     const el = element.value
     if (el) {
-      el.removeEventListener('touchstart', onTouchStart)
-      el.removeEventListener('touchmove', onTouchMove)
-      el.removeEventListener('touchend', onTouchEnd)
+      detachListeners(el)
     }
   })
 
@@ -213,6 +326,8 @@ export function useSwipe(options: SwipeOptions) {
     fingerProgress,
     isSwipeActive,
     isAnimatingOut,
+    swipeDirection,
+    triggerSwipe,
   }
 }
 
