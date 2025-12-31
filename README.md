@@ -16,9 +16,9 @@
   <a href="https://flashcardsinspace.com"><img src="src/main/vue/src/assets/rocket.svg" alt="Visit flashcardsinspace.com" width="150"/></a>
 </p>
 
-Flashcards in Space is a fun and efficient spaced repetition system that helps you learn vocabulary or any other concept you can put into flashcards. Built with a space-themed UI, humor and powered by a custom **Lightspeed Schedule** algorithm.
-
 <a href="https://flashcardsinspace.com"><img src="https://img.shields.io/badge/Visit-flashcardsinspace.com-033270?style=for-the-badge&labelColor=4091c9" alt="Website" height="40"/></a>
+
+Flashcards in Space is a fun and efficient spaced repetition system that helps you learn vocabulary or any other concept you can put into flashcards. Built with a space-themed UI, humor and powered by a custom **Lightspeed Schedule** algorithm.
 
 ## 💡 Why Flashcards in Space?
 
