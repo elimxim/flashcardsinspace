@@ -19,14 +19,20 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{
+import { computed } from 'vue'
+
+const props = withDefaults(defineProps<{
   title: string
   centerTitle?: boolean
+  centerTitlePadding?: number
   shadow?: boolean
 }>(), {
   centerTitle: false,
+  centerTitlePadding: 0,
   shadow: false,
 })
+
+const centerTitlePaddingPx = computed(() => `${props.centerTitlePadding}px`)
 
 </script>
 
@@ -91,6 +97,6 @@ withDefaults(defineProps<{
 .control-bar-title.centered {
   grid-column: 1 / -1;
   text-align: center;
-  padding-inline: 100px;
+  padding-inline: v-bind(centerTitlePaddingPx);
 }
 </style>

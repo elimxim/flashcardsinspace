@@ -9,7 +9,7 @@
       'review-page--theme',
     ]"
   >
-    <ControlBar :title="flashcardSetName" center-title>
+    <ControlBar :title="flashcardSetName" center-title :center-title-padding="100">
       <template v-if="reviewMode.topic" #left>
         <div class="review-mode">
           {{ reviewMode.topic }}
