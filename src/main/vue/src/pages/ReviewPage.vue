@@ -148,8 +148,10 @@
             />
           </template>
         </div>
-        <div v-else-if="isTouchDevice && reviewMode.isOuterSpace()"
-             class="review-nav review-nav--centered">
+        <div
+          v-else-if="isTouchDevice && reviewMode.isOuterSpace()"
+          class="review-nav review-nav--centered"
+        >
           <SmartButton
             class="decision-button dangerous-button"
             text="Move back"
