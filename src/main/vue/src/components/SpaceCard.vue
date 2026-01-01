@@ -160,13 +160,16 @@ const props = withDefaults(defineProps<{
 })
 
 const FLIP_ANIMATION_DURATION_MS = 500
-const flipAnimationDurationCss = `${FLIP_ANIMATION_DURATION_MS}ms`
+const ACCELERATION_FACTOR = 1.2
 
 const flipped = ref(false)
 const rotationAngle = ref(0)
 const rotationAngleDeg = computed(() => `${rotationAngle.value}deg`)
+const currentFlipDuration = ref(FLIP_ANIMATION_DURATION_MS)
+const flipAnimationDurationCss = computed(() => `${currentFlipDuration.value}ms`)
 const isAnimating = ref(false)
 const cardAnimationCompleted = ref(false)
+let flipDurationTimeout: ReturnType<typeof setTimeout> | null = null
 const frontVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
 const backVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
 
@@ -180,17 +183,31 @@ const stageDisplayName = computed(() => {
 
 function flip() {
   if (!props.unflippable && !isAnimating.value) {
+    if (flipDurationTimeout) {
+      clearTimeout(flipDurationTimeout)
+      flipDurationTimeout = null
+    }
+
     isAnimating.value = true
     stopAllVoices()
     flipped.value = !flipped.value
     rotationAngle.value -= 180
 
+    const duration = currentFlipDuration.value
+
     setTimeout(() => {
       isAnimating.value = false
+
+      currentFlipDuration.value = Math.floor(currentFlipDuration.value * ACCELERATION_FACTOR)
+
+      flipDurationTimeout = setTimeout(() => {
+        currentFlipDuration.value = FLIP_ANIMATION_DURATION_MS
+      }, 300)
+
       if (autoPlayVoice.value && cardAnimationCompleted.value) {
         playCurrentSideVoice()
       }
-    }, FLIP_ANIMATION_DURATION_MS)
+    }, duration)
   }
 }
 
