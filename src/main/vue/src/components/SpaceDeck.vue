@@ -125,6 +125,7 @@ const SWIPE_THRESHOLD = 100
 const SWIPE_VELOCITY_THRESHOLD = 0.3
 const SWIPE_MAX_ROTATION = 5
 const SWIPE_ANIMATION_SPEED = 2
+const SWIPE_ANIMATION_SPEED_SLOW = 0.8
 
 const swipeOffset = ref(0)
 const fingerOffset = ref(0)
@@ -135,6 +136,7 @@ const isSwipeActive = ref(false)
 const isSwiping = ref(false)
 const isAnimating = ref(false)
 const isAnimatingOut = ref(false)
+const isSlowAnimation = ref(false)
 const enterAnimation = ref<'drop-down' | 'zoom-in' | ''>('')
 const isPullingIn = ref(false)
 const lastFlashcard = ref<Flashcard | undefined>(undefined)
@@ -176,8 +178,12 @@ function getPullInStartOffset(): number {
   return elementWidth + 50
 }
 
+function getAnimationSpeed(): number {
+  return isSlowAnimation.value ? SWIPE_ANIMATION_SPEED_SLOW : SWIPE_ANIMATION_SPEED
+}
+
 function getAnimationDuration(): number {
-  return Math.round(getExitOffset() / SWIPE_ANIMATION_SPEED)
+  return Math.round(getExitOffset() / getAnimationSpeed())
 }
 
 function getInvisibleDuration(direction: 'left' | 'right'): number {
@@ -189,7 +195,7 @@ function getInvisibleDuration(direction: 'left' | 'right'): number {
     ? window.innerWidth - rect.left
     : rect.right
 
-  return Math.round(distance / SWIPE_ANIMATION_SPEED)
+  return Math.round(distance / getAnimationSpeed())
 }
 
 function canSwipe() {
@@ -393,28 +399,33 @@ function triggerSlideRight() {
   props.onSlideRight()
 }
 
-function animateSwipe(direction: 'left' | 'right', onCompleteCallback: () => void): boolean {
-  if (isAnimating.value) {
-    return false
-  }
-  isAnimating.value = true
-  isAnimatingOut.value = true
-  enterAnimation.value = '' // Stop any zoom-in animation so swipe transform can take effect
+function animateSwipe(direction: 'left' | 'right', onCompleteCallback: () => void, slow = false): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (isAnimating.value) {
+      resolve(false)
+      return
+    }
+    isAnimating.value = true
+    isAnimatingOut.value = true
+    isSlowAnimation.value = slow
+    enterAnimation.value = '' // Stop any zoom-in animation so swipe transform can take effect
 
-  const exitOffset = getExitOffset()
-  const invisibleDuration = getInvisibleDuration(direction)
-  const offset = direction === 'right' ? exitOffset : -exitOffset
+    const exitOffset = getExitOffset()
+    const invisibleDuration = getInvisibleDuration(direction)
+    const offset = direction === 'right' ? exitOffset : -exitOffset
 
-  requestAnimationFrame(() => {
-    swipeOffset.value = offset
-    setTimeout(() => {
-      swipeOffset.value = 0
-      isAnimatingOut.value = false
-      isAnimating.value = false
-      onCompleteCallback()
-    }, invisibleDuration)
+    requestAnimationFrame(() => {
+      swipeOffset.value = offset
+      setTimeout(() => {
+        swipeOffset.value = 0
+        isAnimatingOut.value = false
+        isAnimating.value = false
+        isSlowAnimation.value = false
+        onCompleteCallback()
+        resolve(true)
+      }, invisibleDuration)
+    })
   })
-  return true
 }
 
 function animatePullIn(onCompleteCallback: () => void): boolean {
@@ -459,16 +470,16 @@ function slideRight() {
   animateSwipe('right', triggerSlideRight)
 }
 
-function animateOutLeft() {
-  animateSwipe('left', () => {
+function animateOutLeft(slow = false): Promise<boolean> {
+  return animateSwipe('left', () => {
     enterAnimation.value = 'zoom-in'
-  })
+  }, slow)
 }
 
-function animateOutRight() {
-  animateSwipe('right', () => {
+function animateOutRight(slow = false): Promise<boolean> {
+  return animateSwipe('right', () => {
     enterAnimation.value = 'zoom-in'
-  })
+  }, slow)
 }
 
 function onEnterAnimationEnd() {

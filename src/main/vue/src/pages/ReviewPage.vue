@@ -148,7 +148,8 @@
             />
           </template>
         </div>
-        <div v-else-if="isTouchDevice && reviewMode.isOuterSpace()" class="review-nav review-nav--centered">
+        <div v-else-if="isTouchDevice && reviewMode.isOuterSpace()"
+             class="review-nav review-nav--centered">
           <SmartButton
             class="decision-button dangerous-button"
             text="Move back"
@@ -488,11 +489,11 @@ async function moveBack() {
     )
     return
   }
-  spaceDeck.value?.animateOutLeft()
   const flashcard = copyFlashcard(currFlashcard.value)
   updateFlashcard(flashcard, learningStages.S1, currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   if (success) {
+    await spaceDeck.value?.animateOutLeft(true)
     await nextFlashcard()
   }
 }
