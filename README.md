@@ -20,7 +20,7 @@ Flashcards in Space is a fun and efficient spaced repetition system that helps y
   <a href="https://flashcardsinspace.com"><img src="src/main/vue/src/assets/rocket.svg" alt="Visit flashcardsinspace.com" width="150"/></a>
 </p>
 
-## 💡 Why Flashcards in Space?
+## 🎯 Motivation
 
 Existing spaced repetition tools often prioritize function over form, resulting in dated interfaces that can make daily practice feel like a chore. Flashcards in Space was created to bridge this gap, combining proven learning science with a modern, engaging user experience.
 
