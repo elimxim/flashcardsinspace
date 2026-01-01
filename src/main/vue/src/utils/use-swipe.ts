@@ -36,8 +36,8 @@ export interface SwipeOptions {
   tapeMode?: boolean
   /** Snap-back animation duration in ms for tape mode */
   tapeSnapDuration?: number
-
-
+  /** Width of a single page in tape mode (for calculating exit offset). If not provided, uses element width. */
+  tapePageWidth?: MaybeRefOrGetter<number>
 }
 
 export function useSwipe(options: SwipeOptions) {
@@ -54,7 +54,15 @@ export function useSwipe(options: SwipeOptions) {
     onSwipeRight = () => {},
     tapeMode = false,
     tapeSnapDuration = 200,
+    tapePageWidth,
   } = options
+
+  function getTapePageWidth(): number {
+    if (tapePageWidth !== undefined) {
+      return toValue(tapePageWidth)
+    }
+    return element.value?.offsetWidth ?? 300
+  }
 
   function getExitOffset(): number {
     const el = element.value
@@ -97,14 +105,19 @@ export function useSwipe(options: SwipeOptions) {
   }
 
   const swipeStyle = computed(() => {
-    if (swipeOffset.value === 0 && !isSwipeActive.value && !isAnimatingOut.value) return {}
     const rotation = maxRotation > 0 ? (swipeOffset.value / 200) * maxRotation : 0
     const transitionDuration = tapeMode
       ? tapeSnapDuration
       : getAnimationDuration()
 
+    // In tape mode, add base offset to show the middle page
+    const baseOffset = tapeMode ? -getTapePageWidth() - 4 : 0
+    const totalOffset = baseOffset + swipeOffset.value
+
+    if (totalOffset === 0 && !rotation && !isSwipeActive.value && !isAnimatingOut.value) return {}
+
     return {
-      transform: `translateX(${swipeOffset.value}px)${rotation ? ` rotate(${rotation}deg)` : ''}`,
+      transform: `translateX(${totalOffset}px)${rotation ? ` rotate(${rotation}deg)` : ''}`,
       transition: isSwipeActive.value ? 'none' : `transform ${transitionDuration}ms cubic-bezier(0.33, 0, 0.2, 1)`,
     }
   })
@@ -175,32 +188,36 @@ export function useSwipe(options: SwipeOptions) {
 
     if (isValidSwipe) {
       if (tapeMode) {
-        // Tape mode: animate current content out, then call callback
-        const el = element.value
-        const width = el?.offsetWidth ?? 300
+        // Tape mode: animate to show next/prev page, then call callback and reset
+        const pageWidth = getTapePageWidth()
         const gap = 4
-        // Animate to full exit position
-        const exitOffset = deltaX > 0 ? width + gap : -width - gap
+        // Animate to full page position
+        const exitOffset = deltaX > 0 ? pageWidth + gap : -pageWidth - gap
 
-        isSwipeActive.value = false
         isAnimatingOut.value = true
-        swipeOffset.value = exitOffset
+        // Use RAF to ensure transition is applied before changing offset
+        requestAnimationFrame(() => {
+          isSwipeActive.value = false
+          swipeOffset.value = exitOffset
 
-        setTimeout(() => {
-          // After animation, call callback and reset
-          if (deltaX > 0) {
-            onSwipeRight()
-          } else {
-            onSwipeLeft()
-          }
-          // Snap back to center without animation
-          isSwipeActive.value = true
-          swipeOffset.value = 0
-          requestAnimationFrame(() => {
-            isSwipeActive.value = false
-            isAnimatingOut.value = false
-          })
-        }, tapeSnapDuration)
+          setTimeout(() => {
+            // Reset offset with transitions disabled
+            isSwipeActive.value = true
+            swipeOffset.value = 0
+            // Call callback - content will update but position stays centered
+            if (deltaX > 0) {
+              onSwipeRight()
+            } else {
+              onSwipeLeft()
+            }
+            // Wait for Vue to settle before re-enabling transitions
+
+            setTimeout(() => {
+              isSwipeActive.value = false
+              isAnimatingOut.value = false
+            }, 20)
+          }, tapeSnapDuration)
+        })
       } else {
         // Card mode: animate off-screen, then trigger callback
         isSwipeActive.value = false
@@ -243,49 +260,38 @@ export function useSwipe(options: SwipeOptions) {
 
   /**
    * Programmatically trigger a swipe animation (for button navigation).
-   * In tape mode, animates from the opposite edge and calls the callback.
+   * In tape mode, animates to show next/prev page and calls the callback.
    */
   function triggerSwipe(direction: 'left' | 'right') {
     if (isAnimatingOut.value) return
 
-    const el = element.value
-    if (!el) {
-      // No element, just call callback
-      if (direction === 'left') {
-        onSwipeLeft()
-      } else {
-        onSwipeRight()
-      }
-      return
-    }
+    const pageWidth = tapeMode ? getTapePageWidth() : (element.value?.offsetWidth ?? 300)
+    const gap = 4
+    const exitOffset = direction === 'left' ? -pageWidth - gap : pageWidth + gap
 
-    const width = el.offsetWidth
-    const exitOffset = direction === 'left' ? -width : width
-
-    // Set direction BEFORE animation so the adjacent month can position correctly
     swipeDirection.value = direction
-    isSwipeActive.value = false
     isAnimatingOut.value = true
 
-    // Use RAF to ensure the direction is set before offset changes
     requestAnimationFrame(() => {
+      isSwipeActive.value = false
       swipeOffset.value = exitOffset
 
       setTimeout(() => {
-        // After animation, call callback and reset
+        // Reset offset with transitions disabled
+        isSwipeActive.value = true
+        swipeOffset.value = 0
+        swipeDirection.value = null
+        // Call callback
         if (direction === 'left') {
           onSwipeLeft()
         } else {
           onSwipeRight()
         }
-        // Snap back to center without animation
-        isSwipeActive.value = true
-        swipeOffset.value = 0
-        swipeDirection.value = null
-        requestAnimationFrame(() => {
+        // Wait for Vue to settle before re-enabling transitions
+        setTimeout(() => {
           isSwipeActive.value = false
           isAnimatingOut.value = false
-        })
+        }, 20)
       }, tapeSnapDuration)
     })
   }

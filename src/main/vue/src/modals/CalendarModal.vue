@@ -27,51 +27,34 @@
           {{ day }}
         </div>
       </div>
-      <div class="calendar-days-wrapper">
+      <div ref="calendarWrapperRef" class="calendar-days-wrapper">
         <div
-          ref="calendarDaysRef"
-          class="calendar-days"
+          ref="calendarTapeRef"
+          class="calendar-tape"
           :style="swipeStyle"
         >
           <div
-            v-for="day in calendarPage"
-            :key="day.date"
-            class="calendar-day"
-            :class="dayCssClasses(day)"
+            v-for="(page, pageIndex) in tapePages"
+            :key="tapeMonthKeys[pageIndex]"
+            class="calendar-days"
           >
-            <div v-if="canShowSeq(day)" class="calendar-cell-seq">
-              {{ day.seqNumber }}
+            <div
+              v-for="day in page"
+              :key="day.date"
+              class="calendar-day"
+              :class="dayCssClasses(day)"
+            >
+              <div v-if="canShowSeq(day)" class="calendar-cell-seq">
+                {{ day.seqNumber }}
+              </div>
+              <div v-if="isVacationDay(day)" class="calendar-cell-vacation">
+                🌴
+              </div>
+              <div v-else-if="canShowStages(day)" class="calendar-cell-stages">
+                {{ day.stages }}
+              </div>
+              <span class="calendar-cell-number"> {{ day.number }} </span>
             </div>
-            <div v-if="isVacationDay(day)" class="calendar-cell-vacation">
-              🌴
-            </div>
-            <div v-else-if="canShowStages(day)" class="calendar-cell-stages">
-              {{ day.stages }}
-            </div>
-            <span class="calendar-cell-number"> {{ day.number }} </span>
-          </div>
-        </div>
-        <div
-          v-if="adjacentPage"
-          class="calendar-days calendar-days--adjacent"
-          :style="adjacentStyle"
-        >
-          <div
-            v-for="day in adjacentPage"
-            :key="day.date"
-            class="calendar-day"
-            :class="dayCssClasses(day)"
-          >
-            <div v-if="canShowSeq(day)" class="calendar-cell-seq">
-              {{ day.seqNumber }}
-            </div>
-            <div v-if="isVacationDay(day)" class="calendar-cell-vacation">
-              🌴
-            </div>
-            <div v-else-if="canShowStages(day)" class="calendar-cell-stages">
-              {{ day.stages }}
-            </div>
-            <span class="calendar-cell-number"> {{ day.number }} </span>
           </div>
         </div>
       </div>
@@ -130,84 +113,60 @@ const hasAccess = computed(() => authStore.hasAccess(UserRole.COMMANDER))
 
 const prevMonthButton = ref<HTMLButtonElement>()
 const nextMonthButton = ref<HTMLButtonElement>()
-const calendarDaysRef = ref<HTMLElement>()
+const calendarWrapperRef = ref<HTMLElement>()
+const calendarTapeRef = ref<HTMLElement>()
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const currMonth = ref(parseLocalDate(currDay.value.chronodate))
 
-const calendarPage = computed(() =>
-  calcCalendarPage(currMonth.value, currDay.value, chronodays.value)
-)
+// 3-month tape: prev, curr, next
+const prevMonth = computed(() => {
+  const d = new Date(currMonth.value)
+  d.setMonth(d.getMonth() - 1)
+  return d
+})
+
+const nextMonth = computed(() => {
+  const d = new Date(currMonth.value)
+  d.setMonth(d.getMonth() + 1)
+  return d
+})
+
+// Pre-calculate all 3 pages
+const tapePages = computed(() => [
+  calcCalendarPage(prevMonth.value, currDay.value, chronodays.value),
+  calcCalendarPage(currMonth.value, currDay.value, chronodays.value),
+  calcCalendarPage(nextMonth.value, currDay.value, chronodays.value),
+])
+
+// Keys for Vue's v-for to properly track months
+const tapeMonthKeys = computed(() => [
+  `${prevMonth.value.getFullYear()}-${prevMonth.value.getMonth()}`,
+  `${currMonth.value.getFullYear()}-${currMonth.value.getMonth()}`,
+  `${nextMonth.value.getFullYear()}-${nextMonth.value.getMonth()}`,
+])
 
 const TAPE_SNAP_DURATION = 250
 
+// Page width is the wrapper width (each calendar page fills the wrapper)
+const tapePageWidth = computed(() => calendarWrapperRef.value?.offsetWidth ?? 300)
+
 const {
   swipeStyle,
-  swipeOffset,
   triggerSwipe,
-  isSwipeActive,
-  swipeDirection
 } = useSwipe({
-  element: calendarDaysRef,
+  element: calendarTapeRef,
   threshold: 80,
   maxRotation: 0,
   tapeMode: true,
   tapeSnapDuration: TAPE_SNAP_DURATION,
+  tapePageWidth,
   onSwipeLeft: () => {
     navigateNextMonth()
   },
   onSwipeRight: () => {
     navigatePrevMonth()
   },
-})
-
-// Adjacent month for tape effect during swipe
-const adjacentMonth = computed<Date | null>(() => {
-  // Use swipeDirection for button-triggered animations (set before offset changes)
-  // Use swipeOffset for touch-based swiping
-  const direction = swipeDirection.value ?? (swipeOffset.value > 0 ? 'right' : swipeOffset.value < 0 ? 'left' : null)
-
-  if (!direction) return null
-
-  if (direction === 'right') {
-    // Swiping right - show previous month
-    const prev = new Date(currMonth.value)
-    prev.setMonth(prev.getMonth() - 1)
-    return prev
-  } else {
-    // Swiping left - show next month
-    const next = new Date(currMonth.value)
-    next.setMonth(next.getMonth() + 1)
-    return next
-  }
-})
-
-const adjacentPage = computed(() => {
-  if (!adjacentMonth.value) return null
-  return calcCalendarPage(adjacentMonth.value, currDay.value, chronodays.value)
-})
-
-// Computed style for adjacent month positioning
-const adjacentStyle = computed(() => {
-  const direction = swipeDirection.value ?? (swipeOffset.value > 0 ? 'right' : swipeOffset.value < 0 ? 'left' : null)
-  if (!calendarDaysRef.value || !direction) return { display: 'none' }
-
-  const width = calendarDaysRef.value.offsetWidth
-  const gap = 4
-  // Position the adjacent month on the opposite side, moving together with the main content
-  const offset = direction === 'right'
-    ? swipeOffset.value - width - gap // Previous month on the left
-    : swipeOffset.value + width + gap // Next month on the right
-
-  // Use the same transition as the main content
-  const transition = isSwipeActive.value
-    ? 'none'
-    : `transform ${TAPE_SNAP_DURATION}ms cubic-bezier(0.33, 0, 0.2, 1)`
-
-  return {
-    transform: `translateX(${offset}px)`,
-    transition,
-  }
 })
 
 const userDateFormatter = new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' })
@@ -423,17 +382,21 @@ function handleKeydown(event: KeyboardEvent) {
   min-height: 0;
 }
 
-.calendar-days {
+.calendar-tape {
   position: absolute;
   inset: 0;
+  display: flex;
+  gap: 10px;
+  width: calc(300% + 8px);
+}
+
+.calendar-days {
+  flex: 1;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(6, 1fr);
   gap: 4px;
-}
-
-.calendar-days--adjacent {
-  pointer-events: none;
+  min-width: 0;
 }
 
 .calendar-day {
