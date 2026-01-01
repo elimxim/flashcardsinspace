@@ -63,7 +63,6 @@ import { computed, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import { deckEmptyMessage } from '@/core-logic/review-logic.ts'
-import { useSwipe } from '@/utils/use-swipe.ts'
 import { isTouchDevice } from '@/utils/utils.ts'
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
@@ -113,18 +112,178 @@ const cardTransition = ref('')
 const hasSlot = computed(() => !!slots.default)
 const viewedTimes = computed(() => (flashcard.value?.timesReviewed ?? 0) + 1)
 
-const {
-  swipeStyle,
-  fingerProgress,
-  fingerOffset,
-} = useSwipe({
-  element: spaceDeckElement,
-  enabled: () => isTouchDevice,
-  canSwipeLeft: () => props.canSlideLeft,
-  canSwipeRight: () => props.canSlideRight,
-  onSwipeLeft: () => slideLeft(),
-  onSwipeRight: () => slideRight(),
+const SWIPE_THRESHOLD = 100
+const SWIPE_VELOCITY_THRESHOLD = 0.3
+const SWIPE_MAX_ROTATION = 5
+const SWIPE_ANIMATION_SPEED = 1.5
+
+let touchStartX = 0
+let touchStartY = 0
+let touchStartTime = 0
+let isSwiping = false
+
+const swipeOffset = ref(0)
+const fingerOffset = ref(0)
+const isSwipeActive = ref(false)
+const isAnimatingOut = ref(false)
+
+function getExitOffset(): number {
+  const el = spaceDeckElement.value
+  const elementWidth = el?.offsetWidth ?? 0
+  return window.innerWidth + elementWidth
+}
+
+function getAnimationDuration(): number {
+  return Math.round(getExitOffset() / SWIPE_ANIMATION_SPEED)
+}
+
+function getInvisibleDuration(direction: 'left' | 'right'): number {
+  const el = spaceDeckElement.value
+  if (!el) return getAnimationDuration()
+
+  const rect = el.getBoundingClientRect()
+  const distance = direction === 'right'
+    ? window.innerWidth - rect.left
+    : rect.right
+
+  return Math.round(distance / SWIPE_ANIMATION_SPEED)
+}
+
+function canSwipe() {
+  return isTouchDevice && (props.canSlideLeft || props.canSlideRight)
+}
+
+const swipeStyle = computed(() => {
+  const rotation = SWIPE_MAX_ROTATION > 0 ? (swipeOffset.value / 200) * SWIPE_MAX_ROTATION : 0
+  const transitionDuration = getAnimationDuration()
+
+  if (swipeOffset.value === 0 && !rotation && !isSwipeActive.value && !isAnimatingOut.value) return {}
+
+  return {
+    transform: `translateX(${swipeOffset.value}px)${rotation ? ` rotate(${rotation}deg)` : ''}`,
+    transition: isSwipeActive.value ? 'none' : `transform ${transitionDuration}ms cubic-bezier(0.33, 0, 0.2, 1)`,
+  }
 })
+
+const fingerProgress = computed(() => {
+  const progress = fingerOffset.value / SWIPE_THRESHOLD
+  return Math.max(-1, Math.min(1, progress))
+})
+
+function onTouchStart(event: TouchEvent) {
+  if (!canSwipe()) return
+  const touch = event.touches[0]
+  touchStartX = touch.clientX
+  touchStartY = touch.clientY
+  touchStartTime = Date.now()
+  isSwiping = false
+  isSwipeActive.value = true
+  isAnimatingOut.value = false
+  swipeOffset.value = 0
+  fingerOffset.value = 0
+}
+
+function onTouchMove(event: TouchEvent) {
+  if (!canSwipe()) return
+  const touch = event.touches[0]
+  const deltaX = touch.clientX - touchStartX
+  const deltaY = touch.clientY - touchStartY
+
+  if (isSwiping) {
+    swipeOffset.value = deltaX
+    fingerOffset.value = deltaX
+    if (event.cancelable) {
+      event.preventDefault()
+    }
+    return
+  }
+
+  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+    isSwiping = true
+    swipeOffset.value = deltaX
+    fingerOffset.value = deltaX
+    if (event.cancelable) {
+      event.preventDefault()
+    }
+  }
+}
+
+function onTouchEnd(event: TouchEvent) {
+  fingerOffset.value = 0
+
+  if (!canSwipe()) {
+    isSwipeActive.value = false
+    swipeOffset.value = 0
+    return
+  }
+
+  const touch = event.changedTouches[0]
+  const deltaX = touch.clientX - touchStartX
+  const deltaTime = Date.now() - touchStartTime
+  const velocity = Math.abs(deltaX) / deltaTime
+
+  const meetsThreshold = Math.abs(deltaX) > SWIPE_THRESHOLD || velocity > SWIPE_VELOCITY_THRESHOLD
+  const isSwipeLeft = deltaX < 0
+  const directionAllowed = isSwipeLeft ? props.canSlideLeft : props.canSlideRight
+  const isValidSwipe = isSwiping && meetsThreshold && directionAllowed
+
+  if (isValidSwipe) {
+    isSwipeActive.value = false
+    isAnimatingOut.value = true
+    const direction = deltaX > 0 ? 'right' : 'left'
+    const exitOffset = getExitOffset()
+    const invisibleDuration = getInvisibleDuration(direction)
+    const offset = deltaX > 0 ? exitOffset : -exitOffset
+    requestAnimationFrame(() => {
+      swipeOffset.value = offset
+      setTimeout(() => {
+        swipeOffset.value = 0
+        isAnimatingOut.value = false
+        if (deltaX > 0) {
+          slideRight()
+        } else {
+          slideLeft()
+        }
+      }, invisibleDuration)
+    })
+  } else if (isSwiping) {
+    isSwipeActive.value = false
+    isAnimatingOut.value = true
+    const snapDuration = getAnimationDuration()
+    requestAnimationFrame(() => {
+      swipeOffset.value = 0
+      setTimeout(() => {
+        isAnimatingOut.value = false
+      }, snapDuration)
+    })
+  } else {
+    isSwipeActive.value = false
+    swipeOffset.value = 0
+  }
+
+  isSwiping = false
+}
+
+function attachSwipeListeners(el: HTMLElement) {
+  el.addEventListener('touchstart', onTouchStart)
+  el.addEventListener('touchmove', onTouchMove, { passive: false })
+  el.addEventListener('touchend', onTouchEnd)
+}
+
+function detachSwipeListeners(el: HTMLElement) {
+  el.removeEventListener('touchstart', onTouchStart)
+  el.removeEventListener('touchmove', onTouchMove)
+  el.removeEventListener('touchend', onTouchEnd)
+}
+
+watch(spaceDeckElement, (newEl, oldEl) => {
+  if (oldEl) {
+    detachSwipeListeners(oldEl)
+  }
+  if (newEl) {
+    attachSwipeListeners(newEl)
+  }
+}, { immediate: true })
 
 const swipeLabelText = computed(() => {
   if (fingerOffset.value < 0 && props.swipeLeftText) return props.swipeLeftText
@@ -219,6 +378,10 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
+  const el = spaceDeckElement.value
+  if (el) {
+    detachSwipeListeners(el)
+  }
 })
 
 function handleKeydown(event: KeyboardEvent) {
