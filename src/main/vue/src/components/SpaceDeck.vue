@@ -456,18 +456,18 @@ function animatePullIn(onCompleteCallback: () => void): boolean {
   return true
 }
 
-function slideLeft() {
+async function slideLeft() {
   if (!props.canSlideLeft) return
   if (isDeckEmpty() && lastFlashcard.value) {
     animatePullIn(() => props.onSlideLeft())
   } else {
-    animateSwipe('left', triggerSlideLeft)
+    await animateSwipe('left', triggerSlideLeft)
   }
 }
 
-function slideRight() {
+async function slideRight() {
   if (!props.canSlideRight) return
-  animateSwipe('right', triggerSlideRight)
+  await animateSwipe('right', triggerSlideRight)
 }
 
 function animateOutLeft(slow = false): Promise<boolean> {

@@ -708,18 +708,18 @@ onBeforeRouteLeave(async () => {
   await finishReview()
 })
 
-function handleKeydown(event: KeyboardEvent) {
+async function handleKeydown(event: KeyboardEvent) {
   if (toggleStore.isAnyModalOpen()) return
 
   if (event.key === 'Escape') {
     event.stopPropagation()
-    finishReviewAndLeave()
+    await finishReviewAndLeave()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
-    spaceDeck?.value?.slideLeft()
+    await spaceDeck?.value?.slideLeft()
   } else if (event.key === 'ArrowRight') {
     event.stopPropagation()
-    spaceDeck?.value?.slideRight()
+    await spaceDeck?.value?.slideRight()
   }
 }
 
