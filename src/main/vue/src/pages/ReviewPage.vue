@@ -58,8 +58,8 @@
           :flashcard-front-side-audio="flashcardFrontSideAudioBlob"
           :flashcard-back-side-audio="flashcardBackSideAudioBlob"
           :show-slot="reviewMode.isQuiz()"
-          :can-slide-left="!noPrevAvailable"
-          :can-slide-right="!noNextAvailable"
+          :can-slide-left="canSlideLeft"
+          :can-slide-right="canSlideRight"
           :on-slide-left="onSlideLeft"
           :on-slide-right="onSlideRight"
           :swipe-left-text="swipeLeftText"
@@ -273,6 +273,18 @@ const noPrevAvailable = computed(() => {
     return !noNextAvailable.value
   }
   return flashcardsTotal.value === flashcardsRemaining.value
+})
+
+const canSlideLeft = computed(() => {
+  if (reviewMode.value.isLightspeed()) {
+    return !noNextAvailable.value
+  } else {
+    return !noPrevAvailable.value
+  }
+})
+
+const canSlideRight = computed(() => {
+  return !noNextAvailable.value
 })
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
