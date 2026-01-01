@@ -1,10 +1,9 @@
 <template>
   <div
     class="space-card space-card--theme"
-    :class="{ 'space-card--flipped': flipped }"
     @click="flip"
   >
-    <div class="space-card-flipper">
+    <div class="space-card-flipper" :style="{ transform: `rotateY(${rotationAngle}deg)` }">
       <div
         class="space-card-face space-card-face--front"
         :class="{
@@ -160,7 +159,13 @@ const props = withDefaults(defineProps<{
   },
 })
 
+const FLIP_ANIMATION_DURATION_MS = 500
+const flipAnimationDurationCss = `${FLIP_ANIMATION_DURATION_MS}ms`
+
 const flipped = ref(false)
+const rotationAngle = ref(0)
+const rotationAngleDeg = computed(() => `${rotationAngle.value}deg`)
+const isAnimating = ref(false)
 const cardAnimationCompleted = ref(false)
 const frontVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
 const backVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
@@ -174,21 +179,25 @@ const stageDisplayName = computed(() => {
 })
 
 function flip() {
-  if (!props.unflippable) {
+  if (!props.unflippable && !isAnimating.value) {
+    isAnimating.value = true
     stopAllVoices()
     flipped.value = !flipped.value
+    rotationAngle.value -= 180
 
-    if (autoPlayVoice.value && cardAnimationCompleted.value) {
-      setTimeout(() => {
+    setTimeout(() => {
+      isAnimating.value = false
+      if (autoPlayVoice.value && cardAnimationCompleted.value) {
         playCurrentSideVoice()
-      }, 500) // Match the flip animation duration
-    }
+      }
+    }, FLIP_ANIMATION_DURATION_MS)
   }
 }
 
 function flipToFront() {
-  if (!props.unflippable) {
+  if (!props.unflippable && flipped.value) {
     flipped.value = false
+    rotationAngle.value -= 180
   }
 }
 
@@ -196,7 +205,8 @@ async function flipToFrontAndWait(): Promise<void> {
   return new Promise((resolve) => {
     if (flipped.value && !props.unflippable) {
       flipped.value = false
-      setTimeout(() => resolve(void 0), 500)
+      rotationAngle.value -= 180
+      setTimeout(() => resolve(void 0), FLIP_ANIMATION_DURATION_MS)
     } else {
       resolve(void 0)
     }
@@ -274,13 +284,10 @@ defineExpose({
   z-index: 10;
 }
 
-.space-card--flipped .space-card-flipper {
-  transform: rotateY(180deg);
-}
-
 .space-card-flipper {
   flex: 1;
-  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform v-bind(flipAnimationDurationCss) cubic-bezier(0.25, 1, 0.5, 1);
+  transform: rotateY(v-bind(rotationAngleDeg));
   transform-style: preserve-3d;
   position: relative;
   will-change: transform;
