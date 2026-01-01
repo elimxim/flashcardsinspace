@@ -1,7 +1,7 @@
 <template>
   <button
     ref="button"
-    class="smart-button smart-button--theme appearance-none"
+    class="smart-button smart-button--theme appearance-none touch-callout-none select-none"
     :class="{
       'smart-button--disabled': disabled,
       'smart-button--rounded': rounded,
@@ -19,6 +19,7 @@
     @touchstart="onTouchStart"
     @touchend="onTouchEnd"
     @click.stop="handleClick"
+    @contextmenu.prevent
   >
     <span class="smart-button-progress" :style="{ width: progressPercentage }"/>
     <span class="smart-button-title-wrapper">
@@ -119,7 +120,9 @@ function onTouchEnd() {
 
 function startHold(event: Event) {
   if (props.disabled || props.holdTime <= 0) return
-  event.preventDefault()
+  if (event.cancelable) {
+    event.preventDefault()
+  }
 
   pressStartTime = performance.now()
   animationFrame = requestAnimationFrame(updateProgress)
@@ -213,10 +216,9 @@ function handleGlobalMouseUp() {
   background: var(--s-btn--bg);
   outline: var(--s-btn--border-width) solid var(--s-btn--border-color);
   position: relative;
-  transition:
-    background-color 0.2s ease-in-out,
-    outline 0.2s ease-in-out,
-    box-shadow 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out,
+  outline 0.2s ease-in-out,
+  box-shadow 0.2s ease-in-out;
   width: var(--s-btn--width);
   height: var(--s-btn--height);
   cursor: pointer;
