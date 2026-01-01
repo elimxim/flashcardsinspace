@@ -153,7 +153,6 @@
             class="decision-button dangerous-button"
             text="Move back"
             :disabled="noNextAvailable"
-            :hidden="noNextAvailable"
             :on-click="moveBack"
             :hold-time="1.2"
             auto-blur
@@ -489,7 +488,7 @@ async function moveBack() {
     )
     return
   }
-  spaceDeck.value?.willSlideLeft()
+  spaceDeck.value?.animateOutLeft()
   const flashcard = copyFlashcard(currFlashcard.value)
   updateFlashcard(flashcard, learningStages.S1, currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)

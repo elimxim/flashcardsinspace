@@ -2,6 +2,9 @@
   <div
     ref="spaceDeckElement"
     class="space-deck"
+    @touchstart="onTouchStart"
+    @touchmove="onTouchMove"
+    @touchend="onTouchEnd"
   >
     <div class="flashcard-deck">
       <div
@@ -17,36 +20,42 @@
           {{ swipeLabelText }}
         </span>
       </div>
-      <transition
-        :name="cardTransition"
-        @after-enter="onCardTransitionComplete"
-      >
+      <SpaceCard
+        v-if="canShowPullInCard"
+        :key="lastFlashcard?.id"
+        :stage="lastFlashcard?.stage"
+        :front-side="lastFlashcard?.frontSide"
+        :back-side="lastFlashcard?.backSide"
+        :style="pullInCardStyle"
+        class="pull-in-card"
+      />
+      <SpaceCard
+        v-if="flashcard && deckReady"
+        ref="spaceCard"
+        :key="flashcard.id"
+        v-model:auto-play-voice="autoPlayVoice"
+        v-model:auto-repeat-voice="autoRepeatVoice"
+        :stage="flashcard.stage"
+        :front-side="flashcard.frontSide"
+        :back-side="flashcard.backSide"
+        :viewed-times="viewedTimes"
+        :on-edit="toggleStore.toggleFlashcardEdit"
+        :front-side-audio="flashcardFrontSideAudio"
+        :back-side-audio="flashcardBackSideAudio"
+        :class="cardAnimationClass"
+        :style="cardStyle"
+        @animationend="onEnterAnimationEnd"
+      />
+      <template v-else>
+        <slot v-if="hasSlot && showSlot && deckReady"/>
         <SpaceCard
-          v-if="flashcard && deckReady"
-          ref="spaceCard"
-          :key="flashcard ? flashcard.id : 0"
-          v-model:auto-play-voice="autoPlayVoice"
-          v-model:auto-repeat-voice="autoRepeatVoice"
-          :stage="flashcard?.stage"
-          :front-side="flashcard?.frontSide"
-          :back-side="flashcard?.backSide"
-          :viewed-times="viewedTimes"
-          :on-edit="toggleStore.toggleFlashcardEdit"
-          :front-side-audio="flashcardFrontSideAudio"
-          :back-side-audio="flashcardBackSideAudio"
-          :style="swipeStyle"
+          v-else
+          :front-side="emptyMessage"
+          unflippable
+          text-only
+          transparent
         />
-        <template v-else>
-          <slot v-if="hasSlot && showSlot && deckReady"/>
-          <SpaceCard
-            v-else
-            :front-side="deckEmptyMessage()"
-            unflippable
-            text-only
-            transparent
-          />
-        </template>
-      </transition>
+      </template>
     </div>
   </div>
   <FlashcardEditModal
@@ -79,8 +88,8 @@ const props = withDefaults(defineProps<{
   swipeRightText?: string
   onFlashcardRemoved?: () => void
   onAudioChanged?: () => void
-  onSlideLeft?: () => void
-  onSlideRight?: () => void
+  onSlideLeft?: () => Promise<void> | void
+  onSlideRight?: () => Promise<void> | void
 }>(), {
   showSlot: true,
   flashcardFrontSideAudio: undefined,
@@ -107,30 +116,64 @@ const flashcardWasRemoved = ref(false)
 const audioWasChanged = ref(false)
 const spaceCard = ref<InstanceType<typeof SpaceCard>>()
 const spaceDeckElement = ref<HTMLElement>()
-const cardTransition = ref('')
 
 const hasSlot = computed(() => !!slots.default)
 const viewedTimes = computed(() => (flashcard.value?.timesReviewed ?? 0) + 1)
+const emptyMessage = ref(deckEmptyMessage())
 
 const SWIPE_THRESHOLD = 100
 const SWIPE_VELOCITY_THRESHOLD = 0.3
 const SWIPE_MAX_ROTATION = 5
-const SWIPE_ANIMATION_SPEED = 1.5
-
-let touchStartX = 0
-let touchStartY = 0
-let touchStartTime = 0
-let isSwiping = false
+const SWIPE_ANIMATION_SPEED = 2
 
 const swipeOffset = ref(0)
 const fingerOffset = ref(0)
+const swipeStartX = ref(0)
+const swipeStartY = ref(0)
+const swipeStartTime = ref(0)
 const isSwipeActive = ref(false)
+const isSwiping = ref(false)
+const isAnimating = ref(false)
 const isAnimatingOut = ref(false)
+const enterAnimation = ref<'drop-down' | 'zoom-in' | ''>('')
+const isPullingIn = ref(false)
+const lastFlashcard = ref<Flashcard | undefined>(undefined)
+
+const canShowPullInCard = computed(() => {
+  return isDeckEmpty() && !!lastFlashcard.value && deckReady.value
+})
+
+const pullInCardStyle = computed(() => {
+  if (isPullingIn.value) {
+    return cardStyle.value
+  } else {
+    return {
+      transform: `translateX(${getPullInStartOffset()}px)`,
+      visibility: 'hidden',
+    }
+  }
+})
+
+function isDeckEmpty() {
+  return !flashcard.value
+}
+
+watch(flashcard, (newVal) => {
+  if (newVal) {
+    lastFlashcard.value = newVal
+  }
+}, { immediate: true })
 
 function getExitOffset(): number {
   const el = spaceDeckElement.value
   const elementWidth = el?.offsetWidth ?? 0
   return window.innerWidth + elementWidth
+}
+
+function getPullInStartOffset(): number {
+  const el = spaceDeckElement.value
+  const elementWidth = el?.offsetWidth ?? 300
+  return elementWidth + 50
 }
 
 function getAnimationDuration(): number {
@@ -150,10 +193,10 @@ function getInvisibleDuration(direction: 'left' | 'right'): number {
 }
 
 function canSwipe() {
-  return isTouchDevice && (props.canSlideLeft || props.canSlideRight)
+  return isTouchDevice && (props.canSlideLeft || props.canSlideRight) && !isAnimatingOut.value && !isAnimating.value
 }
 
-const swipeStyle = computed(() => {
+const cardStyle = computed(() => {
   const rotation = SWIPE_MAX_ROTATION > 0 ? (swipeOffset.value / 200) * SWIPE_MAX_ROTATION : 0
   const transitionDuration = getAnimationDuration()
 
@@ -165,6 +208,10 @@ const swipeStyle = computed(() => {
   }
 })
 
+const cardAnimationClass = computed(() => {
+  return enterAnimation.value ? `card-enter-${enterAnimation.value}` : ''
+})
+
 const fingerProgress = computed(() => {
   const progress = fingerOffset.value / SWIPE_THRESHOLD
   return Math.max(-1, Math.min(1, progress))
@@ -173,12 +220,13 @@ const fingerProgress = computed(() => {
 function onTouchStart(event: TouchEvent) {
   if (!canSwipe()) return
   const touch = event.touches[0]
-  touchStartX = touch.clientX
-  touchStartY = touch.clientY
-  touchStartTime = Date.now()
-  isSwiping = false
+  swipeStartX.value = touch.clientX
+  swipeStartY.value = touch.clientY
+  swipeStartTime.value = Date.now()
+  isSwiping.value = false
   isSwipeActive.value = true
   isAnimatingOut.value = false
+  isPullingIn.value = false
   swipeOffset.value = 0
   fingerOffset.value = 0
 }
@@ -186,11 +234,15 @@ function onTouchStart(event: TouchEvent) {
 function onTouchMove(event: TouchEvent) {
   if (!canSwipe()) return
   const touch = event.touches[0]
-  const deltaX = touch.clientX - touchStartX
-  const deltaY = touch.clientY - touchStartY
+  const deltaX = touch.clientX - swipeStartX.value
+  const deltaY = touch.clientY - swipeStartY.value
 
-  if (isSwiping) {
-    swipeOffset.value = deltaX
+  if (isSwiping.value) {
+    if (isPullingIn.value) {
+      swipeOffset.value = getPullInStartOffset() + deltaX
+    } else {
+      swipeOffset.value = deltaX
+    }
     fingerOffset.value = deltaX
     if (event.cancelable) {
       event.preventDefault()
@@ -199,33 +251,71 @@ function onTouchMove(event: TouchEvent) {
   }
 
   if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
-    isSwiping = true
-    swipeOffset.value = deltaX
-    fingerOffset.value = deltaX
-    if (event.cancelable) {
-      event.preventDefault()
+    isSwiping.value = true
+    if (isDeckEmpty() && deltaX < 0 && props.canSlideLeft && lastFlashcard.value) {
+      isPullingIn.value = true
+      enterAnimation.value = ''
+      const pullInStart = getPullInStartOffset()
+      swipeOffset.value = pullInStart + deltaX
+    } else if (!isPullingIn.value) {
+      swipeOffset.value = deltaX
+    } else {
+      const pullInStart = getPullInStartOffset()
+      swipeOffset.value = pullInStart + deltaX
     }
+
+    fingerOffset.value = deltaX
   }
 }
 
 function onTouchEnd(event: TouchEvent) {
   fingerOffset.value = 0
-
   if (!canSwipe()) {
     isSwipeActive.value = false
+    isPullingIn.value = false
     swipeOffset.value = 0
     return
   }
 
   const touch = event.changedTouches[0]
-  const deltaX = touch.clientX - touchStartX
-  const deltaTime = Date.now() - touchStartTime
+  const deltaX = touch.clientX - swipeStartX.value
+  const deltaTime = Date.now() - swipeStartTime.value
   const velocity = Math.abs(deltaX) / deltaTime
 
   const meetsThreshold = Math.abs(deltaX) > SWIPE_THRESHOLD || velocity > SWIPE_VELOCITY_THRESHOLD
   const isSwipeLeft = deltaX < 0
   const directionAllowed = isSwipeLeft ? props.canSlideLeft : props.canSlideRight
-  const isValidSwipe = isSwiping && meetsThreshold && directionAllowed
+  const isValidSwipe = isSwiping.value && meetsThreshold && directionAllowed
+
+  if (isPullingIn.value) {
+    isSwipeActive.value = false
+
+    const pullInValid = meetsThreshold && props.canSlideLeft
+    if (pullInValid) {
+      isAnimatingOut.value = true
+      requestAnimationFrame(() => {
+        swipeOffset.value = 0
+        setTimeout(() => {
+          isAnimatingOut.value = false
+          isPullingIn.value = false
+          props.onSlideLeft()
+        }, getAnimationDuration())
+      })
+    } else {
+      isAnimatingOut.value = true
+      requestAnimationFrame(() => {
+        swipeOffset.value = getPullInStartOffset()
+        setTimeout(() => {
+          isAnimatingOut.value = false
+          isPullingIn.value = false
+          swipeOffset.value = 0
+        }, getAnimationDuration())
+      })
+    }
+
+    isSwiping.value = false
+    return
+  }
 
   if (isValidSwipe) {
     isSwipeActive.value = false
@@ -240,13 +330,13 @@ function onTouchEnd(event: TouchEvent) {
         swipeOffset.value = 0
         isAnimatingOut.value = false
         if (deltaX > 0) {
-          slideRight()
+          triggerSlideRight()
         } else {
-          slideLeft()
+          triggerSlideLeft()
         }
       }, invisibleDuration)
     })
-  } else if (isSwiping) {
+  } else if (isSwiping.value) {
     isSwipeActive.value = false
     isAnimatingOut.value = true
     const snapDuration = getAnimationDuration()
@@ -261,29 +351,8 @@ function onTouchEnd(event: TouchEvent) {
     swipeOffset.value = 0
   }
 
-  isSwiping = false
+  isSwiping.value = false
 }
-
-function attachSwipeListeners(el: HTMLElement) {
-  el.addEventListener('touchstart', onTouchStart)
-  el.addEventListener('touchmove', onTouchMove, { passive: false })
-  el.addEventListener('touchend', onTouchEnd)
-}
-
-function detachSwipeListeners(el: HTMLElement) {
-  el.removeEventListener('touchstart', onTouchStart)
-  el.removeEventListener('touchmove', onTouchMove)
-  el.removeEventListener('touchend', onTouchEnd)
-}
-
-watch(spaceDeckElement, (newEl, oldEl) => {
-  if (oldEl) {
-    detachSwipeListeners(oldEl)
-  }
-  if (newEl) {
-    attachSwipeListeners(newEl)
-  }
-}, { immediate: true })
 
 const swipeLabelText = computed(() => {
   if (fingerOffset.value < 0 && props.swipeLeftText) return props.swipeLeftText
@@ -309,52 +378,110 @@ const swipeTextStyle = computed(() => {
 
 function setDeckReady() {
   deckReady.value = true
-  cardTransition.value = 'drop-down'
+  enterAnimation.value = 'drop-down'
 }
 
-function willSlideLeft() {
-  prepareSlideTransition('slide-to-left')
+function triggerSlideLeft() {
+  if (!props.canSlideLeft) return
+  enterAnimation.value = 'zoom-in'
+  props.onSlideLeft()
 }
 
-function willSlideRight() {
-  prepareSlideTransition('slide-to-right')
+function triggerSlideRight() {
+  if (!props.canSlideRight) return
+  enterAnimation.value = 'zoom-in'
+  props.onSlideRight()
+}
+
+function animateSwipe(direction: 'left' | 'right', onCompleteCallback: () => void): boolean {
+  if (isAnimating.value) {
+    return false
+  }
+  isAnimating.value = true
+  isAnimatingOut.value = true
+  enterAnimation.value = '' // Stop any zoom-in animation so swipe transform can take effect
+
+  const exitOffset = getExitOffset()
+  const invisibleDuration = getInvisibleDuration(direction)
+  const offset = direction === 'right' ? exitOffset : -exitOffset
+
+  requestAnimationFrame(() => {
+    swipeOffset.value = offset
+    setTimeout(() => {
+      swipeOffset.value = 0
+      isAnimatingOut.value = false
+      isAnimating.value = false
+      onCompleteCallback()
+    }, invisibleDuration)
+  })
+  return true
+}
+
+function animatePullIn(onCompleteCallback: () => void): boolean {
+  if (isAnimating.value) {
+    return false
+  }
+  isAnimating.value = true
+  isPullingIn.value = true
+  enterAnimation.value = ''
+  isSwipeActive.value = true
+
+  // Start from off-screen right
+  swipeOffset.value = getPullInStartOffset()
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      isSwipeActive.value = false
+      isAnimatingOut.value = true
+      swipeOffset.value = 0
+      setTimeout(() => {
+        isAnimatingOut.value = false
+        isPullingIn.value = false
+        isAnimating.value = false
+        onCompleteCallback()
+      }, getAnimationDuration())
+    })
+  })
+  return true
 }
 
 function slideLeft() {
   if (!props.canSlideLeft) return
-  willSlideLeft()
-  props.onSlideLeft()
+  if (isDeckEmpty() && lastFlashcard.value) {
+    animatePullIn(() => props.onSlideLeft())
+  } else {
+    animateSwipe('left', triggerSlideLeft)
+  }
 }
 
 function slideRight() {
   if (!props.canSlideRight) return
-  willSlideRight()
-  props.onSlideRight()
+  animateSwipe('right', triggerSlideRight)
 }
 
-function prepareSlideTransition(value: string) {
-  if (!deckReady.value) {
-    cardTransition.value = ''
-    return
-  }
-
-  if (!flashcard.value) {
-    cardTransition.value = 'slide-from-right'
-  } else {
-    cardTransition.value = value
-  }
+function animateOutLeft() {
+  animateSwipe('left', () => {
+    enterAnimation.value = 'zoom-in'
+  })
 }
 
-function onCardTransitionComplete() {
+function animateOutRight() {
+  animateSwipe('right', () => {
+    enterAnimation.value = 'zoom-in'
+  })
+}
+
+function onEnterAnimationEnd() {
+  enterAnimation.value = ''
   spaceCard.value?.onCardAnimationComplete()
 }
 
 defineExpose({
   setDeckReady,
-  willSlideLeft,
-  willSlideRight,
   slideLeft,
   slideRight,
+  animateOutLeft,
+  animateOutRight,
 })
 
 watch(flashcardWasRemoved, (newVal) => {
@@ -378,10 +505,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
-  const el = spaceDeckElement.value
-  if (el) {
-    detachSwipeListeners(el)
-  }
 })
 
 function handleKeydown(event: KeyboardEvent) {
@@ -458,51 +581,8 @@ function handleKeydown(event: KeyboardEvent) {
   transition: opacity 0.3s ease-out;
 }
 
-.slide-to-right-enter-active,
-.slide-to-right-leave-active,
-.slide-to-left-enter-active,
-.slide-to-left-leave-active {
-  transition: all 0.4s cubic-bezier(0.33, 0, 0.2, 1);
-  position: absolute;
-}
-
-.slide-from-right-enter-active,
-.slide-from-right-leave-active {
-  transition: all 0.2s cubic-bezier(0.33, 0, 0.2, 1);
-  position: absolute;
-}
-
-.slide-from-right-leave-active,
-.slide-to-right-leave-active,
-.slide-to-left-leave-active {
-  z-index: 1;
-}
-
-.slide-to-right-enter-from,
-.slide-to-left-enter-from {
-  transform: scale(0.90);
-}
-
-.slide-to-right-leave-to {
-  transform: translateX(200%) rotate(10deg);
-}
-
-.slide-to-left-leave-to {
-  transform: translateX(-200%) rotate(-10deg);
-}
-
-.slide-from-right-enter-from {
-  transform: translateX(200%) rotate(10deg);
-}
-
-.slide-from-right-leave-to {
-  opacity: 0;
-  transform: none;
-}
-
-.drop-down-enter-active {
+.card-enter-drop-down {
   animation: drop-and-bounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  position: absolute;
 }
 
 @keyframes drop-and-bounce {
@@ -523,6 +603,30 @@ function handleKeydown(event: KeyboardEvent) {
   100% {
     transform: scale(0.99);
   }
+}
+
+.card-enter-zoom-in {
+  animation: zoom-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+
+@keyframes zoom-in {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.pull-in-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
 }
 
 </style>
