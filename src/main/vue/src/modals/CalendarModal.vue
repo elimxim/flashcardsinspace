@@ -9,13 +9,13 @@
         <AwesomeButton
           ref="prevMonthButton"
           icon="fa-solid fa-angle-left"
-          :on-click="navigatePrevMonthWithAnimation"
+          :on-click="navigatePrevMonth"
         />
         <span>{{ formattedCurrMonth }}</span>
         <AwesomeButton
           ref="nextMonthButton"
           icon="fa-solid fa-angle-right"
-          :on-click="navigateNextMonthWithAnimation"
+          :on-click="navigateNextMonth"
         />
       </div>
       <div class="calendar-weekdays">
@@ -27,19 +27,20 @@
           {{ day }}
         </div>
       </div>
-      <div ref="calendarWrapperRef" class="calendar-days-wrapper">
-        <div
-          ref="calendarTapeRef"
-          class="calendar-tape"
-          :style="swipeStyle"
-        >
-          <div
-            v-for="(page, pageIndex) in tapePages"
-            :key="tapeMonthKeys[pageIndex]"
-            class="calendar-days"
-          >
+      <SwipeTape
+        ref="swipeTape"
+        :frames="calendarMonths"
+        :frame-key="calendarKey"
+        :snap-duration="TAPE_SNAP_DURATION"
+        :threshold="80"
+        :page-gap="10"
+        :on-swipe-left="onSwipeRight"
+        :on-swipe-right="onSwipeLeft"
+      >
+        <template #default="{ frame }">
+          <div class="calendar-days">
             <div
-              v-for="day in page"
+              v-for="day in frame"
               :key="day.date"
               class="calendar-day"
               :class="dayCssClasses(day)"
@@ -56,8 +57,8 @@
               <span class="calendar-cell-number"> {{ day.number }} </span>
             </div>
           </div>
-        </div>
-      </div>
+        </template>
+      </SwipeTape>
     </div>
     <div v-if="hasAccess" class="modal-control-buttons">
       <SmartButton
@@ -82,7 +83,13 @@
 import Modal from '@/components/Modal.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import {
+  computed,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch
+} from 'vue'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import {
@@ -95,10 +102,11 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { sendChronoSyncNextDay, sendChronoSyncPrevDay } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useAuthStore, UserRole } from '@/stores/auth-store.ts'
-import { parseLocalDate } from '@/utils/utils.ts'
+import { dateNextMonth, datePrevMonth, parseLocalDate } from '@/utils/utils.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
-import { useSwipe } from '@/utils/use-swipe.ts'
+import SwipeTape from '@/components/SwipeTape.vue'
+import { ComponentExposed } from 'vue-component-type-helpers'
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
@@ -113,85 +121,45 @@ const hasAccess = computed(() => authStore.hasAccess(UserRole.COMMANDER))
 
 const prevMonthButton = ref<HTMLButtonElement>()
 const nextMonthButton = ref<HTMLButtonElement>()
-const calendarWrapperRef = ref<HTMLElement>()
-const calendarTapeRef = ref<HTMLElement>()
+const swipeTape = ref<ComponentExposed<typeof SwipeTape>>()
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
 const currMonth = ref(parseLocalDate(currDay.value.chronodate))
+const prevMonth = computed(() => datePrevMonth(currMonth.value))
+const nextMonth = computed(() => dateNextMonth(currMonth.value))
 
-// 3-month tape: prev, curr, next
-const prevMonth = computed(() => {
-  const d = new Date(currMonth.value)
-  d.setMonth(d.getMonth() - 1)
-  return d
-})
-
-const nextMonth = computed(() => {
-  const d = new Date(currMonth.value)
-  d.setMonth(d.getMonth() + 1)
-  return d
-})
-
-// Pre-calculate all 3 pages
-const tapePages = computed(() => [
+const calendarMonths = computed(() => [
   calcCalendarPage(prevMonth.value, currDay.value, chronodays.value),
   calcCalendarPage(currMonth.value, currDay.value, chronodays.value),
   calcCalendarPage(nextMonth.value, currDay.value, chronodays.value),
 ])
 
-// Keys for Vue's v-for to properly track months
-const tapeMonthKeys = computed(() => [
-  `${prevMonth.value.getFullYear()}-${prevMonth.value.getMonth()}`,
-  `${currMonth.value.getFullYear()}-${currMonth.value.getMonth()}`,
-  `${nextMonth.value.getFullYear()}-${nextMonth.value.getMonth()}`,
-])
+function calendarKey(days: CalendarDay[], index: number) {
+  return days.length > 0 ? `${days[0].date}` : index.toString()
+}
 
 const TAPE_SNAP_DURATION = 250
-
-// Page width is the wrapper width (each calendar page fills the wrapper)
-const tapePageWidth = computed(() => calendarWrapperRef.value?.offsetWidth ?? 300)
-
-const {
-  swipeStyle,
-  triggerSwipe,
-} = useSwipe({
-  element: calendarTapeRef,
-  threshold: 80,
-  maxRotation: 0,
-  tapeMode: true,
-  tapeSnapDuration: TAPE_SNAP_DURATION,
-  tapePageWidth,
-  onSwipeLeft: () => {
-    navigateNextMonth()
-  },
-  onSwipeRight: () => {
-    navigatePrevMonth()
-  },
-})
 
 const userDateFormatter = new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' })
 const formattedCurrMonth = computed(() => {
   return userDateFormatter.format(currMonth.value)
 })
 
+function onSwipeLeft() {
+  currMonth.value = datePrevMonth(currMonth.value)
+}
+
+function onSwipeRight() {
+  currMonth.value = dateNextMonth(currMonth.value)
+}
+
 function navigatePrevMonth() {
-  const newMonth = new Date(currMonth.value)
-  newMonth.setMonth(currMonth.value.getMonth() - 1)
-  currMonth.value = newMonth
+  swipeTape.value?.triggerSwipe('right')
 }
 
 function navigateNextMonth() {
-  const newMonth = new Date(currMonth.value)
-  newMonth.setMonth(currMonth.value.getMonth() + 1)
-  currMonth.value = newMonth
-}
-
-function navigatePrevMonthWithAnimation() {
-  triggerSwipe('right')
-}
-
-function navigateNextMonthWithAnimation() {
-  triggerSwipe('left')
+  swipeTape.value?.triggerSwipe('left')
 }
 
 function dayCssClasses(day: CalendarDay): string {
@@ -299,9 +267,9 @@ onUnmounted(() => {
 
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'ArrowLeft') {
-    navigatePrevMonthWithAnimation()
+    navigatePrevMonth()
   } else if (event.key === 'ArrowRight') {
-    navigateNextMonthWithAnimation()
+    navigateNextMonth()
   }
 }
 
@@ -376,22 +344,8 @@ function handleKeydown(event: KeyboardEvent) {
   color: var(--weekday--color);
 }
 
-.calendar-days-wrapper {
-  flex: 1;
-  position: relative;
-  min-height: 0;
-}
-
-.calendar-tape {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  gap: 10px;
-  width: calc(300% + 8px);
-}
-
 .calendar-days {
-  flex: 1;
+  height: 100%;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(6, 1fr);

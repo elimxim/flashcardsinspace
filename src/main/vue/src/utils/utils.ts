@@ -49,6 +49,18 @@ export function parseNumber(value?: unknown): number | undefined {
   return Number(value)
 }
 
+export function datePrevMonth(date: Date): Date {
+  const prev = new Date(date)
+  prev.setMonth(date.getMonth() - 1)
+  return prev
+}
+
+export function dateNextMonth(date: Date): Date {
+  const next = new Date(date)
+  next.setMonth(date.getMonth() + 1)
+  return next
+}
+
 export const isHoverSupported = typeof window !== 'undefined'
   ? window.matchMedia('(hover: hover)').matches
   : false

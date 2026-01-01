@@ -8,17 +8,19 @@ import {
   toValue,
 } from 'vue'
 
-export interface SwipeOptions {
+export interface TapeOptions {
   /** Element to attach swipe listeners to */
   element: Ref<HTMLElement | undefined>
   /** Minimum distance in pixels to trigger swipe */
   threshold?: number
   /** Minimum velocity in px/ms to trigger swipe */
   velocityThreshold?: number
-  /** Maximum rotation in degrees during swipe, 0 disables rotation */
-  maxRotation?: number
-  /** Animation speed in pixels per millisecond */
-  animationSpeed?: number
+  /** Snap-back animation duration in ms */
+  snapDuration?: number
+  /** Width of a single page (for calculating exit offset). If not provided, uses element width. */
+  pageWidth?: MaybeRefOrGetter<number>
+  /** Gap between pages in pixels */
+  pageGap?: number
   /** Whether swipe is enabled */
   enabled?: MaybeRefOrGetter<boolean>
   /** Whether the left swipe is allowed */
@@ -31,13 +33,19 @@ export interface SwipeOptions {
   onSwipeRight?: () => void
 }
 
-export function useSwipe(options: SwipeOptions) {
+/**
+ * Composable for tape/carousel-like navigation.
+ * Instead of animating off-screen, snaps back after triggering callback.
+ * Useful for carousel/tape-like navigation where content slides in from sides.
+ */
+export function useTape(options: TapeOptions) {
   const {
     element,
     threshold = 100,
     velocityThreshold = 0.3,
-    maxRotation = 5,
-    animationSpeed = 1.5,
+    snapDuration = 200,
+    pageWidth,
+    pageGap = 4,
     enabled = true,
     canSwipeLeft = true,
     canSwipeRight = true,
@@ -45,28 +53,11 @@ export function useSwipe(options: SwipeOptions) {
     onSwipeRight = () => {},
   } = options
 
-  function getExitOffset(): number {
-    const el = element.value
-    const elementWidth = el?.offsetWidth ?? 0
-    return window.innerWidth + elementWidth
-  }
-
-  function getAnimationDuration(): number {
-    return Math.round(getExitOffset() / animationSpeed)
-  }
-
-  /** Time until the element is no longer visible (exits viewport) */
-  function getInvisibleDuration(direction: 'left' | 'right'): number {
-    const el = element.value
-    if (!el) return getAnimationDuration()
-
-    const rect = el.getBoundingClientRect()
-    // Distance until the element is fully off-screen
-    const distance = direction === 'right'
-      ? window.innerWidth - rect.left
-      : rect.right
-
-    return Math.round(distance / animationSpeed)
+  function getPageWidth(): number {
+    if (pageWidth !== undefined) {
+      return toValue(pageWidth)
+    }
+    return element.value?.offsetWidth ?? 300
   }
 
   let touchStartX = 0
@@ -75,29 +66,26 @@ export function useSwipe(options: SwipeOptions) {
   let isSwiping = false
 
   const swipeOffset = ref(0)
-  const fingerOffset = ref(0)
   const isSwipeActive = ref(false)
   const isAnimatingOut = ref(false)
+  /** Direction of pending/active swipe: 'left', 'right', or null */
+  const swipeDirection = ref<'left' | 'right' | null>(null)
 
   function canSwipe() {
     return toValue(enabled) && (toValue(canSwipeLeft) || toValue(canSwipeRight))
   }
 
-  const swipeStyle = computed(() => {
-    const rotation = maxRotation > 0 ? (swipeOffset.value / 200) * maxRotation : 0
-    const transitionDuration = getAnimationDuration()
+  const tapeStyle = computed(() => {
+    // Add base offset to show the middle page
+    const baseOffset = -getPageWidth() - pageGap
+    const totalOffset = baseOffset + swipeOffset.value
 
-    if (swipeOffset.value === 0 && !rotation && !isSwipeActive.value && !isAnimatingOut.value) return {}
+    if (totalOffset === 0 && !isSwipeActive.value && !isAnimatingOut.value) return {}
 
     return {
-      transform: `translateX(${swipeOffset.value}px)${rotation ? ` rotate(${rotation}deg)` : ''}`,
-      transition: isSwipeActive.value ? 'none' : `transform ${transitionDuration}ms cubic-bezier(0.33, 0, 0.2, 1)`,
+      transform: `translateX(${totalOffset}px)`,
+      transition: isSwipeActive.value ? 'none' : `transform ${snapDuration}ms cubic-bezier(0.33, 0, 0.2, 1)`,
     }
-  })
-
-  const fingerProgress = computed(() => {
-    const progress = fingerOffset.value / threshold
-    return Math.max(-1, Math.min(1, progress))
   })
 
   function onTouchStart(event: TouchEvent) {
@@ -110,7 +98,6 @@ export function useSwipe(options: SwipeOptions) {
     isSwipeActive.value = true
     isAnimatingOut.value = false
     swipeOffset.value = 0
-    fingerOffset.value = 0
   }
 
   function onTouchMove(event: TouchEvent) {
@@ -122,7 +109,6 @@ export function useSwipe(options: SwipeOptions) {
     // Once swiping, always update the offset smoothly
     if (isSwiping) {
       swipeOffset.value = deltaX
-      fingerOffset.value = deltaX
       if (event.cancelable) {
         event.preventDefault()
       }
@@ -133,7 +119,6 @@ export function useSwipe(options: SwipeOptions) {
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
       isSwiping = true
       swipeOffset.value = deltaX
-      fingerOffset.value = deltaX
       if (event.cancelable) {
         event.preventDefault() // Prevent scrolling when swiping
       }
@@ -141,8 +126,6 @@ export function useSwipe(options: SwipeOptions) {
   }
 
   function onTouchEnd(event: TouchEvent) {
-    fingerOffset.value = 0
-
     if (!canSwipe()) {
       isSwipeActive.value = false
       swipeOffset.value = 0
@@ -160,30 +143,38 @@ export function useSwipe(options: SwipeOptions) {
     const isValidSwipe = isSwiping && meetsThreshold && directionAllowed
 
     if (isValidSwipe) {
-      // Animate off-screen, then trigger callback
-      isSwipeActive.value = false
+      // Animate to show next/prev page, then call callback and reset
+      const width = getPageWidth()
+      // Animate to full page position
+      const exitOffset = deltaX > 0 ? width + pageGap : -width - pageGap
+
       isAnimatingOut.value = true
-      const direction = deltaX > 0 ? 'right' : 'left'
-      const exitOffset = getExitOffset()
-      const invisibleDuration = getInvisibleDuration(direction)
-      const offset = deltaX > 0 ? exitOffset : -exitOffset
+      // Use RAF to ensure transition is applied before changing offset
       requestAnimationFrame(() => {
-        swipeOffset.value = offset
+        isSwipeActive.value = false
+        swipeOffset.value = exitOffset
+
         setTimeout(() => {
+          // Reset offset with transitions disabled
+          isSwipeActive.value = true
           swipeOffset.value = 0
-          isAnimatingOut.value = false
+          // Call callback - content will update but position stays centered
           if (deltaX > 0) {
             onSwipeRight()
           } else {
             onSwipeLeft()
           }
-        }, invisibleDuration)
+          // Wait for Vue to settle before re-enabling transitions
+          setTimeout(() => {
+            isSwipeActive.value = false
+            isAnimatingOut.value = false
+          }, 20)
+        }, snapDuration)
       })
     } else if (isSwiping) {
       // Invalid swipe - snap back with animation
       isSwipeActive.value = false
       isAnimatingOut.value = true
-      const snapDuration = getAnimationDuration()
       requestAnimationFrame(() => {
         swipeOffset.value = 0
         setTimeout(() => {
@@ -196,6 +187,43 @@ export function useSwipe(options: SwipeOptions) {
     }
 
     isSwiping = false
+  }
+
+  /**
+   * Programmatically trigger a swipe animation (for button navigation).
+   * Animates to show next/prev page and calls the callback.
+   */
+  function triggerSwipe(direction: 'left' | 'right') {
+    if (isAnimatingOut.value) return
+
+    const width = getPageWidth()
+    const exitOffset = direction === 'left' ? -width - pageGap : width + pageGap
+
+    swipeDirection.value = direction
+    isAnimatingOut.value = true
+
+    requestAnimationFrame(() => {
+      isSwipeActive.value = false
+      swipeOffset.value = exitOffset
+
+      setTimeout(() => {
+        // Reset offset with transitions disabled
+        isSwipeActive.value = true
+        swipeOffset.value = 0
+        swipeDirection.value = null
+        // Call callback
+        if (direction === 'left') {
+          onSwipeLeft()
+        } else {
+          onSwipeRight()
+        }
+        // Wait for Vue to settle before re-enabling transitions
+        setTimeout(() => {
+          isSwipeActive.value = false
+          isAnimatingOut.value = false
+        }, 20)
+      }, snapDuration)
+    })
   }
 
   function attachListeners(el: HTMLElement) {
@@ -228,11 +256,11 @@ export function useSwipe(options: SwipeOptions) {
   })
 
   return {
-    swipeStyle,
+    tapeStyle,
     swipeOffset,
-    fingerOffset,
-    fingerProgress,
     isSwipeActive,
     isAnimatingOut,
+    swipeDirection,
+    triggerSwipe,
   }
 }
