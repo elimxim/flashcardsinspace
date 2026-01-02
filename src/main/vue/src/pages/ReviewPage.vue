@@ -188,11 +188,7 @@ import { useStopWatch } from '@/utils/stop-watch.ts'
 import { isTouchDevice } from '@/utils/utils.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { getActivePinia, storeToRefs } from 'pinia'
-import {
-  copyFlashcard,
-  fetchFlashcardAudio,
-  updateFlashcard
-} from '@/core-logic/flashcard-logic.ts'
+import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import {
   nextStage,
   prevStage,
@@ -251,13 +247,17 @@ const flashcardStore = useFlashcardStore()
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
 
-const reviewStoreId = props.sessionType || ReviewSessionType.LIGHTSPEED
-const reviewStore = useReviewStore(reviewStoreId)
+const reviewMode = computed(() => determineReviewMode(props.sessionType, props.stages))
+const reviewStore = useReviewStore(reviewMode.value.sessionType)
 
 const {
   reviewQueue,
   flashcardsTotal,
   currFlashcard,
+  autoPlayVoice,
+  autoRepeatVoice,
+  flashcardFrontSideAudioBlob,
+  flashcardBackSideAudioBlob,
   flashcardsRemaining,
   flashcardsSeen,
   progress,
@@ -265,12 +265,19 @@ const {
   noPrevAvailable,
 } = storeToRefs(reviewStore)
 
-const reviewMode = computed(() => determineReviewMode(props.sessionType, props.stages))
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 const elapsedTime = ref(0)
+const { startWatch, stopWatch } = useStopWatch(elapsedTime)
+
 const reviewedFlashcardIds = ref<number[]>([])
 const incorrectFlashcards = ref<Flashcard[]>([])
+
+const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
+
+const quizRound = ref(1)
+const quizOverallTotal = ref(0)
+const quizOverallCorrect = ref(0)
 
 const canSlideLeft = computed(() => {
   if (reviewMode.value.isLightspeed()) {
@@ -283,32 +290,6 @@ const canSlideLeft = computed(() => {
 const canSlideRight = computed(() => {
   return !noNextAvailable.value
 })
-
-const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
-const flashcardFrontSideAudioBlob = ref<Blob | undefined>()
-const flashcardBackSideAudioBlob = ref<Blob | undefined>()
-const autoPlayVoice = ref(false)
-const autoRepeatVoice = ref(false)
-const quizRound = ref(1)
-const quizOverallTotal = ref(0)
-const quizOverallCorrect = ref(0)
-
-const { startWatch, stopWatch } = useStopWatch(elapsedTime)
-
-async function prevFlashcard(): Promise<boolean> {
-  currFlashcard.value = reviewQueue.value.prev()
-  await fetchAudio()
-  return currFlashcard.value !== undefined
-}
-
-async function nextFlashcard(): Promise<boolean> {
-  currFlashcard.value = reviewQueue.value.next()
-  await fetchAudio()
-  if (!currFlashcard.value) {
-    stopWatch()
-  }
-  return currFlashcard.value !== undefined
-}
 
 async function startReview() {
   Log.log(LogTag.LOGIC, `Starting review: ${JSON.stringify(reviewMode.value)}`)
@@ -331,7 +312,7 @@ async function startReview() {
     await createReviewSession()
   }
 
-  if (await nextFlashcard()) {
+  if (await reviewStore.nextFlashcard(flashcardSet.value)) {
     startWatch()
   }
   Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
@@ -350,10 +331,6 @@ function resetState() {
   reviewStore.resetState()
   reviewedFlashcardIds.value = []
   incorrectFlashcards.value = []
-  flashcardFrontSideAudioBlob.value = undefined
-  flashcardBackSideAudioBlob.value = undefined
-  autoPlayVoice.value = false
-  autoRepeatVoice.value = false
   quizOverallTotal.value = 0
   quizOverallCorrect.value = 0
 }
@@ -407,7 +384,7 @@ async function quizAnswer(know: boolean) {
     incorrectFlashcards.value.push(currFlashcard.value)
     await updateQuizSession([currFlashcard.value.id], [currFlashcard.value.id])
   }
-  await nextFlashcard()
+  await reviewStore.nextFlashcard(flashcardSet.value)
 }
 
 async function startNextQuizRound() {
@@ -442,7 +419,7 @@ async function startNextQuizRound() {
 
       startWatch()
 
-      return nextFlashcard()
+      return reviewStore.nextFlashcard(flashcardSet.value)
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to create child review session`, error.response?.data)
@@ -452,12 +429,12 @@ async function startNextQuizRound() {
 
 async function prev() {
   if (noPrevAvailable.value) return
-  await prevFlashcard()
+  await reviewStore.prevFlashcard(flashcardSet.value)
 }
 
 async function next() {
   if (noNextAvailable.value) return
-  await nextFlashcard()
+  await reviewStore.nextFlashcard(flashcardSet.value)
 }
 
 async function onSlideLeft() {
@@ -499,7 +476,7 @@ async function moveBack() {
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   if (success) {
     await spaceDeck.value?.animateOutLeft(true)
-    await nextFlashcard()
+    await reviewStore.nextFlashcard(flashcardSet.value)
   }
 }
 
@@ -518,20 +495,11 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
 }
 
 async function getNextAndMarkDays(flashcardSet: FlashcardSet) {
-  if (await nextFlashcard() && reviewMode.value.isLightspeed()) {
+  if (await reviewStore.nextFlashcard(flashcardSet) && reviewMode.value.isLightspeed()) {
     await markDaysAsInProgress(flashcardSet)
   } else if (reviewMode.value.isLightspeed()) {
     await markDaysAsCompleted(flashcardSet)
   }
-}
-
-async function fetchAudio() {
-  await fetchFlashcardAudio(
-    flashcardSet.value?.id,
-    currFlashcard.value?.id,
-    flashcardFrontSideAudioBlob,
-    flashcardBackSideAudioBlob,
-  )
 }
 
 async function markDaysAs(
@@ -573,11 +541,11 @@ async function markDaysAsCompleted(flashcardSet: FlashcardSet) {
 }
 
 function onFlashcardRemoved() {
-  nextFlashcard()
+  reviewStore.nextFlashcard(flashcardSet.value)
 }
 
 function onAudioChanged() {
-  fetchAudio()
+  reviewStore.fetchAudio(flashcardSet.value)
 }
 
 watch(currFlashcard, async (newVal, oldVal) => {
@@ -587,6 +555,7 @@ watch(currFlashcard, async (newVal, oldVal) => {
     await updateReviewSession([oldVal.id])
   }
   if (!newVal) {
+    stopWatch()
     if (reviewMode.value.isQuiz()) {
       await updateQuizSession(reviewedFlashcardIds.value, incorrectFlashcards.value.map(f => f.id), true)
     } else if (reviewMode.value.isLightspeed()) {
@@ -709,7 +678,7 @@ onUnmounted(async () => {
   reviewStore.$dispose()
   const pinia = getActivePinia()
   if (pinia) {
-    delete pinia.state.value[reviewStoreId]
+    delete pinia.state.value[reviewStore.getStoreId()]
   }
 
   await finishReview()
