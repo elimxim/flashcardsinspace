@@ -203,11 +203,12 @@
   /* control panel */
 
   --cp--widget--color: linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%);
+  --cp--launch--color: linear-gradient(135deg, rgb(91, 91, 145) 0%, rgb(105, 83, 125) 100%);
   --cp--widget--color--active: linear-gradient(135deg, rgb(142, 110, 189) 0%, rgb(215, 91, 209) 100%);
   --cp--widget--color--inactive: linear-gradient(135deg, rgb(121, 121, 121) 0%, rgb(64, 64, 64) 100%);
   --cp--text--color: rgba(13, 18, 74, 0.6);
   --cp--text--color--active: rgba(255, 255, 255, 0.6);
-  --cp--text--color--inactive: rgba(255, 255, 255, 0.3);
+  --cp--text--color--inactive: rgba(255, 255, 255, 0.2);
   --cp--border-color: rgba(128, 128, 128, 0.62);
   --cp--shadow-color: rgba(0, 0, 0, 0.15);
   --cp--count-box--color: rgba(20, 27, 106, 0.82);

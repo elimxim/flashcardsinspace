@@ -2,6 +2,7 @@
   --awesome-button--icon--size: 50px;
   --awesome-button--icon--color: var(--cp--text--color);
   --awesome-button--icon--color--hover: var(--cp--text--color--active);
+  --awesome-button--icon--color--disabled: var(--cp--text--color--inactive);
   --awesome-button--bg: var(--cp--widget--color);
   --awesome-button--bg--hover: var(--cp--widget--color--active);
   --awesome-button--bg--disabled: var(--cp--widget--color--inactive);
