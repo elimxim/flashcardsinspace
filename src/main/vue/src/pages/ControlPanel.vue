@@ -114,6 +114,7 @@ function openFlashcardSetSettings() {
   padding: 14px 10px 10px 10px;
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior: contain;
 }
 
 .control-outer-space-panel {

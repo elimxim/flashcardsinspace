@@ -533,6 +533,7 @@ function handleKeydown(event: KeyboardEvent) {
 .space-deck {
   display: grid;
   place-items: center;
+  overscroll-behavior: contain;
 }
 
 .flashcard-deck {
