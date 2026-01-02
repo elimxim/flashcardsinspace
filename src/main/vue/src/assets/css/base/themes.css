@@ -212,7 +212,7 @@
   --cp--border-color: rgba(128, 128, 128, 0.62);
   --cp--shadow-color: rgba(0, 0, 0, 0.15);
   --cp--count-box--color: rgba(20, 27, 106, 0.82);
-  --cp--count-box--bg: rgba(255, 255, 255, 0.6);
+  --cp--count-box--bg: rgb(210, 210, 228);
 }
 
 @media (max-width: 400px) {

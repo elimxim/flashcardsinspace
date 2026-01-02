@@ -56,6 +56,11 @@
   text-align: center;
 }
 
+.cp-count-box--big {
+  font-size: 0.9rem;
+  width: 50px;
+}
+
 .outer-space-button {
   --smart-button--bg: #242124;
   --smart-button--bg--hover: #34324a;
