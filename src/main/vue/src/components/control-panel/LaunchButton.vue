@@ -44,15 +44,14 @@ withDefaults(defineProps<{
 
 <style scoped>
 .launch-button--theme {
-  --l-btn--text-color: var(--launch-button--text-color, #e2e8f0);
-  --l-btn--text-shadow-color: var(--launch-button--text-shadow-color, rgba(0, 0, 0, 0.3));
   --awesome-button--icon--size: clamp(40px, 10vw, 70px);
-  --awesome-button--icon--color: var(--launch-button--color);
-  --awesome-button--icon--color--hover: var(--launch-button--color--hover);
-  --awesome-button--bg: var(--launch-button--bg);
-  --awesome-button--bg--hover: var(--launch-button--bg--hover);
-  --awesome-button--icon--color--disabled: var(--launch-button--color--disabled);
-  --awesome-button--bg--disabled: var(--launch-button--bg--disabled);
+  --awesome-button--icon--color: var(--cp--text--color);
+  --awesome-button--icon--color--hover: var(--cp--text--color--active);
+  --awesome-button--icon--color--disabled: var(--cp--text--color);
+  --awesome-button--bg: var(--cp--launch--color);
+  --awesome-button--bg--hover: var(--cp--widget--color--active);
+  --awesome-button--bg--disabled: var(--cp--widget--color--inactive);
+  --awesome-button--border: 1px solid var(--cp--border-color);
   --awesome-button--border-radius: 6px;
 }
 
@@ -88,8 +87,8 @@ withDefaults(defineProps<{
 
 .curtain-text {
   font-size: 16px;
-  color: var(--l-btn--text-color);
-  text-shadow: 0 2px 4px var(--l-btn--text-shadow-color);
+  color: #e2e8f0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   letter-spacing: 0.05rem;
   text-transform: uppercase;
   text-align: center;
