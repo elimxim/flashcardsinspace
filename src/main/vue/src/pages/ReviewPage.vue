@@ -748,10 +748,6 @@ async function handleKeydown(event: KeyboardEvent) {
 .review-page--theme {
   --r-page--review-count--color: var(--review-page--review-count--color, rgba(17, 33, 85, 0.92));
   --r-page--review-count--bg: var(--review-page--review-count--border-color, rgb(225, 228, 240));
-  --progressbar--from: var(--review-progressbar--from);
-  --progressbar--via: var(--review-progressbar--via);
-  --progressbar--to: var(--review-progressbar--to);
-  --progressbar--bg-color: var(--review-progressbar--bg-color);
 }
 
 .review-info {
@@ -801,10 +797,6 @@ async function handleKeydown(event: KeyboardEvent) {
 
 .review-nav--centered {
   justify-content: center;
-}
-
-.review-progressbar {
-  width: 100%;
 }
 
 .review-count {
