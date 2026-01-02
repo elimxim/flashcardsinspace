@@ -58,7 +58,7 @@
   --button--bg-color--disabled: #ededed;
 
   --smart-button--title--color--disabled: #a3a3a3;
-  --smart-button--bg--disabled: #C8C8C8FF;
+  --smart-button--bg--disabled: rgba(255, 255, 255, 0.2);
 
   --off-button--bg-color: #4e4e4e;
   --off-button--bg-color--hover: #7e7e7e;
