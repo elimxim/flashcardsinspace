@@ -4,7 +4,11 @@
       <div class="day-steak-number">
         {{ dayStreak }}
       </div>
-      <div class="control-panel--widget--text control-panel--widget--text--active">
+      <div :class="[
+          'control-panel--widget--text',
+          'control-panel--widget--text--active'
+        ]"
+      >
         Day Streak
       </div>
     </div>
