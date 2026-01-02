@@ -543,7 +543,7 @@ function handleKeydown(event: KeyboardEvent) {
 
 .swipe-indicator {
   position: absolute;
-  top: -2rem;
+  top: -3rem;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
