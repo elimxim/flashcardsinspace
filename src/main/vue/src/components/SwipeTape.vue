@@ -203,7 +203,6 @@ defineExpose({
   flex: 1;
   position: relative;
   min-height: 0;
-  overscroll-behavior: contain;
 }
 
 .tape-track {
