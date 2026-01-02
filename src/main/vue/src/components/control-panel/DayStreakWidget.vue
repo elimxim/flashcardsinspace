@@ -44,7 +44,6 @@ const { dayStreak } = storeToRefs(chronoStore)
 }
 
 .day-steak-number {
-  margin-top: 5px;
   color: var(--main-panel--widget--text--color--active);
   font-family: var(--day-streak--font-family);
   font-weight: 600;
