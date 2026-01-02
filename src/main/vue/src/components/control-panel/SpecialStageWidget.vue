@@ -1,5 +1,5 @@
 <template>
-  <div class="special-stage-widget special-stage-widget--theme">
+  <div class="special-stage-widget">
     <AwesomeButton
       class="cp-widget"
       :icon="icon"
@@ -10,10 +10,10 @@
     >
       <template #below>
         <div class="special-stage-title">
-          <div class="special-stage-text">
+          <div class="cp-text">
             {{ props.stage.displayName }}
           </div>
-          <div class="special-stage-count">
+          <div class="cp-count-box">
             {{ flashcardsCount }}
           </div>
         </div>
@@ -64,12 +64,6 @@ function startReview() {
 </script>
 
 <style scoped>
-.special-stage-widget--theme {
-  --s-widget--title--color: var(--special-stage-widget--title--color, rgba(13, 18, 74, 0.6));
-  --s-widget--number--color: var(--special-stage-widget--number--color, rgba(20, 27, 106, 0.82));
-  --s-widget--number--bg: var(--special-stage-widget--number--bg, rgba(255, 255, 255, 0.6));
-}
-
 .special-stage-widget {
   position: relative;
   height: 100%;
@@ -82,29 +76,6 @@ function startReview() {
   justify-content: center;
   align-items: center;
   gap: 4px;
-}
-
-.special-stage-text {
-  flex: 1;
-  font-size: 0.9rem;
-  font-weight: 600;
-  word-wrap: break-word;
-  word-spacing: 0.05rem;
-  letter-spacing: 0.05rem;
-  text-transform: uppercase;
-  text-align: center;
-  color: var(--s-widget--title--color);
-}
-
-.special-stage-count {
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-align: center;
-  color: var(--s-widget--number--color);
-  background: var(--s-widget--number--bg);
-  border-radius: 4px;
-  padding: 2px;
-  width: 40px;
 }
 
 </style>
