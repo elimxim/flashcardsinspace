@@ -4,7 +4,6 @@
       'page',
       'page--bg--light',
       'flex-row',
-      'control-panel--theme',
     ]"
   >
     <SideBar ref="sidebar" style="z-index: 200;"/>
@@ -93,10 +92,6 @@ function openFlashcardSetSettings() {
 </script>
 
 <style scoped>
-.control-panel--theme {
-  --c-panel--text-color: #333333;
-}
-
 .control-panel-layout {
   flex: 1;
   position: relative;
