@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import SpaceCard from '@/components/SpaceCard.vue'
+import SpaceCard from '@/components/review/SpaceCard.vue'
 import FlashcardEditModal from '@/modals/FlashcardEditModal.vue'
 import { computed, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'

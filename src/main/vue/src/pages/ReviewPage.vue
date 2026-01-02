@@ -176,7 +176,7 @@
 <script setup lang="ts">
 import ControlBar from '@/components/ControlBar.vue'
 import Progressbar from '@/components/Progressbar.vue'
-import SpaceDeck from '@/components/SpaceDeck.vue'
+import SpaceDeck from '@/components/review/SpaceDeck.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
