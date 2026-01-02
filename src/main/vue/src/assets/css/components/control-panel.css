@@ -1,4 +1,4 @@
-.main-panel--widget-button {
+.main-panel--widget {
   --awesome-button--icon--size: 50px;
   --awesome-button--icon--color: var(--main-panel--widget--text--color);
   --awesome-button--icon--color--hover: var(--main-panel--widget--text--color--active);
