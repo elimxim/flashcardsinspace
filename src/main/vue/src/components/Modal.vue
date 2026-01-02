@@ -6,7 +6,7 @@
     role="dialog"
     tabindex="-1"
   >
-    <div ref="modalWindow" class="modal-window" tabindex="-1">
+    <div ref="modalWindow" class="modal-window touch-none" tabindex="-1">
       <div class="modal-top-control">
         <slot name="control"/>
         <AwesomeButton
