@@ -9,7 +9,7 @@
       square
     >
       <template #below>
-        <div class="flashcard-widget-button-text">
+        <div class="control-panel--widget--text">
           Add flashcard
         </div>
       </template>
@@ -35,16 +35,6 @@ const { flashcardSet } = storeToRefs(flashcardStore)
   position: relative;
   height: 100%;
   width: fit-content;
-}
-
-.flashcard-widget-button-text {
-  margin-top: 4px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  word-spacing: 0.05rem;
-  letter-spacing: 0.05rem;
-  text-transform: uppercase;
-  text-align: center;
 }
 
 </style>
