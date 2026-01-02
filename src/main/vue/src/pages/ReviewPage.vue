@@ -187,7 +187,7 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useStopWatch } from '@/utils/stop-watch.ts'
 import { isTouchDevice } from '@/utils/utils.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { storeToRefs } from 'pinia'
+import { getActivePinia, storeToRefs } from 'pinia'
 import {
   copyFlashcard,
   fetchFlashcardAudio,
@@ -203,8 +203,6 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
   createReviewQueue,
   createReviewQueueForStages,
-  EmptyReviewQueue,
-  ReviewQueue,
   determineReviewMode,
   MonoStageReviewQueue,
   reviewSessionTypeToSpecialStage,
@@ -236,6 +234,7 @@ import {
 import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
+import { useReviewStore } from '@/stores/review-store.ts'
 
 const props = defineProps<{
   sessionType?: string,
@@ -252,36 +251,26 @@ const flashcardStore = useFlashcardStore()
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
 
+const reviewStoreId = props.sessionType || ReviewSessionType.LIGHTSPEED
+const reviewStore = useReviewStore(reviewStoreId)
+
+const {
+  reviewQueue,
+  flashcardsTotal,
+  currFlashcard,
+  flashcardsRemaining,
+  flashcardsSeen,
+  progress,
+  noNextAvailable,
+  noPrevAvailable,
+} = storeToRefs(reviewStore)
+
 const reviewMode = computed(() => determineReviewMode(props.sessionType, props.stages))
-const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
-const elapsedTime = ref(0)
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
+
+const elapsedTime = ref(0)
 const reviewedFlashcardIds = ref<number[]>([])
 const incorrectFlashcards = ref<Flashcard[]>([])
-const flashcardsTotal = ref(0)
-const flashcardsRemaining = computed(() => {
-  if (noNextAvailable.value) return 0
-  return reviewQueue.value.remaining() + 1
-})
-const flashcardsSeen = computed(() =>
-  Math.max(0, flashcardsTotal.value - flashcardsRemaining.value)
-)
-const progress = computed(() => {
-  const completionRate = flashcardsSeen.value / flashcardsTotal.value
-  if (completionRate) {
-    return Math.max(0, Math.min(1, completionRate))
-  } else {
-    return 0
-  }
-})
-
-const noNextAvailable = computed(() => currFlashcard.value === undefined)
-const noPrevAvailable = computed(() => {
-  if (flashcardsTotal.value === 1) {
-    return !noNextAvailable.value
-  }
-  return flashcardsTotal.value === flashcardsRemaining.value
-})
 
 const canSlideLeft = computed(() => {
   if (reviewMode.value.isLightspeed()) {
@@ -296,7 +285,6 @@ const canSlideRight = computed(() => {
 })
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
-const currFlashcard = ref<Flashcard>()
 const flashcardFrontSideAudioBlob = ref<Blob | undefined>()
 const flashcardBackSideAudioBlob = ref<Blob | undefined>()
 const autoPlayVoice = ref(false)
@@ -359,10 +347,9 @@ async function loadOrCreateQuizSession() {
 
 function resetState() {
   stopWatch()
-  reviewQueue.value = new EmptyReviewQueue()
+  reviewStore.resetState()
   reviewedFlashcardIds.value = []
   incorrectFlashcards.value = []
-  flashcardsTotal.value = 0
   flashcardFrontSideAudioBlob.value = undefined
   flashcardBackSideAudioBlob.value = undefined
   autoPlayVoice.value = false
@@ -703,6 +690,7 @@ async function updateQuizSession(reviewedFlashcardIds: number[], nextRoundFlashc
 }
 
 onMounted(async () => {
+  reviewStore.resetState()
   if (!flashcardStore.loaded) {
     Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
     const selectedSetId = loadSelectedSetIdFromCookies()
@@ -718,6 +706,12 @@ onMounted(async () => {
 })
 
 onUnmounted(async () => {
+  reviewStore.$dispose()
+  const pinia = getActivePinia()
+  if (pinia) {
+    delete pinia.state.value[reviewStoreId]
+  }
+
   await finishReview()
   document.removeEventListener('keydown', handleKeydown)
 })
