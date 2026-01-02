@@ -2,7 +2,7 @@
   <div class="flashcard-widget">
     <AwesomeButton
       icon="fa-solid fa-rectangle-list"
-      class="flashcard-widget-button"
+      class="main-panel--widget-button"
       :disabled="!flashcardSet"
       :on-click="toggleStore.toggleFlashcardCreation"
       fill-space

@@ -2,7 +2,7 @@
   <div class="calendar-widget calendar-widget--theme">
     <AwesomeButton
       :icon="calendarIcon"
-      class="calendar-widget-button"
+      class="main-panel--widget-button"
       :disabled="!flashcardSet"
       :on-click="toggleStore.toggleCalendar"
       fill-space
