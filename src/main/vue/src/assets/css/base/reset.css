@@ -1,5 +1,4 @@
 html {
-  /* Allows overscroll/bounce effect on mobile */
   overscroll-behavior: auto;
   overflow: auto;
   height: 100%;
@@ -8,7 +7,6 @@ html {
 body {
   margin: 0;
   padding: 0;
-  /* Prevent overscroll/bounce effect on mobile */
   overscroll-behavior: auto;
   overflow: auto;
   height: 100%;
@@ -18,7 +16,6 @@ body {
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
-  /* Prevent touch callout (context menu on long press) */
   -webkit-touch-callout: none;
 }
 
