@@ -35,7 +35,7 @@ const { dayStreak } = storeToRefs(chronoStore)
   padding: 4px;
   border-radius: 6px;
   border: 1px solid var(--cp--border-color);
-  background: var(--cp--color--active);
+  background: var(--cp--widget--color--active);
   height: 100%;
 }
 

@@ -202,9 +202,9 @@
 
   /* control panel */
 
-  --cp--color: linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%);
-  --cp--color--active: linear-gradient(135deg, rgb(142, 110, 189) 0%, rgb(215, 91, 209) 100%);
-  --cp--color--inactive: linear-gradient(135deg, rgb(121, 121, 121) 0%, rgb(64, 64, 64) 100%);
+  --cp--widget--color: linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%);
+  --cp--widget--color--active: linear-gradient(135deg, rgb(142, 110, 189) 0%, rgb(215, 91, 209) 100%);
+  --cp--widget--color--inactive: linear-gradient(135deg, rgb(121, 121, 121) 0%, rgb(64, 64, 64) 100%);
   --cp--text--color: rgba(13, 18, 74, 0.6);
   --cp--text--color--active: rgba(255, 255, 255, 0.6);
   --cp--text--color--inactive: rgba(255, 255, 255, 0.3);

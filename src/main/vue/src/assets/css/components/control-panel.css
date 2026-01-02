@@ -2,9 +2,9 @@
   --awesome-button--icon--size: 50px;
   --awesome-button--icon--color: var(--cp--text--color);
   --awesome-button--icon--color--hover: var(--cp--text--color--active);
-  --awesome-button--bg: var(--cp--color);
-  --awesome-button--bg--hover: var(--cp--color--active);
-  --awesome-button--bg--disabled: var(--cp--color--inactive);
+  --awesome-button--bg: var(--cp--widget--color);
+  --awesome-button--bg--hover: var(--cp--widget--color--active);
+  --awesome-button--bg--disabled: var(--cp--widget--color--inactive);
   --awesome-button--border: 1px solid var(--cp--border-color);
   --awesome-button--border-radius: 6px;
 }
