@@ -39,6 +39,7 @@
             :invalid="curLanguageInvalid"
             option-placeholder="Language"
             search-placeholder="Search..."
+            :right-edge-shift="0"
           />
         </AwesomeContainer>
       </div>
