@@ -1,5 +1,5 @@
 <template>
-  <div class="quiz-widget quiz-widget--theme">
+  <div class="quiz-widget">
     <AwesomeButton
       icon="fa-solid fa-q"
       class="cp-widget"

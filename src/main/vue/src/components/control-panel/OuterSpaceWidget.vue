@@ -1,5 +1,5 @@
 <template>
-  <div class="outer-space-widget outer-space-widget--theme">
+  <div class="outer-space-widget">
     <Starfield
       twinkle
       :star-size="2"
