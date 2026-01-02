@@ -54,10 +54,14 @@ const props = withDefaults(defineProps<{
   optionLabel: (option: T) => string
   optionPlaceholder?: string
   searchPlaceholder?: string
+  leftEdgeShift?: number
+  rightEdgeShift?: number
   invalid?: boolean
 }>(), {
   optionPlaceholder: 'Select an option',
   searchPlaceholder: 'Search..',
+  leftEdgeShift: 2,
+  rightEdgeShift: -4,
   invalid: false,
 })
 
@@ -68,6 +72,9 @@ const dropDownList = ref<HTMLUListElement>()
 const isOpen = ref(false)
 const searchQuery = ref('')
 const highlightedIndex = ref(-1)
+
+const leftEdgeShiftPx = computed(() => `${props.leftEdgeShift}px`)
+const rightEdgeShiftPx = computed(() => `${props.rightEdgeShift}px`)
 
 const optionLabel = (option: T): string => {
   if (option) {
@@ -180,8 +187,8 @@ async function scrollHighlightedOptionIntoView() {
 .drop-down {
   position: absolute;
   top: 99%;
-  left: 2px;
-  right: -4px;
+  left: v-bind(leftEdgeShiftPx);
+  right: v-bind(rightEdgeShiftPx);
   border: 1px solid var(--drop-down--border-color);
   border-radius: 0 4px 4px 4px;
   list-style: none;
