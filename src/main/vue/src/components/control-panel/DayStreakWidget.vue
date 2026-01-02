@@ -4,7 +4,7 @@
       <div class="day-steak-number">
         {{ dayStreak }}
       </div>
-      <div class="cp--text cp--text--active">
+      <div class="cp-text cp-text--active">
         Day Streak
       </div>
     </div>

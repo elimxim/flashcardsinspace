@@ -2,7 +2,7 @@
   <div class="calendar-widget">
     <AwesomeButton
       :icon="calendarIcon"
-      class="cp--widget"
+      class="cp-widget"
       :disabled="!flashcardSet"
       :on-click="toggleStore.toggleCalendar"
       fill-space
@@ -10,10 +10,10 @@
     >
       <template #below>
         <div class="calendar-button-slot">
-          <div class="cp--text">
+          <div class="cp-text">
             Day
           </div>
-          <div class="cp--count-box">
+          <div class="cp-count-box">
             <template v-if="isOnVacation">
               🌴
             </template>
@@ -37,30 +37,30 @@
       >
         <div class="calendar-popup-layout">
           <template v-if="previousDaysFrom !== previousDaysTo">
-            <div class="cp--text cp--text--sub cp--text--nowrap">
+            <div class="cp-text cp-text--sub cp-text--nowrap">
               You have uncompleted previous days
             </div>
             <div class="calendar-popup-centered-row">
-              <div class="cp--text cp--text--sub">
+              <div class="cp-text cp-text--sub">
                 From
               </div>
-              <div class="cp--count-box">
+              <div class="cp-count-box">
                 {{ previousDaysFrom?.seqNumber }}
               </div>
-              <div class="cp--text cp--text--sub">
+              <div class="cp-text cp-text--sub">
                 To
               </div>
-              <div class="cp--count-box">
+              <div class="cp-count-box">
                 {{ previousDaysTo?.seqNumber }}
               </div>
             </div>
           </template>
           <template v-else>
-            <div class="cp--text cp--text--sub cp--text--nowrap">
+            <div class="cp-text cp-text--sub cp-text--nowrap">
               You have an uncompleted previous day
             </div>
             <div class="calendar-popup-centered-row">
-              <div class="cp--count-box">
+              <div class="cp-count-box">
                 {{ previousDaysTo?.seqNumber }}
               </div>
             </div>
@@ -69,20 +69,20 @@
             v-if="prevDaysReviewTotal > 0"
             class="calendar-popup-review-row"
           >
-            <div class="cp--text cp--text--sub">
+            <div class="cp-text cp-text--sub">
               With the total number of flashcards to review
             </div>
-            <div class="cp--count-box">
+            <div class="cp-count-box">
               {{ prevDaysReviewTotal }}
             </div>
           </div>
           <template v-else-if="previousDaysFrom !== previousDaysTo">
-            <div class="cp--text cp--text--sub">
+            <div class="cp-text cp-text--sub">
               They will be completed once<br>you complete the current day
             </div>
           </template>
           <template v-else>
-            <div class="cp--text cp--text--sub">
+            <div class="cp-text cp-text--sub">
               It will be completed once<br>you complete the current day
             </div>
           </template>

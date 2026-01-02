@@ -1,7 +1,7 @@
 <template>
   <div class="special-stage-widget special-stage-widget--theme">
     <AwesomeButton
-      class="cp--widget"
+      class="cp-widget"
       :icon="icon"
       :on-click="startReview"
       :disabled="flashcardsCount === 0"

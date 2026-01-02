@@ -2,14 +2,14 @@
   <div class="flashcard-widget">
     <AwesomeButton
       icon="fa-solid fa-rectangle-list"
-      class="cp--widget"
+      class="cp-widget"
       :disabled="!flashcardSet"
       :on-click="toggleStore.toggleFlashcardCreation"
       fill-space
       square
     >
       <template #below>
-        <div class="cp--text">
+        <div class="cp-text">
           Add flashcard
         </div>
       </template>

@@ -1,6 +1,6 @@
 <template>
   <div class="review-info-widget">
-    <div class="cp--text cp--text--nowrap">
+    <div class="cp-text cp-text--nowrap">
       To review
     </div>
     <div class="review-list">
@@ -9,18 +9,18 @@
         :key="review.stage"
         class="review-item"
       >
-        <div class="cp--text cp--text--left cp--text--nowrap">
+        <div class="cp-text cp-text--left cp-text--nowrap">
           {{ review.stage }}
         </div>
-        <div class="cp--count-box">
+        <div class="cp-count-box">
           {{ review.count }}
         </div>
       </div>
       <div class="review-item review-item--total">
-        <div class="cp--text cp--text--left cp--text--nowrap">
+        <div class="cp-text cp-text--left cp-text--nowrap">
           Total
         </div>
-        <div class="cp--count-box">
+        <div class="cp-count-box">
           {{ currDayReviewTotal }}
         </div>
       </div>

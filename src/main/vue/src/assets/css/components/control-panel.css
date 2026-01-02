@@ -1,4 +1,4 @@
-.cp--widget {
+.cp-widget {
   --awesome-button--icon--size: 50px;
   --awesome-button--icon--color: var(--cp--text--color);
   --awesome-button--icon--color--hover: var(--cp--text--color--active);
@@ -9,7 +9,7 @@
   --awesome-button--border-radius: 6px;
 }
 
-.cp--text {
+.cp-text {
   color: var(--cp--text--color);
   font-weight: 600;
   font-size: 0.9rem;
@@ -19,28 +19,28 @@
   text-align: center;
 }
 
-.cp--text--left {
+.cp-text--left {
   text-align: left;
 }
 
-.cp--text--active {
+.cp-text--active {
   color: var(--cp--text--color--active);
 }
 
-.cp--text--inactive {
+.cp-text--inactive {
   color: var(--cp--text--color--inactive);
 }
 
-.cp--text--sub {
+.cp-text--sub {
   font-size: 0.7rem;
   font-weight: 400;
 }
 
-.cp--text--nowrap {
+.cp-text--nowrap {
   white-space: nowrap;
 }
 
-.cp--count-box {
+.cp-count-box {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--cp--count-box--color);
