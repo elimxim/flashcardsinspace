@@ -1,5 +1,5 @@
 <template>
-  <div class="calendar-widget calendar-widget--theme">
+  <div class="calendar-widget">
     <AwesomeButton
       :icon="calendarIcon"
       class="main-panel--widget"
@@ -10,10 +10,10 @@
     >
       <template #below>
         <div class="calendar-button-slot">
-          <div class="calendar-button-text">
+          <div class="control-panel--widget--text">
             Day
           </div>
-          <div class="calendar-button-number">
+          <div class="control-panel--count-box">
             <template v-if="isOnVacation">
               🌴
             </template>
@@ -37,30 +37,40 @@
       >
         <div class="calendar-popup-layout">
           <template v-if="previousDaysFrom !== previousDaysTo">
-            <div class="calendar-popup-header">
+            <div :class="[
+                'control-panel--widget--text',
+                'control-panel--widget--text--sub',
+                'control-panel--widget--text--nowrap',
+              ]"
+            >
               You have uncompleted previous days
             </div>
             <div class="calendar-popup-centered-row">
-              <div class="calendar-popup-text">
+              <div class="control-panel--widget--text control-panel--widget--text--sub">
                 From
               </div>
-              <div class="calendar-day-number">
+              <div class="control-panel--count-box">
                 {{ previousDaysFrom?.seqNumber }}
               </div>
-              <div class="calendar-popup-text">
+              <div class="control-panel--widget--text control-panel--widget--text--sub">
                 To
               </div>
-              <div class="calendar-day-number">
+              <div class="control-panel--count-box">
                 {{ previousDaysTo?.seqNumber }}
               </div>
             </div>
           </template>
           <template v-else>
-            <div class="calendar-popup-header">
+            <div :class="[
+                'control-panel--widget--text',
+                'control-panel--widget--text--sub',
+                'control-panel--widget--text--nowrap',
+              ]"
+            >
               You have an uncompleted previous day
             </div>
             <div class="calendar-popup-centered-row">
-              <div class="calendar-button-number">
+              <div class="control-panel--count-box">
                 {{ previousDaysTo?.seqNumber }}
               </div>
             </div>
@@ -69,20 +79,20 @@
             v-if="prevDaysReviewTotal > 0"
             class="calendar-popup-review-row"
           >
-            <div class="calendar-popup-text">
+            <div class="control-panel--widget--text control-panel--widget--text--sub">
               With the total number of flashcards to review
             </div>
-            <div class="calendar-popup-review-total">
+            <div class="control-panel--count-box">
               {{ prevDaysReviewTotal }}
             </div>
           </div>
           <template v-else-if="previousDaysFrom !== previousDaysTo">
-            <div class="calendar-popup-text">
+            <div class="control-panel--widget--text control-panel--widget--text--sub">
               They will be completed once<br>you complete the current day
             </div>
           </template>
           <template v-else>
-            <div class="calendar-popup-text">
+            <div class="control-panel--widget--text control-panel--widget--text--sub">
               It will be completed once<br>you complete the current day
             </div>
           </template>
@@ -178,16 +188,6 @@ const calendarIcon = computed(() => {
 </script>
 
 <style scoped>
-.calendar-widget--theme {
-  --c-widget--border-color: var(--calendar-widget--border-color, rgba(128, 128, 128, 0.62));
-  --c-widget--popup--text--color: var(--calendar-widget--popup--text--color, rgb(29, 68, 151));
-  --c-widget--popup--button--color: var(--calendar-widget--popup--button--color, rgb(253, 107, 76));
-  --c-widget--popup--button--color--hover: var(--calendar-widget--popup--button--color--hover, rgb(255, 66, 61));
-  --c-widget--popup--number--bg: var(--calendar-widget--popup--number--bg, rgba(255, 255, 255, 0.6));
-  --c-widget--popup--number--color: var(--calendar-widget--popup--number-color, rgba(20, 27, 106, 0.82));
-  --c-widget--popup--shadow-color: var(--calendar-widget--popup--shadow-color, rgba(0, 0, 0, 0.15));
-}
-
 .calendar-widget {
   position: relative;
   height: 100%;
@@ -207,8 +207,8 @@ const calendarIcon = computed(() => {
 .calendar-info-button {
   --awesome-button--border-radius: 50%;
   --awesome-button--icon--size: 22px;
-  --awesome-button--icon--color: var(--c-widget--popup--button--color);
-  --awesome-button--icon--color--hover: var(--c-widget--popup--button--color--hover);
+  --awesome-button--icon--color: rgb(253, 107, 76);
+  --awesome-button--icon--color--hover: rgb(255, 66, 61);
   position: absolute;
   top: -14px;
   right: 1px;
@@ -218,26 +218,6 @@ const calendarIcon = computed(() => {
   height: 28px;
 }
 
-.calendar-button-text {
-  font-size: 0.9rem;
-  font-weight: 600;
-  word-spacing: 0.05rem;
-  letter-spacing: 0.05rem;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.calendar-day-number {
-  font-size: 0.85rem;
-  font-weight: 600;
-  border: 1px solid var(--c-widget--border-color);
-  color: var(--c-widget--popup--number--color);
-  border-radius: 3px;
-  padding: 2px;
-  width: 40px;
-  text-align: center;
-}
-
 .calendar-popup {
   position: absolute;
   top: 50%;
@@ -245,9 +225,9 @@ const calendarIcon = computed(() => {
   transform: translateX(-50%);
   background-color: transparent;
   backdrop-filter: blur(40px);
-  border: 1px solid var(--c-widget--border-color);
+  border: 1px solid var(--main-panel--widget--border-color);
   border-radius: 6px;
-  box-shadow: 0 4px 12px var(--c-widget--popup--shadow-color);
+  box-shadow: 0 4px 12px var(--control-panel--shadow-color);
   z-index: 800;
 }
 
@@ -260,37 +240,6 @@ const calendarIcon = computed(() => {
   width: fit-content;
   height: fit-content;
 }
-
-.calendar-popup-header {
-  font-size: 0.7rem;
-  color: var(--c-widget--popup--text--color);
-  letter-spacing: 0.05rem;
-  word-spacing: 0.05rem;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.calendar-popup-text {
-  font-size: 0.7rem;
-  color: var(--c-widget--popup--text--color);
-  word-spacing: 0.05rem;
-  letter-spacing: 0.05rem;
-  text-transform: uppercase;
-  text-align: center;
-}
-
-.calendar-button-number {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--c-widget--popup--number--color);
-  background: var(--c-widget--popup--number--bg);
-  border-radius: 3px;
-  padding: 2px;
-  width: 40px;
-  text-align: center;
-}
-
 
 .calendar-popup-centered-row {
   display: flex;
@@ -306,18 +255,6 @@ const calendarIcon = computed(() => {
   justify-content: center;
   align-items: center;
   gap: 6px;
-}
-
-.calendar-popup-review-total {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--c-widget--popup--number--color);
-  background: var(--c-widget--popup--number--bg);
-  border-radius: 3px;
-  padding: 1px;
-  min-width: 32px;
-  margin-right: 2px;
-  text-align: center;
 }
 
 .slide-fade-enter-active {
