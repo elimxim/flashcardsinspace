@@ -9,7 +9,7 @@
         </AwesomeContainer>
       </div>
       <div class="flashcards-info">
-        <div class="flashcards-info-number">
+        <div class="cp-count-box cp-count-box--big">
           {{ flashcardCount }}
         </div>
         <div class="flashcards-info-text">
@@ -81,18 +81,6 @@ const flashcardCount = computed(() => flashcards.value.length)
   text-transform: uppercase;
   text-align: center;
   white-space: nowrap;
-}
-
-.flashcards-info-number {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--cp--count-box--color);
-  background-color: rgb(225, 228, 240);
-  border-radius: 3px;
-  padding: 2px;
-  width: 50px;
-  height: fit-content;
-  text-align: center;
 }
 
 .fade-slide-enter-active,
