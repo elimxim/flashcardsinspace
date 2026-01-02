@@ -1,0 +1,7 @@
+.review-progressbar {
+  width: 100%;
+  --progressbar--from: var(--review-progressbar--from);
+  --progressbar--via: var(--review-progressbar--via);
+  --progressbar--to: var(--review-progressbar--to);
+  --progressbar--bg-color: var(--review-progressbar--bg-color);
+}

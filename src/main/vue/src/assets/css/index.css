@@ -8,3 +8,4 @@
 @import '@/assets/css/components/awesome.css' layer(components);
 @import '@/assets/css/components/buttons.css' layer(components);
 @import '@/assets/css/components/control-panel.css' layer(components);
+@import '@/assets/css/components/components.css' layer(components);
