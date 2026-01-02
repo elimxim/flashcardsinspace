@@ -2,7 +2,7 @@
   <div class="calendar-widget">
     <AwesomeButton
       :icon="calendarIcon"
-      class="main-panel--widget"
+      class="cp--widget"
       :disabled="!flashcardSet"
       :on-click="toggleStore.toggleCalendar"
       fill-space
@@ -10,10 +10,10 @@
     >
       <template #below>
         <div class="calendar-button-slot">
-          <div class="control-panel--widget--text">
+          <div class="cp--text">
             Day
           </div>
-          <div class="control-panel--count-box">
+          <div class="cp--count-box">
             <template v-if="isOnVacation">
               🌴
             </template>
@@ -37,40 +37,30 @@
       >
         <div class="calendar-popup-layout">
           <template v-if="previousDaysFrom !== previousDaysTo">
-            <div :class="[
-                'control-panel--widget--text',
-                'control-panel--widget--text--sub',
-                'control-panel--widget--text--nowrap',
-              ]"
-            >
+            <div class="cp--text cp--text--sub cp--text--nowrap">
               You have uncompleted previous days
             </div>
             <div class="calendar-popup-centered-row">
-              <div class="control-panel--widget--text control-panel--widget--text--sub">
+              <div class="cp--text cp--text--sub">
                 From
               </div>
-              <div class="control-panel--count-box">
+              <div class="cp--count-box">
                 {{ previousDaysFrom?.seqNumber }}
               </div>
-              <div class="control-panel--widget--text control-panel--widget--text--sub">
+              <div class="cp--text cp--text--sub">
                 To
               </div>
-              <div class="control-panel--count-box">
+              <div class="cp--count-box">
                 {{ previousDaysTo?.seqNumber }}
               </div>
             </div>
           </template>
           <template v-else>
-            <div :class="[
-                'control-panel--widget--text',
-                'control-panel--widget--text--sub',
-                'control-panel--widget--text--nowrap',
-              ]"
-            >
+            <div class="cp--text cp--text--sub cp--text--nowrap">
               You have an uncompleted previous day
             </div>
             <div class="calendar-popup-centered-row">
-              <div class="control-panel--count-box">
+              <div class="cp--count-box">
                 {{ previousDaysTo?.seqNumber }}
               </div>
             </div>
@@ -79,20 +69,20 @@
             v-if="prevDaysReviewTotal > 0"
             class="calendar-popup-review-row"
           >
-            <div class="control-panel--widget--text control-panel--widget--text--sub">
+            <div class="cp--text cp--text--sub">
               With the total number of flashcards to review
             </div>
-            <div class="control-panel--count-box">
+            <div class="cp--count-box">
               {{ prevDaysReviewTotal }}
             </div>
           </div>
           <template v-else-if="previousDaysFrom !== previousDaysTo">
-            <div class="control-panel--widget--text control-panel--widget--text--sub">
+            <div class="cp--text cp--text--sub">
               They will be completed once<br>you complete the current day
             </div>
           </template>
           <template v-else>
-            <div class="control-panel--widget--text control-panel--widget--text--sub">
+            <div class="cp--text cp--text--sub">
               It will be completed once<br>you complete the current day
             </div>
           </template>
@@ -225,9 +215,9 @@ const calendarIcon = computed(() => {
   transform: translateX(-50%);
   background-color: transparent;
   backdrop-filter: blur(40px);
-  border: 1px solid var(--main-panel--widget--border-color);
+  border: 1px solid var(--cp--border-color);
   border-radius: 6px;
-  box-shadow: 0 4px 12px var(--control-panel--shadow-color);
+  box-shadow: 0 4px 12px var(--cp--shadow-color);
   z-index: 800;
 }
 

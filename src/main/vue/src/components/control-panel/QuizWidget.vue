@@ -2,7 +2,7 @@
   <div class="quiz-widget quiz-widget--theme">
     <AwesomeButton
       icon="fa-solid fa-q"
-      class="main-panel--widget"
+      class="cp--widget"
       :disabled="!flashcardSet"
       :on-click="toggleStore.toggleQuiz"
       fill-space
