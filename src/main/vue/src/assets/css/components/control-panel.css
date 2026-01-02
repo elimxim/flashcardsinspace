@@ -8,3 +8,21 @@
   --awesome-button--border: 1px solid var(--main-panel--widget--border-color);
   --awesome-button--border-radius: 6px;
 }
+
+.control-panel--widget--text {
+  color: var(--main-panel--widget--text--color);
+  font-weight: 600;
+  font-size: 0.9rem;
+  word-spacing: 0.05rem;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.control-panel--widget--text--active {
+  color: var(--main-panel--widget--text--color--active);
+}
+
+.control-panel--widget--text--inactive {
+  color: var(--main-panel--widget--text--color--inactive);
+}
