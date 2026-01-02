@@ -55,3 +55,12 @@
   width: 40px;
   text-align: center;
 }
+
+.outer-space-button {
+  --smart-button--bg: #242124;
+  --smart-button--bg--hover: #34324a;
+  --smart-button--bg--disabled: transparent;
+  --smart-button--padding: 10px;
+  --smart-button--border-color: #4f5053;
+  --smart-button--border-radius: 6px;
+}

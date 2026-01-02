@@ -16,7 +16,7 @@
       auto-blur
     />
     <div class="right-spacer">
-      <div class="outer-space-count">
+      <div class="cp-count-box">
         {{ flashcardCount }}
       </div>
     </div>
@@ -58,12 +58,6 @@ function startReview() {
 </script>
 
 <style scoped>
-.outer-space-widget--theme {
-  --o-widget--bg: var(--outer-space-widget--bg, #242124);
-  --o-widget--stage--count--color: var(--stages-stage-count--color, rgba(13, 18, 74, 0.6));
-  --o-widget--stage--count--bg: var(--stages-stage-count--bg, rgba(255, 255, 255, 0.6));
-}
-
 .outer-space-widget {
   position: relative;
   display: flex;
@@ -73,7 +67,7 @@ function startReview() {
   height: 100%;
   border-radius: 6px;
   padding: 10px;
-  background: var(--o-widget--bg);
+  background: #242124;
 }
 
 .left-spacer {
@@ -85,17 +79,6 @@ function startReview() {
   display: flex;
   justify-content: flex-start;
   padding-left: 10px;
-}
-
-.outer-space-count {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--o-widget--stage--count--color);
-  background: var(--o-widget--stage--count--bg);
-  border-radius: 3px;
-  padding: 2px;
-  width: 40px;
-  text-align: center;
 }
 
 </style>
