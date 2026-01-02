@@ -6,6 +6,7 @@
       'flex-column',
       'flex-center',
       'scroll-none',
+      'touch-none',
       'review-page--theme',
     ]"
   >
