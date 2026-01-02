@@ -9,7 +9,7 @@
         :key="review.stage"
         class="review-item"
       >
-        <div class="cp-text cp-text--left cp-text--nowrap">
+        <div class="cp-text cp-text--light cp-text--left cp-text--nowrap">
           {{ review.stage }}
         </div>
         <div class="cp-count-box">

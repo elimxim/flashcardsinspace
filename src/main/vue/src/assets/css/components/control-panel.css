@@ -24,6 +24,10 @@
   text-align: left;
 }
 
+.cp-text--light {
+  font-weight: 400;
+}
+
 .cp-text--active {
   color: var(--cp--text--color--active);
 }
