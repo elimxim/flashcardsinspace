@@ -6,61 +6,61 @@
       @click="toggle"
     />
     <div
-      class="sidebar sidebar--theme"
+      class="sidebar"
       :class="{
         'sidebar--collapsed': !sidebarExpandedCookie,
         'sidebar--overlay': isOverlay,
         'sidebar--no-transition': isTransitioning
       }"
     >
-    <ControlBar
-      class="sidebar-control-bar"
-      title="FLASHCARD SETS"
-      center-title
-      shadow
-    >
-      <template #left>
-        <AwesomeButton
-          ref="createButton"
-          icon="fa-solid fa-plus"
-          class="control-bar-button"
-          tooltip="Create New Flashcard Set"
-          tooltip-position="bottom-right"
-          :on-click="toggleStore.toggleFlashcardSetCreation"
-        />
-      </template>
-      <template #right>
-        <AwesomeButton
-          ref="toggleButton"
-          icon="fa-solid fa-chevron-left"
-          class="control-bar-button"
-          :on-click="toggle"
-        />
-      </template>
-    </ControlBar>
-    <div class="sidebar-content sidebar-content--scrollable">
-      <div
-        v-for="set in flashcardSets"
-        :key="set.id"
-        class="sidebar-item"
-        :class="{ 'sidebar-item--active': set.id === flashcardSet?.id }"
-        @click="selectFlashcardSet(set.id)"
+      <ControlBar
+        class="sidebar-control-bar"
+        title="FLASHCARD SETS"
+        center-title
+        shadow
       >
-        <div class="sidebar-item__content">
-          <div class="sidebar-item__name">{{ set.name }}</div>
-          <AwesomeContainer class="sidebar-item__language-container" icon="fa-solid fa-globe">
-            <div class="sidebar-item__language">
-              {{ getLanguageName(set) }}
-            </div>
-          </AwesomeContainer>
-        </div>
-        <div class="sidebar-item__count-container">
-          <div class="sidebar-item__count">{{ getFlashcardsNumber(set) }}</div>
+        <template #left>
+          <AwesomeButton
+            ref="createButton"
+            icon="fa-solid fa-plus"
+            class="control-bar-button"
+            tooltip="Create New Flashcard Set"
+            tooltip-position="bottom-right"
+            :on-click="toggleStore.toggleFlashcardSetCreation"
+          />
+        </template>
+        <template #right>
+          <AwesomeButton
+            ref="toggleButton"
+            icon="fa-solid fa-chevron-left"
+            class="control-bar-button"
+            :on-click="toggle"
+          />
+        </template>
+      </ControlBar>
+      <div class="sidebar-content sidebar-content--scrollable">
+        <div
+          v-for="set in flashcardSets"
+          :key="set.id"
+          class="sidebar-item"
+          :class="{ 'sidebar-item--active': set.id === flashcardSet?.id }"
+          @click="selectFlashcardSet(set.id)"
+        >
+          <div class="sidebar-item-content">
+            <div class="sidebar-item-name">{{ set.name }}</div>
+            <AwesomeContainer class="sidebar-item-language-container" icon="fa-solid fa-globe">
+              <div class="sidebar-item-language">
+                {{ getLanguageName(set) }}
+              </div>
+            </AwesomeContainer>
+          </div>
+          <div class="cp-count-box">
+            {{ getFlashcardsNumber(set) }}
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script setup lang="ts">
@@ -157,28 +157,6 @@ onUnmounted(() => {
 
 
 <style scoped>
-.sidebar--theme {
-  --bar--bg: var(--sidebar--bg, #32334a);
-  --bar--border-color: var(--sidebar--border-color, rgba(89, 78, 117, 0.85));
-  --bar--item--bg: var(--sidebar--item--bg, linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%));
-  --bar--item--bg--hover: var(--sidebar--item--bg--hover, linear-gradient(135deg, rgb(142, 110, 189) 0%, rgb(215, 91, 209) 100%));
-  --bar--item--bg--active: var(--sidebar--item--bg--active, linear-gradient(135deg, rgb(142, 110, 189) 0%, rgb(215, 91, 209) 100%));
-  --bar--item--border-color: var(--sidebar--item--border-color, rgba(74, 74, 74, 0.81));
-  --bar--item--border-color--active: var(--sidebar--item--border-color--active, rgba(255, 255, 255, 0.81));
-  --bar--item--color: var(--sidebar--item--color, rgba(13, 18, 74, 0.6));
-  --bar--item--color--hover: var(--sidebar--item--color--hover, rgba(255, 255, 255, 0.6));
-  --bar--item--color--active: var(--sidebar--item--color--active, rgba(255, 255, 255, 0.6));
-  --bar--item--shadow-color: var(--sidebar--item--shadow-color, transparent);
-  --bar--item--count--color: var(--sidebar--item--count-color, rgba(20, 27, 106, 0.82));
-  --bar--item--count--bg: var(--sidebar--item--count--bg, rgba(255, 255, 255, 0.6));
-  --bar--language--text-color: var(--sidebar--language--text-color, #efe9ef);
-  --bar--language--icon-color: var(--sidebar--language--icon-color, rgba(255, 255, 255, 0.6));
-  --bar--scrollbar--track-color: var(--sidebar--scrollbar--track-color, #575e68);
-  --bar--scrollbar--thumb-color: var(--sidebar--scrollbar--thumb-color, #808daa);
-  --bar--scrollbar--thumb-color--hover: var(--sidebar--scrollbar--thumb-hover-color, #98a9ca);
-  --bar--scrollbar--thumb-color--active: var(--sidebar--scrollbar--thumb-active-color, #98a9ca);
-}
-
 .sidebar-overlay {
   display: none;
   position: fixed;
@@ -209,7 +187,7 @@ onUnmounted(() => {
   flex-direction: column;
   width: 260px;
   height: 100%;
-  background: var(--bar--bg);
+  background: #32334a;
   overflow: hidden;
   transition: margin-left 0.35s ease-in-out;
 }
@@ -246,7 +224,7 @@ onUnmounted(() => {
   padding: 1rem;
   flex: 1;
   overflow: hidden;
-  border-right: 2px solid var(--bar--border-color);
+  border-right: 2px solid rgba(89, 78, 117, 0.85);
 }
 
 .sidebar-content--scrollable {
@@ -258,23 +236,23 @@ onUnmounted(() => {
 }
 
 .sidebar-content--scrollable::-webkit-scrollbar-track {
-  background: var(--bar--scrollbar--track-color);
+  background: #575e68;
   border-radius: 0;
 }
 
 .sidebar-content--scrollable::-webkit-scrollbar-thumb {
-  background: var(--bar--scrollbar--thumb-color);
+  background: #808daa;
   border-radius: 0;
 }
 
 @media (hover: hover) {
   .sidebar-content--scrollable::-webkit-scrollbar-thumb:hover {
-    background: var(--bar--scrollbar--thumb-color--hover);
+    background: #98a9ca;
   }
 }
 
 .sidebar-content--scrollable::-webkit-scrollbar-thumb:active {
-  background: var(--bar--scrollbar--thumb-color--active);
+  background: #98a9ca;
 }
 
 .sidebar-item {
@@ -282,47 +260,44 @@ onUnmounted(() => {
   align-items: center;
   padding: 10px;
   cursor: pointer;
-  background: var(--bar--item--bg);
-  border: 1px solid var(--bar--item--border-color);
+  background: var(--cp--widget--color);
+  border: 1px solid var(--cp--border-color);
   border-radius: 6px;
-  box-shadow: 2px 2px 3px var(--bar--item--shadow-color);
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 @media (hover: hover) {
   .sidebar-item:hover {
-    background: var(--bar--item--bg--hover);
-    box-shadow: 8px 3px 3px var(--bar--item--shadow-color);
+    background: var(--cp--widget--color--active);
     backdrop-filter: none;
     transform: translateX(-6px);
   }
 
-  .sidebar-item:hover .sidebar-item__name {
-    color: var(--bar--item--color--hover);
+  .sidebar-item:hover .sidebar-item-name {
+    color: var(--cp--text--color--active);
   }
 
-  .sidebar-item:hover .sidebar-item__language {
-    color: var(--bar--item--color--hover);
+  .sidebar-item:hover .sidebar-item-language {
+    color: var(--cp--text--color--active);
   }
 }
 
 .sidebar-item--active {
-  background: var(--bar--item--bg--active);
-  border-color: var(--bar--item--border-color--active);
-  box-shadow: 8px 3px 3px var(--bar--item--shadow-color);
+  background: var(--cp--widget--color--active);
+  border-color: rgba(255, 255, 255, 0.81);
   backdrop-filter: none;
   transform: translateX(-6px);
 }
 
-.sidebar-item--active .sidebar-item__name {
-  color: var(--bar--item--color--active);
+.sidebar-item--active .sidebar-item-name {
+  color: var(--cp--text--color--active);
 }
 
-.sidebar-item--active .sidebar-item__language {
-  color: var(--bar--item--color--active);
+.sidebar-item--active .sidebar-item-language {
+  color: var(--cp--text--color--active);
 }
 
-.sidebar-item__content {
+.sidebar-item-content {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -330,8 +305,8 @@ onUnmounted(() => {
   min-width: 0;
 }
 
-.sidebar-item__name {
-  color: var(--bar--item--color);
+.sidebar-item-name {
+  color: var(--cp--text--color);
   font-size: 1.1rem;
   font-weight: 400;
   overflow: hidden;
@@ -340,34 +315,20 @@ onUnmounted(() => {
   transition: color 0.2s ease-in-out;
 }
 
-.sidebar-item__language-container {
+.sidebar-item-language-container {
   --awesome-container--icon--size: 0.8rem;
-  --awesome-container--icon--color: var(--bar--language--icon-color);
+  --awesome-container--icon--color: var(--cp--text--color--active);
   --awesome-container--gap: 4px;
 }
 
-.sidebar-item__language {
-  color: var(--bar--item--color);
+.sidebar-item-language {
+  color: var(--cp--text--color);
   font-size: 0.75rem;
   font-weight: 400;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   transition: color 0.2s ease-in-out;
-}
-
-.sidebar-item__count {
-  width: 40px;
-  border-radius: 3px;
-  background: var(--bar--item--count--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px;
-  color: var(--bar--item--count--color);
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-left: 0.75rem;
 }
 
 </style>
