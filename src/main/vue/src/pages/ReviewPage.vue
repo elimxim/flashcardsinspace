@@ -46,10 +46,10 @@
         />
       </div>
       <div class="review-info">
-        <div class="review-count review-count--left">
+        <div class="cp-count-box cp-count-box--big">
           {{ flashcardsSeen }}
         </div>
-        <div class="review-count review-count--right">
+        <div class="cp-count-box cp-count-box--big">
           {{ flashcardsRemaining }}
         </div>
       </div>
@@ -755,6 +755,7 @@ async function handleKeydown(event: KeyboardEvent) {
   align-items: start;
   justify-content: space-between;
   width: 100%;
+  padding: 2px;
 }
 
 .review-mode {
@@ -800,14 +801,14 @@ async function handleKeydown(event: KeyboardEvent) {
 }
 
 .review-count {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--r-page--review-count--color);
   background: var(--r-page--review-count--bg);
+  border-radius: 3px;
   padding: 2px;
-  margin: 2px;
-  border-radius: 6px;
   width: 50px;
+  height: fit-content;
   text-align: center;
 }
 
