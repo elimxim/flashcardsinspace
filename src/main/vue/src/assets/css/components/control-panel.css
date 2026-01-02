@@ -1,0 +1,10 @@
+.main-panel--widget-button {
+  --awesome-button--icon--size: 50px;
+  --awesome-button--icon--color: var(--main-panel--widget-button--color);
+  --awesome-button--icon--color--hover: var(--main-panel--widget-button--color--hover);
+  --awesome-button--bg: var(--main-panel--widget-button--bg);
+  --awesome-button--bg--hover: var(--main-panel--widget-button--bg--hover);
+  --awesome-button--bg--disabled: var(--main-panel--widget-button--bg--disabled);
+  --awesome-button--border: 1px solid var(--main-panel--widget-button--border-color);
+  --awesome-button--border-radius: 6px;
+}

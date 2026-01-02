@@ -200,33 +200,15 @@
   --control-bar--button--bg: transparent;
   --control-bar--button--bg--hover: transparent;
 
-  /* calendar widget */
+  /* control panel */
 
-  --calendar-widget-button--border-color: rgba(128, 128, 128, 0.62);
-  --calendar-widget-button--color: rgba(13, 18, 74, 0.6);
-  --calendar-widget-button--color--hover: rgba(255, 255, 255, 0.6);
-  --calendar-widget-button--bg: linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%);
-  --calendar-widget-button--bg--hover: linear-gradient(135deg, rgb(142, 110, 189) 0%, rgb(215, 91, 209) 100%);
-  --calendar-widget-button--bg--disabled: linear-gradient(135deg, rgb(121, 121, 121) 0%, rgb(64, 64, 64) 100%);
+  --main-panel--widget-button--border-color: rgba(128, 128, 128, 0.62);
+  --main-panel--widget-button--color: rgba(13, 18, 74, 0.6);
+  --main-panel--widget-button--color--hover: rgba(255, 255, 255, 0.6);
+  --main-panel--widget-button--bg: linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%);
+  --main-panel--widget-button--bg--hover: linear-gradient(135deg, rgb(142, 110, 189) 0%, rgb(215, 91, 209) 100%);
+  --main-panel--widget-button--bg--disabled: linear-gradient(135deg, rgb(121, 121, 121) 0%, rgb(64, 64, 64) 100%);
 
-  /* launch button */
-
-  --launch-button--border-color: rgba(128, 128, 128, 0.62);
-  --launch-button--color: rgba(13, 18, 74, 0.6);
-  --launch-button--color--hover: rgba(255, 255, 255, 0.6);
-  --launch-button--color--disabled: rgba(23, 32, 66, 0.78);
-  --launch-button--bg: linear-gradient(135deg, rgb(91, 91, 145) 0%, rgb(105, 83, 125) 100%);
-  --launch-button--bg--hover: linear-gradient(135deg, rgb(142, 110, 189) 0%, rgb(215, 91, 209) 100%);
-  --launch-button--bg--disabled: linear-gradient(135deg, rgb(121, 121, 121) 0%, rgb(64, 64, 64) 100%);
-
-  /* flashcard widget */
-
-  --flashcard-widget-button--border-color: rgba(128, 128, 128, 0.62);
-  --flashcard-widget-button--color: rgba(13, 18, 74, 0.6);
-  --flashcard-widget-button--color--hover: rgba(255, 255, 255, 0.6);
-  --flashcard-widget-button--bg: linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%);
-  --flashcard-widget-button--bg--hover: linear-gradient(135deg, rgb(142, 110, 189) 0%, rgb(215, 91, 209) 100%);
-  --flashcard-widget-button--bg--disabled: linear-gradient(135deg, rgb(121, 121, 121) 0%, rgb(64, 64, 64) 100%);
 }
 
 @media (max-width: 400px) {
