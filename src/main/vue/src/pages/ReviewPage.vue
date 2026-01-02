@@ -459,13 +459,11 @@ async function startNextQuizRound() {
 
 async function prev() {
   if (noPrevAvailable.value) return
-  // spaceDeck.value?.willSlideLeft()
   await prevFlashcard()
 }
 
 async function next() {
   if (noNextAvailable.value) return
-  // spaceDeck.value?.willSlideRight()
   await nextFlashcard()
 }
 
