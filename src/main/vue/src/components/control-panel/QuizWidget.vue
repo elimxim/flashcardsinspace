@@ -9,7 +9,7 @@
       square
     >
       <template #below>
-        <div class="quiz-widget-button-text">
+        <div class="cp-text quiz-text">
           Start Quiz
         </div>
       </template>
@@ -36,13 +36,7 @@ const { flashcardSet } = storeToRefs(flashcardStore)
   width: fit-content;
 }
 
-.quiz-widget-button-text {
-  margin-top: 4px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  word-spacing: 0.05rem;
-  letter-spacing: 0.05rem;
-  text-transform: uppercase;
-  text-align: center;
+.quiz-text {
+  margin-top: 8px;
 }
 </style>
