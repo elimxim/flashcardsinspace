@@ -44,12 +44,13 @@ function goToControlPanel() {
 }
 
 .empty-deck-message {
-  font-size: clamp(1.5rem, 3cqw, 2rem);
+  font-size: clamp(1.2rem, 3cqw, 1.5rem);
   font-weight: 500;
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-align: center;
-  color: #45454a;
+  text-wrap: balance;
+  color: rgba(100, 116, 139, 0.9);
 }
 
 .exit-review-button {
