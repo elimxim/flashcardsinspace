@@ -4,7 +4,7 @@
       <div class="day-steak-number">
         {{ dayStreak }}
       </div>
-      <div class="day-streak-text">
+      <div class="control-panel--widget--text control-panel--widget--text--active">
         Day Streak
       </div>
     </div>
@@ -52,13 +52,4 @@ const { dayStreak } = storeToRefs(chronoStore)
   line-height: 1;
 }
 
-.day-streak-text {
-  color: var(--main-panel--widget--text--color--active);
-  font-weight: 600;
-  font-size: 0.9rem;
-  word-spacing: 0.05rem;
-  letter-spacing: 0.05rem;
-  text-transform: uppercase;
-  text-align: center;
-}
 </style>
