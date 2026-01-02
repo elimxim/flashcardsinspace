@@ -26,15 +26,6 @@
   --awesome-button--bg--hover: var(--control-bar--button--bg--hover);
 }
 
-.outer-space-button {
-  --smart-button--bg: #242124;
-  --smart-button--bg--hover: #34324a;
-  --smart-button--bg--disabled: transparent;
-  --smart-button--padding: 10px;
-  --smart-button--border-color: #4f5053;
-  --smart-button--border-radius: 6px;
-}
-
 .navigation-button {
   --awesome-button--icon--size: 1.3rem;
   --awesome-button--icon--width: 40px;

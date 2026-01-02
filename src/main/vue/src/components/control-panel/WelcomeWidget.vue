@@ -1,5 +1,5 @@
 <template>
-  <div class="welcome-widget welcome-widget--theme">
+  <div class="welcome-widget">
     <div class="welcome-text">
       {{ welcomeText() }}
     </div>
@@ -46,12 +46,6 @@ function toggleModal() {
 </script>
 
 <style scoped>
-.welcome-widget--theme {
-  --w-widget--text--color: var(--welcome-widget--text--color, #32334a);
-  --w-widget--button--bg: var(--welcome-widget--button--bg, #32334a);
-  --w-widget--button--bg--hover: var(--welcome-widget--button--bg--hover, #494a6c);
-}
-
 .welcome-widget {
   width: 200px;
   height: 100px;
@@ -63,9 +57,9 @@ function toggleModal() {
 }
 
 .welcome-text {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 500;
-  color: var(--w-widget--text--color);
+  color: var(--cp--text--color);
   text-align: center;
   white-space: wrap;
   word-spacing: 0.02rem;
@@ -77,7 +71,7 @@ function toggleModal() {
   --smart-button--title--font-size: 0.9rem;
   --smart-button--title--letter-spacing: 0.1rem;
   --smart-button--border-radius: 6px;
-  --smart-button--bg: var(--w-widget--button--bg);
-  --smart-button--bg--hover: var(--w-widget--button--bg--hover);
+  --smart-button--bg: #32334a;
+  --smart-button--bg--hover: #494a6c;
 }
 </style>

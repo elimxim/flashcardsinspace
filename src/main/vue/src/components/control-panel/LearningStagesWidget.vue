@@ -1,6 +1,6 @@
 <template>
   <div
-    class="stages-widget stages-widget--theme"
+    class="stages-widget"
     :class="{
       'stages-widget--hex-grid': isExpanded,
     }"
@@ -277,17 +277,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.stages-widget--theme {
-  --l-widget--border-color: var(--stages-widget--border-color, none);
-  --l-widget--bg: var(--stages-widget--bg, linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%));
-  --l-widget--hex-line--color: var(--stages-widget--hex-line--color, rgba(0, 255, 255, 0.05));
-  --l-widget--title--color: var(--stages-widget--title--color, rgba(13, 18, 74, 0.6));
-  --l-widget--stage--bg: var(--stages-widget--stage--bg, rgba(0, 0, 0, 0.22));
-  --l-widget--stage--name--color: var(--stages-widget--stage--name--color, rgba(250, 249, 246, 0.7));
-  --l-widget--stage--count--color: var(--stages-widget--stage--count--color, rgba(13, 18, 74, 0.6));
-  --l-widget--stage--count--bg: var(--stages-widget--stage--count--bg, rgba(255, 255, 255, 0.6));
-}
-
 .stages-widget {
   position: relative;
   padding: 4px;
@@ -296,8 +285,8 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   gap: 4px;
-  border: 1px solid var(--l-widget--border-color);
-  background: var(--l-widget--bg);
+  border: 1px solid var(--cp--border-color);
+  background: var(--cp--widget--color);
   border-radius: 6px;
   width: 100%;
   flex-grow: 0;
@@ -305,16 +294,16 @@ onUnmounted(() => {
 }
 
 .stages-widget--hex-grid {
-  background: repeating-linear-gradient(0deg, transparent 0px, transparent 24px, var(--l-widget--hex-line--color) 24px, var(--l-widget--hex-line--color) 25px),
-  repeating-linear-gradient(60deg, transparent 0px, transparent 24px, var(--l-widget--hex-line--color) 24px, var(--l-widget--hex-line--color) 25px),
-  repeating-linear-gradient(120deg, transparent 0px, transparent 24px, var(--l-widget--hex-line--color) 24px, var(--l-widget--hex-line--color) 25px),
-  var(--l-widget--bg);
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
+  repeating-linear-gradient(60deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
+  repeating-linear-gradient(120deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
+  var(--cp--widget--color);
 }
 
 .stages-title {
   font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--l-widget--title--color);
+  font-weight: 600;
+  color: var(--cp--text--color);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -349,7 +338,7 @@ onUnmounted(() => {
 .stage {
   display: flex;
   flex-direction: column;
-  background: var(--l-widget--stage--bg);
+  background: rgba(0, 0, 0, 0.22);
   border-radius: 6px;
   justify-content: center;
   align-items: center;
@@ -367,7 +356,7 @@ onUnmounted(() => {
 .stage-name {
   font-size: clamp(0.7rem, 20cqi, 0.9rem);
   font-weight: 600;
-  color: var(--l-widget--stage--name--color);
+  color: rgba(250, 249, 246, 0.7);
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -388,8 +377,8 @@ onUnmounted(() => {
 .stage-count {
   font-size: clamp(0.6rem, 20cqi, 0.85rem);
   font-weight: 600;
-  color: var(--l-widget--stage--count--color);
-  background: var(--l-widget--stage--count--bg);
+  color: var(--cp--count-box--color);
+  background: var(--cp--count-box--bg);
   border-radius: 3px;
   padding: 2px;
   width: 60%;

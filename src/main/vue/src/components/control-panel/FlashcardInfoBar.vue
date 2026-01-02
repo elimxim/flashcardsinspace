@@ -39,21 +39,11 @@ const flashcardCount = computed(() => flashcards.value.length)
 </script>
 
 <style scoped>
-.flashcard-info-bar--theme {
-  --f-bar--bg-color: var(--flashcard-info-bar--bg-color, transparent);
-  --f-bar--language--text-color: var(--flashcard-info-bar--text-color, #333333);
-  --f-bar--language--icon-color: var(--flashcard-info-bar--language--icon-color, #007bff);
-  --f-bar--flashcards--text-color: var(--flashcard-info-bar--flashcards--text-color, rgba(43, 69, 142, 0.88));
-  --f-bar--flashcards--number--color: var(--flashcard-info-bar--flashcards--number--color, rgba(17, 33, 85, 0.92));
-  --f-bar--flashcards--number--bg-color: var(--flashcard-info-bar--flashcards--number--bg-color, rgb(225, 228, 240));
-}
-
 .flashcard-info-bar {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  background: var(--f-bar--bg-color);
   gap: 40px;
   height: fit-content;
   max-height: max-content;
@@ -62,13 +52,13 @@ const flashcardCount = computed(() => flashcards.value.length)
 .language-info {
   display: flex;
   --awesome-container--icon--size: 1.2rem;
-  --awesome-container--icon--color: var(--f-bar--language--icon-color);
+  --awesome-container--icon--color: var(--fa-icon--color--globe);
   --awesome-container--gap: 8px;
 }
 
 .language-info-text {
-  font-size: clamp(0.75rem, 1.5vw, 0.9rem);
-  color: var(--f-bar--language--text-color);
+  font-size: 1rem;
+  color: rgba(43, 69, 142, 0.88);
   white-space: nowrap;
   word-spacing: 0.05rem;
   letter-spacing: 0.05rem;
@@ -83,8 +73,9 @@ const flashcardCount = computed(() => flashcards.value.length)
 }
 
 .flashcards-info-text {
-  font-size: 0.7rem;
-  color: var(--f-bar--flashcards--text-color);
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(43, 69, 142, 0.88);
   word-spacing: 0.05rem;
   letter-spacing: 0.05rem;
   text-transform: uppercase;
@@ -95,8 +86,8 @@ const flashcardCount = computed(() => flashcards.value.length)
 .flashcards-info-number {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--f-bar--flashcards--number--color);
-  background-color: var(--f-bar--flashcards--number--bg-color);
+  color: var(--cp--count-box--color);
+  background-color: rgb(225, 228, 240);
   border-radius: 3px;
   padding: 2px;
   width: 50px;
