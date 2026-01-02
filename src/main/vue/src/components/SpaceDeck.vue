@@ -332,14 +332,15 @@ function onTouchEnd(event: TouchEvent) {
     const offset = deltaX > 0 ? exitOffset : -exitOffset
     requestAnimationFrame(() => {
       swipeOffset.value = offset
-      setTimeout(() => {
+      setTimeout(async () => {
+        if (deltaX > 0) {
+          await props.onSlideRight()
+        } else {
+          await props.onSlideLeft()
+        }
         swipeOffset.value = 0
         isAnimatingOut.value = false
-        if (deltaX > 0) {
-          triggerSlideRight()
-        } else {
-          triggerSlideLeft()
-        }
+        enterAnimation.value = 'zoom-in'
       }, invisibleDuration)
     })
   } else if (isSwiping.value) {
@@ -387,19 +388,19 @@ function setDeckReady() {
   enterAnimation.value = 'drop-down'
 }
 
-function triggerSlideLeft() {
+async function triggerSlideLeft() {
   if (!props.canSlideLeft) return
+  await props.onSlideLeft()
   enterAnimation.value = 'zoom-in'
-  props.onSlideLeft()
 }
 
-function triggerSlideRight() {
+async function triggerSlideRight() {
   if (!props.canSlideRight) return
+  await props.onSlideRight()
   enterAnimation.value = 'zoom-in'
-  props.onSlideRight()
 }
 
-function animateSwipe(direction: 'left' | 'right', onCompleteCallback: () => void, slow = false): Promise<boolean> {
+function animateSwipe(direction: 'left' | 'right', onCompleteCallback: () => Promise<void> | void, slow = false): Promise<boolean> {
   return new Promise((resolve) => {
     if (isAnimating.value) {
       resolve(false)
@@ -416,12 +417,12 @@ function animateSwipe(direction: 'left' | 'right', onCompleteCallback: () => voi
 
     requestAnimationFrame(() => {
       swipeOffset.value = offset
-      setTimeout(() => {
+      setTimeout(async () => {
+        await onCompleteCallback()
         swipeOffset.value = 0
         isAnimatingOut.value = false
         isAnimating.value = false
         isSlowAnimation.value = false
-        onCompleteCallback()
         resolve(true)
       }, invisibleDuration)
     })

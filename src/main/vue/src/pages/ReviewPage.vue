@@ -469,16 +469,16 @@ async function next() {
   await nextFlashcard()
 }
 
-function onSlideLeft() {
-  if (reviewMode.value.isLightspeed()) stageDown()
-  else if (reviewMode.value.isSpecial()) prev()
-  else if (reviewMode.value.isQuiz()) quizAnswer(false)
+async function onSlideLeft() {
+  if (reviewMode.value.isLightspeed()) await stageDown()
+  else if (reviewMode.value.isSpecial()) await prev()
+  else if (reviewMode.value.isQuiz()) await quizAnswer(false)
 }
 
-function onSlideRight() {
-  if (reviewMode.value.isLightspeed()) stageUp()
-  else if (reviewMode.value.isSpecial()) next()
-  else if (reviewMode.value.isQuiz()) quizAnswer(true)
+async function onSlideRight() {
+  if (reviewMode.value.isLightspeed()) await stageUp()
+  else if (reviewMode.value.isSpecial()) await next()
+  else if (reviewMode.value.isQuiz()) await quizAnswer(true)
 }
 
 const swipeLeftText = computed(() => {
