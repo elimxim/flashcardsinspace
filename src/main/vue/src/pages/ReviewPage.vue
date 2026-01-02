@@ -55,13 +55,9 @@
       <div class="review-body">
         <SpaceDeck
           ref="spaceDeck"
-          v-model:flashcard="currFlashcard"
-          v-model:auto-play-voice="autoPlayVoice"
-          v-model:auto-repeat-voice="autoRepeatVoice"
+          :session-type="reviewMode.sessionType"
           :on-flashcard-removed="onFlashcardRemoved"
           :on-audio-changed="onAudioChanged"
-          :flashcard-front-side-audio="flashcardFrontSideAudioBlob"
-          :flashcard-back-side-audio="flashcardBackSideAudioBlob"
           :can-slide-left="canSlideLeft"
           :can-slide-right="canSlideRight"
           :on-slide-left="onSlideLeft"
@@ -254,10 +250,6 @@ const {
   reviewQueue,
   flashcardsTotal,
   currFlashcard,
-  autoPlayVoice,
-  autoRepeatVoice,
-  flashcardFrontSideAudioBlob,
-  flashcardBackSideAudioBlob,
   flashcardsRemaining,
   flashcardsSeen,
   progress,

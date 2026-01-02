@@ -30,18 +30,18 @@
         class="pull-in-card"
       />
       <SpaceCard
-        v-if="flashcard && deckReady"
+        v-if="currFlashcard && deckReady"
         ref="spaceCard"
-        :key="flashcard.id"
+        :key="currFlashcard.id"
         v-model:auto-play-voice="autoPlayVoice"
         v-model:auto-repeat-voice="autoRepeatVoice"
-        :stage="flashcard.stage"
-        :front-side="flashcard.frontSide"
-        :back-side="flashcard.backSide"
+        :stage="currFlashcard.stage"
+        :front-side="currFlashcard.frontSide"
+        :back-side="currFlashcard.backSide"
         :viewed-times="viewedTimes"
         :on-edit="toggleStore.toggleFlashcardEdit"
-        :front-side-audio="flashcardFrontSideAudio"
-        :back-side-audio="flashcardBackSideAudio"
+        :front-side-audio="flashcardFrontSideAudioBlob"
+        :back-side-audio="flashcardBackSideAudioBlob"
         :class="cardAnimationClass"
         :style="cardStyle"
         @animationend="onEnterAnimationEnd"
@@ -59,7 +59,7 @@
     </div>
   </div>
   <FlashcardEditModal
-    v-model:flashcard="flashcard"
+    v-model:flashcard="currFlashcard"
     v-model:removed="flashcardWasRemoved"
     v-model:audio-changed="audioWasChanged"
   />
@@ -71,17 +71,14 @@ import FlashcardEditModal from '@/modals/FlashcardEditModal.vue'
 import { computed, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
-import { deckEmptyMessage } from '@/core-logic/review-logic.ts'
+import { deckEmptyMessage, ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { isTouchDevice } from '@/utils/utils.ts'
-
-const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
-const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })
-const autoRepeatVoice = defineModel<boolean>('autoRepeatVoice', { default: false })
+import { useReviewStore } from '@/stores/review-store.ts'
+import { storeToRefs } from 'pinia'
 
 const props = withDefaults(defineProps<{
+  sessionType: ReviewSessionType
   showSlot?: boolean
-  flashcardFrontSideAudio?: Blob | undefined
-  flashcardBackSideAudio?: Blob | undefined
   canSlideLeft?: boolean
   canSlideRight?: boolean
   swipeLeftText?: string
@@ -92,8 +89,6 @@ const props = withDefaults(defineProps<{
   onSlideRight?: () => Promise<void> | void
 }>(), {
   showSlot: true,
-  flashcardFrontSideAudio: undefined,
-  flashcardBackSideAudio: undefined,
   canSlideLeft: true,
   canSlideRight: true,
   swipeLeftText: undefined,
@@ -111,6 +106,16 @@ const props = withDefaults(defineProps<{
 const slots = useSlots()
 const toggleStore = useToggleStore()
 
+const reviewStore = useReviewStore(props.sessionType)
+
+const {
+  currFlashcard,
+  autoPlayVoice,
+  autoRepeatVoice,
+  flashcardFrontSideAudioBlob,
+  flashcardBackSideAudioBlob,
+} = storeToRefs(reviewStore)
+
 const deckReady = ref(false)
 const flashcardWasRemoved = ref(false)
 const audioWasChanged = ref(false)
@@ -118,7 +123,7 @@ const spaceCard = ref<InstanceType<typeof SpaceCard>>()
 const spaceDeckElement = ref<HTMLElement>()
 
 const hasSlot = computed(() => !!slots.default)
-const viewedTimes = computed(() => (flashcard.value?.timesReviewed ?? 0) + 1)
+const viewedTimes = computed(() => (currFlashcard.value?.timesReviewed ?? 0) + 1)
 const emptyMessage = ref(deckEmptyMessage())
 
 const SWIPE_THRESHOLD = 100
@@ -157,10 +162,10 @@ const pullInCardStyle = computed(() => {
 })
 
 function isDeckEmpty() {
-  return !flashcard.value
+  return !currFlashcard.value
 }
 
-watch(flashcard, (newVal) => {
+watch(currFlashcard, (newVal) => {
   if (newVal) {
     lastFlashcard.value = newVal
   }
