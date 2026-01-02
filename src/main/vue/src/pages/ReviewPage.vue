@@ -7,7 +7,6 @@
       'flex-center',
       'scroll-none',
       'touch-none',
-      'review-page--theme',
     ]"
   >
     <ControlBar
@@ -745,11 +744,6 @@ async function handleKeydown(event: KeyboardEvent) {
 </script>
 
 <style scoped>
-.review-page--theme {
-  --r-page--review-count--color: var(--review-page--review-count--color, rgba(17, 33, 85, 0.92));
-  --r-page--review-count--bg: var(--review-page--review-count--border-color, rgb(225, 228, 240));
-}
-
 .review-info {
   display: flex;
   align-items: start;
@@ -798,18 +792,6 @@ async function handleKeydown(event: KeyboardEvent) {
 
 .review-nav--centered {
   justify-content: center;
-}
-
-.review-count {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--r-page--review-count--color);
-  background: var(--r-page--review-count--bg);
-  border-radius: 3px;
-  padding: 2px;
-  width: 50px;
-  height: fit-content;
-  text-align: center;
 }
 
 .decision-button {
