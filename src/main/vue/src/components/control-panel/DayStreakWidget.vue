@@ -27,7 +27,6 @@ const { dayStreak } = storeToRefs(chronoStore)
 <style scoped>
 .day-streak-widget {
   position: relative;
-  display: flex;
   height: 100%;
   width: fit-content;
 }
