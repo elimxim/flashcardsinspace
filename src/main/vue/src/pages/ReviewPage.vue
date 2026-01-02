@@ -57,7 +57,6 @@
           :on-audio-changed="onAudioChanged"
           :flashcard-front-side-audio="flashcardFrontSideAudioBlob"
           :flashcard-back-side-audio="flashcardBackSideAudioBlob"
-          :show-slot="reviewMode.isQuiz()"
           :can-slide-left="canSlideLeft"
           :can-slide-right="canSlideRight"
           :on-slide-left="onSlideLeft"
@@ -76,6 +75,7 @@
             :on-next-round="startNextQuizRound"
             :on-finish="finishReviewAndLeave"
           />
+          <ReviewResult v-else/>
         </SpaceDeck>
         <div v-if="!isTouchDevice" class="review-nav">
           <template v-if="reviewMode.isLightspeed()">
@@ -177,6 +177,7 @@ import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import Starfield from '@/components/Starfield.vue'
 import QuizResult from '@/components/QuizResult.vue'
+import ReviewResult from '@/components/ReviewResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useStopWatch } from '@/utils/stop-watch.ts'
 import { isTouchDevice } from '@/utils/utils.ts'
