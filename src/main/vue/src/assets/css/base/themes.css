@@ -207,8 +207,11 @@
   --main-panel--widget--color--inactive: linear-gradient(135deg, rgb(121, 121, 121) 0%, rgb(64, 64, 64) 100%);
   --main-panel--widget--text--color: rgba(13, 18, 74, 0.6);
   --main-panel--widget--text--color--active: rgba(255, 255, 255, 0.6);
+  --main-panel--widget--text--color--inactive: rgba(255, 255, 255, 0.3);
   --main-panel--widget--border-color: rgba(128, 128, 128, 0.62);
-
+  --control-panel--shadow-color: rgba(0, 0, 0, 0.15);
+  --control-panel--count-box--color: rgba(20, 27, 106, 0.82);
+  --control-panel--count-box--bg: rgba(255, 255, 255, 0.6);
 }
 
 @media (max-width: 400px) {

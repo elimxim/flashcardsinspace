@@ -26,3 +26,23 @@
 .control-panel--widget--text--inactive {
   color: var(--main-panel--widget--text--color--inactive);
 }
+
+.control-panel--widget--text--sub {
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+
+.control-panel--widget--text--nowrap {
+  white-space: nowrap;
+}
+
+.control-panel--count-box {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--control-panel--count-box--color);
+  background: var(--control-panel--count-box--bg);
+  border-radius: 3px;
+  padding: 2px;
+  width: 40px;
+  text-align: center;
+}
