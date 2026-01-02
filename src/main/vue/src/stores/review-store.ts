@@ -2,7 +2,7 @@ import { computed, ref } from 'vue'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { EmptyReviewQueue, ReviewQueue } from '@/core-logic/review-logic.ts'
 import { defineStore } from 'pinia'
-import { fetchFlashcardAudio } from '@/core-logic/flashcard-logic.ts';
+import { fetchFlashcardAudio } from '@/core-logic/flashcard-logic.ts'
 
 export const useReviewStore = (sessionType: string) => {
   const storeId = `review-${sessionType}`
