@@ -32,7 +32,7 @@
       <div class="control-panel-content scrollbar-hidden">
         <WelcomeWidget v-if="!flashcardSet" class="control-welcome"/>
         <template v-else>
-          <FlashcardInfoBar
+          <FlashcardSetInfoBar
             :hidden="!flashcardSet || (sidebarExpandedCookie && !isSidebarOverlay)"
           />
           <MainPanel/>
@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import SideBar from '@/components/control-panel/SideBar.vue'
 import ControlBar from '@/components/ControlBar.vue'
-import FlashcardInfoBar from '@/components/control-panel/FlashcardInfoBar.vue'
+import FlashcardSetInfoBar from '@/components/control-panel/FlashcardSetInfoBar.vue'
 import MainPanel from '@/components/control-panel/MainPanel.vue'
 import LearningStagesWidget from '@/components/control-panel/LearningStagesWidget.vue'
 import OuterSpaceWidget from '@/components/control-panel/OuterSpaceWidget.vue'

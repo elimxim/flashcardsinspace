@@ -73,11 +73,11 @@ const flashcardCount = computed(() => flashcards.value.length)
 }
 
 .flashcards-info-text {
-  font-size: 1rem;
-  font-weight: 400;
+  font-size: 0.85rem;
+  font-weight: 500;
   color: rgba(43, 69, 142, 0.88);
-  word-spacing: 0.05rem;
-  letter-spacing: 0.05rem;
+  word-spacing: 0.02rem;
+  letter-spacing: 0.02rem;
   text-transform: uppercase;
   text-align: center;
   white-space: nowrap;
