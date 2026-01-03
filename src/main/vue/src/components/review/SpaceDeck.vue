@@ -129,8 +129,8 @@ const emptyMessage = ref(deckEmptyMessage())
 const SWIPE_THRESHOLD = 100
 const SWIPE_VELOCITY_THRESHOLD = 0.3
 const SWIPE_MAX_ROTATION = 5
-const SWIPE_ANIMATION_SPEED = 2
-const SWIPE_ANIMATION_SPEED_SLOW = 0.8
+const SWIPE_ANIMATION_DURATION = 500
+const SWIPE_ANIMATION_DURATION_SLOW = 1000
 
 const swipeOffset = ref(0)
 const fingerOffset = ref(0)
@@ -183,12 +183,8 @@ function getPullInStartOffset(): number {
   return elementWidth + 50
 }
 
-function getAnimationSpeed(): number {
-  return isSlowAnimation.value ? SWIPE_ANIMATION_SPEED_SLOW : SWIPE_ANIMATION_SPEED
-}
-
 function getAnimationDuration(): number {
-  return Math.round(getExitOffset() / getAnimationSpeed())
+  return isSlowAnimation.value ? SWIPE_ANIMATION_DURATION_SLOW : SWIPE_ANIMATION_DURATION
 }
 
 function getInvisibleDuration(direction: 'left' | 'right'): number {
@@ -196,11 +192,14 @@ function getInvisibleDuration(direction: 'left' | 'right'): number {
   if (!el) return getAnimationDuration()
 
   const rect = el.getBoundingClientRect()
-  const distance = direction === 'right'
+  const totalDistance = getExitOffset()
+  const distanceToEdge = direction === 'right'
     ? window.innerWidth - rect.left
     : rect.right
 
-  return Math.round(distance / getAnimationSpeed())
+  // Calculate duration proportionally based on distance ratio
+  const ratio = distanceToEdge / totalDistance
+  return Math.round(getAnimationDuration() * ratio)
 }
 
 function canSwipe() {
