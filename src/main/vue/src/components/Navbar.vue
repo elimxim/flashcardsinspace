@@ -7,7 +7,7 @@
         class="nav-text nav-text--title"
         @click="navigateToControlPanel"
       >
-        Flashcards in Space
+        Flashcards in&nbsp;Space
       </div>
     </div>
 
@@ -242,7 +242,7 @@ onUnmounted(() => {
 
 .nav-text--title {
   font-size: clamp(0.85rem, 2vw, 1.5rem);
-  text-wrap: balance;
+  text-wrap: wrap;
 }
 
 .nav-text--item {
