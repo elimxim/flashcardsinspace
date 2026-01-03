@@ -3,7 +3,7 @@
   Flashcards in Space
 </h1>
 
-[![Deploy](https://github.com/elimxim/flashcardsinspace/actions/workflows/cd.yml/badge.svg)](https://github.com/elimxim/flashcardsinspace/actions/workflows/cd.yml)
+[![Deploy](https://github.com/elimxim/flashcardsinspace/actions/workflows/deploy-release.yml/badge.svg)](https://github.com/elimxim/flashcardsinspace/actions/workflows/deploy-release.yml)
 ![GitHub Issues](https://img.shields.io/github/issues/elimxim/flashcardsinspace)
 ![GitHub Last Commit](https://img.shields.io/github/last-commit/elimxim/flashcardsinspace)
 ![GitHub Repo Size](https://img.shields.io/github/repo-size/elimxim/flashcardsinspace)
