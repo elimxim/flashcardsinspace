@@ -1,11 +1,11 @@
 import { computed, ref } from 'vue'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
-import { EmptyReviewQueue, ReviewQueue } from '@/core-logic/review-logic.ts'
-import { defineStore } from 'pinia'
+import { EmptyReviewQueue, ReviewQueue, ReviewSessionType } from '@/core-logic/review-logic.ts'
+import { defineStore, getActivePinia } from 'pinia'
 import { fetchFlashcardAudio } from '@/core-logic/flashcard-logic.ts'
 
-export const useReviewStore = (sessionType: string) => {
-  const storeId = `review-${sessionType}`
+export const useReviewStore = (sessionType: ReviewSessionType) => {
+  const storeId = buildStoreId(sessionType)
   return defineStore(storeId, () => {
     // state
     const reviewQueue = ref<ReviewQueue>(new EmptyReviewQueue())
@@ -66,16 +66,26 @@ export const useReviewStore = (sessionType: string) => {
       )
     }
 
-    async function prevFlashcard(flashcardSet: FlashcardSet | undefined): Promise<boolean> {
+    async function prevFlashcard(
+      flashcardSet: FlashcardSet | undefined,
+      callback: (success: boolean) => void = () => {},
+    ): Promise<boolean> {
       currFlashcard.value = reviewQueue.value.prev()
       await fetchAudio(flashcardSet)
-      return currFlashcard.value !== undefined
+      const result = currFlashcard.value !== undefined
+      callback(result)
+      return result
     }
 
-    async function nextFlashcard(flashcardSet: FlashcardSet | undefined): Promise<boolean> {
+    async function nextFlashcard(
+      flashcardSet: FlashcardSet | undefined,
+      callback: (success: boolean) => void = () => {},
+    ): Promise<boolean> {
       currFlashcard.value = reviewQueue.value.next()
       await fetchAudio(flashcardSet)
-      return currFlashcard.value !== undefined
+      const result = currFlashcard.value !== undefined
+      callback(result)
+      return result
     }
 
     return {
@@ -93,11 +103,22 @@ export const useReviewStore = (sessionType: string) => {
       noPrevAvailable,
       progress,
 
-      getStoreId: () => storeId,
       resetState,
       fetchAudio,
       prevFlashcard,
       nextFlashcard,
     }
   })()
+}
+
+function buildStoreId(sessionType: string){
+  return `review-${sessionType}`
+}
+
+export function destroyReviewStore(sessionType: ReviewSessionType) {
+  const storeId = buildStoreId(sessionType)
+  const pinia = getActivePinia()
+  if (pinia) {
+    delete pinia.state.value[storeId]
+  }
 }

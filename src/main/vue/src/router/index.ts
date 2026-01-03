@@ -9,7 +9,7 @@ import SignupPage from '@/pages/auth/SignupPage.vue'
 import LoginPage from '@/pages/auth/LoginPage.vue'
 import LogoutPage from '@/pages/auth/LogoutPage.vue'
 import PasswordResetView from '@/pages/auth/PasswordResetView.vue'
-import ReviewPage from '@/pages/ReviewPage.vue'
+import ReviewRouter from '@/components/review/ReviewRouter.vue'
 import LightspeedSchedulePage from '@/pages/LightspeedSchedulePage.vue'
 import { toLearningStages } from '@/core-logic/stage-logic.ts'
 import { loadUserSignedUpFromCookies } from '@/utils/cookies.ts'
@@ -89,7 +89,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/review',
     name: routeNames.review,
-    component: ReviewPage,
+    component: ReviewRouter,
     props: (route) => ({
       sessionType: route.query.sessionType,
       sessionId: parseNumber(route.query.sessionId),
