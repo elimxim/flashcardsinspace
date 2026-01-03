@@ -44,7 +44,7 @@ withDefaults(defineProps<{
 
 <style scoped>
 .launch-button--theme {
-  --awesome-button--icon--size: clamp(40px, 10vw, 70px);
+  --awesome-button--icon--size: 70px;
   --awesome-button--icon--color: var(--cp--text--color);
   --awesome-button--icon--color--hover: var(--cp--text--color--active);
   --awesome-button--icon--color--disabled: var(--cp--text--color);
