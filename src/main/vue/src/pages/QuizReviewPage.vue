@@ -370,8 +370,8 @@ onMounted(async () => {
 })
 
 onUnmounted(async () => {
-  destroyReviewStore(ReviewSessionType.QUIZ)
   finishReview()
+  destroyReviewStore(ReviewSessionType.QUIZ)
   document.removeEventListener('keydown', handleKeydown)
 })
 

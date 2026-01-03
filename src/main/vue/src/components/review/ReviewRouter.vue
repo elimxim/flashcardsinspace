@@ -1,15 +1,12 @@
 <template>
-  <ReviewPage
+  <LightspeedReviewPage
     v-if="reviewMode.isLightspeed()"
-    :session-type="reviewMode.sessionType"
     :session-id="sessionId"
     :stages="stages"
   />
-  <ReviewPage
+  <SpecialReviewPage
     v-else-if="reviewMode.isSpecial()"
-    :session-type="reviewMode.sessionType"
-    :session-id="sessionId"
-    :stages="stages"
+    :review-mode="reviewMode"
   />
   <QuizReviewPage
     v-else-if="reviewMode.isQuiz()"
@@ -19,7 +16,8 @@
 </template>
 
 <script setup lang="ts">
-import ReviewPage from '@/pages/ReviewPage.vue'
+import LightspeedReviewPage from '@/pages/LightspeedReviewPage.vue'
+import SpecialReviewPage from '@/pages/SpecialReviewPage.vue'
 import QuizReviewPage from '@/pages/QuizReviewPage.vue'
 import { Stage } from '@/core-logic/stage-logic.ts'
 import { computed } from 'vue'

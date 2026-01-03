@@ -2,7 +2,7 @@
   <div
     :class="[
       'page',
-      { 'page--bg--light': !reviewMode.isOuterSpace() },
+      'page--bg--light',
       'flex-column',
       'flex-center',
       'scroll-none',
@@ -15,9 +15,9 @@
       :center-title-padding="100"
       center-title
     >
-      <template v-if="reviewMode.topic" #left>
+      <template #left>
         <div class="review-mode">
-          {{ reviewMode.topic }}
+          {{ ReviewSessionType.LIGHTSPEED }}
         </div>
       </template>
       <template #right>
@@ -31,13 +31,6 @@
       </template>
     </ControlBar>
     <div class="review-layout">
-      <Starfield
-        v-if="reviewMode.isOuterSpace()"
-        :density="120"
-        :star-size="1.8"
-        twinkle
-        vertical-drift="3px"
-      />
       <div class="review-progressbar">
         <Progressbar
           :progress="progress"
@@ -55,79 +48,34 @@
       <div class="review-body">
         <SpaceDeck
           ref="spaceDeck"
-          :session-type="reviewMode.sessionType"
+          :session-type="ReviewSessionType.LIGHTSPEED"
           :on-flashcard-removed="onFlashcardRemoved"
           :on-audio-changed="onAudioChanged"
-          :can-slide-left="canSlideLeft"
-          :can-slide-right="canSlideRight"
-          :on-slide-left="onSlideLeft"
-          :on-slide-right="onSlideRight"
-          :swipe-left-text="swipeLeftText"
-          :swipe-right-text="swipeRightText"
+          :can-slide-left="!noNextAvailable"
+          :can-slide-right="!noNextAvailable"
+          :on-slide-left="stageDown"
+          :on-slide-right="stageUp"
+          swipe-left-text="Don't know"
+          swipe-right-text="Know"
         >
           <ReviewResult/>
         </SpaceDeck>
         <div v-if="!isTouchDevice" class="review-nav">
-          <template v-if="reviewMode.isLightspeed()">
-            <SmartButton
-              text="Don't know"
-              class="decision-button dangerous-button"
-              :disabled="noNextAvailable"
-              :hidden="noNextAvailable"
-              :on-click="spaceDeck?.slideLeft"
-              auto-blur
-              rounded
-            />
-            <SmartButton
-              text="Know"
-              class="decision-button safe-button"
-              :disabled="noNextAvailable"
-              :hidden="noNextAvailable"
-              :on-click="spaceDeck?.slideRight"
-              auto-blur
-              rounded
-            />
-          </template>
-          <template v-if="reviewMode.isSpecial()">
-            <SmartButton
-              class="calm-button"
-              text="Prev"
-              :disabled="noPrevAvailable"
-              :on-click="spaceDeck?.slideLeft"
-              auto-blur
-              rounded
-            />
-            <SmartButton
-              v-if="reviewMode.isOuterSpace()"
-              class="decision-button dangerous-button"
-              text="Move back"
-              :disabled="noNextAvailable"
-              :hidden="noNextAvailable"
-              :on-click="moveBack"
-              :hold-time="1.2"
-              auto-blur
-              rounded
-            />
-            <SmartButton
-              class="calm-button"
-              text="Next"
-              :disabled="noNextAvailable"
-              :on-click="spaceDeck?.slideRight"
-              auto-blur
-              rounded
-            />
-          </template>
-        </div>
-        <div
-          v-else-if="isTouchDevice && reviewMode.isOuterSpace()"
-          class="review-nav review-nav--centered"
-        >
           <SmartButton
+            text="Don't know"
             class="decision-button dangerous-button"
-            text="Move back"
             :disabled="noNextAvailable"
-            :on-click="moveBack"
-            :hold-time="1.2"
+            :hidden="noNextAvailable"
+            :on-click="spaceDeck?.slideLeft"
+            auto-blur
+            rounded
+          />
+          <SmartButton
+            text="Know"
+            class="decision-button safe-button"
+            :disabled="noNextAvailable"
+            :hidden="noNextAvailable"
+            :on-click="spaceDeck?.slideRight"
             auto-blur
             rounded
           />
@@ -145,7 +93,6 @@ import SpaceDeck from '@/components/review/SpaceDeck.vue'
 import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
-import Starfield from '@/components/Starfield.vue'
 import ReviewResult from '@/components/review/ReviewResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useStopWatch } from '@/utils/stop-watch.ts'
@@ -153,24 +100,12 @@ import { isTouchDevice } from '@/utils/utils.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
-import {
-  nextStage,
-  prevStage,
-  Stage,
-  learningStages,
-} from '@/core-logic/stage-logic.ts'
+import { nextStage, prevStage, Stage, } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
-import {
-  createReviewQueue,
-  createReviewQueueForStages,
-  determineReviewMode,
-  reviewSessionTypeToSpecialStage,
-} from '@/core-logic/review-logic.ts'
+import { createReviewQueue, ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
-import {
-  loadSelectedSetIdFromCookies,
-} from '@/utils/cookies.ts'
+import { loadSelectedSetIdFromCookies, } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { loadFlashcardRelatedStoresById } from '@/utils/stores.ts'
@@ -193,7 +128,6 @@ import { userApiErrors } from '@/api/user-api-error.ts'
 import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
 
 const props = defineProps<{
-  sessionType?: string,
   sessionId?: number,
   stages: Stage[],
 }>()
@@ -207,8 +141,7 @@ const flashcardStore = useFlashcardStore()
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
 
-const reviewMode = computed(() => determineReviewMode(props.sessionType, props.stages))
-const reviewStore = useReviewStore(reviewMode.value.sessionType)
+const reviewStore = useReviewStore(ReviewSessionType.LIGHTSPEED)
 
 const {
   reviewQueue,
@@ -218,7 +151,6 @@ const {
   flashcardsSeen,
   progress,
   noNextAvailable,
-  noPrevAvailable,
 } = storeToRefs(reviewStore)
 
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
@@ -231,36 +163,11 @@ const incorrectFlashcards = ref<Flashcard[]>([])
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
-const canSlideLeft = computed(() => {
-  if (reviewMode.value.isLightspeed()) {
-    return !noNextAvailable.value
-  } else {
-    return !noPrevAvailable.value
-  }
-})
-
-const canSlideRight = computed(() => {
-  return !noNextAvailable.value
-})
-
 async function startReview() {
-  Log.log(LogTag.LOGIC, `Starting review: ${JSON.stringify(reviewMode.value)}`)
-  if (reviewMode.value.isLightspeed()) {
-    reviewQueue.value = createReviewQueue(flashcards.value, currDay.value, chronodays.value)
-  } else if (reviewMode.value.isSpecial()) {
-    const stage = reviewSessionTypeToSpecialStage(reviewMode.value.sessionType)
-    if (stage) {
-      reviewQueue.value = createReviewQueueForStages(flashcards.value, [stage], currDay.value)
-    }
-  } else {
-    reviewQueue.value = createReviewQueueForStages(flashcards.value, props.stages, currDay.value)
-  }
-
+  Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.LIGHTSPEED}`)
+  reviewQueue.value = createReviewQueue(flashcards.value, currDay.value, chronodays.value)
   flashcardsTotal.value = reviewQueue.value.remaining()
-  if (reviewMode.value.isLightspeed()) {
-    await createReviewSession()
-  }
-
+  await createReviewSession()
   await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
     if (success) startWatch()
   })
@@ -275,12 +182,10 @@ function resetState() {
 }
 
 async function finishReview() {
-  Log.log(LogTag.LOGIC, `Finishing review: ${JSON.stringify(reviewMode.value)}`)
+  Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
   resetState()
-  if (flashcardSet.value) {
-    if (noNextAvailable.value && reviewMode.value.isLightspeed()) {
-      await markDaysAsCompleted(flashcardSet.value)
-    }
+  if (flashcardSet.value && noNextAvailable.value) {
+    await markDaysAsCompleted(flashcardSet.value)
   } else {
     Log.error(LogTag.LOGIC, 'Couldn\'t gracefully finish review: FlashcardSet is undefined')
   }
@@ -314,55 +219,6 @@ async function stageUp() {
   }
 }
 
-async function prev() {
-  if (noPrevAvailable.value) return
-  await reviewStore.prevFlashcard(flashcardSet.value)
-}
-
-async function next() {
-  if (noNextAvailable.value) return
-  await reviewStore.nextFlashcard(flashcardSet.value)
-}
-
-async function onSlideLeft() {
-  if (reviewMode.value.isLightspeed()) await stageDown()
-  else if (reviewMode.value.isSpecial()) await prev()
-}
-
-async function onSlideRight() {
-  if (reviewMode.value.isLightspeed()) await stageUp()
-  else if (reviewMode.value.isSpecial()) await next()
-}
-
-const swipeLeftText = computed(() => {
-  if (reviewMode.value.isLightspeed()) return 'Don\'t know'
-  if (reviewMode.value.isSpecial()) return 'Prev'
-  return undefined
-})
-
-const swipeRightText = computed(() => {
-  if (reviewMode.value.isLightspeed()) return 'Know'
-  if (reviewMode.value.isSpecial()) return 'Next'
-  return undefined
-})
-
-async function moveBack() {
-  if (!flashcardSet.value || !currFlashcard.value) {
-    Log.error(LogTag.LOGIC, `moveBack is impossible:`,
-      `FlashcardSet.id=${flashcardSet.value?.id ?? 'undefined'}`,
-      `current Flashcard.id=${currFlashcard.value?.id ?? 'undefined'}`
-    )
-    return
-  }
-  const flashcard = copyFlashcard(currFlashcard.value)
-  updateFlashcard(flashcard, learningStages.S1, currDay.value.chronodate)
-  const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
-  if (success) {
-    await spaceDeck.value?.animateOutLeft(true)
-    await reviewStore.nextFlashcard(flashcardSet.value)
-  }
-}
-
 async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flashcard): Promise<boolean> {
   return await sendFlashcardUpdateRequest(flashcardSet.id, flashcard)
     .then((response) => {
@@ -378,9 +234,9 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
 }
 
 async function getNextAndMarkDays(flashcardSet: FlashcardSet) {
-  if (await reviewStore.nextFlashcard(flashcardSet) && reviewMode.value.isLightspeed()) {
+  if (await reviewStore.nextFlashcard(flashcardSet)) {
     await markDaysAsInProgress(flashcardSet)
-  } else if (reviewMode.value.isLightspeed()) {
+  } else {
     await markDaysAsCompleted(flashcardSet)
   }
 }
@@ -432,16 +288,13 @@ function onAudioChanged() {
 }
 
 watch(currFlashcard, async (newVal, oldVal) => {
-  if (!flashcardSet.value || !props.sessionId) return
-  if (oldVal && reviewMode.value.isLightspeed()) {
+  if (oldVal) {
     reviewedFlashcardIds.value.push(oldVal.id)
     await updateReviewSession([oldVal.id])
   }
   if (!newVal) {
     stopWatch()
-    if (reviewMode.value.isLightspeed()) {
-      await updateReviewSession(reviewedFlashcardIds.value, true)
-    }
+    await updateReviewSession(reviewedFlashcardIds.value, true)
   }
 })
 
@@ -449,7 +302,7 @@ async function createReviewSession() {
   if (!flashcardSet.value) return
 
   const request: ReviewSessionCreateRequest = {
-    type: reviewMode.value.sessionType,
+    type: ReviewSessionType.LIGHTSPEED,
     chronodayId: currDay.value.id,
   }
 
@@ -502,8 +355,8 @@ onMounted(async () => {
 })
 
 onUnmounted(async () => {
-  destroyReviewStore(reviewMode.value.sessionType)
   await finishReview()
+  destroyReviewStore(ReviewSessionType.LIGHTSPEED)
   document.removeEventListener('keydown', handleKeydown)
 })
 
@@ -573,10 +426,6 @@ async function handleKeydown(event: KeyboardEvent) {
   width: 100%;
   height: fit-content;
   gap: 10px;
-}
-
-.review-nav--centered {
-  justify-content: center;
 }
 
 .decision-button {
