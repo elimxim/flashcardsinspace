@@ -237,7 +237,7 @@ const fingerProgress = computed(() => {
 })
 
 function onTouchStart(event: TouchEvent) {
-  if (!canSwipe()) return
+  if (isAnimating.value || !canSwipe()) return
 
   // Cancel any ongoing animation and capture current position
   cancelAnimation()
