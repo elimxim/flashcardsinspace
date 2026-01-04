@@ -174,8 +174,7 @@ const incorrectFlashcards = ref<Flashcard[]>([])
 
 async function startReview() {
   Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.QUIZ}`)
-  reviewQueue.value = createReviewQueueForStages(flashcards.value, props.stages, currDay.value)
-  flashcardsTotal.value = reviewQueue.value.remaining()
+  reviewStore.loadState(createReviewQueueForStages(flashcards.value, props.stages, currDay.value))
   quizOverallTotal.value = flashcardsTotal.value
   await loadOrCreateQuizSession()
   await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
@@ -243,13 +242,9 @@ async function startNextQuizRound() {
         }
       })
 
-      const newQueue = new MonoStageReviewQueue(incorrectFlashcards.value)
-      newQueue.shuffle()
-
-      reviewQueue.value = newQueue
+      reviewStore.loadState(new MonoStageReviewQueue(incorrectFlashcards.value))
       quizRound.value = quizRound.value + 1
       incorrectFlashcards.value = []
-      flashcardsTotal.value = reviewQueue.value.remaining()
 
       spaceDeck.value?.setDeckReady()
 
@@ -319,11 +314,9 @@ async function loadQuizSession(sessionId: number) {
       const currRoundFlashcardIdSet = new Set(response.data.metadata?.currRoundFlashcardIds ?? [])
       const currRoundFlashcards = flashcards.value.filter(f => currRoundFlashcardIdSet.has(f.id))
       const flashcardsForReview = currRoundFlashcards.filter(f => !reviewedFlashcardIdSet.has(f.id))
-      flashcardsTotal.value = currRoundFlashcardIdSet.size
       reviewedFlashcardIds.value = [...reviewedFlashcardIdSet]
       incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIdSet.has(f.id))
-      reviewQueue.value = new MonoStageReviewQueue(flashcardsForReview)
-      reviewQueue.value.shuffle()
+      reviewStore.loadState(new MonoStageReviewQueue(flashcardsForReview))
       Log.log(LogTag.LOGIC, `Quiz session ${sessionId} retrieved`)
     })
     .catch((error) => {

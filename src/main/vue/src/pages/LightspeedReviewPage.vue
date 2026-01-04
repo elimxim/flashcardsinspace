@@ -104,7 +104,7 @@ import { nextStage, prevStage, Stage, } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { createReviewQueue, ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
-import { onBeforeRouteLeave, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { loadSelectedSetIdFromCookies, } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
@@ -144,7 +144,7 @@ const { chronodays, currDay } = storeToRefs(chronoStore)
 const reviewStore = useReviewStore(ReviewSessionType.LIGHTSPEED)
 
 const {
-  reviewQueue,
+  reviewStoreLoaded,
   flashcardsTotal,
   currFlashcard,
   flashcardsRemaining,
@@ -165,8 +165,7 @@ const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 async function startReview() {
   Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.LIGHTSPEED}`)
-  reviewQueue.value = createReviewQueue(flashcards.value, currDay.value, chronodays.value)
-  flashcardsTotal.value = reviewQueue.value.remaining()
+  reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value, chronodays.value))
   await createReviewSession()
   await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
     if (success) startWatch()
@@ -182,20 +181,23 @@ function resetState() {
 }
 
 async function finishReview() {
+  if (!reviewStoreLoaded.value) return
   Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
-  resetState()
-  if (flashcardSet.value && noNextAvailable.value) {
-    await markDaysAsCompleted(flashcardSet.value)
-  } else {
-    Log.error(LogTag.LOGIC, 'Couldn\'t gracefully finish review: FlashcardSet is undefined')
+  try {
+    if (flashcardSet.value && noNextAvailable.value) {
+      await markDaysAsCompleted(flashcardSet.value)
+    } else {
+      Log.error(LogTag.LOGIC, 'Couldn\'t gracefully finish review: FlashcardSet is undefined')
+    }
+  } finally {
+    resetState()
   }
 }
 
 async function finishReviewAndLeave() {
-  await finishReview()
-    .then(() =>
-      router.push({ name: routeNames.controlPanel })
-    )
+  await finishReview().then(() =>
+    router.push({ name: routeNames.controlPanel })
+  )
 }
 
 async function stageDown() {
@@ -358,10 +360,6 @@ onUnmounted(async () => {
   await finishReview()
   destroyReviewStore(ReviewSessionType.LIGHTSPEED)
   document.removeEventListener('keydown', handleKeydown)
-})
-
-onBeforeRouteLeave(async () => {
-  await finishReview()
 })
 
 async function handleKeydown(event: KeyboardEvent) {

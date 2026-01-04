@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, readonly, ref } from 'vue'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { EmptyReviewQueue, ReviewQueue, ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { defineStore, getActivePinia } from 'pinia'
@@ -15,6 +15,7 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
     const autoRepeatVoice = ref(false)
     const flashcardFrontSideAudioBlob = ref<Blob>()
     const flashcardBackSideAudioBlob = ref<Blob>()
+    const loaded = ref(false)
 
     // getters
     const flashcardsRemaining = computed(() => {
@@ -47,6 +48,14 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
     })
 
     // actions
+    function loadState(queue: ReviewQueue) {
+      resetState()
+      queue.shuffle()
+      reviewQueue.value = queue
+      flashcardsTotal.value = queue.remaining()
+      loaded.value = true
+    }
+
     function resetState() {
       reviewQueue.value = new EmptyReviewQueue()
       currFlashcard.value = undefined
@@ -55,6 +64,7 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
       autoRepeatVoice.value = false
       flashcardFrontSideAudioBlob.value = undefined
       flashcardBackSideAudioBlob.value = undefined
+      loaded.value = false
     }
 
     async function fetchAudio(flashcardSet: FlashcardSet | undefined) {
@@ -89,7 +99,8 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
     }
 
     return {
-      reviewQueue,
+      reviewQueue: readonly(reviewQueue),
+      reviewStoreLoaded: readonly(loaded),
       flashcardsTotal,
       currFlashcard,
       autoPlayVoice,
@@ -103,6 +114,7 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
       noPrevAvailable,
       progress,
 
+      loadState,
       resetState,
       fetchAudio,
       prevFlashcard,

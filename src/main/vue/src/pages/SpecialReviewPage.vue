@@ -130,11 +130,11 @@ import { isTouchDevice } from '@/utils/utils.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
-import { learningStages } from '@/core-logic/stage-logic.ts'
+import { learningStages, specialStages } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
   createReviewQueueForStages,
-  ReviewMode,
+  ReviewMode, ReviewSessionType,
   reviewSessionTypeToSpecialStage,
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
@@ -165,7 +165,6 @@ const { currDay } = storeToRefs(chronoStore)
 const reviewStore = useReviewStore(props.reviewMode.sessionType)
 
 const {
-  reviewQueue,
   flashcardsTotal,
   currFlashcard,
   flashcardsRemaining,
@@ -180,11 +179,8 @@ const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 async function startReview() {
   Log.log(LogTag.LOGIC, `Starting review: ${props.reviewMode.sessionType}`)
-  const stage = reviewSessionTypeToSpecialStage(props.reviewMode.sessionType)
-  if (stage) {
-    reviewQueue.value = createReviewQueueForStages(flashcards.value, [stage], currDay.value)
-  }
-  flashcardsTotal.value = reviewQueue.value.remaining()
+  const stage = reviewSessionTypeToSpecialStage(props.reviewMode.sessionType) ?? specialStages.UNKNOWN
+  reviewStore.loadState(createReviewQueueForStages(flashcards.value, [stage], currDay.value))
   await reviewStore.nextFlashcard(flashcardSet.value)
   Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
 }
