@@ -137,14 +137,15 @@ const fingerOffset = ref(0)
 const swipeStartX = ref(0)
 const swipeStartY = ref(0)
 const swipeStartTime = ref(0)
-const isSwipeActive = ref(false)
-const isSwiping = ref(false)
-const isAnimating = ref(false)
-const isAnimatingOut = ref(false)
+const swipeStartOffset = ref(0) // Track the offset when touch started
+const isTouching = ref(false) // User has finger on screen
+const isSwiping = ref(false) // User is actively swiping horizontally
+const isAnimating = ref(false) // Programmatic animation in progress
 const isSlowAnimation = ref(false)
 const enterAnimation = ref<'drop-down' | 'zoom-in' | ''>('')
 const isPullingIn = ref(false)
 const lastFlashcard = ref<Flashcard | undefined>(undefined)
+let animationTimeoutId: ReturnType<typeof setTimeout> | null = null
 
 const canShowPullInCard = computed(() => {
   return isDeckEmpty() && !!lastFlashcard.value && deckReady.value
@@ -203,18 +204,26 @@ function getInvisibleDuration(direction: 'left' | 'right'): number {
 }
 
 function canSwipe() {
-  return isTouchDevice && (props.canSlideLeft || props.canSlideRight) && !isAnimatingOut.value && !isAnimating.value
+  return isTouchDevice && (props.canSlideLeft || props.canSlideRight)
+}
+
+function cancelAnimation() {
+  if (animationTimeoutId) {
+    clearTimeout(animationTimeoutId)
+    animationTimeoutId = null
+  }
+  isAnimating.value = false
 }
 
 const cardStyle = computed(() => {
   const rotation = SWIPE_MAX_ROTATION > 0 ? (swipeOffset.value / 200) * SWIPE_MAX_ROTATION : 0
   const transitionDuration = getAnimationDuration()
 
-  if (swipeOffset.value === 0 && !rotation && !isSwipeActive.value && !isAnimatingOut.value) return {}
+  if (swipeOffset.value === 0 && !rotation && !isTouching.value && !isAnimating.value) return {}
 
   return {
     transform: `translateX(${swipeOffset.value}px)${rotation ? ` rotate(${rotation}deg)` : ''}`,
-    transition: isSwipeActive.value ? 'none' : `transform ${transitionDuration}ms cubic-bezier(0.33, 0, 0.2, 1)`,
+    transition: isTouching.value ? 'none' : `transform ${transitionDuration}ms cubic-bezier(0.33, 0, 0.2, 1)`,
   }
 })
 
@@ -229,29 +238,36 @@ const fingerProgress = computed(() => {
 
 function onTouchStart(event: TouchEvent) {
   if (!canSwipe()) return
+
+  // Cancel any ongoing animation and capture current position
+  cancelAnimation()
+  const currentOffset = swipeOffset.value
+
   const touch = event.touches[0]
   swipeStartX.value = touch.clientX
   swipeStartY.value = touch.clientY
-  swipeStartTime.value = Date.now()
+  swipeStartTime.value = performance.now()
+  swipeStartOffset.value = currentOffset // Remember where we started from
+  isTouching.value = true
   isSwiping.value = false
-  isSwipeActive.value = true
-  isAnimatingOut.value = false
   isPullingIn.value = false
-  swipeOffset.value = 0
   fingerOffset.value = 0
+  // Keep swipeOffset at current value - don't reset to 0
 }
 
 function onTouchMove(event: TouchEvent) {
-  if (!canSwipe()) return
+  if (!isTouching.value || !canSwipe()) return
+
   const touch = event.touches[0]
   const deltaX = touch.clientX - swipeStartX.value
   const deltaY = touch.clientY - swipeStartY.value
 
   if (isSwiping.value) {
+    // Already swiping - update position
     if (isPullingIn.value) {
       swipeOffset.value = getPullInStartOffset() + deltaX
     } else {
-      swipeOffset.value = deltaX
+      swipeOffset.value = swipeStartOffset.value + deltaX
     }
     fingerOffset.value = deltaX
     if (event.cancelable) {
@@ -260,106 +276,102 @@ function onTouchMove(event: TouchEvent) {
     return
   }
 
+  // Determine if this is a horizontal swipe
   if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
     isSwiping.value = true
+    fingerOffset.value = deltaX
+
+    // Check if we should start a pull-in gesture
     if (isDeckEmpty() && deltaX < 0 && props.canSlideLeft && lastFlashcard.value) {
       isPullingIn.value = true
       enterAnimation.value = ''
-      const pullInStart = getPullInStartOffset()
-      swipeOffset.value = pullInStart + deltaX
-    } else if (!isPullingIn.value) {
-      swipeOffset.value = deltaX
+      swipeOffset.value = getPullInStartOffset() + deltaX
     } else {
-      const pullInStart = getPullInStartOffset()
-      swipeOffset.value = pullInStart + deltaX
+      swipeOffset.value = swipeStartOffset.value + deltaX
     }
-
-    fingerOffset.value = deltaX
   }
 }
 
 function onTouchEnd(event: TouchEvent) {
+  if (!isTouching.value) return
+
   fingerOffset.value = 0
-  if (!canSwipe()) {
-    isSwipeActive.value = false
+  isTouching.value = false
+
+  if (!canSwipe() || !isSwiping.value) {
+    // No swipe happened - snap back if needed
+    if (swipeOffset.value !== 0) {
+      isAnimating.value = true
+      swipeOffset.value = 0
+      animationTimeoutId = setTimeout(() => {
+        isAnimating.value = false
+      }, getAnimationDuration())
+    }
+    isSwiping.value = false
     isPullingIn.value = false
-    swipeOffset.value = 0
     return
   }
 
   const touch = event.changedTouches[0]
   const deltaX = touch.clientX - swipeStartX.value
-  const deltaTime = Date.now() - swipeStartTime.value
+  const deltaTime = performance.now() - swipeStartTime.value
   const velocity = Math.abs(deltaX) / deltaTime
 
   const meetsThreshold = Math.abs(deltaX) > SWIPE_THRESHOLD || velocity > SWIPE_VELOCITY_THRESHOLD
   const isSwipeLeft = deltaX < 0
   const directionAllowed = isSwipeLeft ? props.canSlideLeft : props.canSlideRight
-  const isValidSwipe = isSwiping.value && meetsThreshold && directionAllowed
+  const isValidSwipe = meetsThreshold && directionAllowed
 
   if (isPullingIn.value) {
-    isSwipeActive.value = false
-
-    const pullInValid = meetsThreshold && props.canSlideLeft
-    if (pullInValid) {
-      isAnimatingOut.value = true
-      requestAnimationFrame(() => {
-        swipeOffset.value = 0
-        setTimeout(() => {
-          isAnimatingOut.value = false
-          isPullingIn.value = false
-          props.onSlideLeft()
-        }, getAnimationDuration())
-      })
+    // Handle pull-in gesture completion
+    isAnimating.value = true
+    if (isValidSwipe) {
+      // Complete the pull-in
+      swipeOffset.value = 0
+      animationTimeoutId = setTimeout(() => {
+        isAnimating.value = false
+        isPullingIn.value = false
+        props.onSlideLeft()
+      }, getAnimationDuration())
     } else {
-      isAnimatingOut.value = true
-      requestAnimationFrame(() => {
-        swipeOffset.value = getPullInStartOffset()
-        setTimeout(() => {
-          isAnimatingOut.value = false
-          isPullingIn.value = false
-          swipeOffset.value = 0
-        }, getAnimationDuration())
-      })
+      // Cancel pull-in - slide back off the screen
+      swipeOffset.value = getPullInStartOffset()
+      animationTimeoutId = setTimeout(() => {
+        isAnimating.value = false
+        isPullingIn.value = false
+        swipeOffset.value = 0
+      }, getAnimationDuration())
     }
-
     isSwiping.value = false
     return
   }
 
   if (isValidSwipe) {
-    isSwipeActive.value = false
-    isAnimatingOut.value = true
+    // Complete the swipe
+    isAnimating.value = true
     const direction = deltaX > 0 ? 'right' : 'left'
     const exitOffset = getExitOffset()
     const invisibleDuration = getInvisibleDuration(direction)
     const offset = deltaX > 0 ? exitOffset : -exitOffset
-    requestAnimationFrame(() => {
-      swipeOffset.value = offset
-      setTimeout(async () => {
-        if (deltaX > 0) {
-          await props.onSlideRight()
-        } else {
-          await props.onSlideLeft()
-        }
-        swipeOffset.value = 0
-        isAnimatingOut.value = false
-        enterAnimation.value = 'zoom-in'
-      }, invisibleDuration)
-    })
-  } else if (isSwiping.value) {
-    isSwipeActive.value = false
-    isAnimatingOut.value = true
-    const snapDuration = getAnimationDuration()
-    requestAnimationFrame(() => {
+
+    swipeOffset.value = offset
+    animationTimeoutId = setTimeout(async () => {
+      if (deltaX > 0) {
+        await props.onSlideRight()
+      } else {
+        await props.onSlideLeft()
+      }
       swipeOffset.value = 0
-      setTimeout(() => {
-        isAnimatingOut.value = false
-      }, snapDuration)
-    })
+      isAnimating.value = false
+      enterAnimation.value = 'zoom-in'
+    }, invisibleDuration)
   } else {
-    isSwipeActive.value = false
+    // Snap back to center
+    isAnimating.value = true
     swipeOffset.value = 0
+    animationTimeoutId = setTimeout(() => {
+      isAnimating.value = false
+    }, getAnimationDuration())
   }
 
   isSwiping.value = false
@@ -406,12 +418,11 @@ async function triggerSlideRight() {
 
 function animateSwipe(direction: 'left' | 'right', onCompleteCallback: () => Promise<void> | void, slow = false): Promise<boolean> {
   return new Promise((resolve) => {
-    if (isAnimating.value) {
+    if (isAnimating.value || isTouching.value) {
       resolve(false)
       return
     }
     isAnimating.value = true
-    isAnimatingOut.value = true
     isSlowAnimation.value = slow
     enterAnimation.value = '' // Stop any zoom-in animation so swipe transform can take effect
 
@@ -421,10 +432,9 @@ function animateSwipe(direction: 'left' | 'right', onCompleteCallback: () => Pro
 
     requestAnimationFrame(() => {
       swipeOffset.value = offset
-      setTimeout(async () => {
+      animationTimeoutId = setTimeout(async () => {
         await onCompleteCallback()
         swipeOffset.value = 0
-        isAnimatingOut.value = false
         isAnimating.value = false
         isSlowAnimation.value = false
         resolve(true)
@@ -434,24 +444,22 @@ function animateSwipe(direction: 'left' | 'right', onCompleteCallback: () => Pro
 }
 
 function animatePullIn(onCompleteCallback: () => void): boolean {
-  if (isAnimating.value) {
+  if (isAnimating.value || isTouching.value) {
     return false
   }
   isAnimating.value = true
   isPullingIn.value = true
   enterAnimation.value = ''
-  isSwipeActive.value = true
 
-  // Start from off-screen right
+  // Start from off-screen right (no transition)
+  isTouching.value = true // Temporarily disable transition
   swipeOffset.value = getPullInStartOffset()
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      isSwipeActive.value = false
-      isAnimatingOut.value = true
+      isTouching.value = false // Re-enable transition
       swipeOffset.value = 0
-      setTimeout(() => {
-        isAnimatingOut.value = false
+      animationTimeoutId = setTimeout(() => {
         isPullingIn.value = false
         isAnimating.value = false
         onCompleteCallback()
