@@ -29,11 +29,17 @@ const attempts = ref(3)
 const ccd = ref<InstanceType<typeof CodeConfirmationDevice>>()
 
 function verifyCode(code: string) {
-  ccd.value?.triggerFailure()
+  setTimeout(() => {
+    ccd.value?.triggerFailure()
+  }, 2000)
 }
 
 function resendCode() {
-  attempts.value = 3
+  setTimeout(() => {
+    attempts.value = 3
+    ccd.value?.triggerIdle()
+  }, 2000)
+
 }
 
 </script>
