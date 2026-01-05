@@ -5,9 +5,9 @@
   >
     <textarea
       v-if="area"
-      v-bind="$attrs"
       ref="textArea"
       v-model="model"
+      v-bind="$attrs"
       style="transition: border-color 0.2s ease-in-out;"
       :type="inputType"
       :toast-type="$props.type"
@@ -15,12 +15,13 @@
     />
     <input
       v-else-if="readonly"
-      v-bind="$attrs"
       ref="readonlyInput"
+      v-model="model"
+      v-bind="$attrs"
       style="transition: border-color 0.2s ease-in-out;"
-      :value="value"
       :type="inputType"
       :placeholder="inputPlaceholder"
+      :readonly="readonly"
     />
     <input
       v-else
@@ -56,13 +57,11 @@ const props = withDefaults(defineProps<{
   area?: boolean
   invalid?: boolean
   readonly?: boolean
-  value?: string
   placeholder?: string
 }>(), {
   area: false,
   invalid: false,
   readonly: false,
-  value: '',
   placeholder: '',
 })
 

@@ -9,12 +9,12 @@
     <SmartInput
       v-if="!isOpen"
       type="text"
-      :value="selectedOptionLabel"
+      v-model="selectedOptionLabel"
       :placeholder="optionPlaceholder"
       :invalid="invalid"
       v-bind="$attrs"
-      readonly
       @click="openDropdown"
+      readonly
     />
     <SmartInput
       v-if="isOpen"
