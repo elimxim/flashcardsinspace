@@ -12,8 +12,10 @@
   >
     <div class="hud-wrapper">
       <CodeConfirmationDevice
+        ref="ccd"
         v-model:attempts="attempts"
-        :verify="verify"
+        :verify-code="verifyCode"
+        :resend-code="resendCode"
       />
     </div>
   </div>
@@ -24,9 +26,14 @@ import CodeConfirmationDevice from '@/components/CodeConfirmationDevice.vue'
 import { ref } from 'vue'
 
 const attempts = ref(3)
+const ccd = ref<InstanceType<typeof CodeConfirmationDevice>>()
 
-function verify(code: string) {
+function verifyCode(code: string) {
+  ccd.value?.triggerFailure()
+}
 
+function resendCode() {
+  attempts.value = 3
 }
 
 </script>

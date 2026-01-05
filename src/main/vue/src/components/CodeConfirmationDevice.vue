@@ -69,7 +69,13 @@
       >
         0
       </button>
-      <div class="empty-slot"></div>
+      <button
+        class="hud-grid-key hud-resend-key"
+        :class="{ 'hud-grid-key--locked': !isOff }"
+        @click="resendCode"
+      >
+        ↻
+      </button>
     </div>
   </div>
 </template>
@@ -85,7 +91,8 @@ const attempts = defineModel<number>('attempts', {
 })
 
 const props = defineProps<{
-  verify: (code: string) => void
+  verifyCode: (code: string) => void
+  resendCode: () => void
 }>()
 
 type HudStatus = 'IDLE' | 'SYNCING' | 'ERROR' | 'SUCCESS' | 'OFF'
@@ -95,6 +102,7 @@ const status = ref<HudStatus>('IDLE')
 let failureTimeout: ReturnType<typeof setTimeout> | null = null
 
 const isLocked = computed(() => status.value !== 'IDLE')
+const isOff = computed(() => status.value === 'OFF')
 
 const pressKey = (val: string) => {
   if (status.value !== 'IDLE') return
@@ -102,13 +110,18 @@ const pressKey = (val: string) => {
     input.value += val
     if (input.value.length === 2) {
       status.value = 'SYNCING'
-      props.verify(input.value)
+      props.verifyCode(input.value)
     }
   }
 }
 
 const clearInput = () => {
   input.value = ''
+}
+
+const resendCode = () => {
+  if (!isOff.value) return
+  props.resendCode()
 }
 
 const triggerSuccess = () => status.value = 'SUCCESS'
@@ -259,13 +272,14 @@ defineExpose({
 }
 
 .hud-display--success {
-  border-color: #4aff44;
+  border-color: rgba(74, 255, 68, 0.8);
 }
 
 .hud-display--error {
-  border-color: #ff4444;
+  border-color: rgba(255, 68, 68, 0.8);
   animation: shake 0.4s ease-in-out;
   pointer-events: none;
+  filter: blur(1px);
 }
 
 .hud-display--off {
@@ -365,7 +379,7 @@ defineExpose({
 .hud-grid-key {
   aspect-ratio: 1;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 50%;
   color: rgba(255, 255, 255, 0.8);
   font-size: 3.5cqb;
@@ -377,28 +391,30 @@ defineExpose({
 }
 
 .hud-grid-key--locked {
+  color: rgba(255, 255, 255, 0.15);
+  border-width: 1px;
   pointer-events: none;
 }
 
 @media (hover: hover) {
-  .hud-grid-key:not(.hud-clear-key):hover {
+  .hud-grid-key:not(.hud-clear-key):not(.hud-resend-key):hover {
     border-color: rgba(255, 255, 255, 0.6);
     background: rgba(255, 255, 255, 0.05);
     color: white;
   }
 }
 
-.hud-grid-key:not(.hud-clear-key):active {
+.hud-grid-key:not(.hud-clear-key):not(.hud-resend-key):active {
   transform: scale(0.9);
   background: #00f2ff;
   border-color: #00f2ff;
   color: black;
   box-shadow: 0 0 3cqb #00f2ff;
 }
-.hud-clear-key {
-  border-color: rgba(255, 255, 255, 0.1);
+
+.hud-clear-key:not(.hud-grid-key--locked) {
   color: #ff9d00;
-  opacity: 0.8;
+  border-color: rgba(255, 157, 0, 0.2);
 }
 
 @media (hover: hover) {
@@ -408,13 +424,32 @@ defineExpose({
   }
 }
 
-
 .hud-clear-key:active {
   transform: scale(0.9);
   background: #ff9d00;
   border-color: #ff9d00;
   color: black;
   box-shadow: 0 0 3cqb #ff9d00;
+}
+
+.hud-resend-key:not(.hud-grid-key--locked) {
+  color: #ff0000;
+  border-color: rgba(255, 0, 0, 0.2);
+}
+
+@media (hover: hover) {
+  .hud-resend-key:hover {
+    border-color: #ff0000;
+    background: rgba(255, 255, 255, 0.02);
+  }
+}
+
+.hud-resend-key:active {
+  transform: scale(0.9);
+  background: #ff0000;
+  border-color: #ff0000;
+  color: black;
+  box-shadow: 0 0 3cqb #ff0000;
 }
 
 @keyframes pulse {
