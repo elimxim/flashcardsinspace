@@ -1,5 +1,5 @@
 <template>
-  <div class="hud hud--theme">
+  <div class="code-hud">
     <div class="glass-glare"/>
     <div class="top-left-edge-highlight"/>
     <div class="bottom-right-edge-highlight"/>
@@ -11,11 +11,11 @@
           :key="i"
           class="dot-indicator"
           :class="{
-          'active': attempts >= i,
-          'locked': attempts < i
+          'dot-indicator--active': attempts >= i,
+          'dot-indicator--locked': attempts < i
         }"></div>
       </div>
-      <div class="hud-display" :class="status.toLowerCase()">
+      <div class="hud-display" :class="`hud-display--${status.toLowerCase()}`">
         <div class="display-header">
           <div class="display-nav-titles">
             <span class="display-title-sub">AUTHORIZATION</span>
@@ -34,88 +34,120 @@
         </div>
 
         <div class="code-field">
-          <div class="fill-bar" :style="{ width: (input.length * 50) + '%' }"></div>
-          <div class="digits-overlay">
-            <span class="digit">{{ input[0] || '*' }}</span>
-            <span class="digit">{{ input[1] || '*' }}</span>
+          <div class="code-progress-bar" :style="{ width: (input.length * 50) + '%' }"/>
+          <div class="code-digits-overlay">
+            <span class="code-digit">{{ input[0] || '*' }}</span>
+            <span class="code-digit">{{ input[1] || '*' }}</span>
           </div>
         </div>
-        <div class="footer-tag">AUTO-SUBMIT ENABLED</div>
+        <div class="display-footer-tag">AUTO-SUBMIT ENABLED</div>
       </div>
     </div>
 
-    <div class="keypad-grid" :class="{ 'locked': status !== 'IDLE' }">
-      <button v-for="n in 9" :key="n" @click="pressKey(n.toString())" class="grid-key">
+    <div class="hud-keypad-grid">
+      <button
+        v-for="n in 9"
+        :key="n"
+        class="hud-grid-key"
+        :class="{ 'hud-grid-key--locked': isLocked }"
+        @click="pressKey(n.toString())"
+      >
         {{ n }}
       </button>
 
-      <button @click="clearInput" class="grid-key clear-key">C</button>
-      <button @click="pressKey('0')" class="grid-key">0</button>
+      <button
+        class="hud-grid-key hud-clear-key"
+        :class="{ 'hud-grid-key--locked': isLocked }"
+        @click="clearInput"
+      >
+        C
+      </button>
+      <button
+        class="hud-grid-key"
+        :class="{ 'hud-grid-key--locked': isLocked }"
+        @click="pressKey('0')"
+      >
+        0
+      </button>
       <div class="empty-slot"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, defineExpose } from 'vue';
+import { ref, defineExpose, computed } from 'vue'
 
-type HUDStatus = 'IDLE' | 'SYNCING' | 'ERROR' | 'SUCCESS' | 'LOCKED';
+const attempts = defineModel<number>('attempts', {
+  required: true,
+  set(value) {
+    return Math.min(value, 3)
+  }
+})
 
-const emit = defineEmits<{
-  (e: 'verify', code: string): void;
-}>();
+const props = defineProps<{
+  verify: (code: string) => void
+}>()
 
-const input = ref<string>('');
-const attempts = ref<number>(3);
-const status = ref<HUDStatus>('IDLE');
+type HudStatus = 'IDLE' | 'SYNCING' | 'ERROR' | 'SUCCESS' | 'OFF'
+
+const input = ref<string>('')
+const status = ref<HudStatus>('IDLE')
+let failureTimeout: ReturnType<typeof setTimeout> | null = null
+
+const isLocked = computed(() => status.value !== 'IDLE')
 
 const pressKey = (val: string) => {
-  if (status.value !== 'IDLE') return;
+  if (status.value !== 'IDLE') return
   if (input.value.length < 2) {
-    input.value += val;
+    input.value += val
     if (input.value.length === 2) {
-      status.value = 'SYNCING';
-      triggerFailure()
-      setTimeout(() => emit('verify', input.value), 800);
+      status.value = 'SYNCING'
+      props.verify(input.value)
     }
   }
-};
+}
 
 const clearInput = () => {
-  input.value = '';
-};
+  input.value = ''
+}
 
-const triggerSuccess = () => status.value = 'SUCCESS';
+const triggerSuccess = () => status.value = 'SUCCESS'
 
 const triggerFailure = () => {
-  attempts.value--;
-  status.value = 'ERROR';
-  setTimeout(() => {
-    if (attempts.value <= 0) {
-      status.value = 'LOCKED';
-    } else {
-      input.value = '';
-      status.value = 'IDLE';
-    }
-  }, 1200);
-};
+  attempts.value--
+  status.value = 'ERROR'
 
-defineExpose({ triggerSuccess, triggerFailure });
+  if (failureTimeout) {
+    clearTimeout(failureTimeout)
+    failureTimeout = null
+  }
+
+  failureTimeout = setTimeout(() => {
+    if (attempts.value <= 0) {
+      status.value = 'OFF'
+    } else {
+      input.value = ''
+      status.value = 'IDLE'
+    }
+    failureTimeout = null
+  }, 500)
+}
+
+defineExpose({
+  triggerSuccess,
+  triggerFailure
+})
+
 </script>
 
 <style scoped>
-.hud--theme {
-  --cyan: #00f2ff;
-  --glass: rgba(255, 255, 255, 0.04);
-}
-
-.hud {
+.code-hud {
   container-type: size;
   position: relative;
   height: 100%;
   aspect-ratio: 8 / 15;
   padding: 6cqb 4cqb;
-  background: var(--glass);
+  background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -155,11 +187,9 @@ defineExpose({ triggerSuccess, triggerFailure });
   border-top: 2px solid rgba(255, 255, 255, 0.6);
   border-left: 2px solid rgba(255, 255, 255, 0.6);
   border-top-left-radius: 44px;
-  mask-image: linear-gradient(to right, white 80%, transparent),
-  linear-gradient(to bottom, white 80%, transparent);
+  mask-image: linear-gradient(to right, white 80%, transparent), linear-gradient(to bottom, white 80%, transparent);
   mask-composite: intersect;
-  -webkit-mask-image: linear-gradient(to right, white 80%, transparent),
-  linear-gradient(to bottom, white 80%, transparent);
+  -webkit-mask-image: linear-gradient(to right, white 80%, transparent), linear-gradient(to bottom, white 80%, transparent);
   -webkit-mask-composite: source-in;
   pointer-events: none;
 }
@@ -175,11 +205,9 @@ defineExpose({ triggerSuccess, triggerFailure });
   border-right: 2px solid rgba(255, 255, 255, 0.6);
   border-bottom-right-radius: 44px;
   pointer-events: none;
-  mask-image: linear-gradient(to left, white 80%, transparent),
-  linear-gradient(to top, white 80%, transparent);
+  mask-image: linear-gradient(to left, white 80%, transparent), linear-gradient(to top, white 80%, transparent);
   mask-composite: intersect;
-  -webkit-mask-image: linear-gradient(to left, white 80%, transparent),
-  linear-gradient(to top, white 80%, transparent);
+  -webkit-mask-image: linear-gradient(to left, white 80%, transparent), linear-gradient(to top, white 80%, transparent);
   -webkit-mask-composite: source-in;
 }
 
@@ -207,12 +235,12 @@ defineExpose({ triggerSuccess, triggerFailure });
   transition: all 0.4s ease;
 }
 
-.dot-indicator.active {
+.dot-indicator--active {
   background: #00f2ff;
   box-shadow: 0 0 2cqb #00f2ff;
 }
 
-.dot-indicator.locked {
+.dot-indicator--locked {
   background: red;
   box-shadow: 0 0 2cqb darkred;
 }
@@ -224,6 +252,25 @@ defineExpose({ triggerSuccess, triggerFailure });
   padding: 3cqb;
   margin-bottom: 5.5cqb;
   border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hud-display--syncing {
+  pointer-events: none;
+}
+
+.hud-display--success {
+  border-color: #4aff44;
+}
+
+.hud-display--error {
+  border-color: #ff4444;
+  animation: shake 0.4s ease-in-out;
+  pointer-events: none;
+}
+
+.hud-display--off {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .display-header {
@@ -253,7 +300,7 @@ defineExpose({ triggerSuccess, triggerFailure });
 .signal-flow {
   display: flex;
   gap: 0.5cqb;
-  color: var(--cyan);
+  color: #00f2ff;
   font-size: 5cqb;
 }
 
@@ -272,7 +319,7 @@ defineExpose({ triggerSuccess, triggerFailure });
   justify-content: center;
 }
 
-.fill-bar {
+.code-progress-bar {
   position: absolute;
   left: 0;
   top: 0;
@@ -281,16 +328,26 @@ defineExpose({ triggerSuccess, triggerFailure });
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.digits-overlay {
-  z-index: 1;
+.code-digits-overlay {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 1.2cqb;
+  align-items: center;
+  justify-content: center;
   font-size: 4.4cqb;
   font-weight: 700;
-  letter-spacing: 2.4cqb;
-  color: var(--cyan);
+  color: #00f2ff;
   text-shadow: 0 0 1.5cqb rgba(0, 242, 255, 0.5);
+  z-index: 1;
 }
 
-.footer-tag {
+.code-digit {
+  width: 4cqb;
+  text-align: center;
+}
+
+.display-footer-tag {
   font-size: 1.5cqb;
   opacity: 0.4;
   margin-top: 1.5cqb;
@@ -299,13 +356,13 @@ defineExpose({ triggerSuccess, triggerFailure });
   letter-spacing: 0.2cqb;
 }
 
-.keypad-grid {
+.hud-keypad-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2.8cqb;
 }
 
-.grid-key {
+.hud-grid-key {
   aspect-ratio: 1;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -319,34 +376,45 @@ defineExpose({ triggerSuccess, triggerFailure });
   justify-content: center;
 }
 
-.grid-key:hover {
-  border-color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
+.hud-grid-key--locked {
+  pointer-events: none;
 }
 
-.grid-key:active {
+@media (hover: hover) {
+  .hud-grid-key:not(.hud-clear-key):hover {
+    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+  }
+}
+
+.hud-grid-key:not(.hud-clear-key):active {
   transform: scale(0.9);
-  background: var(--cyan);
-  border-color: var(--cyan);
+  background: #00f2ff;
+  border-color: #00f2ff;
   color: black;
-  box-shadow: 0 0 3cqb var(--cyan);
+  box-shadow: 0 0 3cqb #00f2ff;
 }
-
-.clear-key {
+.hud-clear-key {
   border-color: rgba(255, 255, 255, 0.1);
   color: #ff9d00;
   opacity: 0.8;
 }
 
-.locked {
-  opacity: 0.5;
-  pointer-events: none;
+@media (hover: hover) {
+  .hud-clear-key:hover {
+    border-color: #ff9d00;
+    background: rgba(255, 255, 255, 0.02);
+  }
 }
 
-.error {
-  border-color: #ff4444;
-  animation: shake 0.4s ease-in-out;
+
+.hud-clear-key:active {
+  transform: scale(0.9);
+  background: #ff9d00;
+  border-color: #ff9d00;
+  color: black;
+  box-shadow: 0 0 3cqb #ff9d00;
 }
 
 @keyframes pulse {
