@@ -39,7 +39,6 @@ function resendCode() {
     attempts.value = 3
     ccd.value?.triggerIdle()
   }, 2000)
-
 }
 
 </script>

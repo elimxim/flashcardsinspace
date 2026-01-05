@@ -134,7 +134,7 @@ import { learningStages, specialStages } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
   createReviewQueueForStages,
-  ReviewMode, ReviewSessionType,
+  ReviewMode,
   reviewSessionTypeToSpecialStage,
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
