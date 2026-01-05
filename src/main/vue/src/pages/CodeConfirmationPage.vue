@@ -11,14 +11,23 @@
     ]"
   >
     <div class="hud-wrapper">
-      <CodeConfirmationDevice/>
+      <CodeConfirmationDevice
+        v-model:attempts="attempts"
+        :verify="verify"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import CodeConfirmationDevice from '@/components/CodeConfirmationDevice.vue'
+import { ref } from 'vue'
 
+const attempts = ref(3)
+
+function verify(code: string) {
+
+}
 
 </script>
 
