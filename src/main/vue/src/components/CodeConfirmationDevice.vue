@@ -49,7 +49,7 @@
         v-for="n in 9"
         :key="n"
         class="hud-grid-key"
-        :class="{ 'hud-grid-key--locked': isLocked }"
+        :class="{ 'hud-grid-key--locked': status !== 'IDLE' }"
         @click="pressKey(n.toString())"
       >
         {{ n }}
@@ -57,21 +57,21 @@
 
       <button
         class="hud-grid-key hud-clear-key"
-        :class="{ 'hud-grid-key--locked': isLocked }"
+        :class="{ 'hud-grid-key--locked': status !== 'IDLE' }"
         @click="clearInput"
       >
         C
       </button>
       <button
         class="hud-grid-key"
-        :class="{ 'hud-grid-key--locked': isLocked }"
+        :class="{ 'hud-grid-key--locked': status !== 'IDLE' }"
         @click="pressKey('0')"
       >
         0
       </button>
       <button
         class="hud-grid-key hud-resend-key"
-        :class="{ 'hud-grid-key--locked': !isOff }"
+        :class="{ 'hud-grid-key--locked': status !== 'OFF' }"
         @click="resendCode"
       >
         ↻
@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineExpose, computed } from 'vue'
+import { ref, defineExpose } from 'vue'
 
 const attempts = defineModel<number>('attempts', {
   required: true,
@@ -101,9 +101,6 @@ const input = ref<string>('')
 const status = ref<HudStatus>('IDLE')
 let failureTimeout: ReturnType<typeof setTimeout> | null = null
 
-const isLocked = computed(() => status.value !== 'IDLE')
-const isOff = computed(() => status.value === 'OFF')
-
 const pressKey = (val: string) => {
   if (status.value !== 'IDLE') return
   if (input.value.length < 2) {
@@ -120,9 +117,13 @@ const clearInput = () => {
 }
 
 const resendCode = () => {
-  if (!isOff.value) return
+  if (status.value !== 'OFF') return
+  status.value = 'SYNCING'
   props.resendCode()
+  clearInput()
 }
+
+const triggerIdle = () => status.value = 'IDLE'
 
 const triggerSuccess = () => status.value = 'SUCCESS'
 
@@ -139,7 +140,7 @@ const triggerFailure = () => {
     if (attempts.value <= 0) {
       status.value = 'OFF'
     } else {
-      input.value = ''
+      clearInput()
       status.value = 'IDLE'
     }
     failureTimeout = null
@@ -147,8 +148,9 @@ const triggerFailure = () => {
 }
 
 defineExpose({
+  triggerIdle,
   triggerSuccess,
-  triggerFailure
+  triggerFailure,
 })
 
 </script>
