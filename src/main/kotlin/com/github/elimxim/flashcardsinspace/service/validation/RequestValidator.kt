@@ -1,9 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service.validation
 
-import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
-import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
-import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
-import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
+import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.security.escapeJava
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.HttpInvalidRequestFieldsException
@@ -137,6 +134,28 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
+    fun validate(request: SendConfirmationCodeRequest): ValidSendConfirmationCodeRequest {
+        validateRequest<SendConfirmationCodeRequest>(request) { violations ->
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
+    fun validate(request: VerifyConfirmationCodeRequest): ValidVerifyConfirmationCodeRequest {
+        validateRequest<VerifyConfirmationCodeRequest>(request) { violations ->
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
     private inline fun <reified T> validateRequest(request: T, ifInvalid: (List<Violation>) -> Unit) {
         val constraintViolations = validator.validate(request)
         if (constraintViolations.isNotEmpty()) {
@@ -246,4 +265,13 @@ fun ReviewSessionUpdateRequest.toValidRequest() = ValidReviewSessionUpdateReques
     flashcardIds = flashcardIds?.map { it.id!!.toLong() }?.toSet() ?: emptySet(),
     finished = finished?.toBoolean() ?: false,
     metadata = metadata ?: emptyMap(),
+)
+
+fun SendConfirmationCodeRequest.toValidRequest() = ValidSendConfirmationCodeRequest(
+    purpose = ConfirmationPurpose.valueOf(purpose!!),
+)
+
+fun VerifyConfirmationCodeRequest.toValidRequest() = ValidVerifyConfirmationCodeRequest(
+    code = code!!,
+    purpose = ConfirmationPurpose.valueOf(purpose!!),
 )

@@ -192,3 +192,21 @@ private fun escapeReviewSessionMetadataValue(value: Any): Any {
         else -> value
     }
 }
+
+fun SendConfirmationCodeRequest.normalize() = SendConfirmationCodeRequest(
+    purpose = purpose?.normalize(),
+)
+
+fun SendConfirmationCodeRequest.escapeJava() = SendConfirmationCodeRequest(
+    purpose = purpose?.escapeJava(),
+)
+
+fun VerifyConfirmationCodeRequest.normalize() = VerifyConfirmationCodeRequest(
+    code = code?.normalize(),
+    purpose = purpose?.normalize(),
+)
+
+fun VerifyConfirmationCodeRequest.escapeJava() = VerifyConfirmationCodeRequest(
+    code = code?.escapeJava(),
+    purpose = purpose?.escapeJava(),
+)
