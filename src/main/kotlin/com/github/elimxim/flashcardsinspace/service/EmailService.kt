@@ -1,43 +1,72 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.User
-import jakarta.mail.MessagingException
-import org.springframework.core.io.ClassPathResource
-import org.springframework.mail.javamail.JavaMailSender
-import org.springframework.mail.javamail.MimeMessageHelper
+import com.github.elimxim.flashcardsinspace.entity.ConfirmationPurpose
+import com.github.elimxim.flashcardsinspace.security.maskSecret
+import com.github.elimxim.flashcardsinspace.service.mail.BrevoMailClient
+import com.github.elimxim.flashcardsinspace.service.mail.Mail
+import com.github.elimxim.flashcardsinspace.service.mail.Recipient
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
 
-// todo SMTP server and account
-//@Service
+private val log = LoggerFactory.getLogger(EmailService::class.java)
+
+@Service
 class EmailService(
-    private val mailSender: JavaMailSender,
+    private val mailClient: BrevoMailClient,
     private val templateEngine: TemplateEngine
 ) {
 
-    // todo more logs
-    // todo logo
-    fun sendWelcomeEmail(user: User) {
-        return
-        // fixme
-        val mimeMessage = mailSender.createMimeMessage()
+    fun sendWelcomeEmail(recipient: Recipient) {
+        log.info("Sending welcome email to ${maskSecret(recipient.email)}")
         try {
-            val helper = MimeMessageHelper(mimeMessage, true, "UTF-8")
-            helper.setTo(user.email)
-            helper.setSubject("Welcome to Flashcards from Space!")
-
-            val context = Context()
-            context.setVariable("name", user.getUsername())
+            val context = Context().apply {
+                setVariable("name", recipient.name)
+            }
 
             val htmlContent = templateEngine.process("welcome-email", context)
-            helper.setText(htmlContent, true)
 
-            helper.addInline("logo", ClassPathResource("static/images/logo.svg"))
+            mailClient.send(
+                recipient = recipient,
+                mail = Mail(subject = "Welcome to Flashcards from Space!", httpContent = htmlContent)
+            )
+            log.info("Welcome email sent to ${maskSecret(recipient.email)}")
+        } catch (e: Exception) {
+            log.error("Failed to send welcome email to ${maskSecret(recipient.email)}", e)
+        }
+    }
 
-            mailSender.send(mimeMessage)
-        } catch (e: MessagingException) {
-            // todo log and handle (retry?)
+    fun sendConfirmationCodeEmail(recipient: Recipient, code: String, purpose: ConfirmationPurpose) {
+        log.info("Sending confirmation code to ${maskSecret(recipient.email)}, purpose: $purpose")
+        try {
+            val context = Context().apply {
+                setVariable("code", code)
+                setVariable("purpose", purpose.name)
+                setVariable("purposeDescription", getPurposeDescription(purpose))
+            }
+            val htmlContent = templateEngine.process("confirmation-code-email", context)
+
+            mailClient.send(
+                recipient = recipient,
+                mail = Mail(getSubjectForPurpose(purpose), httpContent = htmlContent)
+            )
+            log.info("Confirmation code email sent to ${maskSecret(recipient.email)}")
+        } catch (e: Exception) {
+            log.error("Failed to send confirmation code email to ${maskSecret(recipient.email)}", e)
+            throw e
+        }
+    }
+
+    private fun getSubjectForPurpose(purpose: ConfirmationPurpose): String {
+        return when (purpose) {
+            ConfirmationPurpose.EMAIL_VERIFICATION -> "Verify Your Email - Flashcards in Space"
+        }
+    }
+
+    private fun getPurposeDescription(purpose: ConfirmationPurpose): String {
+        return when (purpose) {
+            ConfirmationPurpose.EMAIL_VERIFICATION -> "verify your email address"
         }
     }
 }
