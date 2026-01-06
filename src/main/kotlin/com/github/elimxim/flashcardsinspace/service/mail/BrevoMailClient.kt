@@ -17,8 +17,8 @@ class MailClientException(cause: Exception) : RuntimeException(cause)
 data class Recipient(val email: String, val name: String)
 
 sealed class Mail(val subject: String, val httpContent: String) {
-    class WelcomeMail(subject: String, content: String) : Mail(subject, content)
-    class SecurityMail(subject: String, content: String) : Mail(subject, content)
+    class WelcomeMail(subject: String, httpContent: String) : Mail(subject, httpContent)
+    class SecurityMail(subject: String, httpContent: String) : Mail(subject, httpContent)
 }
 
 @Service
