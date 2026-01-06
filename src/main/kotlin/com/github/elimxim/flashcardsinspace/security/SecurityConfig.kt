@@ -2,6 +2,8 @@ package com.github.elimxim.flashcardsinspace.security
 
 import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
 import com.github.elimxim.flashcardsinspace.web.filter.RequestLoggingFilter
+import io.hawt.springboot.HawtioEndpoint
+import org.jolokia.support.spring.actuator.JolokiaEndpoint
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
 import org.springframework.boot.actuate.health.HealthEndpoint
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -66,6 +68,12 @@ class SecurityConfig(
                     channel
                         .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).requiresInsecure()
                         .anyRequest().requiresSecure()
+                }
+            } else {
+                http.authorizeHttpRequests { auth ->
+                    auth
+                        .requestMatchers(EndpointRequest.to(HawtioEndpoint::class.java)).permitAll()
+                        .requestMatchers(EndpointRequest.to(JolokiaEndpoint::class.java)).permitAll()
                 }
             }
 

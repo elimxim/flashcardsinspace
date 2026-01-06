@@ -48,6 +48,8 @@ dependencies {
     implementation("org.liquibase:liquibase-core")
     implementation("com.brevo:brevo:1.1.0")
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
+    implementation("io.hawt:hawtio-springboot:4.2.0")
+    implementation("org.jolokia:jolokia-core:1.7.2")
 
     runtimeOnly("org.postgresql:postgresql")
 
