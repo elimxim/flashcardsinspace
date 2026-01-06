@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Confirmation Code</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; padding: 20px;">
+
+<div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    <div style="text-align: center;">
+        <h1 style="color: #4A90E2;">Your Confirmation Code</h1>
+    </div>
+
+    <p>You requested to <span th:text="${purposeDescription}">verify your email</span>. Use the following code to
+        complete the process:</p>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <div style="display: inline-block; background: linear-gradient(135deg, #4A90E2, #357ABD); color: white; font-size: 48px; font-weight: bold; padding: 20px 40px; border-radius: 10px; letter-spacing: 10px; font-family: 'Courier New', monospace;">
+            <span th:text="${code}">42</span>
+        </div>
+    </div>
+
+    <p style="text-align: center; color: #666; font-size: 14px;">This code will expire in 10 minutes.</p>
+
+    <p>If you didn't request this code, you can safely ignore this email. Someone might have entered your email address
+        by mistake.</p>
+
+    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+
+    <p style="color: #999; font-size: 12px; text-align: center;">
+        This is an automated message from Flashcards in Space.<br>
+        Please do not reply to this email.
+    </p>
+</div>
+
+</body>
+</html>
+
