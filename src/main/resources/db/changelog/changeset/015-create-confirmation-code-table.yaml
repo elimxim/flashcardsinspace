@@ -58,9 +58,9 @@ databaseChangeLog:
                     validateForeignKey: true
         - createIndex:
             tableName: confirmation_code
-            indexName: idx_confirmation_code_user_id
+            indexName: idx_confirmation_code_email_purpose
             columns:
               - column:
-                  name: user_id
+                  name: email
               - column:
                   name: purpose

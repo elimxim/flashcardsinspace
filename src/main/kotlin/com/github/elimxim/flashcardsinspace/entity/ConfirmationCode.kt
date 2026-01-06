@@ -35,7 +35,7 @@ open class ConfirmationCode(
     @Column(nullable = true)
     open var lastUpdatedAt: ZonedDateTime? = null,
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     open var user: User? = null,
 )

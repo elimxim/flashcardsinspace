@@ -294,15 +294,24 @@ data class ValidReviewSessionUpdateRequest(
 class SendConfirmationCodeRequest(
     @field:NotNull
     @field:NotBlank
+    @field:Email
+    var email: String? = null,
+    @field:NotNull
+    @field:NotBlank
     @field:ValidConfirmationPurpose
     var purpose: String? = null,
 )
 
 data class ValidSendConfirmationCodeRequest(
+    val email: String,
     val purpose: ConfirmationPurpose,
 )
 
 class VerifyConfirmationCodeRequest(
+    @field:NotNull
+    @field:NotBlank
+    @field:Email
+    var email: String? = null,
     @field:NotNull
     @field:NotBlank
     @field:Pattern(regexp = "^\\d+$")
@@ -314,6 +323,7 @@ class VerifyConfirmationCodeRequest(
 )
 
 data class ValidVerifyConfirmationCodeRequest(
+    val email: String,
     val code: String,
     val purpose: ConfirmationPurpose,
 )

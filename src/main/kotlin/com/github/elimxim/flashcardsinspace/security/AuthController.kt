@@ -1,12 +1,12 @@
 package com.github.elimxim.flashcardsinspace.security
 
-import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
-import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
-import com.github.elimxim.flashcardsinspace.web.dto.UserDto
-import com.github.elimxim.flashcardsinspace.web.dto.toDto
+import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.util.withLoggingContext
+import com.github.elimxim.flashcardsinspace.web.dto.*
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*
 class AuthController(
     private val authService: AuthService,
     private val jwtService: JwtService,
+    private val confirmationCodeService: ConfirmationCodeService,
 ) {
     @PostMapping("/signup")
     fun signup(
@@ -55,5 +56,23 @@ class AuthController(
             // consider it as expired - 401
             ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
         }
+    }
+
+    @PostMapping("/send-code")
+    fun sendConfirmationCode(
+        @AuthenticationPrincipal user: User?,
+        @RequestBody request: SendConfirmationCodeRequest,
+    ): ResponseEntity<Unit> = withLoggingContext(user) {
+        confirmationCodeService.generateAndSend(user, request)
+        return ResponseEntity.ok().build()
+    }
+
+    @PutMapping("/verify-code")
+    fun verifyConfirmationCode(
+        @AuthenticationPrincipal user: User?,
+        @RequestBody request: VerifyConfirmationCodeRequest,
+    ): ResponseEntity<VerifyConfirmationCodeResponse> = withLoggingContext(user) {
+        val response = confirmationCodeService.verify(user, request)
+        return ResponseEntity.ok(response)
     }
 }
