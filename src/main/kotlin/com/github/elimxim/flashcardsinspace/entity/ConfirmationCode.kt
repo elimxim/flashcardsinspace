@@ -42,8 +42,5 @@ open class ConfirmationCode(
 
 enum class ConfirmationPurpose {
     EMAIL_VERIFICATION,
-    EMAIL_CHANGE,
-    PASSWORD_RESET,
-    ACCOUNT_DELETION
 }
 
