@@ -129,8 +129,8 @@ class AuthService(
         }
 
         if (!jwtService.isTokenValid(refreshToken, user)) {
-            log.error("Invalid refresh token for user {}", email)
-            throw IllegalArgumentException("Invalid refresh token")
+            log.info("Invalid/Expired refresh token for user {}", email)
+            return null
         }
 
         return user
