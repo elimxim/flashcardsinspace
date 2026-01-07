@@ -156,6 +156,17 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
+    fun validate(request: ConfirmationCodeTestRequest): ValidConfirmationCodeTestRequest {
+        validateRequest<ConfirmationCodeTestRequest>(request) { violations ->
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
     private inline fun <reified T> validateRequest(request: T, ifInvalid: (List<Violation>) -> Unit) {
         val constraintViolations = validator.validate(request)
         if (constraintViolations.isNotEmpty()) {
@@ -275,5 +286,10 @@ fun SendConfirmationCodeRequest.toValidRequest() = ValidSendConfirmationCodeRequ
 fun VerifyConfirmationCodeRequest.toValidRequest() = ValidVerifyConfirmationCodeRequest(
     email = email!!,
     code = code!!,
+    purpose = ConfirmationPurpose.valueOf(purpose!!),
+)
+
+fun ConfirmationCodeTestRequest.toValidRequest() = ValidConfirmationCodeTestRequest(
+    email = email!!,
     purpose = ConfirmationPurpose.valueOf(purpose!!),
 )

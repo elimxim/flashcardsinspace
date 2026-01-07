@@ -210,3 +210,13 @@ fun VerifyConfirmationCodeRequest.escapeJava() = VerifyConfirmationCodeRequest(
     code = code?.escapeJava(),
     purpose = purpose?.escapeJava(),
 )
+
+fun ConfirmationCodeTestRequest.normalize() = ConfirmationCodeTestRequest(
+    email = email?.normalize(),
+    purpose = purpose?.normalize(),
+)
+
+fun ConfirmationCodeTestRequest.escapeJava() = ConfirmationCodeTestRequest(
+    email = email?.escapeJava(),
+    purpose = purpose?.escapeJava(),
+)

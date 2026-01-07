@@ -328,7 +328,23 @@ data class ValidVerifyConfirmationCodeRequest(
     val purpose: ConfirmationPurpose,
 )
 
+class ConfirmationCodeTestRequest(
+    @field:NotNull
+    @field:NotBlank
+    @field:Email
+    var email: String? = null,
+    @field:NotNull
+    @field:NotBlank
+    @field:ValidConfirmationPurpose
+    var purpose: String? = null,
+)
+
+data class ValidConfirmationCodeTestRequest(
+    val email: String,
+    val purpose: ConfirmationPurpose,
+)
+
 data class VerifyConfirmationCodeResponse(
     val result: String,
-    val attemptsRemaining: Int? = null,
+    val attempts: Int? = null,
 )
