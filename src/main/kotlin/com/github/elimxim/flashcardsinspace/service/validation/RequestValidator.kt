@@ -134,8 +134,8 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
-    fun validate(request: SendConfirmationCodeRequest): ValidSendConfirmationCodeRequest {
-        validateRequest<SendConfirmationCodeRequest>(request) { violations ->
+    fun validate(request: ConfirmationCodeRequest): ValidConfirmationCodeRequest {
+        validateRequest<ConfirmationCodeRequest>(request) { violations ->
             throw HttpInvalidRequestFieldsException(
                 fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
@@ -145,8 +145,8 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
-    fun validate(request: VerifyConfirmationCodeRequest): ValidVerifyConfirmationCodeRequest {
-        validateRequest<VerifyConfirmationCodeRequest>(request) { violations ->
+    fun validate(request: ConfirmationCodeVerificationRequest): ValidConfirmationCodeVerificationRequest {
+        validateRequest<ConfirmationCodeVerificationRequest>(request) { violations ->
             throw HttpInvalidRequestFieldsException(
                 fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
@@ -278,12 +278,12 @@ fun ReviewSessionUpdateRequest.toValidRequest() = ValidReviewSessionUpdateReques
     metadata = metadata ?: emptyMap(),
 )
 
-fun SendConfirmationCodeRequest.toValidRequest() = ValidSendConfirmationCodeRequest(
+fun ConfirmationCodeRequest.toValidRequest() = ValidConfirmationCodeRequest(
     email = email!!,
     purpose = ConfirmationPurpose.valueOf(purpose!!),
 )
 
-fun VerifyConfirmationCodeRequest.toValidRequest() = ValidVerifyConfirmationCodeRequest(
+fun ConfirmationCodeVerificationRequest.toValidRequest() = ValidConfirmationCodeVerificationRequest(
     email = email!!,
     code = code!!,
     purpose = ConfirmationPurpose.valueOf(purpose!!),

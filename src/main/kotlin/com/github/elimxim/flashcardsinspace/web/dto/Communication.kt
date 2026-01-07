@@ -291,7 +291,7 @@ data class ValidReviewSessionUpdateRequest(
     val metadata: Map<String, Any>,
 )
 
-class SendConfirmationCodeRequest(
+class ConfirmationCodeRequest(
     @field:NotNull
     @field:NotBlank
     @field:Email
@@ -302,12 +302,12 @@ class SendConfirmationCodeRequest(
     var purpose: String? = null,
 )
 
-data class ValidSendConfirmationCodeRequest(
+data class ValidConfirmationCodeRequest(
     val email: String,
     val purpose: ConfirmationPurpose,
 )
 
-class VerifyConfirmationCodeRequest(
+class ConfirmationCodeVerificationRequest(
     @field:NotNull
     @field:NotBlank
     @field:Email
@@ -322,7 +322,7 @@ class VerifyConfirmationCodeRequest(
     var purpose: String? = null,
 )
 
-data class ValidVerifyConfirmationCodeRequest(
+data class ValidConfirmationCodeVerificationRequest(
     val email: String,
     val code: String,
     val purpose: ConfirmationPurpose,
@@ -344,7 +344,7 @@ data class ValidConfirmationCodeTestRequest(
     val purpose: ConfirmationPurpose,
 )
 
-data class VerifyConfirmationCodeResponse(
+data class ConfirmationCodeResponse(
     val result: String,
     val attempts: Int? = null,
 )

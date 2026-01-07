@@ -61,7 +61,7 @@ class AuthController(
     @PostMapping("/send-code")
     fun sendConfirmationCode(
         @AuthenticationPrincipal user: User?,
-        @RequestBody request: SendConfirmationCodeRequest,
+        @RequestBody request: ConfirmationCodeRequest,
     ): ResponseEntity<Unit> = withLoggingContext(user) {
         confirmationCodeService.generateAndSend(user, request)
         return ResponseEntity.ok().build()
@@ -70,8 +70,8 @@ class AuthController(
     @PostMapping("/verify-code")
     fun verifyConfirmationCode(
         @AuthenticationPrincipal user: User?,
-        @RequestBody request: VerifyConfirmationCodeRequest,
-    ): ResponseEntity<VerifyConfirmationCodeResponse> = withLoggingContext(user) {
+        @RequestBody request: ConfirmationCodeVerificationRequest,
+    ): ResponseEntity<ConfirmationCodeResponse> = withLoggingContext(user) {
         val response = confirmationCodeService.verify(user, request)
         return ResponseEntity.ok(response)
     }
@@ -80,7 +80,7 @@ class AuthController(
     fun testConfirmationCode(
         @AuthenticationPrincipal user: User?,
         @RequestBody request: ConfirmationCodeTestRequest,
-    ): ResponseEntity<VerifyConfirmationCodeResponse> = withLoggingContext(user) {
+    ): ResponseEntity<ConfirmationCodeResponse> = withLoggingContext(user) {
         val response = confirmationCodeService.test(user, request)
         return ResponseEntity.ok(response)
     }

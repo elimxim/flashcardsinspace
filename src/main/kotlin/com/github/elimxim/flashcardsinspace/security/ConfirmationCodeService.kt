@@ -43,7 +43,7 @@ class ConfirmationCodeService(
 ) {
 
     @Transactional
-    fun generateAndSend(user: User?, request: SendConfirmationCodeRequest) {
+    fun generateAndSend(user: User?, request: ConfirmationCodeRequest) {
         log.info("Generating confirmation code, email: ${maskSecret(request.email?.escapeJava())}, purpose: ${request.purpose?.escapeJava()}")
         val validRequest = requestValidator.validate(request)
         generateAndSend(user, validRequest.email, validRequest.purpose)
@@ -76,13 +76,13 @@ class ConfirmationCodeService(
     }
 
     @Transactional
-    fun verify(user: User?, request: VerifyConfirmationCodeRequest): VerifyConfirmationCodeResponse {
+    fun verify(user: User?, request: ConfirmationCodeVerificationRequest): ConfirmationCodeResponse {
         log.info("Verifying confirmation code, email: ${maskSecret(request.email?.escapeJava())}, purpose: ${request.purpose?.escapeJava()}")
         return verify(user, requestValidator.validate(request))
     }
 
     @Transactional
-    fun verify(user: User?, request: ValidVerifyConfirmationCodeRequest): VerifyConfirmationCodeResponse {
+    fun verify(user: User?, request: ValidConfirmationCodeVerificationRequest): ConfirmationCodeResponse {
         val secretEmail = Secret(request.email)
         val lastConfirmationCode = when (val result = getLastValidConfirmationCode(request.email, request.purpose)) {
             is LastValidConfirmationCodeResult.Found -> {
@@ -90,7 +90,7 @@ class ConfirmationCodeService(
             }
 
             is LastValidConfirmationCodeResult.NotFound -> {
-                return VerifyConfirmationCodeResponse(result.verificationResult.name)
+                return ConfirmationCodeResponse(result.verificationResult.name)
             }
         }
 
@@ -101,9 +101,9 @@ class ConfirmationCodeService(
             val attempts = lastConfirmationCode.attempts
             log.info("Invalid code, email: $secretEmail, purpose: ${request.purpose}, attempts remaining: $attempts")
             return if (attempts >= MAX_ATTEMPTS) {
-                VerifyConfirmationCodeResponse(VerificationResult.LOCKED.name)
+                ConfirmationCodeResponse(VerificationResult.LOCKED.name)
             } else {
-                VerifyConfirmationCodeResponse(VerificationResult.INVALID.name, attempts)
+                ConfirmationCodeResponse(VerificationResult.INVALID.name, attempts)
             }
         }
 
@@ -113,29 +113,29 @@ class ConfirmationCodeService(
         confirmationCodeRepository.save(lastConfirmationCode)
         log.info("Confirmation code verified successfully, email: $secretEmail, purpose: ${request.purpose}")
         user?.let { userPostVerifyAction(it, secretEmail, request.purpose) }
-        return VerifyConfirmationCodeResponse(VerificationResult.SUCCESS.name)
+        return ConfirmationCodeResponse(VerificationResult.SUCCESS.name)
     }
 
     @Transactional
-    fun test(user: User?, request: ConfirmationCodeTestRequest): VerifyConfirmationCodeResponse {
+    fun test(user: User?, request: ConfirmationCodeTestRequest): ConfirmationCodeResponse {
         log.info("Testing confirmation code, email: ${maskSecret(request.email?.escapeJava())}, purpose: ${request.purpose?.escapeJava()}")
         return test(user, requestValidator.validate(request))
     }
 
     @Transactional
-    fun test(user: User?, request: ValidConfirmationCodeTestRequest): VerifyConfirmationCodeResponse {
+    fun test(user: User?, request: ValidConfirmationCodeTestRequest): ConfirmationCodeResponse {
         if (request.purpose === ConfirmationPurpose.EMAIL_VERIFICATION && user != null && user.emailVerified) {
-            return VerifyConfirmationCodeResponse(VerificationResult.SUCCESS.name)
+            return ConfirmationCodeResponse(VerificationResult.SUCCESS.name)
         }
 
         return when (val result = getLastValidConfirmationCode(request.email, request.purpose)) {
             is LastValidConfirmationCodeResult.Found -> {
                 log.info("Confirmation code tested successfully, email: ${maskSecret(request.email)}, purpose: ${request.purpose}, attempts: ${result.code.attempts}")
-                VerifyConfirmationCodeResponse(VerificationResult.TESTED.name, result.code.attempts)
+                ConfirmationCodeResponse(VerificationResult.TESTED.name, result.code.attempts)
             }
 
             is LastValidConfirmationCodeResult.NotFound -> {
-                VerifyConfirmationCodeResponse(result.verificationResult.name)
+                ConfirmationCodeResponse(result.verificationResult.name)
             }
         }
     }
