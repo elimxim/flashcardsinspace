@@ -6,6 +6,7 @@ import java.time.ZonedDateTime
 data class UserDto(
     val id: Long,
     val email: String,
+    val emailVerified: Boolean,
     val name: String,
     val roles: List<String>,
     val registeredAt: ZonedDateTime,

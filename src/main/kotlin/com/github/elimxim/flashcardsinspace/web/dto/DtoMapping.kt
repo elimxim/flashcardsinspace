@@ -7,6 +7,7 @@ fun User.toDto() = UserDto(
     id = id,
     name = name,
     email = email,
+    emailVerified = emailVerified,
     roles = roles.split(",").toList(),
     registeredAt = registeredAt,
     timezone = timezone,
