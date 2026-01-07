@@ -16,6 +16,14 @@ export const userApiErrors = {
     title: 'Authentication is not successful',
     message: 'There was a glitch in our identity scanners. Please try to establish a connection again.'
   } as UserApiError,
+  CONFIRMATION_CODE__RESENDING_FAILED: {
+    title: 'Could not resend the confirmation code',
+    message: 'Please try again later.'
+  } as UserApiError,
+  CONFIRMATION_CODE__VERIFICATION_FAILED: {
+    title: 'Could not verify the confirmation code',
+    message: 'Please try again later.'
+  } as UserApiError,
   USER__UNAUTHORIZED: {
     title: 'We couldn\'t recognize you',
     message: 'Please try again later.'

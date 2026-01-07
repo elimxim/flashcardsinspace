@@ -62,3 +62,8 @@ export interface ReviewSessionUpdateRequest {
 export interface FlashcardId {
   id: number
 }
+
+export interface ConfirmationCodeResponse {
+  result: string,
+  attempts?: number,
+}

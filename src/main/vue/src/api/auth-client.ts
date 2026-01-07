@@ -3,6 +3,7 @@ import { User } from '@/model/user.ts'
 import apiClient from '@/api/api-client.ts'
 import { configureDateTransformers } from '@/api/axios-config.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { ConfirmationCodeResponse } from '@/api/communication.ts'
 
 const authClient = axios.create({
   baseURL: '/auth',
@@ -55,5 +56,30 @@ export async function sendWhoAmIRequest() {
   Log.log(LogTag.GET, '/users/me')
   return await apiClient.get<User>('/users/me', {
     validateStatus: () => true,
+  })
+}
+
+export async function sendConfirmationCodeRequest(email: string, purpose: string) {
+  Log.log(LogTag.POST, '/send-code')
+  return await authClient.post('/send-code', {
+    email: email,
+    purpose: purpose,
+  })
+}
+
+export async function sendConfirmationCodeVerificationRequest(email: string, code: string, purpose: string) {
+  Log.log(LogTag.POST, '/verify-code')
+  return await authClient.post<ConfirmationCodeResponse>('/verify-code', {
+    email: email,
+    code: code,
+    purpose: purpose,
+  })
+}
+
+export async function sendConfirmationCodeTestRequest(email: string, purpose: string) {
+  Log.log(LogTag.POST, '/test-code')
+  return await authClient.post<ConfirmationCodeResponse>('/test-code', {
+    email: email,
+    purpose: purpose,
   })
 }
