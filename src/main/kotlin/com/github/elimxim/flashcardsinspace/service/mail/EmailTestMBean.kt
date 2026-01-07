@@ -1,7 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service.mail
 
 import com.github.elimxim.flashcardsinspace.entity.ConfirmationPurpose
-import com.github.elimxim.flashcardsinspace.service.EmailService
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.jmx.export.annotation.ManagedOperation

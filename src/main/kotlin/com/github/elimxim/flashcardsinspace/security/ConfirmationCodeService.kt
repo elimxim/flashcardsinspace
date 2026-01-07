@@ -5,7 +5,7 @@ import com.github.elimxim.flashcardsinspace.entity.ConfirmationPurpose
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.ConfirmationCodeRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
-import com.github.elimxim.flashcardsinspace.service.EmailService
+import com.github.elimxim.flashcardsinspace.service.mail.EmailService
 import com.github.elimxim.flashcardsinspace.service.mail.Recipient
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.*

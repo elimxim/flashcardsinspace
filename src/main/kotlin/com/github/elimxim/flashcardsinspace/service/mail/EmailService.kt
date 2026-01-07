@@ -1,10 +1,7 @@
-package com.github.elimxim.flashcardsinspace.service
+package com.github.elimxim.flashcardsinspace.service.mail
 
 import com.github.elimxim.flashcardsinspace.entity.ConfirmationPurpose
 import com.github.elimxim.flashcardsinspace.security.maskSecret
-import com.github.elimxim.flashcardsinspace.service.mail.BrevoMailClient
-import com.github.elimxim.flashcardsinspace.service.mail.Mail
-import com.github.elimxim.flashcardsinspace.service.mail.Recipient
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.thymeleaf.TemplateEngine
