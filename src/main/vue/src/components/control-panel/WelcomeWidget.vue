@@ -7,8 +7,6 @@
       :text="buttonText()"
       class="welcome-button"
       :on-click="toggleModal"
-      fill-width
-      fill-height
     />
   </div>
 </template>
@@ -47,8 +45,8 @@ function toggleModal() {
 
 <style scoped>
 .welcome-widget {
-  width: 200px;
-  height: 100px;
+  width: 220px;
+  height: fit-content;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -67,11 +65,12 @@ function toggleModal() {
 }
 
 .welcome-button {
-  flex: 1;
   --smart-button--title--font-size: 0.9rem;
   --smart-button--title--letter-spacing: 0.1rem;
   --smart-button--border-radius: 6px;
   --smart-button--bg: #32334a;
   --smart-button--bg--hover: #494a6c;
+  --smart-button--width: 200px;
+  --smart-button--height: 60px;
 }
 </style>
