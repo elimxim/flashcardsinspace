@@ -5,6 +5,8 @@ import com.github.elimxim.flashcardsinspace.entity.ConfirmationPurpose
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.ConfirmationCodeRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
+import com.github.elimxim.flashcardsinspace.service.EmailService
+import com.github.elimxim.flashcardsinspace.service.mail.Recipient
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import org.slf4j.LoggerFactory
@@ -18,6 +20,7 @@ private val log = LoggerFactory.getLogger(ConfirmationCodeService::class.java)
 
 enum class VerificationResult {
     SUCCESS,
+    TESTED,
     INVALID,
     NOT_FOUND,
     LOCKED,
@@ -27,43 +30,49 @@ enum class VerificationResult {
 
 private const val CODE_LENGTH = 2
 private const val MAX_ATTEMPTS = 3
-private const val MAX_CODES_PER_WINDOW = 4
+private const val MAX_CODES_PER_WINDOW = 10
 private val CODE_LIMIT_WINDOW: Duration = Duration.ofMinutes(60)
-private val CODE_EXPIRATION: Duration = Duration.ofMinutes(1) // fixme set 4 days
+private val CODE_EXPIRATION: Duration = Duration.ofMinutes(60 * 24)
 
 @Service
 class ConfirmationCodeService(
     private val confirmationCodeRepository: ConfirmationCodeRepository,
     private val userRepository: UserRepository,
     private val requestValidator: RequestValidator,
+    private val emailService: EmailService,
 ) {
 
     @Transactional
     fun generateAndSend(user: User?, request: SendConfirmationCodeRequest) {
         log.info("Generating confirmation code, email: ${maskSecret(request.email?.escapeJava())}, purpose: ${request.purpose?.escapeJava()}")
-        generateAndSend(user, requestValidator.validate(request))
+        val validRequest = requestValidator.validate(request)
+        generateAndSend(user, validRequest.email, validRequest.purpose)
     }
 
     @Transactional
-    fun generateAndSend(user: User?, request: ValidSendConfirmationCodeRequest) {
-        invalidateExistingCodes(request.email, request.purpose)
+    fun generateAndSend(user: User?, email: String, purpose: ConfirmationPurpose) {
+        invalidateExistingCodes(email, purpose)
 
         val code = generateSecureCode()
         val now = ZonedDateTime.now()
 
         val confirmationCode = ConfirmationCode(
-            email = request.email,
+            email = email,
             code = code,
-            purpose = request.purpose,
+            purpose = purpose,
             createdAt = now,
             expiresAt = now.plus(CODE_EXPIRATION),
             user = user,
         )
 
         confirmationCodeRepository.save(confirmationCode)
-        log.info("Confirmation code was generated, email: ${maskSecret(request.email.escapeJava())}, purpose: ${request.purpose}")
+        log.info("Confirmation code was generated, email: ${maskSecret(email)}, purpose: $purpose")
 
-        // todo send confirmation code email
+        emailService.sendConfirmationCodeEmail(
+            recipient = Recipient(email, user?.name),
+            code = code,
+            purpose = purpose,
+        )
     }
 
     @Transactional
@@ -75,46 +84,26 @@ class ConfirmationCodeService(
     @Transactional
     fun verify(user: User?, request: ValidVerifyConfirmationCodeRequest): VerifyConfirmationCodeResponse {
         val secretEmail = Secret(request.email)
-        val codeLimitWindow = ZonedDateTime.now().minus(CODE_LIMIT_WINDOW)
+        val lastConfirmationCode = when (val result = getLastValidConfirmationCode(request.email, request.purpose)) {
+            is LastValidConfirmationCodeResult.Found -> {
+                result.code
+            }
 
-        val lastConfirmationCodes = confirmationCodeRepository
-            .findByEmailAndPurpose(request.email, request.purpose)
-            .filter { it.createdAt.isAfter(codeLimitWindow) }
-
-        if (lastConfirmationCodes.size >= MAX_CODES_PER_WINDOW) {
-            log.info("Too many confirmation codes generated, email: $secretEmail, purpose: ${request.purpose}")
-            return VerifyConfirmationCodeResponse(VerificationResult.LIMITED.name)
-        }
-
-        val lastConfirmationCode = lastConfirmationCodes
-            .filter { it.usedAt == null }
-            .maxByOrNull { it.createdAt }
-
-        if (lastConfirmationCode == null) {
-            log.info("No valid confirmation code found, email: $secretEmail, purpose: ${request.purpose}")
-            return VerifyConfirmationCodeResponse(VerificationResult.NOT_FOUND.name)
-        }
-
-        if (lastConfirmationCode.expiresAt.isBefore(ZonedDateTime.now())) {
-            log.info("Confirmation code expired, email: $secretEmail, purpose: ${request.purpose}")
-            return VerifyConfirmationCodeResponse(VerificationResult.EXPIRED.name)
-        }
-
-        if (lastConfirmationCode.attempts >= MAX_ATTEMPTS) {
-            log.info("Confirmation code locked, email: $secretEmail, purpose: ${request.purpose}")
-            return VerifyConfirmationCodeResponse(VerificationResult.LOCKED.name, 0)
+            is LastValidConfirmationCodeResult.NotFound -> {
+                return VerifyConfirmationCodeResponse(result.verificationResult.name)
+            }
         }
 
         if (lastConfirmationCode.code != request.code) {
             lastConfirmationCode.attempts++
             lastConfirmationCode.lastUpdatedAt = ZonedDateTime.now()
             confirmationCodeRepository.save(lastConfirmationCode)
-            val attemptsRemaining = MAX_ATTEMPTS - lastConfirmationCode.attempts
-            log.info("Invalid code, email: $secretEmail, purpose: ${request.purpose}, attempts remaining: $attemptsRemaining")
-            return if (attemptsRemaining <= 0) {
-                VerifyConfirmationCodeResponse(VerificationResult.LOCKED.name, 0)
+            val attempts = lastConfirmationCode.attempts
+            log.info("Invalid code, email: $secretEmail, purpose: ${request.purpose}, attempts remaining: $attempts")
+            return if (attempts >= MAX_ATTEMPTS) {
+                VerifyConfirmationCodeResponse(VerificationResult.LOCKED.name)
             } else {
-                VerifyConfirmationCodeResponse(VerificationResult.INVALID.name, attemptsRemaining)
+                VerifyConfirmationCodeResponse(VerificationResult.INVALID.name, attempts)
             }
         }
 
@@ -127,9 +116,77 @@ class ConfirmationCodeService(
         return VerifyConfirmationCodeResponse(VerificationResult.SUCCESS.name)
     }
 
+    @Transactional
+    fun test(user: User?, request: ConfirmationCodeTestRequest): VerifyConfirmationCodeResponse {
+        log.info("Testing confirmation code, email: ${maskSecret(request.email?.escapeJava())}, purpose: ${request.purpose?.escapeJava()}")
+        return test(user, requestValidator.validate(request))
+    }
+
+    @Transactional
+    fun test(user: User?, request: ValidConfirmationCodeTestRequest): VerifyConfirmationCodeResponse {
+        if (request.purpose === ConfirmationPurpose.EMAIL_VERIFICATION && user != null && user.emailVerified) {
+            return VerifyConfirmationCodeResponse(VerificationResult.SUCCESS.name)
+        }
+
+        return when (val result = getLastValidConfirmationCode(request.email, request.purpose)) {
+            is LastValidConfirmationCodeResult.Found -> {
+                log.info("Confirmation code tested successfully, email: ${maskSecret(request.email)}, purpose: ${request.purpose}, attempts: ${result.code.attempts}")
+                VerifyConfirmationCodeResponse(VerificationResult.TESTED.name, result.code.attempts)
+            }
+
+            is LastValidConfirmationCodeResult.NotFound -> {
+                VerifyConfirmationCodeResponse(result.verificationResult.name)
+            }
+        }
+    }
+
+    sealed class LastValidConfirmationCodeResult {
+        data class Found(val code: ConfirmationCode) : LastValidConfirmationCodeResult()
+        data class NotFound(val verificationResult: VerificationResult) : LastValidConfirmationCodeResult()
+    }
+
+    private fun getLastValidConfirmationCode(
+        email: String,
+        purpose: ConfirmationPurpose
+    ): LastValidConfirmationCodeResult {
+        val secretEmail = Secret(email)
+        val codeLimitWindow = ZonedDateTime.now().minus(CODE_LIMIT_WINDOW)
+
+        val lastConfirmationCodes = confirmationCodeRepository
+            .findByEmailAndPurpose(email, purpose)
+            .filter { it.createdAt.isAfter(codeLimitWindow) }
+
+        if (lastConfirmationCodes.size >= MAX_CODES_PER_WINDOW) {
+            log.info("Too many confirmation codes generated, email: $secretEmail, purpose: $purpose")
+            return LastValidConfirmationCodeResult.NotFound(VerificationResult.LIMITED)
+        }
+
+        val lastConfirmationCode = lastConfirmationCodes
+            .filter { it.usedAt == null }
+            .maxByOrNull { it.createdAt }
+
+        if (lastConfirmationCode == null) {
+            log.info("No valid confirmation code found, email: $secretEmail, purpose: $purpose")
+            return LastValidConfirmationCodeResult.NotFound(VerificationResult.NOT_FOUND)
+        }
+
+        if (lastConfirmationCode.expiresAt.isBefore(ZonedDateTime.now())) {
+            log.info("Confirmation code expired, email: $secretEmail, purpose: $purpose")
+            return LastValidConfirmationCodeResult.NotFound(VerificationResult.EXPIRED)
+        }
+
+        if (lastConfirmationCode.attempts >= MAX_ATTEMPTS) {
+            log.info("Confirmation code locked, email: $secretEmail, purpose: $purpose")
+            return LastValidConfirmationCodeResult.NotFound(VerificationResult.LOCKED)
+        }
+
+        return LastValidConfirmationCodeResult.Found(lastConfirmationCode)
+    }
+
     private fun userPostVerifyAction(user: User, secretEmail: Secret, purpose: ConfirmationPurpose) {
         if (purpose == ConfirmationPurpose.EMAIL_VERIFICATION) {
             user.emailVerified = true
+            user.lastUpdatedAt = ZonedDateTime.now()
             log.info("Email $secretEmail verified")
             userRepository.save(user)
         }
