@@ -1,8 +1,11 @@
 package com.github.elimxim.flashcardsinspace.security
 
+import com.github.elimxim.flashcardsinspace.entity.ConfirmationPurpose
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
+import com.github.elimxim.flashcardsinspace.service.EmailService
 import com.github.elimxim.flashcardsinspace.service.LanguageService
+import com.github.elimxim.flashcardsinspace.service.mail.Recipient
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
 import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
@@ -31,6 +34,8 @@ class AuthService(
     private val jwtService: JwtService,
     private val languageService: LanguageService,
     private val requestValidator: RequestValidator,
+    private val emailService: EmailService,
+    private val confirmationCodeService: ConfirmationCodeService,
 ) {
     @Transactional
     fun signUp(request: SignUpRequest): User {
@@ -52,6 +57,7 @@ class AuthService(
 
         val user = User(
             email = request.email,
+            emailVerified = false,
             name = request.name,
             secret = passwordEncoder.encode(request.secret.unmasked()),
             language = language,
@@ -62,6 +68,13 @@ class AuthService(
 
         val savedUser = userRepository.save(user)
         log.info("Signup successful ${user.email} => ${user.id}, timezone: ${user.timezone}")
+
+        emailService.sendWelcomeEmail(recipient = Recipient(user.email, user.name))
+        confirmationCodeService.generateAndSend(
+            savedUser,
+            savedUser.email,
+            purpose = ConfirmationPurpose.EMAIL_VERIFICATION
+        )
 
         return savedUser
     }
