@@ -48,6 +48,7 @@ const routes: RouteRecordRaw[] = [
     component: ControlPanel,
     meta: {
       requiresAuth: true,
+      requiresEmailVerified: true,
     },
   },
   {
@@ -66,6 +67,7 @@ const routes: RouteRecordRaw[] = [
     component: UserPage,
     meta: {
       requiresAuth: true,
+      requiresEmailVerified: true,
     },
   },
   {
@@ -99,6 +101,7 @@ const routes: RouteRecordRaw[] = [
     }),
     meta: {
       requiresAuth: true,
+      requiresEmailVerified: true,
     },
   },
   {
@@ -120,24 +123,52 @@ const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore()
-  const { isAuthenticated } = storeToRefs(authStore)
+  const { isAuthenticated, isEmailVerified } = storeToRefs(authStore)
 
-  if (to.meta.requiresAuth && !isAuthenticated.value) {
-    const isUserSignedUp = loadUserSignedUpFromCookies()
-    if (isUserSignedUp) {
+  if (to.meta.requiresAuth) {
+    const isSignedUp = loadUserSignedUpFromCookies()
+    if (isAuthenticated.value) {
+      if (to.meta.requiresEmailVerified && !isEmailVerified.value) {
+        next({ name: routeNames.codeConfirmation })
+      } else {
+        next()
+      }
+    } else if (isSignedUp) {
       next({ name: routeNames.login })
     } else {
       next({ name: routeNames.signup })
     }
-  } else if (to.name === routeNames.login || to.name === routeNames.signup) {
+    return
+  }
+
+  // auth is not required below
+
+  // goes directly to login/signup pages
+  if (to.name === routeNames.login || to.name === routeNames.signup) {
     if (isAuthenticated.value) {
+      if (isEmailVerified.value) {
+        next({ name: routeNames.user })
+      } else {
+        next({ name: routeNames.codeConfirmation })
+      }
+    } else {
+      next()
+    }
+    return
+  }
+
+  // goes directly to code confirmation page
+  if (to.name === routeNames.codeConfirmation) {
+    if (isEmailVerified.value) {
       next({ name: routeNames.user })
     } else {
       next()
     }
-  } else {
-    next()
+    return
   }
+
+  // other pages are accessible
+  next()
 })
 
 export default router
