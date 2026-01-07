@@ -11,8 +11,8 @@
           :key="i"
           class="dot-indicator"
           :class="{
-          'dot-indicator--active': attempts >= i,
-          'dot-indicator--locked': attempts < i
+            'dot-indicator--active': i > attempts,
+            'dot-indicator--locked': i <= attempts
         }"></div>
       </div>
       <div class="hud-display" :class="`hud-display--${status.toLowerCase()}`">
@@ -71,7 +71,7 @@
       </button>
       <button
         class="hud-grid-key hud-resend-key"
-        :class="{ 'hud-grid-key--locked': status !== 'OFF' }"
+        :class="{ 'hud-grid-key--locked': isResetLocked }"
         @click="resendCode"
       >
         ↻
@@ -81,33 +81,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineExpose } from 'vue'
-
-const attempts = defineModel<number>('attempts', {
-  required: true,
-  set(value) {
-    return Math.min(value, 3)
-  }
-})
+import { ref, defineExpose, nextTick, computed } from 'vue'
 
 const props = defineProps<{
-  verifyCode: (code: string) => void
-  resendCode: () => void
+  attempts: number
+  verifyCode: (code: string) => Promise<void>
+  resendCode: () => Promise<void>
 }>()
 
 type HudStatus = 'IDLE' | 'SYNCING' | 'ERROR' | 'SUCCESS' | 'OFF'
 
 const input = ref<string>('')
+const dirty = ref(false)
 const status = ref<HudStatus>('IDLE')
+
+let successTimeout: ReturnType<typeof setTimeout> | null = null
 let failureTimeout: ReturnType<typeof setTimeout> | null = null
 
-const pressKey = (val: string) => {
+const isResetLocked = computed(() => {
+  return status.value === 'SUCCESS' || status.value !== 'OFF' && dirty.value
+})
+
+const pressKey = async (val: string) => {
+  dirty.value = true
   if (status.value !== 'IDLE') return
   if (input.value.length < 2) {
     input.value += val
     if (input.value.length === 2) {
       status.value = 'SYNCING'
-      props.verifyCode(input.value)
+      await nextTick()
+      await props.verifyCode(input.value)
     }
   }
 }
@@ -116,41 +119,61 @@ const clearInput = () => {
   input.value = ''
 }
 
-const resendCode = () => {
-  if (status.value !== 'OFF') return
+const resendCode = async () => {
+  if (status.value !== 'OFF' && dirty.value) return
   status.value = 'SYNCING'
-  props.resendCode()
+  await nextTick()
+  await props.resendCode()
   clearInput()
 }
 
 const triggerIdle = () => status.value = 'IDLE'
 
-const triggerSuccess = () => status.value = 'SUCCESS'
+const switchOff = () => status.value = 'OFF'
 
-const triggerFailure = () => {
-  attempts.value--
-  status.value = 'ERROR'
+const triggerSuccess = async (): Promise<void> => {
+  return new Promise((resolve) => {
+    status.value = 'SUCCESS'
 
-  if (failureTimeout) {
-    clearTimeout(failureTimeout)
-    failureTimeout = null
-  }
-
-  failureTimeout = setTimeout(() => {
-    if (attempts.value <= 0) {
-      status.value = 'OFF'
-    } else {
-      clearInput()
-      status.value = 'IDLE'
+    if (successTimeout) {
+      clearTimeout(successTimeout)
+      successTimeout = null
     }
-    failureTimeout = null
-  }, 500)
+
+    successTimeout = setTimeout(() => {
+      successTimeout = null
+      resolve(void 0)
+    }, 500)
+  })
+}
+
+const triggerFailure = async (): Promise<void> => {
+  return new Promise((resolve) => {
+    status.value = 'ERROR'
+
+    if (failureTimeout) {
+      clearTimeout(failureTimeout)
+      failureTimeout = null
+    }
+
+    failureTimeout = setTimeout(() => {
+      if (props.attempts >= 3) {
+        status.value = 'OFF'
+      } else {
+        clearInput()
+        status.value = 'IDLE'
+      }
+      failureTimeout = null
+      resolve(void 0)
+    }, 500)
+  })
 }
 
 defineExpose({
   triggerIdle,
   triggerSuccess,
   triggerFailure,
+  switchOff,
 })
 
 </script>
