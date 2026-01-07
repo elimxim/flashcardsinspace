@@ -23,8 +23,10 @@
       The confirmation code has expired.
       Press <em>↻</em> request a new one.
     </p>
-    <p v-else-if="verificationResult === CodeVerificationResult.NOT_FOUND"
-       class="code-instructions">
+    <p
+      v-else-if="verificationResult === CodeVerificationResult.NOT_FOUND"
+      class="code-instructions"
+    >
       No valid confirmation code found.
       Press <em>↻</em> request a new one.
     </p>
@@ -83,7 +85,7 @@ import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { ConfirmationCodeResponse } from '@/api/communication.ts'
 import { useRouter } from 'vue-router'
-import { routeNames } from '@/router';
+import { routeNames } from '@/router'
 
 const router = useRouter()
 const toaster = useSpaceToaster()
