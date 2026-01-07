@@ -14,7 +14,7 @@ private val log = LoggerFactory.getLogger(BrevoMailClient::class.java)
 
 class MailClientException(cause: Exception) : RuntimeException(cause)
 
-data class Recipient(val email: String, val name: String)
+data class Recipient(val email: String, val name: String? = null)
 
 sealed class Mail(val subject: String, val httpContent: String) {
     class WelcomeMail(subject: String, httpContent: String) : Mail(subject, httpContent)
