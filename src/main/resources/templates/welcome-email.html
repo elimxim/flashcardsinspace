@@ -3,27 +3,66 @@
 <head>
     <title>Welcome Aboard!</title>
 </head>
-<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; padding: 20px;">
+<body style="margin: 0; padding: 40px 20px; background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
 
-<div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-    <div style="text-align: center;">
-        <img src="cid:logo" alt="Flashcards from Space Logo" width="150"/>
-        <h1 style="color: #4A90E2;">Welcome to the Mothership, <span th:text="${name}">Earthling</span>!</h1>
+<div style="max-width: 600px; margin: auto;">
+    <!-- Top decorative border -->
+    <div style="height: 40px; background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c); border-radius: 44px 44px 0 0;"></div>
+
+    <!-- Main content container -->
+    <div style="background: #ffffff;">
+        <!-- Header section -->
+        <div style="background: linear-gradient(135deg, #1e1e3f 0%, #2d2d5a 40%, #4a3a7a 70%, #6b4a9a 100%); padding: 20px; text-align: center;">
+            <img src="https://flashcardsinspace.com/logo.png" alt="Flashcards in Space Logo" width="200"/>
+            <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 300; letter-spacing: 1px;">
+                Welcome aboard, <span th:text="${#strings.abbreviate(name, 20)}" style="font-weight: 600; color: #9dcee2;">Earthling</span>!
+            </h1>
+            <p style="margin: 15px 0 0 0; color: #9dcee2; font-size: 14px; letter-spacing: 2px; text-transform: uppercase;">
+                Your journey begins now
+            </p>
+        </div>
+
+        <!-- Body content -->
+        <div style="padding: 40px; color: #374151; font-size: 16px; line-height: 1.7;">
+            <p style="margin: 0 0 20px 0;">
+                We are over the moon to have you! Ready to ignite your brain?.
+            </p>
+
+            <p style="margin: 0 0 20px 0;">
+                Fun fact: astronauts use flashcards to memorize spacecraft procedures. We can't promise you'll end up on Mars, but at least you'll remember why you walked into the kitchen.
+            </p>
+
+            <p style="margin: 0 0 20px 0;">
+                Pro tip: studying in short bursts is more effective than marathon sessions. So go ahead, take that snack break. We won't judge.
+            </p>
+
+            <p style="margin: 0 0 20px 0;">
+                Got questions? Found a bug? Spotted an actual alien? Hit us up anytime. We read every message (yes, even the ones about aliens).
+            </p>
+
+            <p style="margin: 0; font-weight: 500; color: #4A90E2;">
+                Happy studying, and may the knowledge be with you!
+            </p>
+        </div>
+
+        <!-- Signature section -->
+        <div style="padding: 0 40px 35px 40px;">
+            <div style="color: #6b7280; font-size: 15px;">
+                Ad Astra,<br>
+                <span style="font-weight: 600; color: #374151;">The Flashcards in Space Team</span>
+            </div>
+        </div>
     </div>
 
-    <p>We're over the moon to have you join us! You've just taken your first step into a larger world of learning.
-        Prepare for launch, because your journey to mastering new knowledge is about to begin.</p>
+    <!-- Bottom decorative border -->
+    <div style="height: 40px; background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c); border-radius: 0 0 44px 44px;"></div>
 
-    <p>Don't worry! We promise our flashcards are easier to handle than a spaceship's control panel. (And way less
-        likely to accidentally eject you into space.)</p>
-
-    <p>If you have any questions or just want to talk about aliens, feel free to reach out to our support team.</p>
-
-    <p>Happy studying, and may the knowledge be with you!</p>
-
-    <p>Cheers,<br>
-        <b>The Flashcards from Space Crew</b>
-    </p>
+    <!-- Footer -->
+    <div style="padding: 25px; text-align: center;">
+        <p style="margin: 0; color: #9ca3af; font-size: 12px;">
+            &#169; 2026 Flashcards in Space. All rights reserved.
+        </p>
+    </div>
 </div>
 
 </body>
