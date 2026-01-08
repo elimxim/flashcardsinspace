@@ -26,7 +26,7 @@ class EmailService(
 
             mailClient.send(
                 recipient = recipient,
-                mail = Mail.WelcomeMail(subject = "Welcome to Flashcards from Space!", htmlContent = htmlContent)
+                mail = Mail.WelcomeMail(subject = "Welcome to Flashcards in Space!", htmlContent = htmlContent)
             )
             log.info("Welcome email sent to ${maskSecret(recipient.email)}")
         } catch (e: Exception) {
@@ -46,7 +46,7 @@ class EmailService(
 
             mailClient.send(
                 recipient = recipient,
-                mail = Mail.SecurityMail(getSubjectForPurpose(purpose), htmlContent = htmlContent)
+                mail = Mail.SecurityMail(getSubjectForPurpose(purpose), httpContent = htmlContent)
             )
             log.info("Confirmation code email sent to ${maskSecret(recipient.email)}")
         } catch (e: Exception) {
