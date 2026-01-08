@@ -17,9 +17,9 @@ class MailClientException(cause: Exception) : RuntimeException(cause)
 
 data class Recipient(val email: String, val name: String? = null)
 
-sealed class Mail(val subject: String, val httpContent: String) {
-    class WelcomeMail(subject: String, httpContent: String) : Mail(subject, httpContent)
-    class SecurityMail(subject: String, httpContent: String) : Mail(subject, httpContent)
+sealed class Mail(val subject: String, val htmlContent: String) {
+    class WelcomeMail(subject: String, htmlContent: String) : Mail(subject, htmlContent)
+    class SecurityMail(subject: String, htmlContent: String) : Mail(subject, htmlContent)
 }
 
 @Service
@@ -50,7 +50,7 @@ class BrevoMailClient(private val mailProperties: MailProperties) {
                 replyTo = SendSmtpEmailReplyTo()
                     .email(mailProperties.replyToEmail)
                 subject = mail.subject
-                htmlContent = mail.httpContent
+                htmlContent = mail.htmlContent
             }
 
             TransactionalEmailsApi().sendTransacEmail(email)
