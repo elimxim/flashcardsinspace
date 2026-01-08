@@ -66,12 +66,11 @@
 
 <script setup lang="ts">
 import CodeConfirmationDevice from '@/components/CodeConfirmationDevice.vue'
-import SpaceToast from '@/components/SpaceToast.vue'
 import { onMounted, ref } from 'vue'
 import {
   sendConfirmationCodeRequest,
-  sendConfirmationCodeVerificationRequest,
   sendConfirmationCodeTestRequest,
+  sendConfirmationCodeVerificationRequest,
 } from '@/api/auth-client.ts'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { storeToRefs } from 'pinia'
@@ -156,6 +155,10 @@ async function processVerificationResponse(response: ConfirmationCodeResponse) {
       attempts.value = 0
       authStore.setEmailVerified()
       await router.push({ name: routeNames.user })
+      break
+    case CodeVerificationResult.TESTED:
+      verificationResult.value = result
+      attempts.value = response.attempts ?? 0
       break
     default:
       ccd.value?.triggerIdle()
