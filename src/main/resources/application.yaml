@@ -22,14 +22,3 @@ spring:
     time-zone: UTC
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-main.yaml
-#  mail:
-#    host: smtp.gmail.com
-#    port: 587
-#    username:
-#    password:
-#    properties:
-#      mail:
-#        smtp:
-#          auth: true
-#          starttls:
-#            enable: true

@@ -45,6 +45,7 @@
             name="username"
             placeholder="Email"
             :invalid="userEmailInvalid"
+            readonly
           />
         </AwesomeContainer>
         <ErrorText

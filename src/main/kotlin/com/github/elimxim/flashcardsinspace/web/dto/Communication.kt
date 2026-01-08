@@ -1,9 +1,6 @@
 package com.github.elimxim.flashcardsinspace.web.dto
 
-import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
-import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
-import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
-import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
+import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.security.ConfidentialLength
 import com.github.elimxim.flashcardsinspace.security.Password
 import com.github.elimxim.flashcardsinspace.security.RequiredConfidential
@@ -292,4 +289,62 @@ data class ValidReviewSessionUpdateRequest(
     val flashcardIds: Set<Long>,
     val finished: Boolean,
     val metadata: Map<String, Any>,
+)
+
+class ConfirmationCodeRequest(
+    @field:NotNull
+    @field:NotBlank
+    @field:Email
+    var email: String? = null,
+    @field:NotNull
+    @field:NotBlank
+    @field:ValidConfirmationPurpose
+    var purpose: String? = null,
+)
+
+data class ValidConfirmationCodeRequest(
+    val email: String,
+    val purpose: ConfirmationPurpose,
+)
+
+class ConfirmationCodeVerificationRequest(
+    @field:NotNull
+    @field:NotBlank
+    @field:Email
+    var email: String? = null,
+    @field:NotNull
+    @field:NotBlank
+    @field:Pattern(regexp = "^\\d+$")
+    var code: String? = null,
+    @field:NotNull
+    @field:NotBlank
+    @field:ValidConfirmationPurpose
+    var purpose: String? = null,
+)
+
+data class ValidConfirmationCodeVerificationRequest(
+    val email: String,
+    val code: String,
+    val purpose: ConfirmationPurpose,
+)
+
+class ConfirmationCodeTestRequest(
+    @field:NotNull
+    @field:NotBlank
+    @field:Email
+    var email: String? = null,
+    @field:NotNull
+    @field:NotBlank
+    @field:ValidConfirmationPurpose
+    var purpose: String? = null,
+)
+
+data class ValidConfirmationCodeTestRequest(
+    val email: String,
+    val purpose: ConfirmationPurpose,
+)
+
+data class ConfirmationCodeResponse(
+    val result: String,
+    val attempts: Int? = null,
 )

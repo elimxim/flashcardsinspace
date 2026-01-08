@@ -8,8 +8,8 @@
   >
     <SmartInput
       v-if="!isOpen"
+      v-model="selectedOptionLabel"
       type="text"
-      :value="selectedOptionLabel"
       :placeholder="optionPlaceholder"
       :invalid="invalid"
       v-bind="$attrs"

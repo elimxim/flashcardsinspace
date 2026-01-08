@@ -20,6 +20,9 @@ export const useAuthStore = defineStore('auth', {
     isAuthenticated(): boolean {
       return this.user !== undefined
     },
+    isEmailVerified(): boolean {
+      return this.user?.emailVerified ?? false
+    }
   },
   actions: {
     setUser(user: User | undefined) {
@@ -31,5 +34,10 @@ export const useAuthStore = defineStore('auth', {
     hasAccess(role: UserRole): boolean {
       return this.user?.roles.includes(role.toString()) ?? false
     },
+    setEmailVerified() {
+      if (this.user !== undefined) {
+        this.user.emailVerified = true
+      }
+    }
   }
 })

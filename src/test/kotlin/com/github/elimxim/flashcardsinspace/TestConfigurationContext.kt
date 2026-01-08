@@ -51,5 +51,8 @@ class TestConfigurationContext {
     fun reviewSessionRepository() = mockk<ReviewSessionRepository>()
 
     @Bean
+    fun confirmationCodeRepository() = mockk<ConfirmationCodeRepository>()
+
+    @Bean
     fun entityManager() = mockk<EntityManager>()
 }

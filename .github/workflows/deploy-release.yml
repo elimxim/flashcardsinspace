@@ -92,6 +92,10 @@ jobs:
           export APP_DATASOURCE_USERNAME="${{ secrets.APP_DATASOURCE_USERNAME }}"
           export APP_DATASOURCE_PASSWORD="${{ secrets.APP_DATASOURCE_PASSWORD }}"
           export APP_SECURITY_JWT_SECRET="${{ secrets.APP_SECURITY_JWT_SECRET }}"
+          export APP_MAIL_API_KEY="${{ secrets.APP_MAIL_API_KEY }}"
+          export APP_MAIL_SENDER_NAME="${{ secrets.APP_MAIL_SENDER_NAME }}"
+          export APP_MAIL_SENDER_DOMAIN="${{ secrets.APP_MAIL_SENDER_DOMAIN }}"
+          export APP_MAIL_REPLY_TO_EMAIL="${{ secrets.APP_MAIL_REPLY_TO_EMAIL }}"
           
           envsubst < props/application.yaml > application.yaml
 

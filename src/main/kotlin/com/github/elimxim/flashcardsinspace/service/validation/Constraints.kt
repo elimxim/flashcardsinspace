@@ -1,9 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service.validation
 
-import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
-import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
-import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
-import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
+import com.github.elimxim.flashcardsinspace.entity.*
 import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
@@ -227,6 +224,31 @@ class MetadataValidator : ConstraintValidator<ValidMetadata, Map<String, Any>> {
                 k is String && keyPattern.matches(k) && isValidValue(v)
             }
             else -> false
+        }
+    }
+}
+
+@Target(
+    AnnotationTarget.FIELD,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.VALUE_PARAMETER
+)
+@Retention(AnnotationRetention.RUNTIME)
+@Constraint(validatedBy = [ConfirmationPurposeValidator::class])
+annotation class ValidConfirmationPurpose(
+    val message: String = "{jakarta.validation.constraints.confirmationPurpose.invalid.message}",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = [],
+)
+
+class ConfirmationPurposeValidator : ConstraintValidator<ValidConfirmationPurpose, String> {
+    override fun isValid(value: String?, context: ConstraintValidatorContext?): Boolean {
+        if (value == null) return true
+        try {
+            ConfirmationPurpose.valueOf(value)
+            return true
+        } catch (_: IllegalArgumentException) {
+            return false
         }
     }
 }

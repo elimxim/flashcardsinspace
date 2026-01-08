@@ -362,6 +362,7 @@ class LightspeedServiceTest {
         user = User(
             id = 1,
             email = "test@test.com",
+            emailVerified = true,
             name = "Test User",
             secret = "secret",
             roles = "USER",

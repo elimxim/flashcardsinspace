@@ -17,6 +17,9 @@ open class User(
     open var email: String,
 
     @Column(nullable = false)
+    open var emailVerified: Boolean,
+
+    @Column(nullable = false)
     open var name: String,
 
     @Column(nullable = false)
@@ -41,13 +44,7 @@ open class User(
     @JoinColumn(name = "language_id", referencedColumnName = "id")
     open var language: Language,
 
-    @OneToMany(
-        mappedBy = "user",
-        cascade = [CascadeType.ALL],
-        fetch = FetchType.LAZY,
-    )
-    open var flashcardSets: MutableList<FlashcardSet> = mutableListOf(),
-) : UserDetails {
+    ) : UserDetails {
     override fun getAuthorities(): Collection<GrantedAuthority> =
         roles.split(",").map { SimpleGrantedAuthority(it.trim()) }
 

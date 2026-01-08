@@ -1,9 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service.validation
 
-import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
-import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
-import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
-import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
+import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.security.escapeJava
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.HttpInvalidRequestFieldsException
@@ -137,6 +134,39 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
+    fun validate(request: ConfirmationCodeRequest): ValidConfirmationCodeRequest {
+        validateRequest<ConfirmationCodeRequest>(request) { violations ->
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
+    fun validate(request: ConfirmationCodeVerificationRequest): ValidConfirmationCodeVerificationRequest {
+        validateRequest<ConfirmationCodeVerificationRequest>(request) { violations ->
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
+    fun validate(request: ConfirmationCodeTestRequest): ValidConfirmationCodeTestRequest {
+        validateRequest<ConfirmationCodeTestRequest>(request) { violations ->
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
     private inline fun <reified T> validateRequest(request: T, ifInvalid: (List<Violation>) -> Unit) {
         val constraintViolations = validator.validate(request)
         if (constraintViolations.isNotEmpty()) {
@@ -246,4 +276,20 @@ fun ReviewSessionUpdateRequest.toValidRequest() = ValidReviewSessionUpdateReques
     flashcardIds = flashcardIds?.map { it.id!!.toLong() }?.toSet() ?: emptySet(),
     finished = finished?.toBoolean() ?: false,
     metadata = metadata ?: emptyMap(),
+)
+
+fun ConfirmationCodeRequest.toValidRequest() = ValidConfirmationCodeRequest(
+    email = email!!,
+    purpose = ConfirmationPurpose.valueOf(purpose!!),
+)
+
+fun ConfirmationCodeVerificationRequest.toValidRequest() = ValidConfirmationCodeVerificationRequest(
+    email = email!!,
+    code = code!!,
+    purpose = ConfirmationPurpose.valueOf(purpose!!),
+)
+
+fun ConfirmationCodeTestRequest.toValidRequest() = ValidConfirmationCodeTestRequest(
+    email = email!!,
+    purpose = ConfirmationPurpose.valueOf(purpose!!),
 )
