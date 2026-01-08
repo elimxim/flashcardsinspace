@@ -16,3 +16,4 @@ app:
     api-key: ${APP_MAIL_API_KEY}
     sender-name: ${APP_MAIL_SENDER_NAME}
     sender-domain: ${APP_MAIL_SENDER_DOMAIN}
+    reply-to-email: ${APP_MAIL_REPLY_TO_EMAIL}
