@@ -150,15 +150,15 @@ async function processVerificationResponse(response: ConfirmationCodeResponse) {
       verificationResult.value = result
       attempts.value = response.attempts ?? 3
       break
-    default:
-      ccd.value?.triggerIdle()
-      break
     case CodeVerificationResult.SUCCESS:
       await ccd.value?.triggerSuccess()
       verificationResult.value = result
       attempts.value = 0
       authStore.setEmailVerified()
       await router.push({ name: routeNames.user })
+      break
+    default:
+      ccd.value?.triggerIdle()
       break
   }
 }
