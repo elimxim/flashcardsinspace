@@ -46,7 +46,7 @@ class EmailService(
 
             mailClient.send(
                 recipient = recipient,
-                mail = Mail.SecurityMail(getSubjectForPurpose(purpose), httpContent = htmlContent)
+                mail = Mail.SecurityMail(getSubjectForPurpose(purpose), htmlContent = htmlContent)
             )
             log.info("Confirmation code email sent to ${maskSecret(recipient.email)}")
         } catch (e: Exception) {
