@@ -97,6 +97,18 @@ tasks.register<NpmTask>("npmRunTest") {
     inputs.dir("src/main/vue/src")
 }
 
+tasks.register<NpmTask>("npmRunLint") {
+    dependsOn("npmInstall")
+    npmCommand.set(listOf("run", "lint"))
+    inputs.dir("src/main/vue/src")
+}
+
+tasks.register<NpmTask>("npmRunTypeCheck") {
+    dependsOn("npmInstall")
+    npmCommand.set(listOf("run", "type-check"))
+    inputs.dir("src/main/vue/src")
+}
+
 tasks.named("processResources") {
     dependsOn("npmRunBuild")
 }

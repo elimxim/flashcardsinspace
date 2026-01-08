@@ -1,0 +1,32 @@
+name: Launch Guard
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Up JDK 24
+        uses: actions/setup-java@v4
+        with:
+          java-version: '24'
+          distribution: 'temurin'
+
+      - name: Set Up Gradle
+        run: chmod +x ./gradlew
+
+      - name: Lint
+        run: ./gradlew npmRunLint --console=plain
+
+      - name: Type Check
+        run: ./gradlew npmRunTypeCheck --console=plain
+
+      - name: Build and Test
+        run: ./gradlew clean build --console=plain
+
