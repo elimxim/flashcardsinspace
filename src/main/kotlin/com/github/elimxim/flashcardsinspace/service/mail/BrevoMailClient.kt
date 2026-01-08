@@ -4,6 +4,7 @@ import brevo.Configuration
 import brevo.auth.ApiKeyAuth
 import brevoApi.TransactionalEmailsApi
 import brevoModel.SendSmtpEmail
+import brevoModel.SendSmtpEmailReplyTo
 import brevoModel.SendSmtpEmailSender
 import brevoModel.SendSmtpEmailTo
 import com.github.elimxim.flashcardsinspace.security.maskSecret
@@ -46,6 +47,8 @@ class BrevoMailClient(private val mailProperties: MailProperties) {
                         .email(recipient.email)
                         .name(recipient.name)
                 )
+                replyTo = SendSmtpEmailReplyTo()
+                    .email(mailProperties.replyToEmail)
                 subject = mail.subject
                 htmlContent = mail.httpContent
             }

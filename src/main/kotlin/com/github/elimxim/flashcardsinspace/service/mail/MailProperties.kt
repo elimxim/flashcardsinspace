@@ -7,4 +7,5 @@ data class MailProperties(
     val apiKey: String,
     val senderName: String,
     val senderDomain: String,
+    val replyToEmail: String,
 )
