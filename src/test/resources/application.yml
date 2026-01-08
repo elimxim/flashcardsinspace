@@ -5,6 +5,11 @@ app:
       secret: "ZHVtbXlzZWNyZXRmb3Jqd3RzYW1wbGVhcHBsaWNhdGlvbg=="
       access-token-expiration-ms: 3600000
       refresh-token-expiration-ms: 36000000
+  mail:
+    api-key: "dummy-api-Key"
+    sender-name: "test-name"
+    sender-domain: "test-domain-com"
+    reply-to-email: "no-reply-dot-com"
 
 spring:
   jpa:
