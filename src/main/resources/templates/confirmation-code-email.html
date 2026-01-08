@@ -3,33 +3,72 @@
 <head>
     <title>Confirmation Code</title>
 </head>
-<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; padding: 20px;">
+<body style="margin: 0; padding: 40px 20px; background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
 
-<div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-    <div style="text-align: center;">
-        <h1 style="color: #4A90E2;">Your Confirmation Code</h1>
-    </div>
+<div style="max-width: 600px; margin: auto;">
+    <!-- Top decorative border -->
+    <div style="height: 40px; background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c); border-radius: 44px 44px 0 0;"></div>
 
-    <p>You requested to <span th:text="${purposeDescription}">verify your email</span>. Use the following code to
-        complete the process:</p>
+    <!-- Main content container -->
+    <div style="background: #ffffff;">
+        <!-- Header section -->
+        <div style="background: linear-gradient(135deg, #1e1e3f 0%, #2d2d5a 40%, #4a3a7a 70%, #6b4a9a 100%); padding: 20px; text-align: center;">
+            <img src="https://flashcardsinspace.com/logo.png" alt="Flashcards in Space Logo" width="200"/>
+            <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 300; letter-spacing: 1px;">
+                Security <span style="font-weight: 600; color: #9dcee2;">Verification</span>
+            </h1>
+            <p style="margin: 15px 0 0 0; color: #9dcee2; font-size: 14px; letter-spacing: 2px; text-transform: uppercase;">
+                <span th:text="${purposeDescription}">Verify your identity</span>
+            </p>
+        </div>
 
-    <div style="text-align: center; margin: 30px 0;">
-        <div style="display: inline-block; background: linear-gradient(135deg, #4A90E2, #357ABD); color: white; font-size: 48px; font-weight: bold; padding: 20px 40px; border-radius: 10px; letter-spacing: 10px; font-family: 'Courier New', monospace;">
-            <span th:text="${code}">42</span>
+        <!-- Body content -->
+        <div style="padding: 40px; color: #374151; font-size: 16px; line-height: 1.7;">
+            <p style="margin: 0 0 25px 0; text-align: center;">
+                Use this code to complete your request:
+            </p>
+
+            <!-- Code display -->
+            <div style="text-align: center; margin: 0 0 25px 0;">
+                <span th:each="digit : ${securityCodeDigits}" th:text="${digit}" style="display: inline-block; background: linear-gradient(135deg, #1e1e3f 0%, #2d2d5a 40%, #4a3a7a 70%, #6b4a9a 100%); color: #ffffff; font-size: 42px; font-weight: bold; padding: 12px 18px; margin: 0 4px; border-radius: 24px; font-family: 'Courier New', Courier, monospace; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">/</span>
+            </div>
+
+            <!-- Timer notice -->
+            <p style="text-align: center; margin: 0 0 30px 0; color: #6b7280; font-size: 14px;">
+                This code will expire in 24 hours.
+            </p>
+
+            <p style="margin: 0 0 30px 0; color: #6b7280; font-size: 14px; text-align: center;">
+                If you didn't request this code, you can safely ignore this email.
+                <br/>Someone might have entered your email address by mistake.
+            </p>
+
+            <!-- Button -->
+            <div style="text-align: center;">
+                <a href="https://flashcardsinspace.com/user" style="display: inline-block; background: linear-gradient(90deg, #667eea, #764ba2); color: #ffffff; font-size: 16px; font-weight: 600; padding: 14px 32px; border-radius: 30px; text-decoration: none;">
+                    Go to My Account
+                </a>
+            </div>
+        </div>
+
+        <!-- Signature section -->
+        <div style="padding: 0 40px 35px 40px;">
+            <div style="color: #6b7280; font-size: 15px;">
+                Safe travels,<br>
+                <span style="font-weight: 600; color: #374151;">The Flashcards in Space Team</span>
+            </div>
         </div>
     </div>
 
-    <p style="text-align: center; color: #666; font-size: 14px;">This code will expire in 10 minutes.</p>
+    <!-- Bottom decorative border -->
+    <div style="height: 40px; background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c); border-radius: 0 0 44px 44px;"></div>
 
-    <p>If you didn't request this code, you can safely ignore this email. Someone might have entered your email address
-        by mistake.</p>
-
-    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-
-    <p style="color: #999; font-size: 12px; text-align: center;">
-        This is an automated message from Flashcards in Space.<br>
-        Please do not reply to this email.
-    </p>
+    <!-- Footer -->
+    <div style="padding: 25px; text-align: center;">
+        <p style="margin: 0; color: #9ca3af; font-size: 12px;">
+            &#169; 2026 Flashcards in Space. All rights reserved.
+        </p>
+    </div>
 </div>
 
 </body>

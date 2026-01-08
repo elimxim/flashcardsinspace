@@ -38,7 +38,7 @@ class EmailService(
         log.info("Sending confirmation code to ${maskSecret(recipient.email)}, purpose: $purpose")
         try {
             val context = Context().apply {
-                setVariable("code", code)
+                setVariable("securityCodeDigits", code.toList().map { it.toString() })
                 setVariable("purpose", purpose.name)
                 setVariable("purposeDescription", getPurposeDescription(purpose))
             }
@@ -57,13 +57,13 @@ class EmailService(
 
     private fun getSubjectForPurpose(purpose: ConfirmationPurpose): String {
         return when (purpose) {
-            ConfirmationPurpose.EMAIL_VERIFICATION -> "Verify Your Email - Flashcards in Space"
+            ConfirmationPurpose.EMAIL_VERIFICATION -> "Complete Registration - Flashcards in Space"
         }
     }
 
     private fun getPurposeDescription(purpose: ConfirmationPurpose): String {
         return when (purpose) {
-            ConfirmationPurpose.EMAIL_VERIFICATION -> "verify your email address"
+            ConfirmationPurpose.EMAIL_VERIFICATION -> "Verify Your Email"
         }
     }
 }
