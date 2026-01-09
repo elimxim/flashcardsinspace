@@ -1,6 +1,7 @@
 package com.github.elimxim.flashcardsinspace.service.mail
 
 import com.github.elimxim.flashcardsinspace.entity.ConfirmationPurpose
+import com.github.elimxim.flashcardsinspace.security.maskSecret
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.jmx.export.annotation.ManagedOperation
@@ -27,10 +28,10 @@ class EmailTestMBean(
         ManagedOperationParameter(name = "name", description = "Name to display in the email")
     )
     fun sendTestWelcomeEmail(email: String, name: String): String {
-        log.info("JMX: Sending test welcome email to $email")
+        log.info("JMX: Sending test welcome email to ${maskSecret(email)}")
         return try {
             emailService.sendWelcomeEmail(recipient = Recipient(email, name))
-            "Welcome email sent successfully to $email"
+            "Welcome email sent successfully to ${maskSecret(email)}"
         } catch (e: Exception) {
             log.error("JMX: Failed to send test welcome email", e)
             "Failed to send welcome email: ${e.message}"
@@ -45,7 +46,7 @@ class EmailTestMBean(
         ManagedOperationParameter(name = "purpose", description = "Purpose of the confirmation (EMAIL_VERIFICATION)")
     )
     fun sendTestConfirmationCodeEmail(email: String, name: String, code: String, purpose: String): String {
-        log.info("JMX: Sending test confirmation code email to $email")
+        log.info("JMX: Sending test confirmation code email to ${maskSecret(email)}")
         return try {
             val confirmationPurpose = ConfirmationPurpose.valueOf(purpose)
             emailService.sendConfirmationCodeEmail(
@@ -53,7 +54,7 @@ class EmailTestMBean(
                 code,
                 confirmationPurpose
             )
-            "Confirmation code email sent successfully to $email"
+            "Confirmation code email sent successfully to ${maskSecret(email)}"
         } catch (e: Exception) {
             log.error("JMX: Failed to send test confirmation code email", e)
             "Failed to send confirmation code email: ${e.message}"
