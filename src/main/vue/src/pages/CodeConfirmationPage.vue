@@ -66,6 +66,7 @@
 
 <script setup lang="ts">
 import CodeConfirmationDevice from '@/components/CodeConfirmationDevice.vue'
+import SpaceToast from '@/components/SpaceToast.vue'
 import { onMounted, ref } from 'vue'
 import {
   sendConfirmationCodeRequest,
