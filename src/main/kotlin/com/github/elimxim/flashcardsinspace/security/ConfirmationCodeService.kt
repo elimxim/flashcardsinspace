@@ -28,11 +28,11 @@ enum class VerificationResult {
     LIMITED,
 }
 
-private const val CODE_LENGTH = 2
+private const val CODE_LENGTH = 4
 private const val MAX_ATTEMPTS = 3
 private const val MAX_CODES_PER_WINDOW = 10
-private val CODE_LIMIT_WINDOW: Duration = Duration.ofMinutes(60)
-private val CODE_EXPIRATION: Duration = Duration.ofMinutes(60 * 24)
+private val CODE_LIMIT_WINDOW: Duration = Duration.ofHours(4)
+private val CODE_EXPIRATION: Duration = Duration.ofHours(24)
 
 @Service
 class ConfirmationCodeService(

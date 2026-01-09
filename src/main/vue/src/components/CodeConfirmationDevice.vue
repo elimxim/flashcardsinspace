@@ -34,10 +34,12 @@
         </div>
 
         <div class="code-field">
-          <div class="code-progress-bar" :style="{ width: (input.length * 50) + '%' }"/>
+          <div class="code-progress-bar" :style="{ width: (input.length * 25) + '%' }"/>
           <div class="code-digits-overlay">
             <span class="code-digit">{{ input[0] || '*' }}</span>
             <span class="code-digit">{{ input[1] || '*' }}</span>
+            <span class="code-digit">{{ input[2] || '*' }}</span>
+            <span class="code-digit">{{ input[3] || '*' }}</span>
           </div>
         </div>
         <div class="display-footer-tag">AUTO-SUBMIT ENABLED</div>
@@ -102,12 +104,12 @@ const isResetLocked = computed(() => {
   return status.value === 'SUCCESS' || status.value !== 'OFF' && dirty.value
 })
 
-const pressKey = async (val: string) => {
+const pressKey = async (digit: string) => {
   dirty.value = true
   if (status.value !== 'IDLE') return
-  if (input.value.length < 2) {
-    input.value += val
-    if (input.value.length === 2) {
+  if (input.value.length < 4) {
+    input.value += digit
+    if (input.value.length === 4) {
       status.value = 'SYNCING'
       await nextTick()
       await props.verifyCode(input.value)
