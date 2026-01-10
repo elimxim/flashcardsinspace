@@ -1,8 +1,8 @@
 server:
   forward-headers-strategy: NATIVE
   tomcat:
-    max-connections: 500
-    accept-count: 50
+    max-connections: 1000
+    accept-count: 100
 
 management:
   endpoints:
