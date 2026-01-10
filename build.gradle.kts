@@ -65,8 +65,8 @@ application {
     mainClass.set("com.github.elimxim.flashcardsinspace.AppKt")
     applicationName = "flash"
     applicationDefaultJvmArgs = listOf(
-        "-Xmx512m",
-        "-Xms512m",
+        "-Xmx800m",
+        "-Xms800m",
         "-XX:+UseSerialGC",
         "-XX:+ExitOnOutOfMemoryError",
         "-XX:+HeapDumpOnOutOfMemoryError",
