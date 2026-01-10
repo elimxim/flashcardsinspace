@@ -23,6 +23,7 @@ private val log = LoggerFactory.getLogger(ReviewSessionService::class.java)
 class ReviewSessionService(
     private val requestValidator: RequestValidator,
     private val flashcardSetService: FlashcardSetService,
+    private val flashcardSetDbService: FlashcardSetDbService,
     private val chronoService: ChronoService,
     private val reviewSessionRepository: ReviewSessionRepository,
 ) {
@@ -136,14 +137,14 @@ class ReviewSessionService(
         return savedSession.toDto()
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getReviewSession(user: User, setId: Long, id: Long): ReviewSessionDto {
         log.info("Getting review session $id for set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
         return getEntity(id).toDto()
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getLatestUncompletedReviewSession(user: User, setId: Long, type: ReviewSessionType): ReviewSessionDto? {
         log.info("Getting latest uncompleted review session for set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
@@ -162,7 +163,7 @@ class ReviewSessionService(
         return latestUncompletedSession?.toDto()
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getEntity(id: Long): ReviewSession {
         return reviewSessionRepository.findById(id).orElseThrow {
             HttpNotFoundException(ApiErrorCode.RES404, "Review session $id not found")
@@ -175,7 +176,7 @@ class ReviewSessionService(
             flashcardIds = null,
             elapsedTime = 0,
             startedAt = ZonedDateTime.now(),
-            flashcardSet = flashcardSetService.getEntity(setId),
+            flashcardSet = flashcardSetDbService.findById(setId),
             reviewDay = chronoService.getEntity(request.chronodayId),
         )
     }

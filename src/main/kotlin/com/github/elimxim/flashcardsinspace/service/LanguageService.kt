@@ -11,12 +11,12 @@ import org.springframework.transaction.annotation.Transactional
 class LanguageService(
     private val languageRepository: LanguageRepository,
 ) {
-    @Transactional
+    @Transactional(readOnly = true)
     fun getAllLanguages(): List<Language> {
         return languageRepository.findAll().sortedBy { it.name }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getEntity(id: Long): Language {
         return languageRepository.findById(id).orElseThrow {
             HttpNotFoundException(ApiErrorCode.LAN404, "Language with id $id not found")

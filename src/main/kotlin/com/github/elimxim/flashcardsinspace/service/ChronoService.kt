@@ -2,7 +2,6 @@ package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepository
-import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
 import com.github.elimxim.flashcardsinspace.web.dto.*
@@ -23,7 +22,7 @@ enum class ChronoSyncDay { NEXT, PREV }
 @Service
 class ChronoService(
     private val flashcardSetService: FlashcardSetService,
-    private val flashcardSetRepository: FlashcardSetRepository,
+    private val flashcardSetDbService: FlashcardSetDbService,
     private val lightspeedService: LightspeedService,
     private val requestValidator: RequestValidator,
     private val dayStreakService: DayStreakService,
@@ -38,7 +37,7 @@ class ChronoService(
 
     @Transactional
     fun sync(setId: Long, clientDatetime: ZonedDateTime, clientTimezone: String): ChronoSyncResponse {
-        val flashcardSet = flashcardSetService.getEntity(setId)
+        val flashcardSet = flashcardSetDbService.findById(setId, mode = FlashcardSetFetchWithMode.CHRONODAYS)
 
         val clientZoneId = ZoneId.of(clientTimezone)
         val datetimeInUserZone = clientDatetime.withZoneSameInstant(clientZoneId)
@@ -72,7 +71,7 @@ class ChronoService(
                 )
             }
 
-            flashcardSetRepository.save(flashcardSet)
+            flashcardSetDbService.save(flashcardSet)
         } else flashcardSet
 
         dayStreakService.calcDayStreak(updatedFlashcardSet)
@@ -97,7 +96,7 @@ class ChronoService(
 
     @Transactional
     fun syncDay(setId: Long, day: ChronoSyncDay): ChronoSyncResponse {
-        val flashcardSet = flashcardSetService.getEntity(setId)
+        val flashcardSet = flashcardSetDbService.findById(setId, mode = FlashcardSetFetchWithMode.ALL)
 
         val lastChronoday = flashcardSet.lastChronoday()
             ?: throw HttpBadRequestException(ApiErrorCode.FSI400, "Flashcard set $setId is not started")
@@ -145,7 +144,7 @@ class ChronoService(
         }
 
         dayStreakService.calcDayStreak(flashcardSet)
-        val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
+        val updatedFlashcardSet = flashcardSetDbService.save(flashcardSet)
 
         val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
         val (currDay, chronodays) = applySchedule(updatedFlashcardSet)
@@ -167,7 +166,7 @@ class ChronoService(
 
     @Transactional
     fun bulkUpdate(setId: Long, request: ValidChronoBulkUpdateRequest): ChronoUpdateResponse {
-        val flashcardSet = flashcardSetService.getEntity(setId)
+        val flashcardSet = flashcardSetDbService.findById(setId, mode = FlashcardSetFetchWithMode.CHRONODAYS)
 
         val chronodaysToUpdate = flashcardSet.chronodays
             .filter { it.id in request.ids }
@@ -179,7 +178,7 @@ class ChronoService(
             lastChronoday.status = request.status
             dayStreakService.calcDayStreak(flashcardSet)
             chronodaysToUpdate.forEach { it.status = request.status }
-            flashcardSetRepository.save(flashcardSet)
+            flashcardSetDbService.save(flashcardSet)
         } else flashcardSet
 
         val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
@@ -192,7 +191,7 @@ class ChronoService(
         )
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getEntity(id: Long): Chronoday {
         return chronodayRepository.findById(id).orElseThrow {
             throw HttpNotFoundException(ApiErrorCode.CHR404, "Chronoday $id not found")

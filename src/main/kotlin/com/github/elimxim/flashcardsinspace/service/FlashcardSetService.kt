@@ -1,15 +1,16 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
+import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.entity.isSuspended
 import com.github.elimxim.flashcardsinspace.entity.repository.DayStreakRepository
-import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.ReviewSessionRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.HttpBadRequestException
 import com.github.elimxim.flashcardsinspace.web.exception.HttpForbiddenException
-import com.github.elimxim.flashcardsinspace.web.exception.HttpNotFoundException
 import jakarta.persistence.EntityManager
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -20,43 +21,41 @@ private val log = LoggerFactory.getLogger(FlashcardSetService::class.java)
 
 @Service
 class FlashcardSetService(
-    private val flashcardSetRepository: FlashcardSetRepository,
+    private val flashcardSetDbService: FlashcardSetDbService,
     private val languageService: LanguageService,
     private val requestValidator: RequestValidator,
     private val dayStreakRepository: DayStreakRepository,
     private val reviewSessionRepository: ReviewSessionRepository,
     private val entityManager: EntityManager,
 ) {
-    @Transactional
+    @Transactional(readOnly = true)
     fun getAll(user: User): List<FlashcardSetDto> {
         log.info("Retrieving all flashcard sets")
-        val result = flashcardSetRepository.findAllByUserAndStatusIn(
-            user = user,
-            status = listOf(FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED)
+        val result = flashcardSetDbService.findAll(
+            user, FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED
         )
         return result.map { it.toDto() }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getAllExtra(user: User): List<FlashcardSetExtraDto> {
         log.info("Retrieving all flashcard sets extra")
-        val result = flashcardSetRepository.findAllByUserAndStatusIn(
-            user = user,
-            status = listOf(FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED)
+        val counts = flashcardSetDbService.countFlashcards(
+            user, FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED
         )
-        return result.map {
+        return counts.map {
             FlashcardSetExtraDto(
-                id = it.id,
-                flashcardsNumber = it.flashcardsNumber(),
+                id = it.getId(),
+                flashcardsNumber = it.getFlashcardCount(),
             )
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun get(user: User, id: Long): FlashcardSetDto {
         log.info("Retrieving flashcard set $id")
         verifyUserHasAccess(user, id)
-        return getEntity(id).toDto()
+        return flashcardSetDbService.findById(id).toDto()
     }
 
     @Transactional
@@ -77,7 +76,7 @@ class FlashcardSetService(
             user = user,
         )
 
-        return flashcardSetRepository.save(flashcardSet).toDto()
+        return flashcardSetDbService.save(flashcardSet).toDto()
     }
 
     @Transactional
@@ -89,11 +88,11 @@ class FlashcardSetService(
 
     @Transactional
     fun update(id: Long, request: ValidFlashcardSetUpdateRequest): FlashcardSetDto {
-        val flashcardSet = getEntity(id)
+        val flashcardSet = flashcardSetDbService.findById(id)
         val changed = mergeFlashcardSet(flashcardSet, request)
 
         return if (changed) {
-            flashcardSetRepository.save(flashcardSet).toDto()
+            flashcardSetDbService.save(flashcardSet).toDto()
         } else {
             flashcardSet.toDto()
         }
@@ -126,43 +125,42 @@ class FlashcardSetService(
     fun remove(user: User, id: Long) {
         log.info("Removing flashcard set $id")
         verifyUserHasAccess(user, id)
-        val flashcardSet = getEntity(id)
-        if (flashcardSet.flashcards.size >= 40) {
+        val flashcardSet = flashcardSetDbService.findById(id)
+        val flashcardCount = flashcardSetDbService.countFlashcards(flashcardSet)
+        if (flashcardCount >= 40) {
             flashcardSet.status = FlashcardSetStatus.DELETED
-            flashcardSetRepository.save(flashcardSet)
+            flashcardSetDbService.save(flashcardSet)
         } else {
             dayStreakRepository.deleteByFlashcardSetId(id)
             reviewSessionRepository.deleteByFlashcardSetId(id)
             entityManager.flush()
             entityManager.clear()
-            flashcardSetRepository.deleteById(id)
+            flashcardSetDbService.delete(flashcardSet)
         }
     }
 
-    @Transactional
-    fun getEntity(id: Long): FlashcardSet =
-        flashcardSetRepository.findById(id).orElseThrow {
-            HttpNotFoundException(ApiErrorCode.FSE404, "Flashcard set with id $id not found")
-        }
-
-    @Transactional
+    @Transactional(readOnly = true)
     fun verifyUserHasAccess(user: User, id: Long) {
-        if (getEntity(id).user.id != user.id) {
-            throw HttpForbiddenException(ApiErrorCode.FSU403, "User ${user.id} does not have access to flashcard set $id")
+        if (flashcardSetDbService.findById(id, mode = FlashcardSetFetchWithMode.USER).user.id != user.id) {
+            throw HttpForbiddenException(
+                ApiErrorCode.FSU403,
+                "User ${user.id} does not have access to flashcard set $id"
+            )
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun verifyInitialized(id: Long) {
-        val flashcardSet = getEntity(id)
-        if (flashcardSet.chronodays.isEmpty()) {
-            throw HttpBadRequestException(ApiErrorCode.FSI400,"Flashcard set $id is not started")
+        val flashcardSet = flashcardSetDbService.findById(id)
+        val chronodayCount = flashcardSetDbService.countChronodays(flashcardSet)
+        if (chronodayCount == 0) {
+            throw HttpBadRequestException(ApiErrorCode.FSI400, "Flashcard set $id is not started")
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun verifyNotSuspended(id: Long) {
-        val flashcardSet = getEntity(id)
+        val flashcardSet = flashcardSetDbService.findById(id)
         if (flashcardSet.isSuspended()) {
             throw HttpBadRequestException(ApiErrorCode.FSS400, "Flashcard set $id is suspended")
         }

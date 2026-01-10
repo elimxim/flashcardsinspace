@@ -1,7 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
-import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetSuspendResponse
@@ -20,8 +19,8 @@ private val log = LoggerFactory.getLogger(FlashcardSetSuspendService::class.java
 @Service
 class FlashcardSetSuspendService(
     private val flashcardSetService: FlashcardSetService,
+    private val flashcardSetDbService: FlashcardSetDbService,
     private val requestValidator: RequestValidator,
-    private val flashcardSetRepository: FlashcardSetRepository,
     private val lightspeedService: LightspeedService,
 ) {
     @Transactional
@@ -33,7 +32,7 @@ class FlashcardSetSuspendService(
 
     @Transactional
     fun suspend(id: Long, request: ValidFlashcardSetUpdateRequest): FlashcardSetSuspendResponse {
-        val flashcardSet = flashcardSetService.getEntity(id)
+        val flashcardSet = flashcardSetDbService.findById(id, mode = FlashcardSetFetchWithMode.CHRONODAYS)
 
         if (flashcardSet.isSuspended()) {
             throw HttpBadRequestException(ApiErrorCode.FAS400, "Flashcard set $id is already suspended")
@@ -49,7 +48,7 @@ class FlashcardSetSuspendService(
             lastChronoday.status = ChronodayStatus.OFF
         }
 
-        val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
+        val updatedFlashcardSet = flashcardSetDbService.save(flashcardSet)
         val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays)
 
         val currDay = if (lastChronoday.status == ChronodayStatus.INITIAL) {

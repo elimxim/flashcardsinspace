@@ -1,7 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
-import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardCreationRequest
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetInitResponse
@@ -19,7 +18,7 @@ private val log = getLogger(FlashcardSetInitService::class.java)
 @Service
 class FlashcardSetInitService(
     private val flashcardSetService: FlashcardSetService,
-    private val flashcardSetRepository: FlashcardSetRepository,
+    private val flashcardSetDbService: FlashcardSetDbService,
     private val lightspeedService: LightspeedService,
     private val requestValidator: RequestValidator,
 ) {
@@ -32,7 +31,7 @@ class FlashcardSetInitService(
 
     @Transactional
     fun init(id: Long, request: ValidFlashcardCreationRequest): FlashcardSetInitResponse {
-        val flashcardSet = flashcardSetService.getEntity(id)
+        val flashcardSet = flashcardSetDbService.findById(id, mode = FlashcardSetFetchWithMode.ALL)
         if (flashcardSet.chronodays.isNotEmpty()) {
             throw HttpBadRequestException(
                 ApiErrorCode.SAS400,
@@ -60,7 +59,7 @@ class FlashcardSetInitService(
         flashcardSet.flashcards.add(flashcard)
         flashcardSet.chronodays.add(initial)
 
-        val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
+        val updatedFlashcardSet = flashcardSetDbService.save(flashcardSet)
         val createdFlashcard = flashcardSet.flashcards.last()
         val createdInitial = updatedFlashcardSet.lastChronoday()!!
         val schedule = lightspeedService.createSchedule(chronodays = listOf(createdInitial))

@@ -21,7 +21,7 @@ class FlashcardAudioService(
     private val flashcardService: FlashcardService,
     private val flashcardSetService: FlashcardSetService,
 ) {
-    @Transactional
+    @Transactional(readOnly = true)
     fun getMetadata(user: User, setId: Long): List<FlashcardAudioMetadata> {
         log.info("Getting audio metadata for flashcard set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
@@ -35,7 +35,7 @@ class FlashcardAudioService(
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun fetchAudio(user: User, setId: Long, flashcardId: Long, side: String): FlashcardAudio? {
         log.info("Fetching audio for flashcard $flashcardId in set $setId, side: $side")
         flashcardSetService.verifyUserHasAccess(user, setId)
@@ -44,7 +44,7 @@ class FlashcardAudioService(
         return flashcardAudioRepository.findByFlashcardIdAndSide(flashcardId, side)
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun fetchAudio(user: User, setId: Long, flashcardId: Long, audioId: Long): FlashcardAudio {
         log.info("Fetching audio $audioId for flashcard $flashcardId in set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
@@ -108,7 +108,7 @@ class FlashcardAudioService(
         flashcardAudioRepository.delete(audio)
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getEntity(id: Long): FlashcardAudio =
         flashcardAudioRepository.findById(id).orElseThrow {
             HttpNotFoundException(ApiErrorCode.FAU404, "Audio with id $id not found")
