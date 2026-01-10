@@ -1,5 +1,9 @@
 server:
   forward-headers-strategy: NATIVE
+  tomcat:
+    max-connections: 500
+    accept-count: 50
+
 management:
   endpoints:
     web:
@@ -10,8 +14,20 @@ management:
       show-details: never
 
 spring:
+  threads:
+    virtual:
+      enabled: true
   datasource:
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 4
+      minimum-idle: 2
+      idle-timeout: 300000 # 5 minutes
+      max-lifetime: 1800000 # 30 minutes
+      connection-timeout: 30000 # 30 seconds
+      leak-detection-threshold: 60000 # 1 minute
+      pool-name: FlashHikariPool
+
   jpa:
     hibernate:
       ddl-auto: validate
