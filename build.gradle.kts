@@ -64,6 +64,14 @@ dependencies {
 application {
     mainClass.set("com.github.elimxim.flashcardsinspace.AppKt")
     applicationName = "flash"
+    applicationDefaultJvmArgs = listOf(
+        "-Xmx512m",
+        "-Xms512m",
+        "-XX:+UseSerialGC",
+        "-XX:+ExitOnOutOfMemoryError",
+        "-XX:+HeapDumpOnOutOfMemoryError",
+        "-XX:HeapDumpPath=/tmp/flashcardsinspace.hprof",
+    )
 }
 
 sourceSets {
