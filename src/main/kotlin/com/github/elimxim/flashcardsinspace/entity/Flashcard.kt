@@ -43,14 +43,6 @@ open class Flashcard(
     @ManyToOne(optional = false)
     @JoinColumn(name = "flashcard_set_id", referencedColumnName = "id")
     open var flashcardSet: FlashcardSet,
-
-    @OneToMany(
-        mappedBy = "flashcard",
-        cascade = [CascadeType.ALL],
-        orphanRemoval = true,
-        fetch = FetchType.LAZY,
-    )
-    open var audios: MutableList<FlashcardAudio> = mutableListOf(), // fixme
 )
 
 const val TERMINAL_STAGE_NAME = "OUTER_SPACE"
