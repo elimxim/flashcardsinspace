@@ -58,14 +58,6 @@ open class FlashcardSet(
         fetch = FetchType.LAZY,
     )
     open var dayStreak: DayStreak? = null,
-
-    @OneToMany(
-        mappedBy = "flashcardSet",
-        cascade = [CascadeType.ALL],
-        orphanRemoval = true,
-        fetch = FetchType.LAZY,
-    )
-    open var reviewSessions: MutableList<ReviewSession> = mutableListOf(),
 )
 
 enum class FlashcardSetStatus {
