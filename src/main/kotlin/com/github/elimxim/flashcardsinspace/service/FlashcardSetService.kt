@@ -131,8 +131,8 @@ class FlashcardSetService(
             flashcardSet.status = FlashcardSetStatus.DELETED
             flashcardSetDbService.save(flashcardSet)
         } else {
-            dayStreakRepository.deleteByFlashcardSetId(id)
-            reviewSessionRepository.deleteByFlashcardSetId(id)
+            dayStreakRepository.deleteByFlashcardSet(flashcardSet)
+            reviewSessionRepository.deleteByFlashcardSet(flashcardSet)
             entityManager.flush()
             entityManager.clear()
             flashcardSetDbService.delete(flashcardSet)

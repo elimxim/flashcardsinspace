@@ -12,11 +12,11 @@ open class DayStreak(
     @Column(nullable = false)
     open var streak: Int,
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "chronoday_id", referencedColumnName = "id")
     open var lastDay: Chronoday,
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "flashcard_set_id", referencedColumnName = "id")
     open var flashcardSet: FlashcardSet,
 )

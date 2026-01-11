@@ -1,5 +1,6 @@
 package com.github.elimxim.flashcardsinspace.entity.repository
 
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
 import com.github.elimxim.flashcardsinspace.entity.ReviewSession
 import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
 import org.springframework.data.jpa.repository.JpaRepository
@@ -25,5 +26,5 @@ interface ReviewSessionRepository : JpaRepository<ReviewSession, Long> {
     """)
     fun findLatestUncompletedReviewSessions(flashcardSetId: Long, type: ReviewSessionType, depthDays: Int): List<ReviewSession>
 
-    fun deleteByFlashcardSetId(flashcardSetId: Long)
+    fun deleteByFlashcardSet(flashcardSet: FlashcardSet)
 }
