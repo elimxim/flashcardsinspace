@@ -1,7 +1,7 @@
 package com.github.elimxim.flashcardsinspace.web
 
 import com.github.elimxim.flashcardsinspace.entity.FlashcardAudio
-import com.github.elimxim.flashcardsinspace.entity.FlashcardAudioMetadata
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardAudioMetadataDto
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.security.escapeJava
 import com.github.elimxim.flashcardsinspace.security.normalize
@@ -24,7 +24,7 @@ class FlashcardAudioController(
     fun getMetadata(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
-    ): ResponseEntity<List<FlashcardAudioMetadata>> = withLoggingContext(user) {
+    ): ResponseEntity<List<FlashcardAudioMetadataDto>> = withLoggingContext(user) {
         val result = flashcardAudioService.getMetadata(user, setId)
         return ResponseEntity.ok(result)
     }

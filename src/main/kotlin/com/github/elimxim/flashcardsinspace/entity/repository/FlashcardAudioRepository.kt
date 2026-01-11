@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
-interface FlashcardAudioMetadataProjection {
+interface FlashcardAudioMetadata {
     fun getAudioId(): Long
     fun getSide(): FlashcardSide
     fun getFlashcardId(): Long
@@ -28,5 +28,5 @@ interface FlashcardAudioRepository : JpaRepository<FlashcardAudio, Long> {
         WHERE f.flashcard_set_id = :setId
     """, nativeQuery = true
     )
-    fun findAllMetadata(@Param("setId") setId: Long): List<FlashcardAudioMetadataProjection>
+    fun findAllMetadata(@Param("setId") setId: Long): List<FlashcardAudioMetadata>
 }

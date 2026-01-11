@@ -1,8 +1,12 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.entity.FlashcardAudio
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSide
+import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardAudioRepository
+import com.github.elimxim.flashcardsinspace.entity.sizeKB
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardAudioDto
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardAudioMetadataDto
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.HttpBadRequestException
@@ -22,14 +26,14 @@ class FlashcardAudioService(
     private val flashcardSetService: FlashcardSetService,
 ) {
     @Transactional(readOnly = true)
-    fun getMetadata(user: User, setId: Long): List<FlashcardAudioMetadata> {
+    fun getMetadata(user: User, setId: Long): List<FlashcardAudioMetadataDto> {
         log.info("Getting audio metadata for flashcard set $setId")
         flashcardSetService.verifyUserHasAccess(user, setId)
 
         return flashcardAudioRepository.findAllMetadata(setId).map {
-            FlashcardAudioMetadata(
+            FlashcardAudioMetadataDto(
                 audioId = it.getAudioId(),
-                flashcardSide = it.getSide(),
+                flashcardSide = it.getSide().name,
                 flashcardId = it.getFlashcardId(),
             )
         }
