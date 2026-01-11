@@ -25,7 +25,7 @@ class FlashcardService(
     private val requestValidator: RequestValidator,
 ) {
     @Transactional(readOnly = true)
-    fun get(user: User, setId: Long): List<FlashcardDto> {
+    fun getAll(user: User, setId: Long): List<FlashcardDto> {
         log.info("Retrieving flashcards from set $setId")
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
