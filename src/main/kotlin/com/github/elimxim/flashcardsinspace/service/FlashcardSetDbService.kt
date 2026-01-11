@@ -5,7 +5,7 @@ import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
-import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetCountProjection
+import com.github.elimxim.flashcardsinspace.entity.FlashcardCount
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.HttpNotFoundException
@@ -58,7 +58,7 @@ class FlashcardSetDbService(
     }
 
     @Transactional(readOnly = true)
-    fun countFlashcards(user: User, vararg status: FlashcardSetStatus): List<FlashcardSetCountProjection> {
+    fun countFlashcards(user: User, vararg status: FlashcardSetStatus): List<FlashcardCount> {
         return flashcardSetRepository.countFlashcardsByUserAndStatusIn(
             user = user,
             status = status.toList()

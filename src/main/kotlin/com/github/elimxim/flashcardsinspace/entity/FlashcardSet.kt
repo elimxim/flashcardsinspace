@@ -1,7 +1,6 @@
 package com.github.elimxim.flashcardsinspace.entity
 
 import jakarta.persistence.*
-import org.hibernate.Hibernate
 import java.time.ZonedDateTime
 
 @Entity
@@ -64,11 +63,13 @@ enum class FlashcardSetStatus {
     ACTIVE, DELETED, SUSPENDED
 }
 
+interface FlashcardCount {
+    fun getId(): Long
+    fun getFlashcardCount(): Int
+}
+
 fun FlashcardSet.lastChronoday(): Chronoday? =
     chronodays.maxByOrNull { it.chronodate }
-
-fun FlashcardSet.flashcardsNumber(): Int =
-    Hibernate.size(flashcards)
 
 fun FlashcardSet.isSuspended(): Boolean =
     status == FlashcardSetStatus.SUSPENDED
