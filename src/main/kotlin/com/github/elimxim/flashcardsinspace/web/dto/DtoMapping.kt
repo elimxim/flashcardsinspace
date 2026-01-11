@@ -30,6 +30,16 @@ fun FlashcardSet.toDto() = FlashcardSetDto(
     lastUpdatedAt = lastUpdatedAt,
 )
 
+fun ReadOnlyFlashcardSet.toDto() = FlashcardSetDto(
+    id = getId(),
+    name = getName(),
+    status = getStatus().name,
+    languageId = getLanguage().getId(),
+    createdAt = getCreatedAt(),
+    startedAt = getStartedAt(),
+    lastUpdatedAt = getLastUpdatedAt(),
+)
+
 fun Flashcard.toDto() = FlashcardDto(
     id = id,
     frontSide = frontSide,

@@ -15,3 +15,9 @@ open class Language(
     @Column(nullable = false, unique = true)
     open val code: String,
 )
+
+interface ReadOnlyLanguage {
+    fun getId(): Long
+    fun getName(): String
+    fun getCode(): String
+}

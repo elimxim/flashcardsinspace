@@ -55,3 +55,16 @@ open class User(
     override fun isCredentialsNonExpired(): Boolean = true
     override fun isEnabled(): Boolean = true
 }
+
+interface ReadOnlyUser {
+    val id: Long
+    val email: String
+    val emailVerified: Boolean
+    val name: String
+    val roles: String
+    val registeredAt: ZonedDateTime
+    val lastLoginAt: ZonedDateTime?
+    val lastUpdatedAt: ZonedDateTime?
+    val timezone: String
+    val language: ReadOnlyLanguage
+}

@@ -75,8 +75,8 @@ interface ReadOnlyFlashcardSet {
     fun getCreatedAt(): ZonedDateTime
     fun getStartedAt(): ZonedDateTime?
     fun getLastUpdatedAt(): ZonedDateTime?
-    fun getLanguage(): Language
-    fun getUser(): User
+    fun getLanguage(): ReadOnlyLanguage
+    fun getUser(): ReadOnlyUser
 }
 
 fun FlashcardSet.lastChronoday(): Chronoday? =
