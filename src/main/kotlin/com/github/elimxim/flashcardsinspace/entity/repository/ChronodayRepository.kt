@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ChronodayRepository : JpaRepository<Chronoday, Long> {
+    fun countByFlashcardSetId(flashcardSetId: Long): Int
 }

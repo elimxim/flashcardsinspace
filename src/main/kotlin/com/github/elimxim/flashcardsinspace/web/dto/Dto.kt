@@ -83,3 +83,9 @@ data class ReviewSessionDto(
     val lastUpdatedAt: ZonedDateTime?,
     val metadata: Map<String, Any>?,
 )
+
+data class FlashcardAudioMetadataDto(
+    val audioId: Long,
+    val flashcardSide: String,
+    val flashcardId: Long,
+)

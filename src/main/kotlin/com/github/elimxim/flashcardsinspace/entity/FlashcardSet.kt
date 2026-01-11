@@ -1,7 +1,6 @@
 package com.github.elimxim.flashcardsinspace.entity
 
 import jakarta.persistence.*
-import org.hibernate.Hibernate
 import java.time.ZonedDateTime
 
 @Entity
@@ -27,11 +26,11 @@ open class FlashcardSet(
     @Column(nullable = true)
     open var lastUpdatedAt: ZonedDateTime? = null,
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "language_id", referencedColumnName = "id")
     open var language: Language,
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     open var user: User,
 
@@ -58,25 +57,16 @@ open class FlashcardSet(
         fetch = FetchType.LAZY,
     )
     open var dayStreak: DayStreak? = null,
-
-    @OneToMany(
-        mappedBy = "flashcardSet",
-        cascade = [CascadeType.ALL],
-        orphanRemoval = true,
-        fetch = FetchType.LAZY,
-    )
-    open var reviewSessions: MutableList<ReviewSession> = mutableListOf(),
 )
 
 enum class FlashcardSetStatus {
     ACTIVE, DELETED, SUSPENDED
 }
 
-fun FlashcardSet.lastChronoday(): Chronoday? =
-    chronodays.maxByOrNull { it.chronodate }
-
-fun FlashcardSet.flashcardsNumber(): Int =
-    Hibernate.size(flashcards)
+interface FlashcardCount {
+    val id: Long
+    val flashcardCount: Int
+}
 
 fun FlashcardSet.isSuspended(): Boolean =
     status == FlashcardSetStatus.SUSPENDED

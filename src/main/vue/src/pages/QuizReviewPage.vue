@@ -202,6 +202,7 @@ function resetState() {
 
 function finishReview() {
   Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.QUIZ}`)
+  currFlashcardWatcher.stop()
   resetState()
 }
 
@@ -266,10 +267,14 @@ function onAudioChanged() {
   reviewStore.fetchAudio(flashcardSet.value)
 }
 
-watch(currFlashcard, async (newVal) => {
+const currFlashcardWatcher = watch(currFlashcard, async (newVal) => {
   if (!newVal) {
     stopWatch()
-    await updateQuizSession(reviewedFlashcardIds.value, incorrectFlashcards.value.map(f => f.id), true)
+    await updateQuizSession(
+      reviewedFlashcardIds.value,
+      incorrectFlashcards.value.map(f => f.id),
+      true
+    )
   }
 })
 
@@ -317,6 +322,7 @@ async function loadQuizSession(sessionId: number) {
       reviewedFlashcardIds.value = [...reviewedFlashcardIdSet]
       incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIdSet.has(f.id))
       reviewStore.loadState(new MonoStageReviewQueue(flashcardsForReview))
+      reviewStore.setFlashcardsTotal(currRoundFlashcards.length)
       Log.log(LogTag.LOGIC, `Quiz session ${sessionId} retrieved`)
     })
     .catch((error) => {

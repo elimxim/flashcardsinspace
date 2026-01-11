@@ -20,12 +20,13 @@ sealed class DayStreakScanResult {
 class DayStreakService {
 
     @Transactional
-    fun calcDayStreak(flashcardSet: FlashcardSet) {
-        val chronodays = flashcardSet.chronodays.sortedBy { it.chronodate }
+    fun calcDayStreak(flashcardSet: FlashcardSet, chronodays: List<Chronoday>) {
+        val chronodays = chronodays.sortedBy { it.chronodate }
         if (chronodays.size < 2) return
 
         val dayStreak = getOrCreateDayStreak(flashcardSet, chronodays)
         val result = calcStreakDays(
+            flashcardSet = flashcardSet,
             fromInclusive = chronodays.last(),
             toExclusive = dayStreak.lastDay,
             chronodays = chronodays,
@@ -97,13 +98,14 @@ class DayStreakService {
      * @return [DayStreakScanResult] describing whether the streak progressed, reset, or did not change
      */
     fun calcStreakDays(
+        flashcardSet: FlashcardSet,
         fromInclusive: Chronoday,
         toExclusive: Chronoday,
         chronodays: List<Chronoday>
     ): DayStreakScanResult {
         log.info(
             """
-            Calculating streak days for flashcard set ${fromInclusive.flashcardSet.id}:
+            Calculating streak days for flashcard set ${flashcardSet.id}:
             [${fromInclusive.id} / ${fromInclusive.chronodate}, ${toExclusive.id} / ${toExclusive.chronodate})
             """.trimOneLine()
         )

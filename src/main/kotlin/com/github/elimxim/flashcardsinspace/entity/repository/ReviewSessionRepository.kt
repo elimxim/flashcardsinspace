@@ -1,9 +1,12 @@
 package com.github.elimxim.flashcardsinspace.entity.repository
 
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
 import com.github.elimxim.flashcardsinspace.entity.ReviewSession
 import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import java.util.*
 
 interface ReviewSessionRepository : JpaRepository<ReviewSession, Long> {
     @Query("""
@@ -25,5 +28,8 @@ interface ReviewSessionRepository : JpaRepository<ReviewSession, Long> {
     """)
     fun findLatestUncompletedReviewSessions(flashcardSetId: Long, type: ReviewSessionType, depthDays: Int): List<ReviewSession>
 
-    fun deleteByFlashcardSetId(flashcardSetId: Long)
+    @EntityGraph(attributePaths = ["flashcardSet", "reviewDay"])
+    override fun findById(id: Long): Optional<ReviewSession>
+
+    fun deleteByFlashcardSet(flashcardSet: FlashcardSet)
 }

@@ -83,7 +83,7 @@ class LightspeedServiceTest {
 
         @Test
         fun `should return empty list when chronodays is empty`() {
-            val schedule = service.createSchedule(emptyList())
+            val schedule = service.createSchedule(testFlashcardSet(), emptyList())
 
             assertThat(schedule).isEmpty()
         }
@@ -103,7 +103,7 @@ class LightspeedServiceTest {
                 testChronoday(6, startDate.plusDays(6), ChronodayStatus.NOT_STARTED, flashcardSet),
             )
 
-            val schedule = service.createSchedule(chronodays, daysAhead = 5)
+            val schedule = service.createSchedule(flashcardSet, chronodays, daysAhead = 5)
 
             assertThat(schedule).hasSize(13)
 
@@ -163,7 +163,7 @@ class LightspeedServiceTest {
                 testChronoday(4, startDate.plusDays(4), ChronodayStatus.NOT_STARTED, flashcardSet),
             )
 
-            val schedule = service.createSchedule(chronodays, daysAhead = 0)
+            val schedule = service.createSchedule(flashcardSet, chronodays, daysAhead = 0)
 
             with(schedule[1]) {
                 assertThat(seqNumber).isNull()
@@ -196,7 +196,7 @@ class LightspeedServiceTest {
                 testChronoday(4, startDate.plusDays(4), ChronodayStatus.OFF, flashcardSet),
             )
 
-            val schedule = service.createSchedule(chronodays, daysAhead = 0)
+            val schedule = service.createSchedule(flashcardSet, chronodays, daysAhead = 0)
 
             assertThat(schedule[1].seqNumber).isEqualTo(1)
             assertThat(schedule[2].seqNumber).isEqualTo(2)
@@ -215,7 +215,7 @@ class LightspeedServiceTest {
                 testChronoday(2, startDate.plusDays(2), ChronodayStatus.OFF, flashcardSet),
             )
 
-            val schedule = service.createSchedule(chronodays, daysAhead = 0)
+            val schedule = service.createSchedule(flashcardSet, chronodays, daysAhead = 0)
 
             assertThat(schedule).hasSize(4)
             assertThat(schedule[0].seqNumber).isEqualTo(0)
@@ -235,7 +235,7 @@ class LightspeedServiceTest {
                 testChronoday(102, startDate.plusDays(2), ChronodayStatus.OFF, flashcardSet),
             )
 
-            val schedule = service.createSchedule(chronodays, daysAhead = 0)
+            val schedule = service.createSchedule(flashcardSet, chronodays, daysAhead = 0)
 
             assertThat(schedule[0].id).isEqualTo(100)
             assertThat(schedule[1].id).isEqualTo(101)
@@ -256,7 +256,7 @@ class LightspeedServiceTest {
                 testChronoday(5, startDate.plusDays(5), ChronodayStatus.NOT_STARTED, flashcardSet),
             )
 
-            val schedule = service.createSchedule(chronodays, daysAhead = 0)
+            val schedule = service.createSchedule(flashcardSet, chronodays, daysAhead = 0)
 
             assertThat(schedule[0].seqNumber).isEqualTo(0)
             assertThat(schedule[1].seqNumber).isEqualTo(1)
@@ -276,7 +276,7 @@ class LightspeedServiceTest {
                 testChronoday(1, startDate.plusDays(1), ChronodayStatus.NOT_STARTED, flashcardSet),
             )
 
-            val schedule = service.createSchedule(chronodays, daysAhead = 3)
+            val schedule = service.createSchedule(flashcardSet, chronodays, daysAhead = 3)
 
             assertThat(schedule).hasSize(6)
             assertThat(schedule[0].seqNumber).isEqualTo(0)
@@ -300,7 +300,7 @@ class LightspeedServiceTest {
                 testChronoday(4, startDate.plusDays(4), ChronodayStatus.NOT_STARTED, flashcardSet),
             )
 
-            val schedule = service.createSchedule(chronodays, daysAhead = 0)
+            val schedule = service.createSchedule(flashcardSet, chronodays, daysAhead = 0)
 
             assertThat(schedule[0].status).isEqualTo(ChronodayStatus.INITIAL.name)
             assertThat(schedule[1].status).isEqualTo(ChronodayStatus.IN_PROGRESS.name)
@@ -326,7 +326,7 @@ class LightspeedServiceTest {
                 testChronoday(2, startDate.plusDays(1), ChronodayStatus.NOT_STARTED, flashcardSet),
             )
 
-            assertThatThrownBy { service.createSchedule(chronodays, daysAhead = 0) }
+            assertThatThrownBy { service.createSchedule(flashcardSet, chronodays, daysAhead = 0) }
                 .isInstanceOf(HttpInternalServerErrorException::class.java)
                 .hasMessageContaining("Duplicated dates")
                 .hasMessageContaining("2024-01-02")
@@ -344,7 +344,7 @@ class LightspeedServiceTest {
                 testChronoday(2, startDate.plusDays(2), ChronodayStatus.NOT_STARTED, flashcardSet),
             )
 
-            val schedule = service.createSchedule(chronodays, daysAhead = 0)
+            val schedule = service.createSchedule(flashcardSet, chronodays, daysAhead = 0)
 
             assertThat(schedule[0].chronodate).isEqualTo(startDate)
             assertThat(schedule[1].chronodate).isEqualTo(startDate.plusDays(1))

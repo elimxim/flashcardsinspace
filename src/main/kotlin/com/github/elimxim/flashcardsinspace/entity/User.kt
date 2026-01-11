@@ -40,7 +40,7 @@ open class User(
     @Column(nullable = false)
     open var timezone: String = "UTC",
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "language_id", referencedColumnName = "id")
     open var language: Language,
 
@@ -55,3 +55,4 @@ open class User(
     override fun isCredentialsNonExpired(): Boolean = true
     override fun isEnabled(): Boolean = true
 }
+

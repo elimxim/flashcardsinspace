@@ -19,7 +19,7 @@ open class Chronoday(
     @Column(nullable = false)
     open var status: ChronodayStatus,
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "flashcard_set_id", referencedColumnName = "id")
     open var flashcardSet: FlashcardSet,
 )

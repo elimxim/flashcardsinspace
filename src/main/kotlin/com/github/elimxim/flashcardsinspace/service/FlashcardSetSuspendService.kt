@@ -1,12 +1,14 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
+import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.entity.isSuspended
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetSuspendResponse
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetUpdateRequest
-import com.github.elimxim.flashcardsinspace.web.dto.ValidFlashcardSetUpdateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.HttpBadRequestException
@@ -20,29 +22,25 @@ private val log = LoggerFactory.getLogger(FlashcardSetSuspendService::class.java
 @Service
 class FlashcardSetSuspendService(
     private val flashcardSetService: FlashcardSetService,
-    private val requestValidator: RequestValidator,
     private val flashcardSetRepository: FlashcardSetRepository,
+    private val requestValidator: RequestValidator,
     private val lightspeedService: LightspeedService,
 ) {
     @Transactional
     fun suspend(user: User, id: Long, request: FlashcardSetUpdateRequest): FlashcardSetSuspendResponse {
         log.info("Suspending flashcard set $id")
-        flashcardSetService.verifyUserHasAccess(user, id)
-        return suspend(id, requestValidator.validate(request))
-    }
-
-    @Transactional
-    fun suspend(id: Long, request: ValidFlashcardSetUpdateRequest): FlashcardSetSuspendResponse {
         val flashcardSet = flashcardSetService.getEntity(id)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
+        val validRequest = requestValidator.validate(request)
 
         if (flashcardSet.isSuspended()) {
             throw HttpBadRequestException(ApiErrorCode.FAS400, "Flashcard set $id is already suspended")
         }
 
-        val lastChronoday = flashcardSet.lastChronoday()
+        val lastChronoday = flashcardSet.chronodays.maxByOrNull { it.chronodate }
             ?: throw HttpBadRequestException(ApiErrorCode.FNC400, "Flashcard set $id has no chronodays")
 
-        flashcardSetService.mergeFlashcardSet(flashcardSet, request)
+        flashcardSetService.mergeFlashcardSet(flashcardSet, validRequest)
         flashcardSet.status = FlashcardSetStatus.SUSPENDED
 
         if (lastChronoday.status == ChronodayStatus.NOT_STARTED) {
@@ -50,7 +48,7 @@ class FlashcardSetSuspendService(
         }
 
         val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
-        val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays)
+        val schedule = lightspeedService.createSchedule(updatedFlashcardSet,updatedFlashcardSet.chronodays)
 
         val currDay = if (lastChronoday.status == ChronodayStatus.INITIAL) {
             schedule.first()

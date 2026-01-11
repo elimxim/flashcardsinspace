@@ -98,6 +98,10 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
       return result
     }
 
+    function setFlashcardsTotal(total: number) {
+      flashcardsTotal.value = total
+    }
+
     return {
       reviewQueue: readonly(reviewQueue),
       reviewStoreLoaded: readonly(loaded),
@@ -119,6 +123,7 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
       fetchAudio,
       prevFlashcard,
       nextFlashcard,
+      setFlashcardsTotal,
     }
   })()
 }

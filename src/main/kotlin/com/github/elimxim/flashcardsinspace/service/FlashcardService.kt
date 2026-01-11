@@ -6,7 +6,7 @@ import com.github.elimxim.flashcardsinspace.entity.ReviewInfo
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
-import com.github.elimxim.flashcardsinspace.util.*
+import com.github.elimxim.flashcardsinspace.util.trimOneLine
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.HttpConflictException
@@ -24,60 +24,52 @@ class FlashcardService(
     private val flashcardRepository: FlashcardRepository,
     private val requestValidator: RequestValidator,
 ) {
-    @Transactional
-    fun get(user: User, setId: Long): List<FlashcardDto> {
+    @Transactional(readOnly = true)
+    fun getAll(user: User, setId: Long): List<FlashcardDto> {
         log.info("Retrieving flashcards from set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        return flashcardSetService.getEntity(setId)
-            .flashcards.map { it.toDto() }
+        val flashcardSet = flashcardSetService.getEntity(setId)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
+        return flashcardRepository.findAllByFlashcardSetId(setId).map { it.toDto() }
     }
 
     @Transactional
     fun add(user: User, setId: Long, request: FlashcardCreationRequest): FlashcardDto {
         log.info("Adding a new flashcard to set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        return add(setId, requestValidator.validate(request)).toDto()
-    }
-
-    @Transactional
-    fun add(setId: Long, request: ValidFlashcardCreationRequest): Flashcard {
         val flashcardSet = flashcardSetService.getEntity(setId)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
+        val validRequest = requestValidator.validate(request)
         val flashcard = Flashcard(
-            frontSide = request.frontSide,
-            backSide = request.backSide,
-            stage = request.stage,
+            frontSide = validRequest.frontSide,
+            backSide = validRequest.backSide,
+            stage = validRequest.stage,
             timesReviewed = 0,
-            creationDate = request.creationDate,
+            creationDate = validRequest.creationDate,
             flashcardSet = flashcardSet,
         )
 
-        flashcardSet.flashcards.add(flashcard)
-        return flashcardRepository.save(flashcard)
+        return flashcardRepository.save(flashcard).toDto()
     }
 
     @Transactional
     fun update(user: User, setId: Long, id: Long, request: FlashcardUpdateRequest): FlashcardDto {
-        log.info("User ${user.id}: updating flashcard $id in set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        verifyUserOperation(user, setId, id)
-        return update(setId, id, requestValidator.validate(request)).toDto()
-    }
-
-    @Transactional
-    fun update(setId: Long, id: Long, request: ValidFlashcardUpdateRequest): Flashcard {
-        flashcardSetService.getEntity(setId)
+        log.info("Updating flashcard $id in set $setId")
         val flashcard = getEntity(id)
+        flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
+        verifyUserOperation(user, setId, flashcard)
+        val validRequest = requestValidator.validate(request)
 
-        if (isReviewOperation(flashcard, request)) {
-            flashcardSetService.verifyNotSuspended(setId)
+        if (isReviewOperation(flashcard, validRequest)) {
+            flashcardSetService.verifyNotSuspended(flashcard.flashcardSet)
         }
 
-        if (mergeFlashcard(flashcard, request)) {
+        val updatedFlashcard = if (mergeFlashcard(flashcard, validRequest)) {
             flashcard.lastUpdatedAt = ZonedDateTime.now()
-            return flashcardRepository.save(flashcard)
+            flashcardRepository.save(flashcard)
         } else {
-            return flashcard
+            flashcard
         }
+
+        return updatedFlashcard.toDto()
     }
 
     private fun isReviewOperation(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Boolean {
@@ -129,31 +121,54 @@ class FlashcardService(
     @Transactional
     fun remove(user: User, setId: Long, id: Long) {
         log.info("Removing flashcard $id from set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        verifyUserOperation(user, setId, id)
-        val flashcardSet = flashcardSetService.getEntity(setId)
         val flashcard = getEntity(id)
-        flashcardSet.flashcards.remove(flashcard)
+        verifyUserOperation(user, setId, flashcard)
+        flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
         flashcardRepository.delete(flashcard)
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getEntity(id: Long): Flashcard =
         flashcardRepository.findById(id).orElseThrow {
             HttpNotFoundException(ApiErrorCode.FLA404, "Flashcard with id $id not found")
         }
 
-    @Transactional
-    fun verifyUserOperation(user: User, setId: Long, id: Long) {
-        if (getEntity(id).flashcardSet.id != setId) {
+    @Transactional(readOnly = true)
+    fun verifyUserOperation(user: User, setId: Long, flashcard: Flashcard) {
+        if (flashcard.flashcardSet.id != setId) {
             throw HttpConflictException(
                 ApiErrorCode.FSF409,
                 """
-                User ${user.id} requested flashcard $id 
+                User ${user.id} requested flashcard ${flashcard.id}
                 doesn't belong to the requested set $setId
                 """.trimOneLine()
             )
         }
     }
 
+}
+
+private fun isFrontSideChanged(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Boolean {
+    return request.frontSide != null && request.frontSide != flashcard.frontSide
+}
+
+private fun isBackSideChanged(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Boolean {
+    return request.backSide != null && request.backSide != flashcard.backSide
+}
+
+private fun isStageChanged(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Boolean {
+    return request.stage != null && request.stage != flashcard.stage
+}
+
+private fun isTimesReviewedChanged(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Boolean {
+    return request.timesReviewed != null && request.timesReviewed != flashcard.timesReviewed
+}
+
+private fun isReviewHistoryChanged(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Boolean {
+    return request.reviewHistory != null && request.reviewHistory.history.size != flashcard.reviewHistory.history.size
+}
+
+private fun isLastReviewDateChanged(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Boolean {
+    return request.lastReviewDate != null &&
+            (flashcard.lastReviewDate == null || !request.lastReviewDate.isEqual(flashcard.lastReviewDate))
 }

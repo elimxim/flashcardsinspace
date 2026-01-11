@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.ZoneId
-import java.time.ZonedDateTime
 
 private val log = LoggerFactory.getLogger(ChronoService::class.java)
 
@@ -32,13 +31,11 @@ class ChronoService(
     @Transactional
     fun sync(user: User, setId: Long, request: ChronoSyncRequest): ChronoSyncResponse {
         log.info("Syncing chronodays for flashcard set $setId, timezone: ${user.timezone}")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        return sync(setId, requestValidator.validate(request).clientDatetime, clientTimezone = user.timezone)
-    }
-
-    @Transactional
-    fun sync(setId: Long, clientDatetime: ZonedDateTime, clientTimezone: String): ChronoSyncResponse {
         val flashcardSet = flashcardSetService.getEntity(setId)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
+        val validRequest = requestValidator.validate(request)
+        val clientDatetime = validRequest.clientDatetime
+        val clientTimezone = user.timezone
 
         val clientZoneId = ZoneId.of(clientTimezone)
         val datetimeInUserZone = clientDatetime.withZoneSameInstant(clientZoneId)
@@ -58,7 +55,7 @@ class ChronoService(
             )
         }
 
-        val lastDate = flashcardSet.lastChronoday()?.chronodate ?: currDate
+        val lastDate = flashcardSet.chronodays.maxByOrNull { it.chronodate }?.chronodate ?: currDate
         val updatedFlashcardSet = if (currDate.isAfter(lastDate)) {
             val status = if (flashcardSet.isSuspended()) ChronodayStatus.OFF else ChronodayStatus.NOT_STARTED
 
@@ -75,7 +72,7 @@ class ChronoService(
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
-        dayStreakService.calcDayStreak(updatedFlashcardSet)
+        dayStreakService.calcDayStreak(updatedFlashcardSet, updatedFlashcardSet.chronodays)
 
         val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
         val (currDay, chronodays) = applySchedule(updatedFlashcardSet)
@@ -89,17 +86,12 @@ class ChronoService(
 
     @Transactional
     fun syncDay(user: User, setId: Long, day: ChronoSyncDay): ChronoSyncResponse {
-        log.info("User ${user.id}: syncing day $day for flashcard set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        flashcardSetService.verifyNotSuspended(setId)
-        return syncDay(setId, day)
-    }
-
-    @Transactional
-    fun syncDay(setId: Long, day: ChronoSyncDay): ChronoSyncResponse {
+        log.info("Syncing day $day for flashcard set $setId")
         val flashcardSet = flashcardSetService.getEntity(setId)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
+        flashcardSetService.verifyNotSuspended(flashcardSet)
 
-        val lastChronoday = flashcardSet.lastChronoday()
+        val lastChronoday = flashcardSet.chronodays.maxByOrNull { it.chronodate }
             ?: throw HttpBadRequestException(ApiErrorCode.FSI400, "Flashcard set $setId is not started")
 
         if (flashcardSet.flashcards.isEmpty()) {
@@ -144,7 +136,7 @@ class ChronoService(
             }
         }
 
-        dayStreakService.calcDayStreak(flashcardSet)
+        dayStreakService.calcDayStreak(flashcardSet, flashcardSet.chronodays)
         val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
 
         val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
@@ -160,31 +152,27 @@ class ChronoService(
     @Transactional
     fun bulkUpdate(user: User, setId: Long, request: ChronoBulkUpdateRequest): ChronoUpdateResponse {
         log.info("Bulk updating chronodays for flashcard set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        flashcardSetService.verifyNotSuspended(setId)
-        return bulkUpdate(setId, requestValidator.validate(request))
-    }
-
-    @Transactional
-    fun bulkUpdate(setId: Long, request: ValidChronoBulkUpdateRequest): ChronoUpdateResponse {
         val flashcardSet = flashcardSetService.getEntity(setId)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
+        flashcardSetService.verifyNotSuspended(flashcardSet)
+        val validRequest = requestValidator.validate(request)
 
         val chronodaysToUpdate = flashcardSet.chronodays
-            .filter { it.id in request.ids }
+            .filter { it.id in validRequest.ids }
             .sortedBy { it.chronodate }
             .toMutableList()
 
         val lastChronoday = chronodaysToUpdate.removeLastOrNull()
         val updatedFlashcardSet = if (lastChronoday != null) {
-            lastChronoday.status = request.status
-            dayStreakService.calcDayStreak(flashcardSet)
-            chronodaysToUpdate.forEach { it.status = request.status }
+            lastChronoday.status = validRequest.status
+            dayStreakService.calcDayStreak(flashcardSet, flashcardSet.chronodays)
+            chronodaysToUpdate.forEach { it.status = validRequest.status }
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
         val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
-        val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays, daysAhead = 0)
-        val updatedDays = schedule.filter { it.id in request.ids }
+        val schedule = lightspeedService.createSchedule(flashcardSet, updatedFlashcardSet.chronodays, daysAhead = 0)
+        val updatedDays = schedule.filter { it.id in validRequest.ids }
 
         return ChronoUpdateResponse(
             chronodays = updatedDays,
@@ -192,7 +180,7 @@ class ChronoService(
         )
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getEntity(id: Long): Chronoday {
         return chronodayRepository.findById(id).orElseThrow {
             throw HttpNotFoundException(ApiErrorCode.CHR404, "Chronoday $id not found")
@@ -200,8 +188,8 @@ class ChronoService(
     }
 
     private fun applySchedule(flashcardSet: FlashcardSet): Pair<ChronodayDto, List<ChronodayDto>> {
-        val schedule = lightspeedService.createSchedule(flashcardSet.chronodays)
-        val lastChronoDate = flashcardSet.lastChronoday()?.chronodate
+        val schedule = lightspeedService.createSchedule(flashcardSet, flashcardSet.chronodays)
+        val lastChronoDate = flashcardSet.chronodays.maxByOrNull { it.chronodate }?.chronodate
         val currDay = schedule.find { it.chronodate.isEqual(lastChronoDate) }
             ?: throw HttpInternalServerErrorException(
                 ApiErrorCode.LCF500,

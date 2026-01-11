@@ -39,8 +39,8 @@ fun FlashcardAudio.sizeKB(): Int {
     return (audioSize / 1024.0).roundToInt()
 }
 
-data class FlashcardAudioMetadata(
-    val audioId: Long,
-    val flashcardSide: FlashcardSide,
-    val flashcardId: Long,
-)
+interface FlashcardAudioMetadata {
+    fun getAudioId(): Long
+    fun getSide(): FlashcardSide
+    fun getFlashcardId(): Long
+}

@@ -21,7 +21,7 @@ class UserService(
     private val requestValidator: RequestValidator,
     private val languageService: LanguageService,
 ) {
-    @Transactional
+    @Transactional(readOnly = true)
     fun findByEmail(username: String): UserDto {
         return userRepository.findByEmail(username)
             .orElseThrow { UsernameNotFoundException("User not found: $username") }

@@ -22,7 +22,7 @@ class FlashcardController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
     ): ResponseEntity<List<FlashcardDto>> = withLoggingContext(user) {
-        val result = flashcardService.get(user, setId)
+        val result = flashcardService.getAll(user, setId)
         return ResponseEntity.ok(result)
     }
 
