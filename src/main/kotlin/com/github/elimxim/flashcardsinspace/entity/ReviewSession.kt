@@ -41,11 +41,11 @@ open class ReviewSession(
     @Column(nullable = true)
     open var parentSessionId: Long? = null,
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "flashcard_set_id", referencedColumnName = "id")
     open var flashcardSet: FlashcardSet,
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "chronoday_id", referencedColumnName = "id")
     open var reviewDay: Chronoday,
 )
