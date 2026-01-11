@@ -183,11 +183,10 @@ function resetState() {
 async function finishReview() {
   if (!reviewStoreLoaded.value) return
   Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
+  currFlashcardWatcher.stop()
   try {
     if (flashcardSet.value && noNextAvailable.value) {
       await markDaysAsCompleted(flashcardSet.value)
-    } else {
-      Log.error(LogTag.LOGIC, 'Couldn\'t gracefully finish review: FlashcardSet is undefined')
     }
   } finally {
     resetState()
@@ -289,12 +288,14 @@ function onAudioChanged() {
   reviewStore.fetchAudio(flashcardSet.value)
 }
 
-watch(currFlashcard, async (newVal, oldVal) => {
+const currFlashcardWatcher = watch(currFlashcard, async (newVal, oldVal) => {
   if (oldVal) {
+    Log.log(LogTag.DEBUG, `oldVal`)
     reviewedFlashcardIds.value.push(oldVal.id)
     await updateReviewSession([oldVal.id])
   }
   if (!newVal) {
+    Log.log(LogTag.DEBUG, `!newVal`)
     stopWatch()
     await updateReviewSession(reviewedFlashcardIds.value, true)
   }
