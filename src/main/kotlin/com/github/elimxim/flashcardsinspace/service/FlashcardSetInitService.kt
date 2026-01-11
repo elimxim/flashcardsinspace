@@ -1,6 +1,7 @@
 package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardCreationRequest
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetInitResponse
@@ -18,6 +19,7 @@ private val log = getLogger(FlashcardSetInitService::class.java)
 @Service
 class FlashcardSetInitService(
     private val flashcardSetService: FlashcardSetService,
+    private val flashcardSetRepository: FlashcardSetRepository,
     private val flashcardSetDbService: FlashcardSetDbService,
     private val lightspeedService: LightspeedService,
     private val requestValidator: RequestValidator,
@@ -59,7 +61,7 @@ class FlashcardSetInitService(
         flashcardSet.flashcards.add(flashcard)
         flashcardSet.chronodays.add(initial)
 
-        val updatedFlashcardSet = flashcardSetDbService.save(flashcardSet)
+        val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
         val createdFlashcard = flashcardSet.flashcards.last()
         val createdInitial = updatedFlashcardSet.lastChronoday()!!
         val schedule = lightspeedService.createSchedule(flashcardSet, chronodays = listOf(createdInitial))

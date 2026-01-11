@@ -4,8 +4,7 @@ import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.isSuspended
-import com.github.elimxim.flashcardsinspace.entity.repository.DayStreakRepository
-import com.github.elimxim.flashcardsinspace.entity.repository.ReviewSessionRepository
+import com.github.elimxim.flashcardsinspace.entity.repository.*
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
@@ -22,6 +21,9 @@ private val log = LoggerFactory.getLogger(FlashcardSetService::class.java)
 @Service
 class FlashcardSetService(
     private val flashcardSetDbService: FlashcardSetDbService,
+    private val flashcardSetRepository: FlashcardSetRepository,
+    private val chronodayRepository: ChronodayRepository,
+    private val flashcardRepository: FlashcardRepository,
     private val languageService: LanguageService,
     private val requestValidator: RequestValidator,
     private val dayStreakRepository: DayStreakRepository,
@@ -31,17 +33,17 @@ class FlashcardSetService(
     @Transactional(readOnly = true)
     fun getAll(user: User): List<FlashcardSetDto> {
         log.info("Retrieving all flashcard sets")
-        val result = flashcardSetDbService.findAll(
-            user, FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED
-        )
+        val statuses = setOf(FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED)
+        val result = flashcardSetRepository.findAllReadOnlyByUser(user)
+            .filter { fs -> fs.getStatus() in statuses }
         return result.map { it.toDto() }
     }
 
     @Transactional(readOnly = true)
     fun getAllExtra(user: User): List<FlashcardSetExtraDto> {
         log.info("Retrieving all flashcard sets extra")
-        val counts = flashcardSetDbService.countFlashcards(
-            user, FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED
+        val counts = flashcardSetRepository.countFlashcardsByUserAndStatusIn(
+            user, status = listOf(FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED)
         )
         return counts.map {
             FlashcardSetExtraDto(
@@ -76,7 +78,7 @@ class FlashcardSetService(
             user = user,
         )
 
-        return flashcardSetDbService.save(flashcardSet).toDto()
+        return flashcardSetRepository.save(flashcardSet).toDto()
     }
 
     @Transactional
@@ -92,7 +94,7 @@ class FlashcardSetService(
         val changed = mergeFlashcardSet(flashcardSet, request)
 
         return if (changed) {
-            flashcardSetDbService.save(flashcardSet).toDto()
+            flashcardSetRepository.save(flashcardSet).toDto()
         } else {
             flashcardSet.toDto()
         }
@@ -126,16 +128,16 @@ class FlashcardSetService(
         log.info("Removing flashcard set $id")
         verifyUserHasAccess(user, id)
         val flashcardSet = flashcardSetDbService.findById(id)
-        val flashcardCount = flashcardSetDbService.countFlashcards(flashcardSet)
+        val flashcardCount = flashcardRepository.countByFlashcardSet(flashcardSet)
         if (flashcardCount >= 40) {
             flashcardSet.status = FlashcardSetStatus.DELETED
-            flashcardSetDbService.save(flashcardSet)
+            flashcardSetRepository.save(flashcardSet)
         } else {
             dayStreakRepository.deleteByFlashcardSet(flashcardSet)
             reviewSessionRepository.deleteByFlashcardSet(flashcardSet)
             entityManager.flush()
             entityManager.clear()
-            flashcardSetDbService.delete(flashcardSet)
+            flashcardSetRepository.delete(flashcardSet)
         }
     }
 
@@ -152,7 +154,7 @@ class FlashcardSetService(
     @Transactional(readOnly = true)
     fun verifyInitialized(id: Long) {
         val flashcardSet = flashcardSetDbService.findById(id)
-        val chronodayCount = flashcardSetDbService.countChronodays(flashcardSet)
+        val chronodayCount = chronodayRepository.countByFlashcardSet(flashcardSet)
         if (chronodayCount == 0) {
             throw HttpBadRequestException(ApiErrorCode.FSI400, "Flashcard set $id is not started")
         }

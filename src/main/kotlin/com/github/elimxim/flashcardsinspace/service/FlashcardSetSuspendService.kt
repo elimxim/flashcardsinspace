@@ -1,6 +1,7 @@
 package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetSuspendResponse
@@ -19,6 +20,7 @@ private val log = LoggerFactory.getLogger(FlashcardSetSuspendService::class.java
 @Service
 class FlashcardSetSuspendService(
     private val flashcardSetService: FlashcardSetService,
+    private val flashcardSetRepository: FlashcardSetRepository,
     private val flashcardSetDbService: FlashcardSetDbService,
     private val requestValidator: RequestValidator,
     private val lightspeedService: LightspeedService,
@@ -48,7 +50,7 @@ class FlashcardSetSuspendService(
             lastChronoday.status = ChronodayStatus.OFF
         }
 
-        val updatedFlashcardSet = flashcardSetDbService.save(flashcardSet)
+        val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
         val schedule = lightspeedService.createSchedule(updatedFlashcardSet,updatedFlashcardSet.chronodays)
 
         val currDay = if (lastChronoday.status == ChronodayStatus.INITIAL) {

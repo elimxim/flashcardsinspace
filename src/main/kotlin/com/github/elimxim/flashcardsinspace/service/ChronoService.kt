@@ -2,6 +2,7 @@ package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepository
+import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
 import com.github.elimxim.flashcardsinspace.web.dto.*
@@ -23,6 +24,7 @@ enum class ChronoSyncDay { NEXT, PREV }
 class ChronoService(
     private val flashcardSetService: FlashcardSetService,
     private val flashcardSetDbService: FlashcardSetDbService,
+    private val flashcardSetRepository: FlashcardSetRepository,
     private val lightspeedService: LightspeedService,
     private val requestValidator: RequestValidator,
     private val dayStreakService: DayStreakService,
@@ -71,7 +73,7 @@ class ChronoService(
                 )
             }
 
-            flashcardSetDbService.save(flashcardSet)
+            flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
         dayStreakService.calcDayStreak(updatedFlashcardSet)
@@ -144,7 +146,7 @@ class ChronoService(
         }
 
         dayStreakService.calcDayStreak(flashcardSet)
-        val updatedFlashcardSet = flashcardSetDbService.save(flashcardSet)
+        val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
 
         val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
         val (currDay, chronodays) = applySchedule(updatedFlashcardSet)
@@ -178,7 +180,7 @@ class ChronoService(
             lastChronoday.status = request.status
             dayStreakService.calcDayStreak(flashcardSet)
             chronodaysToUpdate.forEach { it.status = request.status }
-            flashcardSetDbService.save(flashcardSet)
+            flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
         val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
