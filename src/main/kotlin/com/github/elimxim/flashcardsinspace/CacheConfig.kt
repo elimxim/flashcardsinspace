@@ -27,6 +27,7 @@ class CacheConfig {
             Caffeine.newBuilder()
                 .expireAfterWrite(40, TimeUnit.DAYS)
                 .maximumSize(1)
+                .recordStats()
                 .build()
         )
         cacheManager.registerCustomCache(
@@ -34,6 +35,7 @@ class CacheConfig {
             Caffeine.newBuilder()
                 .expireAfterWrite(40, TimeUnit.DAYS)
                 .maximumSize(400)
+                .recordStats()
                 .build()
         )
         return cacheManager
