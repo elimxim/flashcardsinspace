@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 017-add-required-indexes
+      author: elimxim
+      changes:
+        - createIndex:
+            tableName: day_streak
+            indexName: idx_day_streak_flashcard_set_id
+            columns:
+              - column:
+                  name: flashcard_set_id
+        - createIndex:
+            tableName: day_streak
+            indexName: idx_day_streak_chronoday_id
+            columns:
+              - column:
+                  name: chronoday_id
+        
