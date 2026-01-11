@@ -15,4 +15,9 @@ databaseChangeLog:
             columns:
               - column:
                   name: chronoday_id
-        
+        - createIndex:
+            tableName: astro_user
+            indexName: idx_astro_user_language_id
+            columns:
+              - column:
+                  name: language_id
