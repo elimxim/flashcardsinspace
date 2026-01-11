@@ -62,7 +62,7 @@ class FlashcardSetInitService(
         val updatedFlashcardSet = flashcardSetDbService.save(flashcardSet)
         val createdFlashcard = flashcardSet.flashcards.last()
         val createdInitial = updatedFlashcardSet.lastChronoday()!!
-        val schedule = lightspeedService.createSchedule(chronodays = listOf(createdInitial))
+        val schedule = lightspeedService.createSchedule(flashcardSet, chronodays = listOf(createdInitial))
 
         return FlashcardSetInitResponse(
             flashcardSet = updatedFlashcardSet.toDto(),

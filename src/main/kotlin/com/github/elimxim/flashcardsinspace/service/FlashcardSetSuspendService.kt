@@ -49,7 +49,7 @@ class FlashcardSetSuspendService(
         }
 
         val updatedFlashcardSet = flashcardSetDbService.save(flashcardSet)
-        val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays)
+        val schedule = lightspeedService.createSchedule(updatedFlashcardSet,updatedFlashcardSet.chronodays)
 
         val currDay = if (lastChronoday.status == ChronodayStatus.INITIAL) {
             schedule.first()
