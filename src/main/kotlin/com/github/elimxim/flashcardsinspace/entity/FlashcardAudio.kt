@@ -38,3 +38,9 @@ open class FlashcardAudio(
 fun FlashcardAudio.sizeKB(): Int {
     return (audioSize / 1024.0).roundToInt()
 }
+
+interface FlashcardAudioMetadata {
+    fun getAudioId(): Long
+    fun getSide(): FlashcardSide
+    fun getFlashcardId(): Long
+}
