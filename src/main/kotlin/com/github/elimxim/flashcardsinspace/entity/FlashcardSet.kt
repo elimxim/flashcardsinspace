@@ -68,6 +68,17 @@ interface FlashcardCount {
     fun getFlashcardCount(): Int
 }
 
+interface ReadOnlyFlashcardSet {
+    fun getId(): Long
+    fun getName(): String
+    fun getStatus(): FlashcardSetStatus
+    fun getCreatedAt(): ZonedDateTime
+    fun getStartedAt(): ZonedDateTime?
+    fun getLastUpdatedAt(): ZonedDateTime?
+    fun getLanguage(): Language
+    fun getUser(): User
+}
+
 fun FlashcardSet.lastChronoday(): Chronoday? =
     chronodays.maxByOrNull { it.chronodate }
 

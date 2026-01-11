@@ -1,9 +1,6 @@
 package com.github.elimxim.flashcardsinspace.entity.repository
 
-import com.github.elimxim.flashcardsinspace.entity.FlashcardCount
-import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
-import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
-import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.entity.*
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -11,6 +8,22 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface FlashcardSetRepository : JpaRepository<FlashcardSet, Long> {
+    @Query("""
+        SELECT fs.id AS id, 
+               fs.name AS name, 
+               fs.status AS status, 
+               fs.createdAt AS createdAt, 
+               fs.startedAt AS startedAt, 
+               fs.lastUpdatedAt AS lastUpdatedAt, 
+               fs.language AS language, 
+               fs.user AS user
+        FROM FlashcardSet fs
+        LEFT JOIN FETCH fs.language l
+        LEFT JOIN FETCH fs.user u
+        WHERE fs.id = :id
+    """)
+    fun findReadOnlyById(id: Long): ReadOnlyFlashcardSet?
+
     @EntityGraph(attributePaths = ["language"])
     fun findAllByUserAndStatusIn(user: User, status: List<FlashcardSetStatus>): List<FlashcardSet>
 
