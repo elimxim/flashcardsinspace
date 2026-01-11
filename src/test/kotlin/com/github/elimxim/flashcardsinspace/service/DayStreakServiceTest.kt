@@ -30,7 +30,7 @@ class DayStreakServiceTest {
             )
             flashcardSet.dayStreak = dayStreak
 
-            service.calcDayStreak(flashcardSet)
+            service.calcDayStreak(flashcardSet, flashcardSet.chronodays)
 
             assertThat(flashcardSet.dayStreak?.streak).isEqualTo(dayStreak.streak)
             assertThat(flashcardSet.dayStreak?.lastDay?.id).isEqualTo(dayStreak.lastDay.id)
@@ -47,7 +47,7 @@ class DayStreakServiceTest {
 
             assertThat(flashcardSet.dayStreak).isNull()
 
-            service.calcDayStreak(flashcardSet)
+            service.calcDayStreak(flashcardSet, flashcardSet.chronodays)
 
             assertThat(flashcardSet.dayStreak).isNotNull()
             assertThat(flashcardSet.dayStreak!!.streak).isEqualTo(1)
@@ -63,7 +63,7 @@ class DayStreakServiceTest {
             val completedDay = testChronoday(2, startDate.plusDays(1), ChronodayStatus.COMPLETED, flashcardSet)
             flashcardSet.chronodays.addAll(listOf(initialDay, completedDay))
 
-            service.calcDayStreak(flashcardSet)
+            service.calcDayStreak(flashcardSet, flashcardSet.chronodays)
 
             assertThat(flashcardSet.dayStreak!!.streak).isEqualTo(1)
             assertThat(flashcardSet.dayStreak!!.lastDay.id).isEqualTo(2)
@@ -86,7 +86,7 @@ class DayStreakServiceTest {
             )
             flashcardSet.dayStreak = dayStreak
 
-            service.calcDayStreak(flashcardSet)
+            service.calcDayStreak(flashcardSet, flashcardSet.chronodays)
 
             assertThat(flashcardSet.dayStreak!!.streak).isEqualTo(0)
         }
@@ -107,7 +107,7 @@ class DayStreakServiceTest {
             )
             flashcardSet.dayStreak = dayStreak
 
-            service.calcDayStreak(flashcardSet)
+            service.calcDayStreak(flashcardSet, flashcardSet.chronodays)
 
             assertThat(flashcardSet.dayStreak!!.streak).isEqualTo(5)
         }
@@ -121,13 +121,13 @@ class DayStreakServiceTest {
             val completedDay2 = testChronoday(2, startDate.plusDays(1), ChronodayStatus.COMPLETED, flashcardSet)
             flashcardSet.chronodays.addAll(listOf(initialDay, completedDay2))
 
-            service.calcDayStreak(flashcardSet)
+            service.calcDayStreak(flashcardSet, flashcardSet.chronodays)
             assertThat(flashcardSet.dayStreak!!.streak).isEqualTo(1)
 
             val completedDay3 = testChronoday(3, startDate.plusDays(2), ChronodayStatus.COMPLETED, flashcardSet)
             flashcardSet.chronodays.add(completedDay3)
 
-            service.calcDayStreak(flashcardSet)
+            service.calcDayStreak(flashcardSet, flashcardSet.chronodays)
             assertThat(flashcardSet.dayStreak!!.streak).isEqualTo(2)
         }
     }

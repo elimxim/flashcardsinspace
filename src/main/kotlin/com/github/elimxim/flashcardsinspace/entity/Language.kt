@@ -15,9 +15,3 @@ open class Language(
     @Column(nullable = false, unique = true)
     open val code: String,
 )
-
-interface ReadOnlyLanguage {
-    val id: Long
-    val name: String
-    val code: String
-}

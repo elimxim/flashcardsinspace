@@ -40,7 +40,7 @@ open class Flashcard(
     @Column(nullable = true)
     open var lastUpdatedAt: ZonedDateTime? = null,
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "flashcard_set_id", referencedColumnName = "id")
     open var flashcardSet: FlashcardSet,
 )

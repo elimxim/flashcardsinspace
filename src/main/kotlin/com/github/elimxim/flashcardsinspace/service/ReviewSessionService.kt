@@ -1,9 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.QuizMetadata
-import com.github.elimxim.flashcardsinspace.entity.ReviewSession
-import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
-import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.ReviewSessionRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.addQuizMetadata
@@ -23,7 +20,6 @@ private val log = LoggerFactory.getLogger(ReviewSessionService::class.java)
 class ReviewSessionService(
     private val requestValidator: RequestValidator,
     private val flashcardSetService: FlashcardSetService,
-    private val flashcardSetDbService: FlashcardSetDbService,
     private val chronoService: ChronoService,
     private val reviewSessionRepository: ReviewSessionRepository,
 ) {
@@ -31,16 +27,14 @@ class ReviewSessionService(
     @Transactional
     fun createReviewSession(user: User, setId: Long, request: ReviewSessionCreateRequest): ReviewSessionDto {
         log.info("Creating a new review session for set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        flashcardSetService.verifyInitialized(setId)
-        return createReviewSession(setId, requestValidator.validate(request))
-    }
+        val flashcardSet = flashcardSetService.getEntity(setId)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
+        flashcardSetService.verifyInitialized(flashcardSet)
 
-    @Transactional
-    fun createReviewSession(setId: Long, request: ValidReviewSessionCreateRequest): ReviewSessionDto {
-        val session = createNewReviewSession(setId, request)
+        val validRequest = requestValidator.validate(request)
+        val session = createNewReviewSession(flashcardSet, validRequest)
         if (session.type == ReviewSessionType.QUIZ) {
-            addQuizMetadata(session, request)
+            addQuizMetadata(session, validRequest)
         }
         val savedSession = reviewSessionRepository.save(session)
         return savedSession.toDto()
@@ -49,15 +43,12 @@ class ReviewSessionService(
     @Transactional
     fun updateReviewSession(user: User, setId: Long, id: Long, request: ReviewSessionUpdateRequest) {
         log.info("Updating review session $id for set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        flashcardSetService.verifyInitialized(setId)
-        updateReviewSession(id, requestValidator.validate(request))
-    }
-
-    @Transactional
-    fun updateReviewSession(id: Long, request: ValidReviewSessionUpdateRequest) {
         val session = getEntity(id)
-        val changed = mergeReviewSession(session, request)
+        flashcardSetService.verifyUserHasAccess(user, session.flashcardSet)
+        flashcardSetService.verifyInitialized(session.flashcardSet)
+
+        val validRequest = requestValidator.validate(request)
+        val changed = mergeReviewSession(session, validRequest)
         if (changed) {
             session.lastUpdatedAt = ZonedDateTime.now()
             reviewSessionRepository.save(session)
@@ -101,26 +92,19 @@ class ReviewSessionService(
         request: ReviewSessionCreateRequest
     ): ReviewSessionDto {
         log.info("Creating a child review session of $parentId for set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        flashcardSetService.verifyInitialized(setId)
-        return createChildReviewSession(setId, parentId, requestValidator.validate(request))
-    }
-
-    @Transactional
-    fun createChildReviewSession(
-        setId: Long,
-        parentId: Long,
-        request: ValidReviewSessionCreateRequest
-    ): ReviewSessionDto {
         val parentSession = getEntity(parentId)
-        if (request.type != parentSession.type) {
+        flashcardSetService.verifyUserHasAccess(user, parentSession.flashcardSet)
+        flashcardSetService.verifyInitialized(parentSession.flashcardSet)
+
+        val validRequest = requestValidator.validate(request)
+        if (validRequest.type != parentSession.type) {
             throw HttpBadRequestException(
                 ApiErrorCode.STM400,
-                "Child session type ${request.type} is not the same as parent session type ${parentSession.type}"
+                "Child session type ${validRequest.type} is not the same as parent session type ${parentSession.type}"
             )
         }
 
-        val session = createNewReviewSession(setId, request).apply {
+        val session = createNewReviewSession(parentSession.flashcardSet, validRequest).apply {
             parentSessionId = parentSession.id
         }
         if (session.type == ReviewSessionType.QUIZ) {
@@ -130,7 +114,7 @@ class ReviewSessionService(
                     "Parent session ${parentSession.id} is not ${ReviewSessionType.QUIZ}"
                 )
             }
-            addQuizMetadata(session, request, parentSession)
+            addQuizMetadata(session, validRequest, parentSession)
         }
         val savedSession = reviewSessionRepository.save(session)
         log.info("Created child review session ${savedSession.id} of $parentId for set $setId")
@@ -140,14 +124,16 @@ class ReviewSessionService(
     @Transactional(readOnly = true)
     fun getReviewSession(user: User, setId: Long, id: Long): ReviewSessionDto {
         log.info("Getting review session $id for set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        return getEntity(id).toDto()
+        val session = getEntity(id)
+        flashcardSetService.verifyUserHasAccess(user, session.flashcardSet)
+        return session.toDto()
     }
 
     @Transactional(readOnly = true)
     fun getLatestUncompletedReviewSession(user: User, setId: Long, type: ReviewSessionType): ReviewSessionDto? {
         log.info("Getting latest uncompleted review session for set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
+        val flashcardSet = flashcardSetService.getEntity(setId)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
         val topUncompletedSessions = reviewSessionRepository
             .findLatestUncompletedReviewSessions(setId, type, 30)
             .filter {
@@ -170,13 +156,16 @@ class ReviewSessionService(
         }
     }
 
-    private fun createNewReviewSession(setId: Long, request: ValidReviewSessionCreateRequest): ReviewSession {
+    private fun createNewReviewSession(
+        flashcardSet: FlashcardSet,
+        request: ValidReviewSessionCreateRequest
+    ): ReviewSession {
         return ReviewSession(
             type = request.type,
             flashcardIds = null,
             elapsedTime = 0,
             startedAt = ZonedDateTime.now(),
-            flashcardSet = flashcardSetDbService.findById(setId),
+            flashcardSet = flashcardSet,
             reviewDay = chronoService.getEntity(request.chronodayId),
         )
     }

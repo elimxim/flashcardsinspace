@@ -12,5 +12,7 @@ interface FlashcardRepository : JpaRepository<Flashcard, Long> {
     @EntityGraph(attributePaths = ["flashcardSet"])
     override fun findById(id: Long): Optional<Flashcard>
 
+    fun findAllByFlashcardSetId(flashcardSetId: Long): List<Flashcard>
+
     fun countByFlashcardSet(flashcardSet: FlashcardSet): Int
 }

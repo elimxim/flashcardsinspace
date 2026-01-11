@@ -28,7 +28,8 @@ class FlashcardAudioService(
     @Transactional(readOnly = true)
     fun getMetadata(user: User, setId: Long): List<FlashcardAudioMetadataDto> {
         log.info("Getting audio metadata for flashcard set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
+        val flashcardSet = flashcardSetService.getEntity(setId)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
 
         return flashcardAudioRepository.findAllMetadata(setId).map {
             FlashcardAudioMetadataDto(
@@ -42,8 +43,9 @@ class FlashcardAudioService(
     @Transactional(readOnly = true)
     fun fetchAudio(user: User, setId: Long, flashcardId: Long, side: String): FlashcardAudio? {
         log.info("Fetching audio for flashcard $flashcardId in set $setId, side: $side")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        flashcardService.verifyUserOperation(user, setId, flashcardId)
+        val flashcard = flashcardService.getEntity(flashcardId)
+        flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
+        flashcardService.verifyUserOperation(user, setId, flashcard)
         val side = parseSide(side)
         return flashcardAudioRepository.findByFlashcardIdAndSide(flashcardId, side)
     }
@@ -51,8 +53,9 @@ class FlashcardAudioService(
     @Transactional(readOnly = true)
     fun fetchAudio(user: User, setId: Long, flashcardId: Long, audioId: Long): FlashcardAudio {
         log.info("Fetching audio $audioId for flashcard $flashcardId in set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        flashcardService.verifyUserOperation(user, setId, flashcardId)
+        val flashcard = flashcardService.getEntity(flashcardId)
+        flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
+        flashcardService.verifyUserOperation(user, setId, flashcard)
         return getEntity(audioId)
     }
 
@@ -65,15 +68,10 @@ class FlashcardAudioService(
         file: MultipartFile,
     ): FlashcardAudioDto {
         log.info("Uploading audio file ${file.originalFilename} for flashcard $flashcardId in set $setId, size: ${file.size} bytes")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        flashcardService.verifyUserOperation(user, setId, flashcardId)
-
-        return saveOrUpdateAudio(flashcardId, side, file)
-    }
-
-    @Transactional
-    fun saveOrUpdateAudio(flashcardId: Long, side: String, file: MultipartFile): FlashcardAudioDto {
         val flashcard = flashcardService.getEntity(flashcardId)
+        flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
+        flashcardService.verifyUserOperation(user, setId, flashcard)
+
         val flashcardSide = parseSide(side)
         val audioData = file.bytes
 
@@ -105,8 +103,9 @@ class FlashcardAudioService(
     @Transactional
     fun removeAudio(user: User, setId: Long, flashcardId: Long, audioId: Long) {
         log.info("Removing audio $audioId for flashcard $flashcardId in set $setId")
-        flashcardSetService.verifyUserHasAccess(user, setId)
-        flashcardService.verifyUserOperation(user, setId, flashcardId)
+        val flashcard = flashcardService.getEntity(flashcardId)
+        flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
+        flashcardService.verifyUserOperation(user, setId, flashcard)
 
         val audio = getEntity(audioId)
         flashcardAudioRepository.delete(audio)

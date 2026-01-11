@@ -20,8 +20,8 @@ sealed class DayStreakScanResult {
 class DayStreakService {
 
     @Transactional
-    fun calcDayStreak(flashcardSet: FlashcardSet) {
-        val chronodays = flashcardSet.chronodays.sortedBy { it.chronodate }
+    fun calcDayStreak(flashcardSet: FlashcardSet, chronodays: List<Chronoday>) {
+        val chronodays = chronodays.sortedBy { it.chronodate }
         if (chronodays.size < 2) return
 
         val dayStreak = getOrCreateDayStreak(flashcardSet, chronodays)

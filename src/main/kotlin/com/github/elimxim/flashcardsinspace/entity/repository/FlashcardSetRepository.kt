@@ -1,36 +1,22 @@
 package com.github.elimxim.flashcardsinspace.entity.repository
 
-import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.entity.FlashcardCount
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
+import com.github.elimxim.flashcardsinspace.entity.User
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import java.util.*
 
 @Repository
 interface FlashcardSetRepository : JpaRepository<FlashcardSet, Long> {
     @EntityGraph(attributePaths = ["language", "user"])
-    fun findReadOnlyById(id: Long): ReadOnlyFlashcardSet?
-    
-    @EntityGraph(attributePaths = ["language", "user"])
-    fun findAllReadOnlyByUser(user: User): List<ReadOnlyFlashcardSet>
+    override fun findById(id: Long): Optional<FlashcardSet>
 
     @EntityGraph(attributePaths = ["language"])
     fun findAllByUserAndStatusIn(user: User, status: List<FlashcardSetStatus>): List<FlashcardSet>
-
-    @EntityGraph(attributePaths = ["language"])
-    fun findWithLanguageById(id: Long): FlashcardSet?
-
-    @EntityGraph(attributePaths = ["user"])
-    fun findWithUserById(id: Long): FlashcardSet?
-
-    @EntityGraph(attributePaths = ["language", "flashcards"])
-    fun findWithLanguageAndFlashcardsById(id: Long): FlashcardSet?
-
-    @EntityGraph(attributePaths = ["language", "chronodays", "dayStreak"])
-    fun findWithLanguageAndChronodaysAndDayStreakById(id: Long): FlashcardSet?
-
-    @EntityGraph(attributePaths = ["user", "flashcards"])
-    fun findWithUserAndFlashcardsById(id: Long): FlashcardSet?
 
     @Query("""
         SELECT fs.id AS id, COUNT(f) AS flashcardCount

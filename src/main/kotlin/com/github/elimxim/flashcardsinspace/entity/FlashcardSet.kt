@@ -68,19 +68,5 @@ interface FlashcardCount {
     val flashcardCount: Int
 }
 
-interface ReadOnlyFlashcardSet {
-    val id: Long
-    val name: String
-    val status: FlashcardSetStatus
-    val createdAt: ZonedDateTime
-    val startedAt: ZonedDateTime?
-    val lastUpdatedAt: ZonedDateTime?
-    val language: ReadOnlyLanguage
-    val user: ReadOnlyUser
-}
-
-fun FlashcardSet.lastChronoday(): Chronoday? =
-    chronodays.maxByOrNull { it.chronodate }
-
 fun FlashcardSet.isSuspended(): Boolean =
     status == FlashcardSetStatus.SUSPENDED

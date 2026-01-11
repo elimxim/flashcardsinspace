@@ -1,11 +1,13 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.entity.Chronoday
+import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
+import com.github.elimxim.flashcardsinspace.entity.Flashcard
+import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardCreationRequest
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetInitResponse
-import com.github.elimxim.flashcardsinspace.web.dto.ValidFlashcardCreationRequest
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.HttpBadRequestException
@@ -20,20 +22,15 @@ private val log = getLogger(FlashcardSetInitService::class.java)
 class FlashcardSetInitService(
     private val flashcardSetService: FlashcardSetService,
     private val flashcardSetRepository: FlashcardSetRepository,
-    private val flashcardSetDbService: FlashcardSetDbService,
     private val lightspeedService: LightspeedService,
     private val requestValidator: RequestValidator,
 ) {
     @Transactional
     fun init(user: User, id: Long, request: FlashcardCreationRequest): FlashcardSetInitResponse {
         log.info("Initializing flashcard set $id")
-        flashcardSetService.verifyUserHasAccess(user, id)
-        return init(id, requestValidator.validate(request))
-    }
-
-    @Transactional
-    fun init(id: Long, request: ValidFlashcardCreationRequest): FlashcardSetInitResponse {
-        val flashcardSet = flashcardSetDbService.findById(id, mode = FlashcardSetFetchWithMode.ALL)
+        val flashcardSet = flashcardSetService.getEntity(id)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
+        val validRequest = requestValidator.validate(request)
         if (flashcardSet.chronodays.isNotEmpty()) {
             throw HttpBadRequestException(
                 ApiErrorCode.SAS400,
@@ -49,11 +46,11 @@ class FlashcardSetInitService(
         )
 
         val flashcard = Flashcard(
-            frontSide = request.frontSide,
-            backSide = request.backSide,
-            stage = request.stage,
+            frontSide = validRequest.frontSide,
+            backSide = validRequest.backSide,
+            stage = validRequest.stage,
             timesReviewed = 0,
-            creationDate = request.creationDate,
+            creationDate = validRequest.creationDate,
             flashcardSet = flashcardSet,
         )
 
@@ -63,7 +60,7 @@ class FlashcardSetInitService(
 
         val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
         val createdFlashcard = flashcardSet.flashcards.last()
-        val createdInitial = updatedFlashcardSet.lastChronoday()!!
+        val createdInitial = updatedFlashcardSet.chronodays.maxByOrNull { it.chronodate }!!
         val schedule = lightspeedService.createSchedule(flashcardSet, chronodays = listOf(createdInitial))
 
         return FlashcardSetInitResponse(
