@@ -21,3 +21,15 @@ databaseChangeLog:
             columns:
               - column:
                   name: language_id
+        - createIndex:
+            tableName: flashcard_set
+            indexName: idx_flashcard_set_language_id
+            columns:
+              - column:
+                  name: language_id
+        - createIndex:
+            tableName: flashcard_set
+            indexName: idx_flashcard_set_user_id
+            columns:
+              - column:
+                  name: user_id
