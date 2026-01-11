@@ -34,7 +34,7 @@ spring:
     open-in-view: false
     properties:
       jakarta.persistence.lock.timeout: 3000
-      hibernate.hibernate.jdbc.batch_size: 20
+      hibernate.jdbc.batch_size: 20
       hibernate.order_inserts: true
       hibernate.order_updates: true
   jackson:
