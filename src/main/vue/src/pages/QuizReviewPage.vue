@@ -317,6 +317,7 @@ async function loadQuizSession(sessionId: number) {
       reviewedFlashcardIds.value = [...reviewedFlashcardIdSet]
       incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIdSet.has(f.id))
       reviewStore.loadState(new MonoStageReviewQueue(flashcardsForReview))
+      reviewStore.setFlashcardsTotal(currRoundFlashcards.length)
       Log.log(LogTag.LOGIC, `Quiz session ${sessionId} retrieved`)
     })
     .catch((error) => {
