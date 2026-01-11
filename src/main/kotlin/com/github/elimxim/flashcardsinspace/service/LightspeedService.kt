@@ -2,6 +2,7 @@ package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.Chronoday
 import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
 import com.github.elimxim.flashcardsinspace.schedule.LightspeedSchedule
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
 import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
@@ -48,6 +49,7 @@ class LightspeedService {
     }
 
     fun createSchedule(
+        flashcardSet: FlashcardSet,
         chronodays: List<Chronoday>,
         daysAhead: Int = 200,
     ): List<ChronodayDto> {
@@ -72,7 +74,7 @@ class LightspeedService {
                         ApiErrorCode.DCD500,
                         """
                         Duplicated dates ${chronoday.chronodate} were detected
-                        in flashcard set with id=${chronoday.flashcardSet.id}
+                        in flashcard set with id=${flashcardSet.id}
                         """.trimOneLine()
                     )
                 }

@@ -182,7 +182,7 @@ class ChronoService(
         } else flashcardSet
 
         val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
-        val schedule = lightspeedService.createSchedule(updatedFlashcardSet.chronodays, daysAhead = 0)
+        val schedule = lightspeedService.createSchedule(flashcardSet, updatedFlashcardSet.chronodays, daysAhead = 0)
         val updatedDays = schedule.filter { it.id in request.ids }
 
         return ChronoUpdateResponse(
@@ -199,7 +199,7 @@ class ChronoService(
     }
 
     private fun applySchedule(flashcardSet: FlashcardSet): Pair<ChronodayDto, List<ChronodayDto>> {
-        val schedule = lightspeedService.createSchedule(flashcardSet.chronodays)
+        val schedule = lightspeedService.createSchedule(flashcardSet, flashcardSet.chronodays)
         val lastChronoDate = flashcardSet.lastChronoday()?.chronodate
         val currDay = schedule.find { it.chronodate.isEqual(lastChronoDate) }
             ?: throw HttpInternalServerErrorException(

@@ -146,6 +146,7 @@ class DayStreakServiceTest {
             )
 
             val result = service.calcStreakDays(
+                flashcardSet = flashcardSet,
                 fromInclusive = chronodays[0],
                 toExclusive = chronodays[0],
                 chronodays = chronodays
@@ -166,6 +167,7 @@ class DayStreakServiceTest {
             )
 
             val result = service.calcStreakDays(
+                flashcardSet = flashcardSet,
                 fromInclusive = chronodays[1],
                 toExclusive = chronodays[2],
                 chronodays = chronodays
@@ -185,6 +187,7 @@ class DayStreakServiceTest {
             )
 
             val result = service.calcStreakDays(
+                flashcardSet = flashcardSet,
                 fromInclusive = chronodays[1],
                 toExclusive = chronodays[0],
                 chronodays = chronodays
@@ -209,6 +212,7 @@ class DayStreakServiceTest {
             )
 
             val result = service.calcStreakDays(
+                flashcardSet = flashcardSet,
                 fromInclusive = chronodays[3],
                 toExclusive = chronodays[0],
                 chronodays = chronodays
@@ -233,6 +237,7 @@ class DayStreakServiceTest {
             )
 
             val result = service.calcStreakDays(
+                flashcardSet = flashcardSet,
                 fromInclusive = chronodays[3],
                 toExclusive = chronodays[0],
                 chronodays = chronodays
@@ -256,6 +261,7 @@ class DayStreakServiceTest {
             )
 
             val result = service.calcStreakDays(
+                flashcardSet = flashcardSet,
                 fromInclusive = chronodays[2],
                 toExclusive = chronodays[0],
                 chronodays = chronodays
@@ -280,6 +286,7 @@ class DayStreakServiceTest {
             )
 
             val result = service.calcStreakDays(
+                flashcardSet = flashcardSet,
                 fromInclusive = chronodays[3],
                 toExclusive = chronodays[0],
                 chronodays = chronodays
@@ -301,6 +308,7 @@ class DayStreakServiceTest {
             )
 
             val result = service.calcStreakDays(
+                flashcardSet = flashcardSet,
                 fromInclusive = chronodays[3],
                 toExclusive = chronodays[0],
                 chronodays = chronodays
@@ -324,6 +332,7 @@ class DayStreakServiceTest {
             )
 
             val result = service.calcStreakDays(
+                flashcardSet = flashcardSet,
                 fromInclusive = chronodays[2],
                 toExclusive = chronodays[0],
                 chronodays = chronodays
@@ -346,6 +355,7 @@ class DayStreakServiceTest {
 
             assertThatThrownBy {
                 service.calcStreakDays(
+                    flashcardSet = flashcardSet,
                     fromInclusive = notInList,
                     toExclusive = chronodays[0],
                     chronodays = chronodays
@@ -369,6 +379,7 @@ class DayStreakServiceTest {
 
             assertThatThrownBy {
                 service.calcStreakDays(
+                    flashcardSet = flashcardSet,
                     fromInclusive = chronodays[1],
                     toExclusive = notInList,
                     chronodays = chronodays
@@ -392,6 +403,7 @@ class DayStreakServiceTest {
             )
 
             val result = service.calcStreakDays(
+                flashcardSet = flashcardSet,
                 fromInclusive = chronodays[4],
                 toExclusive = chronodays[0],
                 chronodays = chronodays
