@@ -31,13 +31,13 @@ fun FlashcardSet.toDto() = FlashcardSetDto(
 )
 
 fun ReadOnlyFlashcardSet.toDto() = FlashcardSetDto(
-    id = getId(),
-    name = getName(),
-    status = getStatus().name,
-    languageId = getLanguage().getId(),
-    createdAt = getCreatedAt(),
-    startedAt = getStartedAt(),
-    lastUpdatedAt = getLastUpdatedAt(),
+    id = id,
+    name = name,
+    status = status.name,
+    languageId = language.id,
+    createdAt = createdAt,
+    startedAt = startedAt,
+    lastUpdatedAt = lastUpdatedAt,
 )
 
 fun Flashcard.toDto() = FlashcardDto(

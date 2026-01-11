@@ -64,19 +64,19 @@ enum class FlashcardSetStatus {
 }
 
 interface FlashcardCount {
-    fun getId(): Long
-    fun getFlashcardCount(): Int
+    val id: Long
+    val flashcardCount: Int
 }
 
 interface ReadOnlyFlashcardSet {
-    fun getId(): Long
-    fun getName(): String
-    fun getStatus(): FlashcardSetStatus
-    fun getCreatedAt(): ZonedDateTime
-    fun getStartedAt(): ZonedDateTime?
-    fun getLastUpdatedAt(): ZonedDateTime?
-    fun getLanguage(): ReadOnlyLanguage
-    fun getUser(): ReadOnlyUser
+    val id: Long
+    val name: String
+    val status: FlashcardSetStatus
+    val createdAt: ZonedDateTime
+    val startedAt: ZonedDateTime?
+    val lastUpdatedAt: ZonedDateTime?
+    val language: ReadOnlyLanguage
+    val user: ReadOnlyUser
 }
 
 fun FlashcardSet.lastChronoday(): Chronoday? =

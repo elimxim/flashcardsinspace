@@ -17,7 +17,7 @@ open class Language(
 )
 
 interface ReadOnlyLanguage {
-    fun getId(): Long
-    fun getName(): String
-    fun getCode(): String
+    val id: Long
+    val name: String
+    val code: String
 }
