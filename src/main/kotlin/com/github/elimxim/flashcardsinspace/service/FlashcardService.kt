@@ -52,7 +52,7 @@ class FlashcardService(
 
     @Transactional
     fun update(user: User, setId: Long, id: Long, request: FlashcardUpdateRequest): FlashcardDto {
-        log.info("User ${user.id}: updating flashcard $id in set $setId")
+        log.info("Updating flashcard $id in set $setId")
         val flashcard = getEntity(id)
         flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
         verifyUserOperation(user, setId, flashcard)

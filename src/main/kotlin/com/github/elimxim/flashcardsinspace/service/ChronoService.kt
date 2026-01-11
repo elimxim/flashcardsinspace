@@ -86,7 +86,7 @@ class ChronoService(
 
     @Transactional
     fun syncDay(user: User, setId: Long, day: ChronoSyncDay): ChronoSyncResponse {
-        log.info("User ${user.id}: syncing day $day for flashcard set $setId")
+        log.info("Syncing day $day for flashcard set $setId")
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
         flashcardSetService.verifyNotSuspended(flashcardSet)
