@@ -136,8 +136,9 @@ class FlashcardService(
 
     @Transactional(readOnly = true)
     fun getEntity(id: Long): Flashcard =
-        flashcardRepository.findWithFlashcardSetById(id)
-            ?: throw HttpNotFoundException(ApiErrorCode.FLA404, "Flashcard with id $id not found")
+        flashcardRepository.findById(id).orElseThrow {
+            HttpNotFoundException(ApiErrorCode.FLA404, "Flashcard with id $id not found")
+        }
 
     @Transactional(readOnly = true)
     fun verifyUserOperation(user: User, setId: Long, id: Long) {

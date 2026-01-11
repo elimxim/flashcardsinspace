@@ -50,7 +50,7 @@ open class Flashcard(
         orphanRemoval = true,
         fetch = FetchType.LAZY,
     )
-    open var audios: MutableList<FlashcardAudio> = mutableListOf(),
+    open var audios: MutableList<FlashcardAudio> = mutableListOf(), // fixme
 )
 
 const val TERMINAL_STAGE_NAME = "OUTER_SPACE"
