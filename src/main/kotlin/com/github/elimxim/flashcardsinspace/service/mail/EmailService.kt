@@ -34,13 +34,19 @@ class EmailService(
         }
     }
 
-    fun sendConfirmationCodeEmail(recipient: Recipient, code: String, purpose: ConfirmationPurpose) {
+    fun sendConfirmationCodeEmail(
+        recipient: Recipient,
+        code: String,
+        purpose: ConfirmationPurpose,
+        maxAgeSeconds: Int
+    ) {
         log.info("Sending confirmation code to ${maskSecret(recipient.email)}, purpose: $purpose")
         try {
             val context = Context().apply {
                 setVariable("securityCodeDigits", code.toList().map { it.toString() })
                 setVariable("purpose", purpose.name)
                 setVariable("purposeDescription", getPurposeDescription(purpose))
+                setVariable("expirationTime", getExpirationTime(maxAgeSeconds))
             }
             val htmlContent = templateEngine.process("confirmation-code-email", context)
 
@@ -64,6 +70,18 @@ class EmailService(
     private fun getPurposeDescription(purpose: ConfirmationPurpose): String {
         return when (purpose) {
             ConfirmationPurpose.EMAIL_VERIFICATION -> "Verify Your Email"
+        }
+    }
+
+    private fun getExpirationTime(maxAgeSeconds: Int): String {
+        return when (maxAgeSeconds) {
+            in 0..60 -> "1 minute"
+            in 61..3599 -> "${maxAgeSeconds / 60} minutes"
+            3600 -> "1 hour"
+            in 3601..86399 -> "${maxAgeSeconds / 3600} hours"
+            86400 -> "1 day"
+            in 86401..604800 -> "${maxAgeSeconds / 86400} days"
+            else -> "a week"
         }
     }
 }

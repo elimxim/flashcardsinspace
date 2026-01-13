@@ -134,13 +134,11 @@ fun ChronoBulkUpdateRequest.escapeJava() = ChronoBulkUpdateRequest(
 )
 
 fun UserUpdateRequest.normalize() = UserUpdateRequest(
-    email = email?.normalize()?.lowercase(),
     name = name?.normalize(),
     languageId = languageId?.normalize(),
 )
 
 fun UserUpdateRequest.escapeJava() = UserUpdateRequest(
-    email = email?.escapeJava(),
     name = name?.escapeJava(),
     languageId = languageId?.escapeJava(),
 )
@@ -203,24 +201,10 @@ fun ConfirmationCodeRequest.escapeJava() = ConfirmationCodeRequest(
     purpose = purpose?.escapeJava(),
 )
 
-fun ConfirmationCodeVerificationRequest.normalize() = ConfirmationCodeVerificationRequest(
+fun VerificationCodeRequest.normalize() = VerificationCodeRequest(
     code = code?.normalize(),
-    email = email?.normalize(),
-    purpose = purpose?.normalize(),
 )
 
-fun ConfirmationCodeVerificationRequest.escapeJava() = ConfirmationCodeVerificationRequest(
+fun VerificationCodeRequest.escapeJava() = VerificationCodeRequest(
     code = code?.escapeJava(),
-    email = email?.escapeJava(),
-    purpose = purpose?.escapeJava(),
-)
-
-fun ConfirmationCodeTestRequest.normalize() = ConfirmationCodeTestRequest(
-    email = email?.normalize(),
-    purpose = purpose?.normalize(),
-)
-
-fun ConfirmationCodeTestRequest.escapeJava() = ConfirmationCodeTestRequest(
-    email = email?.escapeJava(),
-    purpose = purpose?.escapeJava(),
 )

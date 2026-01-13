@@ -4,9 +4,12 @@ import com.github.elimxim.flashcardsinspace.entity.ConfirmationCode
 import com.github.elimxim.flashcardsinspace.entity.ConfirmationPurpose
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
+import java.time.ZonedDateTime
 
 @Repository
 interface ConfirmationCodeRepository : JpaRepository<ConfirmationCode, Long> {
+    fun findByTokenHash(tokenHash: String): ConfirmationCode?
+    fun countByEmailAndPurposeAndCreatedAtAfter(email: String, purpose: ConfirmationPurpose, createdAt: ZonedDateTime): Long
     fun findByEmailAndPurpose(email: String, purpose: ConfirmationPurpose): List<ConfirmationCode>
 }
 

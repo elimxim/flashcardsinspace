@@ -1,6 +1,7 @@
 package com.github.elimxim.flashcardsinspace.service.mail
 
 import com.github.elimxim.flashcardsinspace.entity.ConfirmationPurpose
+import com.github.elimxim.flashcardsinspace.security.SecurityProperties
 import com.github.elimxim.flashcardsinspace.security.maskSecret
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -19,7 +20,8 @@ private val log = LoggerFactory.getLogger(EmailTestMBean::class.java)
     description = "MBean for testing email sending in development environment"
 )
 class EmailTestMBean(
-    private val emailService: EmailService
+    private val emailService: EmailService,
+    private val securityProperties: SecurityProperties,
 ) {
 
     @ManagedOperation(description = "Send a test welcome email")
@@ -49,10 +51,16 @@ class EmailTestMBean(
         log.info("JMX: Sending test confirmation code email to ${maskSecret(email)}")
         return try {
             val confirmationPurpose = ConfirmationPurpose.valueOf(purpose)
+
+            val maxAgeSeconds = when (confirmationPurpose) {
+                ConfirmationPurpose.EMAIL_VERIFICATION -> securityProperties.verificationCodes.email.maxAge
+            }
+
             emailService.sendConfirmationCodeEmail(
                 recipient = Recipient(email, name),
                 code,
-                confirmationPurpose
+                confirmationPurpose,
+                maxAgeSeconds,
             )
             "Confirmation code email sent successfully to ${maskSecret(email)}"
         } catch (e: Exception) {

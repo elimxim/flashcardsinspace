@@ -145,19 +145,8 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
-    fun validate(request: ConfirmationCodeVerificationRequest): ValidConfirmationCodeVerificationRequest {
-        validateRequest<ConfirmationCodeVerificationRequest>(request) { violations ->
-            throw HttpInvalidRequestFieldsException(
-                fields(violations),
-                "Request is invalid ${request.escapeJava()}, violations: $violations",
-            )
-        }
-
-        return request.toValidRequest()
-    }
-
-    fun validate(request: ConfirmationCodeTestRequest): ValidConfirmationCodeTestRequest {
-        validateRequest<ConfirmationCodeTestRequest>(request) { violations ->
+    fun validate(request: VerificationCodeRequest): ValidVerificationCodeRequest {
+        validateRequest<VerificationCodeRequest>(request) { violations ->
             throw HttpInvalidRequestFieldsException(
                 fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
@@ -260,7 +249,6 @@ fun ChronoBulkUpdateRequest.toValidRequest() = ValidChronoBulkUpdateRequest(
 )
 
 fun UserUpdateRequest.toValidRequest() = ValidUserUpdateRequest(
-    email = email!!,
     name = name!!,
     languageId = languageId!!.toLong(),
 )
@@ -283,13 +271,6 @@ fun ConfirmationCodeRequest.toValidRequest() = ValidConfirmationCodeRequest(
     purpose = ConfirmationPurpose.valueOf(purpose!!),
 )
 
-fun ConfirmationCodeVerificationRequest.toValidRequest() = ValidConfirmationCodeVerificationRequest(
-    email = email!!,
+fun VerificationCodeRequest.toValidRequest() = ValidVerificationCodeRequest(
     code = code!!,
-    purpose = ConfirmationPurpose.valueOf(purpose!!),
-)
-
-fun ConfirmationCodeTestRequest.toValidRequest() = ValidConfirmationCodeTestRequest(
-    email = email!!,
-    purpose = ConfirmationPurpose.valueOf(purpose!!),
 )
