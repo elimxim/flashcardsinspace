@@ -1,5 +1,7 @@
 package com.github.elimxim.flashcardsinspace.entity
 
+import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
+import com.github.elimxim.flashcardsinspace.web.exception.HttpForbiddenException
 import jakarta.persistence.*
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -56,3 +58,8 @@ open class User(
     override fun isEnabled(): Boolean = true
 }
 
+fun User.checkVerified() {
+    if (!this.emailVerified) {
+        throw HttpForbiddenException(ApiErrorCode.UFO403, "User ${this.id} is not verified")
+    }
+}
