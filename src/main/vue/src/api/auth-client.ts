@@ -3,22 +3,14 @@ import { User } from '@/model/user.ts'
 import apiClient from '@/api/api-client.ts'
 import { configureDateTransformers } from '@/api/axios-config.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
-import { ConfirmationCodeResponse } from '@/api/communication.ts'
+import { VerificationCodeResponse } from '@/api/communication.ts'
 
 const authClient = axios.create({
-  baseURL: '/auth',
-  withCredentials: false,
-})
-
-const authClientWithCredentials = axios.create({
   baseURL: '/auth',
   withCredentials: true,
 })
 
 configureDateTransformers(authClient)
-configureDateTransformers(authClientWithCredentials)
-
-export default authClient
 
 export async function sendSignupRequest(name: string, email: string, password: string, languageId: number | undefined) {
   Log.log(LogTag.POST, '/signup')
@@ -44,12 +36,12 @@ export async function sendLoginRequest(email: string, password: string) {
 
 export async function sendLogoutRequest() {
   Log.log(LogTag.POST, '/logout')
-  return await authClientWithCredentials.post('/logout')
+  return await authClient.post('/logout')
 }
 
 export async function sendRefreshTokenRequest() {
   Log.log(LogTag.POST, '/refresh')
-  return await authClientWithCredentials.post<User>('/refresh')
+  return await authClient.post<User>('/refresh')
 }
 
 export async function sendWhoAmIRequest() {
@@ -59,27 +51,22 @@ export async function sendWhoAmIRequest() {
   })
 }
 
-export async function sendConfirmationCodeRequest(email: string, purpose: string) {
-  Log.log(LogTag.POST, '/send-code')
-  return await authClient.post('/send-code', {
+export async function sendVerificationCodePostRequest(email: string, purpose: string) {
+  Log.log(LogTag.POST, '/verification-code')
+  return await authClient.post('/verification-code', {
     email: email,
     purpose: purpose,
   })
 }
 
-export async function sendConfirmationCodeVerificationRequest(email: string, code: string, purpose: string) {
-  Log.log(LogTag.POST, '/verify-code')
-  return await authClient.post<ConfirmationCodeResponse>('/verify-code', {
-    email: email,
+export async function sendVerificationCodePutRequest(code: string) {
+  Log.log(LogTag.PUT, '/verification-code')
+  return await authClient.put<VerificationCodeResponse>('/verification-code', {
     code: code,
-    purpose: purpose,
   })
 }
 
-export async function sendConfirmationCodeTestRequest(email: string, purpose: string) {
-  Log.log(LogTag.POST, '/test-code')
-  return await authClient.post<ConfirmationCodeResponse>('/test-code', {
-    email: email,
-    purpose: purpose,
-  })
+export async function sendVerificationCodeGetRequest() {
+  Log.log(LogTag.GET, '/verification-code')
+  return await authClient.get<VerificationCodeResponse>('/verification-code')
 }
