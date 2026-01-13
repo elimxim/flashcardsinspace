@@ -1,6 +1,8 @@
 package com.github.elimxim.flashcardsinspace.entity
 
 import jakarta.persistence.*
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.time.ZonedDateTime
 
 @Entity
@@ -12,6 +14,10 @@ open class ConfirmationCode(
 
     @Column(nullable = false)
     open val email: String,
+
+    @Column(nullable = false, columnDefinition = "CHAR(64)")
+    @JdbcTypeCode(SqlTypes.CHAR)
+    open val tokenHash: String,
 
     @Column(nullable = false)
     open val code: String,

@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: 018-add-token-hash-to-confirmation-code
+      author: elimxim
+      changes:
+        - sql:
+            sql: "DELETE FROM confirmation_code"
+        - addColumn:
+            tableName: confirmation_code
+            columns:
+              - column:
+                  name: token_hash
+                  type: CHAR(64)
+                  constraints:
+                    nullable: false
+                  defaultValue: ''
+        - createIndex:
+            tableName: confirmation_code
+            indexName: idx_confirmation_code_token_hash
+            columns:
+              - column:
+                  name: token_hash
