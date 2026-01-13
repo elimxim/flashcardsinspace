@@ -5,6 +5,10 @@ app:
       secret: "ZHVtbXlzZWNyZXRmb3Jqd3RzYW1wbGVhcHBsaWNhdGlvbg=="
       access-token-expiration-ms: 3600000
       refresh-token-expiration-ms: 36000000
+    verification-codes:
+      email:
+        length: 4
+        max-age: 4000
   mail:
     api-key: "dummy-api-Key"
     sender-name: "test-name"
