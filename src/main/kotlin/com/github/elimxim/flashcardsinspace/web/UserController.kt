@@ -17,7 +17,9 @@ class UserController(
     private val userService: UserService,
 ) {
     @GetMapping("/me")
-    fun getMe(@AuthenticationPrincipal userDetails: UserDetails): ResponseEntity<UserDto> {
+    fun getMe(
+        @AuthenticationPrincipal userDetails: UserDetails
+    ): ResponseEntity<UserDto> = withLoggingContext {
         val dto = userService.findByEmail(userDetails.username)
         return ResponseEntity.ok(dto)
     }
