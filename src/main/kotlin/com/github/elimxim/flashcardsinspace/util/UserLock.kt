@@ -1,15 +1,20 @@
 package com.github.elimxim.flashcardsinspace.util
 
+import com.github.elimxim.flashcardsinspace.entity.User
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.math.abs
+import kotlin.math.absoluteValue
 
 private const val BUCKETS = 1024
 
 object UserLock {
     private val locks = Array(BUCKETS) { ReentrantLock() }
 
-    fun <T> withLock(key: Any, action: () -> T): T {
-        val bucket = abs(key.hashCode() % locks.size)
+    fun <T> withLock(user: User?, action: () -> T): T {
+        if (user == null) {
+            return action()
+        }
+
+        val bucket = user.id.hashCode().absoluteValue % locks.size
         val lock = locks[bucket]
 
         lock.lock()
