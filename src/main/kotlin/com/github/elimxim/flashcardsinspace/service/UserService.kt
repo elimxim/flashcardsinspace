@@ -31,22 +31,15 @@ class UserService(
     @Transactional
     fun update(user: User, request: UserUpdateRequest): UserDto {
         log.info("Updating user info")
-        return update(user, requestValidator.validate(request)).toDto()
-    }
-
-    @Transactional
-    fun update(user: User, request: ValidUserUpdateRequest): User {
-        return if (mergeUser(user, request)) {
+        val validRequest = requestValidator.validate(request)
+        val updatedUser = if (mergeUser(user, validRequest)) {
             userRepository.save(user)
         } else user
+        return updatedUser.toDto()
     }
 
-    fun mergeUser(user: User, request: ValidUserUpdateRequest): Boolean {
+    private fun mergeUser(user: User, request: ValidUserUpdateRequest): Boolean {
         var changed = false
-        if (request.email != user.email) {
-            user.email = request.email
-            changed = true
-        }
         if (request.name != user.name) {
             user.name = request.name
             changed = true

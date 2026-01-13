@@ -1,9 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.Flashcard
-import com.github.elimxim.flashcardsinspace.entity.ReviewHistory
-import com.github.elimxim.flashcardsinspace.entity.ReviewInfo
-import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
@@ -27,6 +24,7 @@ class FlashcardService(
     @Transactional(readOnly = true)
     fun getAll(user: User, setId: Long): List<FlashcardDto> {
         log.info("Retrieving flashcards from set $setId")
+        user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
         return flashcardRepository.findAllByFlashcardSetId(setId).map { it.toDto() }
@@ -35,6 +33,7 @@ class FlashcardService(
     @Transactional
     fun add(user: User, setId: Long, request: FlashcardCreationRequest): FlashcardDto {
         log.info("Adding a new flashcard to set $setId")
+        user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
         val validRequest = requestValidator.validate(request)
@@ -53,6 +52,7 @@ class FlashcardService(
     @Transactional
     fun update(user: User, setId: Long, id: Long, request: FlashcardUpdateRequest): FlashcardDto {
         log.info("Updating flashcard $id in set $setId")
+        user.checkVerified()
         val flashcard = getEntity(id)
         flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
         verifyUserOperation(user, setId, flashcard)
@@ -121,6 +121,7 @@ class FlashcardService(
     @Transactional
     fun remove(user: User, setId: Long, id: Long) {
         log.info("Removing flashcard $id from set $setId")
+        user.checkVerified()
         val flashcard = getEntity(id)
         verifyUserOperation(user, setId, flashcard)
         flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)

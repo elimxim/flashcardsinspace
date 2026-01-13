@@ -27,6 +27,7 @@ class ReviewSessionService(
     @Transactional
     fun createReviewSession(user: User, setId: Long, request: ReviewSessionCreateRequest): ReviewSessionDto {
         log.info("Creating a new review session for set $setId")
+        user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
         flashcardSetService.verifyInitialized(flashcardSet)
@@ -43,6 +44,7 @@ class ReviewSessionService(
     @Transactional
     fun updateReviewSession(user: User, setId: Long, id: Long, request: ReviewSessionUpdateRequest) {
         log.info("Updating review session $id for set $setId")
+        user.checkVerified()
         val session = getEntity(id)
         flashcardSetService.verifyUserHasAccess(user, session.flashcardSet)
         flashcardSetService.verifyInitialized(session.flashcardSet)
@@ -92,6 +94,7 @@ class ReviewSessionService(
         request: ReviewSessionCreateRequest
     ): ReviewSessionDto {
         log.info("Creating a child review session of $parentId for set $setId")
+        user.checkVerified()
         val parentSession = getEntity(parentId)
         flashcardSetService.verifyUserHasAccess(user, parentSession.flashcardSet)
         flashcardSetService.verifyInitialized(parentSession.flashcardSet)
@@ -124,6 +127,7 @@ class ReviewSessionService(
     @Transactional(readOnly = true)
     fun getReviewSession(user: User, setId: Long, id: Long): ReviewSessionDto {
         log.info("Getting review session $id for set $setId")
+        user.checkVerified()
         val session = getEntity(id)
         flashcardSetService.verifyUserHasAccess(user, session.flashcardSet)
         return session.toDto()
@@ -132,6 +136,7 @@ class ReviewSessionService(
     @Transactional(readOnly = true)
     fun getLatestUncompletedReviewSession(user: User, setId: Long, type: ReviewSessionType): ReviewSessionDto? {
         log.info("Getting latest uncompleted review session for set $setId")
+        user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
         val topUncompletedSessions = reviewSessionRepository

@@ -1,9 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.Chronoday
-import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
-import com.github.elimxim.flashcardsinspace.entity.Flashcard
-import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardCreationRequest
@@ -28,6 +25,7 @@ class FlashcardSetInitService(
     @Transactional
     fun init(user: User, id: Long, request: FlashcardCreationRequest): FlashcardSetInitResponse {
         log.info("Initializing flashcard set $id")
+        user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(id)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
         val validRequest = requestValidator.validate(request)

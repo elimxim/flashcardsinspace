@@ -31,6 +31,7 @@ class ChronoService(
     @Transactional
     fun sync(user: User, setId: Long, request: ChronoSyncRequest): ChronoSyncResponse {
         log.info("Syncing chronodays for flashcard set $setId, timezone: ${user.timezone}")
+        user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
         val validRequest = requestValidator.validate(request)
@@ -87,6 +88,7 @@ class ChronoService(
     @Transactional
     fun syncDay(user: User, setId: Long, day: ChronoSyncDay): ChronoSyncResponse {
         log.info("Syncing day $day for flashcard set $setId")
+        user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
         flashcardSetService.verifyNotSuspended(flashcardSet)
@@ -152,6 +154,7 @@ class ChronoService(
     @Transactional
     fun bulkUpdate(user: User, setId: Long, request: ChronoBulkUpdateRequest): ChronoUpdateResponse {
         log.info("Bulk updating chronodays for flashcard set $setId")
+        user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
         flashcardSetService.verifyNotSuspended(flashcardSet)

@@ -1,9 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
-import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
-import com.github.elimxim.flashcardsinspace.entity.User
-import com.github.elimxim.flashcardsinspace.entity.isSuspended
+import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.*
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.*
@@ -33,6 +30,7 @@ class FlashcardSetService(
     @Transactional(readOnly = true)
     fun getAll(user: User): List<FlashcardSetDto> {
         log.info("Retrieving all flashcard sets")
+        user.checkVerified()
         val result = flashcardSetRepository.findAllByUserAndStatusIn(
             user, listOf(FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED)
         )
@@ -42,6 +40,7 @@ class FlashcardSetService(
     @Transactional(readOnly = true)
     fun getAllExtra(user: User): List<FlashcardSetExtraDto> {
         log.info("Retrieving all flashcard sets extra")
+        user.checkVerified()
         val counts = flashcardSetRepository.countFlashcardsByUserAndStatusIn(
             user, status = listOf(FlashcardSetStatus.ACTIVE, FlashcardSetStatus.SUSPENDED)
         )
@@ -56,6 +55,7 @@ class FlashcardSetService(
     @Transactional(readOnly = true)
     fun get(user: User, id: Long): FlashcardSetDto {
         log.info("Retrieving flashcard set $id")
+        user.checkVerified()
         val flashcardSet = getEntity(id)
         verifyUserHasAccess(user, flashcardSet)
         return flashcardSet.toDto()
@@ -64,6 +64,7 @@ class FlashcardSetService(
     @Transactional
     fun create(user: User, request: FlashcardSetCreationRequest): FlashcardSetDto {
         log.info("Creating a new flashcard set")
+        user.checkVerified()
         val validRequest = requestValidator.validate(request)
         val language = languageService.getEntity(validRequest.languageId)
 
@@ -81,6 +82,7 @@ class FlashcardSetService(
     @Transactional
     fun update(user: User, id: Long, request: FlashcardSetUpdateRequest): FlashcardSetDto {
         log.info("Updating flashcard set $id")
+        user.checkVerified()
         val flashcardSet = getEntity(id)
         verifyUserHasAccess(user, flashcardSet)
         val validRequest = requestValidator.validate(request)
@@ -119,6 +121,7 @@ class FlashcardSetService(
     @Transactional
     fun remove(user: User, id: Long) {
         log.info("Removing flashcard set $id")
+        user.checkVerified()
         val flashcardSet = getEntity(id)
         verifyUserHasAccess(user, flashcardSet)
         val flashcardCount = flashcardRepository.countByFlashcardSet(flashcardSet)
