@@ -17,6 +17,7 @@ enum class ApiErrorCode {
     WFS400,
     AUF401,
     FSU403,
+    UFO403,
     FSE404,
     FLA404,
     LAN404,
