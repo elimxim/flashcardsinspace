@@ -3,29 +3,27 @@ package com.github.elimxim.flashcardsinspace.util
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletResponse
 
-enum class Cookies(val cookieName: String) {
-    REFRESH_TOKEN("refreshToken"),
-    ACCESS_TOKEN("accessToken"),
-    VERIFICATION_TOKEN("verificationToken"),
-}
+const val REFRESH_TOKEN_COOKIE = "refreshToken"
+const val ACCESS_TOKEN_COOKIE = "accessToken"
+const val VERIFICATION_TOKEN_COOKIE = "verificationToken"
 
 fun addRefreshTokenCookie(response: HttpServletResponse, token: String, maxAge: Int) =
-    addSecureHttpOnlyCookie(response, Cookies.REFRESH_TOKEN.cookieName, value = token, path = "/auth/refresh", maxAge)
+    addSecureHttpOnlyCookie(response, REFRESH_TOKEN_COOKIE, value = token, path = "/auth/refresh", maxAge)
 
 fun clearRefreshTokenCookie(response: HttpServletResponse) =
-    clearSecureHttpOnlyCookie(response, Cookies.REFRESH_TOKEN.cookieName, path = "/auth/refresh")
+    clearSecureHttpOnlyCookie(response, REFRESH_TOKEN_COOKIE, path = "/auth/refresh")
 
 fun addAccessTokenCookie(response: HttpServletResponse, token: String, maxAge: Int) =
-    addSecureHttpOnlyCookie(response, Cookies.ACCESS_TOKEN.cookieName, value = token, path = "/", maxAge)
+    addSecureHttpOnlyCookie(response, ACCESS_TOKEN_COOKIE, value = token, path = "/", maxAge)
 
 fun clearAccessTokenCookie(response: HttpServletResponse) =
-    clearSecureHttpOnlyCookie(response, Cookies.ACCESS_TOKEN.cookieName, path = "/")
+    clearSecureHttpOnlyCookie(response, ACCESS_TOKEN_COOKIE, path = "/")
 
 fun addVerificationTokenCookie(response: HttpServletResponse, token: String, maxAge: Int) =
-    addSecureHttpOnlyCookie(response, Cookies.VERIFICATION_TOKEN.cookieName, value = token, path = "/", maxAge)
+    addSecureHttpOnlyCookie(response, VERIFICATION_TOKEN_COOKIE, value = token, path = "/", maxAge)
 
 fun clearVerificationTokenCookie(response: HttpServletResponse) =
-    clearSecureHttpOnlyCookie(response, Cookies.VERIFICATION_TOKEN.cookieName, path = "/")
+    clearSecureHttpOnlyCookie(response, VERIFICATION_TOKEN_COOKIE, path = "/")
 
 
 fun addSecureHttpOnlyCookie(
