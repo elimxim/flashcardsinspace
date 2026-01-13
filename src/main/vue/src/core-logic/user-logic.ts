@@ -1,17 +1,18 @@
-export enum CodeVerificationResult {
+export enum VerificationCodeResult {
   SUCCESS = 'SUCCESS',
-  TESTED = 'TESTED',
+  CONTEXT = 'CONTEXT',
   INVALID = 'INVALID',
   NOT_FOUND = 'NOT_FOUND',
   LOCKED = 'LOCKED',
   EXPIRED = 'EXPIRED',
   LIMITED = 'LIMITED',
+  USED = 'USED',
 }
 
-export const confirmationCodePurposes = {
+export const verificationCodePurposes = {
   EMAIL_VERIFICATION: 'EMAIL_VERIFICATION',
 }
 
-export function parseCodeVerificationResult(result: string): CodeVerificationResult | undefined {
-  return Object.values(CodeVerificationResult).find(v => v === result)
+export function parseVerificationCodeResult(result: string): VerificationCodeResult | undefined {
+  return Object.values(VerificationCodeResult).find(v => v === result)
 }
