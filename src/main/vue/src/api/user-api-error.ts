@@ -16,6 +16,10 @@ export const userApiErrors = {
     title: 'Authentication is not successful',
     message: 'There was a glitch in our identity scanners. Please try to establish a connection again.'
   } as UserApiError,
+  CONFIRMATION_CODE__CONTEXT_FAILED: {
+    title: 'Could not identify the confirmation context',
+    message: 'Please reload the page and try again.'
+  } as UserApiError,
   CONFIRMATION_CODE__RESENDING_FAILED: {
     title: 'Could not resend the confirmation code',
     message: 'Please try again later.'

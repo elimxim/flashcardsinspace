@@ -131,6 +131,7 @@ import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { saveUserSignedUpToCookies } from '@/utils/cookies.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
+import { VerificationIntent } from '@/core-logic/user-logic.ts';
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -260,7 +261,10 @@ async function signup() {
     Log.log(LogTag.LOGIC, 'Successfully signed up: ', authStore.user?.id)
     authStore.setUser(response.data)
     saveUserSignedUpToCookies(true)
-    await router.push({ name: routeNames.controlPanel })
+    await router.push({
+      name: routeNames.codeConfirmation,
+      query: { intent: VerificationIntent.EMAIL_VERIFICATION },
+    })
   }).catch(error => {
     signupFailed.value = true
 

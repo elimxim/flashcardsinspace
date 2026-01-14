@@ -4,13 +4,10 @@ import App from '@/App.vue'
 import router from '@/router'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { useAuthStore } from '@/stores/auth-store.ts'
-import { sendWhoAmIRequest } from '@/api/auth-client.ts'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { applyFaSolidIcons } from '@/fa-solid.ts'
 import { applyFaRegularIcons } from '@/fa-regular.ts'
-import { attemptTokenRefresh } from '@/api/token-refresh.ts'
-import { LogTag, Log } from '@/utils/logger.ts'
+import { whoAmI } from '@/core-logic/user-logic.ts'
 
 applyFaRegularIcons()
 applyFaSolidIcons()
@@ -19,19 +16,7 @@ const app = createApp(App)
 app.component('FontAwesomeIcon', FontAwesomeIcon)
 app.use(createPinia())
 
-const authStore = useAuthStore()
-
-sendWhoAmIRequest()
-  .then(async (response) => {
-    if (response.status === 200) {
-      Log.log(LogTag.API, `Who Am I: ${response.data}`)
-      authStore.setUser(response.data)
-    } else {
-      Log.log(LogTag.API, `Who Am I: ${response.status}`)
-      await attemptTokenRefresh()
-    }
-  })
-  .then(() => {
-    app.use(router)
-    app.mount('#app')
-  })
+whoAmI().then(() => {
+  app.use(router)
+  app.mount('#app')
+})

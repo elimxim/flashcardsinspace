@@ -44,18 +44,18 @@ export async function sendRefreshTokenRequest() {
   return await authClient.post<User>('/refresh')
 }
 
-export async function sendWhoAmIRequest() {
+export async function sendUserGetRequest() {
   Log.log(LogTag.GET, '/users/me')
   return await apiClient.get<User>('/users/me', {
     validateStatus: () => true,
   })
 }
 
-export async function sendVerificationCodePostRequest(email: string, purpose: string) {
+export async function sendVerificationCodePostRequest(email: string | undefined, intent: string | undefined) {
   Log.log(LogTag.POST, '/verification-code')
   return await authClient.post('/verification-code', {
     email: email,
-    purpose: purpose,
+    purpose: intent,
   })
 }
 

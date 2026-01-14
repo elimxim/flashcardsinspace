@@ -11,44 +11,8 @@
       'confirmation-code-page',
     ]"
   >
-    <p v-if="verificationResult === CodeVerificationResult.LIMITED" class="code-instructions">
-      You have reached the maximum number of confirmation codes per hour.
-      Please try again later.
-    </p>
-    <p v-else-if="verificationResult === CodeVerificationResult.LOCKED" class="code-instructions">
-      You have reached the maximum number of attempts.
-      Press <em>↻</em> request a new one.
-    </p>
-    <p v-else-if="verificationResult === CodeVerificationResult.EXPIRED" class="code-instructions">
-      The confirmation code has expired.
-      Press <em>↻</em> request a new one.
-    </p>
-    <p
-      v-else-if="verificationResult === CodeVerificationResult.NOT_FOUND"
-      class="code-instructions"
-    >
-      No valid confirmation code found.
-      Press <em>↻</em> request a new one.
-    </p>
-    <p v-else-if="verificationResult === CodeVerificationResult.INVALID" class="code-instructions">
-      Invalid confirmation code.
-      Please try again.
-    </p>
-    <p v-else-if="verificationResult === CodeVerificationResult.TESTED" class="code-instructions">
-      Welcome back!
-      Enter the confirmation code sent to your email.
-      Haven't received it? Press <em>↻</em> to resend.
-    </p>
-    <p v-else-if="verificationResult === CodeVerificationResult.SUCCESS" class="code-instructions">
-      Your email has been verified.
-    </p>
-    <p v-else-if="codeResent" class="code-instructions">
-      A new confirmation code has been sent to your email.
-      Please check your inbox and enter the code below.
-    </p>
-    <p v-else class="code-instructions">
-      Enter the confirmation code sent to your email.
-      Haven't received it? Press <em>↻</em> to resend.
+    <p class="instructions">
+      {{ instructions }}
     </p>
     <div class="control-device-wrapper">
       <div class="control-device">
@@ -66,61 +30,112 @@
 
 <script setup lang="ts">
 import CodeConfirmationDevice from '@/components/CodeConfirmationDevice.vue'
-import SpaceToast from '@/components/SpaceToast.vue'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import {
-  sendConfirmationCodeRequest,
-  sendConfirmationCodeTestRequest,
-  sendConfirmationCodeVerificationRequest,
+  sendVerificationCodeGetRequest,
+  sendVerificationCodePostRequest,
+  sendVerificationCodePutRequest,
 } from '@/api/auth-client.ts'
 import { useAuthStore } from '@/stores/auth-store.ts'
-import { storeToRefs } from 'pinia'
 import { Log, LogTag } from '@/utils/logger.ts'
 import {
-  CodeVerificationResult,
-  confirmationCodePurposes,
-  parseCodeVerificationResult
+  parseVerificationIntent,
+  toVerificationCodeResult,
+  VerificationCodeResult,
+  VerificationIntent,
+  whoAmI
 } from '@/core-logic/user-logic.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
-import { ConfirmationCodeResponse } from '@/api/communication.ts'
+import { VerificationCodeResponse } from '@/api/communication.ts'
 import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
+
+const props = withDefaults(defineProps<{
+  intent?: VerificationIntent
+}>(), {
+  intent: undefined,
+})
 
 const router = useRouter()
 const toaster = useSpaceToaster()
 const authStore = useAuthStore()
 
-const { user } = storeToRefs(authStore)
-
+const email = ref<string>()
+const intent = ref(props.intent)
 const attempts = ref(0)
 const codeResent = ref(false)
-const verificationResult = ref<CodeVerificationResult | undefined>()
+const verificationResult = ref<VerificationCodeResult | undefined>()
 const ccd = ref<InstanceType<typeof CodeConfirmationDevice>>()
 
-async function verifyCode(code: string): Promise<void> {
-  if (!user.value) {
-    Log.error(LogTag.SYSTEM, 'User is undefined, cannot verify confirmation code')
-    return
+const instructions = computed(() => {
+  switch (verificationResult.value) {
+    case VerificationCodeResult.SUCCESS:
+      return `Your email has been verified.`
+    case VerificationCodeResult.FOUND:
+      return `
+        Enter the confirmation code sent to your email.
+        Haven't received it? Press <em>↻</em>> to resend.
+      `
+    case VerificationCodeResult.NOT_FOUND:
+      return `
+        No valid confirmation code found.
+        Press <em>↻</em> to request a new one.
+      `
+    case VerificationCodeResult.EXPIRED:
+      return `
+        The confirmation code has expired.
+        Press <em>↻</em> to request a new one.
+      `
+    case VerificationCodeResult.INVALID:
+      return `
+        Invalid confirmation code.
+        Please try again.
+      `
+    case VerificationCodeResult.USED:
+      return `
+        The confirmation code has been used.
+        Press <em>↻</em> to request a new one.
+      `
+    case VerificationCodeResult.LOCKED:
+      return `
+        You have reached the maximum number of attempts.
+        Press <em>↻</em> to request a new one.
+      `
+    case VerificationCodeResult.LIMITED:
+      return `
+        You have reached the maximum number of confirmation codes per hour.
+        Please try again later.
+      `
   }
 
-  await sendConfirmationCodeVerificationRequest(user.value.email, code, confirmationCodePurposes.EMAIL_VERIFICATION)
+  if (codeResent.value) {
+    return `
+      A new confirmation code has been sent to your email.
+      Please check your inbox and enter the code below.
+    `
+  }
+
+  return `
+    Enter the confirmation code sent to your email.
+    Haven't received it? Press <em>↻</em> to resend.
+  `
+})
+
+async function verifyCode(code: string): Promise<void> {
+  await sendVerificationCodePutRequest(code)
     .then(async (response) => {
       await processVerificationResponse(response.data)
     })
     .catch((error) => {
       toaster.bakeError(userApiErrors.CONFIRMATION_CODE__VERIFICATION_FAILED, error.response?.data)
-      Log.error(LogTag.SYSTEM, 'Failed to verify confirmation code', error)
+      Log.error(LogTag.LOGIC, 'Failed to verify confirmation code', error)
     })
 }
 
 async function resendCode(): Promise<void> {
-  if (!user.value) {
-    Log.error(LogTag.SYSTEM, 'User is undefined, cannot resend confirmation code')
-    return
-  }
-
-  await sendConfirmationCodeRequest(user.value.email, confirmationCodePurposes.EMAIL_VERIFICATION)
+  const email = await tryGetEmail()
+  await sendVerificationCodePostRequest(email, intent.value)
     .then(() => {
       attempts.value = 0
       ccd.value?.triggerIdle()
@@ -129,35 +144,50 @@ async function resendCode(): Promise<void> {
     })
     .catch((error) => {
       toaster.bakeError(userApiErrors.CONFIRMATION_CODE__RESENDING_FAILED, error.response?.data)
-      Log.error(LogTag.SYSTEM, 'Failed to resend confirmation code', error)
+      Log.error(LogTag.LOGIC, 'Failed to resend confirmation code', error)
     })
 }
 
-async function processVerificationResponse(response: ConfirmationCodeResponse) {
-  const result = parseCodeVerificationResult(response.result)
+async function tryGetEmail(): Promise<string | undefined> {
+  if (email.value) {
+    return email.value
+  }
+
+  // in case user is authenticated
+  return whoAmI().then(() => {
+    return authStore.user?.email
+  })
+}
+
+async function processVerificationResponse(response: VerificationCodeResponse) {
+  if (response.purpose) {
+    intent.value = parseVerificationIntent(response.purpose)
+  }
+
+  const result = toVerificationCodeResult(response.result)
   switch (result) {
-    case CodeVerificationResult.LIMITED:
-    case CodeVerificationResult.LOCKED:
-    case CodeVerificationResult.EXPIRED:
-    case CodeVerificationResult.NOT_FOUND:
+    case VerificationCodeResult.LIMITED:
+    case VerificationCodeResult.LOCKED:
+    case VerificationCodeResult.EXPIRED:
+    case VerificationCodeResult.USED:
+    case VerificationCodeResult.NOT_FOUND:
       await ccd.value?.triggerFailure()
       ccd.value?.switchOff()
       verificationResult.value = result
       attempts.value = response.attempts ?? 3
       break
-    case CodeVerificationResult.INVALID:
+    case VerificationCodeResult.INVALID:
       await ccd.value?.triggerFailure()
       verificationResult.value = result
       attempts.value = response.attempts ?? 3
       break
-    case CodeVerificationResult.SUCCESS:
+    case VerificationCodeResult.SUCCESS:
       await ccd.value?.triggerSuccess()
       verificationResult.value = result
       attempts.value = 0
-      authStore.setEmailVerified()
-      await router.push({ name: routeNames.user })
+      await onSuccess()
       break
-    case CodeVerificationResult.TESTED:
+    case VerificationCodeResult.FOUND:
       verificationResult.value = result
       attempts.value = response.attempts ?? 0
       break
@@ -167,16 +197,34 @@ async function processVerificationResponse(response: ConfirmationCodeResponse) {
   }
 }
 
-onMounted(async () => {
-  if (user.value) {
-    await sendConfirmationCodeTestRequest(user.value.email, confirmationCodePurposes.EMAIL_VERIFICATION)
-      .then(async (response) => {
-        await processVerificationResponse(response.data)
+async function onSuccess() {
+  if (intent.value === VerificationIntent.EMAIL_VERIFICATION) {
+    if (authStore.isAuthenticated) {
+      Log.log(LogTag.LOGIC, 'Email verified')
+      authStore.setEmailVerified()
+      return router.push({ name: routeNames.user })
+    } else {
+      Log.error(LogTag.LOGIC, 'Email verified but user is not authenticated')
+      await whoAmI().then((success) => {
+        if (success) {
+          authStore.setEmailVerified()
+        }
       })
-      .catch((error) => {
-        Log.error(LogTag.SYSTEM, 'Failed to resend confirmation code', error)
-      })
+    }
+  } else {
+    Log.error(LogTag.LOGIC, `Unknown verification intent: ${intent.value}`)
   }
+}
+
+onMounted(async () => {
+  await sendVerificationCodeGetRequest()
+    .then(async (response) => {
+      await processVerificationResponse(response.data)
+    })
+    .catch((error) => {
+      toaster.bakeError(userApiErrors.CONFIRMATION_CODE__CONTEXT_FAILED, error.response?.data)
+      Log.error(LogTag.LOGIC, 'Failed to get verification code context', error)
+    })
 })
 
 </script>
@@ -190,7 +238,7 @@ onMounted(async () => {
   gap: 0.5rem;
 }
 
-.code-instructions {
+.instructions {
   text-align: center;
   font-size: clamp(0.8rem, 2vw, 1rem);
   letter-spacing: 0.02rem;
@@ -200,7 +248,7 @@ onMounted(async () => {
   margin: 0;
 }
 
-.code-instructions em {
+.instructions em {
   color: #ff0000;
   font-style: normal;
   font-weight: 600;

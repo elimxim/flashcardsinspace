@@ -15,6 +15,7 @@ import CodeConfirmationPage from '@/pages/CodeConfirmationPage.vue'
 import { toLearningStages } from '@/core-logic/stage-logic.ts'
 import { loadUserSignedUpFromCookies } from '@/utils/cookies.ts'
 import { parseNumber } from '@/utils/utils.ts'
+import { parseVerificationIntent } from '@/core-logic/user-logic.ts';
 
 export const routeNames = {
   base: 'base',
@@ -113,6 +114,9 @@ const routes: RouteRecordRaw[] = [
     path: '/code-confirmation',
     name: routeNames.codeConfirmation,
     component: CodeConfirmationPage,
+    props: (route) => ({
+      intent: parseVerificationIntent(route.query.intent),
+    })
   },
 ]
 
