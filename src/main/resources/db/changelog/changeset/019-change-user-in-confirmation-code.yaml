@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 019-change-user-in-confirmation-code
+      author: elimxim
+      changes:
+        - sql:
+            sql: "DELETE FROM confirmation_code"
+        - addNotNullConstraint:
+            tableName: confirmation_code
+            columnName: user_id
+            columnDataType: BIGINT
