@@ -287,19 +287,15 @@ data class ValidReviewSessionUpdateRequest(
 )
 
 class ConfirmationCodeRequest(
-    @field:NotNull
-    @field:NotBlank
     @field:Email
     var email: String? = null,
-    @field:NotNull
-    @field:NotBlank
     @field:ValidConfirmationPurpose
     var purpose: String? = null,
 )
 
 data class ValidConfirmationCodeRequest(
-    val email: String,
-    val purpose: ConfirmationPurpose,
+    val email: String?,
+    val purpose: ConfirmationPurpose?,
 )
 
 class VerificationCodeRequest(

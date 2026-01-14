@@ -267,8 +267,8 @@ fun ReviewSessionUpdateRequest.toValidRequest() = ValidReviewSessionUpdateReques
 )
 
 fun ConfirmationCodeRequest.toValidRequest() = ValidConfirmationCodeRequest(
-    email = email!!,
-    purpose = ConfirmationPurpose.valueOf(purpose!!),
+    email = email,
+    purpose = purpose?.let { ConfirmationPurpose.valueOf(it) },
 )
 
 fun VerificationCodeRequest.toValidRequest() = ValidVerificationCodeRequest(
