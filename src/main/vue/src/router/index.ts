@@ -8,14 +8,15 @@ import UserPage from '@/pages/UserPage.vue'
 import SignupPage from '@/pages/auth/SignupPage.vue'
 import LoginPage from '@/pages/auth/LoginPage.vue'
 import LogoutPage from '@/pages/auth/LogoutPage.vue'
-import PasswordResetView from '@/pages/auth/PasswordResetView.vue'
+import PasswordResetPage from '@/pages/auth/PasswordResetPage.vue'
+import EmailConfirmationPage from '@/pages/auth/EmailConfirmationPage.vue'
 import ReviewRouter from '@/components/review/ReviewRouter.vue'
 import LightspeedSchedulePage from '@/pages/LightspeedSchedulePage.vue'
-import CodeConfirmationPage from '@/pages/CodeConfirmationPage.vue'
+import CodeVerificationPage from '@/pages/CodeVerificationPage.vue'
 import { toLearningStages } from '@/core-logic/stage-logic.ts'
 import { loadUserSignedUpFromCookies } from '@/utils/cookies.ts'
 import { parseNumber } from '@/utils/utils.ts'
-import { parseVerificationIntent } from '@/core-logic/user-logic.ts';
+import { parseVerificationType } from '@/core-logic/user-logic.ts'
 
 export const routeNames = {
   base: 'base',
@@ -26,10 +27,11 @@ export const routeNames = {
   signup: 'signup',
   login: 'login',
   logout: 'logout',
+  emailConfirmation: 'emailConfirmation',
   passwordReset: 'passwordReset',
   review: 'review',
   lightspeedSchedule: 'lightspeedSchedule',
-  codeConfirmation: 'codeConfirmation',
+  codeVerification: 'codeConfirmation',
 }
 
 const routes: RouteRecordRaw[] = [
@@ -89,7 +91,12 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/password-reset',
     name: routeNames.passwordReset,
-    component: PasswordResetView,
+    component: PasswordResetPage,
+  },
+  {
+    path: '/email-confirmation',
+    name: routeNames.emailConfirmation,
+    component: EmailConfirmationPage,
   },
   {
     path: '/review',
@@ -111,11 +118,11 @@ const routes: RouteRecordRaw[] = [
     component: LightspeedSchedulePage,
   },
   {
-    path: '/code-confirmation',
-    name: routeNames.codeConfirmation,
-    component: CodeConfirmationPage,
+    path: '/code-verification',
+    name: routeNames.codeVerification,
+    component: CodeVerificationPage,
     props: (route) => ({
-      intent: parseVerificationIntent(route.query.intent),
+      type: parseVerificationType(route.query.type),
     })
   },
 ]
@@ -133,7 +140,7 @@ router.beforeEach(async (to, _, next) => {
     const isSignedUp = loadUserSignedUpFromCookies()
     if (isAuthenticated.value) {
       if (to.meta.requiresEmailVerified && !isEmailVerified.value) {
-        next({ name: routeNames.codeConfirmation })
+        next({ name: routeNames.codeVerification })
       } else {
         next()
       }
@@ -153,7 +160,7 @@ router.beforeEach(async (to, _, next) => {
       if (isEmailVerified.value) {
         next({ name: routeNames.user })
       } else {
-        next({ name: routeNames.codeConfirmation })
+        next({ name: routeNames.codeVerification })
       }
     } else {
       next()
@@ -161,8 +168,8 @@ router.beforeEach(async (to, _, next) => {
     return
   }
 
-  // goes directly to code confirmation page
-  if (to.name === routeNames.codeConfirmation) {
+  // goes directly to code verification page
+  if (to.name === routeNames.codeVerification) {
     if (isEmailVerified.value) {
       next({ name: routeNames.user })
     } else {

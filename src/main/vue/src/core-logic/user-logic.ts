@@ -15,17 +15,19 @@ export enum VerificationResult {
   LIMITED = 'LIMITED',
 }
 
-export enum VerificationIntent {
-  EMAIL_VERIFICATION = 'EMAIL_VERIFICATION',
+export enum VerificationType {
+  REGISTRATION_REQUEST = 'REGISTRATION_REQUEST',
+  PASSWORD_RESET_REQUEST = 'PASSWORD_RESET_REQUEST',
+  PASSWORD_RESET_ACCESS = 'PASSWORD_RESET_ACCESS',
 }
 
 export function toVerificationCodeResult(result: string): VerificationResult | undefined {
   return Object.values(VerificationResult).find(v => v === result)
 }
 
-export function parseVerificationIntent(value?: unknown): VerificationIntent | undefined {
+export function parseVerificationType(value?: unknown): VerificationType | undefined {
   if (value === undefined || value === null || typeof value !== 'string') return undefined
-  return Object.values(VerificationIntent).find(v => v === value)
+  return Object.values(VerificationType).find(v => v === value)
 }
 
 export async function whoAmI() {

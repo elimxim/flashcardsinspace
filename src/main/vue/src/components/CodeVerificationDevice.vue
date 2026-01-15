@@ -91,7 +91,7 @@ const props = defineProps<{
   resendCode: () => Promise<void>
 }>()
 
-type HudStatus = 'IDLE' | 'SYNCING' | 'ERROR' | 'SUCCESS' | 'OFF'
+type HudStatus = 'IDLE' | 'SYNCING' | 'ERROR' | 'SUCCESS' | 'OFF' | 'LOCKED'
 
 const input = ref<string>('')
 const dirty = ref(false)
@@ -101,7 +101,7 @@ let successTimeout: ReturnType<typeof setTimeout> | null = null
 let failureTimeout: ReturnType<typeof setTimeout> | null = null
 
 const isResetLocked = computed(() => {
-  return status.value === 'SUCCESS' || status.value !== 'OFF' && dirty.value
+  return status.value === 'SUCCESS' || status.value !== 'OFF' && dirty.value || status.value === 'LOCKED'
 })
 
 const pressKey = async (digit: string) => {
@@ -132,6 +132,8 @@ const resendCode = async () => {
 const triggerIdle = () => status.value = 'IDLE'
 
 const switchOff = () => status.value = 'OFF'
+
+const lock = () => status.value = 'LOCKED'
 
 const triggerSuccess = async (): Promise<void> => {
   return new Promise((resolve) => {
@@ -176,6 +178,7 @@ defineExpose({
   triggerSuccess,
   triggerFailure,
   switchOff,
+  lock,
 })
 
 </script>
