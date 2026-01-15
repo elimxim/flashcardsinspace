@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse
 const val REFRESH_TOKEN_COOKIE = "refreshToken"
 const val ACCESS_TOKEN_COOKIE = "accessToken"
 const val VERIFICATION_TOKEN_COOKIE = "verificationToken"
+const val PASSWORD_RESET_TOKEN_COOKIE = "passwordResetToken"
 
 fun addRefreshTokenCookie(response: HttpServletResponse, token: String, maxAge: Int) =
     addSecureHttpOnlyCookie(response, REFRESH_TOKEN_COOKIE, value = token, path = "/auth/refresh", maxAge)
@@ -25,6 +26,11 @@ fun addVerificationTokenCookie(response: HttpServletResponse, token: String, max
 fun clearVerificationTokenCookie(response: HttpServletResponse) =
     clearSecureHttpOnlyCookie(response, VERIFICATION_TOKEN_COOKIE, path = "/")
 
+fun addPasswordResetTokenCookie(response: HttpServletResponse, token: String, maxAge: Int) =
+    addSecureHttpOnlyCookie(response, PASSWORD_RESET_TOKEN_COOKIE, value = token, path = "/auth/password-reset", maxAge)
+
+fun clearPasswordResetTokenCookie(response: HttpServletResponse) =
+    clearSecureHttpOnlyCookie(response, PASSWORD_RESET_TOKEN_COOKIE, path = "auth/password-reset")
 
 fun addSecureHttpOnlyCookie(
     response: HttpServletResponse,

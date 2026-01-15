@@ -286,20 +286,20 @@ data class ValidReviewSessionUpdateRequest(
     val metadata: Map<String, Any>,
 )
 
-class ConfirmationCodeRequest(
+class VerificationIntentRequest(
     @field:NotNull
     @field:NotBlank
     @field:Email
     var email: String? = null,
     @field:NotNull
     @field:NotBlank
-    @field:ValidConfirmationPurpose
-    var purpose: String? = null,
+    @field:ValidVerificationType
+    var type: String? = null,
 )
 
-data class ValidConfirmationCodeRequest(
+data class ValidVerificationIntentRequest(
     val email: String,
-    val purpose: ConfirmationPurpose,
+    val type: VerificationType,
 )
 
 class VerificationCodeRequest(
@@ -313,8 +313,18 @@ data class ValidVerificationCodeRequest(
     val code: String,
 )
 
-data class VerificationCodeResponse(
+data class VerificationIntentResponse(
     val result: String,
-    val purpose: String? = null,
+    val type: String? = null,
     val attempts: Int? = null,
+)
+
+class PasswordResetRequest(
+    @field:RequiredConfidential
+    @field:ConfidentialLength(min = 6, max = 64)
+    var secret: Password? = null,
+)
+
+class ValidPasswordResetRequest(
+    val secret: Password,
 )

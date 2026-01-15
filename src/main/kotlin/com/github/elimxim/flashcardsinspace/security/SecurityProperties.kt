@@ -1,5 +1,6 @@
 package com.github.elimxim.flashcardsinspace.security
 
+import com.github.elimxim.flashcardsinspace.entity.VerificationType
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.NestedConfigurationProperty
 
@@ -11,7 +12,7 @@ data class SecurityProperties(
     @NestedConfigurationProperty
     val cors: CorsProperties = CorsProperties(),
     @NestedConfigurationProperty
-    val verificationCodes: VerificationCodesProperties,
+    val verificationTokens: VerificationTokenProperties,
 )
 
 data class JwtProperties(
@@ -24,12 +25,24 @@ data class CorsProperties(
     val allowedOrigins: List<String> = listOf(),
 )
 
-data class VerificationCodesProperties(
+data class VerificationTokenProperties(
     @NestedConfigurationProperty
-    val email: SecurityCodeProperties,
+    val registrationRequest: SecurityTokenProperties,
+    @NestedConfigurationProperty
+    val passwordResetRequest: SecurityTokenProperties,
+    @NestedConfigurationProperty
+    val passwordResetAccess: SecurityTokenProperties,
 )
 
-data class SecurityCodeProperties(
+data class SecurityTokenProperties(
     val length: Int,
     val maxAge: Int,
 )
+
+fun SecurityProperties.getSecurityTokenProperties(type: VerificationType): SecurityTokenProperties {
+    return when (type) {
+        VerificationType.REGISTRATION_REQUEST -> this.verificationTokens.registrationRequest
+        VerificationType.PASSWORD_RESET_REQUEST -> this.verificationTokens.passwordResetRequest
+        VerificationType.PASSWORD_RESET_ACCESS -> this.verificationTokens.passwordResetAccess
+    }
+}

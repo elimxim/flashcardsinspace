@@ -1,6 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service.mail
 
-import com.github.elimxim.flashcardsinspace.entity.ConfirmationPurpose
+import com.github.elimxim.flashcardsinspace.entity.VerificationType
 import com.github.elimxim.flashcardsinspace.security.maskSecret
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -34,37 +34,40 @@ class EmailService(
         }
     }
 
-    fun sendConfirmationCodeEmail(
+    fun sendVerificationIntentEmail(
         recipient: Recipient,
         code: String,
-        purpose: ConfirmationPurpose,
+        type: VerificationType,
         maxAgeSeconds: Int
     ) {
-        log.info("Sending confirmation code to ${maskSecret(recipient.email)}, purpose: $purpose")
+        log.info("Sending verification code to ${maskSecret(recipient.email)}, type: $type")
         val context = Context().apply {
             setVariable("securityCodeDigits", code.toList().map { it.toString() })
-            setVariable("purpose", purpose.name)
-            setVariable("purposeDescription", getPurposeDescription(purpose))
+            setVariable("subtitle", getSubtitleForType(type))
             setVariable("expirationTime", getExpirationTime(maxAgeSeconds))
         }
-        val htmlContent = templateEngine.process("confirmation-code-email", context)
+        val htmlContent = templateEngine.process("verification-code-email", context)
 
         mailClient.send(
             recipient = recipient,
-            mail = Mail.SecurityMail(getSubjectForPurpose(purpose), htmlContent = htmlContent)
+            mail = Mail.SecurityMail(getSubjectForType(type), htmlContent = htmlContent)
         )
-        log.info("Confirmation code email sent to ${maskSecret(recipient.email)}")
+        log.info("Verification code emailed to ${maskSecret(recipient.email)}")
     }
 
-    private fun getSubjectForPurpose(purpose: ConfirmationPurpose): String {
-        return when (purpose) {
-            ConfirmationPurpose.EMAIL_VERIFICATION -> "Complete Registration - Flashcards in Space"
+    private fun getSubjectForType(type: VerificationType): String {
+        return when (type) {
+            VerificationType.REGISTRATION_REQUEST -> "Complete Registration - Flashcards in Space"
+            VerificationType.PASSWORD_RESET_ACCESS -> "Reset Your Password - Flashcards in Space"
+            VerificationType.PASSWORD_RESET_REQUEST -> "Reset Your Password - Flashcards in Space"
         }
     }
 
-    private fun getPurposeDescription(purpose: ConfirmationPurpose): String {
-        return when (purpose) {
-            ConfirmationPurpose.EMAIL_VERIFICATION -> "Verify Your Email"
+    private fun getSubtitleForType(type: VerificationType): String {
+        return when (type) {
+            VerificationType.REGISTRATION_REQUEST -> "Verify Your Email"
+            VerificationType.PASSWORD_RESET_ACCESS -> "Reset Your Password"
+            VerificationType.PASSWORD_RESET_REQUEST -> "Reset Your Password"
         }
     }
 

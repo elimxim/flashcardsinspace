@@ -71,6 +71,6 @@ class UserService(
         user.emailVerified = true
         user.lastUpdatedAt = ZonedDateTime.now()
         userRepository.save(user)
-        log.info("User ${user.id} verified")
+        log.info("User verified")
     }
 }

@@ -6,8 +6,8 @@ import org.hibernate.type.SqlTypes
 import java.time.ZonedDateTime
 
 @Entity
-@Table(name = "confirmation_code")
-open class ConfirmationCode(
+@Table(name = "verification_intent")
+open class VerificationIntent(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     open val id: Long = 0,
@@ -15,19 +15,19 @@ open class ConfirmationCode(
     @Column(nullable = false)
     open val email: String,
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    open var type: VerificationType,
+
     @Column(nullable = false, columnDefinition = "CHAR(64)")
     @JdbcTypeCode(SqlTypes.CHAR)
     open val tokenHash: String,
 
-    @Column(nullable = false)
-    open val code: String,
+    @Column(nullable = true)
+    open val code: String? = null,
 
     @Column(nullable = false)
     open var attempts: Int = 0,
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    open var purpose: ConfirmationPurpose,
 
     @Column(nullable = false)
     open val createdAt: ZonedDateTime,
@@ -46,7 +46,9 @@ open class ConfirmationCode(
     open var user: User,
 )
 
-enum class ConfirmationPurpose {
-    EMAIL_VERIFICATION,
+enum class VerificationType {
+    REGISTRATION_REQUEST,
+    PASSWORD_RESET_REQUEST,
+    PASSWORD_RESET_ACCESS,
 }
 

@@ -7,7 +7,6 @@ import brevoModel.SendSmtpEmail
 import brevoModel.SendSmtpEmailReplyTo
 import brevoModel.SendSmtpEmailSender
 import brevoModel.SendSmtpEmailTo
-import com.github.elimxim.flashcardsinspace.security.maskSecret
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -32,32 +31,27 @@ class BrevoMailClient(private val mailProperties: MailProperties) {
         get() = "security@${mailProperties.senderDomain}"
 
     fun send(recipient: Recipient, mail: Mail) {
-        try {
-            val apiClient = Configuration.getDefaultApiClient()
-            val auth = apiClient.getAuthentication("api-key") as ApiKeyAuth
-            auth.apiKey = mailProperties.apiKey
+        val apiClient = Configuration.getDefaultApiClient()
+        val auth = apiClient.getAuthentication("api-key") as ApiKeyAuth
+        auth.apiKey = mailProperties.apiKey
 
 
-            val email = SendSmtpEmail().apply {
-                sender = SendSmtpEmailSender()
-                    .email(getSenderEmail(mail))
-                    .name(mailProperties.senderName)
-                to = listOf(
-                    SendSmtpEmailTo()
-                        .email(recipient.email)
-                        .name(recipient.name)
-                )
-                replyTo = SendSmtpEmailReplyTo()
-                    .email(mailProperties.replyToEmail)
-                subject = mail.subject
-                htmlContent = mail.htmlContent
-            }
-
-            TransactionalEmailsApi().sendTransacEmail(email)
-        } catch (e: Exception) {
-            log.error("Failed to send email to ${maskSecret(recipient.email)}", e)
-            throw MailClientException(e)
+        val email = SendSmtpEmail().apply {
+            sender = SendSmtpEmailSender()
+                .email(getSenderEmail(mail))
+                .name(mailProperties.senderName)
+            to = listOf(
+                SendSmtpEmailTo()
+                    .email(recipient.email)
+                    .name(recipient.name)
+            )
+            replyTo = SendSmtpEmailReplyTo()
+                .email(mailProperties.replyToEmail)
+            subject = mail.subject
+            htmlContent = mail.htmlContent
         }
+
+        TransactionalEmailsApi().sendTransacEmail(email)
     }
 
     private fun getSenderEmail(mail: Mail) = when (mail) {

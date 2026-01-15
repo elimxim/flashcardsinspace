@@ -1,16 +1,12 @@
 package com.github.elimxim.flashcardsinspace.security
 
-import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.util.PASSWORD_RESET_TOKEN_COOKIE
 import com.github.elimxim.flashcardsinspace.util.REFRESH_TOKEN_COOKIE
 import com.github.elimxim.flashcardsinspace.util.withLoggingContext
-import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
-import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
-import com.github.elimxim.flashcardsinspace.web.dto.UserDto
-import com.github.elimxim.flashcardsinspace.web.dto.toDto
+import com.github.elimxim.flashcardsinspace.web.dto.*
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -35,10 +31,7 @@ class AuthController(private val authService: AuthService) {
     }
 
     @PostMapping("/logout")
-    fun logout(
-        @AuthenticationPrincipal user: User?,
-        response: HttpServletResponse,
-    ): ResponseEntity<Unit> = withLoggingContext(user) {
+    fun logout(response: HttpServletResponse): ResponseEntity<Unit> = withLoggingContext {
         authService.logout(response)
         return ResponseEntity.ok().build()
     }
@@ -57,5 +50,13 @@ class AuthController(private val authService: AuthService) {
         }
     }
 
-
+    @PostMapping("/password-reset")
+    fun resetPassword(
+        @CookieValue(name = PASSWORD_RESET_TOKEN_COOKIE, required = false) resetToken: String?,
+        @RequestBody request: PasswordResetRequest,
+        response: HttpServletResponse,
+    ): ResponseEntity<Unit> = withLoggingContext {
+        authService.resetPassword(resetToken, request, response)
+        return ResponseEntity.ok().build()
+    }
 }

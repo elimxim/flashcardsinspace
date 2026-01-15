@@ -234,18 +234,18 @@ class MetadataValidator : ConstraintValidator<ValidMetadata, Map<String, Any>> {
     AnnotationTarget.VALUE_PARAMETER
 )
 @Retention(AnnotationRetention.RUNTIME)
-@Constraint(validatedBy = [ConfirmationPurposeValidator::class])
-annotation class ValidConfirmationPurpose(
-    val message: String = "{jakarta.validation.constraints.confirmationPurpose.invalid.message}",
+@Constraint(validatedBy = [VerificationTypeValidator::class])
+annotation class ValidVerificationType(
+    val message: String = "{jakarta.validation.constraints.verificationType.invalid.message}",
     val groups: Array<KClass<*>> = [],
     val payload: Array<KClass<out Payload>> = [],
 )
 
-class ConfirmationPurposeValidator : ConstraintValidator<ValidConfirmationPurpose, String> {
+class VerificationTypeValidator : ConstraintValidator<ValidVerificationType, String> {
     override fun isValid(value: String?, context: ConstraintValidatorContext?): Boolean {
         if (value == null) return true
         try {
-            ConfirmationPurpose.valueOf(value)
+            VerificationType.valueOf(value)
             return true
         } catch (_: IllegalArgumentException) {
             return false

@@ -191,14 +191,14 @@ private fun escapeReviewSessionMetadataValue(value: Any): Any {
     }
 }
 
-fun ConfirmationCodeRequest.normalize() = ConfirmationCodeRequest(
+fun VerificationIntentRequest.normalize() = VerificationIntentRequest(
     email = email?.normalize(),
-    purpose = purpose?.normalize(),
+    type = type?.normalize(),
 )
 
-fun ConfirmationCodeRequest.escapeJava() = ConfirmationCodeRequest(
+fun VerificationIntentRequest.escapeJava() = VerificationIntentRequest(
     email = email?.escapeJava(),
-    purpose = purpose?.escapeJava(),
+    type = type?.escapeJava(),
 )
 
 fun VerificationCodeRequest.normalize() = VerificationCodeRequest(
@@ -207,4 +207,12 @@ fun VerificationCodeRequest.normalize() = VerificationCodeRequest(
 
 fun VerificationCodeRequest.escapeJava() = VerificationCodeRequest(
     code = code?.escapeJava(),
+)
+
+fun PasswordResetRequest.normalize() = PasswordResetRequest(
+    secret = secret?.normalize(),
+)
+
+fun PasswordResetRequest.escapeJava() = PasswordResetRequest(
+    secret = secret?.escapeJava(),
 )
