@@ -2,13 +2,15 @@ package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
+import com.github.elimxim.flashcardsinspace.security.maskSecret
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.UserDto
 import com.github.elimxim.flashcardsinspace.web.dto.UserUpdateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ValidUserUpdateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
+import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
+import com.github.elimxim.flashcardsinspace.web.exception.HttpNotFoundException
 import org.slf4j.LoggerFactory
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
@@ -22,10 +24,18 @@ class UserService(
     private val languageService: LanguageService,
 ) {
     @Transactional(readOnly = true)
-    fun findByEmail(username: String): UserDto {
-        return userRepository.findByEmail(username)
-            .orElseThrow { UsernameNotFoundException("User not found: $username") }
-            .toDto()
+    fun getEntity(email: String): User {
+        return userRepository.findByEmail(email).orElseThrow {
+            HttpNotFoundException(
+                ApiErrorCode.USR404,
+                "User not found: ${maskSecret(email)}"
+            )
+        }
+    }
+
+    @Transactional(readOnly = true)
+    fun findByEmail(email: String): UserDto {
+        return getEntity(email).toDto()
     }
 
     @Transactional
@@ -54,5 +64,13 @@ class UserService(
         }
 
         return changed
+    }
+
+    @Transactional
+    fun verify(user: User) {
+        user.emailVerified = true
+        user.lastUpdatedAt = ZonedDateTime.now()
+        userRepository.save(user)
+        log.info("User ${user.id} verified")
     }
 }
