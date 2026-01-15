@@ -25,6 +25,8 @@ enum class ApiErrorCode {
     USR404,
     FAU404,
     RES404,
+    VTE404,
+    COC404,
     EAT409,
     FSF409,
     UNE500,
@@ -32,4 +34,5 @@ enum class ApiErrorCode {
     CCF500,
     CNF500,
     DCD500,
+    ESF500,
 }
