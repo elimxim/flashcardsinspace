@@ -41,24 +41,19 @@ class EmailService(
         maxAgeSeconds: Int
     ) {
         log.info("Sending confirmation code to ${maskSecret(recipient.email)}, purpose: $purpose")
-        try {
-            val context = Context().apply {
-                setVariable("securityCodeDigits", code.toList().map { it.toString() })
-                setVariable("purpose", purpose.name)
-                setVariable("purposeDescription", getPurposeDescription(purpose))
-                setVariable("expirationTime", getExpirationTime(maxAgeSeconds))
-            }
-            val htmlContent = templateEngine.process("confirmation-code-email", context)
-
-            mailClient.send(
-                recipient = recipient,
-                mail = Mail.SecurityMail(getSubjectForPurpose(purpose), htmlContent = htmlContent)
-            )
-            log.info("Confirmation code email sent to ${maskSecret(recipient.email)}")
-        } catch (e: Exception) {
-            log.error("Failed to send confirmation code email to ${maskSecret(recipient.email)}", e)
-            throw e
+        val context = Context().apply {
+            setVariable("securityCodeDigits", code.toList().map { it.toString() })
+            setVariable("purpose", purpose.name)
+            setVariable("purposeDescription", getPurposeDescription(purpose))
+            setVariable("expirationTime", getExpirationTime(maxAgeSeconds))
         }
+        val htmlContent = templateEngine.process("confirmation-code-email", context)
+
+        mailClient.send(
+            recipient = recipient,
+            mail = Mail.SecurityMail(getSubjectForPurpose(purpose), htmlContent = htmlContent)
+        )
+        log.info("Confirmation code email sent to ${maskSecret(recipient.email)}")
     }
 
     private fun getSubjectForPurpose(purpose: ConfirmationPurpose): String {
