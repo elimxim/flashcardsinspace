@@ -7,7 +7,6 @@ import com.github.elimxim.flashcardsinspace.service.LanguageService
 import com.github.elimxim.flashcardsinspace.service.mail.EmailService
 import com.github.elimxim.flashcardsinspace.service.mail.Recipient
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
-import com.github.elimxim.flashcardsinspace.util.addVerificationTokenCookie
 import com.github.elimxim.flashcardsinspace.web.dto.LoginRequest
 import com.github.elimxim.flashcardsinspace.web.dto.SignUpRequest
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
@@ -36,7 +35,6 @@ class AuthService(
     private val requestValidator: RequestValidator,
     private val emailService: EmailService,
     private val verificationCodeService: VerificationCodeService,
-    private val securityProperties: SecurityProperties,
 ) {
     @Transactional
     fun signUp(request: SignUpRequest, response: HttpServletResponse): User {
@@ -67,11 +65,8 @@ class AuthService(
         log.info("Signup successful ${user.email} => ${user.id}, timezone: ${user.timezone}")
 
         emailService.sendWelcomeEmail(recipient = Recipient(user.email, user.name))
-        val token = verificationCodeService.generateAndSend(
-            savedUser, savedUser.email, ConfirmationPurpose.EMAIL_VERIFICATION
-        )
-        addVerificationTokenCookie(response, token, securityProperties.verificationCodes.email.maxAge)
         jwtService.setCookies(user, response)
+        verificationCodeService.send(savedUser, savedUser.email, ConfirmationPurpose.EMAIL_VERIFICATION, response)
         return savedUser
     }
 

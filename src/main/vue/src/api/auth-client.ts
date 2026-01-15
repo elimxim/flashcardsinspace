@@ -4,6 +4,7 @@ import apiClient from '@/api/api-client.ts'
 import { configureDateTransformers } from '@/api/axios-config.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { VerificationCodeResponse } from '@/api/communication.ts'
+import { email } from '@vuelidate/validators';
 
 const authClient = axios.create({
   baseURL: '/auth',
@@ -51,22 +52,27 @@ export async function sendUserGetRequest() {
   })
 }
 
-export async function sendVerificationCodePostRequest(email: string | undefined, intent: string | undefined) {
-  Log.log(LogTag.POST, '/verification-code')
-  return await authClient.post('/verification-code', {
+export async function sendCodeConfirmationRequestWithBody(email: string, intent: string) {
+  Log.log(LogTag.POST, '/code/confirmation')
+  return await authClient.post('/code/confirmation', {
     email: email,
     purpose: intent,
   })
 }
 
-export async function sendVerificationCodePutRequest(code: string) {
-  Log.log(LogTag.PUT, '/verification-code')
-  return await authClient.put<VerificationCodeResponse>('/verification-code', {
+export async function sendCodeConfirmationRequest() {
+  Log.log(LogTag.POST, '/code/confirmation')
+  return await authClient.post('/code/confirmation')
+}
+
+export async function sendCodeVerificationRequest(code: string) {
+  Log.log(LogTag.POST, '/code/verification')
+  return await authClient.post<VerificationCodeResponse>('/code/verification', {
     code: code,
   })
 }
 
-export async function sendVerificationCodeGetRequest() {
-  Log.log(LogTag.GET, '/verification-code')
-  return await authClient.get<VerificationCodeResponse>('/verification-code')
+export async function sendCodeContextRequest() {
+  Log.log(LogTag.GET, '/code/context')
+  return await authClient.get<VerificationCodeResponse>('/code/context')
 }

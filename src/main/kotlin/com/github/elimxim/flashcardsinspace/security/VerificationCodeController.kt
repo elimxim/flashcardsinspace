@@ -12,33 +12,34 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/auth/verification-code")
+@RequestMapping("/auth/code")
 class VerificationCodeController(
     private val verificationCodeService: VerificationCodeService,
 ) {
-    @PostMapping
-    fun sendConfirmationCode(
+    @PostMapping("/confirmation")
+    fun confirmation(
         @AuthenticationPrincipal user: User?,
-        @RequestBody request: ConfirmationCodeRequest,
+        @CookieValue(name = VERIFICATION_TOKEN_COOKIE, required = false) verificationToken: String?,
+        @RequestBody request: ConfirmationCodeRequest?,
         response: HttpServletResponse,
     ): ResponseEntity<Unit> = withLoggingContext(user) {
-        verificationCodeService.generateAndSend(user, request.normalize(), response)
+        verificationCodeService.send(user, verificationToken, request?.normalize(), response)
         return ResponseEntity.ok().build()
     }
 
-    @PutMapping
-    fun verifyConfirmationCode(
+    @PostMapping("/verification")
+    fun verification(
         @AuthenticationPrincipal user: User?,
         @RequestBody request: VerificationCodeRequest,
         @CookieValue(name = VERIFICATION_TOKEN_COOKIE, required = false) verificationToken: String?,
         response: HttpServletResponse,
     ): ResponseEntity<VerificationCodeResponse> = withLoggingContext(user) {
-        val response = verificationCodeService.verify(user, verificationToken, request.normalize(), response)
+        val response = verificationCodeService.verify(verificationToken, request.normalize(), response)
         return ResponseEntity.ok(response)
     }
 
-    @GetMapping
-    fun testConfirmationCode(
+    @GetMapping("/context")
+    fun codeContext(
         @AuthenticationPrincipal user: User?,
         @CookieValue(name = VERIFICATION_TOKEN_COOKIE, required = false) verificationToken: String?,
         response: HttpServletResponse,

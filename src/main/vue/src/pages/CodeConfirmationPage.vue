@@ -11,18 +11,57 @@
       'confirmation-code-page',
     ]"
   >
-    <p class="instructions">
-      {{ instructions }}
+    <p v-if="verificationResult === VerificationResult.SUCCESS" class="instructions">
+      Your email has been verified.
     </p>
-    <div class="control-device-wrapper">
-      <div class="control-device">
-        <CodeConfirmationDevice
-          ref="ccd"
-          :attempts="attempts"
-          :verify-code="verifyCode"
-          :resend-code="resendCode"
-        />
-      </div>
+    <p v-else-if="verificationResult === VerificationResult.FOUND" class="instructions">
+      Enter the confirmation code sent to your email.
+      Haven't received it? Press <strong>↻</strong>> to resend.
+    </p>
+    <p v-else-if="verificationResult === VerificationResult.NOT_FOUND" class="instructions">
+      No valid confirmation code found.
+      Press <strong>↻</strong> to request a new one.
+    </p>
+    <p v-else-if="verificationResult === VerificationResult.SESSION_EXPIRED" class="instructions">
+      Your session has expired.
+      Press <strong>↻</strong> to request a new confirmation code.
+    </p>
+    <p v-else-if="verificationResult === VerificationResult.EXPIRED" class="instructions">
+      The confirmation code has expired.
+      Press <strong>↻</strong> to request a new one.
+    </p>
+    <p v-else-if="verificationResult === VerificationResult.INVALID" class="instructions">
+      Invalid confirmation code.
+      Please try again.
+    </p>
+    <p v-else-if="verificationResult === VerificationResult.USED" class="instructions">
+      The confirmation code has been used.
+      Press <strong>↻</strong> to request a new one.
+    </p>
+    <p v-else-if="verificationResult === VerificationResult.LOCKED" class="instructions">
+      You have reached the maximum number of attempts.
+      Press <strong>↻</strong> to request a new one.
+    </p>
+    <p v-else-if="verificationResult === VerificationResult.LIMITED" class="instructions">
+      You have reached the maximum number of confirmation codes per hour.
+      Please try again later.
+    </p>
+    <p v-else-if="codeResent" class="instructions">
+      A new confirmation code has been sent to your email.
+      Please check your inbox and enter the code below.
+    </p>
+    <p v-else class="instructions">
+      Enter the confirmation code sent to your email.
+      Haven't received it? Press <strong>↻</strong> to resend.
+    </p>
+
+    <div class="control-device">
+      <CodeConfirmationDevice
+        ref="ccd"
+        :attempts="attempts"
+        :verify-code="verifyCode"
+        :resend-code="resendCode"
+      />
     </div>
   </div>
   <SpaceToast/>
@@ -30,18 +69,18 @@
 
 <script setup lang="ts">
 import CodeConfirmationDevice from '@/components/CodeConfirmationDevice.vue'
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import {
-  sendVerificationCodeGetRequest,
-  sendVerificationCodePostRequest,
-  sendVerificationCodePutRequest,
+  sendCodeConfirmationRequest,
+  sendCodeContextRequest,
+  sendCodeVerificationRequest,
 } from '@/api/auth-client.ts'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import {
   parseVerificationIntent,
   toVerificationCodeResult,
-  VerificationCodeResult,
+  VerificationResult,
   VerificationIntent,
   whoAmI
 } from '@/core-logic/user-logic.ts'
@@ -61,69 +100,14 @@ const router = useRouter()
 const toaster = useSpaceToaster()
 const authStore = useAuthStore()
 
-const email = ref<string>()
 const intent = ref(props.intent)
 const attempts = ref(0)
 const codeResent = ref(false)
-const verificationResult = ref<VerificationCodeResult | undefined>()
+const verificationResult = ref<VerificationResult | undefined>()
 const ccd = ref<InstanceType<typeof CodeConfirmationDevice>>()
 
-const instructions = computed(() => {
-  switch (verificationResult.value) {
-    case VerificationCodeResult.SUCCESS:
-      return `Your email has been verified.`
-    case VerificationCodeResult.FOUND:
-      return `
-        Enter the confirmation code sent to your email.
-        Haven't received it? Press <em>↻</em>> to resend.
-      `
-    case VerificationCodeResult.NOT_FOUND:
-      return `
-        No valid confirmation code found.
-        Press <em>↻</em> to request a new one.
-      `
-    case VerificationCodeResult.EXPIRED:
-      return `
-        The confirmation code has expired.
-        Press <em>↻</em> to request a new one.
-      `
-    case VerificationCodeResult.INVALID:
-      return `
-        Invalid confirmation code.
-        Please try again.
-      `
-    case VerificationCodeResult.USED:
-      return `
-        The confirmation code has been used.
-        Press <em>↻</em> to request a new one.
-      `
-    case VerificationCodeResult.LOCKED:
-      return `
-        You have reached the maximum number of attempts.
-        Press <em>↻</em> to request a new one.
-      `
-    case VerificationCodeResult.LIMITED:
-      return `
-        You have reached the maximum number of confirmation codes per hour.
-        Please try again later.
-      `
-  }
-
-  if (codeResent.value) {
-    return `
-      A new confirmation code has been sent to your email.
-      Please check your inbox and enter the code below.
-    `
-  }
-
-  return `
-    Enter the confirmation code sent to your email.
-    Haven't received it? Press <em>↻</em> to resend.
-  `
-})
-
 async function verifyCode(code: string): Promise<void> {
-  await sendVerificationCodePutRequest(code)
+  await sendCodeVerificationRequest(code)
     .then(async (response) => {
       await processVerificationResponse(response.data)
     })
@@ -134,8 +118,7 @@ async function verifyCode(code: string): Promise<void> {
 }
 
 async function resendCode(): Promise<void> {
-  const email = await tryGetEmail()
-  await sendVerificationCodePostRequest(email, intent.value)
+  await sendCodeConfirmationRequest()
     .then(() => {
       attempts.value = 0
       ccd.value?.triggerIdle()
@@ -143,20 +126,9 @@ async function resendCode(): Promise<void> {
       verificationResult.value = undefined
     })
     .catch((error) => {
-      toaster.bakeError(userApiErrors.CONFIRMATION_CODE__RESENDING_FAILED, error.response?.data)
       Log.error(LogTag.LOGIC, 'Failed to resend confirmation code', error)
+      toaster.bakeError(userApiErrors.CONFIRMATION_CODE__RESENDING_FAILED, error.response?.data)
     })
-}
-
-async function tryGetEmail(): Promise<string | undefined> {
-  if (email.value) {
-    return email.value
-  }
-
-  // in case user is authenticated
-  return whoAmI().then(() => {
-    return authStore.user?.email
-  })
 }
 
 async function processVerificationResponse(response: VerificationCodeResponse) {
@@ -166,28 +138,29 @@ async function processVerificationResponse(response: VerificationCodeResponse) {
 
   const result = toVerificationCodeResult(response.result)
   switch (result) {
-    case VerificationCodeResult.LIMITED:
-    case VerificationCodeResult.LOCKED:
-    case VerificationCodeResult.EXPIRED:
-    case VerificationCodeResult.USED:
-    case VerificationCodeResult.NOT_FOUND:
+    case VerificationResult.LIMITED:
+    case VerificationResult.LOCKED:
+    case VerificationResult.SESSION_EXPIRED:
+    case VerificationResult.EXPIRED:
+    case VerificationResult.USED:
+    case VerificationResult.NOT_FOUND:
       await ccd.value?.triggerFailure()
       ccd.value?.switchOff()
       verificationResult.value = result
       attempts.value = response.attempts ?? 3
       break
-    case VerificationCodeResult.INVALID:
+    case VerificationResult.INVALID:
       await ccd.value?.triggerFailure()
       verificationResult.value = result
       attempts.value = response.attempts ?? 3
       break
-    case VerificationCodeResult.SUCCESS:
+    case VerificationResult.SUCCESS:
       await ccd.value?.triggerSuccess()
       verificationResult.value = result
       attempts.value = 0
       await onSuccess()
       break
-    case VerificationCodeResult.FOUND:
+    case VerificationResult.FOUND:
       verificationResult.value = result
       attempts.value = response.attempts ?? 0
       break
@@ -217,7 +190,7 @@ async function onSuccess() {
 }
 
 onMounted(async () => {
-  await sendVerificationCodeGetRequest()
+  await sendCodeContextRequest()
     .then(async (response) => {
       await processVerificationResponse(response.data)
     })
@@ -241,14 +214,14 @@ onMounted(async () => {
 .instructions {
   text-align: center;
   font-size: clamp(0.8rem, 2vw, 1rem);
+  padding: 0.5rem;
   letter-spacing: 0.02rem;
   text-wrap: balance;
   color: #fdfbff;
-  padding: 0.5rem;
   margin: 0;
 }
 
-.instructions em {
+.instructions strong {
   color: #ff0000;
   font-style: normal;
   font-weight: 600;
