@@ -15,6 +15,7 @@ import com.github.elimxim.flashcardsinspace.web.dto.VerificationIntentResponse
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.HttpInternalServerErrorException
 import com.github.elimxim.flashcardsinspace.web.exception.HttpUnauthorizedException
+import com.github.elimxim.flashcardsinspace.web.exception.TooManyRequestsException
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -86,6 +87,10 @@ class VerificationCodeService(
     fun send(user: User, email: String, type: VerificationType, response: HttpServletResponse) =
         withLoggingContext(user) {
             UserLock.withLock(user) {
+                if (intentsPerWindowExceeded(email, type)) {
+                    throw TooManyRequestsException(ApiErrorCode.MIW429, "Intents per window exceeded")
+                }
+
                 invalidateExistingIntents(email, type)
 
                 val tokenProperties = securityProperties.getSecurityTokenProperties(type)
@@ -119,7 +124,6 @@ class VerificationCodeService(
                 } catch (e: Exception) {
                     log.error("Failed to email verification code to ${maskSecret(email)}", e)
                     throw HttpInternalServerErrorException(ApiErrorCode.ESF500, "Failed to email verification code")
-                    // fixme this exception is not handled well on UI
                 }
 
                 verificationIntent
@@ -211,10 +215,10 @@ class VerificationCodeService(
         verificationIntentRepository.save(intent)
     }
 
-    private fun isMaxIntentsPerWindowExceeded(verificationIntent: VerificationIntent): Boolean {
+    private fun intentsPerWindowExceeded(email: String, type: VerificationType): Boolean {
         val intentLimitWindow = ZonedDateTime.now().minus(INTENT_LIMIT_WINDOW)
         val intentCount = verificationIntentRepository.countByEmailAndTypeAndCreatedAtAfter(
-            verificationIntent.email, verificationIntent.type, intentLimitWindow
+            email, type, intentLimitWindow
         )
         return intentCount >= MAX_INTENTS_PER_WINDOW
     }
@@ -247,7 +251,7 @@ class VerificationCodeService(
             return LookupResult.Failure(VerificationResult.USED, intent.type)
         }
 
-        if (isMaxIntentsPerWindowExceeded(intent)) {
+        if (intentsPerWindowExceeded(intent.email, intent.type)) {
             return LookupResult.Failure(VerificationResult.LIMITED, intent.type)
         }
 

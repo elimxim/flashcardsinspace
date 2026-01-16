@@ -30,6 +30,7 @@ enum class ApiErrorCode {
     RES404,
     EAT409,
     FSF409,
+    MIW429,
     UNE500,
     LCF500,
     CCF500,
