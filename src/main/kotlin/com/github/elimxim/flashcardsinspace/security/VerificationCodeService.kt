@@ -59,10 +59,11 @@ class VerificationCodeService(
     ) {
         log.info(
             """
-            Sending verification code, user: ${user?.id}
-            , email: ${maskSecret(request?.email?.escapeJava())}
-            , type: ${request?.type?.escapeJava()}
-            , verification token: ${maskSecret(verificationToken?.escapeJava())}
+            Sending verification code, 
+            user: ${user?.id},
+            email: ${maskSecret(request?.email?.escapeJava())},
+            type: ${request?.type?.escapeJava()},
+            verification token: ${maskSecret(verificationToken?.escapeJava())}
             """.trimOneLine()
         )
 
