@@ -91,7 +91,11 @@ async function sendCode() {
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, 'Failed to send verification code', error)
-      toaster.bakeError(userApiErrors.VERIFICATION__REQUEST_FAILED, error.response?.data)
+      if (error.response?.status === 429) {
+        toaster.bakeError(userApiErrors.VERIFICATION__TOO_MANY_REQUESTS, error.response?.data)
+      } else {
+        toaster.bakeError(userApiErrors.VERIFICATION__REQUEST_FAILED, error.response?.data)
+      }
     })
 }
 

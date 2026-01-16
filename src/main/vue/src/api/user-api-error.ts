@@ -32,6 +32,10 @@ export const userApiErrors = {
     title: 'Couldn\'t complete the action',
     message: 'Please try again.'
   },
+  VERIFICATION__TOO_MANY_REQUESTS: {
+    title: 'Too many requests',
+    message: 'Please wait and try again later.'
+  } as UserApiError,
   PASSWORD_RESET__FAILED: {
     title: 'Couldn\'t reset the password',
     message: 'Please try again.'
