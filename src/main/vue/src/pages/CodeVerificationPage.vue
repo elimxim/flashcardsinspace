@@ -188,7 +188,7 @@ async function processVerificationResponse(response: VerificationIntentResponse)
       await ccd.value?.triggerFailure()
       ccd.value?.lock()
       verificationResult.value = result
-      attempts.value = 3
+      attempts.value = response.attempts ?? 3
       break
     case VerificationResult.LOCKED:
     case VerificationResult.SESSION_EXPIRED:
@@ -198,17 +198,17 @@ async function processVerificationResponse(response: VerificationIntentResponse)
       await ccd.value?.triggerFailure()
       ccd.value?.switchOff()
       verificationResult.value = result
-      attempts.value = 3
+      attempts.value = response.attempts ?? 3
       break
     case VerificationResult.INVALID:
       await ccd.value?.triggerFailure()
       verificationResult.value = result
-      attempts.value = 3
+      attempts.value = response.attempts ?? attempts.value
       break
     case VerificationResult.SUCCESS:
       await ccd.value?.triggerSuccess()
       verificationResult.value = result
-      attempts.value = 0
+      attempts.value = response.attempts ?? attempts.value
       await onSuccess()
       break
     case VerificationResult.FOUND:
@@ -284,7 +284,7 @@ onMounted(async () => {
   --awesome-button--bg: linear-gradient(135deg, rgb(113, 91, 145) 0%, rgb(83, 110, 125) 100%);
   --awesome-button--bg--hover: linear-gradient(135deg, rgb(161, 130, 205) 0%, rgb(137, 180, 204) 100%);
   --awesome-button--border: 1px solid var(--cp--border-color);
-  --awesome-button--border-radius: 6px;
+  --awesome-button--border-radius: 22px;
 }
 
 .instructions {
