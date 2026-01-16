@@ -30,7 +30,7 @@ fun addPasswordResetTokenCookie(response: HttpServletResponse, token: String, ma
     addSecureHttpOnlyCookie(response, PASSWORD_RESET_TOKEN_COOKIE, value = token, path = "/auth/password-reset", maxAge)
 
 fun clearPasswordResetTokenCookie(response: HttpServletResponse) =
-    clearSecureHttpOnlyCookie(response, PASSWORD_RESET_TOKEN_COOKIE, path = "auth/password-reset")
+    clearSecureHttpOnlyCookie(response, PASSWORD_RESET_TOKEN_COOKIE, path = "/auth/password-reset")
 
 fun addSecureHttpOnlyCookie(
     response: HttpServletResponse,
