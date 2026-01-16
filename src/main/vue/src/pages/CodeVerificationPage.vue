@@ -37,7 +37,7 @@
       </p>
       <p v-else-if="verificationResult === VerificationResult.FOUND" class="instructions">
         Enter the verification code sent to your email.
-        Haven't received it? Press <strong>↻</strong>> to resend.
+        Haven't received it? Press <strong>↻</strong> to resend.
       </p>
       <p v-else-if="verificationResult === VerificationResult.NOT_FOUND" class="instructions">
         No valid verification code found.
