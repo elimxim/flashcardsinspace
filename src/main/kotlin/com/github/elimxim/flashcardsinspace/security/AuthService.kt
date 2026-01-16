@@ -149,7 +149,7 @@ class AuthService(
         val user = intent.user
         withLoggingContext(intent.user) {
             if (intent.type != VerificationType.PASSWORD_RESET_ACCESS) {
-                log.error(" Intent ${intent.id} has wrong type, type: ${intent.type}, expected: ${VerificationType.PASSWORD_RESET_ACCESS}")
+                log.error("Intent ${intent.id} has wrong type, type: ${intent.type}, expected: ${VerificationType.PASSWORD_RESET_ACCESS}")
                 throw HttpUnauthorizedException(ApiErrorCode.VIT401, "intent")
             }
 
