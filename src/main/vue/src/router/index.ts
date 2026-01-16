@@ -31,7 +31,7 @@ export const routeNames = {
   passwordReset: 'passwordReset',
   review: 'review',
   lightspeedSchedule: 'lightspeedSchedule',
-  codeVerification: 'codeConfirmation',
+  codeVerification: 'codeVerification',
 }
 
 const routes: RouteRecordRaw[] = [
