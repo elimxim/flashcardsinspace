@@ -38,8 +38,8 @@ enum class VerificationResult {
 }
 
 private const val MAX_ATTEMPTS = 3
-private const val MAX_CODES_PER_WINDOW = 5
-private val CODE_LIMIT_WINDOW: Duration = Duration.ofHours(4)
+private const val MAX_INTENTS_PER_WINDOW = 5
+private val INTENT_LIMIT_WINDOW: Duration = Duration.ofHours(4)
 
 @Service
 class VerificationCodeService(
@@ -86,14 +86,14 @@ class VerificationCodeService(
     fun send(user: User, email: String, type: VerificationType, response: HttpServletResponse) =
         withLoggingContext(user) {
             UserLock.withLock(user) {
-                invalidateExistingCodes(email, type)
+                invalidateExistingIntents(email, type)
 
-                val codeProperties = securityProperties.getSecurityTokenProperties(type)
-                val code = generateSecureCode(codeProperties.length)
+                val tokenProperties = securityProperties.getSecurityTokenProperties(type)
+                val code = generateSecureCode(tokenProperties.length)
                 val token = TokenHelper.generateRawToken()
                 val tokenHash = TokenHelper.hashToken(token)
                 val now = ZonedDateTime.now()
-                val expiresAt = now.plus(codeProperties.maxAge.toLong(), ChronoUnit.SECONDS)
+                val expiresAt = now.plus(tokenProperties.maxAge.toLong(), ChronoUnit.SECONDS)
 
                 val verificationIntent = VerificationIntent(
                     email = email,
@@ -107,14 +107,14 @@ class VerificationCodeService(
 
                 verificationIntentRepository.save(verificationIntent)
                 log.info("Verification intent created, email: ${maskSecret(email)}, type: $type")
-                addVerificationTokenCookie(response, token, codeProperties.maxAge)
+                addVerificationTokenCookie(response, token, tokenProperties.maxAge)
 
                 try {
                     emailService.sendVerificationIntentEmail(
                         recipient = Recipient(email, user.name),
                         code = code,
                         type = type,
-                        maxAgeSeconds = codeProperties.maxAge,
+                        maxAgeSeconds = tokenProperties.maxAge,
                     )
                 } catch (e: Exception) {
                     log.error("Failed to email verification code to ${maskSecret(email)}", e)
@@ -171,7 +171,7 @@ class VerificationCodeService(
             markAsUsed(intent)
             log.info("Verification code is correct, email: $secretEmail, type: ${intent.type}")
             clearVerificationTokenCookie(response)
-            onSuccessfulCodeVerification(intent, response)
+            onSuccessfulVerification(intent, response)
             return VerificationIntentResponse(VerificationResult.SUCCESS.name)
         }
     }
@@ -211,12 +211,12 @@ class VerificationCodeService(
         verificationIntentRepository.save(intent)
     }
 
-    private fun isMaxCodesPerWindowExceeded(verificationIntent: VerificationIntent): Boolean {
-        val codeLimitWindow = ZonedDateTime.now().minus(CODE_LIMIT_WINDOW)
-        val codeCount = verificationIntentRepository.countByEmailAndTypeAndCreatedAtAfter(
-            verificationIntent.email, verificationIntent.type, codeLimitWindow
+    private fun isMaxIntentsPerWindowExceeded(verificationIntent: VerificationIntent): Boolean {
+        val intentLimitWindow = ZonedDateTime.now().minus(INTENT_LIMIT_WINDOW)
+        val intentCount = verificationIntentRepository.countByEmailAndTypeAndCreatedAtAfter(
+            verificationIntent.email, verificationIntent.type, intentLimitWindow
         )
-        return codeCount > MAX_CODES_PER_WINDOW
+        return intentCount >= MAX_INTENTS_PER_WINDOW
     }
 
     sealed class LookupResult {
@@ -247,7 +247,7 @@ class VerificationCodeService(
             return LookupResult.Failure(VerificationResult.USED, intent.type)
         }
 
-        if (isMaxCodesPerWindowExceeded(intent)) {
+        if (isMaxIntentsPerWindowExceeded(intent)) {
             return LookupResult.Failure(VerificationResult.LIMITED, intent.type)
         }
 
@@ -264,38 +264,38 @@ class VerificationCodeService(
         return LookupResult.Success(intent)
     }
 
-    private fun onSuccessfulCodeVerification(verificationIntent: VerificationIntent, response: HttpServletResponse) {
-        if (verificationIntent.type == VerificationType.REGISTRATION_REQUEST) {
-            log.info("Email ${verificationIntent.email} verified")
-            userService.verify(verificationIntent.user)
+    private fun onSuccessfulVerification(intent: VerificationIntent, response: HttpServletResponse) {
+        if (intent.type == VerificationType.REGISTRATION_REQUEST) {
+            log.info("Email ${intent.email} verified")
+            userService.verify(intent.user)
         }
 
-        if (verificationIntent.type == VerificationType.PASSWORD_RESET_REQUEST) {
+        if (intent.type == VerificationType.PASSWORD_RESET_REQUEST) {
             log.info("Password reset request verified")
 
-            val codeProperties = securityProperties.getSecurityTokenProperties(VerificationType.PASSWORD_RESET_ACCESS)
+            val tokenProperties = securityProperties.getSecurityTokenProperties(VerificationType.PASSWORD_RESET_ACCESS)
             val token = TokenHelper.generateRawToken()
             val tokenHash = TokenHelper.hashToken(token)
             val now = ZonedDateTime.now()
-            val expiresAt = now.plus(codeProperties.maxAge.toLong(), ChronoUnit.SECONDS)
+            val expiresAt = now.plus(tokenProperties.maxAge.toLong(), ChronoUnit.SECONDS)
 
-            val verificationIntent = VerificationIntent(
-                email = verificationIntent.email,
+            val accessIntent = VerificationIntent(
+                email = intent.email,
                 tokenHash = tokenHash,
                 code = null,
                 type = VerificationType.PASSWORD_RESET_ACCESS,
                 createdAt = now,
                 expiresAt = expiresAt,
-                user = verificationIntent.user,
+                user = intent.user,
             )
 
-            verificationIntentRepository.save(verificationIntent)
-            addPasswordResetTokenCookie(response, token, codeProperties.maxAge)
+            verificationIntentRepository.save(accessIntent)
+            addPasswordResetTokenCookie(response, token, tokenProperties.maxAge)
             log.info("Password reset token generated")
         }
     }
 
-    private fun invalidateExistingCodes(email: String, type: VerificationType) {
+    private fun invalidateExistingIntents(email: String, type: VerificationType) {
         val now = ZonedDateTime.now()
         val invalidatedCodes = verificationIntentRepository.findByEmailAndType(email, type)
             .filter { it.usedAt == null }
