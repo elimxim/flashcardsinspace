@@ -243,7 +243,7 @@ class VerificationCodeService(
         val secretEmail = Secret(intent.email)
 
         if (intent.usedAt != null) {
-            log.info("verification intent already used, token hash: $tokenHash")
+            log.info("Verification intent already used, token hash: $tokenHash")
             return LookupResult.Failure(VerificationResult.USED, intent.type)
         }
 
