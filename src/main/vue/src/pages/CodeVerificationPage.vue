@@ -112,7 +112,7 @@ import { userApiErrors } from '@/api/user-api-error.ts'
 import { VerificationIntentResponse } from '@/api/communication.ts'
 import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
-import AwesomeButton from '@/components/AwesomeButton.vue';
+import AwesomeButton from '@/components/AwesomeButton.vue'
 
 const props = withDefaults(defineProps<{
   type?: VerificationType
