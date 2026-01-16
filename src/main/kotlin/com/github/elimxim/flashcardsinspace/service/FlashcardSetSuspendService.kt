@@ -1,9 +1,6 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
-import com.github.elimxim.flashcardsinspace.entity.FlashcardSetStatus
-import com.github.elimxim.flashcardsinspace.entity.User
-import com.github.elimxim.flashcardsinspace.entity.isSuspended
+import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
@@ -29,6 +26,7 @@ class FlashcardSetSuspendService(
     @Transactional
     fun suspend(user: User, id: Long, request: FlashcardSetUpdateRequest): FlashcardSetSuspendResponse {
         log.info("Suspending flashcard set $id")
+        user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(id)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
         val validRequest = requestValidator.validate(request)

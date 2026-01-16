@@ -63,7 +63,8 @@ export interface FlashcardId {
   id: number
 }
 
-export interface ConfirmationCodeResponse {
+export interface VerificationIntentResponse {
   result: string,
+  type?: string,
   attempts?: number,
 }

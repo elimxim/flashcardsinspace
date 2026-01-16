@@ -16,14 +16,30 @@ export const userApiErrors = {
     title: 'Authentication is not successful',
     message: 'There was a glitch in our identity scanners. Please try to establish a connection again.'
   } as UserApiError,
-  CONFIRMATION_CODE__RESENDING_FAILED: {
-    title: 'Could not resend the confirmation code',
+  VERIFICATION__CONTEXT_FAILED: {
+    title: 'Could not load the verification context',
+    message: 'Please reload the page and try again.'
+  } as UserApiError,
+  VERIFICATION__REQUEST_FAILED: {
+    title: 'Could not request verification',
     message: 'Please try again later.'
   } as UserApiError,
-  CONFIRMATION_CODE__VERIFICATION_FAILED: {
-    title: 'Could not verify the confirmation code',
+  VERIFICATION__CODE_FAILED: {
+    title: 'Could not test the verification code',
     message: 'Please try again later.'
   } as UserApiError,
+  VERIFICATION__UNKNOWN_TYPE: {
+    title: 'Couldn\'t complete the action',
+    message: 'Please try again.'
+  },
+  VERIFICATION__TOO_MANY_REQUESTS: {
+    title: 'Too many requests',
+    message: 'Please wait and try again later.'
+  } as UserApiError,
+  PASSWORD_RESET__FAILED: {
+    title: 'Couldn\'t reset the password',
+    message: 'Please try again.'
+  },
   USER__UNAUTHORIZED: {
     title: 'We couldn\'t recognize you',
     message: 'Please try again later.'

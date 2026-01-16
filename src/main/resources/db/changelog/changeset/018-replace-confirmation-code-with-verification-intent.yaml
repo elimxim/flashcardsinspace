@@ -1,0 +1,78 @@
+databaseChangeLog:
+  - changeSet:
+      id: 018-replace-confirmation-code-with-verification-intent
+      author: elimxim
+      changes:
+        - dropTable:
+            tableName: confirmation_code
+        - createTable:
+            tableName: verification_intent
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: token_hash
+                  type: CHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(10)
+              - column:
+                  name: attempts
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expires_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: used_at
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: last_updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_verification_intent_2_user_id
+                    references: astro_user(id)
+                    validateForeignKey: true
+        - createIndex:
+            tableName: verification_intent
+            indexName: idx_verification_intent_email_type
+            columns:
+              - column:
+                  name: email
+              - column:
+                  name: type
+        - createIndex:
+            tableName: verification_intent
+            indexName: idx_verification_intent_token_hash
+            columns:
+              - column:
+                  name: token_hash

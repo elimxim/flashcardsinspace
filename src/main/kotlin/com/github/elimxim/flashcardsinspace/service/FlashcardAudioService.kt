@@ -1,10 +1,7 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.FlashcardAudio
-import com.github.elimxim.flashcardsinspace.entity.FlashcardSide
-import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardAudioRepository
-import com.github.elimxim.flashcardsinspace.entity.sizeKB
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardAudioDto
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardAudioMetadataDto
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
@@ -28,6 +25,7 @@ class FlashcardAudioService(
     @Transactional(readOnly = true)
     fun getMetadata(user: User, setId: Long): List<FlashcardAudioMetadataDto> {
         log.info("Getting audio metadata for flashcard set $setId")
+        user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
 
@@ -43,6 +41,7 @@ class FlashcardAudioService(
     @Transactional(readOnly = true)
     fun fetchAudio(user: User, setId: Long, flashcardId: Long, side: String): FlashcardAudio? {
         log.info("Fetching audio for flashcard $flashcardId in set $setId, side: $side")
+        user.checkVerified()
         val flashcard = flashcardService.getEntity(flashcardId)
         flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
         flashcardService.verifyUserOperation(user, setId, flashcard)
@@ -53,6 +52,7 @@ class FlashcardAudioService(
     @Transactional(readOnly = true)
     fun fetchAudio(user: User, setId: Long, flashcardId: Long, audioId: Long): FlashcardAudio {
         log.info("Fetching audio $audioId for flashcard $flashcardId in set $setId")
+        user.checkVerified()
         val flashcard = flashcardService.getEntity(flashcardId)
         flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
         flashcardService.verifyUserOperation(user, setId, flashcard)
@@ -68,6 +68,7 @@ class FlashcardAudioService(
         file: MultipartFile,
     ): FlashcardAudioDto {
         log.info("Uploading audio file ${file.originalFilename} for flashcard $flashcardId in set $setId, size: ${file.size} bytes")
+        user.checkVerified()
         val flashcard = flashcardService.getEntity(flashcardId)
         flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
         flashcardService.verifyUserOperation(user, setId, flashcard)
@@ -103,6 +104,7 @@ class FlashcardAudioService(
     @Transactional
     fun removeAudio(user: User, setId: Long, flashcardId: Long, audioId: Long) {
         log.info("Removing audio $audioId for flashcard $flashcardId in set $setId")
+        user.checkVerified()
         val flashcard = flashcardService.getEntity(flashcardId)
         flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
         flashcardService.verifyUserOperation(user, setId, flashcard)

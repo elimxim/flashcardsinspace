@@ -39,7 +39,7 @@ export const useSpaceToaster = defineStore('space-toaster', {
     }
   },
   actions: {
-    bakeError(apiError: UserApiError, error: ErrorResponseBody | undefined) {
+    bakeError(apiError: UserApiError, error?: ErrorResponseBody) {
       const toast: Toast = {
         type: ToastType.ERROR,
         title: apiError.title,

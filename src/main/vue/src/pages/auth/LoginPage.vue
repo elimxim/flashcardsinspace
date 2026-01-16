@@ -66,6 +66,10 @@
           New to the galaxy?
           <router-link to="/signup">Signup</router-link>
         </p>
+        <p class="auth-link">
+          Forgot your keys?
+          <router-link to="/email-confirmation">Reset password</router-link>
+        </p>
       </form>
     </div>
   </div>

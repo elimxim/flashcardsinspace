@@ -33,6 +33,10 @@ open class HttpNotFoundException(apiErrorCode: ApiErrorCode, message: String, ca
 open class HttpConflictException(apiErrorCode: ApiErrorCode, message: String, cause: Exception? = null) :
     Http4xxException(apiErrorCode, message, cause)
 
+@ExceptionHttpStatus(HttpStatus.TOO_MANY_REQUESTS)
+open class TooManyRequestsException(apiErrorCode: ApiErrorCode, message: String, cause: Exception? = null) :
+    Http4xxException(apiErrorCode, message, cause)
+
 @ExceptionHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 open class HttpInternalServerErrorException(apiErrorCode: ApiErrorCode, message: String, cause: Exception? = null) :
     Http5xxException(apiErrorCode, message, cause)

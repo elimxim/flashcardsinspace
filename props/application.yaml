@@ -12,6 +12,16 @@ app:
       secret: ${APP_SECURITY_JWT_SECRET}
       access-token-expiration-ms: 14400000 # 4 hours
       refresh-token-expiration-ms: 691200000 # 8 days
+    verification-tokens:
+      registration-request:
+        length: 4
+        max-age: 86400 # 1 day
+      password-reset-request:
+        length: 4
+        max-age: 3600 # 1 hour
+      password-reset-access:
+        length: 4
+        max-age: 600 # 10 minutes
   mail:
     api-key: ${APP_MAIL_API_KEY}
     sender-name: ${APP_MAIL_SENDER_NAME}

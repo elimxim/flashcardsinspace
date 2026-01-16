@@ -226,10 +226,6 @@ data class FlashcardSetSuspendResponse(
 data class UserUpdateRequest(
     @field:NotNull
     @field:NotBlank
-    @field:Email
-    var email: String? = null,
-    @field:NotNull
-    @field:NotBlank
     @field:Size(max = 64)
     @field:Pattern(regexp="^[A-Za-z0-9 _-]+$")
     var name: String? = null,
@@ -240,7 +236,6 @@ data class UserUpdateRequest(
 )
 
 data class ValidUserUpdateRequest(
-    val email: String,
     val name: String,
     val languageId: Long,
 )
@@ -291,60 +286,45 @@ data class ValidReviewSessionUpdateRequest(
     val metadata: Map<String, Any>,
 )
 
-class ConfirmationCodeRequest(
+class VerificationIntentRequest(
     @field:NotNull
     @field:NotBlank
     @field:Email
     var email: String? = null,
     @field:NotNull
     @field:NotBlank
-    @field:ValidConfirmationPurpose
-    var purpose: String? = null,
+    @field:ValidVerificationType
+    var type: String? = null,
 )
 
-data class ValidConfirmationCodeRequest(
+data class ValidVerificationIntentRequest(
     val email: String,
-    val purpose: ConfirmationPurpose,
+    val type: VerificationType,
 )
 
-class ConfirmationCodeVerificationRequest(
-    @field:NotNull
-    @field:NotBlank
-    @field:Email
-    var email: String? = null,
+class VerificationCodeRequest(
     @field:NotNull
     @field:NotBlank
     @field:Pattern(regexp = "^\\d+$")
     var code: String? = null,
-    @field:NotNull
-    @field:NotBlank
-    @field:ValidConfirmationPurpose
-    var purpose: String? = null,
 )
 
-data class ValidConfirmationCodeVerificationRequest(
-    val email: String,
+data class ValidVerificationCodeRequest(
     val code: String,
-    val purpose: ConfirmationPurpose,
 )
 
-class ConfirmationCodeTestRequest(
-    @field:NotNull
-    @field:NotBlank
-    @field:Email
-    var email: String? = null,
-    @field:NotNull
-    @field:NotBlank
-    @field:ValidConfirmationPurpose
-    var purpose: String? = null,
-)
-
-data class ValidConfirmationCodeTestRequest(
-    val email: String,
-    val purpose: ConfirmationPurpose,
-)
-
-data class ConfirmationCodeResponse(
+data class VerificationIntentResponse(
     val result: String,
+    val type: String? = null,
     val attempts: Int? = null,
+)
+
+class PasswordResetRequest(
+    @field:RequiredConfidential
+    @field:ConfidentialLength(min = 6, max = 64)
+    var secret: Password? = null,
+)
+
+class ValidPasswordResetRequest(
+    val secret: Password,
 )

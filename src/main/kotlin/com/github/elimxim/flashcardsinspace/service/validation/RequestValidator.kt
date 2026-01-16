@@ -134,8 +134,8 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
-    fun validate(request: ConfirmationCodeRequest): ValidConfirmationCodeRequest {
-        validateRequest<ConfirmationCodeRequest>(request) { violations ->
+    fun validate(request: VerificationIntentRequest): ValidVerificationIntentRequest {
+        validateRequest<VerificationIntentRequest>(request) { violations ->
             throw HttpInvalidRequestFieldsException(
                 fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
@@ -145,8 +145,8 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
-    fun validate(request: ConfirmationCodeVerificationRequest): ValidConfirmationCodeVerificationRequest {
-        validateRequest<ConfirmationCodeVerificationRequest>(request) { violations ->
+    fun validate(request: VerificationCodeRequest): ValidVerificationCodeRequest {
+        validateRequest<VerificationCodeRequest>(request) { violations ->
             throw HttpInvalidRequestFieldsException(
                 fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
@@ -156,14 +156,13 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
-    fun validate(request: ConfirmationCodeTestRequest): ValidConfirmationCodeTestRequest {
-        validateRequest<ConfirmationCodeTestRequest>(request) { violations ->
+    fun validate(request: PasswordResetRequest): ValidPasswordResetRequest {
+        validateRequest<PasswordResetRequest>(request) { violations ->
             throw HttpInvalidRequestFieldsException(
                 fields(violations),
                 "Request is invalid ${request.escapeJava()}, violations: $violations",
             )
         }
-
         return request.toValidRequest()
     }
 
@@ -260,7 +259,6 @@ fun ChronoBulkUpdateRequest.toValidRequest() = ValidChronoBulkUpdateRequest(
 )
 
 fun UserUpdateRequest.toValidRequest() = ValidUserUpdateRequest(
-    email = email!!,
     name = name!!,
     languageId = languageId!!.toLong(),
 )
@@ -278,18 +276,15 @@ fun ReviewSessionUpdateRequest.toValidRequest() = ValidReviewSessionUpdateReques
     metadata = metadata ?: emptyMap(),
 )
 
-fun ConfirmationCodeRequest.toValidRequest() = ValidConfirmationCodeRequest(
+fun VerificationIntentRequest.toValidRequest() = ValidVerificationIntentRequest(
     email = email!!,
-    purpose = ConfirmationPurpose.valueOf(purpose!!),
+    type = VerificationType.valueOf(type!!),
 )
 
-fun ConfirmationCodeVerificationRequest.toValidRequest() = ValidConfirmationCodeVerificationRequest(
-    email = email!!,
+fun VerificationCodeRequest.toValidRequest() = ValidVerificationCodeRequest(
     code = code!!,
-    purpose = ConfirmationPurpose.valueOf(purpose!!),
 )
 
-fun ConfirmationCodeTestRequest.toValidRequest() = ValidConfirmationCodeTestRequest(
-    email = email!!,
-    purpose = ConfirmationPurpose.valueOf(purpose!!),
+fun PasswordResetRequest.toValidRequest() = ValidPasswordResetRequest(
+    secret = secret!!,
 )

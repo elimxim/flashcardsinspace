@@ -51,11 +51,11 @@ fun Throwable.printApplicationStackTrace(out: PrintStream) {
     }
 
     if (exceptionChain.isEmpty()) {
-        out.println("Application stack trace (${user?.id}): unknown")
+        out.println("Application stack trace (${user?.id ?: "anonymous"}): unknown")
         return
     }
 
-    out.println("Application stack trace (${user?.id}):")
+    out.println("Application stack trace (${user?.id ?: "anonymous"}):")
     exceptionChain.forEachIndexed { index, (exception, stackTraces) ->
         val indent = "  ".repeat(index)
 
