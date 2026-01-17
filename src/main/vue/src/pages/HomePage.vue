@@ -4,7 +4,6 @@
       'page',
       'flex-column',
       'scrollbar-hidden',
-      'home-page',
       'home-page--theme',
     ]"
   >
