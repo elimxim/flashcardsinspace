@@ -28,7 +28,16 @@
       same words repeatedly, you can use spaced repetition to learn the same concepts
       in a fraction of the time. It gives you a straightforward way to know what to study
       and when to study it. All you have to do is create flashcards and follow the spaced
-      repetition schedule.
+      repetition schedule. Our <em>Lightspeed Schedule</em> is a custom spaced repetition
+      algorithm that we created based on Leitner's System. It consists of 7 stages which
+      are designed to accelerate learning by optimizing the timing of reviews. The schedule
+      is designed to be followed daily, with reviews becoming less frequent as you progress
+      through the stages. When you remember a flashcard, you complete the stage and the
+      flashcard moves to the next one. But when you forget a card, it goes back to the
+      first stage and its journey starts over. When you complete the last stage, the flashcard
+      moves to the <strong>Outer Space</strong> stage, which means that you have mastered
+      the cards and they are now permanently stored in your long-term memory. You can still
+      review cards though if you want to reinforce your memory.
     </p>
 
     <div class="learning-timeline">
@@ -89,7 +98,7 @@ import Starfield from '@/components/Starfield.vue'
 const stages = [
   {
     title: "Launch Preparation",
-    description: "Create your flashcards and prepare for liftoff. Add text, images, and audio to both sides.",
+    description: "Create your flashcards and prepare for liftoff. Add text, and audio to both sides.",
     icon: "fa-solid fa-rocket",
     iconClass: "step-icon--launch",
     timing: "Stage S1 • Daily"
@@ -106,18 +115,18 @@ const stages = [
     description: "Knowledge stabilizes in medium-term memory. Review intervals increase as retention strengthens.",
     icon: "fa-solid fa-globe",
     iconClass: "step-icon--stable",
-    timing: "Stage S4-S5 • Weekly"
+    timing: "Stage S4-S5 • Every 1-2 weeks"
   },
   {
     title: "Deep Space Mission",
     description: "Information reaches long-term memory. Reviews become less frequent but maintain knowledge orbit.",
     icon: "fa-solid fa-space-shuttle",
     iconClass: "step-icon--deep",
-    timing: "Stage S6-S7 • Monthly"
+    timing: "Stage S6-S7 • Every 1-2 months"
   },
   {
     title: "Outer Space Mastery",
-    description: "Congratulations, Commander! Knowledge has achieved permanent orbit in your long-term memory.",
+    description: "After competing Stage S7, information is permanently stored in long-term memory. No further reviews needed.",
     icon: "fa-solid fa-star",
     iconClass: "step-icon--mastery",
     timing: "Outer Space • Mastered"
@@ -128,7 +137,7 @@ const stages = [
 
 <style scoped>
 .lightspeed-page {
-  padding: 20px 40px;
+  padding: clamp(10px, 5vw ,20px) clamp(20px, 5vw, 40px);
 }
 
 .lightspeed-header {
@@ -143,7 +152,7 @@ const stages = [
   font-weight: 800;
   line-height: 1.1;
   color: #a0c4ff;
-  text-align: center;
+  text-align: start;
 }
 
 .lightspeed-description {
@@ -297,6 +306,7 @@ const stages = [
 .summary-title {
   font-size: 2rem;
   font-weight: 600;
+  text-wrap: balance;
   color: #ffffff;
   margin: 0;
 }
@@ -329,11 +339,16 @@ const stages = [
 .science-stats {
   display: flex;
   justify-content: space-evenly;
-  gap: 3rem;
+  gap: 1rem;
 }
 
 .science-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
+  gap: 0.5rem;
 }
 
 .stat-number {
@@ -342,13 +357,26 @@ const stages = [
   font-size: 2rem;
   font-weight: 700;
   color: #00d4ff;
-  margin-bottom: 0.5rem;
 }
 
-.science-stat .stat-label {
+.stat-label {
   font-size: 0.9rem;
   color: #94a3b8;
   line-height: 1.3;
 }
+
+
+@media (max-width: 560px) {
+  .summary-header {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .science-stats {
+    flex-direction: column;
+  }
+
+}
+
 
 </style>
