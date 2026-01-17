@@ -49,7 +49,7 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { isHoverSupported } from '@/utils/utils.ts'
+import { isHoverSupported, isTouchDevice } from '@/utils/utils.ts'
 
 const props = withDefaults(defineProps<{
   growMultiplier?: number
@@ -70,7 +70,7 @@ const stageOffsets = ref<number[]>(Array(7).fill(0))
 const stageHeights = ref<number[]>(Array(7).fill(0))
 const stageElements = ref<HTMLElement[]>([])
 const resizeObserver = ref<ResizeObserver>()
-const isExpanded = ref(false)
+const isExpanded = ref(isTouchDevice)
 const isNarrowGrid = ref(false)
 const hoverDelayTimeout = ref<number>()
 const originalStageHeight = ref<number>(0)
