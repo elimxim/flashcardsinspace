@@ -4,6 +4,8 @@ import { storeToRefs } from 'pinia'
 import HomePage from '@/pages/HomePage.vue'
 import ControlPanel from '@/pages/ControlPanel.vue'
 import SupportPage from '@/pages/support/SupportPage.vue'
+import EmotionalSupportPage from '@/pages/support/EmotionalSupportPage.vue'
+import WebsiteSupportPage from '@/pages/support/WebsiteSupportPage.vue'
 import UserPage from '@/pages/UserPage.vue'
 import SignupPage from '@/pages/auth/SignupPage.vue'
 import LoginPage from '@/pages/auth/LoginPage.vue'
@@ -11,7 +13,6 @@ import LogoutPage from '@/pages/auth/LogoutPage.vue'
 import PasswordResetPage from '@/pages/auth/PasswordResetPage.vue'
 import EmailConfirmationPage from '@/pages/auth/EmailConfirmationPage.vue'
 import ReviewRouter from '@/components/review/ReviewRouter.vue'
-import WebsiteSupportPage from '@/pages/support/WebsiteSupportPage.vue'
 import CodeVerificationPage from '@/pages/CodeVerificationPage.vue'
 import { toLearningStages } from '@/core-logic/stage-logic.ts'
 import { loadUserSignedUpFromCookies } from '@/utils/cookies.ts'
@@ -30,6 +31,7 @@ export const routeNames = {
   emailConfirmation: 'emailConfirmation',
   passwordReset: 'passwordReset',
   review: 'review',
+  emotionalSupport: 'emotionalSupport',
   websiteSupport: 'websiteSupport',
   codeVerification: 'codeVerification',
 }
@@ -63,6 +65,16 @@ const routes: RouteRecordRaw[] = [
     path: '/support',
     name: routeNames.support,
     component: SupportPage,
+  },
+  {
+    path: '/website-support',
+    name: routeNames.websiteSupport,
+    component: WebsiteSupportPage,
+  },
+  {
+    path: '/emotional-support',
+    name: routeNames.emotionalSupport,
+    component: EmotionalSupportPage,
   },
   {
     path: '/user',
@@ -111,11 +123,6 @@ const routes: RouteRecordRaw[] = [
       requiresAuth: true,
       requiresEmailVerified: true,
     },
-  },
-  {
-    path: '/website-support',
-    name: routeNames.websiteSupport,
-    component: WebsiteSupportPage,
   },
   {
     path: '/code-verification',
