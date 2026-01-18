@@ -53,6 +53,25 @@
       </div>
     </div>
 
+    <div class="section-description">
+      <p class="section-description">
+        Additionally, our schedule has two special stages: <em>Unknown</em> and <em>Attempted</em>.
+        We added them to give you more control over your learning process. You can review them
+        at any time. You can even create a custom review session for them.
+      </p>
+      <strong>What are Unknown and Attempted stages?</strong><br/>
+      <p class="section-description">
+        The <em>Unknown</em> stage contains flashcards that you have just created. You can review
+        them an unlimited number of times before they move to the first stage on the next day.
+      </p>
+      <p class="section-description">
+        The <em>Attempted</em> stage contains flashcards that you have already seen
+        but forgot. Before going back to the first stage, they move to the <em>Attempted</em>
+        stage. But just for a day. Like the <em>Unknown</em> stage, you can review them
+        an unlimited number of times.
+      </p>
+    </div>
+
     <div class="summary-card">
       <div class="summary-header">
         <div class="summary-icon">
