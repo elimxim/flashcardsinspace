@@ -1,87 +1,88 @@
 <template>
-  <Starfield
-    :density="120"
-    :star-size="1.8"
-    twinkle
-    vertical-drift="3px"
-  />
-
-  <h1 class="section-header">
+  <div class="lightspeed-schedule">
+    <h1 class="section-header">
     <span class="section-title section-title--centered">
       Lightspeed Schedule
     </span>
-  </h1>
+    </h1>
 
-  <div class="section-description">
-    <strong>What is spaced repetition?</strong>
-    <p class="section-description">
-      Spaced repetition is a science-based method of learning new concepts or vocabulary
-      in a manageable amount of time. Instead of spending hours at a desk studying the
-      same words repeatedly, you can use spaced repetition to learn the same concepts
-      in a fraction of the time. It gives you a straightforward way to know what to study
-      and when to study it. All you have to do is create flashcards and follow the spaced
-      repetition schedule.
-    </p>
-    <strong>How does Lightspeed Schedule work?</strong><br/>
-    <p class="section-description">
-      Our <em>Lightspeed Schedule</em> is a custom spaced repetition
-      algorithm that we created based on Leitner's System. It consists of 7 stages which
-      are designed to accelerate learning by optimizing the timing of reviews. The schedule
-      is designed to be followed daily, with reviews becoming less frequent as you progress
-      through the stages. When you remember a flashcard, you complete the stage and the
-      flashcard moves to the next one. But when you forget a card, it goes back to the
-      first stage and its journey starts over. When you complete the last stage, the flashcard
-      moves to the <strong>Outer Space</strong> stage, which means that you have mastered
-      the cards and they are now permanently stored in your long-term memory. You can still
-      review cards though if you want to reinforce your memory.
-    </p>
-  </div>
-
-  <div class="learning-timeline">
-    <div v-for="(stage, index) in stages" :key="index" class="timeline-stage">
-      <div v-if="index < stages.length - 1" class="stage-connector"></div>
-      <div class="stage-icon" :class="stage.iconClass">
-        <font-awesome-icon :icon="stage.icon"/>
-      </div>
-      <div class="stage-content">
-        <h3 class="stage-title">{{ stage.title }}</h3>
-        <p class="step-description">{{ stage.description }}</p>
-        <div v-if="stage.timing" class="step-timing">
-          <span>{{ stage.timing }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="summary-card">
-    <div class="summary-header">
-      <div class="summary-icon">
-        <font-awesome-icon icon="fa-solid fa-graduation-cap"/>
-      </div>
-      <h3 class="summary-title">
-        The Science Behind the Mission
-      </h3>
-    </div>
-    <div class="summary-content">
-      <p>
-        Spaced repetition leverages the psychological spacing effect -
-        the phenomenon where information is better retained when
-        learning sessions are spaced out over time rather than massed together.
-        Modern meta-analyses confirm what Ebbinghaus discovered: distributed
-        practice is significantly more effective than cramming.
+    <div class="section-description">
+      <strong>What is spaced repetition?</strong>
+      <p class="section-description">
+        Spaced repetition is a science-based method of learning new concepts or vocabulary
+        in a manageable amount of time. Instead of spending hours at a desk studying the
+        same words repeatedly, you can use spaced repetition to learn the same concepts
+        in a fraction of the time. It gives you a straightforward way to know what to study
+        and when to study it. All you have to do is create flashcards and follow the spaced
+        repetition schedule.
       </p>
-      <div class="science-stats">
-        <div class="science-stat">
-          <span class="stat-number">1885</span>
-          <span class="stat-label">First discovered by Hermann Ebbinghaus</span>
+      <strong>How does Lightspeed Schedule work?</strong><br/>
+      <p class="section-description">
+        Our <em>Lightspeed Schedule</em> is a custom spaced repetition
+        algorithm that we created based on Leitner's System. It consists of 7 stages which
+        are designed to accelerate learning by optimizing the timing of reviews. The schedule
+        is designed to be followed daily, with reviews becoming less frequent as you progress
+        through the stages. When you remember a flashcard, you complete the stage and the
+        flashcard moves to the next one. But when you forget a card, it goes back to the
+        first stage and its journey starts over. When you complete the last stage, the flashcard
+        moves to the <strong>Outer Space</strong> stage, which means that you have mastered
+        the cards and they are now permanently stored in your long-term memory. You can still
+        review cards though if you want to reinforce your memory.
+      </p>
+    </div>
+
+    <div class="learning-timeline">
+      <Starfield
+        :density="120"
+        :star-size="1.8"
+        vertical-drift="20px"
+        twinkle
+      />
+      <div v-for="(stage, index) in stages" :key="index" class="timeline-stage">
+        <div v-if="index < stages.length - 1" class="stage-connector"></div>
+        <div class="stage-icon" :class="stage.iconClass">
+          <font-awesome-icon :icon="stage.icon"/>
         </div>
-        <div class="science-stat">
-          <span class="stat-number">140+</span>
-          <span class="stat-label">Years of continuous research validation</span>
+        <div class="stage-content">
+          <h3 class="stage-title">{{ stage.title }}</h3>
+          <p class="step-description">{{ stage.description }}</p>
+          <div v-if="stage.timing" class="step-timing">
+            <span>{{ stage.timing }}</span>
+          </div>
         </div>
-        <div class="science-stat">
-          <span class="stat-number">2-3x</span>
-          <span class="stat-label">More effective than cramming</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-header">
+        <div class="summary-icon">
+          <font-awesome-icon icon="fa-solid fa-graduation-cap"/>
+        </div>
+        <h3 class="summary-title">
+          The Science Behind the Mission
+        </h3>
+      </div>
+      <div class="summary-content">
+        <p>
+          Spaced repetition leverages the psychological spacing effect -
+          the phenomenon where information is better retained when
+          learning sessions are spaced out over time rather than massed together.
+          Modern meta-analyses confirm what Ebbinghaus discovered: distributed
+          practice is significantly more effective than cramming.
+        </p>
+        <div class="science-stats">
+          <div class="science-stat">
+            <span class="stat-number">1885</span>
+            <span class="stat-label">First discovered by Hermann Ebbinghaus</span>
+          </div>
+          <div class="science-stat">
+            <span class="stat-number">140+</span>
+            <span class="stat-label">Years of continuous research validation</span>
+          </div>
+          <div class="science-stat">
+            <span class="stat-number">2-3x</span>
+            <span class="stat-label">More effective than cramming</span>
+          </div>
         </div>
       </div>
     </div>
@@ -132,6 +133,11 @@ const stages = [
 </script>
 
 <style scoped>
+.lightspeed-schedule {
+  width: 100%;
+  height: 100%;
+}
+
 .learning-timeline {
   position: relative;
   margin: 3rem 0;
@@ -277,14 +283,14 @@ const stages = [
 }
 
 .summary-icon {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
-  border-radius: 12px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
+  font-size: 3rem;
   color: #ffffff;
   flex-shrink: 0;
 }
@@ -337,6 +343,13 @@ const stages = [
   .summary-header {
     align-items: start;
     gap: 1rem;
+  }
+
+  .summary-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    font-size: 2rem;
   }
 
   .science-stats {
