@@ -25,7 +25,7 @@ withDefaults(defineProps<{
   --gc--bg: var(--glass-card--bg, none);
   --gc--font-family: var(--glass-card--font-family, 'Quicksand', sans-serif);
   --gc--font-size: var(--glass-card--font-size, 2rem);
-  --gc--font-weight: var(--glass-card--font-weight, 600);
+  --gc--font-weight: var(--glass-card--font-weight, 400);
 }
 
 .glass-rim {
