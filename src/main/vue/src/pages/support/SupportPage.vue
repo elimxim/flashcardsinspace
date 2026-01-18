@@ -9,16 +9,21 @@
     ]"
   >
     <div class="support-content">
-      <GlassCard
-        class="emotional-support"
-        text="Emotional Support"
-        @click.stop="goToEmotionalSupport"
-      />
-      <GlassCard
-        class="website-support"
-        text="Website Support"
-        @click.stop="goToWebsiteSupport"
-      />
+      <div class="support-header">
+        <h1>I need...</h1>
+      </div>
+      <div class="cards-container">
+        <GlassCard
+          class="emotional-support"
+          text="Emotional Support"
+          @click.stop="goToEmotionalSupport"
+        />
+        <GlassCard
+          class="website-support"
+          text="Website Support"
+          @click.stop="goToWebsiteSupport"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -45,12 +50,30 @@ function goToWebsiteSupport() {
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: clamp(10px, 5vw, 20px) clamp(20px, 5vw, 40px);
+  z-index: 1;
+}
+
+.support-header h1 {
+  font-family: var(--site-content--font-family);
+  font-size: clamp(2rem, 5vw, 2.5rem);
+  font-weight: 200;
+  letter-spacing: 0.05rem;
+  word-spacing: 0.1rem;
+  color: #ffffff;
+}
+
+.cards-container {
+  display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 40px;
-  padding: clamp(10px, 5vw, 20px) clamp(20px, 5vw, 40px);
 }
 
 .emotional-support {
