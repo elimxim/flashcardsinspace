@@ -1,34 +1,30 @@
 <template>
-  <div
-    :class="[
-      'page',
-      'flex-column',
-      'padding-auto',
-      'scrollbar-hidden',
-      'lightspeed-page',
-    ]"
-  >
-    <Starfield
-      :density="120"
-      :star-size="1.8"
-      twinkle
-      vertical-drift="3px"
-    />
+  <Starfield
+    :density="120"
+    :star-size="1.8"
+    twinkle
+    vertical-drift="3px"
+  />
 
-    <h2 class="lightspeed-header">
-      <span class="lightspeed-title">
-        Lightspeed Schedule
-      </span>
-    </h2>
+  <h1 class="section-header">
+    <span class="section-title section-title--centered">
+      Lightspeed Schedule
+    </span>
+  </h1>
 
-    <p class="lightspeed-description">
-      <strong>What is spaced repetition?</strong><br/>
+  <div class="section-description">
+    <strong>What is spaced repetition?</strong>
+    <p class="section-description">
       Spaced repetition is a science-based method of learning new concepts or vocabulary
       in a manageable amount of time. Instead of spending hours at a desk studying the
       same words repeatedly, you can use spaced repetition to learn the same concepts
       in a fraction of the time. It gives you a straightforward way to know what to study
       and when to study it. All you have to do is create flashcards and follow the spaced
-      repetition schedule. Our <em>Lightspeed Schedule</em> is a custom spaced repetition
+      repetition schedule.
+    </p>
+    <strong>How does Lightspeed Schedule work?</strong><br/>
+    <p class="section-description">
+      Our <em>Lightspeed Schedule</em> is a custom spaced repetition
       algorithm that we created based on Leitner's System. It consists of 7 stages which
       are designed to accelerate learning by optimizing the timing of reviews. The schedule
       is designed to be followed daily, with reviews becoming less frequent as you progress
@@ -39,53 +35,53 @@
       the cards and they are now permanently stored in your long-term memory. You can still
       review cards though if you want to reinforce your memory.
     </p>
+  </div>
 
-    <div class="learning-timeline">
-      <div v-for="(stage, index) in stages" :key="index" class="timeline-stage">
-        <div v-if="index < stages.length - 1" class="stage-connector"></div>
-        <div class="stage-icon" :class="stage.iconClass">
-          <font-awesome-icon :icon="stage.icon"/>
-        </div>
-        <div class="stage-content">
-          <h3 class="stage-title">{{ stage.title }}</h3>
-          <p class="step-description">{{ stage.description }}</p>
-          <div v-if="stage.timing" class="step-timing">
-            <span>{{ stage.timing }}</span>
-          </div>
+  <div class="learning-timeline">
+    <div v-for="(stage, index) in stages" :key="index" class="timeline-stage">
+      <div v-if="index < stages.length - 1" class="stage-connector"></div>
+      <div class="stage-icon" :class="stage.iconClass">
+        <font-awesome-icon :icon="stage.icon"/>
+      </div>
+      <div class="stage-content">
+        <h3 class="stage-title">{{ stage.title }}</h3>
+        <p class="step-description">{{ stage.description }}</p>
+        <div v-if="stage.timing" class="step-timing">
+          <span>{{ stage.timing }}</span>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="summary-card">
-      <div class="summary-header">
-        <div class="summary-icon">
-          <font-awesome-icon icon="fa-solid fa-graduation-cap"/>
-        </div>
-        <h3 class="summary-title">
-          The Science Behind the Mission
-        </h3>
+  <div class="summary-card">
+    <div class="summary-header">
+      <div class="summary-icon">
+        <font-awesome-icon icon="fa-solid fa-graduation-cap"/>
       </div>
-      <div class="summary-content">
-        <p>
-          Spaced repetition leverages the psychological spacing effect -
-          the phenomenon where information is better retained when
-          learning sessions are spaced out over time rather than massed together.
-          Modern meta-analyses confirm what Ebbinghaus discovered: distributed
-          practice is significantly more effective than cramming.
-        </p>
-        <div class="science-stats">
-          <div class="science-stat">
-            <span class="stat-number">1885</span>
-            <span class="stat-label">First discovered by Hermann Ebbinghaus</span>
-          </div>
-          <div class="science-stat">
-            <span class="stat-number">140+</span>
-            <span class="stat-label">Years of continuous research validation</span>
-          </div>
-          <div class="science-stat">
-            <span class="stat-number">2-3x</span>
-            <span class="stat-label">More effective than cramming</span>
-          </div>
+      <h3 class="summary-title">
+        The Science Behind the Mission
+      </h3>
+    </div>
+    <div class="summary-content">
+      <p>
+        Spaced repetition leverages the psychological spacing effect -
+        the phenomenon where information is better retained when
+        learning sessions are spaced out over time rather than massed together.
+        Modern meta-analyses confirm what Ebbinghaus discovered: distributed
+        practice is significantly more effective than cramming.
+      </p>
+      <div class="science-stats">
+        <div class="science-stat">
+          <span class="stat-number">1885</span>
+          <span class="stat-label">First discovered by Hermann Ebbinghaus</span>
+        </div>
+        <div class="science-stat">
+          <span class="stat-number">140+</span>
+          <span class="stat-label">Years of continuous research validation</span>
+        </div>
+        <div class="science-stat">
+          <span class="stat-number">2-3x</span>
+          <span class="stat-label">More effective than cramming</span>
         </div>
       </div>
     </div>
@@ -136,42 +132,6 @@ const stages = [
 </script>
 
 <style scoped>
-.lightspeed-page {
-  padding: clamp(10px, 5vw ,20px) clamp(20px, 5vw, 40px);
-}
-
-.lightspeed-header {
-  margin: 0;
-  padding: 0;
-}
-
-.lightspeed-title {
-  font-family: var(--h-page--font-family);
-  display: block;
-  font-size: clamp(2rem, 6vw, 3rem);
-  font-weight: 800;
-  line-height: 1.1;
-  color: #a0c4ff;
-  text-align: start;
-}
-
-.lightspeed-description {
-  font-family: var(--h-page--font-family);
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  line-height: 1.6;
-  color: #e2e8f0;
-}
-
-.lightspeed-description strong {
-  color: #ffd700;
-}
-
-.lightspeed-description em {
-  color: #00d4ff;
-  font-style: normal;
-  font-weight: 600;
-}
-
 .learning-timeline {
   position: relative;
   margin: 3rem 0;
@@ -257,7 +217,8 @@ const stages = [
 }
 
 .stage-title {
-  font-size: 1.4rem;
+  font-family: var(--site-content--font-family);
+  font-size: clamp(1.2rem, 3vw, 1.4rem);
   font-weight: 600;
   color: #ffffff;
   margin: 0;
@@ -265,6 +226,8 @@ const stages = [
 }
 
 .step-description {
+  font-family: var(--site-content--font-family);
+  font-size: clamp(0.9rem, 3vw, 1.2rem);
   color: #cbd5e1;
   line-height: 1.6;
   max-width: 500px;
@@ -274,6 +237,7 @@ const stages = [
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-family: var(--site-content--font-family);
   font-size: 0.9rem;
   color: #00d4ff;
   font-weight: 500;
@@ -291,7 +255,7 @@ const stages = [
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 2.5rem;
+  padding: 2rem;
   backdrop-filter: blur(10px);
 }
 
@@ -304,7 +268,8 @@ const stages = [
 }
 
 .summary-title {
-  font-size: 2rem;
+  font-family: var(--site-content--font-family);
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
   font-weight: 600;
   text-wrap: balance;
   color: #ffffff;
@@ -312,14 +277,14 @@ const stages = [
 }
 
 .summary-icon {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
-  border-radius: 16px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
+  font-size: 2.5rem;
   color: #ffffff;
   flex-shrink: 0;
 }
@@ -331,6 +296,7 @@ const stages = [
 }
 
 .summary-content p {
+  font-family: var(--site-content--font-family);
   color: #cbd5e1;
   line-height: 1.6;
   margin: 0;
@@ -360,6 +326,7 @@ const stages = [
 }
 
 .stat-label {
+  font-family: var(--site-content--font-family);
   font-size: 0.9rem;
   color: #94a3b8;
   line-height: 1.3;
@@ -368,8 +335,8 @@ const stages = [
 
 @media (max-width: 560px) {
   .summary-header {
-    flex-direction: column;
     align-items: start;
+    gap: 1rem;
   }
 
   .science-stats {
