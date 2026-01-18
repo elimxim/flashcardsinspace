@@ -11,7 +11,7 @@ import LogoutPage from '@/pages/auth/LogoutPage.vue'
 import PasswordResetPage from '@/pages/auth/PasswordResetPage.vue'
 import EmailConfirmationPage from '@/pages/auth/EmailConfirmationPage.vue'
 import ReviewRouter from '@/components/review/ReviewRouter.vue'
-import LightspeedSchedulePage from '@/pages/LightspeedSchedulePage.vue'
+import WebsiteSupportPage from '@/pages/support/WebsiteSupportPage.vue'
 import CodeVerificationPage from '@/pages/CodeVerificationPage.vue'
 import { toLearningStages } from '@/core-logic/stage-logic.ts'
 import { loadUserSignedUpFromCookies } from '@/utils/cookies.ts'
@@ -30,7 +30,7 @@ export const routeNames = {
   emailConfirmation: 'emailConfirmation',
   passwordReset: 'passwordReset',
   review: 'review',
-  lightspeedSchedule: 'lightspeedSchedule',
+  websiteSupport: 'websiteSupport',
   codeVerification: 'codeVerification',
 }
 
@@ -113,9 +113,9 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/lightspeed-schedule',
-    name: routeNames.lightspeedSchedule,
-    component: LightspeedSchedulePage,
+    path: '/website-support',
+    name: routeNames.websiteSupport,
+    component: WebsiteSupportPage,
   },
   {
     path: '/code-verification',
