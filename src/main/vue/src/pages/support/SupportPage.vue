@@ -6,64 +6,59 @@
       'flex-center',
       'padding-auto',
       'support-page',
-      'support-page--theme'
     ]"
   >
-    <Starfield
-      :density="80"
-      :star-size="2"
-      twinkle
-      vertical-drift="4px"
-    />
     <div class="support-content">
-      <div class="support-header">
-        <h1 class="support-title">
-          <font-awesome-icon icon="fa-solid fa-tools" style="font-size: 6rem;"/>
-          <br/>
-          Page is under construction
-        </h1>
-      </div>
+      <GlassCard
+        class="emotional-support"
+        text="Emotional Support"
+        @click.stop="goToEmotionalSupport"
+      />
+      <GlassCard
+        class="website-support"
+        text="Website Support"
+        @click.stop="goToWebsiteSupport"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Starfield from '@/components/Starfield.vue'
+import GlassCard from '@/components/GlassCard.vue'
+import { routeNames } from '@/router'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+function goToEmotionalSupport() {
+  router.push({ name: routeNames.emotionalSupport })
+}
+
+function goToWebsiteSupport() {
+  router.push({ name: routeNames.websiteSupport })
+}
+
 </script>
 
 <style scoped>
-.support-page--theme {
-  --support--title--color: rgba(255, 255, 255, 0.95);
-}
-
-.support-page {
+.support-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  padding: clamp(10px, 5vw, 20px) clamp(20px, 5vw, 40px);
 }
 
-.support-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-  max-width: 800px;
-  width: 100%;
+.emotional-support {
+  background: linear-gradient(135deg, rgba(198, 58, 237, 0.6) 0%, rgba(247, 85, 147, 0.6) 100%);
 }
 
-.support-header {
-  text-align: center;
-}
-
-.support-title {
-  display: flex;
-  flex-direction: column;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 700;
-  color: var(--support--title--color);
-  margin: 0 0 0.5rem 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+.website-support {
+  background: linear-gradient(135deg, rgba(58, 100, 237, 0.6) 0%, rgba(85, 142, 247, 0.6) 100%);
 }
 
 </style>
