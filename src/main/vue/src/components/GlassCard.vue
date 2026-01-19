@@ -34,8 +34,7 @@ withDefaults(defineProps<{
   height: var(--gc--height);
   border-radius: var(--gc--border-radius);
   background: var(--gc--bg);
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3),
-  inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -66,8 +65,7 @@ withDefaults(defineProps<{
 
 .glass-rim:hover {
   transform: scale(1.02) translateZ(0);
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.4),
-  inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 .glass-rim:hover .glass-face {
