@@ -1,5 +1,9 @@
 <template>
-  <div class="glass-rim glass-card--theme">
+  <div
+    class="glass-rim glass-card--theme"
+    :class="{ 'glass-rim--tapped': animatingOnTap }"
+    @click.stop="handleClick"
+  >
     <div class="glass-face">
       <div class="glass-text">
         {{ text }}
@@ -9,11 +13,35 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{
+import { isHoverSupported } from '@/utils/utils.ts'
+import { ref } from 'vue'
+
+const props = withDefaults(defineProps<{
   text?: string,
+  onClick?: () => void,
 }>(), {
   text: '',
+  onClick: () => {
+  },
 })
+
+const animatingOnTap = ref(false)
+
+function handleClick() {
+  if (!isHoverSupported) {
+    startTapAnimation()
+  } else {
+    props.onClick()
+  }
+}
+
+function startTapAnimation() {
+  animatingOnTap.value = true
+  setTimeout(() => {
+    animatingOnTap.value = false
+    props.onClick()
+  }, 800)
+}
 </script>
 
 <style scoped>
@@ -63,17 +91,6 @@ withDefaults(defineProps<{
   overflow: hidden;
 }
 
-.glass-rim:hover {
-  transform: scale(1.02) translateZ(0);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-}
-
-.glass-rim:hover .glass-face {
-  box-shadow: inset 1px 1px 0 0 rgba(255, 255, 255, 0.8),
-  inset -1px -1px 0 0 rgba(0, 0, 0, 0.1),
-  inset 0 0 20px rgba(255, 255, 255, 0.2);
-}
-
 .glass-face::after {
   content: "";
   position: absolute;
@@ -94,7 +111,36 @@ withDefaults(defineProps<{
   pointer-events: none;
 }
 
-.glass-rim:hover .glass-face::after {
+@media (hover: hover) {
+  .glass-rim:hover {
+    transform: scale(1.02) translateZ(0);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-rim:hover .glass-face {
+    box-shadow: inset 1px 1px 0 0 rgba(255, 255, 255, 0.8),
+    inset -1px -1px 0 0 rgba(0, 0, 0, 0.1),
+    inset 0 0 20px rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-rim:hover .glass-face::after {
+    left: 150%;
+    transition: left 0.8s ease-in-out;
+  }
+}
+
+.glass-rim--tapped {
+  transform: scale(1.02) translateZ(0);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.glass-rim--tapped .glass-face {
+  box-shadow: inset 1px 1px 0 0 rgba(255, 255, 255, 0.8),
+  inset -1px -1px 0 0 rgba(0, 0, 0, 0.1),
+  inset 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.glass-rim--tapped .glass-face::after {
   left: 150%;
   transition: left 0.8s ease-in-out;
 }

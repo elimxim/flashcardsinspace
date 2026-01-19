@@ -31,12 +31,12 @@
         <GlassCard
           class="support-card support-card--emotional"
           text="Emotional Support"
-          @click.stop="goToEmotionalSupport"
+          :on-click="goToEmotionalSupport"
         />
         <GlassCard
           class="support-card support-card--website"
           text="Website Support"
-          @click.stop="goToWebsiteSupport"
+          :on-click="goToWebsiteSupport"
         />
       </div>
     </div>
