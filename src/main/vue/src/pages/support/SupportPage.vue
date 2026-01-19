@@ -10,18 +10,18 @@
   >
     <AuroraWaves
       :colors="['#c63aed', '#5864ed', '#00d2ff']"
-      :minLength="2"
-      :maxLength="3"
-      :minThickness="3"
-      :maxThickness="6"
-      :pulsePeak="1.4"
-      :minDuration="20"
-      :maxDuration="30"
-      :minAmplitude="0.4"
-      :maxAmplitude="0.9"
-      :spawnInterval="100"
-      :maxLines="8"
-      :blurAmount="0.85"
+      :min-length="2"
+      :max-length="3"
+      :min-thickness="3"
+      :max-thickness="6"
+      :pulse-peak="1.4"
+      :min-duration="20"
+      :max-duration="30"
+      :min-amplitude="0.4"
+      :max-amplitude="0.9"
+      :spawn-interval="100"
+      :max-lines="8"
+      :blur-amount="0.85"
     />
     <div class="support-content">
       <div class="support-header">

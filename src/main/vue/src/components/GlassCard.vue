@@ -17,8 +17,8 @@ import { isHoverSupported } from '@/utils/utils.ts'
 import { ref } from 'vue'
 
 const props = withDefaults(defineProps<{
-  text?: string,
-  onClick?: () => void,
+  text?: string
+  onClick?: () => void
 }>(), {
   text: '',
   onClick: () => {
