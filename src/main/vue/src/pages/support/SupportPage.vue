@@ -29,12 +29,12 @@
       </div>
       <div class="cards-container">
         <GlassCard
-          class="emotional-support"
+          class="support-card support-card--emotional"
           text="Emotional Support"
           @click.stop="goToEmotionalSupport"
         />
         <GlassCard
-          class="website-support"
+          class="support-card support-card--website"
           text="Website Support"
           @click.stop="goToWebsiteSupport"
         />
@@ -76,7 +76,7 @@ function goToWebsiteSupport() {
 
 .support-header h1 {
   font-family: var(--site-content--font-family);
-  font-size: clamp(2rem, 5vw, 2.5rem);
+  font-size: 2.5rem;
   font-weight: 200;
   letter-spacing: 0.05rem;
   word-spacing: 0.1rem;
@@ -92,12 +92,30 @@ function goToWebsiteSupport() {
   gap: 40px;
 }
 
-.emotional-support {
+.support-card {
+  --glass-card--width: 240px;
+  --glass-card--height: 160px;
+  --glass-card--font-size: 2rem;
+}
+
+.support-card--emotional {
   background: linear-gradient(135deg, rgba(198, 58, 237, 0.6) 0%, rgba(247, 85, 147, 0.6) 100%);
 }
 
-.website-support {
+.support-card--website {
   background: linear-gradient(135deg, rgba(58, 100, 237, 0.6) 0%, rgba(85, 142, 247, 0.6) 100%);
+}
+
+@media(max-width: 400px) {
+  .support-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .support-card {
+    --glass-card--width: 180px;
+    --glass-card--height: 120px;
+    --glass-card--font-size: 1.5rem;
+  }
 }
 
 </style>
