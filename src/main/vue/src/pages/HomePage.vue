@@ -212,7 +212,7 @@ function navigateToLogin() {
 }
 
 function navigateToSupport() {
-  router.push({ name: routeNames.support })
+  router.push({ name: routeNames.getHelp })
 }
 
 onUnmounted(() => {

@@ -69,7 +69,7 @@
           <AwesomeButton
             class="navigation-button"
             icon="fa-solid fa-heart-pulse"
-            :on-click="navigateToSupport"
+            :on-click="navigateToGetHelp"
             :active="supportActive"
             :scale-factor="1.2"
             fill-space
@@ -80,9 +80,9 @@
           <div
             class="nav-text nav-text--item"
             :class="{ 'nav-text--active': supportActive }"
-            @click="navigateToSupport"
+            @click="navigateToGetHelp"
           >
-            Support
+            Get Help
           </div>
           <div class="nav-item-partition">
             <font-awesome-icon icon="fa-solid fa-circle"/>
@@ -136,7 +136,7 @@ const showIcons = ref(window.innerWidth <= ICONS_SWITCH_BREAKPOINT)
 
 const controlPanelActive = computed(() => router.currentRoute.value.name === routeNames.controlPanel)
 const homeActive = computed(() => router.currentRoute.value.name === routeNames.home)
-const supportActive = computed(() => router.currentRoute.value.name === routeNames.support)
+const supportActive = computed(() => router.currentRoute.value.name === routeNames.getHelp)
 const userActive = computed(() => router.currentRoute.value.name === routeNames.user)
 
 function navigateToControlPanel() {
@@ -148,8 +148,8 @@ function navigateToHome() {
   router.push({ name: routeNames.home })
 }
 
-function navigateToSupport() {
-  router.push({ name: routeNames.support })
+function navigateToGetHelp() {
+  router.push({ name: routeNames.getHelp })
 }
 
 function navigateToUser() {

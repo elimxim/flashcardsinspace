@@ -3,7 +3,7 @@ import { useAuthStore } from '@/stores/auth-store.ts'
 import { storeToRefs } from 'pinia'
 import HomePage from '@/pages/HomePage.vue'
 import ControlPanel from '@/pages/ControlPanel.vue'
-import SupportPage from '@/pages/support/SupportPage.vue'
+import GetHelpPage from '@/pages/support/GetHelpPage.vue'
 import EmotionalSupportPage from '@/pages/support/EmotionalSupportPage.vue'
 import WebsiteSupportPage from '@/pages/support/WebsiteSupportPage.vue'
 import UserPage from '@/pages/UserPage.vue'
@@ -24,7 +24,7 @@ export const routeNames = {
   home: 'home',
   controlPanel: 'controlPanel',
   user: 'user',
-  support: 'support',
+  getHelp: 'getHelp',
   signup: 'signup',
   login: 'login',
   logout: 'logout',
@@ -62,9 +62,9 @@ const routes: RouteRecordRaw[] = [
     component: HomePage
   },
   {
-    path: '/support',
-    name: routeNames.support,
-    component: SupportPage,
+    path: '/get-help',
+    name: routeNames.getHelp,
+    component: GetHelpPage,
   },
   {
     path: '/website-support',

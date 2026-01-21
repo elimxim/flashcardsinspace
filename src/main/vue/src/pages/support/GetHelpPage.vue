@@ -5,7 +5,6 @@
       'flex-column',
       'flex-center',
       'padding-auto',
-      'support-page',
     ]"
   >
     <AuroraWaves
@@ -23,29 +22,28 @@
       :max-lines="8"
       :blur-amount="0.85"
     />
-    <div class="support-content">
-      <div class="support-header">
+    <div class="help-content">
+      <div class="help-header">
         <h1>I need...</h1>
       </div>
-      <div class="cards-container">
-        <div class="support-card-wrapper">
-
-        <GlassCard
-          class="support-card support-card--emotional"
-          text="Emotional Support"
-          :on-click="goToEmotionalSupport"
-        />
-          <div class="support-card-description">
+      <div class="help-cards-container">
+        <div class="help-card-wrapper">
+          <GlassCard
+            class="help-card help-card--warm"
+            text="Emotional Support"
+            :on-click="goToEmotionalSupport"
+          />
+          <div class="help-card-description">
             <p>Find your spark with inspiring words</p>
           </div>
         </div>
-        <div class="support-card-wrapper">
+        <div class="help-card-wrapper">
           <GlassCard
-            class="support-card support-card--website"
+            class="help-card support-card--cold"
             text="Website Support"
             :on-click="goToWebsiteSupport"
           />
-          <div class="support-card-description">
+          <div class="help-card-description">
             <p>Learn how to navigate our features</p>
           </div>
         </div>
@@ -73,7 +71,7 @@ function goToWebsiteSupport() {
 </script>
 
 <style scoped>
-.support-content {
+.help-content {
   width: 100%;
   height: 100%;
   display: flex;
@@ -85,7 +83,7 @@ function goToWebsiteSupport() {
   z-index: 1;
 }
 
-.support-header h1 {
+.help-header h1 {
   font-family: var(--site-content--font-family);
   font-size: 2.5rem;
   font-weight: 200;
@@ -94,7 +92,7 @@ function goToWebsiteSupport() {
   color: #ffffff;
 }
 
-.cards-container {
+.help-cards-container {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -103,7 +101,7 @@ function goToWebsiteSupport() {
   gap: 40px;
 }
 
-.support-card-wrapper {
+.help-card-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -111,21 +109,21 @@ function goToWebsiteSupport() {
   gap: 16px;
 }
 
-.support-card {
+.help-card {
   --glass-card--width: 240px;
   --glass-card--height: 160px;
   --glass-card--font-size: 2rem;
 }
 
-.support-card--emotional {
+.help-card--warm {
   background: linear-gradient(135deg, rgba(198, 58, 237, 0.6) 0%, rgba(247, 85, 147, 0.6) 100%);
 }
 
-.support-card--website {
+.support-card--cold {
   background: linear-gradient(135deg, rgba(58, 100, 237, 0.6) 0%, rgba(85, 142, 247, 0.6) 100%);
 }
 
-.support-card-description {
+.help-card-description {
   width: 320px;
   height: 40px;
   text-align: center;
@@ -136,7 +134,7 @@ function goToWebsiteSupport() {
   align-items: center;
 }
 
-.support-card-description p {
+.help-card-description p {
   font-family: var(--site-content--font-family);
   font-size: 1rem;
   font-weight: 200;
@@ -148,21 +146,21 @@ function goToWebsiteSupport() {
 }
 
 @media (max-width: 400px) {
-  .support-header h1 {
+  .help-header h1 {
     font-size: 2rem;
   }
 
-  .support-card {
+  .help-card {
     --glass-card--width: 180px;
     --glass-card--height: 120px;
     --glass-card--font-size: 1.5rem;
   }
 
-  .support-card-description {
+  .help-card-description {
     width: 280px
   }
 
-  .support-card-description p {
+  .help-card-description p {
     font-size: 0.9rem;
   }
 }
