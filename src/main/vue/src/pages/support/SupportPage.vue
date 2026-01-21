@@ -28,16 +28,27 @@
         <h1>I need...</h1>
       </div>
       <div class="cards-container">
+        <div class="support-card-wrapper">
+
         <GlassCard
           class="support-card support-card--emotional"
           text="Emotional Support"
           :on-click="goToEmotionalSupport"
         />
-        <GlassCard
-          class="support-card support-card--website"
-          text="Website Support"
-          :on-click="goToWebsiteSupport"
-        />
+          <div class="support-card-description">
+            <p>Find your spark with inspiring words</p>
+          </div>
+        </div>
+        <div class="support-card-wrapper">
+          <GlassCard
+            class="support-card support-card--website"
+            text="Website Support"
+            :on-click="goToWebsiteSupport"
+          />
+          <div class="support-card-description">
+            <p>Learn how to navigate our features</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -92,6 +103,14 @@ function goToWebsiteSupport() {
   gap: 40px;
 }
 
+.support-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
 .support-card {
   --glass-card--width: 240px;
   --glass-card--height: 160px;
@@ -106,15 +125,45 @@ function goToWebsiteSupport() {
   background: linear-gradient(135deg, rgba(58, 100, 237, 0.6) 0%, rgba(85, 142, 247, 0.6) 100%);
 }
 
-@media(max-width: 400px) {
+.support-card-description {
+  width: 320px;
+  height: 40px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.support-card-description p {
+  font-family: var(--site-content--font-family);
+  font-size: 1rem;
+  font-weight: 200;
+  letter-spacing: 0.02rem;
+  word-spacing: 0.04rem;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 400px) {
   .support-header h1 {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
 
   .support-card {
     --glass-card--width: 180px;
     --glass-card--height: 120px;
     --glass-card--font-size: 1.5rem;
+  }
+
+  .support-card-description {
+    width: 280px
+  }
+
+  .support-card-description p {
+    font-size: 0.9rem;
   }
 }
 
