@@ -5,7 +5,7 @@
       'flex-column',
       'padding-auto',
       'scrollbar-hidden',
-      'website-support-page',
+      'website-guide-page',
     ]"
   >
     <LightspeedScheduleSection/>
@@ -18,7 +18,7 @@ import LightspeedScheduleSection from '@/pages/support/LightspeedScheduleSection
 </script>
 
 <style scoped>
-.website-support-page {
+.website-guide-page {
   padding: clamp(10px, 5vw, 20px) clamp(20px, 5vw, 40px);
 }
 

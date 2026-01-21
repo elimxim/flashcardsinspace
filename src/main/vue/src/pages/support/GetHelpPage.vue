@@ -40,8 +40,8 @@
         <div class="help-card-wrapper">
           <GlassCard
             class="help-card support-card--cold"
-            text="Website Support"
-            :on-click="goToWebsiteSupport"
+            text="Website Guide"
+            :on-click="goToWebsiteGuide"
           />
           <div class="help-card-description">
             <p>Learn how to navigate our features</p>
@@ -64,8 +64,8 @@ function goToEmotionalSupport() {
   router.push({ name: routeNames.emotionalSupport })
 }
 
-function goToWebsiteSupport() {
-  router.push({ name: routeNames.websiteSupport })
+function goToWebsiteGuide() {
+  router.push({ name: routeNames.websiteGuide })
 }
 
 </script>

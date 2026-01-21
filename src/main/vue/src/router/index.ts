@@ -5,7 +5,7 @@ import HomePage from '@/pages/HomePage.vue'
 import ControlPanel from '@/pages/ControlPanel.vue'
 import GetHelpPage from '@/pages/support/GetHelpPage.vue'
 import EmotionalSupportPage from '@/pages/support/EmotionalSupportPage.vue'
-import WebsiteSupportPage from '@/pages/support/WebsiteSupportPage.vue'
+import WebsiteGuidePage from '@/pages/support/WebsiteGuidePage.vue'
 import UserPage from '@/pages/UserPage.vue'
 import SignupPage from '@/pages/auth/SignupPage.vue'
 import LoginPage from '@/pages/auth/LoginPage.vue'
@@ -32,7 +32,7 @@ export const routeNames = {
   passwordReset: 'passwordReset',
   review: 'review',
   emotionalSupport: 'emotionalSupport',
-  websiteSupport: 'websiteSupport',
+  websiteGuide: 'websiteGuide',
   codeVerification: 'codeVerification',
 }
 
@@ -67,9 +67,9 @@ const routes: RouteRecordRaw[] = [
     component: GetHelpPage,
   },
   {
-    path: '/website-support',
-    name: routeNames.websiteSupport,
-    component: WebsiteSupportPage,
+    path: '/website-guide',
+    name: routeNames.websiteGuide,
+    component: WebsiteGuidePage,
   },
   {
     path: '/emotional-support',
