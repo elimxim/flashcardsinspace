@@ -39,7 +39,7 @@
         </div>
         <div class="help-card-wrapper">
           <GlassCard
-            class="help-card support-card--cold"
+            class="help-card help-card--cold"
             text="Website Guide"
             :on-click="goToWebsiteGuide"
           />
@@ -119,7 +119,7 @@ function goToWebsiteGuide() {
   background: linear-gradient(135deg, rgba(198, 58, 237, 0.6) 0%, rgba(247, 85, 147, 0.6) 100%);
 }
 
-.support-card--cold {
+.help-card--cold {
   background: linear-gradient(135deg, rgba(58, 100, 237, 0.6) 0%, rgba(85, 142, 247, 0.6) 100%);
 }
 
