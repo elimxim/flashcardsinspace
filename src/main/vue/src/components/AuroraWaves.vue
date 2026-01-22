@@ -113,7 +113,7 @@ const addLine = () => {
     id,
     colorIndex: Math.floor(random(0, props.colors.length)),
     pathShape: pathShapes[Math.floor(random(0, pathShapes.length))],
-    yPos: random(-10, 110),
+    yPos: random(-20, 40),
     duration: duration,
     length: random(scaleUnit(props.minLength), scaleUnit(props.maxLength)),
     thickness: random(props.minThickness, props.maxThickness),
