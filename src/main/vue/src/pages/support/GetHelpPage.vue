@@ -132,6 +132,7 @@ function goToWebsiteGuide() {
   display: flex;
   justify-content: center;
   align-items: center;
+  backdrop-filter: blur(10px);
 }
 
 .help-card-description p {
