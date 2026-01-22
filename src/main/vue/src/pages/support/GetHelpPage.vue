@@ -19,7 +19,7 @@
       :min-amplitude="0.4"
       :max-amplitude="0.9"
       :spawn-interval="100"
-      :max-lines="8"
+      :max-lines="5"
       :blur-amount="0.85"
     />
     <div class="help-content">
