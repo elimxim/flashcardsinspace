@@ -1,46 +1,43 @@
 <template>
-  <div
-    :class="[
-      'page',
-      'flex-column',
-      'padding-auto',
-      'scrollbar-hidden',
-      'lightspeed-page',
-    ]"
-  >
-    <Starfield
-      :density="120"
-      :star-size="1.8"
-      twinkle
-      vertical-drift="3px"
-    />
+  <div class="lightspeed-schedule">
+    <h1 class="section-header">
+    <span class="section-title section-title--centered">
+      Lightspeed Schedule
+    </span>
+    </h1>
 
-    <h2 class="lightspeed-header">
-      <span class="lightspeed-title">
-        Lightspeed Schedule
-      </span>
-    </h2>
-
-    <p class="lightspeed-description">
-      <strong>What is spaced repetition?</strong><br/>
-      Spaced repetition is a science-based method of learning new concepts or vocabulary
-      in a manageable amount of time. Instead of spending hours at a desk studying the
-      same words repeatedly, you can use spaced repetition to learn the same concepts
-      in a fraction of the time. It gives you a straightforward way to know what to study
-      and when to study it. All you have to do is create flashcards and follow the spaced
-      repetition schedule. Our <em>Lightspeed Schedule</em> is a custom spaced repetition
-      algorithm that we created based on Leitner's System. It consists of 7 stages which
-      are designed to accelerate learning by optimizing the timing of reviews. The schedule
-      is designed to be followed daily, with reviews becoming less frequent as you progress
-      through the stages. When you remember a flashcard, you complete the stage and the
-      flashcard moves to the next one. But when you forget a card, it goes back to the
-      first stage and its journey starts over. When you complete the last stage, the flashcard
-      moves to the <strong>Outer Space</strong> stage, which means that you have mastered
-      the cards and they are now permanently stored in your long-term memory. You can still
-      review cards though if you want to reinforce your memory.
-    </p>
+    <div class="section-description">
+      <strong>What is spaced repetition?</strong>
+      <p class="section-description">
+        Spaced repetition is a science-based method of learning new concepts or vocabulary
+        in a manageable amount of time. Instead of spending hours at a desk studying the
+        same words repeatedly, you can use spaced repetition to learn the same concepts
+        in a fraction of the time. It gives you a straightforward way to know what to study
+        and when to study it. All you have to do is create flashcards and follow the spaced
+        repetition schedule.
+      </p>
+      <strong>How does Lightspeed Schedule work?</strong><br/>
+      <p class="section-description">
+        Our <em>Lightspeed Schedule</em> is a custom spaced repetition
+        algorithm that we created based on Leitner's System. It consists of 7 stages which
+        are designed to accelerate learning by optimizing the timing of reviews. The schedule
+        is designed to be followed daily, with reviews becoming less frequent as you progress
+        through the stages. When you remember a flashcard, you complete the stage and the
+        flashcard moves to the next one. But when you forget a card, it goes back to the
+        first stage and its journey starts over. When you complete the last stage, the flashcard
+        moves to the <strong>Outer Space</strong> stage, which means that you have mastered
+        the cards and they are now permanently stored in your long-term memory. You can still
+        review cards though if you want to reinforce your memory.
+      </p>
+    </div>
 
     <div class="learning-timeline">
+      <Starfield
+        :density="120"
+        :star-size="1.8"
+        vertical-drift="20px"
+        twinkle
+      />
       <div v-for="(stage, index) in stages" :key="index" class="timeline-stage">
         <div v-if="index < stages.length - 1" class="stage-connector"></div>
         <div class="stage-icon" :class="stage.iconClass">
@@ -54,6 +51,25 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="section-description">
+      <p class="section-description">
+        Additionally, our schedule has two special stages: <em>Unknown</em> and <em>Attempted</em>.
+        We added them to give you more control over your learning process. You can review them
+        at any time. You can even create a custom review session for them.
+      </p>
+      <strong>What are Unknown and Attempted stages?</strong><br/>
+      <p class="section-description">
+        The <em>Unknown</em> stage contains flashcards that you have just created. You can review
+        them an unlimited number of times before they move to the first stage on the next day.
+      </p>
+      <p class="section-description">
+        The <em>Attempted</em> stage contains flashcards that you have already seen
+        but forgot. Before going back to the first stage, they move to the <em>Attempted</em>
+        stage. But just for a day. Like the <em>Unknown</em> stage, you can review them
+        an unlimited number of times.
+      </p>
     </div>
 
     <div class="summary-card">
@@ -136,40 +152,9 @@ const stages = [
 </script>
 
 <style scoped>
-.lightspeed-page {
-  padding: clamp(10px, 5vw ,20px) clamp(20px, 5vw, 40px);
-}
-
-.lightspeed-header {
-  margin: 0;
-  padding: 0;
-}
-
-.lightspeed-title {
-  font-family: var(--h-page--font-family);
-  display: block;
-  font-size: clamp(2rem, 6vw, 3rem);
-  font-weight: 800;
-  line-height: 1.1;
-  color: #a0c4ff;
-  text-align: start;
-}
-
-.lightspeed-description {
-  font-family: var(--h-page--font-family);
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  line-height: 1.6;
-  color: #e2e8f0;
-}
-
-.lightspeed-description strong {
-  color: #ffd700;
-}
-
-.lightspeed-description em {
-  color: #00d4ff;
-  font-style: normal;
-  font-weight: 600;
+.lightspeed-schedule {
+  width: 100%;
+  height: 100%;
 }
 
 .learning-timeline {
@@ -257,7 +242,8 @@ const stages = [
 }
 
 .stage-title {
-  font-size: 1.4rem;
+  font-family: var(--site-content--font-family);
+  font-size: clamp(1.2rem, 3vw, 1.4rem);
   font-weight: 600;
   color: #ffffff;
   margin: 0;
@@ -265,6 +251,8 @@ const stages = [
 }
 
 .step-description {
+  font-family: var(--site-content--font-family);
+  font-size: clamp(0.9rem, 3vw, 1.2rem);
   color: #cbd5e1;
   line-height: 1.6;
   max-width: 500px;
@@ -274,6 +262,7 @@ const stages = [
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-family: var(--site-content--font-family);
   font-size: 0.9rem;
   color: #00d4ff;
   font-weight: 500;
@@ -291,7 +280,7 @@ const stages = [
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 2.5rem;
+  padding: 2rem;
   backdrop-filter: blur(10px);
 }
 
@@ -304,7 +293,8 @@ const stages = [
 }
 
 .summary-title {
-  font-size: 2rem;
+  font-family: var(--site-content--font-family);
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
   font-weight: 600;
   text-wrap: balance;
   color: #ffffff;
@@ -331,6 +321,7 @@ const stages = [
 }
 
 .summary-content p {
+  font-family: var(--site-content--font-family);
   color: #cbd5e1;
   line-height: 1.6;
   margin: 0;
@@ -360,6 +351,7 @@ const stages = [
 }
 
 .stat-label {
+  font-family: var(--site-content--font-family);
   font-size: 0.9rem;
   color: #94a3b8;
   line-height: 1.3;
@@ -368,8 +360,15 @@ const stages = [
 
 @media (max-width: 560px) {
   .summary-header {
-    flex-direction: column;
     align-items: start;
+    gap: 1rem;
+  }
+
+  .summary-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    font-size: 2rem;
   }
 
   .science-stats {

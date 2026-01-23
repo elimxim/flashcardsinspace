@@ -11,11 +11,14 @@ Disallow: /logout
 Allow: /signup
 Allow: /login
 Allow: /password-reset
+Allow: /email-confirmation
+Allow: /code-verification
 
 # Allow main public pages
 Allow: /
 Allow: /home
 Allow: /support
-Allow: /lightspeed-schedule
+Allow: /emotional-support
+Allow: /website-support
 
 Sitemap: https://flashcardsinspace.com/sitemap.xml

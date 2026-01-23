@@ -30,12 +30,13 @@
       <SwipeTape
         ref="swipeTape"
         :frames="calendarMonths"
-        :frame-key="calendarKey"
         :snap-duration="TAPE_SNAP_DURATION"
         :threshold="80"
         :page-gap="10"
         :on-swipe-left="onSwipeRight"
         :on-swipe-right="onSwipeLeft"
+        show-middle-frame
+        dynamic-tape
       >
         <template #default="{ frame }">
           <div class="calendar-days">
@@ -134,10 +135,6 @@ const calendarMonths = computed(() => [
   calcCalendarPage(currMonth.value, currDay.value, chronodays.value),
   calcCalendarPage(nextMonth.value, currDay.value, chronodays.value),
 ])
-
-function calendarKey(days: CalendarDay[], index: number) {
-  return days.length > 0 ? `${days[0].date}` : index.toString()
-}
 
 const TAPE_SNAP_DURATION = 250
 
@@ -345,6 +342,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .calendar-days {
+  width: 100%;
   height: 100%;
   display: grid;
   grid-template-columns: repeat(7, 1fr);

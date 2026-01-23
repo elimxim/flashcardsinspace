@@ -4,7 +4,6 @@
       'page',
       'flex-column',
       'scrollbar-hidden',
-      'home-page--theme',
     ]"
   >
     <Starfield
@@ -58,21 +57,21 @@
       </h2>
 
       <div class="section-description">
-        <p class="description-paragraph">
+        <p class="section-description section-description--paragraph">
           Flashcards in Space was born from a simple dream: we envisioned a spaced repetition
           system that we'd genuinely love to use every single day. We searched through already
           existing options like Anki, Quizlet, SuperMemo, and countless other apps, but couldn't
           find anything that sparked our imagination or made learning feel truly exciting.
           It was then that we realized our dream system didn't exist yet.
         </p>
-        <p class="description-paragraph">
+        <p class="section-description section-description--paragraph">
           Instead of settling for outdated interfaces and boring experiences, we decided
           to create our own system, complete with our own <em>Lightspeed Schedule</em> to help
           you learn new concepts at lightspeed. With fun visuals and graphics, streak counters,
           and motivation pages, plus a load of other exciting and one-of-a-kind features,
           you are bound to have a unique and engaging experience at Flashcards in Space.
         </p>
-        <p class="description-paragraph">
+        <p class="section-description section-description--paragraph">
           And, just like space explorers, we are always excited to push beyond the limits
           to create new and improved experiences for you and all the other learners out there.
         </p>
@@ -162,13 +161,13 @@
       </h2>
 
       <div class="section-description">
-        <p class="description-paragraph">
+        <p class="section-description section-description--paragraph">
           Flashcards in Space uses spaced repetition to help you learn new concepts
           without wasting time studying things you don't need to. We make it super simple
           for you to get started and to keep going so that you can learn exactly what you need,
           when you need it.
         </p>
-        <p class="description-paragraph">
+        <p class="section-description section-description--paragraph">
           Here's how your learning journey unfolds: You create flashcards for whatever you
           want to master, then simply follow our <em>Lightspeed Schedule</em>. Cards you struggle
           with come back sooner, while ones you nail get spaced out further. The magic happens
@@ -176,7 +175,7 @@
           graduating from daily reviews all the way to long-term memory. No cramming, no
           guesswork - just consistent progress as you watch your knowledge launch into orbit!
         </p>
-        <p class="description-paragraph">
+        <p class="section-description section-description--paragraph">
           If you are a new astronaut looking to improve your vocabulary or memory skills,
           fly on over to the "support" page to learn exactly how to use Flashcards in Space!
         </p>
@@ -213,7 +212,7 @@ function navigateToLogin() {
 }
 
 function navigateToSupport() {
-  router.push({ name: routeNames.support })
+  router.push({ name: routeNames.getHelp })
 }
 
 onUnmounted(() => {
@@ -222,70 +221,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.home-page--theme {
-  --h-page--font-family: var(--home-page--font-family);
-}
-
-.section-header {
-  margin: 0;
-  padding: 0;
-}
-
-.section-title {
-  font-family: var(--h-page--font-family);
-  display: block;
-  font-size: clamp(2rem, 6vw, 3rem);
-  font-weight: 800;
-  line-height: 1.1;
-  color: #a0c4ff;
-  margin-bottom: 10px;
-}
-
-.section-title--main {
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  text-wrap: balance;
-}
-
-.section-title--sub {
-  font-size: clamp(1rem, 2.5vw, 1.5rem);
-  font-weight: 300;
-  font-style: italic;
-  line-height: 1;
-  color: #b0c4de;
-  margin-top: 20px;
-}
-
-.section-title--centered {
-  text-align: center;
-}
-
-.section-description {
-  font-family: var(--h-page--font-family);
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  line-height: 1.6;
-  color: #e2e8f0;
-}
-
-.section-description--short {
-  max-width: 500px;
-  text-indent: unset;
-}
-
-.section-description strong {
-  color: #ffd700;
-}
-
-.section-description em {
-  color: #00d4ff;
-  font-style: normal;
-  font-weight: 600;
-}
-
-.description-paragraph {
-  font-family: var(--h-page--font-family);
-  text-indent: 2rem;
-}
-
 .what-section {
   position: relative;
   display: flex;
@@ -359,7 +294,7 @@ onUnmounted(() => {
 }
 
 .what-tagline-text {
-  font-family: var(--h-page--font-family);
+  font-family: var(--site-content--font-family);
   font-size: 0.9rem;
   color: #94a3b8;
   font-style: italic;
@@ -447,7 +382,7 @@ onUnmounted(() => {
 }
 
 .feature-title {
-  font-family: var(--h-page--font-family);
+  font-family: var(--site-content--font-family);
   font-size: 1.3rem;
   font-weight: 600;
   color: #ffffff;
@@ -455,7 +390,7 @@ onUnmounted(() => {
 }
 
 .feature-description {
-  font-family: var(--h-page--font-family);
+  font-family: var(--site-content--font-family);
   color: #cbd5e1;
   line-height: 1.6;
 }
