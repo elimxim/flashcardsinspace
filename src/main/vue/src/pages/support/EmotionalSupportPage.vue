@@ -133,7 +133,7 @@ const motivationTips = [
 
   `I am a simple creature. I see snack, I do task. Have you tried putting a piece of chocolate ` +
   `next to the SpaceBar? One card = one bite.`,
-];
+]
 
 const overwhelmedTips = [
   `You don't need to be the superman of flashcards in space all the time. ` +
@@ -158,7 +158,7 @@ const overwhelmedTips = [
 
   `Some cards are just "leeches" sucking your energy. Suspend them! ` +
   `Banish them to the dark side of the moon! You can relearn them next year.`,
-];
+]
 
 type TipsCategory = 'memory' | 'motivation' | 'overwhelmed'
 
