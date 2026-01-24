@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://sitemaps.org/schemas/sitemap/0.9">
-
     <url>
         <loc>https://flashcardsinspace.com/</loc>
         <lastmod>2026-01-19</lastmod>
@@ -14,25 +13,23 @@
         <priority>1.00</priority>
     </url>
     <url>
-        <loc>https://flashcardsinspace.com/support</loc>
-        <lastmod>2026-01-19</lastmod>
+        <loc>https://flashcardsinspace.com/get-help</loc>
+        <lastmod>2026-01-24</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.80</priority>
     </url>
     <url>
         <loc>https://flashcardsinspace.com/emotional-support</loc>
-        <lastmod>2026-01-19</lastmod>
+        <lastmod>2026-01-24</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.80</priority>
     </url>
     <url>
-        <loc>https://flashcardsinspace.com/website-support</loc>
-        <lastmod>2026-01-19</lastmod>
+        <loc>https://flashcardsinspace.com/website-guide</loc>
+        <lastmod>2026-01-24</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.80</priority>
     </url>
-
-
     <url>
         <loc>https://flashcardsinspace.com/signup</loc>
         <lastmod>2026-01-19</lastmod>
