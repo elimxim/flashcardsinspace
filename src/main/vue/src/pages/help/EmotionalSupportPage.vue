@@ -164,9 +164,11 @@ const overwhelmedTips = [
 
 type TipsCategory = 'memory' | 'motivation' | 'overwhelmed'
 
-const shuffledMemoryTips = shuffle(memoryTips)
-const shuffledMotivationTips = shuffle(motivationTips)
-const shuffledOverwhelmedTips = shuffle(overwhelmedTips)
+const shuffledMascotPhrases = shuffle([...mascotPhrases])
+const mascotPhraseIndex = ref(0)
+const shuffledMemoryTips = shuffle([...memoryTips])
+const shuffledMotivationTips = shuffle([...motivationTips])
+const shuffledOverwhelmedTips = shuffle([...overwhelmedTips])
 
 const currentCategory = ref<TipsCategory>()
 const mascotClicked = ref(false)
@@ -188,7 +190,11 @@ const currentCategoryTips = computed(() => {
 
 function handleClickOnMascot() {
   mascotClicked.value = true
-  const index = Math.floor(Math.random() * mascotPhrases.length)
+  let index = mascotPhraseIndex.value + 1
+  if (index >= shuffledMascotPhrases.length) {
+    index = 0
+  }
+  mascotPhraseIndex.value = index
   mascotPhrase.value = mascotPhrases[index]
 }
 
