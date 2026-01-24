@@ -13,6 +13,9 @@
           <stop offset="50%" :stop-color="color" stop-opacity="1"/>
           <stop offset="100%" :stop-color="color" stop-opacity="0"/>
         </linearGradient>
+        <filter id="wave-blur" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur :stdDeviation="blurAmount"/>
+        </filter>
       </defs>
 
       <path
@@ -21,6 +24,7 @@
         class="wave-path"
         :d="line.pathShape"
         :stroke="`url(#grad-${line.colorIndex})`"
+        filter="url(#wave-blur)"
         :style="{
           '--wave--duration': line.duration + 's',
           '--wave--y-pos': line.yPos,
@@ -29,7 +33,6 @@
           '--wave--gap-length': '1000',
           '--wave--base-thick': line.thickness,
           '--wave--peak-thick': (line.thickness * pulsePeak),
-          '--wave--blur': blurAmount + 'px'
         }"
       />
     </svg>
@@ -165,6 +168,10 @@ onUnmounted(() => {
   overflow: hidden;
   z-index: 0;
   pointer-events: none;
+  /* Ensures blend modes work correctly */
+  isolation: isolate;
+  /* Forces GPU acceleration on some older iOS versions */
+  -webkit-backface-visibility: hidden;
 }
 
 .waves-svg {
@@ -176,7 +183,6 @@ onUnmounted(() => {
 .wave-path {
   fill: none;
   stroke-linecap: round;
-  filter: blur(var(--wave--blur));
   mix-blend-mode: screen;
   stroke-width: var(--wave--base-thick);
   stroke-dasharray: var(--wave--line-length) var(--wave--gap-length);
