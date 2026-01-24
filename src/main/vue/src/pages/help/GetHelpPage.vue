@@ -33,7 +33,7 @@
             text="Emotional Support"
             :on-click="goToEmotionalSupport"
           />
-          <div class="help-card-description">
+          <div class="help-card-description select-text">
             <p>Find your spark with inspiring words</p>
           </div>
         </div>
@@ -43,7 +43,7 @@
             text="Website Guide"
             :on-click="goToWebsiteGuide"
           />
-          <div class="help-card-description">
+          <div class="help-card-description select-text">
             <p>Learn how to navigate our features</p>
           </div>
         </div>

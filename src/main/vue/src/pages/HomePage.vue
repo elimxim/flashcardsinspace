@@ -4,6 +4,7 @@
       'page',
       'flex-column',
       'scrollbar-hidden',
+      'select-text',
     ]"
   >
     <Starfield

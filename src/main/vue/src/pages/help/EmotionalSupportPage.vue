@@ -17,7 +17,7 @@
         class="mascot-img"
         @click="handleClickOnMascot"
       />
-      <div class="speech-bubble">
+      <div class="speech-bubble select-text">
         <p v-if="!mascotClicked">
           Hi, my name is Melvin. I am an emotional support possum.
           Don't panic! I'm here to help you. What seems to be the problem?
@@ -61,7 +61,7 @@
         looped-tape
       >
         <template #default="{ frame }">
-          <div class="tip">
+          <div class="tip select-text">
             <p>{{ frame }}</p>
           </div>
         </template>
