@@ -13,9 +13,6 @@
           <stop offset="50%" :stop-color="color" stop-opacity="1"/>
           <stop offset="100%" :stop-color="color" stop-opacity="0"/>
         </linearGradient>
-        <filter id="wave-blur" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur :stdDeviation="blurAmount"/>
-        </filter>
       </defs>
 
       <path
@@ -24,7 +21,6 @@
         class="wave-path"
         :d="line.pathShape"
         :stroke="`url(#grad-${line.colorIndex})`"
-        filter="url(#wave-blur)"
         :style="{
           '--wave--duration': line.duration + 's',
           '--wave--y-pos': line.yPos,
@@ -40,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 
 const props = withDefaults(defineProps<{
   colors?: string[]
@@ -102,6 +98,8 @@ const pathShapes = [
   // Diagonal Flow
   "M -20,70 C 20,70 50,30 80,30 S 110,70 140,30"
 ]
+
+const wavesBlur = computed(() => `${props.blurAmount}px`)
 
 // Normalizes inputs to 100-unit scale
 const scaleUnit = (val: number) => val * 100
@@ -178,6 +176,8 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   overflow: visible;
+  filter: blur(v-bind(wavesBlur));
+  will-change: filter;
 }
 
 .wave-path {

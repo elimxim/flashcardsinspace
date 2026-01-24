@@ -20,7 +20,7 @@
       :max-amplitude="0.7"
       :spawn-interval="100"
       :max-lines="5"
-      :blur-amount="1"
+      :blur-amount="4"
     />
     <div class="help-content">
       <div class="help-header">
