@@ -2,6 +2,7 @@ html {
   overscroll-behavior: auto;
   overflow: auto;
   height: 100%;
+  background: var(--app--bg);
 }
 
 body {
@@ -11,6 +12,7 @@ body {
   overflow: auto;
   height: 100%;
   user-select: none;
+  background: var(--app--bg);
 }
 
 * {
