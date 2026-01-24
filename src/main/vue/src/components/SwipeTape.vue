@@ -295,8 +295,15 @@ function triggerSwipe(direction: 'left' | 'right') {
   })
 }
 
+function goToFirstFrame() {
+  if (!props.dynamicTape) {
+    frameNumber.value = 1
+  }
+}
+
 defineExpose({
   triggerSwipe,
+  goToFirstFrame
 })
 
 onMounted(() => {

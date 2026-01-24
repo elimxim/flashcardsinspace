@@ -16,11 +16,11 @@
       :pulse-peak="1.4"
       :min-duration="20"
       :max-duration="30"
-      :min-amplitude="0.4"
-      :max-amplitude="0.9"
+      :min-amplitude="0.3"
+      :max-amplitude="0.7"
       :spawn-interval="100"
       :max-lines="5"
-      :blur-amount="0.85"
+      :blur-amount="1"
     />
     <div class="help-content">
       <div class="help-header">

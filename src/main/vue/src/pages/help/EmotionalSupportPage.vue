@@ -31,27 +31,28 @@
       <div
         class="tip-category tip-category--left"
         :class="{ 'tip-category--left--active': currentCategory === 'memory' }"
-        @click="currentCategory = 'memory'"
+        @click="handleClickOnTipCategory('memory')"
       >
         Memory
       </div>
       <div
         class="tip-category tip-category--middle"
         :class="{ 'tip-category--middle--active': currentCategory === 'motivation' }"
-        @click="currentCategory = 'motivation'"
+        @click="handleClickOnTipCategory('motivation')"
       >
         Motivation
       </div>
       <div
         class="tip-category tip-category--right"
         :class="{ 'tip-category--right--active': currentCategory === 'overwhelmed' }"
-        @click="currentCategory = 'overwhelmed'"
+        @click="handleClickOnTipCategory('overwhelmed')"
       >
         Overwhelmed
       </div>
     </div>
     <div v-if="currentCategory" class="tips-tape">
       <SwipeTape
+        ref="swipeTape"
         :frames="currentCategoryTips"
         show-progress
         progress-theme="dark"
@@ -71,8 +72,9 @@
 
 <script setup lang="ts">
 import SwipeTape from '@/components/SwipeTape.vue'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { isHoverSupported, shuffle } from '@/utils/utils.ts'
+import { ComponentExposed } from 'vue-component-type-helpers'
 
 const mascotPhrases = [
   `I really like your shoes!`,
@@ -169,6 +171,7 @@ const shuffledOverwhelmedTips = shuffle(overwhelmedTips)
 const currentCategory = ref<TipsCategory>()
 const mascotClicked = ref(false)
 const mascotPhrase = ref('')
+const swipeTape = ref<ComponentExposed<typeof SwipeTape>>()
 
 const currentCategoryTips = computed(() => {
   switch (currentCategory.value) {
@@ -187,6 +190,12 @@ function handleClickOnMascot() {
   mascotClicked.value = true
   const index = Math.floor(Math.random() * mascotPhrases.length)
   mascotPhrase.value = mascotPhrases[index]
+}
+
+async function handleClickOnTipCategory(category: TipsCategory) {
+  currentCategory.value = category
+  await nextTick()
+  swipeTape.value?.goToFirstFrame()
 }
 
 </script>
@@ -223,7 +232,10 @@ function handleClickOnMascot() {
   padding: 25px 35px;
   font-family: var(--site-content--font-family);
   box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.1);
-  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: popIn 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .speech-bubble p {
@@ -259,7 +271,10 @@ function handleClickOnMascot() {
 @keyframes popIn {
   0% {
     opacity: 0;
-    transform: scale(0.9);
+  }
+  50% {
+    opacity: 0;
+    transform: scale(0.8);
   }
   100% {
     opacity: 1;
@@ -334,16 +349,18 @@ function handleClickOnMascot() {
   box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
 }
 
-.tip-category--left--active:hover {
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); /* Lighter Blue */
-}
+@media (hover: hover) {
+  .tip-category--left--active:hover {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); /* Lighter Blue */
+  }
 
-.tip-category--middle--active:hover {
-  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); /* Lighter Green */
-}
+  .tip-category--middle--active:hover {
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); /* Lighter Green */
+  }
 
-.tip-category--right--active:hover {
-  background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%); /* Lighter Pink */
+  .tip-category--right--active:hover {
+    background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%); /* Lighter Pink */
+  }
 }
 
 .tips-tape {
@@ -415,7 +432,6 @@ function handleClickOnMascot() {
     text-align: center;
     width: 100%;
     padding: 15px 20px;
-    min-height: 80px;
   }
 
   .speech-bubble p {
