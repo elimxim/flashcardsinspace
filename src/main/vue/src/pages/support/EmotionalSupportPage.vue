@@ -232,7 +232,10 @@ async function handleClickOnTipCategory(category: TipsCategory) {
   padding: 25px 35px;
   font-family: var(--site-content--font-family);
   box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.1);
-  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: popIn 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .speech-bubble p {
@@ -268,7 +271,10 @@ async function handleClickOnTipCategory(category: TipsCategory) {
 @keyframes popIn {
   0% {
     opacity: 0;
-    transform: scale(0.9);
+  }
+  50% {
+    opacity: 0;
+    transform: scale(0.8);
   }
   100% {
     opacity: 1;
@@ -426,7 +432,6 @@ async function handleClickOnTipCategory(category: TipsCategory) {
     text-align: center;
     width: 100%;
     padding: 15px 20px;
-    min-height: 80px;
   }
 
   .speech-bubble p {
