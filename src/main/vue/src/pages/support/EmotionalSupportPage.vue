@@ -52,8 +52,8 @@
     </div>
     <div v-if="currentCategory" class="tips-tape">
       <SwipeTape
-        :frames="currentCategoryTips"
         ref="swipeTape"
+        :frames="currentCategoryTips"
         show-progress
         progress-theme="dark"
         :show-navigation="isHoverSupported"
