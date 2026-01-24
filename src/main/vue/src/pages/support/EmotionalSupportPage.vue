@@ -343,16 +343,18 @@ async function handleClickOnTipCategory(category: TipsCategory) {
   box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
 }
 
-.tip-category--left--active:hover {
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); /* Lighter Blue */
-}
+@media (hover: hover) {
+  .tip-category--left--active:hover {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); /* Lighter Blue */
+  }
 
-.tip-category--middle--active:hover {
-  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); /* Lighter Green */
-}
+  .tip-category--middle--active:hover {
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); /* Lighter Green */
+  }
 
-.tip-category--right--active:hover {
-  background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%); /* Lighter Pink */
+  .tip-category--right--active:hover {
+    background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%); /* Lighter Pink */
+  }
 }
 
 .tips-tape {
