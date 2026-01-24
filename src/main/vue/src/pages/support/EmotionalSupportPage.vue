@@ -31,21 +31,21 @@
       <div
         class="tip-category tip-category--left"
         :class="{ 'tip-category--left--active': currentCategory === 'memory' }"
-        @click="currentCategory = 'memory'"
+        @click="handleClickOnTipCategory('memory')"
       >
         Memory
       </div>
       <div
         class="tip-category tip-category--middle"
         :class="{ 'tip-category--middle--active': currentCategory === 'motivation' }"
-        @click="currentCategory = 'motivation'"
+        @click="handleClickOnTipCategory('motivation')"
       >
         Motivation
       </div>
       <div
         class="tip-category tip-category--right"
         :class="{ 'tip-category--right--active': currentCategory === 'overwhelmed' }"
-        @click="currentCategory = 'overwhelmed'"
+        @click="handleClickOnTipCategory('overwhelmed')"
       >
         Overwhelmed
       </div>
@@ -53,6 +53,7 @@
     <div v-if="currentCategory" class="tips-tape">
       <SwipeTape
         :frames="currentCategoryTips"
+        ref="swipeTape"
         show-progress
         progress-theme="dark"
         :show-navigation="isHoverSupported"
@@ -71,8 +72,9 @@
 
 <script setup lang="ts">
 import SwipeTape from '@/components/SwipeTape.vue'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { isHoverSupported, shuffle } from '@/utils/utils.ts'
+import { ComponentExposed } from 'vue-component-type-helpers'
 
 const mascotPhrases = [
   `I really like your shoes!`,
@@ -169,6 +171,7 @@ const shuffledOverwhelmedTips = shuffle(overwhelmedTips)
 const currentCategory = ref<TipsCategory>()
 const mascotClicked = ref(false)
 const mascotPhrase = ref('')
+const swipeTape = ref<ComponentExposed<typeof SwipeTape>>()
 
 const currentCategoryTips = computed(() => {
   switch (currentCategory.value) {
@@ -187,6 +190,12 @@ function handleClickOnMascot() {
   mascotClicked.value = true
   const index = Math.floor(Math.random() * mascotPhrases.length)
   mascotPhrase.value = mascotPhrases[index]
+}
+
+async function handleClickOnTipCategory(category: TipsCategory) {
+  currentCategory.value = category
+  await nextTick()
+  swipeTape.value?.goToFirstFrame()
 }
 
 </script>
