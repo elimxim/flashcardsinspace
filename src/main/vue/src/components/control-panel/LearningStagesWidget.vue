@@ -67,7 +67,7 @@ const stageOffsets = ref<number[]>(Array(7).fill(0))
 const stageHeights = ref<number[]>(Array(7).fill(0))
 const stageElements = ref<HTMLElement[]>([])
 const resizeObserver = ref<ResizeObserver>()
-const isExpanded = ref(isTouchDevice)
+const isExpanded = ref(false)
 const isNarrowGrid = ref(false)
 const hoverDelayTimeout = ref<number>()
 const originalStageHeight = ref<number>(0)
@@ -85,10 +85,6 @@ const createFlashcardCountComputed = (stage: Stage) => {
   return computed(() => {
     return countFlashcards(flashcards.value, stage, currDay.value)
   })
-}
-
-const isStageInCurrentDay = (stage: Stage) => {
-  return currDay.value?.stages?.includes(stage.name) ?? false
 }
 
 function captureOriginalHeights(force: boolean = false) {
@@ -204,10 +200,13 @@ function handleMouseLeave() {
   isExpanded.value = false
 }
 
-// fallback for touch devices
 function handleClick() {
   if (isHoverSupported) return
   isExpanded.value = !isExpanded.value
+}
+
+function expand() {
+  isExpanded.value = true
 }
 
 const handleResize = () => {
@@ -225,6 +224,10 @@ watch(isNarrowGrid, (newVal) => {
   } else {
     stageWidthPercentage.value = 80
   }
+})
+
+defineExpose({
+  expand,
 })
 
 onMounted(() => {

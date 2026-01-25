@@ -36,7 +36,7 @@
             :hidden="!flashcardSet || (sidebarExpandedCookie && !isSidebarOverlay)"
           />
           <MainPanel/>
-          <LearningStagesWidget :grow-multiplier="3"/>
+          <LearningStagesWidget ref="learningStagesWidget" :grow-multiplier="3"/>
           <div class="control-outer-space-panel">
             <OuterSpaceWidget/>
           </div>
@@ -70,8 +70,9 @@ import SpaceToast from '@/components/SpaceToast.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
+import { isHoverSupported, isTouchDevice } from '@/utils/utils.ts'
 
 const flashcardStore = useFlashcardStore()
 const toggleStore = useToggleStore()
@@ -80,8 +81,8 @@ const { flashcardSet } = storeToRefs(flashcardStore)
 
 const sidebar = ref<InstanceType<typeof SideBar>>()
 const isSidebarOverlay = computed(() => sidebar.value?.isOverlay ?? false)
-
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
+const learningStagesWidget = ref<InstanceType<typeof LearningStagesWidget>>()
 
 function openFlashcardSetSettings() {
   if (flashcardSet.value) {
@@ -89,6 +90,15 @@ function openFlashcardSetSettings() {
   }
 }
 
+onMounted(() => {
+  if (isTouchDevice) {
+    nextTick().then(() =>
+      setTimeout(() => {
+        learningStagesWidget.value?.expand()
+      }, 1000)
+    )
+  }
+})
 </script>
 
 <style scoped>
