@@ -72,7 +72,7 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
-import { isHoverSupported, isTouchDevice } from '@/utils/utils.ts'
+import { isTouchDevice } from '@/utils/utils.ts'
 
 const flashcardStore = useFlashcardStore()
 const toggleStore = useToggleStore()

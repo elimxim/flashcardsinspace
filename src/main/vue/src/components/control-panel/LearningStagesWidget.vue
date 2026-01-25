@@ -46,7 +46,7 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { isHoverSupported, isTouchDevice } from '@/utils/utils.ts'
+import { isHoverSupported } from '@/utils/utils.ts'
 
 const props = withDefaults(defineProps<{
   growMultiplier?: number
