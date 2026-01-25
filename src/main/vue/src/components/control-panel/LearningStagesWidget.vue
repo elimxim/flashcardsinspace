@@ -20,9 +20,6 @@
         <div
           :ref="(el) => { if (el) stageElements[index] = el as HTMLElement }"
           class="stage"
-          :class="{
-            'stage--current-day': isStageInCurrentDay(stage)
-          }"
           :style="{
             transform: `translateY(${stageOffsets[index]}px)`,
             height: `${stageHeights[index]}px`
