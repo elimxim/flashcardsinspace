@@ -307,7 +307,7 @@ onUnmounted(() => {
   flex-direction: column;
   background: rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
-  padding: 20px 40px;
+  padding: clamp(10px, 5vw ,20px) clamp(20px, 5vw, 40px);
   gap: 20px;
 }
 
@@ -481,7 +481,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 20px 40px;
+  padding: clamp(10px, 5vw ,20px) clamp(20px, 5vw, 40px);
   background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
