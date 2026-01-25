@@ -247,7 +247,7 @@ async function handleClickOnTipCategory(category: TipsCategory) {
 .speech-bubble p {
   margin: 0;
   padding: 0;
-  font-size: 1rem;
+  font-size: clamp(1rem, 3vw, 1.2rem);
   line-height: 1.4;
   font-weight: 500;
 }
@@ -307,7 +307,7 @@ async function handleClickOnTipCategory(category: TipsCategory) {
   cursor: pointer;
   color: rgba(255, 255, 255, 0.6);
   font-family: var(--site-content--font-family);
-  font-size: 1rem;
+  font-size: clamp(1rem, 3vw, 1.2rem);
   font-weight: 600;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -370,9 +370,9 @@ async function handleClickOnTipCategory(category: TipsCategory) {
 }
 
 .tips-tape {
-  width: auto;
+  width: 100%;
+  height: fit-content;
   max-width: 1000px;
-  height: 254px;
 }
 
 .tip {
@@ -387,7 +387,7 @@ async function handleClickOnTipCategory(category: TipsCategory) {
 
 .tip p {
   font-family: var(--site-content--font-family);
-  font-size: 1rem;
+  font-size: clamp(1rem, 3vw, 1.2rem);
   font-weight: 200;
   color: #ffffff;
   text-align: center;

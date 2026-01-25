@@ -392,6 +392,7 @@ onUnmounted(() => {
 
 .feature-description {
   font-family: var(--site-content--font-family);
+  font-size: clamp(1rem, 3vw, 1.2rem);
   color: #cbd5e1;
   line-height: 1.6;
 }

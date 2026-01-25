@@ -45,8 +45,8 @@
         </div>
         <div class="stage-content">
           <h3 class="stage-title">{{ stage.title }}</h3>
-          <p class="step-description">{{ stage.description }}</p>
-          <div v-if="stage.timing" class="step-timing">
+          <p class="stage-description">{{ stage.description }}</p>
+          <div v-if="stage.timing" class="stage-timing">
             <span>{{ stage.timing }}</span>
           </div>
         </div>
@@ -116,35 +116,35 @@ const stages = [
     title: "Launch Preparation",
     description: "Create your flashcards and prepare for liftoff. Add text, and audio to both sides.",
     icon: "fa-solid fa-rocket",
-    iconClass: "step-icon--launch",
+    iconClass: "stage-icon--launch",
     timing: "Stage S1 • Daily"
   },
   {
     title: "Initial Orbit",
     description: "Begin your learning journey. Review new cards frequently as your brain establishes neural pathways.",
     icon: "fa-solid fa-satellite",
-    iconClass: "step-icon--orbit",
+    iconClass: "stage-icon--orbit",
     timing: "Stage S2-S3 • Every 2-4 days"
   },
   {
     title: "Stable Trajectory",
     description: "Knowledge stabilizes in medium-term memory. Review intervals increase as retention strengthens.",
     icon: "fa-solid fa-globe",
-    iconClass: "step-icon--stable",
+    iconClass: "stage-icon--stable",
     timing: "Stage S4-S5 • Every 1-2 weeks"
   },
   {
     title: "Deep Space Mission",
     description: "Information reaches long-term memory. Reviews become less frequent but maintain knowledge orbit.",
     icon: "fa-solid fa-space-shuttle",
-    iconClass: "step-icon--deep",
+    iconClass: "stage-icon--deep",
     timing: "Stage S6-S7 • Every 1-2 months"
   },
   {
     title: "Outer Space Mastery",
     description: "After competing Stage S7, information is permanently stored in long-term memory. No further reviews needed.",
     icon: "fa-solid fa-star",
-    iconClass: "step-icon--mastery",
+    iconClass: "stage-icon--mastery",
     timing: "Outer Space • Mastered"
   }
 ]
@@ -198,27 +198,27 @@ const stages = [
   flex-shrink: 0;
 }
 
-.step-icon--launch {
+.stage-icon--launch {
   background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
   box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
 }
 
-.step-icon--orbit {
+.stage-icon--orbit {
   background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
 }
 
-.step-icon--stable {
+.stage-icon--stable {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
 }
 
-.step-icon--deep {
+.stage-icon--deep {
   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
   box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
 }
 
-.step-icon--mastery {
+.stage-icon--mastery {
   background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
   box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
   animation: pulse-glow 2s ease-in-out infinite;
@@ -250,25 +250,25 @@ const stages = [
   padding: 0;
 }
 
-.step-description {
+.stage-description {
   font-family: var(--site-content--font-family);
-  font-size: clamp(0.9rem, 3vw, 1.2rem);
+  font-size: clamp(1rem, 3vw, 1.2rem);
   color: #cbd5e1;
   line-height: 1.6;
   max-width: 500px;
 }
 
-.step-timing {
+.stage-timing {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-family: var(--site-content--font-family);
-  font-size: 0.9rem;
+  font-size: clamp(0.9rem, 3vw, 1rem);
   color: #00d4ff;
   font-weight: 500;
 }
 
-.step-timing .lamp {
+.stage-timing .lamp {
   --glow-lamp--color: #00d4ff;
 }
 
@@ -322,6 +322,7 @@ const stages = [
 
 .summary-content p {
   font-family: var(--site-content--font-family);
+  font-size: clamp(1rem, 3vw, 1.2rem);
   color: #cbd5e1;
   line-height: 1.6;
   margin: 0;
@@ -343,8 +344,8 @@ const stages = [
 }
 
 .stat-number {
-  font-family: var(--day-streak--font-family);
   display: block;
+  font-family: var(--day-streak--font-family);
   font-size: 2rem;
   font-weight: 700;
   color: #00d4ff;
@@ -352,7 +353,7 @@ const stages = [
 
 .stat-label {
   font-family: var(--site-content--font-family);
-  font-size: 0.9rem;
+  font-size: clamp(0.9rem, 3vw, 1rem);
   color: #94a3b8;
   line-height: 1.3;
 }

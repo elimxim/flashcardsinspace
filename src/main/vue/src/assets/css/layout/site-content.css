@@ -33,7 +33,7 @@
 
 .section-description {
   font-family: var(--site-content--font-family);
-  font-size: clamp(0.9rem, 3vw, 1.2rem);
+  font-size: clamp(1rem, 3vw, 1.2rem);
   line-height: 1.6;
   color: #e2e8f0;
 }
