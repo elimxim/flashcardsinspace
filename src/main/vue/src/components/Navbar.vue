@@ -1,6 +1,6 @@
 <template>
   <nav class="navbar navbar--theme">
-    <Starfield twinkle :density="100" :star-size="1.6" vertical-drift="2px"/>
+    <Starfield twinkle :density="40" :star-size="1.6" vertical-drift="2px"/>
     <div class="logo-container">
       <img src="@/assets/rocket.svg" alt="Logo" class="logo-image"/>
       <div
