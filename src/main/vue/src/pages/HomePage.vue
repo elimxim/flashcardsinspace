@@ -113,13 +113,13 @@
             Their groundbreaking work proved that spaced learning delivers remarkable results.
           </p>
           <div class="feature-stats">
-            <div class="stat">
-              <span class="stat-value">80%</span>
-              <span class="stat-label">Better Retention</span>
+            <div class="feature-stat">
+              <span class="feature-stat-title">80%</span>
+              <span class="feature-stat-description">Better retention</span>
             </div>
-            <div class="stat">
-              <span class="stat-value">50%</span>
-              <span class="stat-label">Less Time</span>
+            <div class="feature-stat">
+              <span class="feature-stat-title">50%</span>
+              <span class="feature-stat-description">Less time</span>
             </div>
           </div>
         </div>
@@ -233,14 +233,6 @@ onUnmounted(() => {
   color: #ffffff;
 }
 
-.stat-label {
-  font-size: 0.8rem;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 0.25rem;
-}
-
 .what-actions {
   display: flex;
   gap: 20px;
@@ -318,85 +310,6 @@ onUnmounted(() => {
   gap: 2rem;
 }
 
-.feature-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 2rem;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.feature-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.5), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.feature-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(0, 212, 255, 0.3);
-  box-shadow: 0 10px 40px rgba(0, 212, 255, 0.1);
-}
-
-.feature-card:hover::before {
-  opacity: 1;
-}
-
-.feature-card--primary {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
-  border-color: rgba(124, 58, 237, 0.3);
-}
-
-.feature-card--primary:hover {
-  border-color: rgba(124, 58, 237, 0.5);
-  box-shadow: 0 10px 40px rgba(124, 58, 237, 0.2);
-}
-
-.feature-card--primary::before {
-  background: linear-gradient(90deg, transparent, rgba(200, 0, 255, 0.5), transparent);
-}
-
-.feature-icon {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  font-size: 34px;
-  color: #ffffff;
-}
-
-.feature-card--primary .feature-icon {
-  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-}
-
-.feature-title {
-  font-family: var(--site-content--font-family);
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #ffffff;
-  margin-bottom: 1rem;
-}
-
-.feature-description {
-  font-family: var(--site-content--font-family);
-  font-size: clamp(1rem, 3vw, 1.2rem);
-  color: #cbd5e1;
-  line-height: 1.6;
-}
-
 .schedule-stages {
   display: flex;
   align-items: center;
@@ -427,29 +340,6 @@ onUnmounted(() => {
 .schedule-stage--transparent {
   background: none;
   border: none;
-}
-
-.feature-stats {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: auto;
-  align-items: center;
-  text-align: center;
-  gap: 20px;
-}
-
-.stat-value {
-  display: block;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #00d4ff;
-}
-
-.stat-label {
-  font-size: 0.8rem;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .feature-demo {
