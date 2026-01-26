@@ -7,13 +7,13 @@
       'select-text',
     ]"
   >
-    <Starfield
-      :density="120"
-      :star-size="1.8"
-      twinkle
-      vertical-drift="3px"
-    />
     <section class="what-section">
+      <Starfield
+        :density="120"
+        :star-size="1.8"
+        twinkle
+        vertical-drift="3px"
+      />
       <h1 class="section-header">
         <span class="section-title section-title--main">
           Welcome to<br/>
@@ -298,7 +298,6 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   background: rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
   padding: clamp(10px, 5vw ,20px) clamp(20px, 5vw, 40px);
   gap: 20px;
 }
