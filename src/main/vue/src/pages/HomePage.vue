@@ -178,12 +178,12 @@
         </p>
         <p class="section-description section-description--paragraph">
           If you are a new astronaut looking to improve your vocabulary or memory skills,
-          fly on over to the "support" page to learn exactly how to use Flashcards in Space!
+          fly on over to the "Get Help" page to learn exactly how to use Flashcards in Space!
         </p>
       </div>
 
       <SmartButton
-        text="Go to Support Page"
+        text="Learn More"
         class="action-button action-button--help"
         :on-click="navigateToSupport"
         rounded
