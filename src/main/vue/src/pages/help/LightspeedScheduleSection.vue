@@ -72,36 +72,32 @@
       </p>
     </div>
 
-    <div class="summary-card">
-      <div class="summary-header">
-        <div class="summary-icon">
-          <font-awesome-icon icon="fa-solid fa-graduation-cap"/>
-        </div>
-        <h3 class="summary-title">
-          The Science Behind the Mission
-        </h3>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <font-awesome-icon icon="fa-solid fa-graduation-cap"/>
       </div>
-      <div class="summary-content">
-        <p>
-          Spaced repetition leverages the psychological spacing effect -
-          the phenomenon where information is better retained when
-          learning sessions are spaced out over time rather than massed together.
-          Modern meta-analyses confirm what Ebbinghaus discovered: distributed
-          practice is significantly more effective than cramming.
-        </p>
-        <div class="science-stats">
-          <div class="science-stat">
-            <span class="stat-number">1885</span>
-            <span class="stat-label">First discovered by Hermann Ebbinghaus</span>
-          </div>
-          <div class="science-stat">
-            <span class="stat-number">140+</span>
-            <span class="stat-label">Years of continuous research validation</span>
-          </div>
-          <div class="science-stat">
-            <span class="stat-number">2-3x</span>
-            <span class="stat-label">More effective than cramming</span>
-          </div>
+      <h3 class="feature-title">
+        The Science Behind the Mission
+      </h3>
+      <p class="feature-description">
+        Spaced repetition leverages the psychological spacing effect -
+        the phenomenon where information is better retained when
+        learning sessions are spaced out over time rather than massed together.
+        Modern meta-analyses confirm what Ebbinghaus discovered: distributed
+        practice is significantly more effective than cramming.
+      </p>
+      <div class="feature-stats">
+        <div class="feature-stat">
+          <span class="feature-stat-title">1885</span>
+          <span class="feature-stat-description">First discovered by Hermann Ebbinghaus</span>
+        </div>
+        <div class="feature-stat">
+          <span class="feature-stat-title">140+</span>
+          <span class="feature-stat-description">Years of continuous research validation</span>
+        </div>
+        <div class="feature-stat">
+          <span class="feature-stat-title">2-3x</span>
+          <span class="feature-stat-description">More effective than cramming</span>
         </div>
       </div>
     </div>
@@ -267,116 +263,5 @@ const stages = [
   color: #00d4ff;
   font-weight: 500;
 }
-
-.stage-timing .lamp {
-  --glow-lamp--color: #00d4ff;
-}
-
-.summary-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 2rem;
-  backdrop-filter: blur(10px);
-}
-
-.summary-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 2rem;
-}
-
-.summary-title {
-  font-family: var(--site-content--font-family);
-  font-size: clamp(1.5rem, 5vw, 2.5rem);
-  font-weight: 600;
-  text-wrap: balance;
-  color: #ffffff;
-  margin: 0;
-}
-
-.summary-icon {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  color: #ffffff;
-  flex-shrink: 0;
-}
-
-.summary-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.summary-content p {
-  font-family: var(--site-content--font-family);
-  font-size: clamp(1rem, 3vw, 1.2rem);
-  color: #cbd5e1;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.science-stats {
-  display: flex;
-  justify-content: space-evenly;
-  gap: 1rem;
-}
-
-.science-stat {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  gap: 0.5rem;
-}
-
-.stat-number {
-  display: block;
-  font-family: var(--day-streak--font-family);
-  font-size: 2rem;
-  font-weight: 700;
-  color: #00d4ff;
-}
-
-.stat-label {
-  font-family: var(--site-content--font-family);
-  font-size: clamp(0.9rem, 3vw, 1rem);
-  color: #94a3b8;
-  line-height: 1.3;
-}
-
-
-@media (max-width: 560px) {
-  .summary-header {
-    align-items: start;
-    gap: 1rem;
-  }
-
-  .summary-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
-    font-size: 2rem;
-  }
-
-  .science-stats {
-    flex-direction: column;
-  }
-
-}
-
 
 </style>
