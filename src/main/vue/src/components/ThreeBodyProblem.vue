@@ -70,7 +70,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   containerSize: 100,
   bodySizes: () => [14, 11, 12],
-  bodyColors: () => ['#00f2ff', '#ff00ff', '#ffffff'],
+  bodyColors: () => ['#c63aed', '#5864ed', '#00d2ff'],
   speed: 1,
   gooeyIntensity: 2,
   glowAmount: 2
