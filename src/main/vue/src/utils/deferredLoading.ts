@@ -31,7 +31,7 @@ export function useDeferredLoading(trigger: () => boolean = () => false, minDura
       const remaining = Math.max(0, minDuration - elapsed)
 
       if (remaining > 0) {
-        await new Promise(r => setTimeout(r, remaining));
+        await new Promise(r => setTimeout(r, remaining))
       }
 
       resolvedLoading.value = false

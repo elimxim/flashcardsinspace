@@ -25,32 +25,41 @@
 
     <div class="glow-layer" :style="{ filter: 'url(#ethereal-glow)' }">
       <div class="engine" :style="{ filter: 'url(#liquid-fusion)' }">
-        <div class="body b1" :style="{
-          width: bodySizes[0] + 'px', height: bodySizes[0] + 'px',
-          backgroundColor: bodyColors[0],
-          animationDuration: animationDuration(4.7),
-          '--tx': physics.b1.limitX + 'px',
-          '--ty': physics.b1.limitY * -1 + 'px',
-          '--tx-mid': physics.b1.limitX * -1 + 'px',
-          '--ty-mid': physics.b1.limitY + 'px'
-        }"></div>
+        <div
+          class="body b1"
+          :style="{
+            width: bodySizes[0] + 'px', height: bodySizes[0] + 'px',
+            backgroundColor: bodyColors[0],
+            animationDuration: animationDuration(4.7),
+            '--tx': physics.b1.limitX + 'px',
+            '--ty': physics.b1.limitY * -1 + 'px',
+            '--tx-mid': physics.b1.limitX * -1 + 'px',
+            '--ty-mid': physics.b1.limitY + 'px'
+          }"
+        />
 
-        <div class="body b2" :style="{
-          width: bodySizes[1] + 'px', height: bodySizes[1] + 'px',
-          backgroundColor: bodyColors[1],
-          animationDuration: animationDuration(3.1),
-          '--tx': physics.b2.limitX * -1 + 'px',
-          '--ty': physics.b2.limitY * -1 + 'px',
-          '--tx-mid': physics.b2.limitX + 'px',
-          '--ty-mid': physics.b2.limitY + 'px'
-        }"></div>
+        <div
+          class="body b2"
+          :style="{
+            width: bodySizes[1] + 'px', height: bodySizes[1] + 'px',
+            backgroundColor: bodyColors[1],
+            animationDuration: animationDuration(3.1),
+            '--tx': physics.b2.limitX * -1 + 'px',
+            '--ty': physics.b2.limitY * -1 + 'px',
+            '--tx-mid': physics.b2.limitX + 'px',
+            '--ty-mid': physics.b2.limitY + 'px'
+          }"
+        />
 
-        <div class="body b3" :style="{
-          width: bodySizes[2] + 'px', height: bodySizes[2] + 'px',
-          backgroundColor: bodyColors[2],
-          animationDuration: animationDuration(5.9),
-          '--orbit': physics.b3.orbit + 'px'
-        }"></div>
+        <div
+          class="body b3"
+          :style="{
+            width: bodySizes[2] + 'px', height: bodySizes[2] + 'px',
+            backgroundColor: bodyColors[2],
+            animationDuration: animationDuration(5.9),
+            '--orbit': physics.b3.orbit + 'px'
+          }"
+        />
       </div>
     </div>
   </div>
@@ -64,7 +73,6 @@ const props = withDefaults(defineProps<{
   bodySizes?: number[]
   bodyColors?: string[]
   speed?: number
-  accentColor?: string
   gooeyIntensity?: number
   glowAmount?: number
 }>(), {
