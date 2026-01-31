@@ -40,7 +40,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, useSlots } from 'vue'
 import { isHoverSupported } from '@/utils/utils.ts'
-import { useDeferredLoading } from '@/utils/deferredLoading.ts';
+import { useDeferredLoading } from '@/utils/deferredLoading.ts'
 
 const props = withDefaults(defineProps<{
   text?: string
@@ -55,7 +55,7 @@ const props = withDefaults(defineProps<{
   titleScale?: number
   animateTap?: boolean
   tapDuration?: number
-  onClick?: () => Promise<void>
+  onClick?: () => void | Promise<void>
 }>(), {
   text: '',
   disabled: false,
