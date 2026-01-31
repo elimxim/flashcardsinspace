@@ -89,7 +89,7 @@ import {
   fetchFlashcardAudioBlob,
   removeFlashcardAudioBlob,
   changeFlashcardSides,
-  uploadFlashcardAudioBlob,
+  uploadFlashcardAudioBlob, copyFlashcard,
 } from '@/core-logic/flashcard-logic.ts'
 import { storeToRefs } from 'pinia'
 import {
@@ -334,17 +334,21 @@ async function removeFlashcard(): Promise<boolean> {
 async function updateFlashcard(): Promise<boolean> {
   if (!flashcardSet.value || !flashcard.value) return false
 
-  const updatedFlashcard = flashcard.value
-  const changed = changeFlashcardSides(updatedFlashcard, frontSide.value, backSide.value)
+  const flashcardCopy = copyFlashcard(flashcard.value)
+  const changed = changeFlashcardSides(flashcardCopy, frontSide.value, backSide.value)
   if (!changed) return true // consider it is updated
 
-  return await sendFlashcardUpdateRequest(flashcardSet.value.id, updatedFlashcard)
+  return await sendFlashcardUpdateRequest(flashcardSet.value.id, flashcardCopy)
     .then((response) => {
       flashcardStore.changeFlashcard(response.data)
+      if (flashcard.value) {
+        flashcard.value.frontSide = response.data.frontSide
+        flashcard.value.backSide = response.data.backSide
+      }
       return true
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to update Flashcard.id=${updatedFlashcard.id}`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to update Flashcard.id=${flashcardCopy.id}`, error.response?.data)
       toaster.bakeError(userApiErrors.FLASHCARD__UPDATING_FAILED, error.response?.data)
       return false
     })
