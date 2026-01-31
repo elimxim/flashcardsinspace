@@ -139,21 +139,21 @@ const homeActive = computed(() => router.currentRoute.value.name === routeNames.
 const supportActive = computed(() => router.currentRoute.value.name === routeNames.getHelp)
 const userActive = computed(() => router.currentRoute.value.name === routeNames.user)
 
-function navigateToControlPanel() {
+async function navigateToControlPanel() {
   if (!isAuthenticated.value) return
-  router.push({ name: routeNames.controlPanel })
+  await router.push({ name: routeNames.controlPanel })
 }
 
-function navigateToHome() {
-  router.push({ name: routeNames.home })
+async function navigateToHome() {
+  await router.push({ name: routeNames.home })
 }
 
-function navigateToGetHelp() {
-  router.push({ name: routeNames.getHelp })
+async function navigateToGetHelp() {
+  await router.push({ name: routeNames.getHelp })
 }
 
-function navigateToUser() {
-  router.push({ name: routeNames.user })
+async function navigateToUser() {
+  await router.push({ name: routeNames.user })
 }
 
 function updateShowIcons() {
