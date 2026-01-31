@@ -7,16 +7,22 @@
   --smart-button--bg: var(--dangerous-button--bg-color);
   --smart-button--bg--hover: var(--dangerous-button--bg-color--hover);
   --smart-button--bg--progress: var(--dangerous-button--bg-color--progress);
+  --smart-button--bg--loading: var(--dangerous-button--bg-color--disabled);
+  --smart-button--spinner--color: var(--dangerous-button--spinner--color);
 }
 
 .calm-button {
   --smart-button--bg: var(--calm-button--bg-color);
   --smart-button--bg--hover: var(--calm-button--bg-color--hover);
+  --smart-button--bg--loading: var(--calm-button--bg-color--loading);
+  --smart-button--spinner--color: var(--calm-button--spinner--color);
 }
 
 .safe-button {
   --smart-button--bg: var(--safe-button--bg-color);
-  --smart-button--bg--hover: var(--safe-button--bg-color--hover)
+  --smart-button--bg--hover: var(--safe-button--bg-color--hover);
+  --smart-button--bg--loading: var(--safe-button--bg-color--disabled);
+  --smart-button--spinner--color: var(--safe-button--spinner--color);
 }
 
 .control-bar-button {
