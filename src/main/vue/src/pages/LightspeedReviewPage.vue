@@ -158,19 +158,26 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 const elapsedTime = ref(0)
 const { startWatch, stopWatch } = useStopWatch(elapsedTime)
 
+const startingReview = ref(false)
+
 const reviewedFlashcardIds = ref<number[]>([])
 const incorrectFlashcards = ref<Flashcard[]>([])
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 async function startReview() {
-  Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.LIGHTSPEED}`)
-  reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value, chronodays.value))
-  await createReviewSession()
-  await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
-    if (success) startWatch()
-  })
-  Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+  startingReview.value = true
+  try {
+    Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.LIGHTSPEED}`)
+    reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value, chronodays.value))
+    await createReviewSession()
+    await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
+      if (success) startWatch()
+    })
+    Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+  } finally {
+    startingReview.value = false
+  }
 }
 
 function resetState() {
@@ -181,7 +188,7 @@ function resetState() {
 }
 
 async function finishReview() {
-  if (!reviewStoreLoaded.value) return
+  if (startingReview.value || !reviewStoreLoaded.value) return
   Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
   currFlashcardWatcher.stop()
   try {
