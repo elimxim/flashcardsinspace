@@ -1,10 +1,10 @@
 <template>
   <Modal
     :visible="toggleStore.flashcardSetSettingsOpen"
-    :on-press-exit="cancel"
-    :on-press-enter="update"
-    :on-press-delete="remove"
     :focus-on="nameInput"
+    :exit-button="cancelButton"
+    :enter-button="updateButton"
+    :delete-button="removeButton"
     title="Flashcard Set Settings"
   >
     <div class="modal-main-area">
@@ -53,12 +53,14 @@
     </div>
     <div class="modal-control-buttons">
       <SmartButton
+        ref="cancelButton"
         class="off-button"
         text="Cancel"
         :on-click="cancel"
         auto-blur
       />
       <SmartButton
+        ref="removeButton"
         class="dangerous-button"
         text="Remove"
         :hold-time="4"
@@ -66,6 +68,7 @@
         auto-blur
       />
       <SmartButton
+        ref="updateButton"
         class="calm-button"
         text="Save"
         :on-click="update"
@@ -115,6 +118,9 @@ const chronoStore = useChronoStore()
 const { languages } = storeToRefs(languageStore)
 const { flashcardSet, language } = storeToRefs(flashcardStore)
 
+const cancelButton = ref<InstanceType<typeof SmartButton>>()
+const removeButton = ref<InstanceType<typeof SmartButton>>()
+const updateButton = ref<InstanceType<typeof SmartButton>>()
 const nameInput = ref<HTMLElement>()
 const newName = ref<string | undefined>(flashcardSet.value?.name)
 const newLanguage = ref<Language | undefined>(language.value)

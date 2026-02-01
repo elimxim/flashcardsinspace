@@ -1,9 +1,9 @@
 <template>
   <Modal
     :visible="toggleStore.flashcardSetCreationOpen"
-    :on-press-exit="cancel"
-    :on-press-enter="create"
     :focus-on="nameInput"
+    :exit-button="cancelButton"
+    :enter-button="createButton"
     title="New Flashcard Set"
     focusable
   >
@@ -45,12 +45,14 @@
     </div>
     <div class="modal-control-buttons">
       <SmartButton
+        ref="cancelButton"
         class="off-button"
         text="Cancel"
         :on-click="cancel"
         auto-blur
       />
       <SmartButton
+        ref="createButton"
         class="safe-button"
         text="Create"
         :on-click="create"
@@ -99,6 +101,8 @@ const { languages } = storeToRefs(languageStore)
 const name = ref('')
 const nameInput = ref<HTMLElement>()
 const language = ref<Language>()
+const cancelButton = ref<InstanceType<typeof SmartButton>>()
+const createButton = ref<InstanceType<typeof SmartButton>>()
 
 const validationRules = {
   name: {
