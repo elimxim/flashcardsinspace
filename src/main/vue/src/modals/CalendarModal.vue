@@ -1,7 +1,7 @@
 <template>
   <Modal
     :visible="toggleStore.calendarOpen"
-    :on-press-exit="exit"
+    :on-exit="exit"
     overflow="hidden"
   >
     <div class="calendar calendar--theme">
