@@ -61,12 +61,10 @@ function pressEnter() {
 }
 
 function holdDelete(event: Event) {
-  console.log('holdDelete')
   props.deleteButton?.hold(event)
 }
 
 function releaseDelete() {
-  console.log('releaseDelete')
   props.deleteButton?.release()
 }
 
