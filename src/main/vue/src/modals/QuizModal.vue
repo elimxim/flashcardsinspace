@@ -2,7 +2,7 @@
   <Modal
     title="Quiz Settings"
     :visible="quizOpen"
-    :on-press-exit="exit"
+    :on-exit="exit"
   >
     <div class="modal-main-area">
       <p class="quiz-description">
@@ -175,10 +175,6 @@ const reviewCount = computed(() => {
 const latestUncompletedSessionId = ref<number>()
 const showBanner = ref(true)
 
-function toggleModalForm() {
-  toggleStore.toggleQuiz()
-}
-
 function resetState() {
   includeUnknown.value = false
   includeAttempted.value = false
@@ -186,12 +182,12 @@ function resetState() {
 }
 
 function exit() {
-  toggleModalForm()
+  toggleStore.toggleQuiz()
   resetState()
 }
 
-async function cancel() {
-  toggleModalForm()
+function cancel() {
+  toggleStore.toggleQuiz()
 }
 
 function startNew() {
