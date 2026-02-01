@@ -132,7 +132,7 @@ function onTouchEnd() {
 }
 
 function startHold(event: Event) {
-  if (props.disabled || resolvedLoading.value || props.holdTime <= 0) return
+  if (props.disabled || resolvedLoading.value || props.holdTime <= 0 || holdTimeout !== null) return
   if (event.cancelable) {
     event.preventDefault()
   }
@@ -182,7 +182,9 @@ function updateProgress() {
 }
 
 defineExpose({
-  click: handleClick
+  click: handleClick,
+  hold: startHold,
+  release: cancelHold,
 })
 
 onMounted(() => {
