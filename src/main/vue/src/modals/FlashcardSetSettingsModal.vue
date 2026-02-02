@@ -116,8 +116,11 @@ const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 
 const { languages } = storeToRefs(languageStore)
-const { flashcardSet, language } = storeToRefs(flashcardStore)
+const { flashcardSet } = storeToRefs(flashcardStore)
 
+const language = computed(() =>
+  languageStore.getLanguage(flashcardSet.value?.languageId ?? -1)
+)
 const cancelButton = ref<InstanceType<typeof SmartButton>>()
 const removeButton = ref<InstanceType<typeof SmartButton>>()
 const updateButton = ref<InstanceType<typeof SmartButton>>()
