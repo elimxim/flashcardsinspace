@@ -19,13 +19,4 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.app {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: var(--app--bg, white);
-  overflow: hidden;
-  touch-action: pan-y;
-}
-
 </style>

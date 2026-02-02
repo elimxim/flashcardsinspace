@@ -94,9 +94,89 @@
             }
         }
     </script>
+    <style>
+        :root {
+            --app--bg: linear-gradient(90deg, #0a0e1a 0%, #1a1f2e 50%, #2a2f3e 100%);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--app--bg);
+        }
+
+        #app {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            background: var(--app--bg);
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+    </style>
 </head>
 <body>
-<div id="app">Loading...</div>
+<div id="app">
+    <div class="initial-loader">
+        <div class="space-scanner">
+            <div class="pulse"></div>
+            <div class="pulse"></div>
+            <div class="pulse"></div>
+            <div class="core"></div>
+        </div>
+    </div>
+</div>
 <script type="module" src="/src/main.ts"></script>
 </body>
+<style>
+    .initial-loader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .space-scanner {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .core {
+        width: 40px;
+        height: 40px;
+        background-color: #7f42b8;
+        border-radius: 50%;
+        box-shadow: 0 0 15px #7f42b8;
+        z-index: 2;
+    }
+
+    .pulse {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 2px solid #7f42b8;
+        border-radius: 50%;
+        opacity: 0;
+        animation: radar-pulse 2s linear infinite;
+    }
+
+    .pulse:nth-child(2) { animation-delay: 0.2s; }
+    .pulse:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes radar-pulse {
+        0% {
+            transform: scale(0.2);
+            opacity: 0.8;
+        }
+        100% {
+            transform: scale(1.5);
+            opacity: 0;
+        }
+    }
+</style>
 </html>
