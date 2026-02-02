@@ -18,6 +18,7 @@ import { sendLanguagesGetRequest } from '@/api/public-api-client.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
+import { watch } from 'vue'
 
 export function determineCurrFlashcardSet(): FlashcardSet | undefined {
   const flashcardSetStore = useFlashcardSetStore()
@@ -139,4 +140,27 @@ export async function loadLanguageStore(): Promise<boolean> {
       toaster.bakeError(userApiErrors.DATA_LOADING, error.response?.data)
       return false
     })
+}
+
+/**
+ * Waits for a specific property on a Pinia store to become truthy.
+ * @param store The Pinia store instance
+ * @param property The boolean property to watch (defaults to 'loaded')
+ */
+export function waitUntilLoaded<T>(store: T, property: keyof T = 'loaded' as keyof T): Promise<void> {
+  if (store[property]) {
+    return Promise.resolve()
+  }
+
+  return new Promise((resolve) => {
+    const unwatch = watch(
+      () => store[property],
+      (value) => {
+        if (value) {
+          unwatch()
+          resolve()
+        }
+      }
+    )
+  })
 }
