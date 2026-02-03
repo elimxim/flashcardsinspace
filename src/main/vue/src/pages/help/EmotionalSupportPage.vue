@@ -329,9 +329,11 @@ async function handleClickOnTipCategory(category: TipsCategory) {
   border-bottom-right-radius: 20px;
 }
 
-.tip-category:not([class*="--active"]):hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
+@media (hover: hover) {
+  .tip-category:not([class*="--active"]):hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
 }
 
 .tip-category--left--active {
