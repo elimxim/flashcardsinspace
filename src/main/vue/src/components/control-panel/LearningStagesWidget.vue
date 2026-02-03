@@ -55,6 +55,10 @@ const props = withDefaults(defineProps<{
   growMultiplier: 2,
 })
 
+defineExpose({
+  expand,
+})
+
 const NAME_SHORT_GRID_WIDTH_THRESHOLD = 480
 
 const flashcardStore = useFlashcardStore()
@@ -228,10 +232,6 @@ watch(isNarrowGrid, (newVal) => {
   } else {
     stageWidthPercentage.value = 80
   }
-})
-
-defineExpose({
-  expand,
 })
 
 onMounted(() => {

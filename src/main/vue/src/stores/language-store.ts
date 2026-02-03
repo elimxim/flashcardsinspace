@@ -1,7 +1,6 @@
 import type { Language } from '@/model/language.ts'
 import { defineStore } from 'pinia'
-
-import { waitUntilStoreLoaded } from '@/utils/store-loading.ts';
+import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 export interface LanguageState {
   languageMap: Map<number, Language>
