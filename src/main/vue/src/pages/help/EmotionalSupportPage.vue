@@ -195,7 +195,7 @@ function handleClickOnMascot() {
     index = 0
   }
   mascotPhraseIndex.value = index
-  mascotPhrase.value = mascotPhrases[index]
+  mascotPhrase.value = shuffledMascotPhrases[index]
 }
 
 async function handleClickOnTipCategory(category: TipsCategory) {
