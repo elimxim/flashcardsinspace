@@ -40,7 +40,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, useSlots } from 'vue'
 import { isHoverSupported } from '@/utils/utils.ts'
-import { useDeferredLoading } from '@/utils/deferredLoading.ts'
+import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 
 const props = withDefaults(defineProps<{
   text?: string

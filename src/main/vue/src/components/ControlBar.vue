@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from 'vue'
-import { useDeferredLoading } from '@/utils/deferredLoading.ts'
+import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 
 const props = withDefaults(defineProps<{
   title: string | undefined
