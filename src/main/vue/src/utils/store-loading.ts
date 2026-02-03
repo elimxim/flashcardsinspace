@@ -6,6 +6,11 @@ import {
   removeSelectedSetIdCookie,
   saveSelectedSetIdToCookies,
 } from '@/utils/cookies.ts'
+import { useLanguageStore } from '@/stores/language-store.ts';
+import { useSpaceToaster } from '@/stores/toast-store.ts';
+import { Log, LogTag } from '@/utils/logger.ts';
+import { sendLanguagesGetRequest } from '@/api/public-api-client.ts';
+import { userApiErrors } from '@/api/user-api-error.ts';
 
 export function getCurrFlashcardSet(): FlashcardSet | undefined {
   const flashcardSetStore = useFlashcardSetStore()
@@ -46,4 +51,24 @@ export function waitUntilStoreLoaded<T>(store: T, property: keyof T = 'loaded' a
       }
     )
   })
+}
+
+export async function loadLanguageStore(): Promise<boolean> {
+  const languageStore = useLanguageStore()
+  const toaster = useSpaceToaster()
+
+  if (languageStore.loaded) {
+    Log.log(LogTag.STORE, 'language store is already loaded')
+    return true
+  }
+
+  return await sendLanguagesGetRequest()
+    .then(response => {
+      languageStore.loadState(response.data)
+      return true
+    }).catch(error => {
+      Log.error(LogTag.STORE, 'Failed to load language store', error)
+      toaster.bakeError(userApiErrors.DATA_LOADING, error.response?.data)
+      return false
+    })
 }

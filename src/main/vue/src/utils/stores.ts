@@ -13,8 +13,6 @@ import {
   sendFlashcardsGetRequest,
 } from '@/api/api-client.ts'
 import { sortFlashcardSets } from '@/core-logic/flashcard-logic.ts'
-import { sendLanguagesGetRequest } from '@/api/public-api-client.ts'
-import { useLanguageStore } from '@/stores/language-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { getCurrFlashcardSet } from '@/utils/store-loading.ts'
@@ -101,26 +99,6 @@ export async function loadFlashcardSetStore(forced: boolean = false): Promise<bo
     })
     .catch((error) => {
       Log.error(LogTag.STORE, 'Failed to load flashcard-set store', error)
-      toaster.bakeError(userApiErrors.DATA_LOADING, error.response?.data)
-      return false
-    })
-}
-
-export async function loadLanguageStore(): Promise<boolean> {
-  const languageStore = useLanguageStore()
-  const toaster = useSpaceToaster()
-
-  if (languageStore.loaded) {
-    Log.log(LogTag.STORE, 'language store is already loaded')
-    return true
-  }
-
-  return await sendLanguagesGetRequest()
-    .then(response => {
-      languageStore.loadState(response.data)
-      return true
-    }).catch(error => {
-      Log.error(LogTag.STORE, 'Failed to load language store', error)
       toaster.bakeError(userApiErrors.DATA_LOADING, error.response?.data)
       return false
     })
