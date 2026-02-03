@@ -1,11 +1,5 @@
 <template>
-  <div
-    class="void"
-    :style="{
-      width: containerSize + 'px',
-      height: containerSize + 'px'
-    }"
-  >
+  <div ref="container" class="void">
     <svg width="0" height="0" style="position: absolute;">
       <defs>
         <filter id="liquid-fusion" x="-100%" y="-100%" width="300%" height="300%">
@@ -66,28 +60,37 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = withDefaults(defineProps<{
-  containerSize?: number
+  voidSize?: number
+  fillSpace?: boolean
   bodySizes?: number[]
   bodyColors?: string[]
   speed?: number
   gooeyIntensity?: number
   glowAmount?: number
 }>(), {
-  containerSize: 100,
+  voidSize: 100,
+  fillSpace: false,
   bodySizes: () => [14, 11, 12],
   bodyColors: () => ['#c63aed', '#5864ed', '#00d2ff'],
   speed: 1,
   gooeyIntensity: 2,
-  glowAmount: 2
+  glowAmount: 2,
+})
+
+const container = ref<HTMLElement>()
+
+const containerSize = computed(() => {
+  if (!container.value || !props.fillSpace) return props.voidSize
+  return Math.min(container.value.clientWidth, container.value.clientHeight)
 })
 
 const animationDuration = (base: number) => `${base / props.speed}s`
 
 const physics = computed(() => {
-  const radius = props.containerSize / 2
+  const radius = containerSize.value / 2
   const buffer = props.gooeyIntensity + (props.glowAmount / 2) + 4
 
   const getLimit = (bodySize: number) => radius - (bodySize / 2) - buffer
@@ -111,11 +114,15 @@ const matrixAlpha = computed(() =>
   props.gooeyIntensity === 0 ? "0 0 0 1 0" : "0 0 0 18 -7"
 )
 
+// todo resize observer
+
 </script>
 
 
 <style scoped>
 .void {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
