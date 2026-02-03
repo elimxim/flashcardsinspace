@@ -47,6 +47,7 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { isHoverSupported } from '@/utils/utils.ts'
+import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 const props = withDefaults(defineProps<{
   growMultiplier?: number
@@ -58,6 +59,9 @@ const NAME_SHORT_GRID_WIDTH_THRESHOLD = 480
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
+
+await waitUntilStoreLoaded(flashcardStore)
+await waitUntilStoreLoaded(chronoStore)
 
 const { flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)

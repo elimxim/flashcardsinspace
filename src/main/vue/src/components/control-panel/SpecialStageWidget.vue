@@ -35,6 +35,7 @@ import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import AwesomeButton from '@/components/AwesomeButton.vue'
+import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 const props = defineProps<{
   stage: Stage
@@ -44,6 +45,9 @@ const props = defineProps<{
 const router = useRouter()
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
+
+await waitUntilStoreLoaded(flashcardStore)
+await waitUntilStoreLoaded(chronoStore)
 
 const { flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)

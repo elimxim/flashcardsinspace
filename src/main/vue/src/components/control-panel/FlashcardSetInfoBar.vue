@@ -26,6 +26,7 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useLanguageStore } from '@/stores/language-store.ts'
+import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 withDefaults(defineProps<{
   hidden?: boolean
@@ -35,6 +36,9 @@ withDefaults(defineProps<{
 
 const flashcardStore = useFlashcardStore()
 const languageStore = useLanguageStore()
+
+await waitUntilStoreLoaded(flashcardStore)
+await waitUntilStoreLoaded(languageStore)
 
 const { flashcards, flashcardSet } = storeToRefs(flashcardStore)
 

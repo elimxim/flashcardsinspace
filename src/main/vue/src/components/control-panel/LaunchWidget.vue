@@ -16,10 +16,14 @@ import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { createReviewQueue, ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
+import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 const router = useRouter()
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
+
+await waitUntilStoreLoaded(flashcardStore)
+await waitUntilStoreLoaded(chronoStore)
 
 const { flashcards, isEmpty, isSuspended } = storeToRefs(flashcardStore)
 const { currDay, chronodays } = storeToRefs(chronoStore)

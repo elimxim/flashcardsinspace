@@ -34,9 +34,13 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { calcStageReviews, StageReview } from '@/core-logic/review-logic.ts'
+import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
+
+await waitUntilStoreLoaded(flashcardStore)
+await waitUntilStoreLoaded(chronoStore)
 
 const { flashcards } = storeToRefs(flashcardStore)
 const { currDay, chronodays } = storeToRefs(chronoStore)

@@ -22,9 +22,12 @@ import AwesomeButton from '@/components/AwesomeButton.vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { storeToRefs } from 'pinia'
+import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 const toggleStore = useToggleStore()
 const flashcardStore = useFlashcardStore()
+
+await waitUntilStoreLoaded(flashcardStore)
 
 const { flashcardSet } = storeToRefs(flashcardStore)
 </script>
