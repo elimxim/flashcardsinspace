@@ -1,6 +1,16 @@
-import { ref, watch } from 'vue'
+import { Ref, ref, watch } from 'vue'
 
-export function useDeferredLoading(trigger: () => boolean = () => false, minDuration = 600, delayEntry = 200) {
+export interface DeferredLoadingOptions {
+  trigger?: () => boolean,
+  minDuration?: number,
+  delayEntry?: number,
+}
+
+export function useDeferredLoading(options?: DeferredLoadingOptions) {
+  const trigger = options?.trigger ?? (() => false)
+  const minDuration = options?.minDuration ?? 600
+  const delayEntry = options?.delayEntry ?? 200
+
   const resolvedLoading = ref(false)
   let startTimestamp = 0
   let entryTimeout: ReturnType<typeof setTimeout> | null = null
