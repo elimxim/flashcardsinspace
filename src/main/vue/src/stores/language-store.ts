@@ -1,6 +1,5 @@
 import type { Language } from '@/model/language.ts'
 import { defineStore } from 'pinia'
-import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 export interface LanguageState {
   languageMap: Map<number, Language>
@@ -27,10 +26,6 @@ export const useLanguageStore = defineStore('language', {
     },
     getLanguage(id: number): Language | undefined {
       return this.languageMap.get(id)
-    },
-    async getLanguageAsync(id: number): Promise<Language | undefined> {
-      await waitUntilStoreLoaded(this)
-      return this.getLanguage(id)
     },
     resetState() {
       this.languageMap = new Map()
