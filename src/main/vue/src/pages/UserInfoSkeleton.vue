@@ -24,9 +24,8 @@
 }
 
 .user-info-row-skeleton {
-  height: 42px;
+  height: 46px;
   width: 100%;
-  border-radius: 6px;
 }
 
 .user-info-row-skeleton--thin {
@@ -41,7 +40,6 @@
   margin-top: 20px;
   width: 100%;
   height: 40px;
-  border-radius: 6px;
   max-width: 600px;
 }
 
