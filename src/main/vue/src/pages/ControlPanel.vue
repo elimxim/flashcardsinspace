@@ -8,7 +8,7 @@
   >
     <SideBar ref="sidebar" style="z-index: 200;"/>
     <div class="control-panel-layout">
-      <ControlBar :title="flashcardSetName" shadow>
+      <ControlBar :title="flashcardSet?.name" shadow>
         <template #left>
           <AwesomeButton
             icon="fa-solid fa-bars"
@@ -81,7 +81,6 @@ const { flashcardSet } = storeToRefs(flashcardStore)
 
 const sidebar = ref<InstanceType<typeof SideBar>>()
 const isSidebarOverlay = computed(() => sidebar.value?.isOverlay ?? false)
-const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 const learningStagesWidget = ref<InstanceType<typeof LearningStagesWidget>>()
 
 function openFlashcardSetSettings() {

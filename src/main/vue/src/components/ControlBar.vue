@@ -6,7 +6,9 @@
     <div class="left-controls">
       <slot name="left"/>
     </div>
+    <div v-if="resolvedLoading" class="skeleton skeleton--dark control-bar-title-skeleton"/>
     <div
+      v-else
       class="control-bar-title"
       :class="{ 'centered': centerTitle }"
     >
@@ -19,10 +21,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, watch } from 'vue'
+import { useDeferredLoading } from '@/utils/deferredLoading.ts'
 
 const props = withDefaults(defineProps<{
-  title: string
+  title: string | undefined
   centerTitle?: boolean
   centerTitlePadding?: number
   shadow?: boolean
@@ -32,7 +35,21 @@ const props = withDefaults(defineProps<{
   shadow: false,
 })
 
+const { resolvedLoading, startLoading, stopLoading } = useDeferredLoading()
+
 const centerTitlePaddingPx = computed(() => `${props.centerTitlePadding}px`)
+
+watch(() => props.title, (newVal) => {
+  if (newVal) {
+    stopLoading()
+  }
+})
+
+onMounted(() => {
+  if (!props.title) {
+    startLoading()
+  }
+})
 
 </script>
 
@@ -92,4 +109,12 @@ const centerTitlePaddingPx = computed(() => `${props.centerTitlePadding}px`)
   text-align: center;
   padding-inline: v-bind(centerTitlePaddingPx);
 }
+
+.control-bar-title-skeleton {
+  grid-column: 2;
+  grid-row: 1;
+  height: 80%;
+  width: 60%;
+}
+
 </style>
