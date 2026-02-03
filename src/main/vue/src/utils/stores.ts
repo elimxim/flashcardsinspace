@@ -12,32 +12,17 @@ import {
   sendFlashcardSetsGetRequest,
   sendFlashcardsGetRequest,
 } from '@/api/api-client.ts'
-import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
 import { sortFlashcardSets } from '@/core-logic/flashcard-logic.ts'
 import { sendLanguagesGetRequest } from '@/api/public-api-client.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
-
-export function determineCurrFlashcardSet(): FlashcardSet | undefined {
-  const flashcardSetStore = useFlashcardSetStore()
-
-  let flashcardSet
-  const selectedSetId = loadSelectedSetIdFromCookies()
-  if (selectedSetId) {
-    flashcardSet = flashcardSetStore.findSet(selectedSetId)
-    if (flashcardSet) {
-      return flashcardSet
-    } else {
-      return flashcardSetStore.firstFlashcardSet
-    }
-  }
-}
+import { getCurrFlashcardSet } from '@/utils/store-loading.ts'
 
 export async function reloadFlashcardRelatedStores(forced: boolean = false): Promise<boolean> {
   const flashcardStore = useFlashcardStore()
 
-  const currFlashcardSet = determineCurrFlashcardSet()
+  const currFlashcardSet = getCurrFlashcardSet()
   Log.log(LogTag.STORE, `Current FlashcardSet.id=${currFlashcardSet?.id}`)
   if (currFlashcardSet) {
     return await loadFlashcardRelatedStores(currFlashcardSet, forced)

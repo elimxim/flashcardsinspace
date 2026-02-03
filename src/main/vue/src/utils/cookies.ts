@@ -59,6 +59,10 @@ function loadSelectedSetIdFromCookies(): number | undefined {
   return loadNumberCookie(COOKIE_SELECTED_SET_ID)
 }
 
+function removeSelectedSetIdCookie() {
+  removeCookie(COOKIE_SELECTED_SET_ID)
+}
+
 function setSidebarExpandedToCookies(value: boolean) {
   saveCookie(COOKIE_SIDEBAR_EXPANDED, value.toString(), 30)
 }
@@ -89,6 +93,7 @@ export {
   loadUserSignedUpFromCookies,
   saveSelectedSetIdToCookies,
   loadSelectedSetIdFromCookies,
+  removeSelectedSetIdCookie,
   setSidebarExpandedToCookies,
   loadSidebarExpandedFromCookies,
   loadLoggingEnabledFromCookies,

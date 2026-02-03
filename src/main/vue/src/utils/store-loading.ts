@@ -1,4 +1,29 @@
 import { watch } from 'vue'
+import { FlashcardSet } from '@/model/flashcard.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
+import {
+  loadSelectedSetIdFromCookies,
+  removeSelectedSetIdCookie,
+  saveSelectedSetIdToCookies,
+} from '@/utils/cookies.ts'
+
+export function getCurrFlashcardSet(): FlashcardSet | undefined {
+  const flashcardSetStore = useFlashcardSetStore()
+  const selectedSetId = loadSelectedSetIdFromCookies()
+  if (selectedSetId) {
+    const flashcardSet = flashcardSetStore.findSet(selectedSetId)
+    if (flashcardSet) {
+      return flashcardSet
+    } else {
+      const firstSet = flashcardSetStore.firstFlashcardSet
+      if (firstSet) {
+        saveSelectedSetIdToCookies(firstSet.id)
+      } else {
+        removeSelectedSetIdCookie()
+      }
+    }
+  }
+}
 
 /**
  * Waits for a specific property on a Pinia store to become truthy.
