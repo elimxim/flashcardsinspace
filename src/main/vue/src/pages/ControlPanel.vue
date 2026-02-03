@@ -30,17 +30,14 @@
         </template>
       </ControlBar>
       <div class="control-panel-content scrollbar-hidden">
-        <WelcomeWidget v-if="!flashcardSet" class="control-welcome"/>
-        <template v-else>
-          <FlashcardSetInfoBar
-            :hidden="!flashcardSet || (sidebarExpandedCookie && !isSidebarOverlay)"
-          />
-          <MainPanel/>
-          <LearningStagesWidget ref="learningStagesWidget" :grow-multiplier="3"/>
-          <div class="control-outer-space-panel">
-            <OuterSpaceWidget/>
-          </div>
-        </template>
+        <Suspense>
+          <template #default>
+            <ControlPanelWidgetBoard :show-info-bar="sidebarExpandedCookie && !isSidebarOverlay"/>
+          </template>
+          <template #fallback>
+            <KineticRingSpinner/>
+          </template>
+        </Suspense>
       </div>
     </div>
   </div>
@@ -55,11 +52,8 @@
 <script setup lang="ts">
 import SideBar from '@/components/control-panel/SideBar.vue'
 import ControlBar from '@/components/ControlBar.vue'
-import FlashcardSetInfoBar from '@/components/control-panel/FlashcardSetInfoBar.vue'
-import MainPanel from '@/components/control-panel/MainPanel.vue'
-import LearningStagesWidget from '@/components/control-panel/LearningStagesWidget.vue'
-import OuterSpaceWidget from '@/components/control-panel/OuterSpaceWidget.vue'
-import WelcomeWidget from '@/components/control-panel/WelcomeWidget.vue'
+import ControlPanelWidgetBoard from '@/pages/ControlPanelWidgetBoard.vue'
+import KineticRingSpinner from '@/components/KineticRingSpinner.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/modals/FlashcardSetSettingsModal.vue'
 import FlashcardSetCreationModal from '@/modals/FlashcardSetCreationModal.vue'
@@ -70,9 +64,8 @@ import SpaceToast from '@/components/SpaceToast.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
-import { isTouchDevice } from '@/utils/utils.ts'
 
 const flashcardStore = useFlashcardStore()
 const toggleStore = useToggleStore()
@@ -81,7 +74,6 @@ const { flashcardSet } = storeToRefs(flashcardStore)
 
 const sidebar = ref<InstanceType<typeof SideBar>>()
 const isSidebarOverlay = computed(() => sidebar.value?.isOverlay ?? false)
-const learningStagesWidget = ref<InstanceType<typeof LearningStagesWidget>>()
 
 function openFlashcardSetSettings() {
   if (flashcardSet.value) {
@@ -89,15 +81,6 @@ function openFlashcardSetSettings() {
   }
 }
 
-onMounted(() => {
-  if (isTouchDevice) {
-    nextTick().then(() =>
-      setTimeout(() => {
-        learningStagesWidget.value?.expand()
-      }, 1000)
-    )
-  }
-})
 </script>
 
 <style scoped>
