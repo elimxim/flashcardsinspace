@@ -14,11 +14,8 @@
 <script setup lang="ts">
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
-import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 const chronoStore = useChronoStore()
-
-await waitUntilStoreLoaded(chronoStore)
 
 const { dayStreak } = storeToRefs(chronoStore)
 

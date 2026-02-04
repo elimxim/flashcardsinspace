@@ -5,8 +5,8 @@
       :key="set.id"
       class="flashcard-set"
       :class="{
-        'flashcard-set--active': set.id === flashcardSet?.id,
-        'flashcard-set--loading': set.id === flashcardSet?.id && resolvedLoading,
+        'flashcard-set--active': set.id === activeFlashcardSetId,
+        'flashcard-set--loading': resolvedLoading,
       }"
       @click="selectFlashcardSet(set.id)"
     >
@@ -24,7 +24,10 @@
       <div v-else class="cp-count-box">
         {{ getFlashcardsNumber(set) }}
       </div>
-      <div v-if="set.id === flashcardSet?.id && resolvedLoading" class="flashcard-set-spinner-container">
+      <div
+        v-if="set.id === flashcardSet?.id && resolvedLoading"
+        class="flashcard-set-spinner-container"
+      >
         <KineticRingSpinner :ring-size="42" :track-size="6" :track-color="'rgba(241,245,249,0.2)'"/>
       </div>
     </div>
@@ -38,22 +41,30 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'
-import { saveSelectedSetIdToCookies } from '@/utils/cookies.ts'
+import {
+  loadSelectedSetIdFromCookies,
+  saveSelectedSetIdToCookies,
+} from '@/utils/cookies.ts'
 import { FlashcardSet } from '@/model/flashcard.ts'
 import {
   loadFlashcardSetExtras,
-  loadStoresForFlashcardSet,
   waitUntilStoreLoaded,
 } from '@/utils/store-loading.ts'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
+
+const props = defineProps<{
+  onFlashcardSetChanged: (setId: number) => Promise<boolean>
+}>()
 
 const languageStore = useLanguageStore()
 const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
 
-await waitUntilStoreLoaded(languageStore)
-await waitUntilStoreLoaded(flashcardSetStore)
+await Promise.all([
+  waitUntilStoreLoaded(languageStore),
+  waitUntilStoreLoaded(flashcardSetStore),
+])
 
 const {
   resolvedLoading,
@@ -64,16 +75,16 @@ const {
 const { flashcardSet } = storeToRefs(flashcardStore)
 const { flashcardSets, extraLoaded } = storeToRefs(flashcardSetStore)
 
+const activeFlashcardSetId = ref(loadSelectedSetIdFromCookies())
+
 async function selectFlashcardSet(setId: number) {
-  const set = flashcardSetStore.findSet(setId)
-  if (set) {
+  try {
     startLoading()
-    await loadStoresForFlashcardSet(set)
-      .then((loaded) => {
-        if (loaded) {
-          saveSelectedSetIdToCookies(set.id)
-        }
-      })
+    activeFlashcardSetId.value = setId
+    if (await props.onFlashcardSetChanged(setId)) {
+      saveSelectedSetIdToCookies(setId)
+    }
+  } finally {
     await stopLoading()
   }
 }
@@ -89,10 +100,7 @@ function getFlashcardsNumber(set: FlashcardSet) {
 }
 
 onMounted(async () => {
-  await waitUntilStoreLoaded(flashcardSetStore)
-    .then(async () => {
-      await loadFlashcardSetExtras()
-    })
+  await loadFlashcardSetExtras()
 })
 
 </script>

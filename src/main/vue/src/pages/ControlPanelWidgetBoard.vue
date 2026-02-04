@@ -1,6 +1,6 @@
 <template>
-  <WelcomeWidget v-if="!flashcardSet" class="control-welcome"/>
-  <template v-else>
+  <WelcomeWidget v-if="flashcardStoreLoaded && !flashcardSet" class="control-welcome"/>
+  <template v-else-if="flashcardStoreLoaded">
     <FlashcardSetInfoBar
       :hidden="showInfoBar"
     />
@@ -22,7 +22,6 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { storeToRefs } from 'pinia'
 import { nextTick, onMounted, ref } from 'vue'
 import { isTouchDevice } from '@/utils/utils.ts'
-import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 defineProps<{
   showInfoBar: boolean
@@ -30,9 +29,7 @@ defineProps<{
 
 const flashcardStore = useFlashcardStore()
 
-await waitUntilStoreLoaded(flashcardStore)
-
-const { flashcardSet } = storeToRefs(flashcardStore)
+const { flashcardSet, loaded: flashcardStoreLoaded } = storeToRefs(flashcardStore)
 
 const learningStagesWidget = ref<InstanceType<typeof LearningStagesWidget>>()
 

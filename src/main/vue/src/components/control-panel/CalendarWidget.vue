@@ -105,14 +105,10 @@ import {
   chronodayStatusesToCompleteDay,
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
-import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 const toggleStore = useToggleStore()
-
-await waitUntilStoreLoaded(flashcardStore)
-await waitUntilStoreLoaded(chronoStore)
 
 const { flashcardSet, flashcards, isSuspended } = storeToRefs(flashcardStore)
 const { currDay, isDayOff, chronodays } = storeToRefs(chronoStore)

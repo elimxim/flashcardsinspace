@@ -34,14 +34,10 @@ import { storeToRefs } from 'pinia'
 import { specialStages } from '@/core-logic/stage-logic.ts'
 import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
-import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 const router = useRouter()
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
-
-await waitUntilStoreLoaded(flashcardStore)
-await waitUntilStoreLoaded(chronoStore)
 
 const { flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)

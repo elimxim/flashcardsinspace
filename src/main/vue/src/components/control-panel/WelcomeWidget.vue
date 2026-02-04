@@ -16,12 +16,9 @@ import SmartButton from '@/components/SmartButton.vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { storeToRefs } from 'pinia'
-import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 const toggleStore = useToggleStore()
 const flashcardSetStore = useFlashcardSetStore()
-
-await waitUntilStoreLoaded(flashcardSetStore)
 
 const { isNoFlashcardSets } = storeToRefs(flashcardSetStore)
 
