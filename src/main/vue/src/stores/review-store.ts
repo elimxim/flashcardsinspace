@@ -103,8 +103,8 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
     }
 
     return {
-      reviewQueue: readonly(reviewQueue),
       reviewStoreLoaded: readonly(loaded),
+      reviewQueue,
       flashcardsTotal,
       currFlashcard,
       autoPlayVoice,

@@ -328,10 +328,10 @@ function onTouchEnd(event: TouchEvent) {
     if (isValidSwipe) {
       // Complete the pull-in
       swipeOffset.value = 0
-      animationTimeoutId = setTimeout(() => {
+      animationTimeoutId = setTimeout(async () => {
+        await props.onSlideLeft()
         isAnimating.value = false
         isPullingIn.value = false
-        props.onSlideLeft()
       }, getAnimationDuration())
     } else {
       // Cancel pull-in - slide back off the screen
@@ -352,9 +352,7 @@ function onTouchEnd(event: TouchEvent) {
     const direction = deltaX > 0 ? 'right' : 'left'
     const exitOffset = getExitOffset()
     const invisibleDuration = getInvisibleDuration(direction)
-    const offset = deltaX > 0 ? exitOffset : -exitOffset
-
-    swipeOffset.value = offset
+    swipeOffset.value = deltaX > 0 ? exitOffset : -exitOffset
     animationTimeoutId = setTimeout(async () => {
       if (deltaX > 0) {
         await props.onSlideRight()
@@ -443,7 +441,7 @@ function animateSwipe(direction: 'left' | 'right', onCompleteCallback: () => Pro
   })
 }
 
-function animatePullIn(onCompleteCallback: () => void): boolean {
+function animatePullIn(onCompleteCallback: () => Promise<void>): boolean {
   if (isAnimating.value || isTouching.value) {
     return false
   }
@@ -459,10 +457,10 @@ function animatePullIn(onCompleteCallback: () => void): boolean {
     requestAnimationFrame(() => {
       isTouching.value = false // Re-enable transition
       swipeOffset.value = 0
-      animationTimeoutId = setTimeout(() => {
+      animationTimeoutId = setTimeout(async () => {
+        await onCompleteCallback()
         isPullingIn.value = false
         isAnimating.value = false
-        onCompleteCallback()
       }, getAnimationDuration())
     })
   })
@@ -472,7 +470,7 @@ function animatePullIn(onCompleteCallback: () => void): boolean {
 async function slideLeft() {
   if (!props.canSlideLeft) return
   if (isDeckEmpty() && lastFlashcard.value) {
-    animatePullIn(() => props.onSlideLeft())
+    animatePullIn(async () => await props.onSlideLeft())
   } else {
     await animateSwipe('left', triggerSlideLeft)
   }

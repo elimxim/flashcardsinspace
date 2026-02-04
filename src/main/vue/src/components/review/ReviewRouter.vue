@@ -6,6 +6,7 @@
   />
   <SpecialReviewPage
     v-else-if="reviewMode.isSpecial()"
+    :session-id="sessionId"
     :review-mode="reviewMode"
   />
   <QuizReviewPage

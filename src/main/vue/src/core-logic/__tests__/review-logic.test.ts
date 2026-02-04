@@ -208,6 +208,46 @@ describe('MonoStageReviewQueue', () => {
     expect(queue.next()).toBe(f42)
   })
 
+  it('should remove current flashcard and not affect the next one', () => {
+    // given:
+    const f31 = flashcard(1, learningStages.S3)
+    const f22 = flashcard(2, learningStages.S2)
+    const f13 = flashcard(3, learningStages.S1)
+    const flashcards = [f31, f22, f13]
+
+    // when:
+    const queue = new MonoStageReviewQueue(flashcards)
+
+    // then:
+    expect(queue.remaining()).toBe(3)
+    expect(queue.next()).toBe(f31)
+    queue.removeCurrent()
+    expect(queue.remaining()).toBe(2)
+    expect(queue.prev()).toBe(undefined)
+    expect(queue.remaining()).toBe(2)
+    expect(queue.next()).toBe(f22)
+    expect(queue.next()).toBe(f13)
+    expect(queue.remaining()).toBe(0)
+    expect(queue.next()).toBeUndefined()
+  })
+
+  it('should remove current flashcard if there is only one in the queue', () => {
+    // given:
+    const f11 = flashcard(1, learningStages.S1)
+    const flashcards = [f11]
+
+    // when:
+    const queue = new MonoStageReviewQueue(flashcards)
+
+    // then:
+    expect(queue.remaining()).toBe(1)
+    expect(queue.next()).toBe(f11)
+    queue.removeCurrent()
+    expect(queue.prev()).toBe(undefined)
+    expect(queue.next()).toBe(undefined)
+    expect(queue.remaining()).toBe(0)
+  })
+
 })
 
 function flashcard(id: number, stage: Stage): Flashcard {
