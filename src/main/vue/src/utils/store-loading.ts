@@ -45,21 +45,35 @@ export function getCurrFlashcardSet(): FlashcardSet | undefined {
  * Waits for a specific property on a Pinia store to become truthy.
  * @param store The Pinia store instance
  * @param property The boolean property to watch (defaults to 'loaded')
+ * @param timeout The timeout in milliseconds (defaults to 10000)
  */
-export function waitUntilStoreLoaded<T>(store: T, property: keyof T = 'loaded' as keyof T): Promise<void> {
+export function waitUntilStoreLoaded<T>(
+  store: T,
+  property: keyof T = 'loaded' as keyof T,
+  timeout: number = 10000,
+): Promise<void> {
   if (store[property]) {
     return Promise.resolve()
   }
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      unwatch()
+      if (!store[property]) {
+        reject(new Error(`Store property ${String(property)} timed out after ${timeout}ms`))
+      }
+    }, timeout)
+
     const unwatch = watch(
       () => store[property],
       (value) => {
         if (value) {
+          clearTimeout(timer)
           unwatch()
           resolve()
         }
-      }
+      },
+      { immediate: true },
     )
   })
 }
@@ -132,6 +146,10 @@ export async function loadStoresForFlashcardSet(flashcardSet: FlashcardSet, forc
     Log.log(LogTag.STORE, `flashcard store is already loaded`)
     return true
   }
+
+  flashcardStore.resetState()
+  chronoStore.resetState()
+  audioStore.resetState()
 
   return await sendFlashcardsGetRequest(flashcardSet.id)
     .then(async (response) => {

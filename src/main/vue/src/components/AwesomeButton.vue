@@ -79,7 +79,6 @@ const props = withDefaults(defineProps<{
   spinIcon?: string
   disabled?: boolean
   active?: boolean
-  loading?: boolean
   hidden?: boolean
   invisible?: boolean
   square?: boolean
@@ -100,7 +99,6 @@ const props = withDefaults(defineProps<{
   spinIcon: undefined,
   disabled: false,
   active: false,
-  loading: false,
   hidden: false,
   invisible: false,
   square: false,
@@ -123,7 +121,7 @@ const {
   resolvedLoading,
   startLoading,
   stopLoading,
-} = useDeferredLoading({ trigger: () => props.loading })
+} = useDeferredLoading()
 
 const pressed = ref(false)
 const rippleActive = ref(false)
