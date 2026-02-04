@@ -1,11 +1,36 @@
 <template>
   <div class="kinetic-ring-spinner">
-    <div class="kinetic-ring">
-      <div class="ring-track"></div>
-      <div class="ring-beam"></div>
+    <div
+      class="kinetic-ring"
+      :style="{
+        '--ring-size': ringSizePx,
+        '--ring-track--size': trackSizePx,
+        '--ring-track--color': trackColor
+      }"
+    >
+      <div class="ring-track"/>
+      <div class="ring-beam"/>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+
+const props = withDefaults(defineProps<{
+  ringSize?: number
+  trackSize?: number
+  trackColor?: string
+}>(), {
+  ringSize: 160,
+  trackSize: 12,
+  trackColor: '#f1f5f9',
+})
+
+const ringSizePx = computed(() => `${props.ringSize}px`)
+const trackSizePx = computed(() => `${props.trackSize}px`)
+
+</script>
 
 <style scoped>
 .kinetic-ring-spinner {
@@ -14,13 +39,12 @@
   align-items: center;
   height: 100%;
   width: 100%;
-  background: white;
 }
 
 .kinetic-ring {
   position: relative;
-  width: 160px;
-  height: 160px;
+  width: var(--ring-size);
+  height: var(--ring-size);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -31,7 +55,7 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 12px solid #f1f5f9;
+  border: var(--ring-track--size) solid var(--ring-track--color);
 }
 
 .ring-beam {
@@ -39,7 +63,7 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 12px solid transparent;
+  border: var(--ring-track--size) solid transparent;
   background: conic-gradient(
     from 0deg,
     transparent 0%,
