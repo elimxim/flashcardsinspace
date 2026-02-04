@@ -38,79 +38,83 @@
         twinkle
         vertical-drift="3px"
       />
-      <div class="review-progressbar">
-        <Progressbar
-          :progress="progress"
-          height="16px"
-        />
-      </div>
-      <div class="review-info">
-        <div class="cp-count-box cp-count-box--big">
-          {{ flashcardsSeen }}
-        </div>
-        <div class="cp-count-box cp-count-box--big">
-          {{ flashcardsRemaining }}
-        </div>
-      </div>
-      <div class="review-body">
-        <SpaceDeck
-          ref="spaceDeck"
-          :session-type="reviewMode.sessionType"
-          :on-flashcard-removed="onFlashcardRemoved"
-          :on-audio-changed="onAudioChanged"
-          :can-slide-left="!noPrevAvailable"
-          :can-slide-right="!noNextAvailable"
-          :on-slide-left="prev"
-          :on-slide-right="next"
-          swipe-left-text="Prev"
-          swipe-right-text="Next"
-        >
-          <ReviewResult/>
-        </SpaceDeck>
-        <div v-if="!isTouchDevice" class="review-nav">
-          <SmartButton
-            class="calm-button"
-            text="Prev"
-            :disabled="noPrevAvailable"
-            :on-click="spaceDeck?.slideLeft"
-            auto-blur
-            rounded
-          />
-          <SmartButton
-            v-if="reviewMode.isOuterSpace()"
-            class="decision-button dangerous-button"
-            text="Move back"
-            :disabled="noNextAvailable"
-            :hidden="noNextAvailable"
-            :on-click="moveBack"
-            :hold-time="1.2"
-            auto-blur
-            rounded
-          />
-          <SmartButton
-            class="calm-button"
-            text="Next"
-            :disabled="noNextAvailable"
-            :on-click="spaceDeck?.slideRight"
-            auto-blur
-            rounded
+      <KineticRingSpinner v-if="!reviewMode.isOuterSpace() && resolvedLoading" :ring-size="240"/>
+      <KineticRingSpinner v-if="reviewMode.isOuterSpace() && resolvedLoading" :ring-size="240" :track-color="'rgb(28,20,57)'"/>
+      <template v-else-if="!loadingStarted">
+        <div class="review-progressbar">
+          <Progressbar
+            :progress="progress"
+            height="16px"
           />
         </div>
-        <div
-          v-else-if="isTouchDevice && reviewMode.isOuterSpace()"
-          class="review-nav review-nav--centered"
-        >
-          <SmartButton
-            class="decision-button dangerous-button"
-            text="Move back"
-            :disabled="noNextAvailable"
-            :on-click="moveBack"
-            :hold-time="1.2"
-            auto-blur
-            rounded
-          />
+        <div class="review-info">
+          <div class="cp-count-box cp-count-box--big">
+            {{ flashcardsSeen }}
+          </div>
+          <div class="cp-count-box cp-count-box--big">
+            {{ flashcardsRemaining }}
+          </div>
         </div>
-      </div>
+        <div class="review-body">
+          <SpaceDeck
+            ref="spaceDeck"
+            :session-type="reviewMode.sessionType"
+            :on-flashcard-removed="onFlashcardRemoved"
+            :on-audio-changed="onAudioChanged"
+            :can-slide-left="!noPrevAvailable"
+            :can-slide-right="!noNextAvailable"
+            :on-slide-left="prev"
+            :on-slide-right="next"
+            swipe-left-text="Prev"
+            swipe-right-text="Next"
+          >
+            <ReviewResult/>
+          </SpaceDeck>
+          <div v-if="!isTouchDevice" class="review-nav">
+            <SmartButton
+              class="calm-button"
+              text="Prev"
+              :disabled="noPrevAvailable"
+              :on-click="spaceDeck?.slideLeft"
+              auto-blur
+              rounded
+            />
+            <SmartButton
+              v-if="reviewMode.isOuterSpace()"
+              class="decision-button dangerous-button"
+              text="Move back"
+              :disabled="noNextAvailable"
+              :hidden="noNextAvailable"
+              :on-click="moveBack"
+              :hold-time="1.2"
+              auto-blur
+              rounded
+            />
+            <SmartButton
+              class="calm-button"
+              text="Next"
+              :disabled="noNextAvailable"
+              :on-click="spaceDeck?.slideRight"
+              auto-blur
+              rounded
+            />
+          </div>
+          <div
+            v-else-if="isTouchDevice && reviewMode.isOuterSpace()"
+            class="review-nav review-nav--centered"
+          >
+            <SmartButton
+              class="decision-button dangerous-button"
+              text="Move back"
+              :disabled="noNextAvailable"
+              :on-click="moveBack"
+              :hold-time="1.2"
+              auto-blur
+              rounded
+            />
+          </div>
+        </div>
+      </template>
     </div>
   </div>
   <SpaceToast/>
@@ -118,6 +122,7 @@
 
 <script setup lang="ts">
 import ControlBar from '@/components/ControlBar.vue'
+import KineticRingSpinner from '@/components/KineticRingSpinner.vue'
 import Progressbar from '@/components/Progressbar.vue'
 import SpaceDeck from '@/components/review/SpaceDeck.vue'
 import SmartButton from '@/components/SmartButton.vue'
@@ -148,6 +153,7 @@ import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
+import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 
 const props = defineProps<{
   reviewMode: ReviewMode,
@@ -161,6 +167,13 @@ const flashcardStore = useFlashcardStore()
 
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
+
+const {
+  loadingStarted,
+  resolvedLoading,
+  startLoading,
+  stopLoading,
+} = useDeferredLoading()
 
 const reviewStore = useReviewStore(props.reviewMode.sessionType)
 
@@ -249,6 +262,7 @@ function onAudioChanged() {
 }
 
 onMounted(async () => {
+  startLoading()
   reviewStore.resetState()
   if (!flashcardStore.loaded) {
     Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
@@ -260,6 +274,7 @@ onMounted(async () => {
     }
   }
   await startReview()
+  await stopLoading()
   spaceDeck.value?.setDeckReady()
   document.addEventListener('keydown', handleKeydown)
 })

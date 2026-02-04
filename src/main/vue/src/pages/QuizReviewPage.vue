@@ -31,65 +31,68 @@
       </template>
     </ControlBar>
     <div class="review-layout">
-      <div class="review-progressbar">
-        <Progressbar
-          :progress="progress"
-          height="16px"
-        />
-      </div>
-      <div class="review-info">
-        <div class="cp-count-box cp-count-box--big">
-          {{ flashcardsSeen }}
-        </div>
-        <div class="cp-count-box cp-count-box--big">
-          {{ flashcardsRemaining }}
-        </div>
-      </div>
-      <div class="review-body">
-        <SpaceDeck
-          ref="spaceDeck"
-          :session-type="ReviewSessionType.QUIZ"
-          :on-flashcard-removed="onFlashcardRemoved"
-          :on-audio-changed="onAudioChanged"
-          :can-slide-left="!noNextAvailable"
-          :can-slide-right="!noNextAvailable"
-          :on-slide-left="() => quizAnswer(false)"
-          :on-slide-right="() => quizAnswer(true)"
-          swipe-left-text="Don't know"
-          swipe-right-text="Know"
-        >
-          <QuizResult
-            :elapsed-time="elapsedTime"
-            :round="quizRound"
-            :overall-total="quizOverallTotal"
-            :overall-correct="quizOverallCorrect"
-            :round-total="flashcardsTotal"
-            :round-failed="incorrectFlashcards.length"
-            :on-next-round="startNextQuizRound"
-            :on-finish="finishReviewAndLeave"
-          />
-        </SpaceDeck>
-        <div v-if="!isTouchDevice" class="review-nav">
-          <SmartButton
-            class="decision-button dangerous-button"
-            text="Don't know"
-            :disabled="noNextAvailable"
-            :hidden="noNextAvailable"
-            :on-click="spaceDeck?.slideLeft"
-            auto-blur
-            rounded
-          />
-          <SmartButton
-            class="decision-button safe-button"
-            text="Know"
-            :disabled="noNextAvailable"
-            :hidden="noNextAvailable"
-            :on-click="spaceDeck?.slideRight"
-            auto-blur
-            rounded
+      <KineticRingSpinner v-if="resolvedLoading" :ring-size="240"/>
+      <template v-else-if="!loadingStarted">
+        <div class="review-progressbar">
+          <Progressbar
+            :progress="progress"
+            height="16px"
           />
         </div>
-      </div>
+        <div class="review-info">
+          <div class="cp-count-box cp-count-box--big">
+            {{ flashcardsSeen }}
+          </div>
+          <div class="cp-count-box cp-count-box--big">
+            {{ flashcardsRemaining }}
+          </div>
+        </div>
+        <div class="review-body">
+          <SpaceDeck
+            ref="spaceDeck"
+            :session-type="ReviewSessionType.QUIZ"
+            :on-flashcard-removed="onFlashcardRemoved"
+            :on-audio-changed="onAudioChanged"
+            :can-slide-left="!noNextAvailable"
+            :can-slide-right="!noNextAvailable"
+            :on-slide-left="() => quizAnswer(false)"
+            :on-slide-right="() => quizAnswer(true)"
+            swipe-left-text="Don't know"
+            swipe-right-text="Know"
+          >
+            <QuizResult
+              :elapsed-time="elapsedTime"
+              :round="quizRound"
+              :overall-total="quizOverallTotal"
+              :overall-correct="quizOverallCorrect"
+              :round-total="flashcardsTotal"
+              :round-failed="incorrectFlashcards.length"
+              :on-next-round="startNextQuizRound"
+              :on-finish="finishReviewAndLeave"
+            />
+          </SpaceDeck>
+          <div v-if="!isTouchDevice" class="review-nav">
+            <SmartButton
+              class="decision-button dangerous-button"
+              text="Don't know"
+              :disabled="noNextAvailable"
+              :hidden="noNextAvailable"
+              :on-click="spaceDeck?.slideLeft"
+              auto-blur
+              rounded
+            />
+            <SmartButton
+              class="decision-button safe-button"
+              text="Know"
+              :disabled="noNextAvailable"
+              :hidden="noNextAvailable"
+              :on-click="spaceDeck?.slideRight"
+              auto-blur
+              rounded
+            />
+          </div>
+        </div>
+      </template>
     </div>
   </div>
   <SpaceToast/>
@@ -97,6 +100,7 @@
 
 <script setup lang="ts">
 import ControlBar from '@/components/ControlBar.vue'
+import KineticRingSpinner from '@/components/KineticRingSpinner.vue'
 import Progressbar from '@/components/Progressbar.vue'
 import SpaceDeck from '@/components/review/SpaceDeck.vue'
 import SmartButton from '@/components/SmartButton.vue'
@@ -132,6 +136,7 @@ import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
+import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 
 const props = defineProps<{
   sessionId?: number,
@@ -146,6 +151,13 @@ const flashcardStore = useFlashcardStore()
 
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
+
+const {
+  loadingStarted,
+  resolvedLoading,
+  startLoading,
+  stopLoading,
+} = useDeferredLoading()
 
 const reviewStore = useReviewStore(ReviewSessionType.QUIZ)
 
@@ -353,6 +365,7 @@ async function updateQuizSession(reviewedFlashcardIds: number[], nextRoundFlashc
 }
 
 onMounted(async () => {
+  startLoading()
   reviewStore.resetState()
   if (!flashcardStore.loaded) {
     Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
@@ -364,6 +377,7 @@ onMounted(async () => {
     }
   }
   await startReview()
+  await stopLoading()
   spaceDeck.value?.setDeckReady()
   document.addEventListener('keydown', handleKeydown)
 })
