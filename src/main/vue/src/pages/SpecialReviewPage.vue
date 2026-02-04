@@ -39,13 +39,9 @@
         vertical-drift="3px"
       />
       <KineticRingSpinner
-        v-if="!reviewMode.isOuterSpace() && resolvedLoading"
+        v-if="resolvedLoading"
         :ring-size="240"
-      />
-      <KineticRingSpinner
-        v-if="reviewMode.isOuterSpace() && resolvedLoading"
-        :ring-size="240"
-        :track-color="'rgb(28,20,57)'"
+        :track-color="reviewMode.isOuterSpace() ? 'rgb(28,20,57)' : '#f1f5f9'"
       />
       <template v-else-if="!loadingStarted">
         <div class="review-progressbar">
