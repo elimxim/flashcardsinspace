@@ -222,17 +222,13 @@ async function startReview() {
   Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
 }
 
-function resetState() {
-  reviewStore.resetState()
-  reviewedFlashcardIds.value = []
-}
-
 async function finishReview() {
   Log.log(LogTag.LOGIC, `Finishing review: ${props.reviewMode.sessionType}`)
   currFlashcardWatcher.stop()
   stopWatch()
   await updateReviewSession(reviewedFlashcardIds.value, true)
-  resetState()
+  reviewStore.resetState()
+  reviewedFlashcardIds.value = []
 }
 
 function finishReviewAndLeave() {
