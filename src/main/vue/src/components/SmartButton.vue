@@ -94,9 +94,12 @@ async function handleClick() {
     if (!isHoverSupported && props.animateTap) {
       startTapAnimation()
     } else {
-      startLoading()
-      await props.onClick()
-      await stopLoading()
+      try {
+        startLoading()
+        await props.onClick()
+      } finally {
+        await stopLoading()
+      }
     }
   }
 }
@@ -105,9 +108,12 @@ function startTapAnimation() {
   animatingOnTap.value = true
   setTimeout(async () => {
     animatingOnTap.value = false
-    startLoading()
-    await props.onClick()
-    await stopLoading()
+    try {
+      startLoading()
+      await props.onClick()
+    } finally {
+      await stopLoading()
+    }
   }, props.tapDuration)
 }
 
@@ -142,9 +148,12 @@ function startHold(event: Event) {
 
   holdTimeout = setTimeout(async () => {
     if (pressStartTime) {
-      startLoading()
-      await props.onClick()
-      await stopLoading()
+      try {
+        startLoading()
+        await props.onClick()
+      } finally {
+        await stopLoading()
+      }
     }
     cancelHold()
   }, props.holdTime * 1000)

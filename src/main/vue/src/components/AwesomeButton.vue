@@ -129,9 +129,12 @@ const animatingOnTap = ref(false)
 
 async function press() {
   pressed.value = !pressed.value
-  startLoading()
-  await props.onClick()
-  await stopLoading()
+  try {
+    startLoading()
+    await props.onClick()
+  } finally {
+    await stopLoading()
+  }
 }
 
 function handleClick() {
@@ -147,9 +150,12 @@ function handleClick() {
 
 async function handleDoubleClick() {
   if (props.disabled || resolvedLoading.value) return
-  startLoading()
-  await props.onDoubleClick()
-  await stopLoading()
+  try {
+    startLoading()
+    await props.onDoubleClick()
+  } finally {
+    await stopLoading()
+  }
 }
 
 async function handleHover() {

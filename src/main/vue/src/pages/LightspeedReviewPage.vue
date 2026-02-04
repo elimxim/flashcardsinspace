@@ -361,19 +361,22 @@ async function updateReviewSession(flashcardIds: number[], finished: boolean = f
 }
 
 onMounted(async () => {
-  startLoading()
-  reviewStore.resetState()
-  if (!flashcardStore.loaded) {
-    Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
-    const selectedSetId = loadSelectedSetIdFromCookies()
-    if (selectedSetId) {
-      await loadStoresForFlashcardSetId(selectedSetId)
-    } else {
-      Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
+  try {
+    startLoading()
+    reviewStore.resetState()
+    if (!flashcardStore.loaded) {
+      Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
+      const selectedSetId = loadSelectedSetIdFromCookies()
+      if (selectedSetId) {
+        await loadStoresForFlashcardSetId(selectedSetId)
+      } else {
+        Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
+      }
     }
+    await startReview()
+  } finally {
+    await stopLoading()
   }
-  await startReview()
-  await stopLoading()
   spaceDeck.value?.setDeckReady()
   document.addEventListener('keydown', handleKeydown)
 })
