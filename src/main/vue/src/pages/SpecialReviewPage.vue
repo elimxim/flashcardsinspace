@@ -192,6 +192,7 @@ const {
 const reviewStore = useReviewStore(props.reviewMode.sessionType)
 
 const {
+  reviewQueue,
   flashcardsTotal,
   currFlashcard,
   flashcardsRemaining,
@@ -325,6 +326,7 @@ async function updateReviewSession(flashcardIds: number[], finished: boolean = f
 }
 
 function onFlashcardRemoved() {
+  reviewQueue.value.removeCurrent()
   reviewStore.nextFlashcard(flashcardSet.value)
 }
 
