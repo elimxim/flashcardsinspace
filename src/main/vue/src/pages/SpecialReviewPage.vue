@@ -38,8 +38,15 @@
         twinkle
         vertical-drift="3px"
       />
-      <KineticRingSpinner v-if="!reviewMode.isOuterSpace() && resolvedLoading" :ring-size="240"/>
-      <KineticRingSpinner v-if="reviewMode.isOuterSpace() && resolvedLoading" :ring-size="240" :track-color="'rgb(28,20,57)'"/>
+      <KineticRingSpinner
+        v-if="!reviewMode.isOuterSpace() && resolvedLoading"
+        :ring-size="240"
+      />
+      <KineticRingSpinner
+        v-if="reviewMode.isOuterSpace() && resolvedLoading"
+        :ring-size="240"
+        :track-color="'rgb(28,20,57)'"
+      />
       <template v-else-if="!loadingStarted">
         <div class="review-progressbar">
           <Progressbar
@@ -132,7 +139,7 @@ import Starfield from '@/components/Starfield.vue'
 import ReviewResult from '@/components/review/ReviewResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { isTouchDevice } from '@/utils/utils.ts'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { learningStages, specialStages } from '@/core-logic/stage-logic.ts'
@@ -143,19 +150,26 @@ import {
   reviewSessionTypeToSpecialStage,
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
-import { useRouter } from 'vue-router'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { loadStoresForFlashcardSetId } from '@/utils/store-loading.ts'
-import { sendFlashcardUpdateRequest } from '@/api/api-client.ts'
+import {
+  sendFlashcardUpdateRequest,
+  sendReviewSessionCreateRequest,
+  sendReviewSessionUpdateRequest
+} from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
+import { useStopWatch } from '@/utils/stop-watch.ts'
+import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 
 const props = defineProps<{
+  sessionId?: number,
   reviewMode: ReviewMode,
 }>()
 
@@ -183,18 +197,26 @@ const {
   flashcardsRemaining,
   flashcardsSeen,
   progress,
-  noNextAvailable,
   noPrevAvailable,
+  noNextAvailable,
 } = storeToRefs(reviewStore)
 
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
+const reviewedFlashcardIds = ref<number[]>([])
+
+const elapsedTime = ref(0)
+const { startWatch } = useStopWatch(elapsedTime)
+
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 async function startReview() {
   Log.log(LogTag.LOGIC, `Starting review: ${props.reviewMode.sessionType}`)
   const stage = reviewSessionTypeToSpecialStage(props.reviewMode.sessionType) ?? specialStages.UNKNOWN
   reviewStore.loadState(createReviewQueueForStages(flashcards.value, [stage], currDay.value))
-  await reviewStore.nextFlashcard(flashcardSet.value)
+  await createReviewSession()
+  await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
+    if (success) startWatch()
+  })
   Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
 }
 
@@ -202,8 +224,9 @@ function resetState() {
   reviewStore.resetState()
 }
 
-function finishReview() {
+async function finishReview() {
   Log.log(LogTag.LOGIC, `Finishing review: ${props.reviewMode.sessionType}`)
+  await updateReviewSession(reviewedFlashcardIds.value, true)
   resetState()
 }
 
@@ -214,11 +237,13 @@ function finishReviewAndLeave() {
 
 async function prev() {
   if (noPrevAvailable.value) return
+  await updateReviewSession([])
   await reviewStore.prevFlashcard(flashcardSet.value)
 }
 
 async function next() {
-  if (noNextAvailable.value) return
+  if (!currFlashcard.value || noNextAvailable.value) return
+  await updateReviewSession([currFlashcard.value.id])
   await reviewStore.nextFlashcard(flashcardSet.value)
 }
 
@@ -253,6 +278,52 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
     })
 }
 
+watch(currFlashcard, async (newVal) => {
+  if (!newVal) {
+    await updateReviewSession(reviewedFlashcardIds.value)
+  }
+})
+
+async function createReviewSession() {
+  if (!flashcardSet.value) return
+
+  const request: ReviewSessionCreateRequest = {
+    type: props.reviewMode.sessionType,
+    chronodayId: currDay.value.id,
+  }
+
+  await sendReviewSessionCreateRequest(flashcardSet.value.id, request)
+    .then((response) => {
+      Log.log(LogTag.LOGIC, `Review session ${response.data.id} created`)
+      router.replace({
+        query: {
+          ...router.currentRoute.value.query,
+          sessionId: response.data.id,
+        }
+      })
+    })
+    .catch((error) => {
+      Log.error(LogTag.LOGIC, `Failed to create a review session`, error.response?.data)
+      toaster.bakeError(userApiErrors.REVIEW_SESSION__CREATION_FAILED, error.response?.data)
+    })
+}
+
+async function updateReviewSession(flashcardIds: number[], finished: boolean = false) {
+  if (!flashcardSet.value || !props.sessionId) return
+  await sendReviewSessionUpdateRequest(flashcardSet.value.id, props.sessionId, {
+    elapsedTime: elapsedTime.value,
+    flashcardIds: flashcardIds.map(id => ({ id: id })),
+    finished: finished,
+  })
+    .then(() => {
+      Log.log(LogTag.LOGIC, `Review session ${props.sessionId} updated`)
+    })
+    .catch((error) => {
+      Log.error(LogTag.LOGIC, `Failed to updated review session ${props.sessionId}`, error.response?.data)
+      toaster.bakeError(userApiErrors.REVIEW_SESSION__UPDATING_FAILED, error.response?.data)
+    })
+}
+
 function onFlashcardRemoved() {
   reviewStore.nextFlashcard(flashcardSet.value)
 }
@@ -282,9 +353,12 @@ onMounted(async () => {
   document.addEventListener('keydown', handleKeydown)
 })
 
-onUnmounted(async () => {
-  finishReview()
+onBeforeRouteLeave(async () => {
+  await finishReview()
   destroyReviewStore(props.reviewMode.sessionType)
+})
+
+onUnmounted(async () => {
   document.removeEventListener('keydown', handleKeydown)
 })
 

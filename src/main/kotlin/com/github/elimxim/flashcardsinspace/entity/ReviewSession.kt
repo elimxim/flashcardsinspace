@@ -51,7 +51,7 @@ open class ReviewSession(
 )
 
 enum class ReviewSessionType {
-    LIGHTSPEED, UNKNOWN, ATTEMPTED, SPACE, QUIZ
+    LIGHTSPEED, UNKNOWN, ATTEMPTED, OUTER_SPACE, QUIZ
 }
 
 @JsonTypeInfo(
