@@ -102,7 +102,7 @@ import {
   sendFlashcardSetUpdateRequest,
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { reloadFlashcardRelatedStores } from '@/utils/stores.ts'
+import { loadStoresForCurrFlashcardSet } from '@/utils/store-loading.ts'
 import { copyFlashcardSet, flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
@@ -177,7 +177,7 @@ function cancel() {
 async function remove() {
   const removed = await removeFlashcardSet()
   if (removed) {
-    await reloadFlashcardRelatedStores(true)
+    await loadStoresForCurrFlashcardSet(true)
       .then(() => {
         toggleStore.toggleFlashcardSetSettings()
         resetState()

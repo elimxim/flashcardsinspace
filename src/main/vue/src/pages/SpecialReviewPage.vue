@@ -142,7 +142,7 @@ import { useRouter } from 'vue-router'
 import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
-import { loadFlashcardRelatedStoresById } from '@/utils/stores.ts'
+import { loadStoresForFlashcardSetId } from '@/utils/store-loading.ts'
 import { sendFlashcardUpdateRequest } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
@@ -254,7 +254,7 @@ onMounted(async () => {
     Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
     const selectedSetId = loadSelectedSetIdFromCookies()
     if (selectedSetId) {
-      await loadFlashcardRelatedStoresById(selectedSetId)
+      await loadStoresForFlashcardSetId(selectedSetId)
     } else {
       Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
     }

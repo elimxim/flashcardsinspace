@@ -7,6 +7,7 @@ export interface FlashcardSetsState {
   flashcardSets: FlashcardSet[]
   extra: Map<number, FlashcardSetExtra>
   loaded: boolean
+  extraLoaded: boolean
 }
 
 export const useFlashcardSetStore = defineStore('flashcard-set', {
@@ -15,6 +16,7 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       flashcardSets: [],
       extra: new Map(),
       loaded: false,
+      extraLoaded: false,
     }
   },
   getters: {
@@ -29,10 +31,9 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
     },
   },
   actions: {
-    loadState(flashcardSets: FlashcardSet[], extras: FlashcardSetExtra[]) {
+    loadState(flashcardSets: FlashcardSet[]) {
       this.resetState()
       this.flashcardSets = flashcardSets
-      this.extra = mapFlashcardSetExtra(extras)
       this.loaded = true
     },
     checkStateLoaded() {
@@ -42,6 +43,11 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       this.flashcardSets = []
       this.extra = new Map()
       this.loaded = false
+      this.extraLoaded = false
+    },
+    loadExtras(extras: FlashcardSetExtra[]) {
+      this.extra = mapFlashcardSetExtra(extras)
+      this.extraLoaded = true
     },
     addSet(flashcardSet: FlashcardSet) {
       Log.log(LogTag.STORE, `flashcard-set.addSet: FlashcardSet.id=${flashcardSet.id}`)
@@ -76,17 +82,17 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
         this.extra.set(id, { id: id, flashcardsNumber: 0 })
       }
     },
-    findExtra(id: number): FlashcardSetExtra | undefined {
+    getExtra(id: number): FlashcardSetExtra | undefined {
       return this.extra.get(id)
     },
     incrementFlashcardsNumber(id: number) {
-      const extra = this.findExtra(id)
+      const extra = this.getExtra(id)
       if (extra) {
         extra.flashcardsNumber += 1
       }
     },
     decrementFlashcardsNumber(id: number) {
-      const extra = this.findExtra(id)
+      const extra = this.getExtra(id)
       if (extra) {
         extra.flashcardsNumber -= 1
       }
