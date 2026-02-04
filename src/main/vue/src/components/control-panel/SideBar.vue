@@ -40,7 +40,7 @@
       </ControlBar>
       <Suspense>
         <template #default>
-          <FlashcardSetList/>
+          <FlashcardSetList :on-flashcard-set-changed="onFlashcardSetChanged"/>
         </template>
         <template #fallback>
           <FlashcardSetListSkeleton/>
@@ -58,6 +58,10 @@ import AwesomeButton from '@/components/AwesomeButton.vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
+
+defineProps<{
+  onFlashcardSetChanged: (setId: number) => Promise<boolean>
+}>()
 
 const OVERLAY_BREAKPOINT = 620
 
@@ -98,7 +102,6 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateOverlayMode)
 })
 </script>
-
 
 <style scoped>
 .sidebar-overlay {

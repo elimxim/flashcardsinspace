@@ -6,7 +6,11 @@
       'flex-row',
     ]"
   >
-    <SideBar ref="sidebar" style="z-index: 200;"/>
+    <SideBar
+      ref="sidebar"
+      style="z-index: 200;"
+      :on-flashcard-set-changed="onFlashcardSetChanged"
+    />
     <div class="control-panel-layout">
       <ControlBar :title="flashcardSet?.name" shadow>
         <template #left>
@@ -30,14 +34,11 @@
         </template>
       </ControlBar>
       <div class="control-panel-content scrollbar-hidden">
-        <Suspense>
-          <template #default>
-            <ControlPanelWidgetBoard :show-info-bar="sidebarExpandedCookie && !isSidebarOverlay"/>
-          </template>
-          <template #fallback>
-            <KineticRingSpinner/>
-          </template>
-        </Suspense>
+        <KineticRingSpinner v-if="resolvedLoading"/>
+        <ControlPanelWidgetBoard
+          v-else
+          :show-info-bar="sidebarExpandedCookie && !isSidebarOverlay"
+        />
       </div>
     </div>
   </div>
@@ -69,12 +70,24 @@ import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
 import {
   loadFlashcardSetStore,
   loadStoresForCurrFlashcardSet,
+  loadStoresForFlashcardSet,
 } from '@/utils/store-loading.ts'
+import { useDeferredLoading } from '@/utils/deferred-loading.ts'
+import { Log, LogTag } from '@/utils/logger.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 
+const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
 const toggleStore = useToggleStore()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
+
+const {
+  resolvedLoading,
+  startLoading,
+  stopLoading,
+  resetLoading,
+} = useDeferredLoading()
 
 const sidebar = ref<InstanceType<typeof SideBar>>()
 const isSidebarOverlay = computed(() => sidebar.value?.isOverlay ?? false)
@@ -85,13 +98,33 @@ function openFlashcardSetSettings() {
   }
 }
 
+async function onFlashcardSetChanged(setId: number): Promise<boolean> {
+  Log.log(LogTag.DEBUG, `onFlashcardSetChanged: ${setId}`)
+  const set = flashcardSetStore.findSet(setId)
+  if (set) {
+    try {
+      resetLoading()
+      startLoading()
+      return await loadStoresForFlashcardSet(set)
+    } finally {
+      await stopLoading()
+    }
+  }
+  return false
+}
+
 onMounted(async () => {
-  await loadFlashcardSetStore()
-    .then((loaded) => {
-      if (loaded) {
-        return loadStoresForCurrFlashcardSet()
-      }
-    })
+  try {
+    startLoading()
+    await loadFlashcardSetStore()
+      .then((loaded) => {
+        if (loaded) {
+          return loadStoresForCurrFlashcardSet()
+        }
+      })
+  } finally {
+    await stopLoading()
+  }
 })
 
 </script>
