@@ -5,7 +5,7 @@
       :key="set.id"
       class="flashcard-set"
       :class="{
-        'flashcard-set--active': set.id === activeFlashcardSetId,
+        'flashcard-set--active': set.id === selectedSetIdCookie,
         'flashcard-set--loading': resolvedLoading,
       }"
       @click="selectFlashcardSet(set.id)"
@@ -25,7 +25,7 @@
         {{ getFlashcardsNumber(set) }}
       </div>
       <div
-        v-if="set.id === activeFlashcardSetId && resolvedLoading"
+        v-if="set.id === selectedSetIdCookie && resolvedLoading"
         class="flashcard-set-spinner-container"
       >
         <KineticRingSpinner :ring-size="42" :track-size="6" :track-color="'rgba(241,245,249,0.2)'"/>
@@ -40,17 +40,14 @@ import KineticRingSpinner from '@/components/KineticRingSpinner.vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'
-import {
-  loadSelectedSetIdFromCookies,
-  saveSelectedSetIdToCookies,
-} from '@/utils/cookies.ts'
 import { FlashcardSet } from '@/model/flashcard.ts'
 import {
   loadFlashcardSetExtras,
   waitUntilStoreLoaded,
 } from '@/utils/store-loading.ts'
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
+import { selectedSetIdCookie } from '@/utils/cookies-ref.ts'
 
 const props = defineProps<{
   onFlashcardSetChanged: (setId: number) => Promise<boolean>
@@ -72,15 +69,11 @@ const {
 
 const { flashcardSets, extraLoaded } = storeToRefs(flashcardSetStore)
 
-const activeFlashcardSetId = ref(loadSelectedSetIdFromCookies())
-
 async function selectFlashcardSet(setId: number) {
   try {
     startLoading()
-    activeFlashcardSetId.value = setId
-    if (await props.onFlashcardSetChanged(setId)) {
-      saveSelectedSetIdToCookies(setId)
-    }
+    selectedSetIdCookie.value = setId
+    await props.onFlashcardSetChanged(setId)
   } finally {
     await stopLoading()
   }

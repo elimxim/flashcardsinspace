@@ -1,11 +1,6 @@
 import { watch } from 'vue'
 import { FlashcardSet } from '@/model/flashcard.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
-import {
-  loadSelectedSetIdFromCookies,
-  removeSelectedSetIdCookie,
-  saveSelectedSetIdToCookies,
-} from '@/utils/cookies.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
@@ -14,7 +9,8 @@ import { userApiErrors } from '@/api/user-api-error.ts'
 import {
   sendChronoSyncRequest,
   sendFlashcardAudioMetadataGetRequest,
-  sendFlashcardSetExtraRequest, sendFlashcardSetGetRequest,
+  sendFlashcardSetExtraRequest,
+  sendFlashcardSetGetRequest,
   sendFlashcardSetsGetRequest,
   sendFlashcardsGetRequest,
 } from '@/api/api-client.ts'
@@ -22,22 +18,20 @@ import { sortFlashcardSets } from '@/core-logic/flashcard-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
+import { selectedSetIdCookie } from '@/utils/cookies-ref.ts'
 
 export function getCurrFlashcardSet(): FlashcardSet | undefined {
   const flashcardSetStore = useFlashcardSetStore()
-  const selectedSetId = loadSelectedSetIdFromCookies()
-  if (selectedSetId) {
-    const flashcardSet = flashcardSetStore.findSet(selectedSetId)
+  if (selectedSetIdCookie.value) {
+    const flashcardSet = flashcardSetStore.findSet(selectedSetIdCookie.value)
     if (flashcardSet) {
       return flashcardSet
-    } else {
-      const firstSet = flashcardSetStore.firstFlashcardSet
-      if (firstSet) {
-        saveSelectedSetIdToCookies(firstSet.id)
-      } else {
-        removeSelectedSetIdCookie()
-      }
     }
+  }
+  const firstSet = flashcardSetStore.firstFlashcardSet
+  if (firstSet) {
+    selectedSetIdCookie.value = firstSet.id
+    return firstSet
   }
 }
 

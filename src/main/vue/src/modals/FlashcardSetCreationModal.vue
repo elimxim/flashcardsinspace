@@ -88,6 +88,7 @@ import {
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
+import { selectedSetIdCookie } from '@/utils/cookies-ref.ts'
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
@@ -154,6 +155,7 @@ async function createNewFlashcardSet(): Promise<boolean> {
   const newSet = createFlashcardSet(name.value, language.value)
   return await sendFlashcardSetCreationRequest(newSet)
     .then((response) => {
+      selectedSetIdCookie.value = response.data.id
       flashcardSetStore.addSet(response.data)
       flashcardStore.loadState(response.data, [])
       return sendChronoSyncRequest(response.data.id)
