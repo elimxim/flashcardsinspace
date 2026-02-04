@@ -178,6 +178,7 @@ const toaster = useSpaceToaster()
 const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
 const flashcardStore = useFlashcardStore()
+const hasCleanedUp = ref(false)
 
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
@@ -206,7 +207,7 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 const reviewedFlashcardIds = ref<number[]>([])
 
 const elapsedTime = ref(0)
-const { startWatch } = useStopWatch(elapsedTime)
+const { startWatch, stopWatch } = useStopWatch(elapsedTime)
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
@@ -223,10 +224,13 @@ async function startReview() {
 
 function resetState() {
   reviewStore.resetState()
+  reviewedFlashcardIds.value = []
 }
 
 async function finishReview() {
   Log.log(LogTag.LOGIC, `Finishing review: ${props.reviewMode.sessionType}`)
+  currFlashcardWatcher.stop()
+  stopWatch()
   await updateReviewSession(reviewedFlashcardIds.value, true)
   resetState()
 }
@@ -244,6 +248,7 @@ async function prev() {
 
 async function next() {
   if (!currFlashcard.value || noNextAvailable.value) return
+  reviewedFlashcardIds.value.push(currFlashcard.value.id)
   await updateReviewSession([currFlashcard.value.id])
   await reviewStore.nextFlashcard(flashcardSet.value)
 }
@@ -279,7 +284,7 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
     })
 }
 
-watch(currFlashcard, async (newVal) => {
+const currFlashcardWatcher = watch(currFlashcard, async (newVal) => {
   if (!newVal) {
     await updateReviewSession(reviewedFlashcardIds.value)
   }
@@ -320,7 +325,7 @@ async function updateReviewSession(flashcardIds: number[], finished: boolean = f
       Log.log(LogTag.LOGIC, `Review session ${props.sessionId} updated`)
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to updated review session ${props.sessionId}`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to update review session ${props.sessionId}`, error.response?.data)
       toaster.bakeError(userApiErrors.REVIEW_SESSION__UPDATING_FAILED, error.response?.data)
     })
 }
@@ -332,6 +337,17 @@ function onFlashcardRemoved() {
 
 function onAudioChanged() {
   reviewStore.fetchAudio(flashcardSet.value)
+}
+
+async function cleanUpReview() {
+  if (hasCleanedUp.value) {
+    return
+  }
+
+  hasCleanedUp.value = true
+
+  await finishReview()
+  destroyReviewStore(props.reviewMode.sessionType)
 }
 
 onMounted(async () => {
@@ -356,12 +372,12 @@ onMounted(async () => {
 })
 
 onBeforeRouteLeave(async () => {
-  await finishReview()
-  destroyReviewStore(props.reviewMode.sessionType)
+  await cleanUpReview()
 })
 
 onUnmounted(async () => {
   document.removeEventListener('keydown', handleKeydown)
+  await cleanUpReview()
 })
 
 async function handleKeydown(event: KeyboardEvent) {
