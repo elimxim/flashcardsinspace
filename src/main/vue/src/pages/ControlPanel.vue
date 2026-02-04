@@ -64,8 +64,12 @@ import SpaceToast from '@/components/SpaceToast.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
+import {
+  loadFlashcardSetStore,
+  loadStoresForCurrFlashcardSet,
+} from '@/utils/store-loading.ts'
 
 const flashcardStore = useFlashcardStore()
 const toggleStore = useToggleStore()
@@ -80,6 +84,15 @@ function openFlashcardSetSettings() {
     toggleStore.toggleFlashcardSetSettings()
   }
 }
+
+onMounted(async () => {
+  await loadFlashcardSetStore()
+    .then((loaded) => {
+      if (loaded) {
+        return loadStoresForCurrFlashcardSet()
+      }
+    })
+})
 
 </script>
 
