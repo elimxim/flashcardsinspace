@@ -139,7 +139,7 @@ import Starfield from '@/components/Starfield.vue'
 import ReviewResult from '@/components/review/ReviewResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { isTouchDevice } from '@/utils/utils.ts'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { learningStages, specialStages } from '@/core-logic/stage-logic.ts'
@@ -224,7 +224,6 @@ async function startReview() {
 
 async function finishReview() {
   Log.log(LogTag.LOGIC, `Finishing review: ${props.reviewMode.sessionType}`)
-  currFlashcardWatcher.stop()
   stopWatch()
   await updateReviewSession(reviewedFlashcardIds.value, true)
   reviewStore.resetState()
@@ -279,12 +278,6 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
       return false
     })
 }
-
-const currFlashcardWatcher = watch(currFlashcard, async (newVal) => {
-  if (!newVal) {
-    await updateReviewSession(reviewedFlashcardIds.value)
-  }
-})
 
 async function createReviewSession() {
   if (!flashcardSet.value) return
