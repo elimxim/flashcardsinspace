@@ -36,7 +36,7 @@
       <div class="control-panel-content scrollbar-hidden">
         <KineticRingSpinner v-if="resolvedLoading"/>
         <WelcomeWidget v-else-if="!loadingStarted && !flashcardSet" class="control-welcome"/>
-        <ControlPanelWidgetBoard
+        <WidgetBoard
           v-else-if="!loadingStarted"
           :show-info-bar="sidebarExpandedCookie && !isSidebarOverlay"
         />
@@ -56,7 +56,7 @@ import SideBar from '@/components/control-panel/SideBar.vue'
 import ControlBar from '@/components/ControlBar.vue'
 import KineticRingSpinner from '@/components/KineticRingSpinner.vue'
 import WelcomeWidget from '@/components/control-panel/WelcomeWidget.vue'
-import ControlPanelWidgetBoard from '@/pages/ControlPanelWidgetBoard.vue'
+import WidgetBoard from '@/components/control-panel/WidgetBoard.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/modals/FlashcardSetSettingsModal.vue'
 import FlashcardSetCreationModal from '@/modals/FlashcardSetCreationModal.vue'

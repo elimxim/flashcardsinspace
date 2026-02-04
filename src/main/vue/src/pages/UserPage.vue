@@ -26,8 +26,8 @@
 
 
 <script setup lang="ts">
-import UserInfo from '@/pages/UserInfo.vue'
-import UserInfoSkeleton from '@/pages/UserInfoSkeleton.vue'
+import UserInfo from '@/components/UserInfo.vue'
+import UserInfoSkeleton from '@/components/UserInfoSkeleton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { storeToRefs } from 'pinia'

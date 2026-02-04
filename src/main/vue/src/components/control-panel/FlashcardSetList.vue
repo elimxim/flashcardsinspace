@@ -37,7 +37,6 @@
 <script setup lang="ts">
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import KineticRingSpinner from '@/components/KineticRingSpinner.vue'
-import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'
@@ -59,7 +58,6 @@ const props = defineProps<{
 
 const languageStore = useLanguageStore()
 const flashcardSetStore = useFlashcardSetStore()
-const flashcardStore = useFlashcardStore()
 
 await Promise.all([
   waitUntilStoreLoaded(languageStore),
@@ -72,7 +70,6 @@ const {
   stopLoading
 } = useDeferredLoading()
 
-const { flashcardSet } = storeToRefs(flashcardStore)
 const { flashcardSets, extraLoaded } = storeToRefs(flashcardSetStore)
 
 const activeFlashcardSetId = ref(loadSelectedSetIdFromCookies())

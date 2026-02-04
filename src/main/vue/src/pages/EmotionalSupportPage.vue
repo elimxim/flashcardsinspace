@@ -10,7 +10,7 @@
   >
     <div class="comic-container">
       <img
-        src="@/assets/mascot.svg"
+        src="../assets/mascot.svg"
         alt="Melvin"
         role="button"
         tabindex="0"

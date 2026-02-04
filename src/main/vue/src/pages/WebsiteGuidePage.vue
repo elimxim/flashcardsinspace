@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import LightspeedScheduleSection from '@/pages/help/LightspeedScheduleSection.vue'
+import LightspeedScheduleSection from '@/components/LightspeedScheduleSection.vue'
 
 </script>
 

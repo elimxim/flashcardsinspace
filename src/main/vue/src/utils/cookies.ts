@@ -22,7 +22,6 @@ function loadCookie(name: string): string | undefined {
   return value
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function removeCookie(name: string) {
   Log.log(LogTag.COOKIES,`${name} => x_x`)
   Cookies.remove(name)
