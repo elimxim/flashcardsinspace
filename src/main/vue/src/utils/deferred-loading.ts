@@ -9,11 +9,13 @@ export function useDeferredLoading(options?: DeferredLoadingOptions) {
   const minDuration = options?.minDuration ?? 600
   const delayEntry = options?.delayEntry ?? 200
 
+  const loadingStarted = ref(false)
   const resolvedLoading = ref(false)
   let startTimestamp = 0
   let entryTimeout: ReturnType<typeof setTimeout> | null = null
 
   const startLoading = () => {
+    loadingStarted.value = true
     entryTimeout = setTimeout(() => {
       resolvedLoading.value = true
       startTimestamp = performance.now()
@@ -22,6 +24,7 @@ export function useDeferredLoading(options?: DeferredLoadingOptions) {
   }
 
   const stopLoading = async () => {
+    loadingStarted.value = false
     if (entryTimeout) {
       clearTimeout(entryTimeout)
     }
@@ -39,6 +42,7 @@ export function useDeferredLoading(options?: DeferredLoadingOptions) {
   }
 
   const resetLoading = () => {
+    loadingStarted.value = false
     if (entryTimeout) {
       clearTimeout(entryTimeout)
       entryTimeout = null
@@ -47,6 +51,7 @@ export function useDeferredLoading(options?: DeferredLoadingOptions) {
   }
 
   return {
+    loadingStarted,
     resolvedLoading,
     startLoading,
     stopLoading,

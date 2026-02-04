@@ -25,7 +25,7 @@
         {{ getFlashcardsNumber(set) }}
       </div>
       <div
-        v-if="set.id === flashcardSet?.id && resolvedLoading"
+        v-if="set.id === activeFlashcardSetId && resolvedLoading"
         class="flashcard-set-spinner-container"
       >
         <KineticRingSpinner :ring-size="42" :track-size="6" :track-color="'rgba(241,245,249,0.2)'"/>

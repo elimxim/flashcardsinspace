@@ -35,8 +35,9 @@
       </ControlBar>
       <div class="control-panel-content scrollbar-hidden">
         <KineticRingSpinner v-if="resolvedLoading"/>
+        <WelcomeWidget v-else-if="!loadingStarted && !flashcardSet" class="control-welcome"/>
         <ControlPanelWidgetBoard
-          v-else
+          v-else-if="!loadingStarted"
           :show-info-bar="sidebarExpandedCookie && !isSidebarOverlay"
         />
       </div>
@@ -53,8 +54,9 @@
 <script setup lang="ts">
 import SideBar from '@/components/control-panel/SideBar.vue'
 import ControlBar from '@/components/ControlBar.vue'
-import ControlPanelWidgetBoard from '@/pages/ControlPanelWidgetBoard.vue'
 import KineticRingSpinner from '@/components/KineticRingSpinner.vue'
+import WelcomeWidget from '@/components/control-panel/WelcomeWidget.vue'
+import ControlPanelWidgetBoard from '@/pages/ControlPanelWidgetBoard.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/modals/FlashcardSetSettingsModal.vue'
 import FlashcardSetCreationModal from '@/modals/FlashcardSetCreationModal.vue'
@@ -83,6 +85,7 @@ const toggleStore = useToggleStore()
 const { flashcardSet } = storeToRefs(flashcardStore)
 
 const {
+  loadingStarted,
   resolvedLoading,
   startLoading,
   stopLoading,
@@ -148,11 +151,6 @@ onMounted(async () => {
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
-}
-
-.control-outer-space-panel {
-  flex: 0 0 14%;
-  overflow: hidden;
 }
 
 .control-welcome {
