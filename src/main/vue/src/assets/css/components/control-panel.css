@@ -56,6 +56,20 @@
   text-align: center;
 }
 
+.cp-count-box--pulsing {
+  color: var(--cp--count-box--bg);
+  animation: box-pulse 1s infinite ease-in-out;
+}
+
+@keyframes box-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 .cp-count-box--big {
   font-size: 0.9rem;
   width: 50px;

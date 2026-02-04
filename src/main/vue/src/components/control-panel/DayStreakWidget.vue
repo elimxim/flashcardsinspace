@@ -16,6 +16,7 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 
 const chronoStore = useChronoStore()
+
 const { dayStreak } = storeToRefs(chronoStore)
 
 </script>

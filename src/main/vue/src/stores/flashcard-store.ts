@@ -1,7 +1,5 @@
 import { type Flashcard, type FlashcardSet } from '@/model/flashcard.ts'
 import { defineStore } from 'pinia'
-import type { Language } from '@/model/language.ts'
-import { useLanguageStore } from '@/stores/language-store.ts'
 import { flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 
@@ -27,18 +25,11 @@ export const useFlashcardStore = defineStore('flashcard', {
         return []
       }
     },
-    language(): Language | undefined {
-      if (this.flashcardSet) {
-        const languageStore = useLanguageStore()
-        return languageStore.getLanguage(this.flashcardSet.languageId)
-      }
-    },
     isEmpty(): boolean {
       return this.flashcardMap.size === 0
     },
     isStarted(): boolean {
-      const r = this.flashcardSet?.startedAt !== undefined
-      return r
+      return this.flashcardSet?.startedAt !== undefined
     },
     isSuspended(): boolean {
       return this.flashcardSet?.status === flashcardSetStatuses.SUSPENDED

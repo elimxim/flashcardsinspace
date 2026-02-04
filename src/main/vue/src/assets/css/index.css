@@ -5,6 +5,7 @@
 @import '@/assets/css/layout/layout.css' layer(layout);
 @import '@/assets/css/layout/auth.css' layer(layout);
 @import '@/assets/css/layout/site-content.css' layer(layout);
+@import '@/assets/css/layout/skeleton.css' layer(layout);
 @import '@/assets/css/shared/shared.css' layer(shared);
 @import '@/assets/css/components/awesome.css' layer(components);
 @import '@/assets/css/components/buttons.css' layer(components);

@@ -6,9 +6,13 @@
       'flex-row',
     ]"
   >
-    <SideBar ref="sidebar" style="z-index: 200;"/>
+    <SideBar
+      ref="sidebar"
+      style="z-index: 200;"
+      :on-flashcard-set-changed="onFlashcardSetChanged"
+    />
     <div class="control-panel-layout">
-      <ControlBar :title="flashcardSetName" shadow>
+      <ControlBar :title="flashcardSet?.name" shadow>
         <template #left>
           <AwesomeButton
             icon="fa-solid fa-bars"
@@ -30,17 +34,12 @@
         </template>
       </ControlBar>
       <div class="control-panel-content scrollbar-hidden">
-        <WelcomeWidget v-if="!flashcardSet" class="control-welcome"/>
-        <template v-else>
-          <FlashcardSetInfoBar
-            :hidden="!flashcardSet || (sidebarExpandedCookie && !isSidebarOverlay)"
-          />
-          <MainPanel/>
-          <LearningStagesWidget ref="learningStagesWidget" :grow-multiplier="3"/>
-          <div class="control-outer-space-panel">
-            <OuterSpaceWidget/>
-          </div>
-        </template>
+        <KineticRingSpinner v-if="resolvedLoading"/>
+        <WelcomeWidget v-else-if="!loadingStarted && !flashcardSet" class="control-welcome"/>
+        <WidgetBoard
+          v-else-if="!loadingStarted"
+          :show-info-bar="sidebarExpandedCookie && !isSidebarOverlay"
+        />
       </div>
     </div>
   </div>
@@ -55,11 +54,9 @@
 <script setup lang="ts">
 import SideBar from '@/components/control-panel/SideBar.vue'
 import ControlBar from '@/components/ControlBar.vue'
-import FlashcardSetInfoBar from '@/components/control-panel/FlashcardSetInfoBar.vue'
-import MainPanel from '@/components/control-panel/MainPanel.vue'
-import LearningStagesWidget from '@/components/control-panel/LearningStagesWidget.vue'
-import OuterSpaceWidget from '@/components/control-panel/OuterSpaceWidget.vue'
+import KineticRingSpinner from '@/components/KineticRingSpinner.vue'
 import WelcomeWidget from '@/components/control-panel/WelcomeWidget.vue'
+import WidgetBoard from '@/components/control-panel/WidgetBoard.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import FlashcardSetSettingsModal from '@/modals/FlashcardSetSettingsModal.vue'
 import FlashcardSetCreationModal from '@/modals/FlashcardSetCreationModal.vue'
@@ -70,19 +67,33 @@ import SpaceToast from '@/components/SpaceToast.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
-import { isTouchDevice } from '@/utils/utils.ts'
+import {
+  loadFlashcardSetStore,
+  loadStoresForCurrFlashcardSet,
+  loadStoresForFlashcardSet,
+} from '@/utils/store-loading.ts'
+import { useDeferredLoading } from '@/utils/deferred-loading.ts'
+import { Log, LogTag } from '@/utils/logger.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 
+const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
 const toggleStore = useToggleStore()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
 
+const {
+  loadingStarted,
+  resolvedLoading,
+  startLoading,
+  stopLoading,
+  resetLoading,
+} = useDeferredLoading()
+
 const sidebar = ref<InstanceType<typeof SideBar>>()
 const isSidebarOverlay = computed(() => sidebar.value?.isOverlay ?? false)
-const flashcardSetName = computed(() => flashcardSet.value?.name || '')
-const learningStagesWidget = ref<InstanceType<typeof LearningStagesWidget>>()
 
 function openFlashcardSetSettings() {
   if (flashcardSet.value) {
@@ -90,15 +101,35 @@ function openFlashcardSetSettings() {
   }
 }
 
-onMounted(() => {
-  if (isTouchDevice) {
-    nextTick().then(() =>
-      setTimeout(() => {
-        learningStagesWidget.value?.expand()
-      }, 1000)
-    )
+async function onFlashcardSetChanged(setId: number): Promise<boolean> {
+  Log.log(LogTag.DEBUG, `onFlashcardSetChanged: ${setId}`)
+  const set = flashcardSetStore.findSet(setId)
+  if (set) {
+    try {
+      resetLoading()
+      startLoading()
+      return await loadStoresForFlashcardSet(set)
+    } finally {
+      await stopLoading()
+    }
+  }
+  return false
+}
+
+onMounted(async () => {
+  try {
+    startLoading()
+    await loadFlashcardSetStore()
+      .then((loaded) => {
+        if (loaded) {
+          return loadStoresForCurrFlashcardSet()
+        }
+      })
+  } finally {
+    await stopLoading()
   }
 })
+
 </script>
 
 <style scoped>
@@ -120,11 +151,6 @@ onMounted(() => {
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
-}
-
-.control-outer-space-panel {
-  flex: 0 0 14%;
-  overflow: hidden;
 }
 
 .control-welcome {

@@ -24,8 +24,8 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { storeToRefs } from 'pinia'
 
 const toggleStore = useToggleStore()
-
 const flashcardStore = useFlashcardStore()
+
 const { flashcardSet } = storeToRefs(flashcardStore)
 
 </script>

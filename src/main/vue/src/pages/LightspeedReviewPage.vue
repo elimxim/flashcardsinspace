@@ -31,56 +31,59 @@
       </template>
     </ControlBar>
     <div class="review-layout">
-      <div class="review-progressbar">
-        <Progressbar
-          :progress="progress"
-          height="16px"
-        />
-      </div>
-      <div class="review-info">
-        <div class="cp-count-box cp-count-box--big">
-          {{ flashcardsSeen }}
-        </div>
-        <div class="cp-count-box cp-count-box--big">
-          {{ flashcardsRemaining }}
-        </div>
-      </div>
-      <div class="review-body">
-        <SpaceDeck
-          ref="spaceDeck"
-          :session-type="ReviewSessionType.LIGHTSPEED"
-          :on-flashcard-removed="onFlashcardRemoved"
-          :on-audio-changed="onAudioChanged"
-          :can-slide-left="!noNextAvailable"
-          :can-slide-right="!noNextAvailable"
-          :on-slide-left="stageDown"
-          :on-slide-right="stageUp"
-          swipe-left-text="Don't know"
-          swipe-right-text="Know"
-        >
-          <ReviewResult/>
-        </SpaceDeck>
-        <div v-if="!isTouchDevice" class="review-nav">
-          <SmartButton
-            text="Don't know"
-            class="decision-button dangerous-button"
-            :disabled="noNextAvailable"
-            :hidden="noNextAvailable"
-            :on-click="spaceDeck?.slideLeft"
-            auto-blur
-            rounded
-          />
-          <SmartButton
-            text="Know"
-            class="decision-button safe-button"
-            :disabled="noNextAvailable"
-            :hidden="noNextAvailable"
-            :on-click="spaceDeck?.slideRight"
-            auto-blur
-            rounded
+      <KineticRingSpinner v-if="resolvedLoading" :ring-size="240"/>
+      <template v-else-if="!loadingStarted">
+        <div class="review-progressbar">
+          <Progressbar
+            :progress="progress"
+            height="16px"
           />
         </div>
-      </div>
+        <div class="review-info">
+          <div class="cp-count-box cp-count-box--big">
+            {{ flashcardsSeen }}
+          </div>
+          <div class="cp-count-box cp-count-box--big">
+            {{ flashcardsRemaining }}
+          </div>
+        </div>
+        <div class="review-body">
+          <SpaceDeck
+            ref="spaceDeck"
+            :session-type="ReviewSessionType.LIGHTSPEED"
+            :on-flashcard-removed="onFlashcardRemoved"
+            :on-audio-changed="onAudioChanged"
+            :can-slide-left="!noNextAvailable"
+            :can-slide-right="!noNextAvailable"
+            :on-slide-left="stageDown"
+            :on-slide-right="stageUp"
+            swipe-left-text="Don't know"
+            swipe-right-text="Know"
+          >
+            <ReviewResult/>
+          </SpaceDeck>
+          <div v-if="!isTouchDevice" class="review-nav">
+            <SmartButton
+              text="Don't know"
+              class="decision-button dangerous-button"
+              :disabled="noNextAvailable"
+              :hidden="noNextAvailable"
+              :on-click="spaceDeck?.slideLeft"
+              auto-blur
+              rounded
+            />
+            <SmartButton
+              text="Know"
+              class="decision-button safe-button"
+              :disabled="noNextAvailable"
+              :hidden="noNextAvailable"
+              :on-click="spaceDeck?.slideRight"
+              auto-blur
+              rounded
+            />
+          </div>
+        </div>
+      </template>
     </div>
   </div>
   <SpaceToast/>
@@ -88,6 +91,7 @@
 
 <script setup lang="ts">
 import ControlBar from '@/components/ControlBar.vue'
+import KineticRingSpinner from '@/components/KineticRingSpinner.vue'
 import Progressbar from '@/components/Progressbar.vue'
 import SpaceDeck from '@/components/review/SpaceDeck.vue'
 import SmartButton from '@/components/SmartButton.vue'
@@ -108,7 +112,7 @@ import { useRouter } from 'vue-router'
 import { loadSelectedSetIdFromCookies, } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
-import { loadFlashcardRelatedStoresById } from '@/utils/stores.ts'
+import { loadStoresForFlashcardSetId } from '@/utils/store-loading.ts'
 import {
   sendChronoBulkUpdateRequest,
   sendFlashcardUpdateRequest,
@@ -126,6 +130,7 @@ import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
+import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 
 const props = defineProps<{
   sessionId?: number,
@@ -140,6 +145,13 @@ const flashcardStore = useFlashcardStore()
 
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { chronodays, currDay } = storeToRefs(chronoStore)
+
+const {
+  loadingStarted,
+  resolvedLoading,
+  startLoading,
+  stopLoading,
+} = useDeferredLoading()
 
 const reviewStore = useReviewStore(ReviewSessionType.LIGHTSPEED)
 
@@ -158,19 +170,26 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 const elapsedTime = ref(0)
 const { startWatch, stopWatch } = useStopWatch(elapsedTime)
 
+const startingReview = ref(false)
+
 const reviewedFlashcardIds = ref<number[]>([])
 const incorrectFlashcards = ref<Flashcard[]>([])
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 async function startReview() {
-  Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.LIGHTSPEED}`)
-  reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value, chronodays.value))
-  await createReviewSession()
-  await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
-    if (success) startWatch()
-  })
-  Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+  startingReview.value = true
+  try {
+    Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.LIGHTSPEED}`)
+    reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value, chronodays.value))
+    await createReviewSession()
+    await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
+      if (success) startWatch()
+    })
+    Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+  } finally {
+    startingReview.value = false
+  }
 }
 
 function resetState() {
@@ -181,7 +200,7 @@ function resetState() {
 }
 
 async function finishReview() {
-  if (!reviewStoreLoaded.value) return
+  if (startingReview.value || !reviewStoreLoaded.value) return
   Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
   currFlashcardWatcher.stop()
   try {
@@ -342,17 +361,22 @@ async function updateReviewSession(flashcardIds: number[], finished: boolean = f
 }
 
 onMounted(async () => {
-  reviewStore.resetState()
-  if (!flashcardStore.loaded) {
-    Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
-    const selectedSetId = loadSelectedSetIdFromCookies()
-    if (selectedSetId) {
-      await loadFlashcardRelatedStoresById(selectedSetId)
-    } else {
-      Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
+  try {
+    startLoading()
+    reviewStore.resetState()
+    if (!flashcardStore.loaded) {
+      Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
+      const selectedSetId = loadSelectedSetIdFromCookies()
+      if (selectedSetId) {
+        await loadStoresForFlashcardSetId(selectedSetId)
+      } else {
+        Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
+      }
     }
+    await startReview()
+  } finally {
+    await stopLoading()
   }
-  await startReview()
   spaceDeck.value?.setDeckReady()
   document.addEventListener('keydown', handleKeydown)
 })

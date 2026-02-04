@@ -1,10 +1,10 @@
 <template>
   <Modal
     :visible="toggleStore.flashcardSetSettingsOpen"
-    :on-press-exit="cancel"
-    :on-press-enter="update"
-    :on-press-delete="remove"
     :focus-on="nameInput"
+    :exit-button="cancelButton"
+    :enter-button="updateButton"
+    :delete-button="removeButton"
     title="Flashcard Set Settings"
   >
     <div class="modal-main-area">
@@ -53,12 +53,14 @@
     </div>
     <div class="modal-control-buttons">
       <SmartButton
+        ref="cancelButton"
         class="off-button"
         text="Cancel"
         :on-click="cancel"
         auto-blur
       />
       <SmartButton
+        ref="removeButton"
         class="dangerous-button"
         text="Remove"
         :hold-time="4"
@@ -66,6 +68,7 @@
         auto-blur
       />
       <SmartButton
+        ref="updateButton"
         class="calm-button"
         text="Save"
         :on-click="update"
@@ -99,7 +102,7 @@ import {
   sendFlashcardSetUpdateRequest,
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { reloadFlashcardRelatedStores } from '@/utils/stores.ts'
+import { loadStoresForCurrFlashcardSet } from '@/utils/store-loading.ts'
 import { copyFlashcardSet, flashcardSetStatuses } from '@/core-logic/flashcard-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
@@ -113,8 +116,14 @@ const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 
 const { languages } = storeToRefs(languageStore)
-const { flashcardSet, language } = storeToRefs(flashcardStore)
+const { flashcardSet } = storeToRefs(flashcardStore)
 
+const language = computed(() =>
+  languageStore.getLanguage(flashcardSet.value?.languageId ?? -1)
+)
+const cancelButton = ref<InstanceType<typeof SmartButton>>()
+const removeButton = ref<InstanceType<typeof SmartButton>>()
+const updateButton = ref<InstanceType<typeof SmartButton>>()
 const nameInput = ref<HTMLElement>()
 const newName = ref<string | undefined>(flashcardSet.value?.name)
 const newLanguage = ref<Language | undefined>(language.value)
@@ -168,7 +177,7 @@ function cancel() {
 async function remove() {
   const removed = await removeFlashcardSet()
   if (removed) {
-    await reloadFlashcardRelatedStores(true)
+    await loadStoresForCurrFlashcardSet(true)
       .then(() => {
         toggleStore.toggleFlashcardSetSettings()
         resetState()

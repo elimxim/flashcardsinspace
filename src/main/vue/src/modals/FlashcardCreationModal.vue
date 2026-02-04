@@ -2,9 +2,9 @@
   <Modal
     title="New Flashcard"
     :visible="toggleStore.flashcardCreationOpen"
-    :on-press-exit="cancel"
-    :on-press-enter="create"
     :focus-on="frontSideTextArea"
+    :exit-button="cancelButton"
+    :enter-button="createButton"
   >
     <template #control>
       <AwesomeButton
@@ -54,12 +54,14 @@
     </div>
     <div class="modal-control-buttons">
       <SmartButton
+        ref="cancelButton"
         class="off-button"
         text="Cancel"
         :on-click="cancel"
         auto-blur
       />
       <SmartButton
+        ref="createButton"
         class="safe-button"
         text="Create"
         :on-click="create"
@@ -116,7 +118,8 @@ const frontSideAudioBlob = ref<Blob | undefined>()
 const backSide = ref<string>('')
 const backSideAudioBlob = ref<Blob | undefined>()
 const infiniteLoopButton = ref<InstanceType<typeof AwesomeButton>>()
-
+const cancelButton = ref<InstanceType<typeof SmartButton>>()
+const createButton = ref<InstanceType<typeof SmartButton>>()
 const createdFlashcard = ref<Flashcard | undefined>()
 
 const validationRules = {

@@ -10,7 +10,7 @@
 import Navbar from '@/components/Navbar.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import { onMounted } from 'vue'
-import { loadLanguageStore } from '@/utils/stores.ts'
+import { loadLanguageStore } from '@/utils/store-loading.ts'
 
 onMounted(() => {
   loadLanguageStore()
@@ -19,13 +19,4 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.app {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: var(--app--bg, white);
-  overflow: hidden;
-  touch-action: pan-y;
-}
-
 </style>

@@ -37,7 +37,6 @@ import {
   type Component,
   ComputedRef,
 } from 'vue'
-import { loadFlashcardSetStore } from '@/utils/stores.ts'
 import { specialStages } from '@/core-logic/stage-logic.ts'
 import { useFlip } from '@/utils/flip.ts'
 
@@ -241,9 +240,7 @@ function updateMainPanelWidth() {
 }
 
 onMounted(() => {
-  loadFlashcardSetStore()
   updateMainPanelWidth()
-
   resizeObserver = new ResizeObserver(() => {
     updateMainPanelWidth()
   })

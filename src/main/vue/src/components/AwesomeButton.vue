@@ -17,6 +17,7 @@
         role="button"
         class="awesome-button awesome-button--theme select-none drag-none"
         :class="{
+        'awesome-button--loading': resolvedLoading,
         'awesome-button--active': active,
         'awesome-button--disabled': disabled,
         'awesome-button--invisible': invisible,
@@ -27,29 +28,38 @@
         :disabled="disabled"
         v-bind="$attrs"
         @click.stop="handleClick"
-        @dblclick.stop="onDoubleClick"
-        @mouseenter="onHover"
-        @mouseleave="onHover"
+        @dblclick.stop="handleDoubleClick"
+        @mouseenter="handleHover"
+        @mouseleave="handleHover"
       >
-        <slot name="above"/>
-        <div class="awesome-icon-wrapper">
+        <div v-if="resolvedLoading" class="awesome-icon-wrapper">
           <font-awesome-icon
-            v-if="pressed && spinnable"
-            :icon="spinIcon || icon"
-            class="awesome-icon awesome--icon--spinning"
-          />
-          <font-awesome-icon
-            v-else-if="fade"
-            :icon="icon"
-            class="awesome-icon awesome--icon--fading"
-          />
-          <font-awesome-icon
-            v-else
-            :icon="icon"
+            icon="fa-solid fa-spinner"
             class="awesome-icon"
+            spin-pulse
           />
         </div>
-        <slot name="below"/>
+        <template v-else>
+          <slot name="above"/>
+          <div class="awesome-icon-wrapper">
+            <font-awesome-icon
+              v-if="pressed && spinnable"
+              :icon="spinIcon || icon"
+              class="awesome-icon awesome--icon--spinning"
+            />
+            <font-awesome-icon
+              v-else-if="fade"
+              :icon="icon"
+              class="awesome-icon awesome--icon--fading"
+            />
+            <font-awesome-icon
+              v-else
+              :icon="icon"
+              class="awesome-icon"
+            />
+          </div>
+          <slot name="below"/>
+        </template>
       </div>
     </Tooltip>
   </div>
@@ -59,6 +69,7 @@
 import Tooltip from '@/components/Tooltip.vue'
 import { ref } from 'vue'
 import { isHoverSupported } from '@/utils/utils.ts'
+import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 
 const props = withDefaults(defineProps<{
   icon: string
@@ -78,9 +89,9 @@ const props = withDefaults(defineProps<{
   tooltip?: string
   tooltipPosition?: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
   tooltipDelay?: number
-  onClick?: () => void
-  onDoubleClick?: () => void
-  onHover?: () => void
+  onClick?: () => void | Promise<void>
+  onDoubleClick?: () => void | Promise<void>
+  onHover?: () => void | Promise<void>
 }>(), {
   fade: false,
   scaleFactor: 1.1,
@@ -98,25 +109,36 @@ const props = withDefaults(defineProps<{
   tooltip: undefined,
   tooltipPosition: 'top',
   tooltipDelay: 1000,
-  onClick: () => {
+  onClick: async () => {
   },
-  onDoubleClick: () => {
+  onDoubleClick: async () => {
   },
-  onHover: () => {
+  onHover: async () => {
   },
 })
+
+const {
+  resolvedLoading,
+  startLoading,
+  stopLoading,
+} = useDeferredLoading()
 
 const pressed = ref(false)
 const rippleActive = ref(false)
 const animatingOnTap = ref(false)
 
-function press() {
+async function press() {
   pressed.value = !pressed.value
-  props.onClick()
+  try {
+    startLoading()
+    await props.onClick()
+  } finally {
+    await stopLoading()
+  }
 }
 
 function handleClick() {
-  if (props.disabled) return
+  if (props.disabled || resolvedLoading.value) return
   if (props.clickRipple) {
     triggerRipple()
   } else if (!isHoverSupported && props.animateTap) {
@@ -124,6 +146,21 @@ function handleClick() {
   } else {
     press()
   }
+}
+
+async function handleDoubleClick() {
+  if (props.disabled || resolvedLoading.value) return
+  try {
+    startLoading()
+    await props.onDoubleClick()
+  } finally {
+    await stopLoading()
+  }
+}
+
+async function handleHover() {
+  if (props.disabled || resolvedLoading.value) return
+  await props.onHover()
 }
 
 function startTapAnimation() {
@@ -165,6 +202,8 @@ defineExpose({
   --a-btn--bg--hover: var(--awesome-button--bg--hover, none);
   --a-btn--bg--disabled: var(--awesome-button--bg--disabled, none);
   --a-btn--bg--active: var(--awesome-button--bg--active, none);
+  --a-btn--bg--loading: var(--awesome-button--bg--loading, none);
+  --a-btn--spinner--color: var(--awesome-button--icon--color--loading, #000000);
   --a-btn--border: var(--awesome-button--border, none);
   --a-btn--border--hover: var(--awesome-button--border--hover, none);
   --a-btn--border-radius: var(--awesome-button--border-radius, none);
@@ -215,13 +254,13 @@ defineExpose({
 }
 
 @media (hover: hover) {
-  .awesome-button:not(.awesome-button--disabled):not(.awesome-button--active):hover {
+  .awesome-button:not(.awesome-button--disabled):not(.awesome-button--active):not(.awesome-button--loading):hover {
     color: var(--a-btn--icon--color--hover);
     background: var(--a-btn--bg--hover);
   }
 }
 
-.awesome-button--tapped:not(.awesome-button--disabled):not(.awesome-button--active) {
+.awesome-button--tapped:not(.awesome-button--disabled):not(.awesome-button--active):not(.awesome-button--loading) {
   color: var(--a-btn--icon--color--hover);
   background: var(--a-btn--bg--hover);
 }
@@ -234,9 +273,14 @@ defineExpose({
   transform: none;
 }
 
-.awesome-button--active {
+.awesome-button--active:not(.awesome-button--loading) {
   color: var(--a-btn--icon--color--active);
   background: var(--a-btn--bg--active);
+}
+
+.awesome-button--loading {
+  color: var(--a-btn--spinner--color);
+  background: var(--a-btn--bg--loading);
 }
 
 .awesome-button--invisible {

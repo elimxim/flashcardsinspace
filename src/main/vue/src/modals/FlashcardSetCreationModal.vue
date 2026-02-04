@@ -1,9 +1,9 @@
 <template>
   <Modal
     :visible="toggleStore.flashcardSetCreationOpen"
-    :on-press-exit="cancel"
-    :on-press-enter="create"
     :focus-on="nameInput"
+    :exit-button="cancelButton"
+    :enter-button="createButton"
     title="New Flashcard Set"
     focusable
   >
@@ -45,12 +45,14 @@
     </div>
     <div class="modal-control-buttons">
       <SmartButton
+        ref="cancelButton"
         class="off-button"
         text="Cancel"
         :on-click="cancel"
         auto-blur
       />
       <SmartButton
+        ref="createButton"
         class="safe-button"
         text="Create"
         :on-click="create"
@@ -86,6 +88,7 @@ import {
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
+import { selectedSetIdCookie } from '@/utils/cookies-ref.ts'
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
@@ -99,6 +102,8 @@ const { languages } = storeToRefs(languageStore)
 const name = ref('')
 const nameInput = ref<HTMLElement>()
 const language = ref<Language>()
+const cancelButton = ref<InstanceType<typeof SmartButton>>()
+const createButton = ref<InstanceType<typeof SmartButton>>()
 
 const validationRules = {
   name: {
@@ -150,6 +155,7 @@ async function createNewFlashcardSet(): Promise<boolean> {
   const newSet = createFlashcardSet(name.value, language.value)
   return await sendFlashcardSetCreationRequest(newSet)
     .then((response) => {
+      selectedSetIdCookie.value = response.data.id
       flashcardSetStore.addSet(response.data)
       flashcardStore.loadState(response.data, [])
       return sendChronoSyncRequest(response.data.id)

@@ -25,6 +25,7 @@ import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
+import { useLanguageStore } from '@/stores/language-store.ts'
 
 withDefaults(defineProps<{
   hidden?: boolean
@@ -33,8 +34,13 @@ withDefaults(defineProps<{
 })
 
 const flashcardStore = useFlashcardStore()
-const { flashcards, language } = storeToRefs(flashcardStore)
+const languageStore = useLanguageStore()
 
+const { flashcards, flashcardSet } = storeToRefs(flashcardStore)
+
+const language = computed(() =>
+  languageStore.getLanguage(flashcardSet.value?.languageId ?? -1)
+)
 const flashcardCount = computed(() => flashcards.value.length)
 </script>
 

@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
+import SmartButton from '@/components/SmartButton.vue'
 import { nextTick, ref, watch, onUnmounted, onMounted } from 'vue'
 
 const props = withDefaults(defineProps<{
@@ -33,33 +34,38 @@ const props = withDefaults(defineProps<{
   title?: string
   focusOn?: HTMLElement
   overflow?: string
-  onPressExit?: () => void
-  onPressEnter?: () => void
-  onPressDelete?: () => void
+  exitButton?: InstanceType<typeof SmartButton>
+  enterButton?: InstanceType<typeof SmartButton>
+  deleteButton?: InstanceType<typeof SmartButton>
+  onExit?: () => void
 }>(), {
   title: '',
   focusOn: undefined,
   overflow: 'auto',
-  onPressExit: () => {
-  },
-  onPressEnter: () => {
-  },
-  onPressDelete: () => {
+  exitButton: undefined,
+  enterButton: undefined,
+  deleteButton: undefined,
+  onExit: () => {
   },
 })
 
 const modalWindow = ref<HTMLDivElement>()
 
 function pressExit() {
-  props.onPressExit()
+  props.exitButton?.click()
+  props.onExit()
 }
 
 function pressEnter() {
-  props.onPressEnter()
+  props.enterButton?.click()
 }
 
-function pressDelete() {
-  props.onPressDelete()
+function holdDelete(event: Event) {
+  props.deleteButton?.hold(event)
+}
+
+function releaseDelete() {
+  props.deleteButton?.release()
 }
 
 watch(() => props.visible, (newVal) => {
@@ -76,10 +82,12 @@ watch(() => props.visible, (newVal) => {
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
+  window.addEventListener('keyup', handleKeyUp)
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener('keyup', handleKeyUp)
 })
 
 function handleKeydown(event: KeyboardEvent) {
@@ -89,20 +97,26 @@ function handleKeydown(event: KeyboardEvent) {
     event.preventDefault()
     event.stopPropagation()
     pressExit()
-  } else if (event.key === 'Enter' && !event.ctrlKey) {
-    if (!(event.target instanceof HTMLTextAreaElement)) {
+  } else if (event.key === 'Enter') {
+    if (event.ctrlKey || !(event.target instanceof HTMLTextAreaElement)) {
       event.preventDefault()
       event.stopPropagation()
       pressEnter()
     }
-  } else if (event.key === 'Enter' && event.ctrlKey) {
-    event.preventDefault()
-    event.stopPropagation()
-    pressEnter()
   } else if (event.key === 'Delete') {
     event.preventDefault()
     event.stopPropagation()
-    pressDelete()
+    holdDelete(event)
+  }
+}
+
+function handleKeyUp(event: KeyboardEvent) {
+  if (!props.visible) return
+
+  if (event.key === 'Delete') {
+    event.preventDefault()
+    event.stopPropagation()
+    releaseDelete()
   }
 }
 

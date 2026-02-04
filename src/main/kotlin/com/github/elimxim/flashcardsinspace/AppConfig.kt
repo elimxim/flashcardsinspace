@@ -8,7 +8,10 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 
 @Configuration
-@EnableConfigurationProperties(MailProperties::class)
+@EnableConfigurationProperties(
+    MailProperties::class,
+    DevProperties::class
+)
 class AppConfig {
     @Bean
     fun messageSource(): MessageSource {

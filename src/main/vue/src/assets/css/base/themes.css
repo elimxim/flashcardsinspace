@@ -66,12 +66,18 @@
   --dangerous-button--bg-color: #830000;
   --dangerous-button--bg-color--hover: #aa0000;
   --dangerous-button--bg-color--progress: #d60000;
+  --dangerous-button--bg-color--disabled: #ff8080;
+  --dangerous-button--spinner--color: #ededed;
 
   --safe-button--bg-color: #118300;
   --safe-button--bg-color--hover: #00bd10;
+  --safe-button--bg-color--disabled: #80df88;
+  --safe-button--spinner--color: #ededed;
 
   --calm-button--bg-color: #0056b3;
   --calm-button--bg-color--hover: #0070e6;
+  --calm-button--bg-color--loading: #4da3ff;
+  --calm-button--spinner--color: #ededed;
 
   /* calendar */
 

@@ -10,7 +10,7 @@
   >
     <div class="comic-container">
       <img
-        src="@/assets/mascot.svg"
+        src="../assets/mascot.svg"
         alt="Melvin"
         role="button"
         tabindex="0"
@@ -195,7 +195,7 @@ function handleClickOnMascot() {
     index = 0
   }
   mascotPhraseIndex.value = index
-  mascotPhrase.value = mascotPhrases[index]
+  mascotPhrase.value = shuffledMascotPhrases[index]
 }
 
 async function handleClickOnTipCategory(category: TipsCategory) {
@@ -329,9 +329,11 @@ async function handleClickOnTipCategory(category: TipsCategory) {
   border-bottom-right-radius: 20px;
 }
 
-.tip-category:not([class*="--active"]):hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
+@media (hover: hover) {
+  .tip-category:not([class*="--active"]):hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
 }
 
 .tip-category--left--active {
