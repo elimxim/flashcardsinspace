@@ -1,9 +1,10 @@
 <template>
   <div
     class="space-card space-card--theme"
+    :class="{ 'space-card--flipped': flipped }"
     @click="flip"
   >
-    <div class="space-card-flipper" :style="{ transform: `rotateY(${rotationAngle}deg)` }">
+    <div class="space-card-flipper">
       <div
         class="space-card-face space-card-face--front"
         :class="{
@@ -160,13 +161,10 @@ const props = withDefaults(defineProps<{
 })
 
 const FLIP_ANIMATION_DURATION_MS = 500
-const ACCELERATION_FACTOR = 1.2
 
 const flipped = ref(false)
-const rotationAngle = ref(0)
-const rotationAngleDeg = computed(() => `${rotationAngle.value}deg`)
 const currentFlipDuration = ref(FLIP_ANIMATION_DURATION_MS)
-const flipAnimationDurationCss = computed(() => `${currentFlipDuration.value}ms`)
+const flipAnimationDurationMs = computed(() => `${currentFlipDuration.value}ms`)
 const isAnimating = ref(false)
 const cardAnimationCompleted = ref(false)
 let flipDurationTimeout: ReturnType<typeof setTimeout> | null = null
@@ -191,30 +189,19 @@ function flip() {
     isAnimating.value = true
     stopAllVoices()
     flipped.value = !flipped.value
-    rotationAngle.value -= 180
-
-    const duration = currentFlipDuration.value
 
     setTimeout(() => {
       isAnimating.value = false
-
-      currentFlipDuration.value = Math.floor(currentFlipDuration.value * ACCELERATION_FACTOR)
-
-      flipDurationTimeout = setTimeout(() => {
-        currentFlipDuration.value = FLIP_ANIMATION_DURATION_MS
-      }, 300)
-
       if (autoPlayVoice.value && cardAnimationCompleted.value) {
         playCurrentSideVoice()
       }
-    }, duration)
+    }, FLIP_ANIMATION_DURATION_MS)
   }
 }
 
 function flipToFront() {
   if (!props.unflippable && flipped.value) {
     flipped.value = false
-    rotationAngle.value -= 180
   }
 }
 
@@ -222,7 +209,6 @@ async function flipToFrontAndWait(): Promise<void> {
   return new Promise((resolve) => {
     if (flipped.value && !props.unflippable) {
       flipped.value = false
-      rotationAngle.value -= 180
       setTimeout(() => resolve(void 0), FLIP_ANIMATION_DURATION_MS)
     } else {
       resolve(void 0)
@@ -301,10 +287,13 @@ defineExpose({
   z-index: 10;
 }
 
+.space-card--flipped .space-card-flipper {
+  transform: rotateY(180deg);
+}
+
 .space-card-flipper {
   flex: 1;
-  transition: transform v-bind(flipAnimationDurationCss) cubic-bezier(0.25, 1, 0.5, 1);
-  transform: rotateY(v-bind(rotationAngleDeg));
+  transition: transform v-bind(flipAnimationDurationMs) cubic-bezier(0.25, 1, 0.5, 1);
   transform-style: preserve-3d;
   position: relative;
   will-change: transform;
