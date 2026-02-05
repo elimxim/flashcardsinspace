@@ -9,7 +9,7 @@
     <div v-if="resolvedLoading" class="skeleton skeleton--dark control-bar-title-skeleton"/>
     <div
       v-else-if="!isDelaying || !loadingStarted"
-      class="control-bar-title"
+      class="control-bar-title select-text"
       :class="{ 'centered': centerTitle }"
     >
       {{ title }}

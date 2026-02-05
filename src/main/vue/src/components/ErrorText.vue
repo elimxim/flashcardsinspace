@@ -3,7 +3,7 @@
     <div
       v-if="firstErrorText"
       :key="firstErrorText"
-      class="error-text error-text--theme"
+      class="error-text error-text--theme select-text"
     >
       {{ firstErrorText }}
     </div>

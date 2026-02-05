@@ -23,7 +23,7 @@
       :blur-amount="4"
     />
     <div class="help-content">
-      <div class="help-header">
+      <div class="help-header select-text">
         <h1>I need...</h1>
       </div>
       <div class="help-cards-container">

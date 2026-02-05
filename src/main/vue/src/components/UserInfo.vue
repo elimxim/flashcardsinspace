@@ -53,10 +53,10 @@
         />
       </AwesomeContainer>
     </div>
-    <div class="user-info-item">
+    <div class="user-info-item select-text">
       Registered at: {{ user?.registeredAt ?? 'Unknown' }}
     </div>
-    <div class="user-info-item">
+    <div class="user-info-item select-text">
       Timezone: {{ user?.timezone ?? 'Unknown' }}
     </div>
     <div class="user-controls">

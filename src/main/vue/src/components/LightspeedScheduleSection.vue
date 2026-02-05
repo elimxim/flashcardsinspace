@@ -1,5 +1,5 @@
 <template>
-  <div class="lightspeed-schedule">
+  <div class="lightspeed-schedule select-text">
     <h1 class="section-header">
     <span class="section-title section-title--centered">
       Lightspeed Schedule

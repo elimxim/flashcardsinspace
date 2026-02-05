@@ -8,7 +8,9 @@
       'website-guide-page',
     ]"
   >
-    <LightspeedScheduleSection/>
+    <div class="schedule-section">
+      <LightspeedScheduleSection/>
+    </div>
   </div>
 </template>
 
@@ -20,6 +22,10 @@ import LightspeedScheduleSection from '@/components/LightspeedScheduleSection.vu
 <style scoped>
 .website-guide-page {
   padding: clamp(10px, 5vw, 20px) clamp(20px, 5vw, 40px);
+}
+
+.schedule-section {
+  flex: 1;
 }
 
 </style>

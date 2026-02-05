@@ -10,8 +10,8 @@
       'user-page--theme',
     ]"
   >
-    <h2>Welcome aboard, {{ user?.name ?? 'Unknown' }}!</h2>
-    <div>{{ randomDayPhrase }}</div>
+    <h2 class="select-text">Welcome aboard, {{ user?.name ?? 'Unknown' }}!</h2>
+    <div class="select-text">{{ randomDayPhrase }}</div>
     <DeferredLoading :wait-for="userInfoAwait">
       <UserInfo :user="user"/>
       <template #fallback>

@@ -14,7 +14,7 @@
           :on-click="pressExit"
         />
       </div>
-      <div v-if="title" class="modal-title">
+      <div v-if="title" class="modal-title select-text">
         {{ title }}
       </div>
       <div class="modal-body">
