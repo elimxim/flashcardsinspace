@@ -14,7 +14,7 @@ import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { onMounted } from 'vue'
 
 const props = withDefaults(defineProps<{
-  waitFor: () => Promise<void>
+  waitFor: () => Promise<unknown>
   delayEntry?: number
   minDuration?: number
 }>(), {
