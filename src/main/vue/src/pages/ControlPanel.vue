@@ -12,7 +12,7 @@
       :on-flashcard-set-changed="onFlashcardSetChanged"
     />
     <div class="control-panel-layout">
-      <ControlBar :title="flashcardSet?.name" shadow>
+      <ControlBar :title="flashcardSetName" shadow>
         <template #left>
           <AwesomeButton
             icon="fa-solid fa-bars"
@@ -92,6 +92,8 @@ const {
   resetLoading,
 } = useDeferredLoading()
 
+const flashcardSetName = ref<string>()
+
 const sidebar = ref<InstanceType<typeof SideBar>>()
 const isSidebarOverlay = computed(() => sidebar.value?.isOverlay ?? false)
 
@@ -126,6 +128,7 @@ onMounted(async () => {
         }
       })
   } finally {
+    flashcardSetName.value = flashcardSet.value?.name ?? ''
     await stopLoading()
   }
 })

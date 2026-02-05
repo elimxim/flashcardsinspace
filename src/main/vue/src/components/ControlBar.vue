@@ -8,7 +8,7 @@
     </div>
     <div v-if="resolvedLoading" class="skeleton skeleton--dark control-bar-title-skeleton"/>
     <div
-      v-else
+      v-else-if="!isDelaying || !loadingStarted"
       class="control-bar-title"
       :class="{ 'centered': centerTitle }"
     >
@@ -35,12 +35,18 @@ const props = withDefaults(defineProps<{
   shadow: false,
 })
 
-const { resolvedLoading, startLoading, stopLoading } = useDeferredLoading()
+const {
+  isDelaying,
+  loadingStarted,
+  resolvedLoading,
+  startLoading,
+  stopLoading,
+} = useDeferredLoading()
 
 const centerTitlePaddingPx = computed(() => `${props.centerTitlePadding}px`)
 
 watch(() => props.title, (newVal) => {
-  if (newVal) {
+  if (newVal !== undefined) {
     stopLoading()
   }
 })
