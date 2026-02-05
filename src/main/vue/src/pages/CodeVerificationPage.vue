@@ -4,7 +4,6 @@
       'page',
       'flex-column',
       'padding-auto',
-      'home-page',
       'scroll-none',
       'touch-none',
     ]"
