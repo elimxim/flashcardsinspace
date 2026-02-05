@@ -179,16 +179,14 @@ onUnmounted(() => {
 }
 
 .navbar {
+  flex: 0 0 var(--navbar-height);
+  height: var(--navbar-height);
   position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   display: flex;
   justify-content: space-between;
   background: var(--nav--bg);
   padding: clamp(4px, 1.5vw, 10px);
-  height: var(--navbar-height);
 }
 
 .nav-items {

@@ -1,11 +1,11 @@
 .page {
+  flex: 1;
   position: relative;
+  min-height: 0;
   width: 100%;
-  min-height: calc(100dvh - var(--navbar-height));
-  max-height: calc(100dvh - var(--navbar-height));
   padding: 0;
   margin: 0;
-  overflow: auto;
+  overflow-y: auto;
   overscroll-behavior: contain;
   touch-action: pan-y;
 }
