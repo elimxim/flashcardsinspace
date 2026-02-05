@@ -175,7 +175,7 @@ onUnmounted(() => toaster.reset())
 
 .space-toast {
   position: relative;
-  width: 360px;
+  width: 320px;
   border-radius: 1rem;
   overflow: hidden;
   backdrop-filter: blur(6px);
