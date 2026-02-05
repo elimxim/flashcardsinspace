@@ -98,7 +98,6 @@ import { useRouter } from 'vue-router'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { User } from '@/model/user.ts'
-import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 const props = defineProps<{
   user: User | undefined,
@@ -108,8 +107,6 @@ const authStore = useAuthStore()
 const languageStore = useLanguageStore()
 const toaster = useSpaceToaster()
 const router = useRouter()
-
-await waitUntilStoreLoaded(languageStore)
 
 const { languages } = storeToRefs(languageStore)
 

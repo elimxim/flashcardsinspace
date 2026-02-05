@@ -12,30 +12,34 @@
   >
     <h2>Welcome aboard, {{ user?.name ?? 'Unknown' }}!</h2>
     <div>{{ randomDayPhrase }}</div>
-    <Suspense>
-      <template #default>
-        <UserInfo :user="user"/>
-      </template>
+    <DeferredLoading :wait-for="userInfoAwait">
+      <UserInfo :user="user"/>
       <template #fallback>
         <UserInfoSkeleton/>
       </template>
-    </Suspense>
+    </DeferredLoading>
   </div>
   <SpaceToast/>
 </template>
 
 
 <script setup lang="ts">
+import DeferredLoading from '@/components/DeferredLoading.vue'
 import UserInfo from '@/components/UserInfo.vue'
 import UserInfoSkeleton from '@/components/UserInfoSkeleton.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import { useAuthStore } from '@/stores/auth-store.ts'
+import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
+import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 const authStore = useAuthStore()
+const languageStore = useLanguageStore()
 
 const { user } = storeToRefs(authStore)
+
+const userInfoAwait = () => waitUntilStoreLoaded(languageStore)
 
 const daysSinceRegistration = computed(() => {
   if (!user.value?.registeredAt) {
