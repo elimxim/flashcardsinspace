@@ -1,22 +1,25 @@
 import { ref } from 'vue'
 
 export interface DeferredLoadingOptions {
-  minDuration?: number,
   delayEntry?: number,
+  minDuration?: number,
 }
 
 export function useDeferredLoading(options?: DeferredLoadingOptions) {
-  const minDuration = options?.minDuration ?? 600
   const delayEntry = options?.delayEntry ?? 200
+  const minDuration = options?.minDuration ?? 800
 
   const loadingStarted = ref(false)
+  const isDelaying = ref(true)
   const resolvedLoading = ref(false)
+
   let startTimestamp = 0
   let entryTimeout: ReturnType<typeof setTimeout> | null = null
 
   const startLoading = () => {
     loadingStarted.value = true
     entryTimeout = setTimeout(() => {
+      isDelaying.value = false
       resolvedLoading.value = true
       startTimestamp = performance.now()
       entryTimeout = null
@@ -34,14 +37,17 @@ export function useDeferredLoading(options?: DeferredLoadingOptions) {
       const remaining = Math.max(0, minDuration - elapsed)
 
       if (remaining > 0) {
-        await new Promise(r => setTimeout(r, remaining))
+        await new Promise(resolved => setTimeout(resolved, remaining))
       }
 
       resolvedLoading.value = false
     }
+
+    isDelaying.value = false
   }
 
   const resetLoading = () => {
+    isDelaying.value = true
     loadingStarted.value = false
     if (entryTimeout) {
       clearTimeout(entryTimeout)
@@ -51,6 +57,7 @@ export function useDeferredLoading(options?: DeferredLoadingOptions) {
   }
 
   return {
+    isDelaying,
     loadingStarted,
     resolvedLoading,
     startLoading,
