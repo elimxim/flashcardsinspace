@@ -1,14 +1,16 @@
 package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
-import com.github.elimxim.flashcardsinspace.entity.repository.*
+import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepository
+import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
+import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
+import com.github.elimxim.flashcardsinspace.entity.repository.ReviewSessionRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.HttpBadRequestException
 import com.github.elimxim.flashcardsinspace.web.exception.HttpForbiddenException
 import com.github.elimxim.flashcardsinspace.web.exception.HttpNotFoundException
-import jakarta.persistence.EntityManager
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,9 +25,7 @@ class FlashcardSetService(
     private val flashcardRepository: FlashcardRepository,
     private val languageService: LanguageService,
     private val requestValidator: RequestValidator,
-    private val dayStreakRepository: DayStreakRepository,
     private val reviewSessionRepository: ReviewSessionRepository,
-    private val entityManager: EntityManager,
 ) {
     @Transactional(readOnly = true)
     fun getAll(user: User): List<FlashcardSetDto> {
@@ -129,10 +129,8 @@ class FlashcardSetService(
             flashcardSet.status = FlashcardSetStatus.DELETED
             flashcardSetRepository.save(flashcardSet)
         } else {
-            dayStreakRepository.deleteByFlashcardSet(flashcardSet)
+            flashcardSet.dayStreak = null
             reviewSessionRepository.deleteByFlashcardSet(flashcardSet)
-            entityManager.flush()
-            entityManager.clear()
             flashcardSetRepository.delete(flashcardSet)
         }
     }
