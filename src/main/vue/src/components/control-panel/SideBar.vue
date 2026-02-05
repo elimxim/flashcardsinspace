@@ -38,26 +38,28 @@
           />
         </template>
       </ControlBar>
-      <Suspense>
-        <template #default>
-          <FlashcardSetList :on-flashcard-set-changed="onFlashcardSetChanged"/>
-        </template>
+      <DeferredLoading :wait-for="flashcardSetListAwaitCond">
+        <FlashcardSetList :on-flashcard-set-changed="onFlashcardSetChanged"/>
         <template #fallback>
           <FlashcardSetListSkeleton/>
         </template>
-      </Suspense>
+      </DeferredLoading>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import ControlBar from '@/components/ControlBar.vue'
+import DeferredLoading from '@/components/DeferredLoading.vue'
 import FlashcardSetList from '@/components/control-panel/FlashcardSetList.vue'
 import FlashcardSetListSkeleton from '@/components/control-panel/FlashcardSetListSkeleton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
+import { useLanguageStore } from '@/stores/language-store.ts'
+import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
+import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 defineProps<{
   onFlashcardSetChanged: (setId: number) => Promise<boolean>
@@ -66,9 +68,16 @@ defineProps<{
 const OVERLAY_BREAKPOINT = 620
 
 const toggleStore = useToggleStore()
+const languageStore = useLanguageStore()
+const flashcardSetStore = useFlashcardSetStore()
 
 const isOverlay = ref(window.innerWidth <= OVERLAY_BREAKPOINT)
 const isTransitioning = ref(false)
+
+const flashcardSetListAwaitCond = () => Promise.all([
+  waitUntilStoreLoaded(languageStore),
+  waitUntilStoreLoaded(flashcardSetStore),
+])
 
 function updateOverlayMode() {
   const wasOverlay = isOverlay.value

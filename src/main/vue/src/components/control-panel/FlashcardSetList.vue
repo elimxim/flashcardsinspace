@@ -41,10 +41,7 @@ import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'
 import { FlashcardSet } from '@/model/flashcard.ts'
-import {
-  loadFlashcardSetExtras,
-  waitUntilStoreLoaded,
-} from '@/utils/store-loading.ts'
+import { loadFlashcardSetExtras } from '@/utils/store-loading.ts'
 import { onMounted } from 'vue'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { selectedSetIdCookie } from '@/utils/cookies-ref.ts'
@@ -55,11 +52,6 @@ const props = defineProps<{
 
 const languageStore = useLanguageStore()
 const flashcardSetStore = useFlashcardSetStore()
-
-await Promise.all([
-  waitUntilStoreLoaded(languageStore),
-  waitUntilStoreLoaded(flashcardSetStore),
-])
 
 const {
   resolvedLoading,
