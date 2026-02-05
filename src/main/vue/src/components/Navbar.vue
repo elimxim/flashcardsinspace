@@ -179,10 +179,9 @@ onUnmounted(() => {
 }
 
 .navbar {
+  position: relative;
   flex: 0 0 var(--navbar-height);
   height: var(--navbar-height);
-  position: sticky;
-  top: 0;
   display: flex;
   justify-content: space-between;
   background: var(--nav--bg);
