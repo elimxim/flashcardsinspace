@@ -83,9 +83,9 @@ const elapsedMs = ref<number>(0)
 let timerIntervalId: number | undefined
 
 const mimeCandidates: string[] = [
+  'audio/mp4',
   'audio/webm;codecs=opus',
   'audio/ogg;codecs=opus',
-  'audio/mp4',
   'audio/webm',
   'audio/ogg',
 ]
@@ -119,11 +119,10 @@ async function ensureStream(): Promise<MediaStream> {
 
   const constraints: MediaStreamConstraints = {
     audio: {
-      echoCancellation: true,
+      echoCancellation: false,
       noiseSuppression: true,
       autoGainControl: true,
       channelCount: 1,
-      sampleRate: 44100
     }
   }
 
