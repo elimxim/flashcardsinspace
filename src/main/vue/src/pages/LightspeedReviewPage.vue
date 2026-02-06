@@ -37,6 +37,7 @@
           <Progressbar
             :progress="progress"
             height="16px"
+            glide
           />
         </div>
         <div class="review-info">
