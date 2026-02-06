@@ -119,7 +119,7 @@ export async function fetchFlashcardAudioBlob(
 
   const cachedAudio = audioCache.getAudio(flashcardId, isFrontSide)
   if (cachedAudio) {
-    Log.error(LogTag.LOGIC, `Returning cached audio for Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}`)
+    Log.log(LogTag.LOGIC, `Returning cached audio for Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}`)
     return cachedAudio
   }
 

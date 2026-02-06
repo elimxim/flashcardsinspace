@@ -24,6 +24,7 @@
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import { ref, onBeforeUnmount, watch, onMounted } from 'vue'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { usePlaybackControl } from '@/stores/playback-store.ts'
 
 const props = withDefaults(defineProps<{
   audioBlob?: Blob | undefined,
@@ -33,6 +34,10 @@ const props = withDefaults(defineProps<{
   loopPlay: false,
 })
 
+const playbackControl = usePlaybackControl()
+
+let playerId: string | null = null
+
 const audioUrl = ref<string>()
 const audioRef = ref<HTMLAudioElement>()
 const isPlaying = ref(false)
@@ -40,7 +45,9 @@ const isLooping = ref(false)
 
 function play() {
   const audio = audioRef.value as HTMLAudioElement | undefined
-  if (!audio || !audioUrl.value) return
+  if (!audio || !audioUrl.value || !playerId) return
+
+  playbackControl.requestPlay(playerId)
 
   if (props.loopPlay) {
     isLooping.value = true
@@ -53,18 +60,25 @@ function play() {
     })
 }
 
-function stop() {
-  const audio = audioRef.value as HTMLAudioElement | undefined
-  if (!audio || !audioUrl.value) return
+function stop(notifyStore = true) {
+  const audio = audioRef.value
+  if (!audio) return
+
   isLooping.value = false
   audio.pause()
   audio.currentTime = 0
+
+  if (notifyStore && playerId) {
+    playbackControl.notifyStopped(playerId)
+  }
 }
 
 function handleAudioEnded() {
   isPlaying.value = false
   if (isLooping.value) {
     play()
+  } else if (playerId) {
+    playbackControl.notifyStopped(playerId)
   }
 }
 
@@ -94,13 +108,21 @@ onMounted(() => {
   if (props.audioBlob) {
     updateAudioUrl(props.audioBlob)
   }
+
+  playerId = playbackControl.register(() => stop(false))
 })
 
 onBeforeUnmount(() => {
+  stop(true)
   isPlaying.value = false
-  isLooping.value = false
-  audioRef?.value?.pause()
-  if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
+
+  if (playerId) {
+    playbackControl.unregister(playerId)
+  }
+
+  if (audioUrl.value) {
+    URL.revokeObjectURL(audioUrl.value)
+  }
 })
 
 defineExpose({
