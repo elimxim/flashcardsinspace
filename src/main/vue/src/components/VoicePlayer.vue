@@ -83,10 +83,15 @@ function handleAudioEnded() {
 }
 
 function updateAudioUrl(blob: Blob | undefined) {
+  const audio = audioRef.value
   if (blob && blob.size > 0) {
     try {
       if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
       audioUrl.value = URL.createObjectURL(blob)
+
+      if (audio) {
+        audio.load()
+      }
     } catch (error) {
       Log.error(LogTag.LOGIC, 'Failed to create object URL', error, blob)
       audioUrl.value = undefined

@@ -163,6 +163,8 @@ function toggleControls() {
 async function startRecording() {
   if (!isSupported.value) return
 
+  audioBlob.value = undefined
+
   const stream = await ensureStream()
   const mimeType = pickAudioMimeType()
 
