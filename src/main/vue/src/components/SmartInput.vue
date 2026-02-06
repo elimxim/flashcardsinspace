@@ -108,8 +108,8 @@ defineExpose({
 
 <style scoped>
 .smart-input--theme {
-  --inpt--font-size: var(--smart-input--font-size, clamp(0.9rem, 2vh, 1rem));
-  --inpt--font-size--error: var(--smart-input--font-size--error, clamp(0.9rem, 2vh, 1rem));
+  --inpt--font-size: var(--smart-input--font-size, 1rem);
+  --inpt--font-size--error: var(--smart-input--font-size--error, 1rem);
   --inpt--color: var(--smart-input--color, #45454a);
   --inpt--color--error: var(--smart-input--color--error, #c80f0f);
   --inpt--bg-color: var(--smart-input--bg-color, #f9f9f9);

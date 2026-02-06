@@ -5,8 +5,8 @@
       'page--bg--light',
       'flex-column',
       'padding-auto',
-      'user-page',
       'scrollbar-hidden',
+      'user-page',
       'user-page--theme',
     ]"
   >
@@ -72,8 +72,6 @@ const randomDayPhrase = computed(() => {
 }
 
 .user-page {
-  display: flex;
-  flex-direction: column;
   gap: 10px;
 }
 
