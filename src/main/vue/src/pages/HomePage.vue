@@ -126,21 +126,6 @@
 
         <div class="feature-card">
           <div class="feature-icon">
-            <font-awesome-icon icon="fa-solid fa-volume-high"/>
-          </div>
-          <h3 class="feature-title">Audio Recording</h3>
-          <p class="feature-description">
-            Record and play audio for both sides of your flashcards.
-            Perfect for language learning and pronunciation practice.
-          </p>
-          <div class="feature-demo">
-            <span class="demo-text">Try the audio feature</span>
-            <VoiceRecorder v-model="audioDemo" expanded no-trash/>
-          </div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
             <font-awesome-icon icon="fa-solid fa-palette"/>
           </div>
           <h3 class="feature-title">Engaging Visual Interface</h3>
@@ -149,6 +134,19 @@
             feel like piloting a spaceship. With intuitive visual elements and interactive features,
             every element is designed to be simple, fun, and engaging, transforming your study
             sessions into an enjoyable adventure.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <font-awesome-icon icon="fa-solid fa-chart-line"/>
+          </div>
+          <h3 class="feature-title">Mission Progress</h3>
+          <p class="feature-description">
+            We focus on what works. Our system currently features an adaptive <b>Quiz Mode</b>
+            for mastering tough cards, <b>Audio support</b>, and a <b>Progress Calendar</b>.
+            We’re serious about the future of your learning, and this is just the beginning
+            of what we’re building together.
           </p>
         </div>
       </div>
@@ -195,7 +193,6 @@
 <script setup lang="ts">
 import Starfield from '@/components/Starfield.vue'
 import SmartButton from '@/components/SmartButton.vue'
-import VoiceRecorder from '@/components/VoiceRecorder.vue'
 import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
 import { onUnmounted, ref } from 'vue'
@@ -339,31 +336,6 @@ onUnmounted(() => {
 .schedule-stage--transparent {
   background: none;
   border: none;
-}
-
-.feature-demo {
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-  gap: 1rem;
-
-  --voice-recorder--time--color: #ffffff;
-  --voice-recorder--time--bg: rgba(0, 212, 255, 0.2);
-  --voice-recorder--controls--bg: rgba(0, 212, 255, 0.15);
-  --voice-recorder--button--color: #00d4ff;
-  --voice-recorder--button--color--hover: #ffffff;
-  --voice-recorder--button--color--active: #ffffff;
-  --voice-recorder--button--color--disabled: #94a3b8;
-  --voice-recorder--mic-button--bg--hover: rgba(0, 212, 255, 0.2);
-  --voice-recorder--mic-button--bg--active: rgba(0, 212, 255, 0.2);
-  --voice-recorder--play-button--bg--hover: rgba(0, 212, 255, 0.2);
-  --voice-recorder--play-button--bg--active: rgba(0, 212, 255, 0.2);
-  --voice-recorder--warning-text--color: #cbd5e1;
-}
-
-.demo-text {
-  color: #94a3b8;
-  font-size: 0.9rem;
 }
 
 .how-it-works-section {
