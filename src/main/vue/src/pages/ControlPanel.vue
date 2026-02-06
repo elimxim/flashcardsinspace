@@ -108,6 +108,7 @@ async function onFlashcardSetChanged(setId: number): Promise<boolean> {
   const set = flashcardSetStore.findSet(setId)
   if (set) {
     try {
+      flashcardSetName.value = undefined
       resetLoading()
       startLoading()
       return await loadStoresForFlashcardSet(set)

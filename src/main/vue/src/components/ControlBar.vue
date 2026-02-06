@@ -48,6 +48,8 @@ const centerTitlePaddingPx = computed(() => `${props.centerTitlePadding}px`)
 watch(() => props.title, (newVal) => {
   if (newVal !== undefined) {
     stopLoading()
+  } else {
+    startLoading()
   }
 })
 
