@@ -4,6 +4,7 @@ import com.github.elimxim.flashcardsinspace.entity.FlashcardAudio
 import com.github.elimxim.flashcardsinspace.entity.FlashcardAudioMetadata
 import com.github.elimxim.flashcardsinspace.entity.FlashcardSide
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
@@ -14,7 +15,7 @@ interface FlashcardAudioRepository : JpaRepository<FlashcardAudio, Long> {
 
     @Query(
         """
-        SELECT 
+        SELECT
             fa.id AS audioId,
             fa.side AS side,
             fa.flashcard_id AS flashcardId
@@ -24,4 +25,15 @@ interface FlashcardAudioRepository : JpaRepository<FlashcardAudio, Long> {
     """, nativeQuery = true
     )
     fun findAllMetadata(@Param("setId") setId: Long): List<FlashcardAudioMetadata>
+
+    @Modifying
+    @Query(
+        """
+        DELETE FROM flashcard_audio fa
+        WHERE fa.flashcard_id IN (
+            SELECT f.id FROM flashcard f WHERE f.flashcard_set_id = :setId
+        )
+    """, nativeQuery = true
+    )
+    fun deleteByFlashcardSetId(@Param("setId") setId: Long)
 }

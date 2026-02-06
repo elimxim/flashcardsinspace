@@ -1,10 +1,7 @@
 package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
-import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepository
-import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
-import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
-import com.github.elimxim.flashcardsinspace.entity.repository.ReviewSessionRepository
+import com.github.elimxim.flashcardsinspace.entity.repository.*
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
@@ -23,6 +20,7 @@ class FlashcardSetService(
     private val flashcardSetRepository: FlashcardSetRepository,
     private val chronodayRepository: ChronodayRepository,
     private val flashcardRepository: FlashcardRepository,
+    private val flashcardAudioRepository: FlashcardAudioRepository,
     private val languageService: LanguageService,
     private val requestValidator: RequestValidator,
     private val reviewSessionRepository: ReviewSessionRepository,
@@ -130,6 +128,7 @@ class FlashcardSetService(
             flashcardSetRepository.save(flashcardSet)
         } else {
             flashcardSet.dayStreak = null
+            flashcardAudioRepository.deleteByFlashcardSetId(id)
             reviewSessionRepository.deleteByFlashcardSet(flashcardSet)
             flashcardSetRepository.delete(flashcardSet)
         }
