@@ -112,6 +112,7 @@ async function onFlashcardSetChanged(setId: number): Promise<boolean> {
       startLoading()
       return await loadStoresForFlashcardSet(set)
     } finally {
+      flashcardSetName.value = flashcardSet.value?.name ?? ''
       await stopLoading()
     }
   }
