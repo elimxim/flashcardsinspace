@@ -36,8 +36,6 @@
   --input--border-color--focus: #007bff;
   --input--border-color--error: #c80f0f;
 
-  --smart-input--font-size: clamp(0.9rem, 2vh, 1rem);
-  --smart-input--font-size--error: clamp(0.8rem, 2vh, 0.9rem);
   --smart-input--color: #45454a;
   --smart-input--color--error: #c80f0f;
   --smart-input--bg-color: #f9f9f9;
