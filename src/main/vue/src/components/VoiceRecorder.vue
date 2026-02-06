@@ -131,7 +131,7 @@ async function ensureStream(): Promise<MediaStream> {
     mediaStream.value = stream
     return stream
   } catch(error) {
-    Log.error(LogTag.LOGIC, 'Advanced constraints failed, falling back to basic audio', error)
+    Log.error(LogTag.SYSTEM, 'Advanced constraints failed, falling back to basic audio', error)
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
     mediaStream.value = stream
     return stream
@@ -179,8 +179,8 @@ async function startRecording() {
 
   try {
     mediaRecorder.value = new MediaRecorder(stream, options)
-  } catch (e) {
-    console.warn('High bitrate not supported, falling back to default')
+  } catch (error) {
+    Log.error(LogTag.SYSTEM, 'High bitrate not supported, falling back to default', error)
     mediaRecorder.value = new MediaRecorder(stream, mimeType ? { mimeType } : undefined)
   }
 

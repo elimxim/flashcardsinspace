@@ -34,11 +34,8 @@ const {
 
 onMounted(async () => {
   startLoading()
-  console.log('Waiting for promise...')
   await props.waitFor()
-  console.log('Promise resolved')
   await stopLoading()
-  console.log('Loading stopped')
 })
 
 </script>
