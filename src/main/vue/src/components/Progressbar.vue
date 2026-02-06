@@ -31,6 +31,8 @@ const props = withDefaults(defineProps<{
   indeterminate?: boolean
   /** Optional delay before starting (ms) */
   delay?: number
+  /** Make the bar glide in */
+  glide?: boolean
 }>(), {
   progress: null,
   duration: 4000,
@@ -132,6 +134,10 @@ const barWidthPercent = computed(() => {
   }
 })
 
+const barTransition = computed(() => {
+  return props.glide ? 'width 0.3s ease-out' : 'none'
+})
+
 const trackHeight = computed(() => props.height)
 const trackBorderRadius = computed(() => props.trackRounded ? `${props.height}` : '0')
 const barBorderRadius = computed(() => props.barRounded ? `${props.height}` : '0')
@@ -171,6 +177,7 @@ const barRight = computed(() => props.reverse ? '0' : 'auto')
   left: v-bind(barLeft);
   right: v-bind(barRight);
   border-radius: v-bind(barBorderRadius);
+  transition: v-bind(barTransition);
   background-image: linear-gradient(
     90deg,
     var(--bar--from, #9f9f9f),
