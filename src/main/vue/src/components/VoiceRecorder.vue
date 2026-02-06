@@ -116,9 +116,27 @@ function pickAudioMimeType(): string | undefined {
 
 async function ensureStream(): Promise<MediaStream> {
   if (mediaStream.value) return mediaStream.value
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-  mediaStream.value = stream
-  return stream
+
+  const constraints: MediaStreamConstraints = {
+    audio: {
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true,
+      channelCount: 1,
+      sampleRate: 44100
+    }
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints)
+    mediaStream.value = stream
+    return stream
+  } catch(error) {
+    Log.error(LogTag.LOGIC, 'Advanced constraints failed, falling back to basic audio', error)
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    mediaStream.value = stream
+    return stream
+  }
 }
 
 function startTimer() {
@@ -149,19 +167,32 @@ async function startRecording() {
   const mimeType = pickAudioMimeType()
 
   blobChunks.value = []
-  mediaRecorder.value = new MediaRecorder(stream,
-    mimeType ? { mimeType: mimeType } : undefined
-  )
+
+  const options: MediaRecorderOptions = {
+    audioBitsPerSecond: 128000
+  }
+
+  if (mimeType) {
+    options.mimeType = mimeType
+  }
+
+  try {
+    mediaRecorder.value = new MediaRecorder(stream, options)
+  } catch (e) {
+    console.warn('High bitrate not supported, falling back to default')
+    mediaRecorder.value = new MediaRecorder(stream, mimeType ? { mimeType } : undefined)
+  }
 
   mediaRecorder.value.ondataavailable = (e: BlobEvent) => {
     if (e.data && e.data.size > 0) blobChunks.value.push(e.data)
   }
 
   mediaRecorder.value.onstop = () => {
-    audioBlob.value = new Blob(blobChunks.value, { type: mediaRecorder.value?.mimeType })
+    const finalMime = mediaRecorder.value?.mimeType || mimeType
+    audioBlob.value = new Blob(blobChunks.value, { type: finalMime })
   }
 
-  mediaRecorder.value.start()
+  mediaRecorder.value.start(1000)
   isRecording.value = true
   isPaused.value = false
   elapsedMs.value = 0
