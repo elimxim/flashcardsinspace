@@ -14,12 +14,11 @@
 
 <style scoped>
 .flashcard-set-list-skeleton {
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 1rem;
-  overflow-x: hidden;
-  overflow-y: auto;
 }
 
 .flashcard-set-skeleton {

@@ -89,37 +89,11 @@ onMounted(async () => {
 
 <style scoped>
 .flashcard-set-list {
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 1rem;
-  border-right: 2px solid rgba(89, 78, 117, 0.85);
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
-.flashcard-set-list::-webkit-scrollbar {
-  width: 8px;
-}
-
-.flashcard-set-list::-webkit-scrollbar-track {
-  background: #575e68;
-  border-radius: 0;
-}
-
-.flashcard-set-list::-webkit-scrollbar-thumb {
-  background: #808daa;
-  border-radius: 0;
-}
-
-@media (hover: hover) {
-  .flashcard-set-list::-webkit-scrollbar-thumb:hover {
-    background: #98a9ca;
-  }
-}
-
-.flashcard-set-list::-webkit-scrollbar-thumb:active {
-  background: #98a9ca;
 }
 
 .flashcard-set {

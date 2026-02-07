@@ -38,12 +38,14 @@
           />
         </template>
       </ControlBar>
-      <DeferredLoading :wait-for="flashcardSetListAwaitCond">
-        <FlashcardSetList :on-flashcard-set-changed="onFlashcardSetChanged"/>
-        <template #fallback>
-          <FlashcardSetListSkeleton/>
-        </template>
-      </DeferredLoading>
+      <div class="sidebar-content">
+        <DeferredLoading :wait-for="flashcardSetListAwaitCond">
+          <FlashcardSetList :on-flashcard-set-changed="onFlashcardSetChanged"/>
+          <template #fallback>
+            <FlashcardSetListSkeleton/>
+          </template>
+        </DeferredLoading>
+      </div>
     </div>
   </div>
 </template>
@@ -146,6 +148,37 @@ onUnmounted(() => {
   background: #32334a;
   overflow: hidden;
   transition: margin-left 0.35s ease-in-out;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sidebar-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: #575e68;
+  border-radius: 0;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: #808daa;
+  border-radius: 0;
+}
+
+@media (hover: hover) {
+  .sidebar-content::-webkit-scrollbar-thumb:hover {
+    background: #98a9ca;
+  }
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:active {
+  background: #98a9ca;
 }
 
 .sidebar--collapsed {
