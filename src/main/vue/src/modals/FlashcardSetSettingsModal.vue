@@ -212,6 +212,7 @@ async function removeFlashcardSet(): Promise<boolean> {
   return await sendFlashcardSetRemovalRequest(removedSet.id)
     .then(() => {
       flashcardSetStore.removeSet(removedSet)
+      toaster.bakeSuccess('Success', 'Flashcard Set removed', 400)
       return true
     })
     .catch((error) => {
