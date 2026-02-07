@@ -36,10 +36,16 @@ export const usePlaybackControl = defineStore('playback-control', () => {
     }
   }
 
+  function $reset() {
+    registry.clear()
+    activePlayerId = null
+  }
+
   return {
     register,
     unregister,
     requestPlay,
-    notifyStopped
+    notifyStopped,
+    $reset,
   }
 })

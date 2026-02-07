@@ -195,7 +195,7 @@ async function startReview() {
 
 function resetState() {
   stopWatch()
-  reviewStore.resetState()
+  reviewStore.$reset()
   reviewedFlashcardIds.value = []
   incorrectFlashcards.value = []
 }
@@ -364,7 +364,7 @@ async function updateReviewSession(flashcardIds: number[], finished: boolean = f
 onMounted(async () => {
   try {
     startLoading()
-    reviewStore.resetState()
+    reviewStore.$reset()
     if (!flashcardStore.loaded) {
       Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
       const selectedSetId = loadSelectedSetIdFromCookies()

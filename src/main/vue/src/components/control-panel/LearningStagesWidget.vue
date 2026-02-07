@@ -2,11 +2,11 @@
   <div
     class="stages-widget stages-widget--theme"
     :class="{ 'stages-widget--expanded': isExpanded }"
-    @click="toggleExpand"
     :style="{
       '--stage-height-base': `${baseHeight}px`,
       '--stage-height-expanded': `${baseHeight * props.growMultiplier}px`
     }"
+    @click="toggleExpand"
   >
     <div class="stages-title">
       Learning Stages

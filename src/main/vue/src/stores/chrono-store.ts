@@ -31,7 +31,7 @@ export const useChronoStore = defineStore('chrono', {
   actions: {
     loadState(chronodays: Chronoday[], currDay: Chronoday, dayStreak: number) {
       Log.log(LogTag.STORE, `chrono.loadState: currDay.chronodate=${currDay.chronodate} + ${chronodays.length} chronodays, dayStreak=${dayStreak} `)
-      this.resetState()
+      this.$reset()
       this.chronodays = chronodays
       this.currDay = currDay
       this.dayStreak = dayStreak
@@ -39,12 +39,6 @@ export const useChronoStore = defineStore('chrono', {
     },
     checkStateLoaded() {
       if (!this.loaded) throw Error(`chrono.checkStateLoaded: !loaded`)
-    },
-    resetState() {
-      this.chronodays = []
-      this.currDay = defaultCurrDay()
-      this.dayStreak = 0
-      this.loaded = false
     },
     canGoPrev(): boolean {
       this.checkStateLoaded()

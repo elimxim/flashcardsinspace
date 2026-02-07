@@ -163,7 +163,7 @@ export const useAudioCache = defineStore('audio-cache', () => {
     return true
   }
 
-  function resetState() {
+  function $reset() {
     audioMap.value.clear()
     totalSize.value = 0
     accessOrder.value = []
@@ -175,6 +175,6 @@ export const useAudioCache = defineStore('audio-cache', () => {
     addAudio,
     getAudio,
     deleteAudio,
-    resetState,
+    $reset,
   }
 })

@@ -17,7 +17,7 @@ export const useAudioStore = defineStore('audio', {
   actions: {
     loadState(audioMetadata: FlashcardAudioMetadata[]) {
       Log.log(LogTag.STORE, `audio.loadState: ${audioMetadata.length} metadata size`)
-      this.resetState()
+      this.$reset()
       this.audioIdMap = new Map(
         audioMetadata.map(metadata => [
           audioMapKey(metadata.flashcardId, metadata.flashcardSide),
@@ -28,10 +28,6 @@ export const useAudioStore = defineStore('audio', {
     },
     checkStateLoaded() {
       if (!this.loaded) throw Error(`audio.checkStateLoaded: !loaded`)
-    },
-    resetState() {
-      this.audioIdMap.clear()
-      this.loaded = false
     },
     setAudioId(flashcardId: number, side: string, audioId: number) {
       Log.log(LogTag.STORE, `audio.setAudioId: Audio.id=${audioId}, Flashcard.id=${flashcardId}, Flashcard.side=${side}`)

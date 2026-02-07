@@ -20,17 +20,13 @@ export const useLanguageStore = defineStore('language', {
   },
   actions: {
     loadState(languages: Language[]) {
-      this.resetState()
+      this.$reset()
       this.languageMap = new Map(languages.map(v => [v.id, v]))
       this.loaded = true
     },
     getLanguage(id: number): Language | undefined {
       return this.languageMap.get(id)
     },
-    resetState() {
-      this.languageMap = new Map()
-      this.loaded = false
-    }
   }
 })
 

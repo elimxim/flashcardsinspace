@@ -1,4 +1,4 @@
-import { watch } from 'vue'
+import { toRef, watch } from 'vue'
 import { FlashcardSet } from '@/model/flashcard.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
@@ -41,34 +41,33 @@ export function getCurrFlashcardSet(): FlashcardSet | undefined {
  * @param property The boolean property to watch (defaults to 'loaded')
  * @param timeout The timeout in milliseconds (defaults to 10000)
  */
-export function waitUntilStoreLoaded<T>(
+export function waitUntilStoreLoaded<T extends object>(
   store: T,
   property: keyof T = 'loaded' as keyof T,
   timeout: number = 10000,
 ): Promise<void> {
-  if (store[property]) {
-    return Promise.resolve()
-  }
+  const propRef = toRef(store, property)
+  if (propRef.value) return Promise.resolve()
 
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      unwatch()
-      if (!store[property]) {
-        reject(new Error(`Store property ${String(property)} timed out after ${timeout}ms`))
-      }
-    }, timeout)
+    let timer: ReturnType<typeof setTimeout>
 
     const unwatch = watch(
-      () => store[property],
+      propRef,
       (value) => {
         if (value) {
-          clearTimeout(timer)
+          if (timer) clearTimeout(timer)
           unwatch()
           resolve()
         }
       },
-      { immediate: true },
+      { immediate: true }
     )
+
+    timer = setTimeout(() => {
+      unwatch()
+      reject(new Error(`Store property ${String(property)} timed out after ${timeout}ms`))
+    }, timeout)
   })
 }
 
@@ -141,9 +140,9 @@ export async function loadStoresForFlashcardSet(flashcardSet: FlashcardSet, forc
     return true
   }
 
-  flashcardStore.resetState()
-  chronoStore.resetState()
-  audioStore.resetState()
+  flashcardStore.$reset()
+  chronoStore.$reset()
+  audioStore.$reset()
 
   return await sendFlashcardsGetRequest(flashcardSet.id)
     .then(async (response) => {
@@ -177,7 +176,7 @@ export async function loadStoresForCurrFlashcardSet(forced: boolean = false): Pr
   if (currFlashcardSet) {
     return await loadStoresForFlashcardSet(currFlashcardSet, forced)
   } else {
-    flashcardStore.resetState()
+    flashcardStore.$reset()
     return true
   }
 }

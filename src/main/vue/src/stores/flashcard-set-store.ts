@@ -32,18 +32,12 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
   },
   actions: {
     loadState(flashcardSets: FlashcardSet[]) {
-      this.resetState()
+      this.$reset()
       this.flashcardSets = flashcardSets
       this.loaded = true
     },
     checkStateLoaded() {
       if (!this.loaded) throw Error(`flashcard-set.checkStateLoaded: !loaded`)
-    },
-    resetState() {
-      this.flashcardSets = []
-      this.extra = new Map()
-      this.loaded = false
-      this.extraLoaded = false
     },
     loadExtras(extras: FlashcardSetExtra[]) {
       this.extra = mapFlashcardSetExtra(extras)

@@ -38,7 +38,7 @@ export const useFlashcardStore = defineStore('flashcard', {
   actions: {
     loadState(flashcardSet: FlashcardSet, flashcards: Flashcard[]) {
       Log.log(LogTag.STORE, `flashcard.loadState: FlashcardSet.id=${flashcardSet.id} + ${flashcards.length} flashcards`)
-      this.resetState()
+      this.$reset()
       this.flashcardSet = flashcardSet
       this.flashcardMap = new Map(flashcards.map(v => [v.id, v]))
       this.loaded = true
@@ -46,11 +46,6 @@ export const useFlashcardStore = defineStore('flashcard', {
     checkStateLoaded() {
       if (!this.flashcardSet) throw Error(`flashcard.checkStateLoaded: !flashcardSet`)
       if (!this.loaded) throw Error(`flashcard.checkStateLoaded: !loaded`)
-    },
-    resetState() {
-      this.flashcardSet = undefined
-      this.flashcardMap = new Map()
-      this.loaded = false
     },
     changeSet(flashcardSet: FlashcardSet) {
       Log.log(LogTag.STORE, `flashcard.changeSet: FlashcardSet.id=${flashcardSet.id}`)

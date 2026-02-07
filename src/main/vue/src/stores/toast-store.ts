@@ -69,7 +69,7 @@ export const useSpaceToaster = defineStore('space-toaster', {
     },
     bake(toast: Toast) {
       const wasShowing = this.show
-      this.reset()
+      this.$reset()
       const showNow = () => {
         this.toast = toast
         this.show = true
@@ -107,18 +107,21 @@ export const useSpaceToaster = defineStore('space-toaster', {
       }
     },
     dismiss() {
-      this.reset()
+      this.$reset()
     },
-    reset() {
+    $reset() {
       if (this.timeout != null) {
         window.clearTimeout(this.timeout)
       }
-      this.toast = null
-      this.show = false
-      this.paused = false
-      this.timeout = null
-      this.remaining = 0
-      this.startedAt = 0
+
+      this.$patch((state: ToastState) => {
+        state.toast = null
+        state.show = false
+        state.paused = false
+        state.timeout = null
+        state.remaining = 0
+        state.startedAt = 0
+      })
     },
   }
 })

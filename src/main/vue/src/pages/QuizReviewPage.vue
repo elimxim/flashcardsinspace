@@ -206,7 +206,7 @@ async function loadOrCreateQuizSession() {
 
 function resetState() {
   stopWatch()
-  reviewStore.resetState()
+  reviewStore.$reset()
   reviewedFlashcardIds.value = []
   incorrectFlashcards.value = []
   quizOverallTotal.value = 0
@@ -368,7 +368,7 @@ async function updateQuizSession(reviewedFlashcardIds: number[], nextRoundFlashc
 onMounted(async () => {
   try {
     startLoading()
-    reviewStore.resetState()
+    reviewStore.$reset()
     if (!flashcardStore.loaded) {
       Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
       const selectedSetId = loadSelectedSetIdFromCookies()

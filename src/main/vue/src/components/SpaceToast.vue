@@ -63,7 +63,7 @@ import { ToastType, useSpaceToaster } from '@/stores/toast-store.ts'
 const toaster = useSpaceToaster()
 const { toast, show, paused } = storeToRefs(toaster)
 
-onUnmounted(() => toaster.reset())
+onUnmounted(() => toaster.$reset())
 </script>
 
 <style scoped>

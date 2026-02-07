@@ -49,22 +49,11 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
 
     // actions
     function loadState(queue: ReviewQueue) {
-      resetState()
+      $reset()
       queue.shuffle()
       reviewQueue.value = queue
       flashcardsTotal.value = queue.remaining()
       loaded.value = true
-    }
-
-    function resetState() {
-      reviewQueue.value = new EmptyReviewQueue()
-      currFlashcard.value = undefined
-      flashcardsTotal.value = 0
-      autoPlayVoice.value = false
-      autoRepeatVoice.value = false
-      flashcardFrontSideAudioBlob.value = undefined
-      flashcardBackSideAudioBlob.value = undefined
-      loaded.value = false
     }
 
     async function fetchAudio(flashcardSet: FlashcardSet | undefined) {
@@ -102,6 +91,17 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
       flashcardsTotal.value = total
     }
 
+    function $reset() {
+      reviewQueue.value = new EmptyReviewQueue()
+      currFlashcard.value = undefined
+      flashcardsTotal.value = 0
+      autoPlayVoice.value = false
+      autoRepeatVoice.value = false
+      flashcardFrontSideAudioBlob.value = undefined
+      flashcardBackSideAudioBlob.value = undefined
+      loaded.value = false
+    }
+
     return {
       reviewStoreLoaded: readonly(loaded),
       reviewQueue,
@@ -119,7 +119,7 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
       progress,
 
       loadState,
-      resetState,
+      $reset,
       fetchAudio,
       prevFlashcard,
       nextFlashcard,
