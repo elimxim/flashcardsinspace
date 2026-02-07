@@ -119,7 +119,7 @@ async function ensureStream(): Promise<MediaStream> {
 
   const constraints: MediaStreamConstraints = {
     audio: {
-      echoCancellation: false,
+      echoCancellation: true,
       noiseSuppression: true,
       autoGainControl: true,
       channelCount: 1,
@@ -216,10 +216,17 @@ function resumeRecording() {
 
 function stopRecording() {
   if (!mediaRecorder.value) return
+
   mediaRecorder.value.stop()
   isRecording.value = false
   isPaused.value = false
   stopTimer()
+
+  if (mediaStream.value) {
+    mediaStream.value.getTracks().forEach(track => track.stop())
+    mediaStream.value = undefined
+  }
+
   Log.log(LogTag.LOGIC, `Audio recorded: ${audioSize()} KB`)
 }
 
