@@ -130,6 +130,7 @@ onUnmounted(() => {
   border: 1px solid var(--cp--border-color);
   background: var(--cp--widget--color);
   border-radius: 6px;
+  gap: 10px;
   width: 100%;
   transition: background var(--animation-duration) var(--animation-ease);
 }
@@ -147,11 +148,6 @@ onUnmounted(() => {
 }
 
 @media (hover: hover) {
-  .stages-widget:hover {
-    background: repeating-linear-gradient(0deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.05) 24px, rgba(0, 255, 255, 0.05) 25px),
-    var(--cp--widget--color);
-  }
-
   .stages-widget:hover .stage-grid {
     height: var(--stage-height-expanded);
     transition-delay: 0.5s;
@@ -161,11 +157,6 @@ onUnmounted(() => {
     height: calc(var(--stage-height-base) + (var(--growth-space) * var(--stage-ratio)));
     transition-delay: 0.5s;
   }
-}
-
-.stages-widget--expanded {
-  background: repeating-linear-gradient(0deg, transparent 0px, transparent 24px, rgba(0, 255, 255, 0.1) 24px, rgba(0, 255, 255, 0.1) 25px),
-  var(--cp--widget--color);
 }
 
 .stages-widget--expanded .stage-grid {

@@ -3,7 +3,7 @@
     :hidden="showInfoBar"
   />
   <MainPanel/>
-  <LearningStagesWidget ref="learningStagesWidget" :grow-multiplier="3"/>
+  <LearningStagesWidget ref="learningStagesWidget" :grow-multiplier="2.5"/>
   <div class="control-outer-space-panel">
     <OuterSpaceWidget/>
   </div>
