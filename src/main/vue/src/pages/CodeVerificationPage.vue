@@ -24,10 +24,10 @@
       </div>
     </div>
     <div v-else class="verification-section">
-      <p v-if="isRegistrationRequest" class="instructions">
+      <p v-if="isRegistrationRequest" class="instructions instructions--title">
         Complete your registration.
       </p>
-      <p v-else-if="isPasswordResetRequest" class="instructions">
+      <p v-else-if="isPasswordResetRequest" class="instructions instructions--title">
         Complete your password reset.
       </p>
 
@@ -139,7 +139,7 @@ const isPasswordResetRequest = computed(() =>
 
 const cannotProceedPasswordReset = computed(() => {
   const isSessionExpired = verificationResult.value === VerificationResult.SESSION_EXPIRED
-  return (isPasswordResetRequest.value) && isSessionExpired
+  return isPasswordResetRequest.value && isSessionExpired
 })
 
 function startOverPasswordReset() {
@@ -169,10 +169,13 @@ async function resendCode(): Promise<void> {
       Log.error(LogTag.LOGIC, 'Failed to resend verification code', error)
       if (error.response?.status === 429) {
         toaster.bakeError(userApiErrors.VERIFICATION__TOO_MANY_REQUESTS, error.response?.data)
+        ccd.value?.lock()
       } else {
         toaster.bakeError(userApiErrors.VERIFICATION__REQUEST_FAILED, error.response?.data)
+        ccd.value?.triggerFailure()
       }
     })
+  console.log("after resend code")
 }
 
 async function processVerificationResponse(response: VerificationIntentResponse) {
@@ -184,35 +187,35 @@ async function processVerificationResponse(response: VerificationIntentResponse)
   const result = toVerificationCodeResult(response.result)
   switch (result) {
     case VerificationResult.LIMITED:
+      attempts.value = response.attempts ?? 3
       await ccd.value?.triggerFailure()
       ccd.value?.lock()
       verificationResult.value = result
-      attempts.value = response.attempts ?? 3
       break
     case VerificationResult.LOCKED:
     case VerificationResult.SESSION_EXPIRED:
     case VerificationResult.EXPIRED:
     case VerificationResult.USED:
     case VerificationResult.NOT_FOUND:
+      attempts.value = response.attempts ?? 3
       await ccd.value?.triggerFailure()
       ccd.value?.switchOff()
       verificationResult.value = result
-      attempts.value = response.attempts ?? 3
       break
     case VerificationResult.INVALID:
+      attempts.value = response.attempts ?? attempts.value
       await ccd.value?.triggerFailure()
       verificationResult.value = result
-      attempts.value = response.attempts ?? attempts.value
       break
     case VerificationResult.SUCCESS:
+      attempts.value = response.attempts ?? attempts.value
       await ccd.value?.triggerSuccess()
       verificationResult.value = result
-      attempts.value = response.attempts ?? attempts.value
       await onSuccess()
       break
     case VerificationResult.FOUND:
-      verificationResult.value = result
       attempts.value = response.attempts ?? 0
+      verificationResult.value = result
       break
     default:
       ccd.value?.triggerIdle()
@@ -293,6 +296,10 @@ onMounted(async () => {
   text-wrap: balance;
   color: #fdfbff;
   margin: 0;
+}
+
+.instructions--title {
+  font-size: clamp(1rem, 2vw, 1.2rem);
 }
 
 .instructions strong {

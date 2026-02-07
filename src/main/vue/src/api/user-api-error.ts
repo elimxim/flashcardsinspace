@@ -34,7 +34,7 @@ export const userApiErrors = {
   },
   VERIFICATION__TOO_MANY_REQUESTS: {
     title: 'Too many requests',
-    message: 'Please wait and try again later.'
+    message: 'You have reached the maximum number of verification codes per hour. Please try again later.'
   } as UserApiError,
   PASSWORD_RESET__FAILED: {
     title: 'Couldn\'t reset the password',

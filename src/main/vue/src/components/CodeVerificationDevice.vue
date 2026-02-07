@@ -146,7 +146,7 @@ const triggerSuccess = async (): Promise<void> => {
 
     successTimeout = setTimeout(() => {
       successTimeout = null
-      resolve(void 0)
+      resolve()
     }, 500)
   })
 }
@@ -154,7 +154,6 @@ const triggerSuccess = async (): Promise<void> => {
 const triggerFailure = async (): Promise<void> => {
   return new Promise((resolve) => {
     status.value = 'ERROR'
-
     if (failureTimeout) {
       clearTimeout(failureTimeout)
       failureTimeout = null
@@ -168,7 +167,7 @@ const triggerFailure = async (): Promise<void> => {
         status.value = 'IDLE'
       }
       failureTimeout = null
-      resolve(void 0)
+      resolve()
     }, 500)
   })
 }
