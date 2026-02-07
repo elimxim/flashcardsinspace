@@ -46,7 +46,7 @@ import { computed, ref, onMounted, onUnmounted } from 'vue'
 const props = withDefaults(defineProps<{
   growMultiplier?: number
 }>(), {
-  growMultiplier: 2.5,
+  growMultiplier: 2,
 })
 
 const flashcardStore = useFlashcardStore()
