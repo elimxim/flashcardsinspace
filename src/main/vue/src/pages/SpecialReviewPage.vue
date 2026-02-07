@@ -257,6 +257,7 @@ async function moveBack() {
   updateFlashcard(flashcard, learningStages.S1, currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   if (success) {
+    reviewQueue.value.removeCurrent()
     await spaceDeck.value?.animateOutLeft(true)
     await reviewStore.nextFlashcard(flashcardSet.value)
   }
