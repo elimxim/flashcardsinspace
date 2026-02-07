@@ -31,14 +31,12 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth-store.ts'
-import { routeNames } from '@/router'
 import { sendLogoutRequest } from '@/api/auth-client.ts'
 import Progressbar from '@/components/Progressbar.vue'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { resetAllPiniaStores } from '@/utils/pinia-reset-plugin.ts'
 
-const router = useRouter()
 const authStore = useAuthStore()
 
 const redirectDelay = 10000
@@ -76,7 +74,7 @@ function clearTimers() {
 
 async function goToLogin() {
   clearTimers()
-  await router.push({ name: routeNames.login })
+  window.location.href = '/login'
 }
 
 onMounted(() => {
@@ -85,6 +83,7 @@ onMounted(() => {
     .then(() => {
       console.info('Successfully logged out')
       authStore.resetUser()
+      resetAllPiniaStores()
     })
     .catch(error => {
       Log.error(LogTag.LOGIC, 'Failed to log out: ', error)

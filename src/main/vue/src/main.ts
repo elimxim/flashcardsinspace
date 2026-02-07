@@ -8,13 +8,17 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { applyFaSolidIcons } from '@/fa-solid.ts'
 import { applyFaRegularIcons } from '@/fa-regular.ts'
 import { whoAmI } from '@/core-logic/user-logic.ts'
+import { PiniaResetPlugin } from '@/utils/pinia-reset-plugin.ts'
 
 applyFaRegularIcons()
 applyFaSolidIcons()
 
 const app = createApp(App)
 app.component('FontAwesomeIcon', FontAwesomeIcon)
-app.use(createPinia())
+
+const pinia = createPinia()
+pinia.use(PiniaResetPlugin)
+app.use(pinia)
 
 whoAmI().then(() => {
   app.use(router)
