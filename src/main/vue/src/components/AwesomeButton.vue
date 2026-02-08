@@ -17,7 +17,6 @@
         role="button"
         class="awesome-button awesome-button--theme select-none drag-none"
         :class="{
-        'awesome-button--loading': resolvedLoading,
         'awesome-button--active': active,
         'awesome-button--disabled': disabled,
         'awesome-button--invisible': invisible,
@@ -202,8 +201,6 @@ defineExpose({
   --a-btn--bg--hover: var(--awesome-button--bg--hover, none);
   --a-btn--bg--disabled: var(--awesome-button--bg--disabled, none);
   --a-btn--bg--active: var(--awesome-button--bg--active, none);
-  --a-btn--bg--loading: var(--awesome-button--bg--loading, none);
-  --a-btn--spinner--color: var(--awesome-button--icon--color--loading, #000000);
   --a-btn--border: var(--awesome-button--border, none);
   --a-btn--border--hover: var(--awesome-button--border--hover, none);
   --a-btn--border-radius: var(--awesome-button--border-radius, none);
@@ -254,13 +251,13 @@ defineExpose({
 }
 
 @media (hover: hover) {
-  .awesome-button:not(.awesome-button--disabled):not(.awesome-button--active):not(.awesome-button--loading):hover {
+  .awesome-button:not(.awesome-button--disabled):not(.awesome-button--active):hover {
     color: var(--a-btn--icon--color--hover);
     background: var(--a-btn--bg--hover);
   }
 }
 
-.awesome-button--tapped:not(.awesome-button--disabled):not(.awesome-button--active):not(.awesome-button--loading) {
+.awesome-button--tapped:not(.awesome-button--disabled):not(.awesome-button--active) {
   color: var(--a-btn--icon--color--hover);
   background: var(--a-btn--bg--hover);
 }
@@ -273,14 +270,9 @@ defineExpose({
   transform: none;
 }
 
-.awesome-button--active:not(.awesome-button--loading) {
+.awesome-button--active {
   color: var(--a-btn--icon--color--active);
   background: var(--a-btn--bg--active);
-}
-
-.awesome-button--loading {
-  color: var(--a-btn--spinner--color);
-  background: var(--a-btn--bg--loading);
 }
 
 .awesome-button--invisible {
