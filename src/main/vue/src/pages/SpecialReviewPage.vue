@@ -164,6 +164,7 @@ import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { useStopWatch } from '@/utils/stop-watch.ts'
 import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
+import { useRunOnce } from '@/utils/run-once.ts'
 
 const props = defineProps<{
   sessionId?: number,
@@ -175,7 +176,13 @@ const toaster = useSpaceToaster()
 const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
 const flashcardStore = useFlashcardStore()
-const hasCleanedUp = ref(false)
+
+const {
+  runOnce: startReviewOnce,
+  isPending: reviewStarting,
+} = useRunOnce(startReview)
+
+const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
 
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
@@ -210,26 +217,51 @@ const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 async function startReview() {
   Log.log(LogTag.LOGIC, `Starting review: ${props.reviewMode.sessionType}`)
-  const stage = reviewSessionTypeToSpecialStage(props.reviewMode.sessionType) ?? specialStages.UNKNOWN
-  reviewStore.loadState(createReviewQueueForStages(flashcards.value, [stage], currDay.value))
-  await createReviewSession()
-  await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
-    if (success) startWatch()
-  })
-  Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+  try {
+    startLoading()
+    reviewStore.$reset()
+    if (!flashcardStore.loaded) {
+      Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
+      const selectedSetId = loadSelectedSetIdFromCookies()
+      if (selectedSetId) {
+        await loadStoresForFlashcardSetId(selectedSetId)
+      } else {
+        Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
+      }
+    }
+    const stage = reviewSessionTypeToSpecialStage(props.reviewMode.sessionType) ?? specialStages.UNKNOWN
+    reviewStore.loadState(createReviewQueueForStages(flashcards.value, [stage], currDay.value))
+    await createReviewSession()
+    await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
+      if (success) startWatch()
+    })
+    Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+
+  } finally {
+    await stopLoading()
+  }
+  spaceDeck.value?.setDeckReady()
 }
 
 async function finishReview() {
+  if (reviewStarting.value) {
+    await startReviewOnce()
+  }
+
   Log.log(LogTag.LOGIC, `Finishing review: ${props.reviewMode.sessionType}`)
-  stopWatch()
-  await updateReviewSession(reviewedFlashcardIds.value, true)
-  reviewStore.$reset()
-  reviewedFlashcardIds.value = []
+  try {
+    await updateReviewSession(reviewedFlashcardIds.value, true)
+  } finally {
+    stopWatch()
+    reviewedFlashcardIds.value = []
+    reviewStore.$reset()
+    destroyReviewStore(props.reviewMode.sessionType)
+  }
 }
 
-function finishReviewAndLeave() {
-  finishReview()
-  router.push({ name: routeNames.controlPanel })
+async function finishReviewAndLeave() {
+  await finishReviewOnce()
+  await router.push({ name: routeNames.controlPanel })
 }
 
 async function prev() {
@@ -326,45 +358,18 @@ function onAudioChanged() {
   reviewStore.fetchAudio(flashcardSet.value)
 }
 
-async function cleanUpReview() {
-  if (hasCleanedUp.value) {
-    return
-  }
-
-  hasCleanedUp.value = true
-
-  await finishReview()
-  destroyReviewStore(props.reviewMode.sessionType)
-}
-
 onMounted(async () => {
-  try {
-    startLoading()
-    reviewStore.$reset()
-    if (!flashcardStore.loaded) {
-      Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
-      const selectedSetId = loadSelectedSetIdFromCookies()
-      if (selectedSetId) {
-        await loadStoresForFlashcardSetId(selectedSetId)
-      } else {
-        Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
-      }
-    }
-    await startReview()
-  } finally {
-    await stopLoading()
-  }
-  spaceDeck.value?.setDeckReady()
+  await startReviewOnce()
   document.addEventListener('keydown', handleKeydown)
 })
 
 onBeforeRouteLeave(async () => {
-  await cleanUpReview()
+  await finishReviewOnce()
 })
 
 onUnmounted(async () => {
   document.removeEventListener('keydown', handleKeydown)
-  await cleanUpReview()
+  await finishReviewOnce()
 })
 
 async function handleKeydown(event: KeyboardEvent) {
@@ -372,7 +377,7 @@ async function handleKeydown(event: KeyboardEvent) {
 
   if (event.key === 'Escape') {
     event.stopPropagation()
-    finishReviewAndLeave()
+    await finishReviewAndLeave()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
     await spaceDeck?.value?.slideLeft()

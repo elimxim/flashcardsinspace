@@ -132,6 +132,7 @@ import { userApiErrors } from '@/api/user-api-error.ts'
 import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
+import { useRunOnce } from '@/utils/run-once.ts'
 
 const props = defineProps<{
   sessionId?: number,
@@ -157,7 +158,6 @@ const {
 const reviewStore = useReviewStore(ReviewSessionType.LIGHTSPEED)
 
 const {
-  reviewStoreLoaded,
   flashcardsTotal,
   currFlashcard,
   flashcardsRemaining,
@@ -166,12 +166,17 @@ const {
   noNextAvailable,
 } = storeToRefs(reviewStore)
 
+const {
+  runOnce: startReviewOnce,
+  isPending: reviewStarting,
+} = useRunOnce(startReview)
+
+const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
+
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 const elapsedTime = ref(0)
 const { startWatch, stopWatch } = useStopWatch(elapsedTime)
-
-const startingReview = ref(false)
 
 const reviewedFlashcardIds = ref<number[]>([])
 const incorrectFlashcards = ref<Flashcard[]>([])
@@ -179,9 +184,19 @@ const incorrectFlashcards = ref<Flashcard[]>([])
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 async function startReview() {
-  startingReview.value = true
+  Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.LIGHTSPEED}`)
   try {
-    Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.LIGHTSPEED}`)
+    startLoading()
+    reviewStore.$reset()
+    if (!flashcardStore.loaded) {
+      Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
+      const selectedSetId = loadSelectedSetIdFromCookies()
+      if (selectedSetId) {
+        await loadStoresForFlashcardSetId(selectedSetId)
+      } else {
+        Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
+      }
+    }
     reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value, chronodays.value))
     await createReviewSession()
     await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
@@ -189,19 +204,16 @@ async function startReview() {
     })
     Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
   } finally {
-    startingReview.value = false
+    await stopLoading()
   }
-}
-
-function resetState() {
-  stopWatch()
-  reviewStore.$reset()
-  reviewedFlashcardIds.value = []
-  incorrectFlashcards.value = []
+  spaceDeck.value?.setDeckReady()
 }
 
 async function finishReview() {
-  if (startingReview.value || !reviewStoreLoaded.value) return
+  if (reviewStarting.value) {
+    await startReviewOnce()
+  }
+
   Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
   currFlashcardWatcher.stop()
   try {
@@ -209,14 +221,17 @@ async function finishReview() {
       await markDaysAsCompleted(flashcardSet.value)
     }
   } finally {
-    resetState()
+    stopWatch()
+    reviewedFlashcardIds.value = []
+    incorrectFlashcards.value = []
+    reviewStore.$reset()
+    destroyReviewStore(ReviewSessionType.LIGHTSPEED)
   }
 }
 
 async function finishReviewAndLeave() {
-  await finishReview().then(() =>
-    router.push({ name: routeNames.controlPanel })
-  )
+  await finishReviewOnce()
+  await router.push({ name: routeNames.controlPanel })
 }
 
 async function stageDown() {
@@ -362,28 +377,12 @@ async function updateReviewSession(flashcardIds: number[], finished: boolean = f
 }
 
 onMounted(async () => {
-  try {
-    startLoading()
-    reviewStore.$reset()
-    if (!flashcardStore.loaded) {
-      Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
-      const selectedSetId = loadSelectedSetIdFromCookies()
-      if (selectedSetId) {
-        await loadStoresForFlashcardSetId(selectedSetId)
-      } else {
-        Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
-      }
-    }
-    await startReview()
-  } finally {
-    await stopLoading()
-  }
-  spaceDeck.value?.setDeckReady()
+  await startReviewOnce()
   document.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(async () => {
-  await finishReview()
+  await finishReviewOnce()
   destroyReviewStore(ReviewSessionType.LIGHTSPEED)
   document.removeEventListener('keydown', handleKeydown)
 })

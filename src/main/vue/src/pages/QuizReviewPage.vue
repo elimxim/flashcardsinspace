@@ -138,6 +138,7 @@ import { userApiErrors } from '@/api/user-api-error.ts'
 import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
+import { useRunOnce } from '@/utils/run-once.ts'
 
 const props = defineProps<{
   sessionId?: number,
@@ -172,6 +173,13 @@ const {
   noNextAvailable,
 } = storeToRefs(reviewStore)
 
+const {
+  runOnce: startReviewOnce,
+  isPending: reviewStarting,
+} = useRunOnce(startReview)
+
+const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
+
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 const elapsedTime = ref(0)
@@ -187,13 +195,29 @@ const incorrectFlashcards = ref<Flashcard[]>([])
 
 async function startReview() {
   Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.QUIZ}`)
-  reviewStore.loadState(createReviewQueueForStages(flashcards.value, props.stages, currDay.value))
-  quizOverallTotal.value = flashcardsTotal.value
-  await loadOrCreateQuizSession()
-  await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
-    if (success) startWatch()
-  })
-  Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+  try {
+    startLoading()
+    reviewStore.$reset()
+    if (!flashcardStore.loaded) {
+      Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
+      const selectedSetId = loadSelectedSetIdFromCookies()
+      if (selectedSetId) {
+        await loadStoresForFlashcardSetId(selectedSetId)
+      } else {
+        Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
+      }
+    }
+    reviewStore.loadState(createReviewQueueForStages(flashcards.value, props.stages, currDay.value))
+    quizOverallTotal.value = flashcardsTotal.value
+    await loadOrCreateQuizSession()
+    await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
+      if (success) startWatch()
+    })
+    Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+  } finally {
+    await stopLoading()
+  }
+  spaceDeck.value?.setDeckReady()
 }
 
 async function loadOrCreateQuizSession() {
@@ -213,15 +237,20 @@ function resetState() {
   quizOverallCorrect.value = 0
 }
 
-function finishReview() {
+async function finishReview() {
+  if (reviewStarting.value) {
+    await startReviewOnce()
+  }
   Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.QUIZ}`)
   currFlashcardWatcher.stop()
   resetState()
+  reviewStore.$reset()
+  destroyReviewStore(ReviewSessionType.QUIZ)
 }
 
-function finishReviewAndLeave() {
-  finishReview()
-  router.push({ name: routeNames.controlPanel })
+async function finishReviewAndLeave() {
+  await finishReviewOnce()
+  await router.push({ name: routeNames.controlPanel })
 }
 
 async function quizAnswer(know: boolean) {
@@ -366,29 +395,12 @@ async function updateQuizSession(reviewedFlashcardIds: number[], nextRoundFlashc
 }
 
 onMounted(async () => {
-  try {
-    startLoading()
-    reviewStore.$reset()
-    if (!flashcardStore.loaded) {
-      Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
-      const selectedSetId = loadSelectedSetIdFromCookies()
-      if (selectedSetId) {
-        await loadStoresForFlashcardSetId(selectedSetId)
-      } else {
-        Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
-      }
-    }
-    await startReview()
-  } finally {
-    await stopLoading()
-  }
-  spaceDeck.value?.setDeckReady()
+  await startReviewOnce()
   document.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(async () => {
-  finishReview()
-  destroyReviewStore(ReviewSessionType.QUIZ)
+  await finishReviewOnce()
   document.removeEventListener('keydown', handleKeydown)
 })
 
@@ -397,7 +409,7 @@ async function handleKeydown(event: KeyboardEvent) {
 
   if (event.key === 'Escape') {
     event.stopPropagation()
-    finishReviewAndLeave()
+    await finishReviewAndLeave()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
     await spaceDeck?.value?.slideLeft()
