@@ -57,9 +57,9 @@ const seconds = computed(() => {
 <style scoped>
 .stopwatch--theme {
   --sw--bg: var(--stopwatch--bg, #ffffff);
-  --sw--text--color: var(--stopwatch--text--color, #1a1a2e);
-  --sw--label--color: var(--stopwatch--label--color, #9fa4b6);
-  --sw--separator--color: var(--stopwatch--separator--color, #e1e4f0);
+  --sw--text--color: var(--stopwatch--text--color, #353535);
+  --sw--label--color: var(--stopwatch--label--color, #6a6a6a);
+  --sw--separator--color: var(--stopwatch--separator--color, #dfdfdf);
   --sw--border-radius: var(--stopwatch--border-radius, 6px);
 }
 
@@ -105,7 +105,7 @@ const seconds = computed(() => {
 }
 
 .clock-segment-value {
-  font-size: clamp(1rem, 30cqw, 4rem);
+  font-size: clamp(1.5rem, 30cqw, 4rem);
   font-weight: 300;
   color: var(--sw--text--color);
   font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -115,7 +115,7 @@ const seconds = computed(() => {
 .clock-segment-label {
   font-size: clamp(0.5rem, 9cqw, 0.75rem);
   font-weight: 400;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05rem;
   color: var(--sw--label--color);
 }
 
@@ -126,9 +126,9 @@ const seconds = computed(() => {
 }
 
 .clock-top-label {
-  font-size: clamp(0.5rem, 4.5cqw, 0.75rem);
+  font-size: clamp(0.7rem, 5.5cqw, 0.85rem);
   font-weight: 400;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05rem;
   text-transform: uppercase;
   color: var(--sw--label--color);
 }

@@ -112,8 +112,8 @@ const leftDashArray = computed(() => {
   --d-chart--arc--thickness: var(--doughnut-chart--arc--thickness, 16);
   --d-chart--arc--right--color: var(--doughnut-chart--arc--right--color, #4caf50);
   --d-chart--arc--left--color: var(--doughnut-chart--arc--left--color, #f44336);
-  --d-chart--text--color: var(--doughnut-chart--text--color, #666);
-  --d-chart--total--color: var(--doughnut-chart--total--color, #333);
+  --d-chart--text--color: var(--doughnut-chart--text--color, #6a6a6a);
+  --d-chart--total--color: var(--doughnut-chart--total--color, #353535);
 }
 
 .doughnut-chart--wrapper {
@@ -131,6 +131,7 @@ const leftDashArray = computed(() => {
   position: relative;
   aspect-ratio: 1;
   container-type: inline-size;
+  padding: 2px;
 }
 
 .doughnut-circle {

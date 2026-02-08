@@ -114,14 +114,14 @@ withDefaults(defineProps<{
 
 .quiz-title {
   grid-column: 1 / -1;
-  font-size: clamp(0.7rem, 3cqw, 1.1rem);
+  font-size: clamp(0.9rem, 3cqw, 1.2rem);
   font-weight: 600;
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
   text-align: center;
   white-space: nowrap;
-  color: #45454a;
+  color: #353535;
 }
 
 .quiz-info {
@@ -137,10 +137,12 @@ withDefaults(defineProps<{
 .quiz-chart-wrapper {
   grid-column: 3 / -1;
   width: 100%;
+  height: 100%;
 }
 
 .quiz-chart {
   width: 100%;
+  height: 100%;
   aspect-ratio: 1 / 1;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border-radius: 6px;
@@ -153,7 +155,7 @@ withDefaults(defineProps<{
   align-items: center;
   align-self: flex-start;
   gap: clamp(2px, 1cqw, 4px);
-  padding: clamp(2px, 1cqw, 6px);
+  padding: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border-radius: 6px;
 }
@@ -167,14 +169,14 @@ withDefaults(defineProps<{
 }
 
 .quiz-stats-title {
-  font-size: clamp(0.5rem, 1.9cqw, 0.75rem);
+  font-size: clamp(0.7rem, 2.5cqw, 0.85rem);
   font-weight: 400;
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
   text-align: center;
   white-space: nowrap;
-  color: #9fa4b6;
+  color: #6a6a6a;
 }
 
 .quiz-stats-row {
@@ -187,9 +189,9 @@ withDefaults(defineProps<{
 }
 
 .quiz-stats-text {
-  font-size: clamp(0.5rem, 2cqw, 0.8rem);
+  font-size: clamp(0.65rem, 2.5cqw, 0.85rem);
   font-weight: 600;
-  color: #1a1a2e;
+  color: #353535;
   letter-spacing: 0.05rem;
   word-spacing: 0.05rem;
   text-transform: uppercase;
@@ -198,14 +200,14 @@ withDefaults(defineProps<{
 }
 
 .quiz-stats-number {
-  font-size: clamp(0.5rem, 2cqw, 0.8rem);
+  font-size: clamp(0.7rem, 2.5cqw, 0.85rem);
   font-weight: 600;
   color: rgba(17, 33, 85, 0.92);
   background: rgb(225, 228, 240);
   padding: clamp(2px, 1cqw, 3px);
   margin: clamp(1px, 0.5cqw, 2px);
   border-radius: 6px;
-  width: clamp(24px, 10cqw, 40px);
+  width: 40px;
   text-align: center;
 }
 
