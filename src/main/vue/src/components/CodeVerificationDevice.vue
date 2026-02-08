@@ -84,7 +84,7 @@
 
 <script setup lang="ts">
 import { ref, defineExpose, nextTick, computed } from 'vue'
-import { UXConfig } from '@/utils/device-utils.ts';
+import { UXConfig } from '@/utils/device-utils.ts'
 
 const props = defineProps<{
   attempts: number

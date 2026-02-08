@@ -133,7 +133,7 @@ import VoicePlayer from '@/components/VoicePlayer.vue'
 import Tooltip from '@/components/Tooltip.vue'
 import { ref, nextTick, computed } from 'vue'
 import { stageNameMap } from '@/core-logic/stage-logic.ts'
-import { UXConfig } from '@/utils/device-utils.ts';
+import { UXConfig } from '@/utils/device-utils.ts'
 
 const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })
 const autoRepeatVoice = defineModel<boolean>('autoRepeatVoice', { default: false })
