@@ -15,7 +15,7 @@ import MainPanel from '@/components/control-panel/MainPanel.vue'
 import LearningStagesWidget from '@/components/control-panel/LearningStagesWidget.vue'
 import OuterSpaceWidget from '@/components/control-panel/OuterSpaceWidget.vue'
 import { nextTick, onMounted, ref } from 'vue'
-import { isTouchDevice } from '@/utils/utils.ts'
+import { UXConfig } from '@/utils/device-utils.ts'
 
 defineProps<{
   showInfoBar: boolean
@@ -24,7 +24,7 @@ defineProps<{
 const learningStagesWidget = ref<InstanceType<typeof LearningStagesWidget>>()
 
 onMounted(() => {
-  if (isTouchDevice) {
+  if (UXConfig().expandLearningStagesWidget) {
     nextTick().then(() =>
       setTimeout(() => {
         learningStagesWidget.value?.expand()
