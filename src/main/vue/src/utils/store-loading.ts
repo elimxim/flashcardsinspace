@@ -50,7 +50,10 @@ export function waitUntilStoreLoaded<T extends object>(
   if (propRef.value) return Promise.resolve()
 
   return new Promise((resolve, reject) => {
-    let timer: ReturnType<typeof setTimeout>
+    let timer = setTimeout(() => {
+      unwatch()
+      reject(new Error(`Store property ${String(property)} timed out after ${timeout}ms`))
+    }, timeout)
 
     const unwatch = watch(
       propRef,
@@ -63,11 +66,6 @@ export function waitUntilStoreLoaded<T extends object>(
       },
       { immediate: true }
     )
-
-    timer = setTimeout(() => {
-      unwatch()
-      reject(new Error(`Store property ${String(property)} timed out after ${timeout}ms`))
-    }, timeout)
   })
 }
 
