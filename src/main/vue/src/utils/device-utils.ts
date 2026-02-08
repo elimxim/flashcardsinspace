@@ -41,12 +41,12 @@ export const deviceInteraction = () => {
 }
 
 export const UXConfig = () => {
-  const { isTouch, isTouchOnly, isHover, hasTouch } = deviceInteraction()
+  const { isTouchOnly, isHover, hasTouch } = deviceInteraction()
   const { isMobile, isTablet, isDesktop } = deviceType()
 
   return {
     // Whether the user can see the animation of a tap
-    showAnimationOnTap: !isTouch,
+    showAnimationOnTap: !isHover,
     // Whether the user can see the tooltip
     showTooltips: isHover,
     // Whether the user can see the navigation buttons
