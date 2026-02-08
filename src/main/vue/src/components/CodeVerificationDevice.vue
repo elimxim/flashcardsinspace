@@ -51,7 +51,10 @@
         v-for="n in 9"
         :key="n"
         class="hud-grid-key"
-        :class="{ 'hud-grid-key--locked': status !== 'IDLE' }"
+        :class="{
+          'hud-grid-key--locked': isDigitKeyLocked,
+          'hud-grid-key--tapped': animatingKeys[n.toString()] && !isDigitKeyLocked
+        }"
         @click="handleKeyPress(n.toString())"
       >
         {{ n }}
@@ -59,21 +62,30 @@
 
       <button
         class="hud-grid-key hud-clear-key"
-        :class="{ 'hud-grid-key--locked': status !== 'IDLE' }"
+        :class="{
+          'hud-grid-key--locked': isClearKeyLocked,
+          'hud-clear-key--tapped': animatingKeys['C'] && !isClearKeyLocked
+        }"
         @click="handleKeyPress('C')"
       >
         C
       </button>
       <button
         class="hud-grid-key"
-        :class="{ 'hud-grid-key--locked': status !== 'IDLE' }"
+        :class="{
+          'hud-grid-key--locked': isDigitKeyLocked,
+          'hud-grid-key--tapped': animatingKeys['0'] && !isDigitKeyLocked
+        }"
         @click="handleKeyPress('0')"
       >
         0
       </button>
       <button
         class="hud-grid-key hud-resend-key"
-        :class="{ 'hud-grid-key--locked': isResetLocked }"
+        :class="{
+          'hud-grid-key--locked': isResetKeyLocked,
+          'hud-resend-key--tapped': animatingKeys['R'] && !isResetKeyLocked
+        }"
         @click="handleKeyPress('R')"
       >
         ↻
@@ -99,17 +111,34 @@ type HudStatus = 'IDLE' | 'SYNCING' | 'ERROR' | 'SUCCESS' | 'OFF' | 'LOCKED'
 const input = ref<string>('')
 const dirty = ref(false)
 const status = ref<HudStatus>('IDLE')
-const animatingOnTap = ref(false)
+
+const animatingKeys = ref<Record<string, boolean>>({})
 const animationDurationMs = computed(() => `${KEY_ANIMATION_DURATION}ms`)
 
 let successTimeout: ReturnType<typeof setTimeout> | null = null
 let failureTimeout: ReturnType<typeof setTimeout> | null = null
 
-const isResetLocked = computed(() => {
+const isResetKeyLocked = computed(() => {
   return status.value === 'SUCCESS' || status.value !== 'OFF' && dirty.value || status.value === 'LOCKED'
 })
 
+const isDigitKeyLocked = computed(() => {
+  return status.value !== 'IDLE'
+})
+
+const isClearKeyLocked = computed(() => {
+  return status.value !== 'IDLE'
+})
+
+function isKeyLocked(key: string) {
+  if (/^\d$/.test(key)) return isDigitKeyLocked.value
+  if (key === 'C') return isDigitKeyLocked.value
+  if (key === 'R') return isResetKeyLocked.value
+  return true
+}
+
 const handleKeyPress = async (key: string) => {
+  if (isKeyLocked(key)) return
   if (UXConfig().showAnimationOnTap) {
     await startTapAnimation(key)
   } else {
@@ -118,9 +147,9 @@ const handleKeyPress = async (key: string) => {
 }
 
 const startTapAnimation = async (key: string) => {
-  animatingOnTap.value = true
+  animatingKeys.value[key] = true
   setTimeout(async () => {
-    animatingOnTap.value = false
+    animatingKeys.value[key] = false
     await processKeyPress(key)
   }, KEY_ANIMATION_DURATION)
 }
@@ -460,7 +489,7 @@ defineExpose({
   }
 }
 
-.hud-grid-key:not(.hud-clear-key):not(.hud-resend-key):active {
+.hud-grid-key--tapped:not(.hud-grid-key--locked) {
   transform: scale(0.9);
   background: #00f2ff;
   border-color: #00f2ff;
@@ -480,7 +509,7 @@ defineExpose({
   }
 }
 
-.hud-clear-key:active {
+.hud-clear-key--tapped:not(.hud-grid-key--locked) {
   transform: scale(0.9);
   background: #ff9d00;
   border-color: #ff9d00;
@@ -500,7 +529,7 @@ defineExpose({
   }
 }
 
-.hud-resend-key:active {
+.hud-resend-key--tapped:not(.hud-grid-key--locked) {
   transform: scale(0.9);
   background: #ff0000;
   border-color: #ff0000;
