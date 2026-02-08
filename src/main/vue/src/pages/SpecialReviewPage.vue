@@ -74,7 +74,7 @@
           >
             <ReviewResult/>
           </SpaceDeck>
-          <div v-if="!isTouchDevice" class="review-nav">
+          <div v-if="UXConfig().showNavButtons" class="review-nav">
             <SmartButton
               class="calm-button"
               text="Prev"
@@ -104,7 +104,7 @@
             />
           </div>
           <div
-            v-else-if="isTouchDevice && reviewMode.isOuterSpace()"
+            v-else-if="reviewMode.isOuterSpace()"
             class="review-nav review-nav--centered"
           >
             <SmartButton
@@ -135,7 +135,6 @@ import SpaceToast from '@/components/SpaceToast.vue'
 import Starfield from '@/components/Starfield.vue'
 import ReviewResult from '@/components/review/ReviewResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { isTouchDevice } from '@/utils/utils.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
@@ -164,6 +163,7 @@ import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { useStopWatch } from '@/utils/stop-watch.ts'
 import { ReviewSessionCreateRequest } from '@/api/communication.ts'
+import { UXConfig } from '@/utils/device-utils.ts'
 
 const props = defineProps<{
   sessionId?: number,

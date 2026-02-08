@@ -56,7 +56,7 @@
         :frames="currentCategoryTips"
         show-progress
         progress-theme="dark"
-        :show-navigation="isHoverSupported"
+        :show-navigation="UXConfig().showNavButtons"
         navigation-theme="dark"
         looped-tape
       >
@@ -73,8 +73,9 @@
 <script setup lang="ts">
 import SwipeTape from '@/components/SwipeTape.vue'
 import { computed, nextTick, ref } from 'vue'
-import { isHoverSupported, shuffle } from '@/utils/utils.ts'
+import { shuffle } from '@/utils/utils.ts'
 import { ComponentExposed } from 'vue-component-type-helpers'
+import { UXConfig } from '@/utils/device-utils.ts'
 
 const mascotPhrases = [
   `I really like your shoes!`,

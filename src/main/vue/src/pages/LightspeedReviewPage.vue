@@ -63,7 +63,7 @@
           >
             <ReviewResult/>
           </SpaceDeck>
-          <div v-if="!isTouchDevice" class="review-nav">
+          <div v-if="UXConfig().showNavButtons" class="review-nav">
             <SmartButton
               text="Don't know"
               class="decision-button dangerous-button"
@@ -101,7 +101,6 @@ import SpaceToast from '@/components/SpaceToast.vue'
 import ReviewResult from '@/components/review/ReviewResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useStopWatch } from '@/utils/stop-watch.ts'
-import { isTouchDevice } from '@/utils/utils.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
@@ -132,6 +131,7 @@ import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
+import { UXConfig } from '@/utils/device-utils.ts'
 
 const props = defineProps<{
   sessionId?: number,
