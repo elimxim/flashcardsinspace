@@ -47,6 +47,7 @@
               :on-click="toggleAutoRepeatVoice"
             />
             <AwesomeButton
+              v-if="!UXConfig().hasStrictAudio"
               icon="fa-solid fa-a"
               class="space-card-button"
               tooltip="Auto play voice"
@@ -105,6 +106,7 @@
               :on-click="toggleAutoRepeatVoice"
             />
             <AwesomeButton
+              v-if="!UXConfig().hasStrictAudio"
               icon="fa-solid fa-a"
               class="space-card-button"
               tooltip="Auto play voice"
@@ -131,6 +133,7 @@ import VoicePlayer from '@/components/VoicePlayer.vue'
 import Tooltip from '@/components/Tooltip.vue'
 import { ref, nextTick, computed } from 'vue'
 import { stageNameMap } from '@/core-logic/stage-logic.ts'
+import { UXConfig } from '@/utils/device-utils.ts';
 
 const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })
 const autoRepeatVoice = defineModel<boolean>('autoRepeatVoice', { default: false })

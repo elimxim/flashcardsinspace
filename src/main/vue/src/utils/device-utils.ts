@@ -42,7 +42,7 @@ export const deviceInteraction = () => {
 
 export const UXConfig = () => {
   const { isTouch, isTouchOnly, isHover, hasTouch } = deviceInteraction()
-  const { isTablet, isDesktop } = deviceType()
+  const { isMobile, isTablet, isDesktop } = deviceType()
 
   return {
     // Whether the user can see the animation of a tap
@@ -57,5 +57,7 @@ export const UXConfig = () => {
     showSwipeHints: hasTouch,
     // Whether the user should see the learning stages widget expanded
     expandLearningStagesWidget: isTouchOnly,
+    // Assume mobile/tablet browsers will block autoplay until a user gesture
+    hasStrictAudio: isMobile || isTablet,
   }
 }
