@@ -60,18 +60,3 @@ export function dateNextMonth(date: Date): Date {
   next.setMonth(date.getMonth() + 1)
   return next
 }
-
-export const isHoverSupported = typeof window !== 'undefined'
-  ? window.matchMedia('(hover: hover)').matches
-  : false
-
-/**
- * Detects if the primary input method is touch (mobile/tablet).
- * Uses CSS media queries to distinguish between:
- * - Mobile/Tablet: pointer is coarse (finger) AND no hover capability
- * - Desktop/Hybrid: fine pointer (mouse) OR has hover capability
- */
-export const isTouchDevice = typeof window !== 'undefined'
-  ? window.matchMedia('(pointer: coarse) and (hover: none)').matches
-  : false
-
