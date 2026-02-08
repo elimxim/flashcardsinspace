@@ -109,6 +109,10 @@ watch(() => props.audioBlob, (newVal) => {
   updateAudioUrl(newVal)
 })
 
+watch(() => props.loopPlay, (newVal) => {
+  isLooping.value = newVal
+})
+
 onMounted(() => {
   if (props.audioBlob) {
     updateAudioUrl(props.audioBlob)
