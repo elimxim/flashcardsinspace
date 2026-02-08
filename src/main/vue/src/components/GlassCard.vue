@@ -13,8 +13,8 @@
 </template>
 
 <script setup lang="ts">
-import { isHoverSupported } from '@/utils/utils.ts'
 import { ref } from 'vue'
+import { UXConfig } from '@/utils/device-utils.ts'
 
 const props = withDefaults(defineProps<{
   text?: string
@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<{
 const animatingOnTap = ref(false)
 
 function handleClick() {
-  if (!isHoverSupported) {
+  if (UXConfig().showAnimationOnTap) {
     startTapAnimation()
   } else {
     props.onClick()

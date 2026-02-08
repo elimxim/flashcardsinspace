@@ -39,8 +39,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, useSlots } from 'vue'
-import { isHoverSupported } from '@/utils/utils.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
+import { UXConfig } from '@/utils/device-utils.ts'
 
 const props = withDefaults(defineProps<{
   text?: string
@@ -91,7 +91,7 @@ async function handleClick() {
   if (props.disabled || resolvedLoading.value) return
   if (props.autoBlur) button.value?.blur()
   if (props.holdTime <= 0) {
-    if (!isHoverSupported && props.animateTap) {
+    if (UXConfig().showAnimationOnTap && props.animateTap) {
       startTapAnimation()
     } else {
       try {

@@ -68,8 +68,8 @@
 <script setup lang="ts">
 import Tooltip from '@/components/Tooltip.vue'
 import { ref } from 'vue'
-import { isHoverSupported } from '@/utils/utils.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
+import { UXConfig } from '@/utils/device-utils.ts'
 
 const props = withDefaults(defineProps<{
   icon: string
@@ -141,7 +141,7 @@ function handleClick() {
   if (props.disabled || resolvedLoading.value) return
   if (props.clickRipple) {
     triggerRipple()
-  } else if (!isHoverSupported && props.animateTap) {
+  } else if (UXConfig().showAnimationOnTap && props.animateTap) {
     startTapAnimation()
   } else {
     press()
