@@ -8,7 +8,7 @@
   >
     <div class="flashcard-deck">
       <div
-        v-if="isTouchDevice && swipeLabelText"
+        v-if="UXConfig().showSwipeHints && swipeLabelText"
         class="swipe-indicator"
         :class="{
           'swipe-indicator--left': fingerOffset < 0,
@@ -72,9 +72,9 @@ import { computed, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import { deckEmptyMessage, ReviewSessionType } from '@/core-logic/review-logic.ts'
-import { isTouchDevice } from '@/utils/utils.ts'
 import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
+import { UXConfig } from '@/utils/device-utils.ts'
 
 const props = withDefaults(defineProps<{
   sessionType: ReviewSessionType
@@ -204,7 +204,7 @@ function getInvisibleDuration(direction: 'left' | 'right'): number {
 }
 
 function canSwipe() {
-  return isTouchDevice && (props.canSlideLeft || props.canSlideRight)
+  return UXConfig().canSwipe && (props.canSlideLeft || props.canSlideRight)
 }
 
 function cancelAnimation() {
