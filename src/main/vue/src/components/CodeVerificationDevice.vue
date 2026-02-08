@@ -52,7 +52,7 @@
         :key="n"
         class="hud-grid-key"
         :class="{ 'hud-grid-key--locked': status !== 'IDLE' }"
-        @click="pressKey(n.toString())"
+        @click="handleKeyPress(n.toString())"
       >
         {{ n }}
       </button>
@@ -60,21 +60,21 @@
       <button
         class="hud-grid-key hud-clear-key"
         :class="{ 'hud-grid-key--locked': status !== 'IDLE' }"
-        @click="clearInput"
+        @click="handleKeyPress('C')"
       >
         C
       </button>
       <button
         class="hud-grid-key"
         :class="{ 'hud-grid-key--locked': status !== 'IDLE' }"
-        @click="pressKey('0')"
+        @click="handleKeyPress('0')"
       >
         0
       </button>
       <button
         class="hud-grid-key hud-resend-key"
         :class="{ 'hud-grid-key--locked': isResetLocked }"
-        @click="resendCode"
+        @click="handleKeyPress('R')"
       >
         ↻
       </button>
@@ -84,6 +84,7 @@
 
 <script setup lang="ts">
 import { ref, defineExpose, nextTick, computed } from 'vue'
+import { UXConfig } from '@/utils/device-utils.ts';
 
 const props = defineProps<{
   attempts: number
@@ -91,11 +92,15 @@ const props = defineProps<{
   resendCode: () => Promise<void>
 }>()
 
+const KEY_ANIMATION_DURATION = 200
+
 type HudStatus = 'IDLE' | 'SYNCING' | 'ERROR' | 'SUCCESS' | 'OFF' | 'LOCKED'
 
 const input = ref<string>('')
 const dirty = ref(false)
 const status = ref<HudStatus>('IDLE')
+const animatingOnTap = ref(false)
+const animationDurationMs = computed(() => `${KEY_ANIMATION_DURATION}ms`)
 
 let successTimeout: ReturnType<typeof setTimeout> | null = null
 let failureTimeout: ReturnType<typeof setTimeout> | null = null
@@ -103,6 +108,28 @@ let failureTimeout: ReturnType<typeof setTimeout> | null = null
 const isResetLocked = computed(() => {
   return status.value === 'SUCCESS' || status.value !== 'OFF' && dirty.value || status.value === 'LOCKED'
 })
+
+const handleKeyPress = async (key: string) => {
+  if (UXConfig().showAnimationOnTap) {
+    await startTapAnimation(key)
+  } else {
+    await processKeyPress(key)
+  }
+}
+
+const startTapAnimation = async (key: string) => {
+  animatingOnTap.value = true
+  setTimeout(async () => {
+    animatingOnTap.value = false
+    await processKeyPress(key)
+  }, KEY_ANIMATION_DURATION)
+}
+
+const processKeyPress = async (key: string) => {
+  if (/^\d$/.test(key)) await pressKey(key)
+  if (key === 'C') clearInput()
+  if (key === 'R') await resendCode()
+}
 
 const pressKey = async (digit: string) => {
   dirty.value = true
@@ -413,7 +440,7 @@ defineExpose({
   color: rgba(255, 255, 255, 0.8);
   font-size: 3.5cqb;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all v-bind(animationDurationMs) cubic-bezier(0.175, 0.885, 0.32, 1.275);
   display: flex;
   align-items: center;
   justify-content: center;
