@@ -327,10 +327,12 @@ defineExpose({
 
 .space-card-face--front {
   transform: rotateY(0deg);
+  --paper-color: var(--card--front--bg-color);
 }
 
 .space-card-face--back {
   transform: rotateY(180deg);
+  --paper-color: var(--card--back--bg-color);
 }
 
 .space-card-face--front--style {
@@ -390,7 +392,24 @@ defineExpose({
   overscroll-behavior: contain;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
+  /* --- THE SCROLL SHADOWS (0px Height) --- */
+  background:
+    /* 1. Top Cover (Moves with text, hides shadow when at top) */
+    linear-gradient(var(--paper-color) 30%, rgba(255,255,255,0)) center top,
+
+      /* 2. Bottom Cover (Moves with text, hides shadow when at bottom) */
+    linear-gradient(rgba(255,255,255,0), var(--paper-color) 70%) center bottom,
+
+      /* 3. Top Shadow (Fixed, revealed when cover moves away) */
+    radial-gradient(farthest-side at 50% 0, rgba(0,0,0,0.2), rgba(0,0,0,0)) center top,
+
+      /* 4. Bottom Shadow (Fixed, revealed when cover moves away) */
+    radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,0.2), rgba(0,0,0,0)) center bottom;
+
+  /* The Magic: 'local' scrolls with content, 'scroll' stays fixed */
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;}
 
 .space-card-content p {
   margin: 0;
