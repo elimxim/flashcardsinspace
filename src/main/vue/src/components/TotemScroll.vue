@@ -185,6 +185,8 @@ onBeforeUnmount(() => {
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .scroll-viewport::-webkit-scrollbar {
@@ -194,6 +196,7 @@ onBeforeUnmount(() => {
 .scroll-content {
   min-height: 100%;
   box-sizing: border-box;
+  margin: auto 0;
 }
 
 .scroll-track-wrapper {
