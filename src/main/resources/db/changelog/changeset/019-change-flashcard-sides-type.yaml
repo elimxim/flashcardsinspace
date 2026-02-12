@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 019-change-flashcard-sides-type
+      author: elimxim
+      changes:
+        - modifyDataType:
+            tableName: flashcard
+            columnName: front_side
+            newDataType: TEXT
+        - modifyDataType:
+            tableName: flashcard
+            columnName: back_side
+            newDataType: TEXT
