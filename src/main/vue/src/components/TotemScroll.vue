@@ -1,14 +1,14 @@
 <template>
   <div class="totem-scroll totem-scroll--theme">
-    <div class="scroll-viewport" ref="viewport" @scroll="handleScroll">
-      <div class="scroll-content" ref="contentRef">
+    <div ref="viewport" class="scroll-viewport" @scroll="handleScroll">
+      <div ref="contentRef" class="scroll-content">
         <slot/>
       </div>
     </div>
 
     <div
-      class="scroll-track-wrapper"
       v-show="isScrollable"
+      class="scroll-track-wrapper"
       :style="{ width: `${trackWidth}px` }"
     >
       <button
