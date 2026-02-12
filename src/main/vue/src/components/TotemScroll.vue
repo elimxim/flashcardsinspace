@@ -135,8 +135,20 @@ const isDotActive = (index: number) => {
 
 const scrollStep = (direction: number) => {
   if (!viewport.value) return
-  const step = viewport.value.clientHeight * 0.5
-  viewport.value.scrollBy({ top: direction * step, behavior: 'smooth' })
+
+  const { scrollTop, scrollHeight, clientHeight } = viewport.value
+  const step = clientHeight * 0.5
+  const maxScroll = scrollHeight - clientHeight
+
+  const targetPos = scrollTop + (direction * step)
+  const normalizedTargetPos = Math.max(0, Math.min(targetPos, maxScroll))
+
+  if (Math.abs(normalizedTargetPos - scrollTop) < 1) return
+
+  viewport.value.scrollTo({
+    top: normalizedTargetPos,
+    behavior: 'smooth'
+  })
 }
 
 const scrollToSection = (index: number) => {
@@ -144,7 +156,11 @@ const scrollToSection = (index: number) => {
   const scrollHeight = contentRef.value?.scrollHeight || 0
   const maxScroll = scrollHeight - viewport.value.clientHeight
   const targetRatio = index / (props.dotCount - 1)
-  viewport.value.scrollTo({ top: targetRatio * maxScroll, behavior: 'smooth' })
+
+  viewport.value.scrollTo({
+    top: targetRatio * maxScroll,
+    behavior: 'smooth'
+  })
 }
 
 onMounted(() => {
