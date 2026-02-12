@@ -27,9 +27,11 @@
             :on-click="handleEdit"
           />
         </div>
-        <div class="space-card-content scrollbar-hidden">
-          <p>{{ frontSide }}</p>
-        </div>
+        <TotemScroll>
+          <div class="space-card-content">
+            <p>{{ frontSide }}</p>
+          </div>
+        </TotemScroll>
         <div class="space-card-strip select-none">
           <span v-if="!textOnly">
             <Tooltip text="Viewed Times" position="top-right">
@@ -86,9 +88,11 @@
             :on-click="handleEdit"
           />
         </div>
-        <div class="space-card-content scrollbar-hidden">
-          <p>{{ backSide }}</p>
-        </div>
+        <TotemScroll>
+          <div class="space-card-content">
+            <p>{{ backSide }}</p>
+          </div>
+        </TotemScroll>
         <div class="space-card-strip select-none">
           <span v-if="!textOnly">
             <Tooltip text="Viewed Times" position="top-right">
@@ -128,6 +132,7 @@
 </template>
 
 <script setup lang="ts">
+import TotemScroll from '@/components/TotemScroll.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import VoicePlayer from '@/components/VoicePlayer.vue'
 import Tooltip from '@/components/Tooltip.vue'
@@ -382,34 +387,15 @@ defineExpose({
 }
 
 .space-card-content {
+  height: 100%;
   display: block;
-  flex: 1;
   width: 100%;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* --- THE SCROLL SHADOWS (0px Height) --- */
-  background:
-    /* 1. Top Cover (Moves with text, hides shadow when at top) */
-    linear-gradient(var(--paper-color) 30%, rgba(255,255,255,0)) center top,
-
-      /* 2. Bottom Cover (Moves with text, hides shadow when at bottom) */
-    linear-gradient(rgba(255,255,255,0), var(--paper-color) 70%) center bottom,
-
-      /* 3. Top Shadow (Fixed, revealed when cover moves away) */
-    radial-gradient(farthest-side at 50% 0, rgba(0,0,0,0.2), rgba(0,0,0,0)) center top,
-
-      /* 4. Bottom Shadow (Fixed, revealed when cover moves away) */
-    radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,0.2), rgba(0,0,0,0)) center bottom;
-
-  /* The Magic: 'local' scrolls with content, 'scroll' stays fixed */
-  background-repeat: no-repeat;
-  background-attachment: local, local, scroll, scroll;
-  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;}
+}
 
 .space-card-content p {
   margin: 0;
