@@ -27,8 +27,8 @@
             :on-click="handleEdit"
           />
         </div>
-        <div class="space-card-body">
-          {{ frontSide }}
+        <div class="space-card-content scrollbar-hidden">
+          <p>{{ frontSide }}</p>
         </div>
         <div class="space-card-strip select-none">
           <span v-if="!textOnly">
@@ -86,8 +86,8 @@
             :on-click="handleEdit"
           />
         </div>
-        <div class="space-card-body">
-          {{ backSide }}
+        <div class="space-card-content scrollbar-hidden">
+          <p>{{ backSide }}</p>
         </div>
         <div class="space-card-strip select-none">
           <span v-if="!textOnly">
@@ -294,6 +294,14 @@ defineExpose({
   transform: rotateY(180deg);
 }
 
+.space-card:not(.space-card--flipped) .space-card-face--back {
+  pointer-events: none;
+}
+
+.space-card--flipped .space-card-face--front {
+  pointer-events: none;
+}
+
 .space-card-flipper {
   flex: 1;
   transition: transform v-bind(flipAnimationDurationMs) cubic-bezier(0.25, 1, 0.5, 1);
@@ -371,27 +379,40 @@ defineExpose({
   gap: 10px;
 }
 
-.space-card-body {
+.space-card-content {
+  display: block;
   flex: 1;
   width: 100%;
-  height: 100%;
-  font-size: clamp(1.4rem, 2vw, 1.8rem);
-  color: var(--card--color);
-  text-align: center;
-  white-space: pre-wrap;
-  overflow: hidden;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.space-card-content p {
+  margin: 0;
+  min-height: 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+  padding: 10px;
+  color: var(--card--color);
+  font-size: clamp(1.4rem, 2vw, 1.8rem);
+  text-align: center;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .space-card-strip-text {
   background: none;
   font-size: inherit;
   color: inherit;
-
 }
 
 .space-card-button {
