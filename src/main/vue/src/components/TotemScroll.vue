@@ -187,6 +187,7 @@ onBeforeUnmount(() => {
   -ms-overflow-style: none;
   display: flex;
   flex-direction: column;
+  overscroll-behavior: none;
 }
 
 .scroll-viewport::-webkit-scrollbar {
