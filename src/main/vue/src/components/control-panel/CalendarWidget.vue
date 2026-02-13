@@ -72,7 +72,7 @@
             <div class="cp-text cp-text--sub">
               With the total number of flashcards to review
             </div>
-            <div class="cp-count-box">
+            <div class="cp-count-box" style="flex-shrink: 0;">
               {{ prevDaysReviewTotal }}
             </div>
           </div>
