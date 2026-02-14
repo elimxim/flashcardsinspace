@@ -12,7 +12,9 @@
 ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green)
 ![License](https://img.shields.io/badge/license-Proprietary-red)
 
-Flashcards in Space is a fun and efficient spaced repetition system that helps you learn vocabulary or any other concept you can put into flashcards. Built with a space-themed UI, humor and powered by a custom **Lightspeed Schedule** algorithm.
+Flashcards in Space is a personal mission to make long-term learning feel less like a chore and more like an exploration. 
+It combines the proven science of spaced repetition with a modern, space-themed interface designed 
+to keep you curious and consistent.
 
 <a href="https://flashcardsinspace.com"><img src="https://img.shields.io/badge/Visit-flashcardsinspace.com-033270?style=for-the-badge&labelColor=4091c9" alt="Website" height="40"/></a>
 
@@ -20,11 +22,36 @@ Flashcards in Space is a fun and efficient spaced repetition system that helps y
   <a href="https://flashcardsinspace.com"><img src="src/main/vue/src/assets/rocket.svg" alt="Visit flashcardsinspace.com" width="150"/></a>
 </p>
 
-## 🎯 Motivation
+## 🎯 The Story Behind the Mission
 
-Existing spaced repetition tools often prioritize function over form, resulting in dated interfaces that can make daily practice feel like a chore. Flashcards in Space was created to bridge this gap, combining proven learning science with a modern, engaging user experience.
+Flashcards in Space wasn’t born from a business plan, but from a personal need and a bit of "what if?" curiosity. 
+The project is built on three core pillars:
 
-At its core is the **Lightspeed Schedule**, a custom spaced repetition algorithm designed to optimize retention while keeping sessions efficient. Built on the foundational research of Hermann Ebbinghaus, Sebastian Leitner, and other pioneers of spaced repetition science.
+### 1. Reimagining the Ritual
+
+I’ve always been a believer in the Leitner System, the simple but powerful idea of moving cards through boxes 
+as you master them. However, I found myself constantly struggling with existing tools. 
+They were either powerful but buried under "clunky"interfaces that felt like 90s spreadsheets, 
+or beautiful but lacked the specific scheduling flexibility I needed. I wanted a place to learn that felt warm, 
+intuitive, and fun to return to every morning.
+
+### 2. Refining the Learning Rhythm
+
+While the traditional Leitner system is powerful, its rigid intervals often lead to "review spikes", 
+daunting days when hundreds of cards collide at once. Gabriel Wyner made incredible strides in smoothing this out 
+to create a more manageable pace, and the Lightspeed Schedule takes that evolution to its natural conclusion. 
+By intelligently shifting and distributing learning stages across the calendar, 
+it eliminates those overwhelming peaks entirely. The result is a perfectly fluid, natural progression 
+that ensures your daily ritual stays calm and consistent, no matter how large your deck grows.
+
+### 3. A Laboratory for Modern Craft
+
+This project serves as a laboratory for high-precision engineering. Rather than relying on modern UI libraries or 
+Material Design frameworks, I chose to build every component from scratch to maintain well-grained control 
+over the entire system. This approach allowed me to explore a new era of productivity: using AI to grow 
+the individual building blocks of the interface while I focused on the choreography of the architecture. 
+It wasn’t about shortcuts, but about seeing how far a solo developer can push the limits of custom design 
+when they have an intelligent powerful co-pilot at their side.
 
 ## 🚀 Getting Started
 
