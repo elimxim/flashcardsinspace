@@ -101,7 +101,7 @@ import {
 } from '@/api/api-client.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
-import { useAudioCache } from '@/stores/audio-cache.ts';
+import { useAudioCache } from '@/stores/audio-cache.ts'
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const removed = defineModel<boolean>('removed', { default: false })
