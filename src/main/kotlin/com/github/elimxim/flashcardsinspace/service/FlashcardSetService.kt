@@ -15,6 +15,8 @@ import java.time.ZonedDateTime
 
 private val log = LoggerFactory.getLogger(FlashcardSetService::class.java)
 
+private const val SOFT_DELETE_THRESHOLD = 30
+
 @Service
 class FlashcardSetService(
     private val flashcardSetRepository: FlashcardSetRepository,
@@ -123,7 +125,7 @@ class FlashcardSetService(
         val flashcardSet = getEntity(id)
         verifyUserHasAccess(user, flashcardSet)
         val flashcardCount = flashcardRepository.countByFlashcardSet(flashcardSet)
-        if (flashcardCount >= 40) {
+        if (flashcardCount >= SOFT_DELETE_THRESHOLD) {
             flashcardSet.status = FlashcardSetStatus.DELETED
             flashcardSetRepository.save(flashcardSet)
         } else {
