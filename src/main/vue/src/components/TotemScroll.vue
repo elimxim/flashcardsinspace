@@ -12,6 +12,7 @@
       :style="{ width: `${trackWidth}px` }"
     >
       <button
+        v-if="UXConfig().showNavButtons"
         class="scroll-nav-btn top"
         :style="buttonStyle"
         @click.stop="scrollStep(-1)"
@@ -32,6 +33,7 @@
         />
       </div>
       <button
+        v-if="UXConfig().showNavButtons"
         class="scroll-nav-btn bottom"
         :style="buttonStyle"
         @click.stop="scrollStep(1)"
@@ -47,6 +49,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed, nextTick } from 'vue'
+import { UXConfig } from '@/utils/device-utils.ts'
 
 const props = withDefaults(defineProps<{
   dotCount?: number
