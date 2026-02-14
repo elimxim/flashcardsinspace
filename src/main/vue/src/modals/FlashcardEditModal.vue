@@ -101,6 +101,7 @@ import {
 } from '@/api/api-client.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
+import { useAudioCache } from '@/stores/audio-cache.ts';
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const removed = defineModel<boolean>('removed', { default: false })
@@ -110,6 +111,7 @@ const toggleStore = useToggleStore()
 const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
 const audioStore = useAudioStore()
+const audioCache = useAudioCache()
 const toaster = useSpaceToaster()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
@@ -329,6 +331,16 @@ async function removeFlashcard(): Promise<boolean> {
     .then(() => {
       flashcardStore.removeFlashcard(flashcardId)
       flashcardSetStore.decrementFlashcardsNumber(setId)
+      audioStore.removeAudioId(flashcardId, flashcardSides.FRONT)
+      audioStore.removeAudioId(flashcardId, flashcardSides.BACK)
+      audioCache.deleteAudio(flashcardId, true)
+      audioCache.deleteAudio(flashcardId, false)
+      frontSideAudio.value = undefined
+      backSideAudio.value = undefined
+      frontSideAudioId.value = undefined
+      backSideAudioId.value = undefined
+      frontSideAudioSize.value = undefined
+      backSideAudioSize.value = undefined
       toaster.bakeSuccess('Success', 'Flashcard removed', 200)
       return true
     }).catch((error) => {

@@ -36,4 +36,13 @@ interface FlashcardAudioRepository : JpaRepository<FlashcardAudio, Long> {
     """, nativeQuery = true
     )
     fun deleteByFlashcardSetId(@Param("setId") setId: Long)
+
+    @Modifying
+    @Query(
+        """
+        DELETE FROM flashcard_audio fa
+        WHERE fa.flashcard_id = :flashcardId
+    """, nativeQuery = true
+    )
+    fun deleteByFlashcardId(@Param("flashcardId") flashcardId: Long)
 }

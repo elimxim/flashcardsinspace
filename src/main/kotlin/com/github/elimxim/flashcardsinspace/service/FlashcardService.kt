@@ -1,6 +1,7 @@
 package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardAudioRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
@@ -19,6 +20,7 @@ private val log = LoggerFactory.getLogger(FlashcardService::class.java)
 class FlashcardService(
     private val flashcardSetService: FlashcardSetService,
     private val flashcardRepository: FlashcardRepository,
+    private val flashcardAudioRepository: FlashcardAudioRepository,
     private val requestValidator: RequestValidator,
 ) {
     @Transactional(readOnly = true)
@@ -125,6 +127,7 @@ class FlashcardService(
         val flashcard = getEntity(id)
         verifyUserOperation(user, setId, flashcard)
         flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
+        flashcardAudioRepository.deleteByFlashcardId(flashcard.id)
         flashcardRepository.delete(flashcard)
     }
 
