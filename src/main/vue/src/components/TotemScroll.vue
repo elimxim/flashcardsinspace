@@ -67,7 +67,9 @@ const contentRef = ref<HTMLElement | null>(null)
 const isScrollable = ref(false)
 const thumbSize = ref(1)
 const thumbStart = ref(0)
+
 let resizeObserver: ResizeObserver | null = null
+let mutationObserver: MutationObserver | null = null
 
 const dotStyle = computed(() => ({
   width: `${props.dotSize}px`,
@@ -79,24 +81,25 @@ const buttonStyle = computed(() => ({
   height: `${props.buttonSize}px`
 }))
 
-/**
- * calculates:
- * - is the content overflowing? (show/hide scrollbar)
- * - how many dots should be filled? (thumb Size)
- * - which dots should be filled? (thumb Position)
- */
 const updateMetrics = () => {
-  if (!viewport.value || !contentRef.value) return
+  if (!viewport.value) return
 
-  const { scrollTop, clientHeight } = viewport.value
-  const scrollHeight = contentRef.value.scrollHeight
+  // 1. Source of truth: viewport
+  const { scrollTop, clientHeight, scrollHeight } = viewport.value
   const maxScroll = scrollHeight - clientHeight
 
-  const shouldBeScrollable = maxScroll > 1 // Tolerance of 1px
+  // 2. Determine scrollability
+  // Use a slightly loose tolerance (1px) to prevent sub-pixel flicker
+  const shouldBeScrollable = maxScroll > 1
+
   if (isScrollable.value !== shouldBeScrollable) {
     isScrollable.value = shouldBeScrollable
+
+    // If scrollbar visibility changes, the viewport width might change (due to flex).
+    // We wait for that layout shift, then measure again to be safe.
     if (shouldBeScrollable) {
-      nextTick(updateMetrics)
+      nextTick(() => requestAnimationFrame(updateMetrics))
+      return
     }
   }
 
@@ -106,6 +109,7 @@ const updateMetrics = () => {
     return
   }
 
+  // 3. Update Thumb Size & Position
   const visibleRatio = clientHeight / scrollHeight
   let size = 1
   if (visibleRatio > 0.75) {
@@ -113,7 +117,6 @@ const updateMetrics = () => {
   } else if (visibleRatio > 0.50) {
     size = 2
   }
-
   thumbSize.value = Math.min(size, props.dotCount)
 
   const trackLength = props.dotCount - thumbSize.value
@@ -129,53 +132,58 @@ const handleScroll = () => {
   requestAnimationFrame(updateMetrics)
 }
 
+const handleResizeOrMutation = () => {
+  nextTick(() => {
+    requestAnimationFrame(updateMetrics)
+  })
+}
+
 const isDotActive = (index: number) => {
   return index >= thumbStart.value && index < (thumbStart.value + thumbSize.value)
 }
 
 const scrollStep = (direction: number) => {
   if (!viewport.value) return
-
   const { scrollTop, scrollHeight, clientHeight } = viewport.value
   const step = clientHeight * 0.5
   const maxScroll = scrollHeight - clientHeight
-
   const targetPos = scrollTop + (direction * step)
   const normalizedTargetPos = Math.max(0, Math.min(targetPos, maxScroll))
-
   if (Math.abs(normalizedTargetPos - scrollTop) < 1) return
-
-  viewport.value.scrollTo({
-    top: normalizedTargetPos,
-    behavior: 'smooth'
-  })
+  viewport.value.scrollTo({ top: normalizedTargetPos, behavior: 'smooth' })
 }
 
 const scrollToSection = (index: number) => {
   if (!viewport.value) return
-  const scrollHeight = contentRef.value?.scrollHeight || 0
-  const maxScroll = scrollHeight - viewport.value.clientHeight
+  const { scrollHeight, clientHeight } = viewport.value
+  const maxScroll = scrollHeight - clientHeight
   const targetRatio = index / (props.dotCount - 1)
-
-  viewport.value.scrollTo({
-    top: targetRatio * maxScroll,
-    behavior: 'smooth'
-  })
+  viewport.value.scrollTo({ top: targetRatio * maxScroll, behavior: 'smooth' })
 }
 
 onMounted(() => {
   updateMetrics()
+  if (viewport.value) {
+    resizeObserver = new ResizeObserver(handleResizeOrMutation)
+    resizeObserver.observe(viewport.value)
+  }
   if (contentRef.value) {
-    resizeObserver = new ResizeObserver(() => {
-      updateMetrics()
+    mutationObserver = new MutationObserver(handleResizeOrMutation)
+    mutationObserver.observe(contentRef.value, {
+      childList: true,
+      subtree: true,
+      characterData: true
     })
-    resizeObserver.observe(contentRef.value)
   }
 })
 
 onBeforeUnmount(() => {
   if (resizeObserver) {
     resizeObserver.disconnect()
+  }
+
+  if (mutationObserver) {
+    mutationObserver.disconnect()
   }
 })
 </script>
