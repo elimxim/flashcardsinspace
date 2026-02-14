@@ -96,7 +96,6 @@
 
 <script setup lang="ts">
 import { ref, defineExpose, nextTick, computed } from 'vue'
-import { UXConfig } from '@/utils/device-utils.ts'
 
 const props = defineProps<{
   attempts: number
@@ -139,11 +138,7 @@ function isKeyLocked(key: string) {
 
 const handleKeyPress = async (key: string) => {
   if (isKeyLocked(key)) return
-  if (UXConfig().showAnimationOnTap) {
-    await startTapAnimation(key)
-  } else {
-    await processKeyPress(key)
-  }
+  await startTapAnimation(key)
 }
 
 const startTapAnimation = async (key: string) => {
@@ -481,14 +476,6 @@ defineExpose({
   pointer-events: none;
 }
 
-@media (hover: hover) {
-  .hud-grid-key:not(.hud-clear-key):not(.hud-resend-key):hover {
-    border-color: rgba(255, 255, 255, 0.6);
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
-  }
-}
-
 .hud-grid-key--tapped:not(.hud-grid-key--locked) {
   transform: scale(0.9);
   background: #00f2ff;
@@ -500,13 +487,6 @@ defineExpose({
 .hud-clear-key:not(.hud-grid-key--locked) {
   color: #ff9d00;
   border-color: rgba(255, 157, 0, 0.2);
-}
-
-@media (hover: hover) {
-  .hud-clear-key:hover {
-    border-color: #ff9d00;
-    background: rgba(255, 255, 255, 0.02);
-  }
 }
 
 .hud-clear-key--tapped:not(.hud-grid-key--locked) {
@@ -523,6 +503,16 @@ defineExpose({
 }
 
 @media (hover: hover) {
+  .hud-grid-key:not(.hud-clear-key):not(.hud-resend-key):not(.hud-grid-key--tapped):hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .hud-clear-key:not(.hud-clear-key--tapped):hover {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: #ff9d00;
+  }
+
   .hud-resend-key:hover {
     border-color: #ff0000;
     background: rgba(255, 255, 255, 0.02);
