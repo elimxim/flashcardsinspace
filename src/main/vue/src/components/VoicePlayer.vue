@@ -99,6 +99,8 @@ function updateAudioUrl(blob: Blob | undefined) {
   } else {
     if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
     audioUrl.value = undefined
+    isPlaying.value = false
+    isLooping.value = false
     if (blob) {
       Log.error(LogTag.LOGIC, 'Invalid blob provided:', blob)
     }
