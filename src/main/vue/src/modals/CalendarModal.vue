@@ -52,10 +52,12 @@
               <div v-if="isVacationDay(day)" class="calendar-cell-vacation">
                 🌴
               </div>
-              <div v-else-if="canShowStages(day)" class="calendar-cell-stages">
+              <div v-if="canShowStages(day)" class="calendar-cell-stages">
                 {{ day.stages }}
               </div>
-              <span class="calendar-cell-number"> {{ day.number }} </span>
+              <span v-if="!isVacationDay(day)" class="calendar-cell-number">
+                {{ day.number }}
+              </span>
             </div>
           </div>
         </template>
@@ -457,7 +459,7 @@ function handleKeydown(event: KeyboardEvent) {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   font-weight: 800;
   height: 100%;
   width: 100%;
@@ -487,7 +489,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .calendar-cell-vacation {
-  font-size: clamp(1rem, 1.8vw, 1.6rem);
+  font-size: clamp(1.4rem, 1.8vw, 1.6rem);
   display: flex;
   align-items: center;
   justify-content: center;
