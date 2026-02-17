@@ -3,86 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Houston, We Have a Problem!</title>
+    <title>Scheduled Maintenance | Orbiting Updates</title>
+
     <link rel="icon" href="/maintenance/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/maintenance/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/maintenance/favicon-16x16.png">
+
     <style>
+        :root {
+            --space-black: #030308;
+            --nebula-purple: #1a1a3a;
+            --star-glow: #5b79da;
+            --text-dim: #a5a5c5;
+        }
+
         body {
             font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #0c0a1e;
-            color: #e0e0e0;
+            background: radial-gradient(circle at center, var(--nebula-purple) 0%, var(--space-black) 100%);
+            color: #ffffff;
             text-align: center;
-            padding: 1rem;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100dvh;
             margin: 0;
+            padding: 1rem;
             overflow: hidden;
-            background-size: cover;
-            background-position: center bottom;
-            box-shadow: inset 0 0 10rem rgba(0, 0, 0, 0.5);
             user-select: none;
         }
 
+        /* Enhanced Starfield */
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                    radial-gradient(1.5px 1.5px at 20px 30px, #fff, rgba(0, 0, 0, 0)),
+                    radial-gradient(1px 1px at 150px 150px, #fff, rgba(0, 0, 0, 0)),
+                    radial-gradient(2px 2px at 50px 160px, #5b79da, rgba(0, 0, 0, 0)),
+                    radial-gradient(1px 1px at 280px 120px, #fff, rgba(0, 0, 0, 0)),
+                    radial-gradient(1.5px 1.5px at 110px 210px, #fff, rgba(0, 0, 0, 0));
+            background-size: 300px 300px;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
         .container {
-            width: fit-content;
-            background-color: rgba(12, 10, 30, 0.8);
-            margin: 4rem;
-            padding: 2rem;
-            border-radius: 12px;
-            border: 1px solid rgba(91, 121, 218, 0.3);
-            box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+            width: 95%;
+            max-width: 500px;
+            background-color: rgba(7, 7, 20, 0.7);
+            backdrop-filter: blur(20px);
+            padding: 3rem 2rem;
+            border-radius: 28px;
+            border: 1px solid rgba(91, 121, 218, 0.25);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(91, 121, 218, 0.05);
+            animation: float 6s infinite ease-in-out;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #5b79da;
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 10px #5b79da;
+            animation: pulse 2s infinite;
+        }
+
+        .mission-status {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #5b79da;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #ffffff;
-            text-shadow: 0 0 10px #575757;
-            margin-top: 0;
-            margin-bottom: 1rem;
+            font-size: clamp(1.8rem, 5vw, 2.4rem);
+            font-weight: 800;
+            margin: 0 0 1.5rem 0;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to bottom, #ffffff 40%, #a5a5c5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         p {
-            font-size: 1rem;
-            line-height: 1.6;
-            min-width: 20rem;
-            max-width: 30rem;
-            margin: 0 auto 1rem auto;
+            font-size: clamp(1rem, 2.5vw, 1.15rem);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            color: var(--text-dim);
+            font-weight: 400;
         }
 
         .footer {
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            color: #5b79da;
+            border-top: 1px solid rgba(91, 121, 218, 0.15);
+            padding-top: 1.5rem;
             margin-top: 1rem;
-            font-size: 0.9rem;
-            color: #aaa;
-            margin-bottom: 0;
+            opacity: 0.9;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
 <body>
+
 <div class="container">
-    <h1>System Anomaly Detected</h1>
+    <div class="mission-status">
+        <span class="status-dot"></span> Mission in Progress
+    </div>
+
+    <h1>Upgrading Systems</h1>
+
     <p>
-        Our crew is on an unscheduled spacewalk to wrangle a batch of floating grammar cards that escaped their
+        Our crew is on a scheduled spacewalk to wrangle a batch of floating grammar cards that escaped their
         container. It seems "i before e" doesn't apply in zero gravity.
     </p>
-    <p class="footer">
-        We're re-calibrating our trajectory and should be back in orbit shortly. Thanks for your patience!
-    </p>
+
+    <div class="footer">
+        Re-calibrating trajectory... back in orbit shortly.
+    </div>
 </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const images = [
-            '/maintenance/image1.webp',
-            '/maintenance/image2.webp',
-        ];
-        const randomIndex = Math.floor(Math.random() * images.length);
-        const randomImage = images[randomIndex];
-        document.body.style.backgroundImage = `url('${randomImage}')`;
-    });
-</script>
+
 </body>
 </html>
