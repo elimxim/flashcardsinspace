@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scheduled Maintenance | Orbiting Updates</title>
+    <title>Upgrading Systems</title>
 
     <link rel="icon" href="/maintenance/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/maintenance/favicon-32x32.png">
@@ -11,135 +11,140 @@
 
     <style>
         :root {
-            --space-black: #030308;
-            --nebula-purple: #1a1a3a;
-            --star-glow: #5b79da;
-            --text-dim: #a5a5c5;
+            --bg: #0a0e1a;
+            --accent: #7f42b8;
+            --text-main: #ffffff;
+            --text-muted: #80809a;
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: radial-gradient(circle at center, var(--nebula-purple) 0%, var(--space-black) 100%);
-            color: #ffffff;
-            text-align: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            background-image:
+                    radial-gradient(circle at 80% 0%, rgba(127, 66, 184, 0.12) 0%, transparent 40%),
+                    radial-gradient(circle at 20% 100%, rgba(5, 7, 10, 0.8) 0%, transparent 40%);
+            color: var(--text-main);
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100dvh;
-            margin: 0;
-            padding: 1rem;
             overflow: hidden;
-            user-select: none;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Enhanced Starfield */
-        body::before {
+        body::after {
             content: "";
             position: absolute;
             inset: 0;
-            background-image:
-                    radial-gradient(1.5px 1.5px at 20px 30px, #fff, rgba(0, 0, 0, 0)),
-                    radial-gradient(1px 1px at 150px 150px, #fff, rgba(0, 0, 0, 0)),
-                    radial-gradient(2px 2px at 50px 160px, #5b79da, rgba(0, 0, 0, 0)),
-                    radial-gradient(1px 1px at 280px 120px, #fff, rgba(0, 0, 0, 0)),
-                    radial-gradient(1.5px 1.5px at 110px 210px, #fff, rgba(0, 0, 0, 0));
-            background-size: 300px 300px;
-            opacity: 0.3;
-            z-index: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 1;
         }
 
         .container {
             position: relative;
-            z-index: 1;
-            width: 95%;
-            max-width: 500px;
-            background-color: rgba(7, 7, 20, 0.7);
-            backdrop-filter: blur(20px);
-            padding: 3rem 2rem;
-            border-radius: 28px;
-            border: 1px solid rgba(91, 121, 218, 0.25);
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(91, 121, 218, 0.05);
-            animation: float 6s infinite ease-in-out;
+            z-index: 10;
+            width: 100%;
+            max-width: 680px;
+            padding: 2rem;
+            text-align: left;
         }
 
-        .status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #5b79da;
+        .line-accent {
+            position: relative;
+            margin-left: 2px;
+            width: 1px;
+            height: 100px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            margin-bottom: 2.5rem;
+        }
+
+        .line-accent::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -1.5px;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
             border-radius: 50%;
-            margin-right: 8px;
-            box-shadow: 0 0 10px #5b79da;
-            animation: pulse 2s infinite;
-        }
-
-        .mission-status {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #5b79da;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            box-shadow: 0 0 10px var(--accent);
         }
 
         h1 {
-            font-size: clamp(1.8rem, 5vw, 2.4rem);
-            font-weight: 800;
-            margin: 0 0 1.5rem 0;
-            letter-spacing: -0.5px;
-            background: linear-gradient(to bottom, #ffffff 40%, #a5a5c5 100%);
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6em;
+            margin: 0 0 2.5rem 0;
+            color: var(--accent);
+            text-shadow: 0 0 15px rgba(127, 66, 184, 0.4);
+        }
+
+        .hero-text {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            text-wrap: balance;
+            line-height: 1.15;
+            font-weight: 600;
+            letter-spacing: -0.045em;
+            margin-bottom: 2.5rem;
+            color: #fff;
+        }
+
+        .hero-text span {
+            background: linear-gradient(180deg, #ffffff 40%, #a0a0b0 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        p {
-            font-size: clamp(1rem, 2.5vw, 1.15rem);
+        .hero-text .highlight {
+            background: none;
+            -webkit-text-fill-color: var(--accent);
+            color: var(--accent);
+            text-shadow: 0 0 40px rgba(127, 66, 184, 0.3);
+        }
+
+        .description {
+            font-size: clamp(0.95rem, 2.5vw, 1.15rem);
             line-height: 1.8;
-            margin-bottom: 2rem;
-            color: var(--text-dim);
+            color: var(--text-muted);
+            max-width: 540px;
             font-weight: 400;
+            letter-spacing: -0.01em;
         }
 
-        .footer {
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
-            color: #5b79da;
-            border-top: 1px solid rgba(91, 121, 218, 0.15);
-            padding-top: 1.5rem;
-            margin-top: 1rem;
-            opacity: 0.9;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(1.2); }
-            100% { opacity: 1; transform: scale(1); }
+        .glow-box {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 60%;
+            background: var(--accent);
+            opacity: 0.05;
+            filter: blur(160px);
+            z-index: -1;
         }
     </style>
 </head>
 <body>
 
+<div class="glow-box"></div>
+
 <div class="container">
-    <div class="mission-status">
-        <span class="status-dot"></span> Mission in Progress
+    <div class="line-accent"></div>
+
+    <h1>System Update</h1>
+
+    <div class="hero-text">
+        <span>Synchronizing advanced orbital upgrades to the </span><span class="highlight">core architecture.</span>
     </div>
 
-    <h1>Upgrading Systems</h1>
-
-    <p>
-        Our crew is on a scheduled spacewalk to wrangle a batch of floating grammar cards that escaped their
-        container. It seems "i before e" doesn't apply in zero gravity.
+    <p class="description">
+        Our team is currently conducting a high-precision alignment of our system framework. It appears "i before e" loses stability in zero gravity; we are recalibrating our trajectory to bring systems back within improved orbital parameters shortly.
     </p>
-
-    <div class="footer">
-        Re-calibrating trajectory... back in orbit shortly.
-    </div>
 </div>
 
 </body>
