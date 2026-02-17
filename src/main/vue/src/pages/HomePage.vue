@@ -30,7 +30,15 @@
         that helps you learn vocabulary or any other concept you can put into flashcards.
       </p>
 
-      <div class="what-actions">
+      <div v-if="isAuthenticated" class="what-actions">
+        <SmartButton
+          text="Go to User Page"
+          class="action-button action-button--user-page"
+          :on-click="navigateToSignup"
+          rounded
+        />
+      </div>
+      <div v-else class="what-actions">
         <SmartButton
           text="Ready to start your journey?"
           class="action-button action-button--signup"
@@ -196,8 +204,13 @@ import SmartButton from '@/components/SmartButton.vue'
 import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
 import { onUnmounted, ref } from 'vue'
+import { useAuthStore } from '@/stores/auth-store.ts'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
+const authStore = useAuthStore()
+
+const { isAuthenticated } = storeToRefs(authStore)
 
 const audioDemo = ref<Blob | undefined>()
 
@@ -259,6 +272,12 @@ onUnmounted(() => {
 }
 
 .action-button--login {
+  --smart-button--bg: linear-gradient(135deg, #3a64ed 0%, #558ef7 100%);
+  --smart-button--bg--hover: linear-gradient(135deg, #5cbbf6 0%, #84a0fc 100%);
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+}
+
+.action-button--user-page {
   --smart-button--bg: linear-gradient(135deg, #3a64ed 0%, #558ef7 100%);
   --smart-button--bg--hover: linear-gradient(135deg, #5cbbf6 0%, #84a0fc 100%);
   box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
