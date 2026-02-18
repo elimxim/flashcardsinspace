@@ -95,14 +95,10 @@
         }
     </script>
     <style>
-        :root {
-            --app--bg: linear-gradient(90deg, #0a0e1a 0%, #1a1f2e 50%, #2a2f3e 100%);
-        }
-
         body {
             margin: 0;
             padding: 0;
-            background: var(--app--bg);
+            background-color: #1a1f2e;
         }
 
         #app {
@@ -110,7 +106,7 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            background: var(--app--bg);
+            background-color: #1a1f2e;
             overflow: hidden;
             touch-action: pan-y;
         }
@@ -118,7 +114,7 @@
 </head>
 <body>
 <div id="app">
-    <div class="initial-loader">
+    <div id="initial-loader" class="initial-loader">
         <div class="space-scanner">
             <div class="scanner-pulse"></div>
             <div class="scanner-pulse"></div>
@@ -127,6 +123,18 @@
         </div>
     </div>
 </div>
+
+<script>
+    window.loaderTimerId = setTimeout(() => {
+        console.log("Loader timer expired")
+        const loader = document.getElementById('initial-loader');
+        if (loader) {
+            loader.classList.add('visible');
+            window.loaderAppearedAt = performance.now();
+        }
+    }, 200);
+</script>
+
 <script type="module" src="/src/main.ts"></script>
 </body>
 <style>
@@ -135,6 +143,15 @@
         justify-content: center;
         align-items: center;
         height: 100dvh;
+        background-color: #1a1f2e;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .initial-loader.visible {
+        opacity: 1;
+        visibility: visible;
     }
 
     .space-scanner {
