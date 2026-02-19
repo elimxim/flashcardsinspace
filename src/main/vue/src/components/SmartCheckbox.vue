@@ -8,18 +8,18 @@
     />
     <span class="checkbox-icon-container">
       <font-awesome-icon
-        v-if="model"
         icon="fa-solid fa-square-check"
         class="checkbox-icon checkbox-icon--checked"
+        :class="{ 'is-visible': model }"
       />
       <font-awesome-icon
-        v-else
         icon="fa-regular fa-square"
         class="checkbox-icon checkbox-icon--unchecked"
+        :class="{ 'is-visible': !model }"
       />
     </span>
     <span v-if="label || checkedLabel" class="label-container">
-      <transition name="label-switch" mode="out-in">
+      <transition name="label-switch">
         <span :key="currentLabel" class="checkbox-label">
           {{ currentLabel }}
         </span>
@@ -85,11 +85,22 @@ const currentLabel = computed(() => {
   height: var(--chkbx--size);
   width: var(--chkbx--size);
   flex-shrink: 0;
+  position: relative;
 }
 
 .checkbox-icon {
   font-size: var(--chkbx--size);
-  transition: color 0.2s ease;
+  transition: opacity 0.2s ease, color 0.2s ease;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  display: block;
+}
+
+.checkbox-icon.is-visible {
+  opacity: 1;
 }
 
 .checkbox-icon--unchecked {
@@ -100,28 +111,38 @@ const currentLabel = computed(() => {
   color: var(--chkbx--color-checked);
 }
 
-.smart-checkbox:hover .checkbox-icon--unchecked {
-  color: var(--chkbx--color-unchecked--hover);
+@media (hover: hover) {
+  .smart-checkbox:hover .checkbox-icon--unchecked {
+    color: var(--chkbx--color-unchecked--hover);
+  }
+
+  .smart-checkbox:hover .checkbox-icon--checked {
+    color: var(--chkbx--color-checked--hover);
+  }
 }
 
-.smart-checkbox:hover .checkbox-icon--checked {
-  color: var(--chkbx--color-checked--hover);
-}
-
-.label-container {
+.checkbox-label-container {
   position: relative;
   display: flex;
   align-items: center;
+  min-height: calc(var(--chkbx--label--font-size) * 1.5);
 }
 
 .checkbox-label {
   font-size: var(--chkbx--label--font-size);
   color: var(--chkbx--label--color);
+  line-height: 1.5;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .label-switch-enter-active,
 .label-switch-leave-active {
   transition: all 0.3s ease;
+}
+
+.label-switch-leave-active {
+  position: absolute;
 }
 
 .label-switch-enter-from {
@@ -139,5 +160,5 @@ const currentLabel = computed(() => {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
-</style>
 
+</style>
