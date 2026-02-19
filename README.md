@@ -44,14 +44,35 @@ By intelligently shifting and distributing learning stages across the calendar,
 it eliminates those overwhelming peaks entirely. The result is a perfectly fluid, natural progression 
 that ensures your daily ritual stays calm and consistent, no matter how large your deck grows.
 
-### 3. A Laboratory for Modern Craft
+### 3. The Philosophy: Low-Level Construction
 
-This project serves as a laboratory for high-precision engineering. Rather than relying on modern UI libraries or 
-Material Design frameworks, I chose to build every component from scratch to maintain well-grained control 
-over the entire system. This approach allowed me to explore a new era of productivity: using AI to grow 
-the individual building blocks of the interface while I focused on the choreography of the architecture. 
-It wasn’t about shortcuts, but about seeing how far a solo developer can push the limits of custom design 
-when they have an intelligent powerful co-pilot at their side.
+This project is a laboratory for high-precision engineering. While "vibe coding" prioritizes speed through abstraction 
+and "prompt-and-pray" generation, this codebase is built on technical sovereignty. 
+
+I chose to build every single UI component from scratch using only a UI framework and a couple of base libs. 
+I wanted to see how far a solo developer can push the limits of custom design when they have a powerful AI teammate at their side.
+
+**The AI as a High-Precision Lathe, Not an Autopilot**
+
+In this workflow, the AI isn't used to "skip" the work, but to scale it. It's not the pilot; it’s a high-precision lathe. 
+By treating the AI as an Extreme Programming (XP) partner, I can mill individual building blocks to a micron-level 
+of precision while I focus on the choreography of the architecture.
+
+**This is the move from "vibing" to engineering:**
+- Granular Implementation: Every `div`, `ref`, and CSS property is an intentional choice. 
+  No "black box" components, no library bloat, and no wrestling with a UI kit’s baked-in styles.
+- Deterministic Control: "Vibing" often leads to a "last mile" debugging nightmare. 
+  By constructing the logic line-by-line, I maintain well-grained control over the entire system.
+- Architectural Sovereignty: While the AI handles the heavy lifting of implementation, 
+  I remain the sole architect of the system’s behavior and state.
+
+**Why go from scratch?**
+
+To prove that the "tax" of bespoke excellence has been eliminated. 
+Traditionally, a solo dev uses a UI framework to survive. 
+I chose low-level construction to achieve enterprise-grade custom architecture with a team of one.
+
+This isn't a shortcut, it's a new era of productivity where the engineer maintains total command over the code. 
 
 ## 🚀 Getting Started
 
