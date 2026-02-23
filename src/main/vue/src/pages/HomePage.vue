@@ -162,9 +162,9 @@
 
     <section class="how-it-works-section">
       <h2 class="section-header">
-          <span class="section-title section-title--centered">
-            How does Flashcards in Space work?
-          </span>
+        <span class="section-title section-title--centered">
+          How does Flashcards in Space work?
+        </span>
       </h2>
 
       <div class="section-description">
