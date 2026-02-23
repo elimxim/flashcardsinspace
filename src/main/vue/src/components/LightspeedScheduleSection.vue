@@ -1,9 +1,9 @@
 <template>
   <div class="lightspeed-schedule select-text">
-    <h1 class="section-header">
-    <span class="section-title section-title--centered">
-      Lightspeed Schedule
-    </span>
+    <h1 class="section-header" style="margin-bottom: 20px;">
+      <span class="section-title section-title--centered">
+        Lightspeed Schedule
+      </span>
     </h1>
 
     <div class="section-description">
