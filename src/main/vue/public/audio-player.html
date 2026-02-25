@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: transparent;
+            display: flex;
+            align-items: center;
+        }
+        #player {
+            width: 100%;
+            outline: none;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<audio id="player" controls controlsList="nodownload" oncontextmenu="return false;">
+    <source id="audioSource" src="" type="audio/mpeg">
+</audio>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const audioUrl = urlParams.get('src');
+    const playerHeight = urlParams.get('h') || '40';
+
+    if (audioUrl) {
+        const player = document.getElementById('player');
+        const source = document.getElementById('audioSource');
+
+        // Apply the height parameter
+        player.style.height = playerHeight + 'px';
+
+        source.src = audioUrl;
+        player.load();
+    }
+</script>
+</body>
+</html>
