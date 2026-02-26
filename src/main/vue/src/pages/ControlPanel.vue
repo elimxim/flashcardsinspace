@@ -67,7 +67,7 @@ import SpaceToast from '@/components/SpaceToast.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
 import {
   loadFlashcardSetStore,
@@ -119,6 +119,12 @@ async function onFlashcardSetChanged(setId: number): Promise<boolean> {
   }
   return false
 }
+
+watch(flashcardSet, (newVal) => {
+  if (newVal) {
+    flashcardSetName.value = newVal.name
+  }
+})
 
 onMounted(async () => {
   try {
