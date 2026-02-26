@@ -43,7 +43,7 @@ class ChronoService(
         val currDate = datetimeInUserZone.toLocalDate()
 
         if (flashcardSet.chronodays.isEmpty()) {
-            val schedule = lightspeedService.createSchedule(startDatetime = clientDatetime)
+            val schedule = lightspeedService.createSchedule(startDatetime = datetimeInUserZone)
             val currDay = schedule.find { it.chronodate.isEqual(currDate) }
                 ?: throw HttpInternalServerErrorException(
                     ApiErrorCode.CCF500,
