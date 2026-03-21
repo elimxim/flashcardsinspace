@@ -35,9 +35,9 @@ class ChronoController(
     fun synchronizeNextDay(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
-    ): ResponseEntity<ChronoSyncResponse> = withLoggingContext(user) {
-        val response = chronoService.syncDay(user, setId, day = ChronoSyncDay.NEXT)
-        return ResponseEntity.ok(response)
+    ): ResponseEntity<Unit> = withLoggingContext(user) {
+        chronoService.syncDay(user, setId, day = ChronoSyncDay.NEXT)
+        return ResponseEntity.ok().build()
     }
 
     @PreAuthorize("hasAuthority('COMMANDER')")
@@ -45,9 +45,9 @@ class ChronoController(
     fun synchronizePrevDay(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
-    ): ResponseEntity<ChronoSyncResponse> = withLoggingContext(user) {
-        val response = chronoService.syncDay(user, setId, day = ChronoSyncDay.PREV)
-        return ResponseEntity.ok(response)
+    ): ResponseEntity<Unit> = withLoggingContext(user) {
+        chronoService.syncDay(user, setId, day = ChronoSyncDay.PREV)
+        return ResponseEntity.ok().build()
     }
 
     @PutMapping("/bulk")

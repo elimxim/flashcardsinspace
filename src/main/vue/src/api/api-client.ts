@@ -106,12 +106,12 @@ export async function sendChronoSyncRequest(setId: number) {
 
 export async function sendChronoSyncNextDay(setId: number) {
   Log.log(LogTag.POST, `/flashcard-sets/${setId}/chrono/sync/next`)
-  return apiClient.post<ChronoSyncResponse>(`/flashcard-sets/${setId}/chrono/sync/next`)
+  return apiClient.post<void>(`/flashcard-sets/${setId}/chrono/sync/next`)
 }
 
 export async function sendChronoSyncPrevDay(setId: number) {
   Log.log(LogTag.POST, `/flashcard-sets/${setId}/chrono/sync/prev`)
-  return apiClient.post<ChronoSyncResponse>(`/flashcard-sets/${setId}/chrono/sync/prev`)
+  return apiClient.post<void>(`/flashcard-sets/${setId}/chrono/sync/prev`)
 }
 
 export async function sendChronoBulkUpdateRequest(setId: number, status: string, days: Chronoday[]) {

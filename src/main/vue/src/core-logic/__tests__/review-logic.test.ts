@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import {
   MonoStageReviewQueue,
-  MultiStageReviewQueue, ReviewQueue,
+  MultiStageReviewQueue,
+  ReviewQueue,
 } from '@/core-logic/review-logic.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import { type Stage, learningStages } from '@/core-logic/stage-logic.ts'

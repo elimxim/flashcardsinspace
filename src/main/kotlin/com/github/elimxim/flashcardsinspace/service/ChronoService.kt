@@ -86,7 +86,7 @@ class ChronoService(
     }
 
     @Transactional
-    fun syncDay(user: User, setId: Long, day: ChronoSyncDay): ChronoSyncResponse {
+    fun syncDay(user: User, setId: Long, day: ChronoSyncDay) {
         log.info("Syncing day $day for flashcard set $setId")
         user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(setId)
@@ -137,18 +137,6 @@ class ChronoService(
                 flashcardSet.chronodays.remove(lastChronoday)
             }
         }
-
-        dayStreakService.calcDayStreak(flashcardSet, flashcardSet.chronodays)
-        val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
-
-        val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
-        val (currDay, chronodays) = applySchedule(updatedFlashcardSet)
-
-        return ChronoSyncResponse(
-            currDay = currDay,
-            chronodays = chronodays,
-            dayStreak = dayStreak,
-        )
     }
 
     @Transactional
