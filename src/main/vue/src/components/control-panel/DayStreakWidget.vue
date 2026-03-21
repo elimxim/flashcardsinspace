@@ -2,7 +2,7 @@
   <div class="day-streak-widget">
     <div class="day-streak select-none">
       <div class="day-steak-number">
-        {{ dayStreak }}
+        {{ dayStreak.streak }}
       </div>
       <div class="cp-text cp-text--active">
         Day Streak

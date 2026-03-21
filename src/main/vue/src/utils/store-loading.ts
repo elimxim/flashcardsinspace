@@ -215,7 +215,7 @@ export async function markCurrDayAsCompleted(flashcardSetId: number, currDay: Ch
     try {
       const response = await sendChronoBulkUpdateRequest(flashcardSetId, chronodayStatuses.COMPLETED, [currDay])
       chronoStore.updateDays(response.data.chronodays)
-      chronoStore.updateDayStreak(chronoStore.dayStreak + 1)
+      chronoStore.updateDayStreak(response.data.dayStreak)
     } catch (error) {
       Log.error(LogTag.STORE, `Failed to mark currDay as COMPLETED`, error)
     }

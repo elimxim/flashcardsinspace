@@ -117,6 +117,7 @@ const chronoStore = useChronoStore()
 
 const { languages } = storeToRefs(languageStore)
 const { flashcardSet } = storeToRefs(flashcardStore)
+const { currDay } = storeToRefs(chronoStore)
 
 const language = computed(() =>
   languageStore.getLanguage(flashcardSet.value?.languageId ?? -1)
@@ -238,7 +239,10 @@ async function updateFlashcardSet(): Promise<boolean> {
         chronoStore.loadState(
           response.data.chronodays,
           response.data.currDay,
-          0,
+          {
+            streak: 0,
+            lastDate: currDay.value.chronodate
+          }
         )
         return true
       }).catch((error) => {

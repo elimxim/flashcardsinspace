@@ -6,3 +6,7 @@ export interface Chronoday {
   stages: string[]
 }
 
+export interface DayStreak {
+  streak: number
+  lastDate: string // "yyyy-MM-dd"
+}

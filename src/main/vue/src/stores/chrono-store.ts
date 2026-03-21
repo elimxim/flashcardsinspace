@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { type Chronoday } from '@/model/chrono.ts'
+import { type Chronoday, DayStreak } from '@/model/chrono.ts'
 import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 import { asIsoDateStr } from '@/utils/utils.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
@@ -7,7 +7,7 @@ import { Log, LogTag } from '@/utils/logger.ts'
 export interface ChronoState {
   chronodays: Chronoday[]
   currDay: Chronoday
-  dayStreak: number
+  dayStreak: DayStreak
   loaded: boolean
 }
 
@@ -16,7 +16,10 @@ export const useChronoStore = defineStore('chrono', {
     return {
       chronodays: [],
       currDay: defaultCurrDay(),
-      dayStreak: 0,
+      dayStreak: {
+        streak: 0,
+        lastDate: asIsoDateStr(new Date())
+      },
       loaded: false,
     }
   },
@@ -29,7 +32,7 @@ export const useChronoStore = defineStore('chrono', {
     },
   },
   actions: {
-    loadState(chronodays: Chronoday[], currDay: Chronoday, dayStreak: number) {
+    loadState(chronodays: Chronoday[], currDay: Chronoday, dayStreak: DayStreak) {
       Log.log(LogTag.STORE, `chrono.loadState: currDay.chronodate=${currDay.chronodate} + ${chronodays.length} chronodays, dayStreak=${dayStreak} `)
       this.$reset()
       this.chronodays = chronodays
@@ -73,8 +76,8 @@ export const useChronoStore = defineStore('chrono', {
         }
       })
     },
-    updateDayStreak(streak: number) {
-      this.dayStreak = streak
+    updateDayStreak(dayStreak: DayStreak) {
+      this.dayStreak = dayStreak
     },
   }
 })

@@ -1,6 +1,6 @@
 import { toSortedOrderNumbers } from '@/core-logic/stage-logic.ts'
-import type { Chronoday } from '@/model/chrono.ts'
-import { asIsoDateStr } from '@/utils/utils.ts'
+import type { Chronoday, DayStreak } from '@/model/chrono.ts'
+import { asIsoDateStr, dateMinusDays, parseIsoDate } from '@/utils/utils.ts'
 
 export const chronodayStatuses = {
   INITIAL: 'INITIAL',
@@ -18,6 +18,7 @@ export interface CalendarDay {
   seqNumber?: number
   isCurrMonth: boolean
   isCurrDay: boolean
+  isStreak: boolean
 }
 
 export const chronodayStatusesToProgressDay = new Set([
@@ -56,10 +57,19 @@ export function selectConsecutiveDaysBefore(
   return result
 }
 
-export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays: Chronoday[]): CalendarDay[] {
+export function calcCalendarPage(
+  currMonth: Date,
+  currDay: Chronoday,
+  chronodays: Chronoday[],
+  dayStreak: DayStreak,
+): CalendarDay[] {
   const chronodayMap = new Map(chronodays.map(day => [day.chronodate, day]))
   const year = currMonth.getFullYear()
   const month = currMonth.getMonth()
+
+  const streakTo = parseIsoDate(dayStreak.lastDate)
+  const daysBack = dayStreak.streak - 1 < 0 ? 0 : dayStreak.streak - 1
+  const streakFrom = dateMinusDays(streakTo, daysBack)
 
   const firstMonthDay = new Date(year, month, 1)
   const firstWeekDay = firstMonthDay.getDay()
@@ -77,6 +87,7 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
       date: date.toDateString(),
       isCurrMonth: false,
       isCurrDay: false,
+      isStreak: false,
     })
   }
 
@@ -96,6 +107,7 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
       seqNumber: chronoday?.seqNumber,
       isCurrMonth: true,
       isCurrDay: isoDateStr === currDay.chronodate,
+      isStreak: date >= streakFrom && date <= streakTo,
     })
   }
 
@@ -114,6 +126,7 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
       date: date.toDateString(),
       isCurrMonth: false,
       isCurrDay: false,
+      isStreak: false,
     })
   }
 
@@ -128,6 +141,7 @@ export function calcCalendarPage(currMonth: Date, currDay: Chronoday, chronodays
         date: date.toDateString(),
         isCurrMonth: false,
         isCurrDay: false,
+        isStreak: false,
       })
     }
   }

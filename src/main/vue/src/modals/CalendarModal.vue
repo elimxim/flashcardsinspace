@@ -105,7 +105,7 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { sendChronoSyncNextDay, sendChronoSyncPrevDay } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useAuthStore, UserRole } from '@/stores/auth-store.ts'
-import { dateNextMonth, datePrevMonth, parseLocalDate } from '@/utils/utils.ts'
+import { dateNextMonth, datePrevMonth, parseIsoDate } from '@/utils/utils.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import SwipeTape from '@/components/SwipeTape.vue'
@@ -118,7 +118,7 @@ const flashcardStore = useFlashcardStore()
 const authStore = useAuthStore()
 
 const { flashcardSet, isStarted } = storeToRefs(flashcardStore)
-const { chronodays, currDay } = storeToRefs(chronoStore)
+const { chronodays, currDay, dayStreak } = storeToRefs(chronoStore)
 
 const hasAccess = computed(() => authStore.hasAccess(UserRole.COMMANDER))
 
@@ -128,14 +128,14 @@ const swipeTape = ref<ComponentExposed<typeof SwipeTape>>()
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-const currMonth = ref(parseLocalDate(currDay.value.chronodate))
+const currMonth = ref(parseIsoDate(currDay.value.chronodate))
 const prevMonth = computed(() => datePrevMonth(currMonth.value))
 const nextMonth = computed(() => dateNextMonth(currMonth.value))
 
 const calendarMonths = computed(() => [
-  calcCalendarPage(prevMonth.value, currDay.value, chronodays.value),
-  calcCalendarPage(currMonth.value, currDay.value, chronodays.value),
-  calcCalendarPage(nextMonth.value, currDay.value, chronodays.value),
+  calcCalendarPage(prevMonth.value, currDay.value, chronodays.value, dayStreak.value),
+  calcCalendarPage(currMonth.value, currDay.value, chronodays.value, dayStreak.value),
+  calcCalendarPage(nextMonth.value, currDay.value, chronodays.value, dayStreak.value),
 ])
 
 const TAPE_SNAP_DURATION = 250
@@ -192,6 +192,10 @@ function dayCssClasses(day: CalendarDay): string {
     result.push('calendar-day--current')
   }
 
+  if (day.isStreak) {
+    result.push('calendar-day--streak')
+  }
+
   return result.join(" ")
 }
 
@@ -208,7 +212,7 @@ function isVacationDay(day: CalendarDay): boolean {
 }
 
 function exit() {
-  currMonth.value = parseLocalDate(currDay.value.chronodate)
+  currMonth.value = parseIsoDate(currDay.value.chronodate)
   toggleStore.toggleCalendar()
 }
 
@@ -239,7 +243,7 @@ const isDaySwitchPossible = computed(() =>
 )
 
 watch(currDay, (newValue) => {
-  currMonth.value = parseLocalDate(newValue.chronodate)
+  currMonth.value = parseIsoDate(newValue.chronodate)
 })
 
 onMounted(() => {
@@ -286,6 +290,7 @@ function handleKeydown(event: KeyboardEvent) {
   --day--off--color: var(--calendar--day--off--color, white);
   --day--off--bg-color: var(--calendar--day--off--bg-color, #43938a);
   --day--off--stripe-color: var(--calendar--day--off--stripe-color, rgba(115, 115, 115, 0.35));
+  --day--streak--color: var(--calendar--day--streak-color, rgb(255, 215, 0));
 }
 
 .calendar {
@@ -386,12 +391,12 @@ function handleKeydown(event: KeyboardEvent) {
   );
 }
 
-.calendar-day--completed::before {
+.calendar-day--completed:not(.calendar-day--streak)::before {
   content: "✔";
   position: absolute;
   top: 0;
   left: 0;
-  font-size:clamp(0.45rem, 1.8vw, 0.65rem);
+  font-size: clamp(0.45rem, 1.8vw, 0.65rem);
   line-height: 1;
   color: var(--day--checkmark--color);
   pointer-events: none;
@@ -429,6 +434,21 @@ function handleKeydown(event: KeyboardEvent) {
     var(--day--off--stripe-color) 0 10px,
     transparent 10px 20px
   );
+}
+
+.calendar-day--streak {
+  color: var(--day--streak--color);
+}
+
+.calendar-day--streak::before {
+  content: "★";
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: clamp(0.45rem, 1.8vw, 0.65rem);
+  line-height: 1;
+  color: var(--day--streak--color);
+  pointer-events: none;
 }
 
 @media (hover: hover) {
