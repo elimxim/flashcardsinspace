@@ -92,3 +92,8 @@ fun ReviewSessionMetadata.toDto(): Map<String, Any>? = when (this) {
         }
     }
 }
+
+fun DayStreak.toDto() = DayStreakDto(
+    streak = streak,
+    lastDate = lastDay.chronodate,
+)

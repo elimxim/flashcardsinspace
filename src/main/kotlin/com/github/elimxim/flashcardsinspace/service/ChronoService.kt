@@ -2,6 +2,7 @@ package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.ChronodayRepository
+import com.github.elimxim.flashcardsinspace.entity.repository.DayStreakRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
@@ -13,6 +14,7 @@ import com.github.elimxim.flashcardsinspace.web.exception.HttpNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.time.ZoneId
 
 private val log = LoggerFactory.getLogger(ChronoService::class.java)
@@ -26,6 +28,7 @@ class ChronoService(
     private val lightspeedService: LightspeedService,
     private val requestValidator: RequestValidator,
     private val dayStreakService: DayStreakService,
+    private val dayStreakRepository: DayStreakRepository,
     private val chronodayRepository: ChronodayRepository,
 ) {
     @Transactional
@@ -52,7 +55,7 @@ class ChronoService(
             return ChronoSyncResponse(
                 currDay = currDay,
                 chronodays = schedule,
-                dayStreak = 0,
+                dayStreak = DayStreakDto(0, currDate),
             )
         }
 
@@ -75,9 +78,8 @@ class ChronoService(
 
         dayStreakService.calcDayStreak(updatedFlashcardSet, updatedFlashcardSet.chronodays)
 
-        val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
+        val dayStreak = updatedFlashcardSet.dayStreak?.toDto() ?: DayStreakDto(0, currDate)
         val (currDay, chronodays) = applySchedule(updatedFlashcardSet)
-
         return ChronoSyncResponse(
             currDay = currDay,
             chronodays = chronodays,
@@ -134,9 +136,25 @@ class ChronoService(
                     )
                 }
 
+                val dayStreak = flashcardSet.dayStreak
+                if (dayStreak != null && dayStreak.lastDay.id == lastChronoday.id) {
+                    val prevChronoday = flashcardSet.chronodays
+                        .filter { it.id != lastChronoday.id }
+                        .maxByOrNull { it.chronodate }
+
+                    if (prevChronoday != null) {
+                        dayStreak.streak -= 1
+                        dayStreak.lastDay = prevChronoday
+                    }
+
+                    dayStreakRepository.save(dayStreak)
+                }
+
                 flashcardSet.chronodays.remove(lastChronoday)
             }
         }
+
+        flashcardSetRepository.save(flashcardSet)
     }
 
     @Transactional
@@ -161,7 +179,7 @@ class ChronoService(
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 
-        val dayStreak = updatedFlashcardSet.dayStreak?.streak ?: 0
+        val dayStreak = updatedFlashcardSet.dayStreak?.toDto() ?: DayStreakDto(0, LocalDate.now())
         val schedule = lightspeedService.createSchedule(flashcardSet, updatedFlashcardSet.chronodays, daysAhead = 0)
         val updatedDays = schedule.filter { it.id in validRequest.ids }
 
