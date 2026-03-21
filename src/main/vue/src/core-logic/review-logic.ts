@@ -373,7 +373,7 @@ export async function markCurrDayAsCompleted(flashcardSetId: number, currDay: Ch
       chronoStore.updateDays(response.data.chronodays)
       chronoStore.updateDayStreak(chronoStore.dayStreak + 1)
     } catch (error) {
-      Log.error(LogTag.STORE, `Failed to mark currDay as COMPLETED`)
+      Log.error(LogTag.STORE, `Failed to mark currDay as COMPLETED`, error)
     }
   }
 }

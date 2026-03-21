@@ -110,7 +110,6 @@ import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import SwipeTape from '@/components/SwipeTape.vue'
 import { ComponentExposed } from 'vue-component-type-helpers'
-import router from '@/router';
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
