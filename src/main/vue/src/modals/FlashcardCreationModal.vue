@@ -218,7 +218,10 @@ async function addNewFlashcard(): Promise<boolean> {
         chronoStore.loadState(
           response.data.chronodays,
           response.data.currDay,
-          0,
+          {
+            streak: 0,
+            lastDate: currDay.value.chronodate
+          }
         )
         flashcardSetStore.addExtra(setId)
         flashcardSetStore.incrementFlashcardsNumber(setId)

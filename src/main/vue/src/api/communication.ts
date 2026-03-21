@@ -1,4 +1,4 @@
-import type { Chronoday } from '@/model/chrono.ts'
+import type { Chronoday, DayStreak } from '@/model/chrono.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 
 export interface ErrorResponseBody {
@@ -16,7 +16,7 @@ export interface ChronoSyncRequest {
 export interface ChronoSyncResponse {
   chronodays: Chronoday[]
   currDay: Chronoday,
-  dayStreak: number,
+  dayStreak: DayStreak,
 }
 
 export interface ChronoBulkUpdateRequest {
@@ -26,7 +26,7 @@ export interface ChronoBulkUpdateRequest {
 
 export interface ChronoUpdateResponse {
   chronodays: Chronoday[]
-  dayStreak: number,
+  dayStreak: DayStreak,
 }
 
 export interface ChronodayId {

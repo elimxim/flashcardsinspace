@@ -89,3 +89,8 @@ data class FlashcardAudioMetadataDto(
     val flashcardSide: String,
     val flashcardId: Long,
 )
+
+data class DayStreakDto(
+    val streak: Int,
+    val lastDate: LocalDate,
+)

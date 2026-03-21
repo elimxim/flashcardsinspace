@@ -1,3 +1,5 @@
+import { Log, LogTag } from '@/utils/logger.ts'
+
 /**
  * Creates a seeded pseudorandom number generator using the Mulberry32 algorithm.
  *
@@ -39,7 +41,8 @@ export function asIsoDateStr(date: Date): string {
  * @param dateStr ISO date string "yyyy-MM-dd"
  * @returns Date object at midnight local time
  */
-export function parseLocalDate(dateStr: string): Date {
+export function parseIsoDate(dateStr: string): Date {
+  Log.log(LogTag.DEBUG, `parseIsoDateStr: ${dateStr}`)
   const [year, month, day] = dateStr.split('-').map(Number)
   return new Date(year, month - 1, day)
 }
@@ -59,4 +62,10 @@ export function dateNextMonth(date: Date): Date {
   const next = new Date(date)
   next.setMonth(date.getMonth() + 1)
   return next
+}
+
+export function dateMinusDays(date: Date, days: number): Date {
+  const newDate = new Date(date)
+  newDate.setDate(newDate.getDate() - days)
+  return newDate
 }

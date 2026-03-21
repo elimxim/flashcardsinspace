@@ -181,7 +181,7 @@ data class ValidChronoSyncRequest(
 data class ChronoSyncResponse(
     val currDay: ChronodayDto,
     val chronodays: List<ChronodayDto>,
-    val dayStreak: Int,
+    val dayStreak: DayStreakDto,
 )
 
 class ChronoBulkUpdateRequest(
@@ -207,7 +207,7 @@ data class ValidChronoBulkUpdateRequest(
 
 data class ChronoUpdateResponse(
     val chronodays: List<ChronodayDto>,
-    val dayStreak: Int,
+    val dayStreak: DayStreakDto,
 )
 
 data class FlashcardSetInitResponse(
