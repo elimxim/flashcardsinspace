@@ -19,6 +19,7 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
 import { selectedSetIdCookie } from '@/utils/cookies-ref.ts'
+import { markCurrDayAsCompleted } from '@/core-logic/review-logic.ts'
 
 export function getCurrFlashcardSet(): FlashcardSet | undefined {
   const flashcardSetStore = useFlashcardSetStore()
@@ -153,6 +154,7 @@ export async function loadStoresForFlashcardSet(flashcardSet: FlashcardSet, forc
         response.data.currDay,
         response.data.dayStreak,
       )
+      markCurrDayAsCompleted(flashcardSet.id, response.data.currDay, response.data.chronodays)
       return sendFlashcardAudioMetadataGetRequest(flashcardSet.id)
     })
     .then((response) => {
