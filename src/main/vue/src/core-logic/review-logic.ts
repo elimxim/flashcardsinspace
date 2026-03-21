@@ -6,15 +6,19 @@ import {
   stageNameMap,
   stageOrderMap,
   learningStages,
-  specialStageSet,
+  specialStageSet, learningStageArray,
 } from '@/core-logic/stage-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 import {
+  chronodayStatuses,
   chronodayStatusesToCompleteDay,
   selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
 import { shuffle } from '@/utils/utils.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { useFlashcardStore } from '@/stores/flashcard-store.ts'
+import { useChronoStore } from '@/stores/chrono-store.ts'
+import { sendChronoBulkUpdateRequest } from '@/api/api-client.ts'
 
 export enum ReviewSessionType {
   LIGHTSPEED = 'LIGHTSPEED',
@@ -349,6 +353,29 @@ export function calcStageReviews(
         count: count,
       }
     })
+}
+
+// If the current day is empty (nothing to review), it's marked as completed.
+// To keep the day streak the user needs to log in every day but doesn't need to start the review;
+// If there is nothing to review (the review button is simply locked in this case) -
+// fewer frictions = happier user.
+export async function markCurrDayAsCompleted(flashcardSetId: number, currDay: Chronoday, chronodays: Chronoday[]): Promise<void> {
+  const flashcardStore = useFlashcardStore()
+  const chronoStore = useChronoStore()
+
+  const allStages = learningStageArray.map(v => v.name)
+  const flashcardsToReview = calcStageReviews(flashcardStore.flashcards, allStages, currDay, chronodays)
+    .reduce((acc, v) => acc + v.count, 0)
+
+  if (currDay.status === chronodayStatuses.NOT_STARTED && flashcardsToReview === 0) {
+    try {
+      const response = await sendChronoBulkUpdateRequest(flashcardSetId, chronodayStatuses.COMPLETED, [currDay])
+      chronoStore.updateDays(response.data.chronodays)
+      chronoStore.updateDayStreak(chronoStore.dayStreak + 1)
+    } catch (error) {
+      Log.error(LogTag.STORE, `Failed to mark currDay as COMPLETED`)
+    }
+  }
 }
 
 export const deckEmptyMessages = [
