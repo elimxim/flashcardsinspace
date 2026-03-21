@@ -110,6 +110,7 @@ import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import SwipeTape from '@/components/SwipeTape.vue'
 import { ComponentExposed } from 'vue-component-type-helpers'
+import router from '@/router';
 
 const toggleStore = useToggleStore()
 const toaster = useSpaceToaster()
@@ -216,14 +217,7 @@ async function goPrevDay() {
   if (!flashcardSet.value) return
   if (!chronoStore.canGoPrev()) return
   await sendChronoSyncPrevDay(flashcardSet.value.id)
-    .then((response) => {
-      chronoStore.loadState(
-        response.data.chronodays,
-        response.data.currDay,
-        response.data.dayStreak,
-      )
-      currMonth.value = parseLocalDate(response.data.currDay.chronodate)
-    })
+    .then(() => window.location.reload())
     .catch((error) => {
       Log.log(LogTag.LOGIC, 'Failed to sync prev day:', error)
       toaster.bakeError(userApiErrors.SCHEDULE__PREV_FAILED, error.response?.data)
@@ -234,14 +228,7 @@ async function goNextDay() {
   if (!flashcardSet.value) return
   if (!chronoStore.canGoNext()) return
   await sendChronoSyncNextDay(flashcardSet.value.id)
-    .then((response) => {
-      chronoStore.loadState(
-        response.data.chronodays,
-        response.data.currDay,
-        response.data.dayStreak,
-      )
-      currMonth.value = parseLocalDate(response.data.currDay.chronodate)
-    })
+    .then(() => window.location.reload())
     .catch((error) => {
       Log.error(LogTag.LOGIC, 'Failed to sync next day:', error)
       toaster.bakeError(userApiErrors.SCHEDULE__NEXT_FAILED, error.response?.data)
