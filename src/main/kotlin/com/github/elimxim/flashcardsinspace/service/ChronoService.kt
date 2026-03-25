@@ -171,11 +171,9 @@ class ChronoService(
             .sortedBy { it.chronodate }
             .toMutableList()
 
-        val lastChronoday = chronodaysToUpdate.removeLastOrNull()
-        val updatedFlashcardSet = if (lastChronoday != null) {
-            lastChronoday.status = validRequest.status
-            dayStreakService.calcDayStreak(flashcardSet, flashcardSet.chronodays)
+        val updatedFlashcardSet = if (chronodaysToUpdate.isNotEmpty()) {
             chronodaysToUpdate.forEach { it.status = validRequest.status }
+            dayStreakService.calcDayStreak(flashcardSet, flashcardSet.chronodays)
             flashcardSetRepository.save(flashcardSet)
         } else flashcardSet
 

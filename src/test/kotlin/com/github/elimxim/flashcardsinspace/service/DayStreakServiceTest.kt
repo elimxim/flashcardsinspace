@@ -413,6 +413,31 @@ class DayStreakServiceTest {
             val progress = result as DayStreakScanResult.Progress
             assertThat(progress.count).isEqualTo(2)
         }
+
+        @Test
+        fun `should count handle multiple consecutive OFF days in streak`() {
+            val flashcardSet = testFlashcardSet()
+            val startDate = LocalDate.of(2024, 1, 1)
+
+            val chronodays = listOf(
+                testChronoday(1, startDate, ChronodayStatus.INITIAL, flashcardSet),
+                testChronoday(2, startDate.plusDays(1), ChronodayStatus.COMPLETED, flashcardSet),
+                testChronoday(3, startDate.plusDays(2), ChronodayStatus.OFF, flashcardSet),
+                testChronoday(4, startDate.plusDays(3), ChronodayStatus.OFF, flashcardSet),
+                testChronoday(5, startDate.plusDays(4), ChronodayStatus.COMPLETED, flashcardSet),
+            )
+
+            val result = service.calcStreakDays(
+                flashcardSet = flashcardSet,
+                fromInclusive = chronodays[4],
+                toExclusive = chronodays[0],
+                chronodays = chronodays
+            )
+
+            assertThat(result).isInstanceOf(DayStreakScanResult.Progress::class.java)
+            val progress = result as DayStreakScanResult.Progress
+            assertThat(progress.count).isEqualTo(2)
+        }
     }
 
     private fun testFlashcardSet() = FlashcardSet(
