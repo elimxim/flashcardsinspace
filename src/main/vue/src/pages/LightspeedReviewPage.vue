@@ -282,21 +282,9 @@ async function markDaysAs(
   status: string,
   acceptedStatuses: Set<string>,
 ) {
-  if (!acceptedStatuses.has(currDay.value.status)) {
-    return
-  }
+  if (!acceptedStatuses.has(currDay.value.status)) return
 
-  const days = selectConsecutiveDaysBefore(chronodays.value, currDay.value, acceptedStatuses)
-  if (days.length === 0) {
-    Log.error(LogTag.LOGIC,
-      `No days to mark as ${status}`,
-      `FlashcardSet.id=${flashcardSetId}`,
-      `currDay=${JSON.stringify(currDay.value)}`
-    )
-    return
-  }
-
-  await sendChronoBulkUpdateRequest(flashcardSetId, status, days)
+  await sendChronoBulkUpdateRequest(flashcardSetId, status, [currDay.value])
     .then((response) => {
       chronoStore.updateDays(response.data.chronodays)
       chronoStore.updateDayStreak(response.data.dayStreak)
