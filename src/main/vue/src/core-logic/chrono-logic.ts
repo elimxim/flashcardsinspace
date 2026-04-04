@@ -107,7 +107,7 @@ export function calcCalendarPage(
       seqNumber: chronoday?.seqNumber,
       isCurrMonth: true,
       isCurrDay: isoDateStr === currDay.chronodate,
-      isStreak: date >= streakFrom && date <= streakTo,
+      isStreak: date >= streakFrom && date <= streakTo && dayStreak.streak > 0,
     })
   }
 
