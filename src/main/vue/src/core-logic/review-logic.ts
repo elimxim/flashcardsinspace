@@ -10,8 +10,7 @@ import {
 } from '@/core-logic/stage-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 import {
-  chronodayStatusesToCompleteDay,
-  selectConsecutiveDaysBefore
+  chronodayStatusesToStartReview,
 } from '@/core-logic/chrono-logic.ts'
 import { shuffle } from '@/utils/utils.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
@@ -242,17 +241,13 @@ export class MonoStageReviewQueue implements ReviewQueue {
 export function createReviewQueue(
   flashcards: Flashcard[],
   currDay: Chronoday,
-  chronodays: Chronoday[],
-  acceptedStatuses: Set<string> = chronodayStatusesToCompleteDay,
 ): ReviewQueue {
-  const daysForReview = selectConsecutiveDaysBefore(
-    chronodays, currDay, acceptedStatuses
-  )
-  const stagesForReview = new Set(daysForReview.map(d => d.stages).flat())
+  if (!chronodayStatusesToStartReview.has(currDay.status)) return new EmptyReviewQueue()
 
+  const reviewStages = new Set(currDay.stages)
   const result = new Map<Stage, Flashcard[]>()
   flashcards.filter(f => {
-    const isStageAvailable = stagesForReview.has(f.stage)
+    const isStageAvailable = reviewStages.has(f.stage)
     if (f.stage === learningStages.S1.name) {
       return isStageAvailable
         && !isUnknownFlashcard(f, currDay)
@@ -333,12 +328,10 @@ export interface StageReview {
 
 export function calcStageReviews(
   flashcards: Flashcard[],
-  stages: string[],
   currDay: Chronoday,
-  chronodays: Chronoday[],
 ): StageReview[] {
-  const queue = createReviewQueue(flashcards, currDay, chronodays)
-  return stages
+  const queue = createReviewQueue(flashcards, currDay)
+  return currDay.stages
     .map(v => stageNameMap.get(v))
     .filter(v => v !== undefined)
     .sort((a, b) => b.order - a.order)

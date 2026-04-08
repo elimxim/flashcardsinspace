@@ -124,7 +124,6 @@ import {
   chronodayStatuses,
   chronodayStatusesToCompleteDay,
   chronodayStatusesToProgressDay,
-  selectConsecutiveDaysBefore
 } from '@/core-logic/chrono-logic.ts'
 import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
@@ -146,7 +145,7 @@ const chronoStore = useChronoStore()
 const flashcardStore = useFlashcardStore()
 
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
-const { chronodays, currDay } = storeToRefs(chronoStore)
+const { currDay } = storeToRefs(chronoStore)
 
 const {
   loadingStarted,
@@ -197,7 +196,7 @@ async function startReview() {
         Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
       }
     }
-    reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value, chronodays.value))
+    reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value))
     await createReviewSession()
     await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
       if (success) startWatch()

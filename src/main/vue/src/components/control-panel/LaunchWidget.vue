@@ -22,10 +22,10 @@ const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 
 const { flashcards, isEmpty, isSuspended } = storeToRefs(flashcardStore)
-const { currDay, chronodays } = storeToRefs(chronoStore)
+const { currDay } = storeToRefs(chronoStore)
 
 const noFlashcardsForReview = computed<boolean>(() => {
-  const queue = createReviewQueue(flashcards.value, currDay.value, chronodays.value)
+  const queue = createReviewQueue(flashcards.value, currDay.value)
   return queue.remaining() === 0
 })
 

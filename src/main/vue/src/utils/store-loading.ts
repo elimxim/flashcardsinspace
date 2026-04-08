@@ -20,9 +20,8 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
 import { selectedSetIdCookie } from '@/utils/cookies-ref.ts'
-import { calcStageReviews } from '@/core-logic/review-logic.ts'
+import { createReviewQueue } from '@/core-logic/review-logic.ts'
 import { Chronoday } from '@/model/chrono.ts'
-import { learningStageArray } from '@/core-logic/stage-logic.ts'
 import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 
 export function getCurrFlashcardSet(): FlashcardSet | undefined {
@@ -158,7 +157,7 @@ export async function loadStoresForFlashcardSet(flashcardSet: FlashcardSet, forc
         response.data.currDay,
         response.data.dayStreak,
       )
-      markCurrDayAsCompleted(flashcardSet.id, response.data.currDay, response.data.chronodays)
+      markCurrDayAsCompleted(flashcardSet.id, response.data.currDay)
       return sendFlashcardAudioMetadataGetRequest(flashcardSet.id)
     })
     .then((response) => {
@@ -203,13 +202,11 @@ export async function loadStoresForFlashcardSetId(setId: number, forced: boolean
 // To keep the day streak the user needs to log in every day but doesn't need to start the review;
 // If there is nothing to review (the review button is simply locked in this case) -
 // fewer frictions = happier user.
-export async function markCurrDayAsCompleted(flashcardSetId: number, currDay: Chronoday, chronodays: Chronoday[]): Promise<void> {
+export async function markCurrDayAsCompleted(flashcardSetId: number, currDay: Chronoday): Promise<void> {
   const flashcardStore = useFlashcardStore()
   const chronoStore = useChronoStore()
 
-  const allStages = learningStageArray.map(v => v.name)
-  const flashcardsToReview = calcStageReviews(flashcardStore.flashcards, allStages, currDay, chronodays)
-    .reduce((acc, v) => acc + v.count, 0)
+  const flashcardsToReview = createReviewQueue(flashcardStore.flashcards, currDay).remaining()
 
   if (currDay.status === chronodayStatuses.NOT_STARTED && flashcardsToReview === 0) {
     try {

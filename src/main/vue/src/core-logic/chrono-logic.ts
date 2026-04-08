@@ -30,6 +30,11 @@ export const chronodayStatusesToCompleteDay = new Set([
   chronodayStatuses.IN_PROGRESS,
 ])
 
+export const chronodayStatusesToStartReview = new Set([
+  chronodayStatuses.NOT_STARTED,
+  chronodayStatuses.IN_PROGRESS,
+])
+
 export function selectConsecutiveDaysBefore(
   chronodays: Chronoday[],
   startDay: Chronoday,
