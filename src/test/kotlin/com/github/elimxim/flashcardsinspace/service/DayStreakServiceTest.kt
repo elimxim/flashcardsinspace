@@ -70,7 +70,7 @@ class DayStreakServiceTest {
         }
 
         @Test
-        fun `should reset streak when no progress`() {
+        fun `should not reset streak when day is off`() {
             val flashcardSet = testFlashcardSet()
             val startDate = LocalDate.of(2024, 1, 1)
 
@@ -88,7 +88,7 @@ class DayStreakServiceTest {
 
             service.calcDayStreak(flashcardSet, flashcardSet.chronodays)
 
-            assertThat(flashcardSet.dayStreak!!.streak).isEqualTo(0)
+            assertThat(flashcardSet.dayStreak!!.streak).isEqualTo(5)
         }
 
         @Test
@@ -225,15 +225,15 @@ class DayStreakServiceTest {
         }
 
         @Test
-        fun `should skip IN_PROGRESS days before first COMPLETED day`() {
+        fun `should skip OFF days before first COMPLETED day`() {
             val flashcardSet = testFlashcardSet()
             val startDate = LocalDate.of(2024, 1, 1)
 
             val chronodays = listOf(
                 testChronoday(1, startDate, ChronodayStatus.INITIAL, flashcardSet),
                 testChronoday(2, startDate.plusDays(1), ChronodayStatus.COMPLETED, flashcardSet),
-                testChronoday(3, startDate.plusDays(2), ChronodayStatus.IN_PROGRESS, flashcardSet),
-                testChronoday(4, startDate.plusDays(3), ChronodayStatus.IN_PROGRESS, flashcardSet)
+                testChronoday(3, startDate.plusDays(2), ChronodayStatus.OFF, flashcardSet),
+                testChronoday(4, startDate.plusDays(3), ChronodayStatus.OFF, flashcardSet)
             )
 
             val result = service.calcStreakDays(
@@ -247,6 +247,28 @@ class DayStreakServiceTest {
             val progress = result as DayStreakScanResult.Progress
             assertThat(progress.count).isEqualTo(1)
             assertThat(progress.lastDay.id).isEqualTo(2)
+        }
+
+        @Test
+        fun `should skip OFF days with no change`() {
+            val flashcardSet = testFlashcardSet()
+            val startDate = LocalDate.of(2024, 1, 1)
+
+            val chronodays = listOf(
+                testChronoday(1, startDate, ChronodayStatus.INITIAL, flashcardSet),
+                testChronoday(2, startDate.plusDays(1), ChronodayStatus.COMPLETED, flashcardSet),
+                testChronoday(3, startDate.plusDays(2), ChronodayStatus.OFF, flashcardSet),
+                testChronoday(4, startDate.plusDays(3), ChronodayStatus.OFF, flashcardSet)
+            )
+
+            val result = service.calcStreakDays(
+                flashcardSet = flashcardSet,
+                fromInclusive = chronodays[3],
+                toExclusive = chronodays[1],
+                chronodays = chronodays
+            )
+
+            assertThat(result).isInstanceOf(DayStreakScanResult.NoChange::class.java)
         }
 
         @Test
@@ -321,24 +343,23 @@ class DayStreakServiceTest {
         }
 
         @Test
-        fun `should reset when first day is OFF day`() {
+        fun `should not reset when first day is OFF day`() {
             val flashcardSet = testFlashcardSet()
             val startDate = LocalDate.of(2024, 1, 1)
 
             val chronodays = listOf(
-                testChronoday(1, startDate, ChronodayStatus.INITIAL, flashcardSet),
                 testChronoday(2, startDate.plusDays(1), ChronodayStatus.COMPLETED, flashcardSet),
                 testChronoday(3, startDate.plusDays(2), ChronodayStatus.OFF, flashcardSet),
             )
 
             val result = service.calcStreakDays(
                 flashcardSet = flashcardSet,
-                fromInclusive = chronodays[2],
+                fromInclusive = chronodays[1],
                 toExclusive = chronodays[0],
                 chronodays = chronodays
             )
 
-            assertThat(result).isInstanceOf(DayStreakScanResult.Reset::class.java)
+            assertThat(result).isInstanceOf(DayStreakScanResult.NoChange::class.java)
         }
 
         @Test
