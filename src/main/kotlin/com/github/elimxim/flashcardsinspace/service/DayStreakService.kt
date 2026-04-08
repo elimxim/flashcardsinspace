@@ -72,11 +72,11 @@ class DayStreakService {
      * Calculates day-streak progress between two chronodays within a flashcard set timeline.
      *
      * The scan walks backwards from `fromInclusive` down to (but excluding) `toExclusive` and counts
-     * consecutive COMPLETED days. Once counting has started, OFF (day-off/vacation) days are allowed:
+     * consecutive COMPLETED days. Once counting has started, OFF (day-off/vacation) days are allowed -
      * they do not increase the count and do not break the streak. Before the first COMPLETED day is seen:
-     *  - IN_PROGRESS days are ignored (skipped)
-     *  - NOT_STARTED is ignored only when it is exactly the `fromInclusive` day
-     *  - any other status (including OFF) stops the scan and results in a reset
+     *  - OFF day is ignored - it doesn't break the counter
+     *  - day is ignored only when it is exactly the `fromInclusive` day
+     *  - any other statuses stops the scan and results in a reset
      *
      * Returns:
      *  - Progress: at least one COMPLETED day was found; `count` equals newly
@@ -133,9 +133,9 @@ class DayStreakService {
                     countingStarted = true
                     lastDay = day
                     counter++
-                } else if (day.isInProgress()) {
+                } else if (day.isOff()) {
                     continue
-                } else if (day.isNotStarted() && day.id == fromInclusive.id) {
+                } else if (day.id == fromInclusive.id) {
                     continue
                 } else {
                     countingBroken = true
@@ -144,7 +144,7 @@ class DayStreakService {
             } else {
                 if (day.isCompleted()) {
                     counter++
-                } else if (!day.isOff()) {
+                } else if (!(day.isOff() || day.isInitial())) {
                     break
                 }
             }
