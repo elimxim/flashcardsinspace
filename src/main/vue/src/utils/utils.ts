@@ -69,3 +69,10 @@ export function dateMinusDays(date: Date, days: number): Date {
   newDate.setDate(newDate.getDate() - days)
   return newDate
 }
+
+export function tomorrowMidnight(date: Date) {
+  const tomorrow = new Date(date)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  tomorrow.setHours(0, 0, 0, 0)
+  return tomorrow
+}

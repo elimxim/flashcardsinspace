@@ -25,67 +25,23 @@
       </template>
     </AwesomeButton>
     <AwesomeButton
-      v-if="hasNotCompletedPreviousDays"
+      v-if="isUserCloseToLoseDayStreak"
       class="calendar-info-button"
       icon="fa-solid fa-circle-exclamation"
       :on-hover="togglePreviousDaysPopup"
     />
     <transition name="slide-fade">
       <div
-        v-if="hasNotCompletedPreviousDays && showPreviousDaysPopup"
+        v-if="isUserCloseToLoseDayStreak && showPreviousDaysPopup"
         class="calendar-popup"
       >
         <div class="calendar-popup-layout">
-          <template v-if="previousDaysFrom !== previousDaysTo">
-            <div class="cp-text cp-text--sub cp-text--nowrap">
-              You have uncompleted previous days
-            </div>
-            <div class="calendar-popup-centered-row">
-              <div class="cp-text cp-text--sub">
-                From
-              </div>
-              <div class="cp-count-box">
-                {{ previousDaysFrom?.seqNumber }}
-              </div>
-              <div class="cp-text cp-text--sub">
-                To
-              </div>
-              <div class="cp-count-box">
-                {{ previousDaysTo?.seqNumber }}
-              </div>
-            </div>
-          </template>
-          <template v-else>
-            <div class="cp-text cp-text--sub cp-text--nowrap">
-              You have an uncompleted previous day
-            </div>
-            <div class="calendar-popup-centered-row">
-              <div class="cp-count-box">
-                {{ previousDaysTo?.seqNumber }}
-              </div>
-            </div>
-          </template>
-          <div
-            v-if="prevDaysReviewTotal > 0"
-            class="calendar-popup-review-row"
-          >
-            <div class="cp-text cp-text--sub">
-              With the total number of flashcards to review
-            </div>
-            <div class="cp-count-box" style="flex-shrink: 0;">
-              {{ prevDaysReviewTotal }}
-            </div>
+          <div class="cp-text cp-text--sub cp-text--nowrap">
+            Don't forget to do your review
           </div>
-          <template v-else-if="previousDaysFrom !== previousDaysTo">
-            <div class="cp-text cp-text--sub">
-              They will be completed once<br>you complete the current day
-            </div>
-          </template>
-          <template v-else>
-            <div class="cp-text cp-text--sub">
-              It will be completed once<br>you complete the current day
-            </div>
-          </template>
+          <div class="cp-text cp-text--sub">
+            You just have {{ timeBeforeMidnight }} before the midnight
+          </div>
         </div>
       </div>
     </transition>
@@ -94,26 +50,24 @@
 
 <script setup lang="ts">
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import { computed, ref } from 'vue'
-import { calcStageReviews } from '@/core-logic/review-logic.ts'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
-import {
-  chronodayStatuses,
-  chronodayStatusesToCompleteDay,
-  selectConsecutiveDaysBefore
-} from '@/core-logic/chrono-logic.ts'
+import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
+import { tomorrowMidnight } from '@/utils/utils.ts'
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 const toggleStore = useToggleStore()
 
-const { flashcardSet, flashcards, isSuspended } = storeToRefs(flashcardStore)
-const { currDay, isDayOff, chronodays } = storeToRefs(chronoStore)
+const { flashcardSet, isSuspended } = storeToRefs(flashcardStore)
+const { currDay, isDayOff } = storeToRefs(chronoStore)
 
 const showPreviousDaysPopup = ref(false)
+const minutesBeforeMidnight = ref(-1)
+let alarmInterval: ReturnType<typeof setInterval> | null = null
 
 const togglePreviousDaysPopup = () => {
   showPreviousDaysPopup.value = !showPreviousDaysPopup.value
@@ -124,46 +78,30 @@ const currDayNumber = computed(() =>
   isOnVacation.value ? '🌴' : currDay.value?.seqNumber ?? '?'
 )
 
-const previousDays = computed(() => {
-  if (!currDay.value) return []
-  return selectConsecutiveDaysBefore(
-    chronoStore.chronodays,
-    currDay.value,
-    chronodayStatusesToCompleteDay,
-    false,
-  )
-})
-
-const hasNotCompletedPreviousDays = computed(() => {
-  return previousDays.value.length !== 0
-})
-
-const previousDaysFrom = computed(() => {
-  const days = previousDays.value
-  if (days.length !== 0) {
-    return days[days.length - 1]
+const isUserCloseToLoseDayStreak = computed(() => {
+  if (currDay.value.status === chronodayStatuses.COMPLETED) {
+    return false
   } else {
-    return currDay.value
+    const minutes = minutesBeforeMidnight.value
+    return minutes > 0 && minutes < 6 * 60 // 6 hours
   }
 })
 
-const previousDaysTo = computed(() => {
-  const days = previousDays.value
-  if (days.length !== 0) {
-    return days[0]
+const timeBeforeMidnight = computed(() => {
+  const minutes = minutesBeforeMidnight.value
+  if (minutes > 60) {
+    const hours = Math.floor(minutes / 60)
+    return `${hours} hours`
   } else {
-    return currDay.value
+    return `${minutes} minutes`
   }
 })
 
-const prevDaysReviewTotal = computed(() => {
-  if (!currDay.value) return 0
-  const currStages = new Set(currDay.value.stages)
-  const prevStages = previousDays.value.map(d => d.stages).flat()
-  const uniqueStages = [...new Set(prevStages)].filter(v => !currStages.has(v))
-  return calcStageReviews(flashcards.value, uniqueStages, currDay.value, chronodays.value)
-    .reduce((acc, v) => acc + v.count, 0)
-})
+function calcMinutesBeforeMidnight() {
+  const now = new Date()
+  const tomorrow = tomorrowMidnight(now)
+  minutesBeforeMidnight.value = (tomorrow.getTime() - now.getTime()) / (60 * 1000)
+}
 
 const calendarIcon = computed(() => {
   if (isOnVacation.value || currDay.value.status === chronodayStatuses.INITIAL) {
@@ -172,6 +110,17 @@ const calendarIcon = computed(() => {
     return 'fa-solid fa-calendar-check'
   } else {
     return 'fa-solid fa-calendar-days'
+  }
+})
+
+onMounted(() => {
+  calcMinutesBeforeMidnight()
+  alarmInterval = setInterval(calcMinutesBeforeMidnight, 60000)
+})
+
+onUnmounted(() => {
+  if (alarmInterval) {
+    clearInterval(alarmInterval)
   }
 })
 
@@ -210,7 +159,7 @@ const calendarIcon = computed(() => {
 
 .calendar-popup {
   position: absolute;
-  top: 50%;
+  top: 35%;
   left: 50%;
   transform: translateX(-50%);
   background-color: transparent;
@@ -229,22 +178,6 @@ const calendarIcon = computed(() => {
   border-radius: 6px;
   width: fit-content;
   height: fit-content;
-}
-
-.calendar-popup-centered-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-}
-
-.calendar-popup-review-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
 }
 
 .slide-fade-enter-active {
