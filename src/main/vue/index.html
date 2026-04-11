@@ -114,7 +114,7 @@
 </head>
 <body>
 <div id="app">
-    <div id="initial-loader" class="initial-loader">
+    <div id="app-spinner" class="app-spinner">
         <div class="space-scanner">
             <div class="scanner-pulse"></div>
             <div class="scanner-pulse"></div>
@@ -124,21 +124,12 @@
     </div>
 </div>
 
-<script>
-    window.loaderTimerId = setTimeout(() => {
-        console.log("Loader timer expired")
-        const loader = document.getElementById('initial-loader');
-        if (loader) {
-            loader.classList.add('visible');
-            window.loaderAppearedAt = performance.now();
-        }
-    }, 200);
-</script>
+<script src="/app-spinner.js"></script>
 
 <script type="module" src="/src/main.ts"></script>
 </body>
 <style>
-    .initial-loader {
+    .app-spinner {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -149,7 +140,7 @@
         transition: opacity 0.2s ease, visibility 0.2s ease;
     }
 
-    .initial-loader.visible {
+    .app-spinner.visible {
         opacity: 1;
         visibility: visible;
     }
