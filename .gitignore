@@ -6,3 +6,4 @@ out
 logs
 certs
 **/*-dev.yaml
+tasks

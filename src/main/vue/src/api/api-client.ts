@@ -7,6 +7,7 @@ import {
   ChronoUpdateResponse,
   FlashcardSetInitResponse,
   FlashcardSetSuspendResponse,
+  Page,
   ReviewSessionCreateRequest,
   ReviewSessionUpdateRequest,
 } from '@/api/communication.ts'
@@ -75,9 +76,23 @@ export async function sendFlashcardSetCreationRequest(flashcardSet: FlashcardSet
   return apiClient.post<FlashcardSet>(`/flashcard-sets`, flashcardSet)
 }
 
-export async function sendFlashcardsGetRequest(setId: number) {
-  Log.log(LogTag.GET, `flashcards-sets/${setId}/flashcards`)
-  return apiClient.get<Flashcard[]>(`/flashcard-sets/${setId}/flashcards`)
+export async function sendFlashcardsGetRequest(setId: number): Promise<Flashcard[]> {
+  const first = await sendFlashcardsGetPageRequest(setId, 0)
+  const all: Flashcard[] = [...first.data.content]
+  for (let page = 1; page < first.data.totalPages; page++) {
+    const response = await sendFlashcardsGetPageRequest(setId, page)
+    const pageContent = response.data.content
+    const last = response.data.last
+    Log.log(LogTag.DEBUG, `Fetched page ${page} (last: ${last}): ${all.length} + ${pageContent.length} flashcards`)
+    all.push(...pageContent)
+    if (last) break
+  }
+  return all
+}
+
+export async function sendFlashcardsGetPageRequest(setId: number, page: number) {
+  Log.log(LogTag.GET, `flashcards-sets/${setId}/flashcards?page=${page}`)
+  return apiClient.get<Page<Flashcard>>(`/flashcard-sets/${setId}/flashcards`, { params: { page } })
 }
 
 export async function sendFlashcardCreationRequest(setId: number, flashcard: Flashcard) {
