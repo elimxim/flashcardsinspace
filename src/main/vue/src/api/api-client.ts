@@ -92,7 +92,7 @@ export async function sendFlashcardsGetRequest(setId: number): Promise<Flashcard
 
 export async function sendFlashcardsGetPageRequest(setId: number, page: number) {
   Log.log(LogTag.GET, `flashcards-sets/${setId}/flashcards?page=${page}`)
-  return apiClient.get<Page<Flashcard>>(`/flashcard-sets/${setId}/flashcards`, { params: { page, size: 2 } })
+  return apiClient.get<Page<Flashcard>>(`/flashcard-sets/${setId}/flashcards`, { params: { page } })
 }
 
 export async function sendFlashcardCreationRequest(setId: number, flashcard: Flashcard) {
