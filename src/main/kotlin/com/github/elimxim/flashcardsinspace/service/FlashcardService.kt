@@ -10,6 +10,8 @@ import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.HttpConflictException
 import com.github.elimxim.flashcardsinspace.web.exception.HttpNotFoundException
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
@@ -24,12 +26,12 @@ class FlashcardService(
     private val requestValidator: RequestValidator,
 ) {
     @Transactional(readOnly = true)
-    fun getAll(user: User, setId: Long): List<FlashcardDto> {
+    fun getAll(user: User, setId: Long, pageable: Pageable): Page<FlashcardDto> {
         log.info("Retrieving flashcards from set $setId")
         user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
-        return flashcardRepository.findAllByFlashcardSetId(setId).map { it.toDto() }
+        return flashcardRepository.findAllByFlashcardSetId(setId, pageable).map { it.toDto() }
     }
 
     @Transactional
