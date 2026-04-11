@@ -1,6 +1,12 @@
 import type { Chronoday, DayStreak } from '@/model/chrono.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 
+export interface Page<T> {
+  content: T[]
+  totalPages: number
+  last: boolean
+}
+
 export interface ErrorResponseBody {
   timestamp: Date
   statusCode: number

@@ -147,8 +147,8 @@ export async function loadStoresForFlashcardSet(flashcardSet: FlashcardSet, forc
   audioStore.$reset()
 
   return await sendFlashcardsGetRequest(flashcardSet.id)
-    .then(async (response) => {
-      flashcardStore.loadState(flashcardSet, response.data)
+    .then(async (flashcards) => {
+      flashcardStore.loadState(flashcardSet, flashcards)
       return sendChronoSyncRequest(flashcardSet.id)
     })
     .then((response) => {
