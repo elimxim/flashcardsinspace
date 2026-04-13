@@ -48,6 +48,7 @@
           v-model="newSuspended"
           label="Active"
           checked-label="Suspended (vacation mode 🌴)"
+          reverse
         />
       </div>
       <div class="modal-main-area--actions">
