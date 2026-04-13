@@ -54,6 +54,27 @@ class FlashcardService(
     }
 
     @Transactional
+    fun addBulk(user: User, setId: Long, request: FlashcardBulkCreationRequest): List<FlashcardDto> {
+        log.info("Adding flashcards in bulk to set $setId")
+        user.checkVerified()
+        val flashcardSet = flashcardSetService.getEntity(setId)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
+        val validBulkRequest = requestValidator.validate(request)
+        val flashcards = validBulkRequest.requests.map { req ->
+            Flashcard(
+                frontSide = req.frontSide,
+                backSide = req.backSide,
+                stage = req.stage,
+                timesReviewed = 0,
+                creationDate = req.creationDate,
+                flashcardSet = flashcardSet,
+            )
+        }
+
+        return flashcardRepository.saveAll(flashcards).map { it.toDto() }
+    }
+
+    @Transactional
     fun update(user: User, setId: Long, id: Long, request: FlashcardUpdateRequest): FlashcardDto {
         log.info("Updating flashcard $id in set $setId")
         user.checkVerified()
