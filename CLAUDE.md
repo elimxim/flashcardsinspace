@@ -108,7 +108,8 @@ PostgreSQL with Liquibase. Schema: `flashcardsinspace`. Migrations in `src/main/
 
 ### Frontend Code Style
 
-- **No semicolons** in `.ts` and `.vue` files.
+- **No semicolons** in `.ts` and `.vue` files — ESLint forbids it.
+- **No `any` type** in `.ts` and `.vue` files — ESLint forbids it. Use explicit types, generics, or a named alias with a targeted `as` cast where a heterogeneous collection forces it.
 
 ### Dev Environment
 
