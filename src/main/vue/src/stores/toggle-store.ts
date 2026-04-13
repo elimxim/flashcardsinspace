@@ -7,6 +7,7 @@ export interface ToggleState {
   flashcardEditOpen: boolean
   calendarOpen: boolean
   quizOpen: boolean
+  fileUploadOpen: boolean
 }
 
 export const useToggleStore = defineStore('toggle', {
@@ -18,6 +19,7 @@ export const useToggleStore = defineStore('toggle', {
       flashcardEditOpen: false,
       calendarOpen: false,
       quizOpen: false,
+      fileUploadOpen: false,
     }
   },
   actions: {
@@ -39,6 +41,9 @@ export const useToggleStore = defineStore('toggle', {
     toggleQuiz() {
       this.quizOpen = !this.quizOpen
     },
+    toggleFileUpload() {
+      this.fileUploadOpen = !this.fileUploadOpen
+    },
     isAnyModalOpen(): boolean {
       return this.flashcardSetSettingsOpen
         || this.flashcardSetCreationOpen
@@ -46,6 +51,7 @@ export const useToggleStore = defineStore('toggle', {
         || this.flashcardEditOpen
         || this.calendarOpen
         || this.quizOpen
+        || this.fileUploadOpen
     },
   }
 })
