@@ -5,12 +5,12 @@ import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 
 describe('selectConsecutiveDaysBeforeIncluding', () => {
   const chronodays: Chronoday[] = [
-    chronoday(0, 0, chronodayStatuses.COMPLETED),
-    chronoday(1, 1, chronodayStatuses.COMPLETED),
-    chronoday(2, undefined, chronodayStatuses.OFF),
-    chronoday(3, 2, chronodayStatuses.COMPLETED),
-    chronoday(4, 3, chronodayStatuses.COMPLETED),
-    chronoday(5, 4, chronodayStatuses.NOT_STARTED),
+    makeChronoday(0, 0, chronodayStatuses.COMPLETED),
+    makeChronoday(1, 1, chronodayStatuses.COMPLETED),
+    makeChronoday(2, undefined, chronodayStatuses.OFF),
+    makeChronoday(3, 2, chronodayStatuses.COMPLETED),
+    makeChronoday(4, 3, chronodayStatuses.COMPLETED),
+    makeChronoday(5, 4, chronodayStatuses.NOT_STARTED),
   ]
 
   it('should return an empty array if the condition is not met for the start day', () => {
@@ -90,7 +90,7 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
 
   it('should return an empty array when the provided chronodays array is empty', () => {
     // given:
-    const dummyStartDay = chronoday(0, 0, 'COMPLETED')
+    const dummyStartDay = makeChronoday(0, 0, 'COMPLETED')
 
     // when:
     const result = selectConsecutiveDaysBefore([], dummyStartDay, new Set())
@@ -100,7 +100,7 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
   })
 })
 
-const chronoday = (id: number, seqNumber: number | undefined, status: string): Chronoday => ({
+const makeChronoday = (id: number, seqNumber: number | undefined, status: string): Chronoday => ({
   id,
   chronodate: `2025-08-${10 + id}`,
   seqNumber,
