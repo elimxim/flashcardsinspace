@@ -36,7 +36,7 @@
         <div class="count-text">
           {{ parsedCount }} flashcard{{ parsedCount !== 1 ? 's' : '' }} parsed
         </div>
-        <div v-if="duplicateCount > 0" class="duplicate-text">
+        <div class="duplicate-text" :style="{ visibility: duplicateCount > 0 ? 'visible' : 'hidden' }">
           {{ duplicateCount }} duplicate{{ duplicateCount !== 1 ? 's' : '' }} skipped
         </div>
       </div>
