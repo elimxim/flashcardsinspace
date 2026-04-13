@@ -84,17 +84,17 @@
           auto-blur
         />
         <SmartButton
-          class="calm-button quiz-start-button"
+          class="calm-button counter-button"
           text="Start"
           :on-click="startNew"
           :disabled="reviewCount <= 0"
           auto-blur
         >
-          <span class="quiz-start-button-title">
-            <span class="quiz-start-button-text">
+          <span class="counter-button--layout">
+            <span class="counter-button--text">
               Start
             </span>
-            <span class="quiz-stage-flashcard-count">
+            <span class="counter-button--number">
               {{ reviewCount }}
             </span>
           </span>
@@ -365,22 +365,4 @@ onMounted(async () => {
   --awesome-button--icon--color--hover: #cfe9fb;
 }
 
-.quiz-start-button {
-  --smart-button--width: fit-content;
-  --smart-button--padding: 4px;
-}
-
-.quiz-start-button-title {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  padding: 4px;
-}
-
-.quiz-start-button-text {
-  font-weight: 600;
-  text-transform: uppercase;
-}
 </style>
