@@ -1,71 +1,72 @@
 <template>
   <div class="import-export">
-    <div class="panels-viewport">
-      <Transition :name="transitionName">
-        <div v-if="panel === 'main'" key="main" class="buttons-panel">
-          <AwesomeButton
-            icon="fa-solid fa-file"
-            class="ie-btn ie-btn--file ie-btn--bounce"
-            :scale-factor="1.2"
-            tooltip="Import / Export"
-            tooltip-position="top-right"
-            :on-click="goToIo"
-          />
+    <Transition :name="transitionName">
+      <div v-if="panel === 'main'" key="main" class="buttons-panel">
+        <AwesomeButton
+          icon="fa-solid fa-file"
+          class="ie-btn ie-btn--file ie-btn--bounce"
+          :scale-factor="1.2"
+          tooltip="Import / Export"
+          tooltip-position="top-right"
+          :on-click="goToIo"
+        />
+        <div class="ie-text">
+          Import / Export flashcards
         </div>
-        <div v-else-if="panel === 'io'" key="io" class="buttons-panel">
-          <AwesomeButton
-            icon="fa-solid fa-circle-arrow-left"
-            class="ie-btn ie-btn--back"
-            :scale-factor="1.2"
-            tooltip="Back"
-            tooltip-position="top-right"
-            :on-click="goBack"
-          />
-          <AwesomeButton
-            icon="fa-solid fa-file-arrow-down"
-            class="ie-btn ie-btn--file"
-            :scale-factor="1.2"
-            tooltip="Download"
-            tooltip-position="top"
-            :on-click="goToDownload"
-          />
-          <AwesomeButton
-            icon="fa-solid fa-file-arrow-up"
-            class="ie-btn ie-btn--file"
-            :scale-factor="1.2"
-            tooltip="Upload"
-            tooltip-position="top"
-            :on-click="triggerUpload"
-          />
-        </div>
-        <div v-else key="download" class="buttons-panel">
-          <AwesomeButton
-            icon="fa-solid fa-circle-arrow-left"
-            class="ie-btn ie-btn--back"
-            :scale-factor="1.2"
-            tooltip="Back"
-            tooltip-position="top-right"
-            :on-click="goBack"
-          />
-          <AwesomeButton
-            icon="fa-solid fa-file-csv"
-            class="ie-btn ie-btn--csv"
-            :scale-factor="1.2"
-            tooltip="CSV"
-            tooltip-position="top"
-            :on-click="downloadCsv"
-          />
-          <AwesomeButton
-            icon="fa-solid fa-file-excel"
-            class="ie-btn ie-btn--excel"
-            :scale-factor="1.2"
-            tooltip="XLSX"
-            tooltip-position="top"
-            :on-click="downloadXlsx"
-          />
-        </div>
-      </Transition>
-    </div>
+      </div>
+      <div v-else-if="panel === 'io'" key="io" class="buttons-panel">
+        <AwesomeButton
+          icon="fa-solid fa-circle-arrow-left"
+          class="ie-btn ie-btn--back"
+          :scale-factor="1.2"
+          tooltip="Back"
+          tooltip-position="top-right"
+          :on-click="goBack"
+        />
+        <AwesomeButton
+          icon="fa-solid fa-file-arrow-down"
+          class="ie-btn ie-btn--download"
+          :scale-factor="1.2"
+          tooltip="Download"
+          tooltip-position="top"
+          :on-click="goToDownload"
+        />
+        <AwesomeButton
+          icon="fa-solid fa-file-arrow-up"
+          class="ie-btn ie-btn--upload"
+          :scale-factor="1.2"
+          tooltip="Upload"
+          tooltip-position="top"
+          :on-click="triggerUpload"
+        />
+      </div>
+      <div v-else key="download" class="buttons-panel">
+        <AwesomeButton
+          icon="fa-solid fa-circle-arrow-left"
+          class="ie-btn ie-btn--back"
+          :scale-factor="1.2"
+          tooltip="Back"
+          tooltip-position="top-right"
+          :on-click="goBack"
+        />
+        <AwesomeButton
+          icon="fa-solid fa-file-csv"
+          class="ie-btn ie-btn--csv"
+          :scale-factor="1.2"
+          tooltip="CSV"
+          tooltip-position="top"
+          :on-click="downloadCsv"
+        />
+        <AwesomeButton
+          icon="fa-solid fa-file-excel"
+          class="ie-btn ie-btn--excel"
+          :scale-factor="1.2"
+          tooltip="XLSX"
+          tooltip-position="top"
+          :on-click="downloadXlsx"
+        />
+      </div>
+    </Transition>
     <input
       ref="fileInput"
       type="file"
@@ -176,6 +177,16 @@ function onFileSelected(event: Event) {
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 4px;
+}
+
+.ie-text {
+  font-size: clamp(0.9rem, 2vh, 1rem);
+  color: #45454a;
+  line-height: 1.5;
+  display: inline-block;
+  vertical-align: middle;
+  text-wrap: nowrap;
 }
 
 .ie-btn {
@@ -183,6 +194,16 @@ function onFileSelected(event: Event) {
   --awesome-button--bg--hover: #eaeaea;
   --awesome-button--border-radius: 10px;
   --awesome-button--padding: 8px;
+}
+
+.ie-btn--download {
+  --awesome-button--icon--color: #069494;
+  --awesome-button--icon--color--hover: #069494;
+}
+
+.ie-btn--upload {
+  --awesome-button--icon--color: #f08000;
+  --awesome-button--icon--color--hover: #f08000;
 }
 
 .ie-btn--file {
@@ -230,7 +251,6 @@ function onFileSelected(event: Event) {
   }
 }
 
-/* Forward: leave drifts left, enter drifts in from the right */
 .slide-forward-enter-active {
   transition: transform 0.26s ease, opacity 0.26s ease;
   z-index: 1;
@@ -250,7 +270,6 @@ function onFileSelected(event: Event) {
   opacity: 0;
 }
 
-/* Back: leave drifts right, enter drifts in from the left */
 .slide-back-enter-active {
   transition: transform 0.26s ease, opacity 0.26s ease;
   z-index: 1;
