@@ -89,10 +89,8 @@ import { useAudioStore } from '@/stores/audio-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import {
   flashcardSides,
-  fetchFlashcardAudioBlob,
-  removeFlashcardAudioBlob,
   changeFlashcardSides,
-  uploadFlashcardAudioBlob, copyFlashcard,
+  copyFlashcard,
 } from '@/core-logic/flashcard-logic.ts'
 import { storeToRefs } from 'pinia'
 import {
@@ -102,6 +100,11 @@ import {
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { useAudioCache } from '@/stores/audio-cache.ts'
+import {
+  fetchFlashcardAudioBlob,
+  removeFlashcardAudioBlob,
+  uploadFlashcardAudioBlob
+} from '@/core-logic/flashcard-audio-logic.ts'
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const removed = defineModel<boolean>('removed', { default: false })
