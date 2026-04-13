@@ -40,7 +40,7 @@
             Don't forget to do your review
           </div>
           <div class="cp-text cp-text--sub">
-            You just have {{ timeBeforeMidnight }} before the midnight
+            You just have {{ timeBeforeMidnight }} before midnight
           </div>
         </div>
       </div>
