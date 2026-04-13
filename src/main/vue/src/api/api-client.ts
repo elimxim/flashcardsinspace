@@ -100,6 +100,11 @@ export async function sendFlashcardCreationRequest(setId: number, flashcard: Fla
   return apiClient.post<Flashcard>(`/flashcard-sets/${setId}/flashcards`, flashcard)
 }
 
+export async function sendFlashcardBulkCreationRequest(setId: number, flashcards: Flashcard[]) {
+  Log.log(LogTag.POST, `/flashcard-sets/${setId}/flashcards/bulk`)
+  return apiClient.post<Flashcard[]>(`/flashcard-sets/${setId}/flashcards/bulk`, { requests: flashcards })
+}
+
 export async function sendFlashcardUpdateRequest(setId: number, flashcard: Flashcard) {
   Log.log(LogTag.PUT, `/flashcard-sets/${setId}/flashcards/${flashcard.id}`)
   return apiClient.put<Flashcard>(`/flashcard-sets/${setId}/flashcards/${flashcard.id}`, flashcard)

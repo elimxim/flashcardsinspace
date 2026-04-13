@@ -76,3 +76,7 @@ export function tomorrowMidnight(date: Date) {
   tomorrow.setHours(0, 0, 0, 0)
   return tomorrow
 }
+
+export async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}

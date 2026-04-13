@@ -88,10 +88,8 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
-import {
-  newFlashcard,
-  uploadFlashcardAudioBlob,
-} from '@/core-logic/flashcard-logic.ts'
+import { newFlashcard } from '@/core-logic/flashcard-logic.ts'
+import { uploadFlashcardAudioBlob } from '@/core-logic/flashcard-audio-logic.ts'
 import { storeToRefs } from 'pinia'
 import {
   sendFlashcardAudioMetadataGetRequest,

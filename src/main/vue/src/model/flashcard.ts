@@ -48,3 +48,8 @@ export interface FlashcardSetExtra {
   id: number
   flashcardsNumber: number
 }
+
+export interface FlashcardContent {
+  frontSide: string
+  backSide: string
+}

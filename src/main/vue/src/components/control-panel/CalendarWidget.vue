@@ -40,7 +40,7 @@
             Don't forget to do your review
           </div>
           <div class="cp-text cp-text--sub">
-            You just have {{ timeBeforeMidnight }} before the midnight
+            You just have {{ timeBeforeMidnight }} before midnight
           </div>
         </div>
       </div>
@@ -91,9 +91,9 @@ const timeBeforeMidnight = computed(() => {
   const minutes = minutesBeforeMidnight.value
   if (minutes > 60) {
     const hours = Math.floor(minutes / 60)
-    return `${hours} hours`
+    return `${hours} hour` + (hours > 1 ? 's' : '')
   } else {
-    return `${minutes} minutes`
+    return `${minutes} minute` + (minutes > 1 ? 's' : '')
   }
 })
 

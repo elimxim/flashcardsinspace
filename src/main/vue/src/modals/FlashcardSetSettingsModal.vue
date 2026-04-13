@@ -48,7 +48,11 @@
           v-model="newSuspended"
           label="Active"
           checked-label="Suspended (vacation mode 🌴)"
+          reverse
         />
+      </div>
+      <div class="modal-main-area--actions">
+        <FlashcardSetImportExport/>
       </div>
     </div>
     <div class="modal-control-buttons">
@@ -87,6 +91,7 @@ import SmartCheckbox from '@/components/SmartCheckbox.vue'
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import ErrorText from '@/components/ErrorText.vue'
+import FlashcardSetImportExport from '@/components/FlashcardSetImportExport.vue'
 import { computed, ref, watch } from 'vue'
 import { helpers, maxLength, required } from '@vuelidate/validators'
 import { useVuelidate } from '@vuelidate/core'
@@ -293,7 +298,7 @@ watch(newLanguage, () => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: start;
+  justify-content: flex-start;
   gap: 10px;
 }
 
@@ -307,7 +312,11 @@ watch(newLanguage, () => {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding-left: 0.5rem;
+  padding-left: 8px;
+}
+
+.modal-main-area--actions {
+  width: 100%;
 }
 
 .modal-control-buttons {

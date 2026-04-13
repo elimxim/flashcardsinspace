@@ -1,15 +1,13 @@
 <template>
-  <div class="kinetic-ring-spinner">
-    <div
-      class="kinetic-ring"
-      :style="{
-        '--ring-size': ringSizePx,
-        '--ring-track--size': trackSizePx,
-        '--ring-track--color': trackColor
-      }"
-    >
+  <div class="kinetic-ring-spinner kinetic-ring-spinner--theme">
+    <div class="kinetic-ring">
       <div class="ring-track"/>
-      <div class="ring-beam"/>
+      <div
+        class="ring-beam"
+        :class="{
+          'ring-beam--frozen': freeze,
+        }"
+      />
     </div>
   </div>
 </template>
@@ -20,19 +18,32 @@ import { computed } from 'vue'
 const props = withDefaults(defineProps<{
   ringSize?: number
   trackSize?: number
-  trackColor?: string
+  beamSpeed?: number
+  freeze?: boolean
 }>(), {
   ringSize: 160,
   trackSize: 12,
-  trackColor: '#f1f5f9',
+  beamSpeed: 1.2,
+  freeze: false,
 })
 
 const ringSizePx = computed(() => `${props.ringSize}px`)
 const trackSizePx = computed(() => `${props.trackSize}px`)
+const beamSpeedSeconds = computed(() => `${props.beamSpeed}s`)
 
 </script>
 
 <style scoped>
+.kinetic-ring-spinner--theme {
+  --ring-size: v-bind(ringSizePx);
+  --ring-track--size: v-bind(trackSizePx);
+  --ring-track--color: #f1f5f9;
+  --beam--speed: v-bind(beamSpeedSeconds);
+  --beam--color-1: var(--kinetic-ring-spinner--beam--color-1, #7f42b8);
+  --beam--color-2: var(--kinetic-ring-spinner--beam--color-2, #a855f7);
+  --beam--color-frozen: var(--kinetic-ring-spinner--beam--color-freeze, transparent);
+}
+
 .kinetic-ring-spinner {
   display: flex;
   justify-content: center;
@@ -67,19 +78,27 @@ const trackSizePx = computed(() => `${props.trackSize}px`)
   background: conic-gradient(
     from 0deg,
     transparent 0%,
-    #7f42b8 15%,
-    #a855f7 25%,
+    var(--beam--color-1) 15%,
+    var(--beam--color-2) 25%,
     transparent 35%
   ) border-box;
   -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: destination-out;
   mask-composite: exclude;
-  filter: drop-shadow(0 0 8px rgba(127, 66, 184, 0.6));
-  animation: rotate 1.2s linear infinite;
+  animation: rotate var(--beam--speed) linear infinite;
+}
+
+.ring-beam--frozen {
+  animation-play-state: paused;
+  background: var(--beam--color-frozen) border-box;
 }
 
 @keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

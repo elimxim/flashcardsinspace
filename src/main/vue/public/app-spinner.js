@@ -1,3 +1,4 @@
+/* eslint-disable */
 window.loaderTimerId = setTimeout(() => {
     console.log("Loader timer expired")
     const loader = document.getElementById('app-spinner');

@@ -59,6 +59,14 @@ fun FlashcardCreationRequest.escapeJava() = FlashcardCreationRequest(
     creationDate = creationDate?.escapeJava(),
 )
 
+fun FlashcardBulkCreationRequest.normalize() = FlashcardBulkCreationRequest(
+    requests = requests?.map { it.normalize() },
+)
+
+fun FlashcardBulkCreationRequest.escapeJava() = FlashcardBulkCreationRequest(
+    requests = requests?.map { it.escapeJava() },
+)
+
 fun FlashcardUpdateRequest.normalize() = FlashcardUpdateRequest(
     frontSide = frontSide?.normalize(),
     backSide = backSide?.normalize(),

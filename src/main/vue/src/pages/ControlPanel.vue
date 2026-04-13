@@ -48,6 +48,7 @@
   <FlashcardCreationModal/>
   <CalendarModal/>
   <QuizModal/>
+  <FlashcardSetUploadModal/>
   <SpaceToast/>
 </template>
 
@@ -63,6 +64,7 @@ import FlashcardSetCreationModal from '@/modals/FlashcardSetCreationModal.vue'
 import FlashcardCreationModal from '@/modals/FlashcardCreationModal.vue'
 import CalendarModal from '@/modals/CalendarModal.vue'
 import QuizModal from '@/modals/QuizModal.vue'
+import FlashcardSetUploadModal from '@/modals/FlashcardSetUploadModal.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'

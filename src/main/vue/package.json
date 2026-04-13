@@ -27,7 +27,8 @@
     "pinia": "^3.0.3",
     "vue": "^3.5.17",
     "vue-country-flag-next": "^2.3.2",
-    "vue-router": "^4.5.1"
+    "vue-router": "^4.5.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
@@ -41,6 +42,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-vue": "~10.2.0",
     "jiti": "^2.4.2",
+    "jsdom": "^29.0.2",
     "npm-run-all2": "^8.0.4",
     "prettier": "3.5.3",
     "typescript": "~5.8.0",

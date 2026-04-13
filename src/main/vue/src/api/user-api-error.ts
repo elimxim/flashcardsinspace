@@ -116,6 +116,22 @@ export const userApiErrors = {
     title: 'Could not remove the audio',
     message: 'Please refresh the page and repeat the action.'
   } as UserApiError,
+  FLASHCARD__DOWNLOAD_FAILED: {
+    title: 'Could not download the flashcards',
+    message: 'Please try again.'
+  } as UserApiError,
+  FLASHCARD__FILE_PARSE_FAILED: {
+    title: 'Could not parse the file',
+    message: 'Please check the file format and try again.'
+  } as UserApiError,
+  FLASHCARD__ALL_DUPLICATES: {
+    title: 'All flashcards are duplicates',
+    message: 'The file contains only flashcards that already exist in this set.'
+  } as UserApiError,
+  FLASHCARD__BULK_CREATION_FAILED: {
+    title: 'Could not upload flashcards',
+    message: 'Please try again.'
+  } as UserApiError,
   REVIEW_SESSION__FETCHING_FAILED: {
     title: 'Could not fetch an active review session',
     message: 'Please exit the current review session and try again.'

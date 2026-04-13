@@ -131,6 +131,17 @@ data class ValidFlashcardUpdateRequest(
     data class ReviewInfo(val stage: FlashcardStage, val reviewDate: LocalDate)
 }
 
+class FlashcardBulkCreationRequest(
+    @field:NotNull
+    @field:Size(min = 1)
+    @field:Valid
+    var requests: List<FlashcardCreationRequest>? = null,
+)
+
+class ValidFlashcardBulkCreationRequest(
+    val requests: List<ValidFlashcardCreationRequest>
+)
+
 class FlashcardSetCreationRequest(
     @field:NotNull
     @field:NotBlank

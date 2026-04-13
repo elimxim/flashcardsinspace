@@ -1,5 +1,10 @@
 <template>
-  <label class="smart-checkbox smart-checkbox--theme">
+  <label
+    class="smart-checkbox smart-checkbox--theme"
+    :class="{
+      'smart-checkbox--reversed': reverse
+    }"
+  >
     <input
       v-model="model"
       type="checkbox"
@@ -18,12 +23,10 @@
         :class="{ 'is-visible': !model }"
       />
     </span>
-    <span v-if="label || checkedLabel" class="label-container">
-      <transition name="label-switch">
-        <span :key="currentLabel" class="checkbox-label">
-          {{ currentLabel }}
-        </span>
-      </transition>
+    <span v-if="label || checkedLabel" class="checkbox-label-container">
+      <span :key="currentLabel" class="checkbox-label">
+        {{ currentLabel }}
+      </span>
     </span>
   </label>
 </template>
@@ -36,9 +39,11 @@ const model = defineModel<boolean>({ default: false })
 const props = withDefaults(defineProps<{
   label?: string
   checkedLabel?: string
+  reverse?: boolean
 }>(), {
   label: '',
-  checkedLabel: ''
+  checkedLabel: '',
+  reverse: false,
 })
 
 const currentLabel = computed(() => {
@@ -67,6 +72,10 @@ const currentLabel = computed(() => {
   cursor: pointer;
   user-select: none;
   position: relative;
+}
+
+.smart-checkbox--reversed {
+  flex-direction: row-reverse;
 }
 
 .checkbox-input {
@@ -134,31 +143,7 @@ const currentLabel = computed(() => {
   line-height: 1.5;
   display: inline-block;
   vertical-align: middle;
-}
-
-.label-switch-enter-active,
-.label-switch-leave-active {
-  transition: all 0.3s ease;
-}
-
-.label-switch-leave-active {
-  position: absolute;
-}
-
-.label-switch-enter-from {
-  opacity: 0;
-  transform: translateY(-10px) scale(0.95);
-}
-
-.label-switch-leave-to {
-  opacity: 0;
-  transform: translateY(10px) scale(0.95);
-}
-
-.label-switch-enter-to,
-.label-switch-leave-from {
-  opacity: 1;
-  transform: translateY(0) scale(1);
+  text-wrap: nowrap;
 }
 
 </style>

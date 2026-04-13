@@ -7,3 +7,4 @@ logs
 certs
 **/*-dev.yaml
 tasks
+SPEC.md
