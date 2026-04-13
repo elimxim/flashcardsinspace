@@ -16,6 +16,21 @@
           :beam-speed="2.4"
           :freeze="uploadState !== 'parsing'"
         />
+        <font-awesome-icon
+          v-if="uploadState === 'parsing'"
+          icon="fa-solid fa-gears"
+          class="spinner-icon spinner-icon--parsing"
+        />
+        <font-awesome-icon
+          v-else-if="uploadState === 'success'"
+          icon="fa-solid fa-check"
+          class="spinner-icon spinner-icon--success"
+        />
+        <font-awesome-icon
+          v-if="uploadState === 'error'"
+          icon="fa-solid fa-xmark"
+          class="spinner-icon spinner-icon--error"
+        />
       </div>
       <div class="info-section">
         <div class="count-text">
@@ -70,6 +85,7 @@ import { userApiErrors } from '@/api/user-api-error.ts'
 import { parseFlashcardsFromFile } from '@/core-logic/flashcard-file-logic.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { FlashcardContent } from '@/model/flashcard.ts'
+import { sleep } from '@/utils/utils.ts'
 
 type UploadState = 'parsing' | 'success' | 'error'
 
@@ -99,6 +115,7 @@ async function parseFile(file: File) {
   duplicateIndices.value = new Set()
 
   try {
+    await sleep(2000)
     const rows = await parseFlashcardsFromFile(file)
     parsedRows.value = rows
     duplicateIndices.value = findDuplicates(rows, flashcards.value)
@@ -172,8 +189,30 @@ onUnmounted(() => {
 }
 
 .spinner-container {
+  position: relative;
   width: 200px;
   height: 200px;
+}
+
+.spinner-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 50px;
+  pointer-events: none;
+}
+
+.spinner-icon--parsing {
+  color: #3498db;
+}
+
+.spinner-icon--success {
+  color: #10b981;
+}
+
+.spinner-icon--error {
+  color: #ef4444;
 }
 
 .file-upload-spinner {
