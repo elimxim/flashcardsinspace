@@ -252,40 +252,40 @@ function onFileSelected(event: Event) {
 }
 
 .slide-forward-enter-active {
-  transition: transform 0.26s ease, opacity 0.26s ease;
+  transition: transform 0.4s ease, opacity 0.4s ease;
   z-index: 1;
 }
 
 .slide-forward-leave-active {
-  transition: transform 0.26s ease, opacity 0.26s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
 .slide-forward-enter-from {
-  transform: translateX(30px);
+  transform: translateX(80px);
   opacity: 0;
 }
 
 .slide-forward-leave-to {
-  transform: translateX(-30px);
+  transform: translateX(-80px);
   opacity: 0;
 }
 
 .slide-back-enter-active {
-  transition: transform 0.26s ease, opacity 0.26s ease;
+  transition: transform 0.4s ease, opacity 0.4s ease;
   z-index: 1;
 }
 
 .slide-back-leave-active {
-  transition: transform 0.26s ease, opacity 0.26s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
 .slide-back-enter-from {
-  transform: translateX(-30px);
+  transform: translateX(-80px);
   opacity: 0;
 }
 
 .slide-back-leave-to {
-  transform: translateX(30px);
+  transform: translateX(80px);
   opacity: 0;
 }
 </style>
