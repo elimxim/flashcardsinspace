@@ -8,6 +8,7 @@
           :scale-factor="1.2"
           tooltip="Import / Export"
           tooltip-position="top-right"
+          :tap-duration="100"
           :on-click="goToIo"
         />
         <div class="ie-text">
@@ -21,6 +22,7 @@
           :scale-factor="1.2"
           tooltip="Back"
           tooltip-position="top-right"
+          :tap-duration="100"
           :on-click="goBack"
         />
         <AwesomeButton
@@ -29,6 +31,7 @@
           :scale-factor="1.2"
           tooltip="Download"
           tooltip-position="top"
+          :tap-duration="100"
           :on-click="goToDownload"
         />
         <AwesomeButton
@@ -47,6 +50,7 @@
           :scale-factor="1.2"
           tooltip="Back"
           tooltip-position="top-right"
+          :tap-duration="100"
           :on-click="goBack"
         />
         <AwesomeButton
