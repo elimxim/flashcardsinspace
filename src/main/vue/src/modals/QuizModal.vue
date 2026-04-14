@@ -5,7 +5,7 @@
     :on-exit="exit"
   >
     <div class="modal-main-area">
-      <p class="quiz-description">
+      <p class="note-paragraph">
         Practice flashcards from selected stages.
         Missed cards repeat each round until you know them all.
         Doing this will help those tough cards stick better into your long-term memory.
@@ -259,18 +259,6 @@ onMounted(async () => {
   flex-direction: row;
   justify-content: space-between;
   gap: 10px;
-}
-
-.quiz-description {
-  margin: 0;
-  padding: 6px;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  color: #4a5568;
-  background: #f0f4f8;
-  border-radius: 6px;
-  border-left: 3px solid #007bff;
-  border-right: 3px solid #007bff;
 }
 
 .quiz-stage-grid {

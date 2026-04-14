@@ -5,6 +5,10 @@
     :on-exit="cancel"
   >
     <div class="modal-main-area">
+      <p class="note-paragraph">
+        Please be careful when uploading a lot of flashcards.
+        They will be added to UNKNOWN all at once and be available for review next day.
+      </p>
       <div class="spinner-container">
         <KineticRingSpinner
           class="file-upload-spinner"
@@ -12,7 +16,7 @@
             'file-upload-spinner--success': uploadState === 'success',
             'file-upload-spinner--error': uploadState === 'error',
           }"
-          :ring-size="160"
+          :ring-size="180"
           :beam-speed="2.4"
           :freeze="uploadState !== 'parsing'"
         />
@@ -183,15 +187,15 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 16px;
   padding: 10px 0;
 }
 
 .spinner-container {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 180px;
+  height: 180px;
 }
 
 .spinner-icon {
