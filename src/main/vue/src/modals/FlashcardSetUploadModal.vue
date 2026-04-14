@@ -16,7 +16,7 @@
             'file-upload-spinner--success': uploadState === 'success',
             'file-upload-spinner--error': uploadState === 'error',
           }"
-          :ring-size="180"
+          :ring-size="160"
           :beam-speed="2.4"
           :freeze="uploadState !== 'parsing'"
         />
@@ -194,8 +194,8 @@ onUnmounted(() => {
 
 .spinner-container {
   position: relative;
-  width: 180px;
-  height: 180px;
+  width: 160px;
+  height: 160px;
 }
 
 .spinner-icon {
