@@ -152,19 +152,58 @@ async function upload() {
 
   const newFlashcards = uniqueFlashcards.map(r => newFlashcard(r.frontSide, r.backSide, today))
 
-  await sendFlashcardBulkCreationRequest(setId, newFlashcards)
+  const success = await sendFlashcardBulkCreationRequest(setId, newFlashcards)
     .then((response) => {
-      for (const flashcard of response.data) {
-        flashcardStore.addNewFlashcard(flashcard)
-        flashcardSetStore.incrementFlashcardsNumber(setId)
+      if (response.data.initialized) {
+        if (!response.data.flashcardSet
+          || !response.data.flashcards
+          || !response.data.chronodays
+          || !response.data.currDay
+        ) {
+          Log.log(LogTag.LOGIC, `Response doesn't have required fields: ${JSON.stringify(response.data)}`)
+          toaster.bakeError(userApiErrors.FLASHCARD__CREATION_FAILED)
+          return false
+        }
+
+        flashcardSetStore.updateSet(response.data.flashcardSet)
+        flashcardStore.changeSet(response.data.flashcardSet)
+        flashcardSetStore.addExtra(setId)
+        for (const flashcard of response.data.flashcards) {
+          flashcardStore.addNewFlashcard(flashcard)
+          flashcardSetStore.incrementFlashcardsNumber(setId)
+        }
+        chronoStore.loadState(
+          response.data.chronodays,
+          response.data.currDay,
+          {
+            streak: 0,
+            lastDate: currDay.value.chronodate
+          }
+        )
+      } else {
+        if (!response.data.flashcards) {
+          Log.log(LogTag.LOGIC, `Response doesn't have flashcards: ${JSON.stringify(response.data)}`)
+          toaster.bakeError(userApiErrors.FLASHCARD__BULK_CREATION_FAILED)
+          return false
+        }
+
+        for (const flashcard of response.data.flashcards) {
+          flashcardStore.addNewFlashcard(flashcard)
+          flashcardSetStore.incrementFlashcardsNumber(setId)
+        }
+        toaster.bakeSuccess('Success', `${response.data.flashcards.length} flashcard${response.data.flashcards.length !== 1 ? 's' : ''} uploaded`, 400)
+        return true
       }
-      toaster.bakeSuccess('Success', `${response.data.length} flashcard${response.data.length !== 1 ? 's' : ''} uploaded`, 400)
-      toggleStore.toggleFileUpload()
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to bulk-create flashcards for FlashcardSet.id=${setId}`, error)
       toaster.bakeError(userApiErrors.FLASHCARD__BULK_CREATION_FAILED, error.response?.data)
+      return false
     })
+
+    if (success) {
+      toggleStore.toggleFileUpload()
+    }
 }
 
 function cancel() {

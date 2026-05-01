@@ -73,12 +73,8 @@
 </template>
 
 <script setup lang="ts">
-import Modal from '@/components/Modal.vue'
 import SmartButton from '@/components/SmartButton.vue'
-import SmartInput from '@/components/SmartInput.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import VoiceRecorder from '@/components/VoiceRecorder.vue'
-import ErrorText from '@/components/ErrorText.vue'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { maxLength, required } from '@vuelidate/validators'
@@ -94,7 +90,6 @@ import { storeToRefs } from 'pinia'
 import {
   sendFlashcardAudioMetadataGetRequest,
   sendFlashcardCreationRequest,
-  sendFlashcardSetInitRequest,
 } from '@/api/api-client.ts'
 import { Flashcard } from '@/model/flashcard.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
@@ -107,7 +102,7 @@ const flashcardStore = useFlashcardStore()
 const audioStore = useAudioStore()
 const toaster = useSpaceToaster()
 
-const { flashcardSet, isStarted } = storeToRefs(flashcardStore)
+const { flashcardSet } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
 const frontSide = ref<string>('')
@@ -193,22 +188,19 @@ async function addNewFlashcard(): Promise<boolean> {
   if (!flashcardSet.value) return false
   const setId = flashcardSet.value.id
   const flashcard = newFlashcard(frontSide.value, backSide.value, currDay.value.chronodate)
-  if (isStarted.value) {
-    return await sendFlashcardCreationRequest(setId, flashcard)
-      .then((response) => {
-        createdFlashcard.value = response.data
-        flashcardStore.addNewFlashcard(response.data)
-        flashcardSetStore.incrementFlashcardsNumber(setId)
-        return true
-      })
-      .catch((error) => {
-        Log.error(LogTag.LOGIC, `Failed to add a flashcard to FlashcardSet.id=${setId}`, error.response?.data)
-        toaster.bakeError(userApiErrors.FLASHCARD__CREATION_FAILED, error.response?.data)
-        return false
-      })
-  } else {
-    return await sendFlashcardSetInitRequest(setId, flashcard)
-      .then((response) => {
+  return await sendFlashcardCreationRequest(setId, flashcard)
+    .then(async (response) => {
+      if (response.data.initialized) {
+        if (!response.data.flashcardSet
+          || !response.data.flashcard
+          || !response.data.chronodays
+          || !response.data.currDay
+        ) {
+          Log.log(LogTag.LOGIC, `Response doesn't have required fields: ${JSON.stringify(response.data)}`)
+          toaster.bakeError(userApiErrors.FLASHCARD__CREATION_FAILED)
+          return false
+        }
+
         createdFlashcard.value = response.data.flashcard
         flashcardSetStore.updateSet(response.data.flashcardSet)
         flashcardStore.changeSet(response.data.flashcardSet)
@@ -223,18 +215,35 @@ async function addNewFlashcard(): Promise<boolean> {
         )
         flashcardSetStore.addExtra(setId)
         flashcardSetStore.incrementFlashcardsNumber(setId)
-        return sendFlashcardAudioMetadataGetRequest(setId)
-      })
-      .then((response) => {
-        audioStore.loadState(response.data)
+
+        return await sendFlashcardAudioMetadataGetRequest(setId)
+          .then((response) => {
+            audioStore.loadState(response.data)
+            return true
+          })
+          .catch((error) => {
+            Log.error(LogTag.LOGIC, `Failed to init FlashcardSet.id=${setId}`, error.response?.data)
+            toaster.bakeError(userApiErrors.FLASHCARD__CREATION_FAILED, error.response?.data)
+            return false
+          })
+      } else {
+        if (!response.data.flashcard) {
+          Log.log(LogTag.LOGIC, `Response doesn't have flashcard: ${JSON.stringify(response.data)}`)
+          toaster.bakeError(userApiErrors.FLASHCARD__CREATION_FAILED)
+          return false
+        }
+
+        createdFlashcard.value = response.data.flashcard
+        flashcardStore.addNewFlashcard(response.data.flashcard)
+        flashcardSetStore.incrementFlashcardsNumber(setId)
         return true
-      })
-      .catch((error) => {
-        Log.error(LogTag.LOGIC, `Failed to init FlashcardSet.id=${setId}`, error.response?.data)
-        toaster.bakeError(userApiErrors.FLASHCARD__CREATION_FAILED, error.response?.data)
-        return false
-      })
-  }
+      }
+    })
+    .catch((error) => {
+      Log.error(LogTag.LOGIC, `Failed to add a flashcard to FlashcardSet.id=${setId}`, error.response?.data)
+      toaster.bakeError(userApiErrors.FLASHCARD__CREATION_FAILED, error.response?.data)
+      return false
+    })
 }
 
 function toggleModalForm() {
