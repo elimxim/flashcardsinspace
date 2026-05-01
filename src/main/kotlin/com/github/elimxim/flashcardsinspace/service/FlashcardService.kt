@@ -5,6 +5,7 @@ import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardAudioRepo
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
+import com.github.elimxim.flashcardsinspace.util.withLock
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.HttpConflictException
@@ -24,6 +25,7 @@ class FlashcardService(
     private val flashcardRepository: FlashcardRepository,
     private val flashcardAudioRepository: FlashcardAudioRepository,
     private val requestValidator: RequestValidator,
+    private val flashcardAddService: FlashcardAddService,
 ) {
     @Transactional(readOnly = true)
     fun getAll(user: User, setId: Long, pageable: Pageable): Page<FlashcardDto> {
@@ -34,44 +36,29 @@ class FlashcardService(
         return flashcardRepository.findAllByFlashcardSetId(setId, pageable).map { it.toDto() }
     }
 
-    @Transactional
-    fun add(user: User, setId: Long, request: FlashcardCreationRequest): FlashcardDto {
+    fun add(user: User, setId: Long, request: FlashcardCreationRequest): FlashcardCreationResponse {
         log.info("Adding a new flashcard to set $setId")
-        user.checkVerified()
-        val flashcardSet = flashcardSetService.getEntity(setId)
-        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
-        val validRequest = requestValidator.validate(request)
-        val flashcard = Flashcard(
-            frontSide = validRequest.frontSide,
-            backSide = validRequest.backSide,
-            stage = validRequest.stage,
-            timesReviewed = 0,
-            creationDate = validRequest.creationDate,
-            flashcardSet = flashcardSet,
-        )
-
-        return flashcardRepository.save(flashcard).toDto()
+        return addInternal(user, setId) {
+            flashcardAddService.add(setId, request)
+        }
     }
 
-    @Transactional
-    fun addBulk(user: User, setId: Long, request: FlashcardBulkCreationRequest): List<FlashcardDto> {
+    fun addBulk(user: User, setId: Long, request: FlashcardBulkCreationRequest): FlashcardCreationResponse {
         log.info("Adding flashcards in bulk to set $setId")
+        return addInternal(user, setId) {
+            flashcardAddService.add(setId, request)
+        }
+    }
+
+    private fun addInternal(user: User, setId: Long, action: () -> FlashcardCreationResponse): FlashcardCreationResponse {
         user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
-        val validBulkRequest = requestValidator.validate(request)
-        val flashcards = validBulkRequest.requests.map { req ->
-            Flashcard(
-                frontSide = req.frontSide,
-                backSide = req.backSide,
-                stage = req.stage,
-                timesReviewed = 0,
-                creationDate = req.creationDate,
-                flashcardSet = flashcardSet,
-            )
+        return if (flashcardSet.isNotStarted()) {
+            withLock(flashcardSet) { action() }
+        } else {
+            action()
         }
-
-        return flashcardRepository.saveAll(flashcards).map { it.toDto() }
     }
 
     @Transactional

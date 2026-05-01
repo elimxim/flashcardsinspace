@@ -4,10 +4,7 @@ import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.FlashcardService
 import com.github.elimxim.flashcardsinspace.util.withLoggingContext
-import com.github.elimxim.flashcardsinspace.web.dto.FlashcardBulkCreationRequest
-import com.github.elimxim.flashcardsinspace.web.dto.FlashcardCreationRequest
-import com.github.elimxim.flashcardsinspace.web.dto.FlashcardDto
-import com.github.elimxim.flashcardsinspace.web.dto.FlashcardUpdateRequest
+import com.github.elimxim.flashcardsinspace.web.dto.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -35,7 +32,7 @@ class FlashcardController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @RequestBody request: FlashcardCreationRequest,
-    ): ResponseEntity<FlashcardDto> = withLoggingContext(user) {
+    ): ResponseEntity<FlashcardCreationResponse> = withLoggingContext(user) {
         val dto = flashcardService.add(user, setId, request.normalize())
         return ResponseEntity.ok(dto)
     }
@@ -45,7 +42,7 @@ class FlashcardController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @RequestBody request: FlashcardBulkCreationRequest,
-    ): ResponseEntity<List<FlashcardDto>> = withLoggingContext(user) {
+    ): ResponseEntity<FlashcardCreationResponse> = withLoggingContext(user) {
         val result = flashcardService.addBulk(user, setId, request.normalize())
         return ResponseEntity.ok(result)
     }
