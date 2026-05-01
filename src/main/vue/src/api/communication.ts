@@ -39,11 +39,13 @@ export interface ChronodayId {
   id: number
 }
 
-export interface FlashcardSetInitResponse {
-  flashcardSet: FlashcardSet,
-  flashcard: Flashcard,
-  currDay: Chronoday,
-  chronodays: Chronoday[],
+export interface FlashcardCreationResponse {
+  initialized: boolean
+  flashcardSet?: FlashcardSet,
+  flashcard?: Flashcard,
+  flashcards?: Flashcard[],
+  currDay?: Chronoday,
+  chronodays?: Chronoday[],
 }
 
 export interface FlashcardSetSuspendResponse {
