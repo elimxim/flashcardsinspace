@@ -87,7 +87,7 @@ class VerificationCodeService(
     @Transactional
     fun send(user: User, email: String, type: VerificationType, response: HttpServletResponse) =
         withLoggingContext(user) {
-            UserLock.withLock(user) {
+            withLock(user) {
                 if (intentsPerWindowExceeded(email, type)) {
                     throw TooManyRequestsException(ApiErrorCode.MIW429, "Intents per window exceeded")
                 }
