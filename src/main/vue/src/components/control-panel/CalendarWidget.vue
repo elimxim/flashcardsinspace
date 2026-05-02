@@ -57,12 +57,13 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
 import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 import { tomorrowMidnight } from '@/utils/utils.ts'
+import { createReviewQueue } from '@/core-logic/review-logic.ts'
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 const toggleStore = useToggleStore()
 
-const { flashcardSet, isSuspended } = storeToRefs(flashcardStore)
+const { flashcardSet, flashcards, isSuspended } = storeToRefs(flashcardStore)
 const { currDay, isDayOff } = storeToRefs(chronoStore)
 
 const showPreviousDaysPopup = ref(false)
@@ -79,7 +80,7 @@ const currDayNumber = computed(() =>
 )
 
 const isUserCloseToLoseDayStreak = computed(() => {
-  if (currDay.value.status === chronodayStatuses.COMPLETED) {
+  if (currDay.value.status === chronodayStatuses.COMPLETED || reviewQueueIsEmpty.value) {
     return false
   } else {
     const minutes = minutesBeforeMidnight.value
@@ -95,6 +96,11 @@ const timeBeforeMidnight = computed(() => {
   } else {
     return `${minutes} minute` + (minutes > 1 ? 's' : '')
   }
+})
+
+const reviewQueueIsEmpty = computed(() => {
+  const queue = createReviewQueue(flashcards.value, currDay.value)
+  return queue.remaining() === 0
 })
 
 function calcMinutesBeforeMidnight() {
