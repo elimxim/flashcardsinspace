@@ -1,10 +1,13 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.entity.Chronoday
+import com.github.elimxim.flashcardsinspace.entity.ChronodayStatus
+import com.github.elimxim.flashcardsinspace.entity.Flashcard
+import com.github.elimxim.flashcardsinspace.entity.FlashcardSet
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardSetRepository
-import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
-import com.github.elimxim.flashcardsinspace.web.dto.FlashcardCreationRequest
-import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetInitResponse
+import com.github.elimxim.flashcardsinspace.web.dto.ChronodayDto
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardDto
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardSetDto
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.HttpBadRequestException
@@ -15,24 +18,25 @@ import java.time.ZonedDateTime
 
 private val log = getLogger(FlashcardSetInitService::class.java)
 
+data class InitResult(
+    val flashcardSet: FlashcardSetDto,
+    val flashcards: List<FlashcardDto>,
+    val schedule: List<ChronodayDto>,
+)
+
 @Service
 class FlashcardSetInitService(
-    private val flashcardSetService: FlashcardSetService,
     private val flashcardSetRepository: FlashcardSetRepository,
     private val lightspeedService: LightspeedService,
-    private val requestValidator: RequestValidator,
 ) {
+
     @Transactional
-    fun init(user: User, id: Long, request: FlashcardCreationRequest): FlashcardSetInitResponse {
-        log.info("Initializing flashcard set $id")
-        user.checkVerified()
-        val flashcardSet = flashcardSetService.getEntity(id)
-        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
-        val validRequest = requestValidator.validate(request)
+    fun init(flashcardSet: FlashcardSet, flashcards: List<Flashcard>): InitResult {
+        log.info("Initializing flashcard set ${flashcardSet.id}")
         if (flashcardSet.chronodays.isNotEmpty()) {
             throw HttpBadRequestException(
                 ApiErrorCode.SAS400,
-                "Flashcard set $id is already started"
+                "Flashcard set ${flashcardSet.id} is already started"
             )
         }
 
@@ -43,29 +47,20 @@ class FlashcardSetInitService(
             flashcardSet = flashcardSet,
         )
 
-        val flashcard = Flashcard(
-            frontSide = validRequest.frontSide,
-            backSide = validRequest.backSide,
-            stage = validRequest.stage,
-            timesReviewed = 0,
-            creationDate = validRequest.creationDate,
-            flashcardSet = flashcardSet,
-        )
-
         flashcardSet.startedAt = now
-        flashcardSet.flashcards.add(flashcard)
+        flashcardSet.flashcards.addAll(flashcards)
         flashcardSet.chronodays.add(initial)
 
         val updatedFlashcardSet = flashcardSetRepository.save(flashcardSet)
-        val createdFlashcard = flashcardSet.flashcards.last()
-        val createdInitial = updatedFlashcardSet.chronodays.maxByOrNull { it.chronodate }!!
-        val schedule = lightspeedService.createSchedule(flashcardSet, chronodays = listOf(createdInitial))
 
-        return FlashcardSetInitResponse(
+        val createdFlashcards = updatedFlashcardSet.flashcards.takeLast(flashcards.size)
+        val createdInitial = updatedFlashcardSet.chronodays.maxByOrNull { it.chronodate }!!
+        val schedule = lightspeedService.createSchedule(updatedFlashcardSet, chronodays = listOf(createdInitial))
+
+        return InitResult(
             flashcardSet = updatedFlashcardSet.toDto(),
-            flashcard = createdFlashcard.toDto(),
-            currDay = schedule.first(),
-            chronodays = schedule
+            flashcards = createdFlashcards.map { it.toDto() },
+            schedule = schedule,
         )
     }
 }

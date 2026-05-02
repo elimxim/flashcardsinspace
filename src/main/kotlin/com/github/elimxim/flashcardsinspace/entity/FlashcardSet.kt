@@ -68,5 +68,5 @@ interface FlashcardCount {
     val flashcardCount: Int
 }
 
-fun FlashcardSet.isSuspended(): Boolean =
-    status == FlashcardSetStatus.SUSPENDED
+fun FlashcardSet.isSuspended(): Boolean = status == FlashcardSetStatus.SUSPENDED
+fun FlashcardSet.isNotStarted(): Boolean = startedAt == null

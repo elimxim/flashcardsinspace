@@ -221,11 +221,28 @@ data class ChronoUpdateResponse(
     val dayStreak: DayStreakDto,
 )
 
-data class FlashcardSetInitResponse(
-    val flashcardSet: FlashcardSetDto,
-    val flashcard: FlashcardDto,
-    val currDay: ChronodayDto,
-    val chronodays: List<ChronodayDto>,
+/**
+ * Response for flashcard creation, which may include FlashcardSet initialization data.
+ *
+ * If [initialized] is `true`, it was the first flashcard(s)
+ * in FlashcardSet that led to its initialization.
+ * The following fields will be set in this case:
+ *
+ * - [flashcardSet]
+ * - [flashcard] or [flashcards] depending on the number of flashcards sent
+ * - [currDay]
+ * - [chronodays]
+ *
+ * If [initialized] is `false`, it was a regular request.
+ * In this case [flashcard] or [flashcards] will be set.
+ */
+data class FlashcardCreationResponse(
+    val initialized: Boolean,
+    val flashcardSet: FlashcardSetDto? = null,
+    val flashcard: FlashcardDto? = null,
+    val flashcards: List<FlashcardDto>? = null,
+    val currDay: ChronodayDto? = null,
+    val chronodays: List<ChronodayDto>? = null,
 )
 
 data class FlashcardSetSuspendResponse(

@@ -5,7 +5,7 @@ import {
   ChronoSyncRequest,
   ChronoSyncResponse,
   ChronoUpdateResponse,
-  FlashcardSetInitResponse,
+  FlashcardCreationResponse,
   FlashcardSetSuspendResponse,
   Page,
   ReviewSessionCreateRequest,
@@ -44,11 +44,6 @@ export async function sendFlashcardSetsGetRequest() {
 export async function sendFlashcardSetExtraRequest() {
   Log.log(LogTag.GET, `/flashcard-sets/extra`)
   return apiClient.get<FlashcardSetExtra[]>('/flashcard-sets/extra')
-}
-
-export async function sendFlashcardSetInitRequest(id: number, flashcard: Flashcard) {
-  Log.log(LogTag.POST, `/flashcard-sets/${id}/init`)
-  return apiClient.post<FlashcardSetInitResponse>(`/flashcard-sets/${id}/init`, flashcard)
 }
 
 export async function sendFlashcardSetSuspendRequest(id: number, flashcardSet: FlashcardSet) {
@@ -97,12 +92,12 @@ export async function sendFlashcardsGetPageRequest(setId: number, page: number) 
 
 export async function sendFlashcardCreationRequest(setId: number, flashcard: Flashcard) {
   Log.log(LogTag.POST, `/flashcard-sets/${setId}/flashcards`)
-  return apiClient.post<Flashcard>(`/flashcard-sets/${setId}/flashcards`, flashcard)
+  return apiClient.post<FlashcardCreationResponse>(`/flashcard-sets/${setId}/flashcards`, flashcard)
 }
 
 export async function sendFlashcardBulkCreationRequest(setId: number, flashcards: Flashcard[]) {
   Log.log(LogTag.POST, `/flashcard-sets/${setId}/flashcards/bulk`)
-  return apiClient.post<Flashcard[]>(`/flashcard-sets/${setId}/flashcards/bulk`, { requests: flashcards })
+  return apiClient.post<FlashcardCreationResponse>(`/flashcard-sets/${setId}/flashcards/bulk`, { requests: flashcards })
 }
 
 export async function sendFlashcardUpdateRequest(setId: number, flashcard: Flashcard) {
