@@ -180,6 +180,8 @@ async function upload() {
             lastDate: currDay.value.chronodate
           }
         )
+        toaster.bakeSuccess('Success', `${response.data.flashcards.length} flashcard${response.data.flashcards.length !== 1 ? 's' : ''} uploaded`, 400)
+        return true
       } else {
         if (!response.data.flashcards) {
           Log.log(LogTag.LOGIC, `Response doesn't have flashcards: ${JSON.stringify(response.data)}`)
