@@ -2,7 +2,6 @@
   <Modal
     title="New Flashcard"
     :visible="toggleStore.flashcardCreationOpen"
-    :focus-on="frontSideTextArea"
     :exit-button="cancelButton"
     :enter-button="createButton"
   >
@@ -13,41 +12,18 @@
         flip-icon="fa-solid fa-arrows-spin"
         tooltip="Infinite loop"
         tooltip-position="bottom-left"
-        sping-when-flipped
+        spin-when-flipped
       />
     </template>
 
-    <div class="modal-main-area">
-      <div class="modal-main-area--inner">
-        <TextInput
-          ref="frontSideTextArea"
-          v-model="frontSide"
-          :invalid="frontSideInvalid"
-          placeholder="Front side"
-        />
-        <ErrorText
-          :when="frontSideMaxLengthInvalid"
-          text="Your text has its own gravity! Maximum 512 characters."
-        />
-        <VoiceRecorder
-          v-model="frontSideAudioBlob"
-        />
-      </div>
-      <div class="modal-main-area--inner">
-        <TextInput
-          v-model="backSide"
-          :invalid="backSideInvalid"
-          placeholder="Back side"
-        />
-        <ErrorText
-          :when="backSideMaxLengthInvalid"
-          text="Your text has its own gravity! Maximum 512 characters."
-        />
-        <VoiceRecorder
-          v-model="backSideAudioBlob"
-        />
-      </div>
-    </div>
+    <FlashcardSides
+      ref="flashcardSides"
+      v-model:front-text="frontSide"
+      v-model:front-audio="frontSideAudioBlob"
+      v-model:back-text="backSide"
+      v-model:back-audio="backSideAudioBlob"
+    />
+
     <div class="modal-control-buttons">
       <SmartButton
         ref="cancelButton"
@@ -61,7 +37,7 @@
         class="safe-button"
         text="Create"
         :on-click="create"
-        :disabled="formInvalid"
+        :disabled="flashcardSides?.invalid"
         auto-blur
       />
     </div>
@@ -70,14 +46,10 @@
 
 <script setup lang="ts">
 import SmartButton from '@/components/SmartButton.vue'
-import TextInput from '@/components/TextInput.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import ErrorText from '@/components/ErrorText.vue'
+import FlashcardSides from '@/components/FlashcardSides.vue'
 import Modal from '@/components/Modal.vue'
-import VoiceRecorder from '@/components/VoiceRecorder.vue'
-import { computed, nextTick, ref, watch } from 'vue'
-import { useVuelidate } from '@vuelidate/core'
-import { maxLength, required } from '@vuelidate/validators'
+import { ref } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
@@ -106,34 +78,14 @@ const { flashcardSet } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
 const frontSide = ref<string>('')
-const frontSideTextArea = ref<HTMLElement>()
 const frontSideAudioBlob = ref<Blob | undefined>()
 const backSide = ref<string>('')
 const backSideAudioBlob = ref<Blob | undefined>()
+const flashcardSides = ref<InstanceType<typeof FlashcardSides>>()
 const infiniteLoopButton = ref<InstanceType<typeof AwesomeButton>>()
 const cancelButton = ref<InstanceType<typeof SmartButton>>()
 const createButton = ref<InstanceType<typeof SmartButton>>()
 const createdFlashcard = ref<Flashcard | undefined>()
-
-const validationRules = {
-  frontSide: { required, maxLength: maxLength(512) },
-  backSide: { required, maxLength: maxLength(512) },
-}
-
-const $v = useVuelidate(validationRules, {
-  frontSide: frontSide,
-  backSide: backSide,
-})
-
-const formInvalid = computed(() => $v.value.$errors.length > 0)
-const frontSideInvalid = computed(() => $v.value.frontSide.$errors.length > 0)
-const frontSideMaxLengthInvalid = computed(() =>
-  $v.value.frontSide.$errors.find(v => v.$validator === 'maxLength') !== undefined
-)
-const backSideInvalid = computed(() => $v.value.backSide.$errors.length > 0)
-const backSideMaxLengthInvalid = computed(() =>
-  $v.value.backSide.$errors.find(v => v.$validator === 'maxLength') !== undefined
-)
 
 async function uploadAudioIfRelevant(): Promise<boolean> {
   const set = flashcardSet.value
@@ -169,17 +121,16 @@ async function cancel() {
 }
 
 async function create() {
-  $v.value.$touch()
-  if (!formInvalid.value) {
-    const added = await addNewFlashcard()
-    if (added) {
-      const uploaded = await uploadAudioIfRelevant()
-      if (uploaded) {
-        if (!infiniteLoopButton.value?.isPressed()) {
-          toggleModalForm()
-        }
-        await resetState()
+  flashcardSides.value?.validate()
+  if (flashcardSides.value?.invalid) return
+  const added = await addNewFlashcard()
+  if (added) {
+    const uploaded = await uploadAudioIfRelevant()
+    if (uploaded) {
+      if (!infiniteLoopButton.value?.isPressed()) {
+        toggleModalForm()
       }
+      await resetState()
     }
   }
 }
@@ -252,46 +203,14 @@ function toggleModalForm() {
 
 async function resetState() {
   createdFlashcard.value = undefined
-  frontSide.value = ''
   frontSideAudioBlob.value = undefined
-  backSide.value = ''
   backSideAudioBlob.value = undefined
-  $v.value.$reset()
-  nextTick().then(() => {
-    frontSideTextArea.value?.focus()
-  })
+  flashcardSides.value?.resetState()
 }
-
-watch(frontSide, () => {
-  if (frontSideInvalid.value) {
-    $v.value.frontSide.$reset()
-  }
-})
-
-watch(backSide, () => {
-  if (backSideInvalid.value) {
-    $v.value.backSide.$reset()
-  }
-})
 
 </script>
 
 <style scoped>
-.modal-main-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-}
-
-.modal-main-area--inner {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
 .modal-control-buttons {
   display: flex;
   flex-direction: row;
