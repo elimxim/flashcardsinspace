@@ -15,6 +15,7 @@
       v-bind="$attrs"
       type="text"
       :placeholder="inputPlaceholder"
+      :rows="rows"
     />
   </div>
 </template>
@@ -30,10 +31,12 @@ const props = withDefaults(defineProps<{
   invalid?: boolean
   placeholder?: string
   expandable?: boolean
+  rows?: number
 }>(), {
   invalid: false,
   placeholder: '',
   expandable: false,
+  rows: 1,
 })
 
 const textArea = ref<HTMLTextAreaElement>()
