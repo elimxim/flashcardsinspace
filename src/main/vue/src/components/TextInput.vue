@@ -3,6 +3,12 @@
     class="text-input text-input--theme"
     :class="{ 'text-input--error': invalid }"
   >
+    <div v-if="expandable" class="text-input--toolbar">
+      <AwesomeButton
+        :icon="expanded ? 'fa-solid fa-compress' : 'fa-solid fa-expand'"
+        :on-click="toggleExpanded"
+      />
+    </div>
     <textarea
       ref="textArea"
       v-model="model"
@@ -14,16 +20,20 @@
 </template>
 
 <script setup lang="ts">
+import AwesomeButton from '@/components/AwesomeButton.vue'
 import { computed, ref } from 'vue'
 
 const model = defineModel<string>({ default: '' })
+const expanded = defineModel<boolean>('expanded', { default: false })
 
 const props = withDefaults(defineProps<{
   invalid?: boolean
   placeholder?: string
+  expandable?: boolean
 }>(), {
   invalid: false,
   placeholder: '',
+  expandable: false,
 })
 
 const textArea = ref<HTMLTextAreaElement>()
@@ -31,6 +41,10 @@ const textArea = ref<HTMLTextAreaElement>()
 const inputPlaceholder = computed(() =>
   props.invalid ? props.placeholder + '!' : props.placeholder
 )
+
+function toggleExpanded() {
+  expanded.value = !expanded.value
+}
 
 function focus() {
   textArea.value?.focus()
@@ -59,9 +73,19 @@ defineExpose({
 
 .text-input {
   flex: 1;
-  position: relative;
   display: flex;
+  flex-direction: column;
   width: 100%;
+  background-color: var(--tx-inpt--bg-color);
+  border: 2px solid var(--tx-inpt--border-color);
+  border-radius: var(--tx-inpt--border-radius);
+  transition: border-color 0.2s ease-in-out;
+}
+
+.text-input--toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 2px 4px 0;
 }
 
 .text-input textarea {
@@ -69,28 +93,24 @@ defineExpose({
   width: 100%;
   font-size: var(--tx-inpt--font-size);
   color: var(--tx-inpt--color);
-  background-color: var(--tx-inpt--bg-color);
-  border-color: var(--tx-inpt--border-color);
-  border-radius: var(--tx-inpt--border-radius);
-  padding: clamp(0.75rem, 1.5vh, 1.25rem) clamp(0.75rem, 1vw, 1.25rem);
+  background: transparent;
+  border: none;
+  padding: clamp(4px, 1.5vh, 8px) clamp(4px, 1vw, 8px);
   margin: 0;
-  border-style: solid;
-  border-width: 2px;
   resize: none;
-  transition: border-color 0.2s ease-in-out;
+  outline: none;
 }
 
 .text-input textarea::placeholder {
   color: var(--tx-inpt--placeholder--color);
 }
 
-.text-input:hover textarea,
-.text-input textarea:focus {
-  outline: none;
+.text-input:hover,
+.text-input:focus-within {
   border-color: var(--tx-inpt--border-color--focus);
 }
 
-.text-input--error textarea {
+.text-input--error {
   border-color: var(--tx-inpt--border-color--error);
 }
 
