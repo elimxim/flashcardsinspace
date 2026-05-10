@@ -3,18 +3,8 @@
     class="smart-input smart-input--theme"
     :class="{ 'smart-input--error': invalid }"
   >
-    <textarea
-      v-if="area"
-      ref="textArea"
-      v-model="model"
-      v-bind="$attrs"
-      style="transition: border-color 0.2s ease-in-out;"
-      :type="inputType"
-      :toast-type="$props.type"
-      :placeholder="inputPlaceholder"
-    />
     <input
-      v-else-if="readonly"
+      v-if="readonly"
       ref="readonlyInput"
       v-model="model"
       v-bind="$attrs"
@@ -33,7 +23,7 @@
       :placeholder="inputPlaceholder"
     />
     <button
-      v-if="!area && isPassword"
+      v-if="isPassword"
       ref="secretButton"
       class="secret-button"
       type="button"
@@ -54,12 +44,10 @@ const model = defineModel<string>({ default: '' })
 
 const props = withDefaults(defineProps<{
   type: Type
-  area?: boolean
   invalid?: boolean
   readonly?: boolean
   placeholder?: string
 }>(), {
-  area: false,
   invalid: false,
   readonly: false,
   placeholder: '',
@@ -68,13 +56,12 @@ const props = withDefaults(defineProps<{
 const isPassword = computed(() => props.type === 'password')
 const showPassword = ref(false)
 
-const textArea = ref<HTMLTextAreaElement>()
 const readonlyInput = ref<HTMLInputElement>()
 const input = ref<HTMLInputElement>()
 const secretButton = ref<HTMLButtonElement>()
 
 const inputType = computed(() => {
-  if (!props.area && isPassword.value) {
+  if (isPassword.value) {
     return showPassword.value ? 'text' : 'password'
   } else {
     return props.type
@@ -91,9 +78,7 @@ function toggleShowPassword() {
 }
 
 function focus() {
-  if (props.area) {
-    textArea.value?.focus()
-  } else if (props.readonly) {
+  if (props.readonly) {
     readonlyInput.value?.focus()
   } else {
     input.value?.focus()

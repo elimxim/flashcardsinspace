@@ -9,13 +9,11 @@
   >
     <div class="modal-main-area">
       <div class="modal-main-area--inner">
-        <SmartInput
+        <TextInput
           ref="frontSideTextArea"
           v-model="frontSide"
-          type="text"
           :invalid="frontSideInvalid"
           placeholder="Front side"
-          area
         />
         <ErrorText
           :when="frontSideMaxLengthInvalid"
@@ -26,12 +24,10 @@
         />
       </div>
       <div class="modal-main-area--inner">
-        <SmartInput
+        <TextInput
           v-model="backSide"
-          type="text"
           :invalid="backSideInvalid"
           placeholder="Back side"
-          area
         />
         <ErrorText
           :when="backSideMaxLengthInvalid"
@@ -74,7 +70,7 @@
 <script setup lang="ts">
 import Modal from '@/components/Modal.vue'
 import SmartButton from '@/components/SmartButton.vue'
-import SmartInput from '@/components/SmartInput.vue'
+import TextInput from '@/components/TextInput.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import VoiceRecorder from '@/components/VoiceRecorder.vue'
 import ErrorText from '@/components/ErrorText.vue'
