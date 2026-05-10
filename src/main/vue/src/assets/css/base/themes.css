@@ -37,15 +37,25 @@
   --input--border-color--error: #c80f0f;
 
   --smart-input--color: #45454a;
+  --text-input--color: #45454a;
   --smart-input--color--error: #c80f0f;
+  --text-input--color--error: #c80f0f;
   --smart-input--bg-color: #f9f9f9;
+  --text-input--bg-color: #f9f9f9;
   --smart-input--border-color: #b8c4d6;
+  --text-input--border-color: #b8c4d6;
   --smart-input--border-color--focus: #007bff;
+  --text-input--border-color--focus: #007bff;
   --smart-input--border-color--error: #c80f0f;
+  --text-input--border-color--error: #c80f0f;
   --smart-input--border-radius: var(--border-radius);
+  --text-input--border-radius: var(--border-radius);
   --smart-input--placeholder--color: #b8c4d6;
+  --text-input--placeholder--color: #b8c4d6;
   --smart-input--secret-button--color: #b8c4d6;
+  --text-input--secret-button--color: #b8c4d6;
   --smart-input--secret-button--color--hover: #007bff;
+  --text-input--secret-button--color--hover: #007bff;
 
   /* buttons */
 
