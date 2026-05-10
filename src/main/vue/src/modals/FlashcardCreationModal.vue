@@ -10,10 +10,10 @@
       <AwesomeButton
         ref="infiniteLoopButton"
         icon="fa-regular fa-circle"
-        spin-icon="fa-solid fa-arrows-spin"
+        flip-icon="fa-solid fa-arrows-spin"
         tooltip="Infinite loop"
         tooltip-position="bottom-left"
-        spinnable
+        sping-when-flipped
       />
     </template>
 

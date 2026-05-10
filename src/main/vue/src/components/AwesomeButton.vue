@@ -42,9 +42,10 @@
           <slot name="above"/>
           <div class="awesome-icon-wrapper">
             <font-awesome-icon
-              v-if="pressed && spinnable"
-              :icon="spinIcon || icon"
-              class="awesome-icon awesome--icon--spinning"
+              v-if="pressed && flipIcon"
+              :icon="flipIcon"
+              class="awesome-icon"
+              :class="{ 'awesome--icon--spinning': spinWhenFlipped }"
             />
             <font-awesome-icon
               v-else-if="fade"
@@ -74,8 +75,8 @@ const props = withDefaults(defineProps<{
   icon: string
   fade?: boolean
   scaleFactor?: number
-  spinnable?: boolean
-  spinIcon?: string
+  flipIcon?: string
+  spinWhenFlipped?: boolean
   disabled?: boolean
   active?: boolean
   hidden?: boolean
@@ -94,8 +95,8 @@ const props = withDefaults(defineProps<{
 }>(), {
   fade: false,
   scaleFactor: 1.1,
-  spinnable: false,
-  spinIcon: undefined,
+  flipIcon: undefined,
+  spinWhenFlipped: false,
   disabled: false,
   active: false,
   hidden: false,
