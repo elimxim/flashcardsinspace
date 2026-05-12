@@ -4,7 +4,8 @@
       "Bash(./gradlew test:*)",
       "Bash(./gradlew compileTestKotlin)",
       "Bash(./gradlew compileTestKotlin --stacktrace)",
-      "Bash(./gradlew dependencies:*)"
+      "Bash(./gradlew dependencies:*)",
+      "mcp__github__issue_read"
     ]
   }
 }

@@ -82,22 +82,31 @@ function handleAudioEnded() {
   }
 }
 
-function updateAudioUrl(blob: Blob | undefined) {
-  const audio = audioRef.value
-  if (blob && blob.size > 0) {
-    try {
-      if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
-      audioUrl.value = URL.createObjectURL(blob)
+function revokeAudio() {
+  const url = audioUrl.value
+  if (!url) return
 
-      if (audio) {
-        audio.load()
-      }
+  const audio = audioRef.value
+  if (audio) {
+    audio.pause()
+    audio.removeAttribute('src')
+    audio.load()
+  }
+
+  URL.revokeObjectURL(url)
+  audioUrl.value = undefined
+}
+
+function updateAudioUrl(blob: Blob | undefined) {
+  if (blob && blob.size > 0) {
+    revokeAudio()
+    try {
+      audioUrl.value = URL.createObjectURL(blob)
     } catch (error) {
       Log.error(LogTag.LOGIC, 'Failed to create object URL', error, blob)
       audioUrl.value = undefined
     }
   } else {
-    if (audioUrl.value) URL.revokeObjectURL(audioUrl.value)
     audioUrl.value = undefined
     isPlaying.value = false
     isLooping.value = false
@@ -131,9 +140,7 @@ onBeforeUnmount(() => {
     playbackControl.unregister(playerId)
   }
 
-  if (audioUrl.value) {
-    URL.revokeObjectURL(audioUrl.value)
-  }
+  revokeAudio()
 })
 
 defineExpose({

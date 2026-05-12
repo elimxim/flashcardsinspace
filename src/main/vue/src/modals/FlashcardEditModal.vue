@@ -2,42 +2,18 @@
   <Modal
     title="Edit Flashcard"
     :visible="toggleStore.flashcardEditOpen"
-    :focus-on="frontSideTextArea"
     :exit-button="cancelButton"
     :enter-button="updateButton"
     :delete-button="removeButton"
   >
-    <div class="modal-main-area">
-      <div class="modal-main-area--inner">
-        <TextInput
-          ref="frontSideTextArea"
-          v-model="frontSide"
-          :invalid="frontSideInvalid"
-          placeholder="Front side"
-        />
-        <ErrorText
-          :when="frontSideMaxLengthInvalid"
-          text="Your text has its own gravity! Maximum 512 characters."
-        />
-        <VoiceRecorder
-          v-model="frontSideAudio"
-        />
-      </div>
-      <div class="modal-main-area--inner">
-        <TextInput
-          v-model="backSide"
-          :invalid="backSideInvalid"
-          placeholder="Back side"
-        />
-        <ErrorText
-          :when="backSideMaxLengthInvalid"
-          text="Your text has its own gravity! Maximum 512 characters."
-        />
-        <VoiceRecorder
-          v-model="backSideAudio"
-        />
-      </div>
-    </div>
+    <FlashcardInput
+      ref="sidesRef"
+      v-model:front-text="frontSide"
+      v-model:front-audio="frontSideAudio"
+      v-model:back-text="backSide"
+      v-model:back-audio="backSideAudio"
+    />
+
     <div class="modal-control-buttons">
       <SmartButton
         ref="cancelButton"
@@ -59,7 +35,7 @@
         class="calm-button"
         text="Save"
         :on-click="update"
-        :disabled="!stateChanged || formInvalid"
+        :disabled="!stateChanged || sidesRef?.invalid"
         auto-blur
       />
     </div>
@@ -70,13 +46,9 @@
 <script setup lang="ts">
 import Modal from '@/components/Modal.vue'
 import SmartButton from '@/components/SmartButton.vue'
-import TextInput from '@/components/TextInput.vue'
+import FlashcardInput from '@/components/FlashcardInput.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
-import VoiceRecorder from '@/components/VoiceRecorder.vue'
-import ErrorText from '@/components/ErrorText.vue'
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
-import { useVuelidate } from '@vuelidate/core'
-import { maxLength, required } from '@vuelidate/validators'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
@@ -116,7 +88,6 @@ const toaster = useSpaceToaster()
 const { flashcardSet } = storeToRefs(flashcardStore)
 
 const frontSide = ref(flashcard.value?.frontSide ?? '')
-const frontSideTextArea = ref<HTMLElement>()
 const frontSideAudioId = ref(audioStore.getAudioId(flashcard.value?.id, flashcardSides.FRONT))
 const frontSideAudio = ref<Blob | undefined>()
 const frontSideAudioSize = ref<number | undefined>()
@@ -127,26 +98,7 @@ const backSideAudioSize = ref<number | undefined>()
 const cancelButton = ref<InstanceType<typeof SmartButton>>()
 const removeButton = ref<InstanceType<typeof SmartButton>>()
 const updateButton = ref<InstanceType<typeof SmartButton>>()
-
-const validationRules = {
-  frontSide: { required, maxLength: maxLength(512) },
-  backSide: { required, maxLength: maxLength(512) },
-}
-
-const $v = useVuelidate(validationRules, {
-  frontSide: frontSide,
-  backSide: backSide,
-})
-
-const formInvalid = computed(() => $v.value.$errors.length > 0)
-const frontSideInvalid = computed(() => $v.value.frontSide.$errors.length > 0)
-const frontSideMaxLengthInvalid = computed(() =>
-  $v.value.frontSide.$errors.find(v => v.$validator === 'maxLength') !== undefined
-)
-const backSideInvalid = computed(() => $v.value.backSide.$errors.length > 0)
-const backSideMaxLengthInvalid = computed(() =>
-  $v.value.backSide.$errors.find(v => v.$validator === 'maxLength') !== undefined
-)
+const sidesRef = ref<InstanceType<typeof FlashcardInput>>()
 
 const stateChanged = computed(() => {
   return flashcard.value?.frontSide !== frontSide.value
@@ -307,8 +259,8 @@ async function remove() {
 
 async function update() {
   if (stateChanged.value) {
-    $v.value.$touch()
-    if (!formInvalid.value) {
+    sidesRef.value?.validate()
+    if (!sidesRef.value?.invalid) {
       const updated = await updateFlashcard()
       if (updated) {
         const uploaded = await uploadAudioIfRelevant()
@@ -377,15 +329,12 @@ function toggleModalForm() {
 
 async function resetState() {
   Log.log(LogTag.LOGIC, 'Resetting state...')
+  sidesRef.value?.resetState()
   frontSide.value = flashcard.value?.frontSide ?? ''
   frontSideAudioId.value = audioStore.getAudioId(flashcard.value?.id, flashcardSides.FRONT)
   backSide.value = flashcard.value?.backSide ?? ''
   backSideAudioId.value = audioStore.getAudioId(flashcard.value?.id, flashcardSides.BACK)
   await fetchAudio()
-  $v.value.$reset()
-  nextTick().then(() => {
-    frontSideTextArea.value?.focus()
-  })
 }
 
 watch(flashcard, async (newVal) => {
@@ -397,18 +346,6 @@ watch(flashcard, async (newVal) => {
   await fetchAudio()
 })
 
-watch(frontSide, () => {
-  if (frontSideInvalid.value) {
-    $v.value.frontSide.$reset()
-  }
-})
-
-watch(backSide, () => {
-  if (backSideInvalid.value) {
-    $v.value.backSide.$reset()
-  }
-})
-
 onMounted(async () => {
   await fetchAudio()
 })
@@ -416,21 +353,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.modal-main-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-}
-
-.modal-main-area--inner {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
 .modal-control-buttons {
   display: flex;
   flex-direction: row;
