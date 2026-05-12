@@ -46,7 +46,7 @@
 <script setup lang="ts">
 import Modal from '@/components/Modal.vue'
 import SmartButton from '@/components/SmartButton.vue'
-import FlashcardSides from '@/components/FlashcardSides.vue'
+import FlashcardInput from '@/components/FlashcardInput.vue'
 import SpaceToast from '@/components/SpaceToast.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
@@ -98,7 +98,7 @@ const backSideAudioSize = ref<number | undefined>()
 const cancelButton = ref<InstanceType<typeof SmartButton>>()
 const removeButton = ref<InstanceType<typeof SmartButton>>()
 const updateButton = ref<InstanceType<typeof SmartButton>>()
-const sidesRef = ref<InstanceType<typeof FlashcardSides>>()
+const sidesRef = ref<InstanceType<typeof FlashcardInput>>()
 
 const stateChanged = computed(() => {
   return flashcard.value?.frontSide !== frontSide.value

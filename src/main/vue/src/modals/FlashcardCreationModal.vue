@@ -47,7 +47,7 @@
 <script setup lang="ts">
 import SmartButton from '@/components/SmartButton.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
-import FlashcardSides from '@/components/FlashcardSides.vue'
+import FlashcardInput from '@/components/FlashcardInput.vue'
 import Modal from '@/components/Modal.vue'
 import { ref } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
@@ -81,7 +81,7 @@ const frontSide = ref<string>('')
 const frontSideAudioBlob = ref<Blob | undefined>()
 const backSide = ref<string>('')
 const backSideAudioBlob = ref<Blob | undefined>()
-const flashcardSides = ref<InstanceType<typeof FlashcardSides>>()
+const flashcardSides = ref<InstanceType<typeof FlashcardInput>>()
 const infiniteLoopButton = ref<InstanceType<typeof AwesomeButton>>()
 const cancelButton = ref<InstanceType<typeof SmartButton>>()
 const createButton = ref<InstanceType<typeof SmartButton>>()
