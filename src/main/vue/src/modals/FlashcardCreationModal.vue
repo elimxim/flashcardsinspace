@@ -16,7 +16,7 @@
       />
     </template>
 
-    <FlashcardSides
+    <FlashcardInput
       ref="flashcardSides"
       v-model:front-text="frontSide"
       v-model:front-audio="frontSideAudioBlob"

@@ -6,7 +6,7 @@
     :enter-button="updateButton"
     :delete-button="removeButton"
   >
-    <FlashcardSides
+    <FlashcardInput
       ref="sidesRef"
       v-model:front-text="frontSide"
       v-model:front-audio="frontSideAudio"
