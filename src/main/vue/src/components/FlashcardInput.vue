@@ -77,7 +77,7 @@ defineExpose({ validate, resetState, invalid })
   flex-direction: column;
   justify-content: center;
   gap: 10px;
-  min-height: 62px;
+  min-height: 0;
 }
 
 .side-slot {
@@ -85,7 +85,7 @@ defineExpose({ validate, resetState, invalid })
   display: flex;
   flex-direction: column;
   transition: flex-grow v-bind(expansionTransition) ease-in-out;
-  min-height: fit-content;
+  min-height: 62px;
   overflow: hidden;
 }
 
