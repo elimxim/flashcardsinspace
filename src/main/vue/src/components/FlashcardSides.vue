@@ -5,31 +5,23 @@
       'front-active': activeSide === 'front',
       'back-active': activeSide === 'back',
     }"
-    @mousedown="lastMouseDownInside = true"
-    @focusout="onFocusout"
   >
-    <div
-      class="side-slot side-slot--front"
-      @focusin="activeSide = 'front'"
-    >
+    <div class="side-slot side-slot--front">
       <FlashcardSideInput
         ref="frontRef"
         v-model:text="frontText"
         v-model:audio="frontAudio"
         placeholder="Front side"
-        side="front"
+        @input-click="toggleSide('front')"
       />
     </div>
-    <div
-      class="side-slot side-slot--back"
-      @focusin="activeSide = 'back'"
-    >
+    <div class="side-slot side-slot--back">
       <FlashcardSideInput
         ref="backRef"
         v-model:text="backText"
         v-model:audio="backAudio"
         placeholder="Back side"
-        side="back"
+        @input-click="toggleSide('back')"
       />
     </div>
   </div>
@@ -49,11 +41,13 @@ const activeSide = ref<'front' | 'back' | null>(null)
 const frontRef = ref<InstanceType<typeof FlashcardSideInput>>()
 const backRef = ref<InstanceType<typeof FlashcardSideInput>>()
 
-let lastMouseDownInside = false
-
 const invalid = computed(() =>
   (frontRef.value?.invalid ?? false) || (backRef.value?.invalid ?? false)
 )
+
+function toggleSide(side: 'front' | 'back') {
+  activeSide.value = activeSide.value === side ? null : side
+}
 
 function validate() {
   frontRef.value?.validate()
@@ -61,21 +55,9 @@ function validate() {
 }
 
 function resetState() {
+  activeSide.value = null
   frontRef.value?.resetState()
   backRef.value?.resetState()
-}
-
-function onFocusout(e: FocusEvent) {
-  if (lastMouseDownInside) {
-    lastMouseDownInside = false
-    return
-  }
-
-  const area = e.currentTarget as HTMLElement
-  const next = e.relatedTarget as Element | null
-  if (area.contains(next)) return
-  if (next?.closest('button, [role="button"]')) return
-  activeSide.value = null
 }
 
 defineExpose({ validate, resetState, invalid })

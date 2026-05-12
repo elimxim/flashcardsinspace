@@ -10,6 +10,7 @@
       :invalid="invalid"
       :placeholder="placeholder"
       expandable
+      @input-click="emit('inputClick')"
     />
     <ErrorText
       :when="maxLengthInvalid"
@@ -29,6 +30,10 @@ import { ref, computed, watch, onBeforeUnmount } from 'vue'
 
 defineProps<{
   placeholder: string
+}>()
+
+const emit = defineEmits<{
+  inputClick: []
 }>()
 
 const text = defineModel<string>('text', { required: true })

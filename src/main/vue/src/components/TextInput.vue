@@ -16,6 +16,7 @@
       type="text"
       :placeholder="inputPlaceholder"
       :rows="rows"
+      @click="emit('inputClick')"
     />
   </div>
 </template>
@@ -26,6 +27,10 @@ import { computed, ref } from 'vue'
 
 const model = defineModel<string>({ default: '' })
 const expanded = defineModel<boolean>('expanded', { default: false })
+
+const emit = defineEmits<{
+  inputClick: []
+}>()
 
 const props = withDefaults(defineProps<{
   invalid?: boolean
