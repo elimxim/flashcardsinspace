@@ -63,6 +63,10 @@ function focus() {
   textInputRef.value?.focus()
 }
 
+function scrollIntoView() {
+  textInputRef.value?.scrollIntoView()
+}
+
 function validate() {
   $v.value.$touch()
 }
@@ -80,7 +84,13 @@ function onKeydown(e: KeyboardEvent) {
   }
 }
 
-defineExpose({ focus, validate, resetState, invalid })
+defineExpose({
+  focus,
+  scrollIntoView,
+  validate,
+  resetState,
+  invalid
+})
 
 watch(expanded, (isExpanded) => {
   if (isExpanded) {

@@ -45,8 +45,15 @@ const invalid = computed(() =>
   (frontRef.value?.invalid ?? false) || (backRef.value?.invalid ?? false)
 )
 
+const EXPANSION_TRANSITION_MS = 300
+const expansionTransition = `${EXPANSION_TRANSITION_MS}ms`
+
 function toggleSide(side: 'front' | 'back') {
   activeSide.value = activeSide.value === side ? null : side
+  if (activeSide.value === side) {
+    const ref = side === 'front' ? frontRef : backRef
+    setTimeout(() => ref.value?.scrollIntoView(), EXPANSION_TRANSITION_MS)
+  }
 }
 
 function validate() {
@@ -70,14 +77,14 @@ defineExpose({ validate, resetState, invalid })
   flex-direction: column;
   justify-content: center;
   gap: 10px;
-  min-height: 0;
+  min-height: 62px;
 }
 
 .side-slot {
   flex: 1 1 0;
   display: flex;
   flex-direction: column;
-  transition: flex-grow 300ms ease-in-out;
+  transition: flex-grow v-bind(expansionTransition) ease-in-out;
   min-height: fit-content;
   overflow: hidden;
 }

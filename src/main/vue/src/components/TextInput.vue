@@ -58,9 +58,15 @@ function focus() {
   textArea.value?.focus()
 }
 
+function scrollIntoView() {
+  textArea.value?.scrollIntoView({ block: 'nearest' })
+}
+
 defineExpose({
-  focus
+  focus,
+  scrollIntoView,
 })
+
 </script>
 
 <style scoped>
