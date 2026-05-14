@@ -1,6 +1,6 @@
 <template>
   <div class="import-export">
-    <Transition :name="transitionName">
+    <Transition name="bubble" mode="out-in" :duration="{ enter: 360, leave: 140 }">
       <div v-if="panel === 'main'" key="main" class="buttons-panel">
         <AwesomeButton
           icon="fa-solid fa-file"
@@ -8,7 +8,6 @@
           :scale-factor="1.2"
           tooltip="Import / Export"
           tooltip-position="top-right"
-          :tap-duration="100"
           :on-click="goToIo"
         />
         <div class="ie-text">
@@ -22,7 +21,6 @@
           :scale-factor="1.2"
           tooltip="Back"
           tooltip-position="top-right"
-          :tap-duration="100"
           :on-click="goBack"
         />
         <AwesomeButton
@@ -31,7 +29,6 @@
           :scale-factor="1.2"
           tooltip="Download"
           tooltip-position="top"
-          :tap-duration="100"
           :on-click="goToDownload"
         />
         <AwesomeButton
@@ -50,7 +47,6 @@
           :scale-factor="1.2"
           tooltip="Back"
           tooltip-position="top-right"
-          :tap-duration="100"
           :on-click="goBack"
         />
         <AwesomeButton
@@ -105,21 +101,17 @@ const toaster = useSpaceToaster()
 const { flashcardSet } = storeToRefs(flashcardStore)
 
 const panel = ref<Panel>('main')
-const transitionName = ref('slide-forward')
 const fileInput = ref<HTMLInputElement>()
 
 function goToIo() {
-  transitionName.value = 'slide-forward'
   panel.value = 'io'
 }
 
 function goToDownload() {
-  transitionName.value = 'slide-forward'
   panel.value = 'download'
 }
 
 function goBack() {
-  transitionName.value = 'slide-back'
   panel.value = panel.value === 'download' ? 'io' : 'main'
 }
 
@@ -255,41 +247,69 @@ function onFileSelected(event: Event) {
   }
 }
 
-.slide-forward-enter-active {
-  transition: transform 0.4s ease, opacity 0.4s ease;
-  z-index: 1;
+@keyframes bubble-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.slide-forward-leave-active {
-  transition: transform 0.2s ease, opacity 0.2s ease;
+@keyframes bubble-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.slide-forward-enter-from {
-  transform: translateX(80px);
+.bubble-leave-active {
+  transition: transform 140ms ease-in, opacity 140ms ease-in;
+  transform-origin: center;
+}
+
+.bubble-leave-to {
+  transform: scale(0.7);
   opacity: 0;
 }
 
-.slide-forward-leave-to {
-  transform: translateX(-80px);
-  opacity: 0;
+.bubble-enter-active > * {
+  animation: bubble-pop 220ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-origin: center;
 }
 
-.slide-back-enter-active {
-  transition: transform 0.4s ease, opacity 0.4s ease;
-  z-index: 1;
+.bubble-enter-active > *:nth-child(1) {
+  animation-delay: 0ms;
 }
 
-.slide-back-leave-active {
-  transition: transform 0.2s ease, opacity 0.2s ease;
+.bubble-enter-active > *:nth-child(2) {
+  animation-delay: 60ms;
 }
 
-.slide-back-enter-from {
-  transform: translateX(-80px);
-  opacity: 0;
+.bubble-enter-active > *:nth-child(3) {
+  animation-delay: 120ms;
 }
 
-.slide-back-leave-to {
-  transform: translateX(80px);
-  opacity: 0;
+@media (prefers-reduced-motion: reduce) {
+  .bubble-leave-active {
+    transition: opacity 100ms linear;
+  }
+
+  .bubble-leave-to {
+    transform: none;
+  }
+
+  .bubble-enter-active > * {
+    animation: bubble-fade 100ms linear both;
+    animation-delay: 0ms !important;
+  }
 }
 </style>
