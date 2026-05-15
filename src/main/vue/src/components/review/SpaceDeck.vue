@@ -56,6 +56,9 @@
           transparent
         />
       </template>
+      <Transition name="loader-fade">
+        <component :is="UfoLoader" v-if="resolvedLoading" class="deck-loader"/>
+      </Transition>
     </div>
   </div>
   <FlashcardEditModal
@@ -67,6 +70,7 @@
 
 <script setup lang="ts">
 import SpaceCard from '@/components/review/SpaceCard.vue'
+import UfoLoader from '@/components/UfoLoader.vue'
 import FlashcardEditModal from '@/modals/FlashcardEditModal.vue'
 import { computed, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
@@ -75,6 +79,7 @@ import { deckEmptyMessage, ReviewSessionType } from '@/core-logic/review-logic.t
 import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
 import { UXConfig } from '@/utils/device-utils.ts'
+import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 
 const props = withDefaults(defineProps<{
   sessionType: ReviewSessionType
@@ -125,6 +130,17 @@ const spaceDeckElement = ref<HTMLElement>()
 const hasSlot = computed(() => !!slots.default)
 const viewedTimes = computed(() => (currFlashcard.value?.timesReviewed ?? 0) + 1)
 const emptyMessage = ref(deckEmptyMessage())
+
+const { resolvedLoading, startLoading, stopLoading, resetLoading } = useDeferredLoading({
+  delayEntry: 200,
+  minDuration: 800,
+})
+
+async function runSlide(slide: () => Promise<void> | void) {
+  startLoading()
+  await slide()
+  await stopLoading()
+}
 
 const SWIPE_THRESHOLD = 100
 const SWIPE_VELOCITY_THRESHOLD = 0.3
@@ -354,11 +370,7 @@ function onTouchEnd(event: TouchEvent) {
     const invisibleDuration = getInvisibleDuration(direction)
     swipeOffset.value = deltaX > 0 ? exitOffset : -exitOffset
     animationTimeoutId = setTimeout(async () => {
-      if (deltaX > 0) {
-        await props.onSlideRight()
-      } else {
-        await props.onSlideLeft()
-      }
+      await runSlide(deltaX > 0 ? props.onSlideRight : props.onSlideLeft)
       swipeOffset.value = 0
       isAnimating.value = false
       enterAnimation.value = 'zoom-in'
@@ -404,13 +416,13 @@ function setDeckReady() {
 
 async function triggerSlideLeft() {
   if (!props.canSlideLeft) return
-  await props.onSlideLeft()
+  await runSlide(props.onSlideLeft)
   enterAnimation.value = 'zoom-in'
 }
 
 async function triggerSlideRight() {
   if (!props.canSlideRight) return
-  await props.onSlideRight()
+  await runSlide(props.onSlideRight)
   enterAnimation.value = 'zoom-in'
 }
 
@@ -527,6 +539,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
+  resetLoading()
 })
 
 function handleKeydown(event: KeyboardEvent) {
@@ -649,6 +662,20 @@ function handleKeydown(event: KeyboardEvent) {
   width: 100%;
   height: 100%;
   z-index: 20;
+}
+
+.deck-loader {
+  z-index: 15;
+}
+
+.loader-fade-enter-active,
+.loader-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.loader-fade-enter-from,
+.loader-fade-leave-to {
+  opacity: 0;
 }
 
 </style>
