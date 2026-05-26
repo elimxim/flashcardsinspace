@@ -1,16 +1,17 @@
 ﻿<template>
   <div
     class="side"
-    :class="{ 'side--fullscreen': expanded }"
+    :class="{ 'side--fullscreen': expandedFull }"
   >
     <TextInput
       ref="textInputRef"
       v-model="text"
-      v-model:expanded="expanded"
+      v-model:expanded-full="expandedFull"
+      v-model:expanded-down="expandedDown"
       :invalid="invalid"
       :placeholder="placeholder"
-      expandable
-      @input-click="emit('inputClick')"
+      show-expand-full
+      show-expand-down
     />
     <ErrorText
       :when="maxLengthInvalid"
@@ -32,12 +33,10 @@ defineProps<{
   placeholder: string
 }>()
 
-const emit = defineEmits<{
-  inputClick: []
-}>()
-
 const text = defineModel<string>('text', { required: true })
 const audio = defineModel<Blob | undefined>('audio')
+const expandedFull = defineModel<boolean>('expanded-full', { default: false })
+const expandedDown = defineModel<boolean>('expanded-down', { default: false })
 
 const $v = useVuelidate({
     text: { required, maxLength: maxLength(512) }
@@ -56,7 +55,6 @@ watch(text, () => {
   }
 })
 
-const expanded = ref(false)
 const textInputRef = ref<InstanceType<typeof TextInput>>()
 
 function focus() {
@@ -74,11 +72,13 @@ function validate() {
 function resetState() {
   $v.value.$reset()
   text.value = ''
+  expandedFull.value = false
+  expandedDown.value = false
 }
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') {
-    expanded.value = false
+    expandedFull.value = false
     e.preventDefault()
     e.stopImmediatePropagation()
   }
@@ -89,11 +89,11 @@ defineExpose({
   scrollIntoView,
   validate,
   resetState,
-  invalid
+  invalid,
 })
 
-watch(expanded, (isExpanded) => {
-  if (isExpanded) {
+watch(expandedFull, (newVal) => {
+  if (newVal) {
     window.addEventListener('keydown', onKeydown, { capture: true })
   } else {
     window.removeEventListener('keydown', onKeydown, { capture: true })

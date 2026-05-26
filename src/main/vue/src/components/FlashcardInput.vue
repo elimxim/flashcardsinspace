@@ -1,5 +1,6 @@
 ﻿<template>
   <div
+    ref="containerRef"
     class="flashcard-sides"
     :class="{
       'front-active': activeSide === 'front',
@@ -11,8 +12,8 @@
         ref="frontRef"
         v-model:text="frontText"
         v-model:audio="frontAudio"
+        v-model:expanded-down="frontExpandedDown"
         placeholder="Front side"
-        @input-click="toggleSide('front')"
       />
     </div>
     <div class="side-slot side-slot--back">
@@ -20,8 +21,8 @@
         ref="backRef"
         v-model:text="backText"
         v-model:audio="backAudio"
+        v-model:expanded-down="backExpandedDown"
         placeholder="Back side"
-        @input-click="toggleSide('back')"
       />
     </div>
   </div>
@@ -29,17 +30,57 @@
 
 <script setup lang="ts">
 import FlashcardSideInput from '@/components/FlashcardSideInput.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const frontText = defineModel<string>('frontText', { required: true })
 const frontAudio = defineModel<Blob | undefined>('frontAudio')
 const backText = defineModel<string>('backText', { required: true })
 const backAudio = defineModel<Blob | undefined>('backAudio')
 
-const activeSide = ref<'front' | 'back' | null>(null)
-
+const containerRef = ref<HTMLDivElement>()
 const frontRef = ref<InstanceType<typeof FlashcardSideInput>>()
 const backRef = ref<InstanceType<typeof FlashcardSideInput>>()
+
+const frontExpandedDown = ref<boolean>(false)
+const backExpandedDown = ref<boolean>(false)
+
+const activeSide = ref<'front' | 'back' | null>(null)
+
+watch([frontExpandedDown, backExpandedDown], ([isFrontExpanded, isBackExpanded]) => {
+  switch (activeSide.value) {
+    case null:
+      activeSide.value = isFrontExpanded ? 'front' : isBackExpanded ? 'back' : null
+      triggerSide(activeSide.value)
+      break
+    case 'front':
+      if (!isFrontExpanded && !isBackExpanded) {
+        activeSide.value = null
+        containerRef.value?.scrollIntoView()
+        frontExpandedDown.value = false
+      } else if (isBackExpanded) {
+        activeSide.value = 'back'
+        triggerSide(activeSide.value)
+        frontExpandedDown.value = false
+      }
+      break
+    case 'back':
+      if (!isBackExpanded && !isFrontExpanded) {
+        activeSide.value = null
+        containerRef.value?.scrollIntoView()
+        backExpandedDown.value = false
+      } else if (isFrontExpanded) {
+        activeSide.value = 'front'
+        triggerSide(activeSide.value)
+        backExpandedDown.value = false
+      }
+      break
+  }
+})
+
+function triggerSide(side: 'front' | 'back' | null) {
+  const ref = side === 'front' ? frontRef?.value : side === 'back' ? backRef?.value : undefined
+  if (ref) setTimeout(() => ref.scrollIntoView(), EXPANSION_TRANSITION_MS)
+}
 
 const invalid = computed(() =>
   (frontRef.value?.invalid ?? false) || (backRef.value?.invalid ?? false)
@@ -48,21 +89,12 @@ const invalid = computed(() =>
 const EXPANSION_TRANSITION_MS = 300
 const expansionTransition = `${EXPANSION_TRANSITION_MS}ms`
 
-function toggleSide(side: 'front' | 'back') {
-  activeSide.value = activeSide.value === side ? null : side
-  if (activeSide.value === side) {
-    const ref = side === 'front' ? frontRef : backRef
-    setTimeout(() => ref.value?.scrollIntoView(), EXPANSION_TRANSITION_MS)
-  }
-}
-
 function validate() {
   frontRef.value?.validate()
   backRef.value?.validate()
 }
 
 function resetState() {
-  activeSide.value = null
   frontRef.value?.resetState()
   backRef.value?.resetState()
 }

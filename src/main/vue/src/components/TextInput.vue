@@ -3,10 +3,16 @@
     class="text-input text-input--theme"
     :class="{ 'text-input--error': invalid }"
   >
-    <div v-if="expandable" class="text-input--toolbar">
+    <div v-if="showToolbar" class="text-input--toolbar">
       <AwesomeButton
-        :icon="expanded ? 'fa-solid fa-compress' : 'fa-solid fa-expand'"
-        :on-click="toggleExpanded"
+        v-if="showExpandDown"
+        :icon="expandedDown ? 'fa-solid fa-angles-up' : 'fa-solid fa-angles-down'"
+        :on-click="toggleExpandedDown"
+      />
+      <AwesomeButton
+        v-if="showExpandFull"
+        :icon="expandedFull ? 'fa-solid fa-compress' : 'fa-solid fa-expand'"
+        :on-click="toggleExpandedFull"
       />
     </div>
     <textarea
@@ -16,7 +22,6 @@
       type="text"
       :placeholder="inputPlaceholder"
       :rows="rows"
-      @click="emit('inputClick')"
     />
   </div>
 </template>
@@ -26,21 +31,20 @@ import AwesomeButton from '@/components/AwesomeButton.vue'
 import { computed, ref } from 'vue'
 
 const model = defineModel<string>({ default: '' })
-const expanded = defineModel<boolean>('expanded', { default: false })
-
-const emit = defineEmits<{
-  inputClick: []
-}>()
+const expandedFull = defineModel<boolean>('expanded-full', { default: false })
+const expandedDown = defineModel<boolean>('expanded-down', { default: false })
 
 const props = withDefaults(defineProps<{
   invalid?: boolean
   placeholder?: string
-  expandable?: boolean
+  showExpandFull?: boolean
+  showExpandDown?: boolean
   rows?: number
 }>(), {
   invalid: false,
   placeholder: '',
-  expandable: false,
+  showExpandFull: false,
+  showExpandDown: false,
   rows: 1,
 })
 
@@ -50,8 +54,16 @@ const inputPlaceholder = computed(() =>
   props.invalid ? props.placeholder + '!' : props.placeholder
 )
 
-function toggleExpanded() {
-  expanded.value = !expanded.value
+const showToolbar = computed(() =>
+  props.showExpandFull || props.showExpandDown
+)
+
+function toggleExpandedFull() {
+  expandedFull.value = !expandedFull.value
+}
+
+function toggleExpandedDown() {
+  expandedDown.value = !expandedDown.value
 }
 
 function focus() {
@@ -98,6 +110,7 @@ defineExpose({
 
 .text-input--toolbar {
   display: flex;
+  gap: 6px;
   justify-content: flex-end;
   padding: 2px 4px 0;
 }
