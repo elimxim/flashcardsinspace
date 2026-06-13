@@ -37,8 +37,8 @@ data class FlashcardSetExtraDto(
 
 data class FlashcardDto(
     val id: Long,
-    val frontSide: String,
-    val backSide: String,
+    val frontSide: String? = null,
+    val backSide: String? = null,
     val stage: String,
     val timesReviewed: Int,
     val reviewHistory: ReviewHistoryDto,

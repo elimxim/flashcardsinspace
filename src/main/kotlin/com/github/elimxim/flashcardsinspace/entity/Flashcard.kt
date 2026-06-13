@@ -14,11 +14,11 @@ open class Flashcard(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     open val id: Long = 0,
 
-    @Column(nullable = false)
-    open var frontSide: String,
+    @Column(nullable = true)
+    open var frontSide: String? = null,
 
-    @Column(nullable = false)
-    open var backSide: String,
+    @Column(nullable = true)
+    open var backSide: String? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
