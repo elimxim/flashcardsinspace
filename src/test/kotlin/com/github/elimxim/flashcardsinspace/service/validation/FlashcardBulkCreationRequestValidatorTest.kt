@@ -59,8 +59,8 @@ class FlashcardBulkCreationRequestValidatorTest {
     }
 
     @Test
-    fun `should fail validation if an item has null frontSide`() {
-        // given:
+    fun `should pass validation if an item has null frontSide (picture-only side)`() {
+        // Text may be null when the side carries a picture instead (picture XOR text).
         val request = FlashcardBulkCreationRequest(
             requests = listOf(
                 FlashcardCreationRequest(
@@ -72,18 +72,15 @@ class FlashcardBulkCreationRequestValidatorTest {
             )
         )
 
-        // when:
-        val exception = assertThrows<HttpInvalidRequestFieldsException> {
-            validator.validate(request)
-        }
+        val validRequest = validator.validate(request)
 
-        // then:
-        assertThat(exception.fields).containsExactly("frontSide")
+        assertThat(validRequest.requests).hasSize(1)
+        assertThat(validRequest.requests[0].frontSide).isNull()
     }
 
     @Test
-    fun `should fail validation if an item has blank backSide`() {
-        // given:
+    fun `should pass validation if an item has blank backSide (picture-only side)`() {
+        // Text may be blank/null when the side carries a picture instead (picture XOR text).
         val request = FlashcardBulkCreationRequest(
             requests = listOf(
                 FlashcardCreationRequest(
@@ -95,13 +92,10 @@ class FlashcardBulkCreationRequestValidatorTest {
             )
         )
 
-        // when:
-        val exception = assertThrows<HttpInvalidRequestFieldsException> {
-            validator.validate(request)
-        }
+        val validRequest = validator.validate(request)
 
-        // then:
-        assertThat(exception.fields).containsExactly("backSide")
+        assertThat(validRequest.requests).hasSize(1)
+        assertThat(validRequest.requests[0].backSide).isEqualTo("   ")
     }
 
     @Test
