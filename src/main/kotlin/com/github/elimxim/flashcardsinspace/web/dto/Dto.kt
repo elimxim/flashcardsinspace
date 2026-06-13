@@ -56,6 +56,17 @@ data class FlashcardAudioDto(
     val uploadedAt: ZonedDateTime?,
 )
 
+data class FlashcardPictureDto(
+    val id: Long,
+    val side: String,
+    val mimeType: String?,
+    val pictureSize: Long,
+    val width: Int,
+    val height: Int,
+    val flashcardId: Long,
+    val uploadedAt: ZonedDateTime?,
+)
+
 data class ReviewHistoryDto(
     val history: List<ReviewInfoDto>
 )
@@ -88,6 +99,14 @@ data class FlashcardAudioMetadataDto(
     val audioId: Long,
     val flashcardSide: String,
     val flashcardId: Long,
+)
+
+data class FlashcardPictureMetadataDto(
+    val pictureId: Long,
+    val flashcardSide: String,
+    val flashcardId: Long,
+    val width: Int,
+    val height: Int,
 )
 
 data class DayStreakDto(

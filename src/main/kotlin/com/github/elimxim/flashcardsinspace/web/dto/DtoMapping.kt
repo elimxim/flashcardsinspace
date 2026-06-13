@@ -60,6 +60,17 @@ fun FlashcardAudio.toDto() = FlashcardAudioDto(
     uploadedAt = uploadedAt,
 )
 
+fun FlashcardPicture.toDto() = FlashcardPictureDto(
+    id = id,
+    side = side.name,
+    mimeType = mimeType,
+    pictureSize = pictureSize,
+    width = width,
+    height = height,
+    flashcardId = flashcard.id,
+    uploadedAt = uploadedAt,
+)
+
 fun ReviewSession.toDto() = ReviewSessionDto(
     id = id,
     type = type.name,
