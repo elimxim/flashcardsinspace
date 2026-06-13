@@ -2,6 +2,7 @@ package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardAudioRepository
+import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardPictureRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
@@ -24,6 +25,7 @@ class FlashcardService(
     private val flashcardSetService: FlashcardSetService,
     private val flashcardRepository: FlashcardRepository,
     private val flashcardAudioRepository: FlashcardAudioRepository,
+    private val flashcardPictureRepository: FlashcardPictureRepository,
     private val requestValidator: RequestValidator,
     private val flashcardAddService: FlashcardAddService,
 ) {
@@ -138,6 +140,7 @@ class FlashcardService(
         verifyUserOperation(user, setId, flashcard)
         flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
         flashcardAudioRepository.deleteByFlashcardId(flashcard.id)
+        flashcardPictureRepository.deleteByFlashcardId(flashcard.id)
         flashcardRepository.delete(flashcard)
     }
 
