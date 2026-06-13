@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
+import org.springframework.web.multipart.MaxUploadSizeExceededException
 import org.springframework.web.servlet.resource.NoResourceFoundException
 import java.time.LocalDateTime
 
@@ -33,6 +34,19 @@ class GlobalExceptionHandler {
             val body = buildErrorBody(
                 status = HttpStatus.INTERNAL_SERVER_ERROR,
                 exception = HttpInternalServerErrorException(ApiErrorCode.UNE500, "Unexpected error occurred", e)
+            )
+
+            ResponseEntity(body, body.httpStatus)
+        }
+
+    // Thrown by Spring during multipart parsing when an upload exceeds spring.servlet.multipart.max-file-size
+    @ExceptionHandler(MaxUploadSizeExceededException::class)
+    fun handleMaxUploadSizeExceeded(e: MaxUploadSizeExceededException, request: WebRequest): ResponseEntity<ErrorResponseBody> =
+        withLoggingContext {
+            log.info("Upload exceeded the multipart size limit: ${e.message}")
+            val body = buildErrorBody(
+                status = HttpStatus.PAYLOAD_TOO_LARGE,
+                exception = HttpPayloadTooLargeException(ApiErrorCode.FPI413, "Upload exceeds the maximum allowed size"),
             )
 
             ResponseEntity(body, body.httpStatus)
