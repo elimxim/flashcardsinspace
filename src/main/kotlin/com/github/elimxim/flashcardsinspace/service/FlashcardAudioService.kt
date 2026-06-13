@@ -1,7 +1,11 @@
 package com.github.elimxim.flashcardsinspace.service
 
-import com.github.elimxim.flashcardsinspace.entity.*
+import com.github.elimxim.flashcardsinspace.entity.FlashcardAudio
+import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.entity.checkVerified
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardAudioRepository
+import com.github.elimxim.flashcardsinspace.entity.sizeKB
+import com.github.elimxim.flashcardsinspace.util.parseSideOrThrow
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardAudioDto
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardAudioMetadataDto
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
@@ -45,7 +49,9 @@ class FlashcardAudioService(
         val flashcard = flashcardService.getEntity(flashcardId)
         flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
         flashcardService.verifyUserOperation(user, setId, flashcard)
-        val side = parseSide(side)
+        val side = side.parseSideOrThrow {
+            HttpBadRequestException(ApiErrorCode.WFS400, "Invalid side $it for uploading audio")
+        }
         return flashcardAudioRepository.findByFlashcardIdAndSide(flashcardId, side)
     }
 
@@ -73,7 +79,10 @@ class FlashcardAudioService(
         flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
         flashcardService.verifyUserOperation(user, setId, flashcard)
 
-        val flashcardSide = parseSide(side)
+        val flashcardSide = side.parseSideOrThrow {
+            HttpBadRequestException(ApiErrorCode.WFS400, "Invalid side $it for uploading audio")
+        }
+
         val audioData = file.bytes
 
         val existingAudio = flashcardAudioRepository.findByFlashcardIdAndSide(flashcardId, flashcardSide)
@@ -118,10 +127,4 @@ class FlashcardAudioService(
         flashcardAudioRepository.findById(id).orElseThrow {
             HttpNotFoundException(ApiErrorCode.FAU404, "Audio with id $id not found")
         }
-
-    private fun parseSide(side: String) = when {
-        FlashcardSide.FRONT.name.equals(side, ignoreCase = true) -> FlashcardSide.FRONT
-        FlashcardSide.BACK.name.equals(side, ignoreCase = true) -> FlashcardSide.BACK
-        else -> throw HttpBadRequestException(ApiErrorCode.WFS400, "Invalid side $side for uploading audio")
-    }
 }
