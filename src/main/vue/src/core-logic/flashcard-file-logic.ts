@@ -33,7 +33,7 @@ export function parseFlashcardsFromFile(file: File): Promise<FlashcardContent[]>
 }
 
 export function downloadFlashcardsAsCsv(flashcards: Flashcard[], filename: string): void {
-  const rows = flashcards.map(f => [f.frontSide, f.backSide])
+  const rows = flashcards.map(f => [f.frontSide ?? '', f.backSide ?? ''])
   const sheet = XLSX.utils.aoa_to_sheet(rows)
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(workbook, sheet, 'Flashcards')
@@ -41,7 +41,7 @@ export function downloadFlashcardsAsCsv(flashcards: Flashcard[], filename: strin
 }
 
 export function downloadFlashcardsAsXlsx(flashcards: Flashcard[], filename: string): void {
-  const rows = flashcards.map(f => [f.frontSide, f.backSide])
+  const rows = flashcards.map(f => [f.frontSide ?? '', f.backSide ?? ''])
   const sheet = XLSX.utils.aoa_to_sheet(rows)
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(workbook, sheet, 'Flashcards')

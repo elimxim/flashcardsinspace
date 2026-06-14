@@ -19,7 +19,7 @@ export const flashcardSides = {
   BACK: 'BACK',
 }
 
-export function newFlashcard(frontSide: string, backSide: string, chronodate: string): Flashcard {
+export function newFlashcard(frontSide: string | undefined, backSide: string | undefined, chronodate: string): Flashcard {
   return {
     id: 0,
     frontSide: frontSide,
@@ -100,12 +100,12 @@ export function mapFlashcardSetExtra(flashcardSetExtras: FlashcardSetExtra[]): M
 
 export function findDuplicates(candidates: FlashcardContent[], existing: Flashcard[]): Set<number> {
   const existingSet = new Set(
-    existing.map(f => `${f.frontSide.trim().toLowerCase()}::${f.backSide.trim().toLowerCase()}`)
+    existing.map(f => `${f.frontSide?.trim().toLowerCase() ?? ''}::${f.backSide?.trim().toLowerCase() ?? ''}`)
   )
   const duplicates = new Set<number>()
   const seen = new Set<string>()
   for (let i = 0; i < candidates.length; i++) {
-    const key = `${candidates[i].frontSide.toLowerCase()}::${candidates[i].backSide.toLowerCase()}`
+    const key = `${candidates[i].frontSide?.toLowerCase() ?? ''}::${candidates[i].backSide?.toLowerCase() ?? ''}`
     if (existingSet.has(key) || seen.has(key)) {
       duplicates.add(i)
     } else {

@@ -254,8 +254,8 @@ describe('MonoStageReviewQueue', () => {
 function flashcard(id: number, stage: Stage): Flashcard {
   return {
     id: id,
-    frontSide: '',
-    backSide: '',
+    frontSide: undefined,
+    backSide: undefined,
     stage: stage.name,
     timesReviewed: 0,
     reviewHistory: { history: [] },

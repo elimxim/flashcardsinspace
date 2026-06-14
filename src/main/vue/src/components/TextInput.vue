@@ -30,7 +30,7 @@
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import { computed, ref } from 'vue'
 
-const model = defineModel<string>({ default: '' })
+const model = defineModel<string | undefined>()
 const expandedFull = defineModel<boolean>('expanded-full', { default: false })
 const expandedDown = defineModel<boolean>('expanded-down', { default: false })
 
