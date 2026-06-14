@@ -10,6 +10,7 @@ import {
   sendChronoBulkUpdateRequest,
   sendChronoSyncRequest,
   sendFlashcardAudioMetadataGetRequest,
+  sendFlashcardPictureMetadataRequest,
   sendFlashcardSetExtraRequest,
   sendFlashcardSetGetRequest,
   sendFlashcardSetsGetRequest,
@@ -19,6 +20,7 @@ import { sortFlashcardSets } from '@/core-logic/flashcard-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
+import { usePictureStore } from '@/stores/picture-store.ts'
 import { selectedSetIdCookie } from '@/utils/cookies-ref.ts'
 import { createReviewQueue } from '@/core-logic/review-logic.ts'
 import { Chronoday } from '@/model/chrono.ts'
@@ -135,6 +137,7 @@ export async function loadStoresForFlashcardSet(flashcardSet: FlashcardSet, forc
   const flashcardStore = useFlashcardStore()
   const chronoStore = useChronoStore()
   const audioStore = useAudioStore()
+  const pictureStore = usePictureStore()
 
   const currSetId = flashcardStore.flashcardSet?.id
   if (flashcardStore.loaded && flashcardSet.id === currSetId && !forced) {
@@ -145,6 +148,7 @@ export async function loadStoresForFlashcardSet(flashcardSet: FlashcardSet, forc
   flashcardStore.$reset()
   chronoStore.$reset()
   audioStore.$reset()
+  pictureStore.$reset()
 
   return await sendFlashcardsGetRequest(flashcardSet.id)
     .then(async (flashcards) => {
@@ -158,10 +162,14 @@ export async function loadStoresForFlashcardSet(flashcardSet: FlashcardSet, forc
         response.data.dayStreak,
       )
       markCurrDayAsCompleted(flashcardSet.id, response.data.currDay)
-      return sendFlashcardAudioMetadataGetRequest(flashcardSet.id)
+      return Promise.all([
+        sendFlashcardAudioMetadataGetRequest(flashcardSet.id),
+        sendFlashcardPictureMetadataRequest(flashcardSet.id),
+      ])
     })
-    .then((response) => {
-      audioStore.loadState(response.data)
+    .then(([audioResponse, pictureResponse]) => {
+      audioStore.loadState(audioResponse.data)
+      pictureStore.loadState(pictureResponse.data)
       return true
     })
     .catch((error) => {
