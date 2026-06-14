@@ -31,7 +31,7 @@ export const userApiErrors = {
   VERIFICATION__UNKNOWN_TYPE: {
     title: 'Couldn\'t complete the action',
     message: 'Please try again.'
-  },
+  } as UserApiError,
   VERIFICATION__TOO_MANY_REQUESTS: {
     title: 'Too many requests',
     message: 'You have reached the maximum number of verification codes per hour. Please try again later.'
@@ -39,7 +39,7 @@ export const userApiErrors = {
   PASSWORD_RESET__FAILED: {
     title: 'Couldn\'t reset the password',
     message: 'Please try again.'
-  },
+  } as UserApiError,
   USER__UNAUTHORIZED: {
     title: 'We couldn\'t recognize you',
     message: 'Please try again later.'
@@ -114,6 +114,26 @@ export const userApiErrors = {
   } as UserApiError,
   AUDIO__REMOVAL_FAILED: {
     title: 'Could not remove the audio',
+    message: 'Please refresh the page and repeat the action.'
+  } as UserApiError,
+  PICTURE__UPLOADING_FAILED: {
+    title: 'Could not upload the picture',
+    message: 'Make sure the file is a valid image, and try again.'
+  } as UserApiError,
+  PICTURE__TOO_LARGE: {
+    title: 'Could not process the picture',
+    message: 'Make sure the file is no larger than 8 MB, and try again.'
+  } as UserApiError,
+  PICTURE__TOO_LARGE_AFTER_COMPRESSION: {
+    title: 'Picture is too large',
+    message: 'Even after compression this image is too large to upload. Please choose a smaller or simpler picture.'
+  } as UserApiError,
+  PICTURE__FETCHING_FAILED: {
+    title: 'Could not fetch the picture',
+    message: 'Please refresh the page and repeat the action.'
+  } as UserApiError,
+  PICTURE__REMOVAL_FAILED: {
+    title: 'Could not remove the picture',
     message: 'Please refresh the page and repeat the action.'
   } as UserApiError,
   FLASHCARD__DOWNLOAD_FAILED: {
