@@ -20,8 +20,10 @@
       ref="flashcardSides"
       v-model:front-text="frontSide"
       v-model:front-audio="frontSideAudioBlob"
+      v-model:front-picture="frontSidePictureBlob"
       v-model:back-text="backSide"
       v-model:back-audio="backSideAudioBlob"
+      v-model:back-picture="backSidePictureBlob"
     />
 
     <div class="modal-control-buttons">
@@ -56,12 +58,15 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
+import { usePictureStore } from '@/stores/picture-store.ts'
 import { newFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { uploadFlashcardAudioBlob } from '@/core-logic/flashcard-audio-logic.ts'
+import { uploadFlashcardPictureBlob } from '@/core-logic/flashcard-picture-logic.ts'
 import { storeToRefs } from 'pinia'
 import {
   sendFlashcardAudioMetadataGetRequest,
   sendFlashcardCreationRequest,
+  sendFlashcardPictureMetadataRequest,
 } from '@/api/api-client.ts'
 import { Flashcard } from '@/model/flashcard.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
@@ -72,15 +77,18 @@ const chronoStore = useChronoStore()
 const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
 const audioStore = useAudioStore()
+const pictureStore = usePictureStore()
 const toaster = useSpaceToaster()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
-const frontSide = ref<string>('')
+const frontSide = ref<string>()
 const frontSideAudioBlob = ref<Blob | undefined>()
-const backSide = ref<string>('')
+const frontSidePictureBlob = ref<Blob | undefined>()
+const backSide = ref<string>()
 const backSideAudioBlob = ref<Blob | undefined>()
+const backSidePictureBlob = ref<Blob | undefined>()
 const flashcardSides = ref<InstanceType<typeof FlashcardInput>>()
 const infiniteLoopButton = ref<InstanceType<typeof AwesomeButton>>()
 const cancelButton = ref<InstanceType<typeof SmartButton>>()
@@ -115,6 +123,34 @@ async function uploadAudioIfRelevant(): Promise<boolean> {
     .then((results) => results.every(v => v))
 }
 
+async function uploadPictureIfRelevant(): Promise<boolean> {
+  const set = flashcardSet.value
+  const card = createdFlashcard.value
+
+  if (!set || !card) {
+    Log.log(LogTag.LOGIC, `Cannot upload picture: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`)
+    return true
+  }
+
+  return await Promise.all([
+    (async function () {
+      if (frontSidePictureBlob.value) {
+        return uploadFlashcardPictureBlob(set, card, frontSidePictureBlob.value, true)
+      } else {
+        return true
+      }
+    })(),
+    (async function () {
+      if (backSidePictureBlob.value) {
+        return uploadFlashcardPictureBlob(set, card, backSidePictureBlob.value, false)
+      } else {
+        return true
+      }
+    })(),
+  ])
+    .then((results) => results.every(v => v))
+}
+
 async function cancel() {
   await resetState()
   toggleModalForm()
@@ -125,8 +161,8 @@ async function create() {
   if (flashcardSides.value?.invalid) return
   const added = await addNewFlashcard()
   if (added) {
-    const uploaded = await uploadAudioIfRelevant()
-    if (uploaded) {
+    const uploaded = await Promise.all([uploadAudioIfRelevant(), uploadPictureIfRelevant()])
+    if (uploaded.every(Boolean)) {
       if (!infiniteLoopButton.value?.isPressed()) {
         toggleModalForm()
       }
@@ -167,9 +203,13 @@ async function addNewFlashcard(): Promise<boolean> {
         flashcardSetStore.addExtra(setId)
         flashcardSetStore.incrementFlashcardsNumber(setId)
 
-        return await sendFlashcardAudioMetadataGetRequest(setId)
-          .then((response) => {
-            audioStore.loadState(response.data)
+        return await Promise.all([
+          sendFlashcardAudioMetadataGetRequest(setId),
+          sendFlashcardPictureMetadataRequest(setId),
+        ])
+          .then(([audioResponse, pictureResponse]) => {
+            audioStore.loadState(audioResponse.data)
+            pictureStore.loadState(pictureResponse.data)
             return true
           })
           .catch((error) => {
@@ -204,7 +244,9 @@ function toggleModalForm() {
 async function resetState() {
   createdFlashcard.value = undefined
   frontSideAudioBlob.value = undefined
+  frontSidePictureBlob.value = undefined
   backSideAudioBlob.value = undefined
+  backSidePictureBlob.value = undefined
   flashcardSides.value?.resetState()
 }
 

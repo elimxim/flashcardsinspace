@@ -12,6 +12,7 @@
         ref="frontRef"
         v-model:text="frontText"
         v-model:audio="frontAudio"
+        v-model:picture="frontPicture"
         v-model:expanded-down="frontExpandedDown"
         placeholder="Front side"
       />
@@ -21,6 +22,7 @@
         ref="backRef"
         v-model:text="backText"
         v-model:audio="backAudio"
+        v-model:picture="backPicture"
         v-model:expanded-down="backExpandedDown"
         placeholder="Back side"
       />
@@ -32,10 +34,12 @@
 import FlashcardSideInput from '@/components/FlashcardSideInput.vue'
 import { ref, computed, watch } from 'vue'
 
-const frontText = defineModel<string>('frontText', { required: true })
+const frontText = defineModel<string | undefined>('frontText', { required: true })
 const frontAudio = defineModel<Blob | undefined>('frontAudio')
-const backText = defineModel<string>('backText', { required: true })
+const frontPicture = defineModel<Blob | undefined>('frontPicture')
+const backText = defineModel<string | undefined>('backText', { required: true })
 const backAudio = defineModel<Blob | undefined>('backAudio')
+const backPicture = defineModel<Blob | undefined>('backPicture')
 
 const containerRef = ref<HTMLDivElement>()
 const frontRef = ref<InstanceType<typeof FlashcardSideInput>>()

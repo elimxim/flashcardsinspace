@@ -52,8 +52,6 @@
           <SpaceDeck
             ref="spaceDeck"
             :session-type="ReviewSessionType.LIGHTSPEED"
-            :on-flashcard-removed="onFlashcardRemoved"
-            :on-audio-changed="onAudioChanged"
             :can-slide-left="!noNextAvailable"
             :can-slide-right="!noNextAvailable"
             :on-slide-left="stageDown"
@@ -300,14 +298,6 @@ async function markDaysAsInProgress(flashcardSet: FlashcardSet) {
 
 async function markDaysAsCompleted(flashcardSet: FlashcardSet) {
   await markDaysAs(flashcardSet.id, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
-}
-
-function onFlashcardRemoved() {
-  reviewStore.nextFlashcard(flashcardSet.value)
-}
-
-function onAudioChanged() {
-  reviewStore.fetchAudio(flashcardSet.value)
 }
 
 const currFlashcardWatcher = watch(currFlashcard, async (newVal, oldVal) => {

@@ -63,12 +63,8 @@ data class ValidLoginRequest(
 )
 
 class FlashcardCreationRequest(
-    @field:NotNull
-    @field:NotBlank
     @field:Size(max = 512)
     var frontSide: String? = null,
-    @field:NotNull
-    @field:NotBlank
     @field:Size(max = 512)
     var backSide: String? = null,
     @field:NotNull
@@ -82,8 +78,8 @@ class FlashcardCreationRequest(
 )
 
 data class ValidFlashcardCreationRequest(
-    val frontSide: String,
-    val backSide: String,
+    val frontSide: String? = null,
+    val backSide: String? = null,
     val stage: FlashcardStage,
     val creationDate: LocalDate,
 )

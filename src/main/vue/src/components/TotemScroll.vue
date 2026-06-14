@@ -222,12 +222,17 @@ onBeforeUnmount(() => {
 }
 
 .scroll-content {
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
   box-sizing: border-box;
-  margin: auto 0;
 }
 
 .scroll-track-wrapper {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -235,7 +240,6 @@ onBeforeUnmount(() => {
   gap: v-bind('spacing + "px"');
   padding: 10px 0;
   user-select: none;
-  flex-shrink: 0;
   color: var(--scroll--color--main);
   transition: color 0.3s ease;
 }

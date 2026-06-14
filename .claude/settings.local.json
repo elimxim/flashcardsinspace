@@ -1,10 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./gradlew test:*)",
-      "Bash(./gradlew compileTestKotlin)",
-      "Bash(./gradlew compileTestKotlin --stacktrace)",
-      "Bash(./gradlew dependencies:*)",
+      "Bash(./gradlew:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git worktree:*)",
       "mcp__github__issue_read"
     ]
   }

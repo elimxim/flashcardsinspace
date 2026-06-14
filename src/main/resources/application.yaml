@@ -17,6 +17,10 @@ spring:
   threads:
     virtual:
       enabled: true
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 2MB
   datasource:
     driver-class-name: org.postgresql.Driver
     hikari:

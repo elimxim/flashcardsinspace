@@ -31,51 +31,27 @@ class FlashcardCreationRequestValidatorTest {
     }
 
     @Test
-    fun `should fail validation if frontSide is null`() {
-        // given:
+    fun `should pass validation if frontSide is null (picture-only side)`() {
+        // Text may be null when the side carries a picture instead (picture XOR text).
         val request = validRequest().apply {
             frontSide = null
         }
 
-        // when:
-        val exception = assertThrows<HttpInvalidRequestFieldsException> {
-            validator.validate(request)
-        }
+        val validRequest = validator.validate(request)
 
-        // then:
-        assertThat(exception.fields).containsExactly("frontSide")
+        assertThat(validRequest.frontSide).isNull()
     }
 
     @Test
-    fun `should fail validation if frontSide is empty`() {
-        // given:
+    fun `should pass validation if frontSide is blank (picture-only side)`() {
+        // Text may be blank when the side carries a picture instead (picture XOR text).
         val request = validRequest().apply {
             frontSide = ""
         }
 
-        // when:
-        val exception = assertThrows<HttpInvalidRequestFieldsException> {
-            validator.validate(request)
-        }
+        val validRequest = validator.validate(request)
 
-        // then:
-        assertThat(exception.fields).containsExactly("frontSide")
-    }
-
-    @Test
-    fun `should fail validation if frontSide is blank`() {
-        // given:
-        val request = validRequest().apply {
-            frontSide = "   "
-        }
-
-        // when:
-        val exception = assertThrows<HttpInvalidRequestFieldsException> {
-            validator.validate(request)
-        }
-
-        // then:
-        assertThat(exception.fields).containsExactly("frontSide")
+        assertThat(validRequest.frontSide).isEmpty()
     }
 
     @Test
@@ -95,51 +71,27 @@ class FlashcardCreationRequestValidatorTest {
     }
 
     @Test
-    fun `should fail validation if backSide is null`() {
-        // given:
+    fun `should pass validation if backSide is null (picture-only side)`() {
+        // Text may be null when the side carries a picture instead (picture XOR text).
         val request = validRequest().apply {
             backSide = null
         }
 
-        // when:
-        val exception = assertThrows<HttpInvalidRequestFieldsException> {
-            validator.validate(request)
-        }
+        val validRequest = validator.validate(request)
 
-        // then:
-        assertThat(exception.fields).containsExactly("backSide")
+        assertThat(validRequest.backSide).isNull()
     }
 
     @Test
-    fun `should fail validation if backSide is empty`() {
-        // given:
+    fun `should pass validation if backSide is blank (picture-only side)`() {
+        // Text may be blank when the side carries a picture instead (picture XOR text).
         val request = validRequest().apply {
             backSide = ""
         }
 
-        // when:
-        val exception = assertThrows<HttpInvalidRequestFieldsException> {
-            validator.validate(request)
-        }
+        val validRequest = validator.validate(request)
 
-        // then:
-        assertThat(exception.fields).containsExactly("backSide")
-    }
-
-    @Test
-    fun `should fail validation if backSide is blank`() {
-        // given:
-        val request = validRequest().apply {
-            backSide = "   "
-        }
-
-        // when:
-        val exception = assertThrows<HttpInvalidRequestFieldsException> {
-            validator.validate(request)
-        }
-
-        // then:
-        assertThat(exception.fields).containsExactly("backSide")
+        assertThat(validRequest.backSide).isEmpty()
     }
 
     @Test
@@ -290,8 +242,8 @@ class FlashcardCreationRequestValidatorTest {
     fun `should fail validation if all fields are invalid`() {
         // given:
         val request = FlashcardCreationRequest().apply {
-            frontSide = null
-            backSide = ""
+            frontSide = "a".repeat(513)
+            backSide = "b".repeat(513)
             stage = " "
             creationDate = "invalid-date"
         }

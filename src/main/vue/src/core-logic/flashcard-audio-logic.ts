@@ -80,6 +80,7 @@ export async function removeFlashcardAudioBlob(
 
   return await sendFlashcardAudioRemovalRequest(flashcardSet.id, flashcard.id, audioId)
     .then(() => {
+      Log.log(LogTag.LOGIC, `Audio.id=${audioId} removed`)
       audioStore.removeAudioId(flashcard.id, getFlashcardSide(isFrontSide))
       audioCache.deleteAudio(flashcard.id, isFrontSide)
       return true

@@ -52,6 +52,7 @@ dependencies {
     implementation("io.hawt:hawtio-springboot:4.2.0")
     implementation("org.jolokia:jolokia-core:1.7.2")
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.3")
+    implementation("com.github.usefulness:webp-imageio:0.10.2")
 
     runtimeOnly("org.postgresql:postgresql")
 

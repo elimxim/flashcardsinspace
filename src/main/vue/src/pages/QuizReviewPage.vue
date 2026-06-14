@@ -52,8 +52,6 @@
           <SpaceDeck
             ref="spaceDeck"
             :session-type="ReviewSessionType.QUIZ"
-            :on-flashcard-removed="onFlashcardRemoved"
-            :on-audio-changed="onAudioChanged"
             :can-slide-left="!noNextAvailable"
             :can-slide-right="!noNextAvailable"
             :on-slide-left="() => quizAnswer(false)"
@@ -299,14 +297,6 @@ async function startNextQuizRound() {
       Log.error(LogTag.LOGIC, `Failed to create child review session`, error.response?.data)
       toaster.bakeError(userApiErrors.QUIZ_SESSION__NEXT_ROUND_FAILED, error.response?.data)
     })
-}
-
-function onFlashcardRemoved() {
-  reviewStore.nextFlashcard(flashcardSet.value)
-}
-
-function onAudioChanged() {
-  reviewStore.fetchAudio(flashcardSet.value)
 }
 
 const currFlashcardWatcher = watch(currFlashcard, async (newVal) => {

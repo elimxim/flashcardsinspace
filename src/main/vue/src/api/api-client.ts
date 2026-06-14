@@ -15,6 +15,8 @@ import {
   Flashcard,
   FlashcardAudio,
   FlashcardAudioMetadata,
+  FlashcardPicture,
+  FlashcardPictureMetadata,
   FlashcardSet,
   FlashcardSetExtra
 } from '@/model/flashcard.ts'
@@ -188,6 +190,41 @@ export async function sendFlashcardAudioFetchByIdRequest(setId: number, flashcar
 export async function sendFlashcardAudioRemovalRequest(setId: number, flashcardId: number, audioId: number) {
   Log.log(LogTag.DELETE, `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
   return apiClient.delete(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
+}
+
+export async function sendFlashcardPictureMetadataRequest(setId: number) {
+  Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/pictures/metadata`)
+  return apiClient.get<FlashcardPictureMetadata[]>(`/flashcard-sets/${setId}/flashcards/pictures/metadata`)
+}
+
+export async function sendFlashcardPictureUploadRequest(setId: number, flashcardId: number, side: string, pictureBlob: Blob) {
+  const form = new FormData()
+  form.append('side', side)
+  form.append('file', new File([pictureBlob], `picture-${Date.now()}.webp`, {
+    type: 'image/webp',
+  }))
+
+  Log.log(LogTag.POST, `/flashcard-sets/${setId}/flashcards/${flashcardId}/picture?side=${side}`)
+  return apiClient.post<FlashcardPicture>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/picture`,
+    form,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60_000,
+    }
+  )
+}
+
+export async function sendFlashcardPictureGetRequest(setId: number, flashcardId: number, side: string) {
+  Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/${flashcardId}/picture?side=${side}`)
+  return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/picture`, {
+    responseType: 'blob',
+    params: { side },
+  })
+}
+
+export async function sendFlashcardPictureRemovalRequest(setId: number, flashcardId: number, pictureId: number) {
+  Log.log(LogTag.DELETE, `/flashcard-sets/${setId}/flashcards/${flashcardId}/picture/${pictureId}`)
+  return apiClient.delete(`/flashcard-sets/${setId}/flashcards/${flashcardId}/picture/${pictureId}`)
 }
 
 export async function sendUserUpdateRequest(username: string, userEmail: string, languageId: number | undefined) {

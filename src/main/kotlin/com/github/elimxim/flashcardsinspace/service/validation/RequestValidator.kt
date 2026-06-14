@@ -224,8 +224,8 @@ fun SignUpRequest.toValidRequest() = ValidSignUpRequest(
 )
 
 fun FlashcardCreationRequest.toValidRequest() = ValidFlashcardCreationRequest(
-    frontSide = frontSide!!,
-    backSide = backSide!!,
+    frontSide = frontSide,
+    backSide = backSide,
     stage = FlashcardStage.valueOf(stage!!),
     creationDate = LocalDate.parse(creationDate!!, DateTimeFormatter.ISO_LOCAL_DATE),
 )

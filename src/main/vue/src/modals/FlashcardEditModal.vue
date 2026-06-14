@@ -10,8 +10,10 @@
       ref="sidesRef"
       v-model:front-text="frontSide"
       v-model:front-audio="frontSideAudio"
+      v-model:front-picture="frontSidePicture"
       v-model:back-text="backSide"
       v-model:back-audio="backSideAudio"
+      v-model:back-picture="backSidePicture"
     />
 
     <div class="modal-control-buttons">
@@ -54,6 +56,7 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
+import { usePictureStore } from '@/stores/picture-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import {
   flashcardSides,
@@ -68,21 +71,30 @@ import {
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { useAudioCache } from '@/stores/audio-cache.ts'
+import { usePictureCache } from '@/stores/picture-cache.ts'
 import {
   fetchFlashcardAudioBlob,
   removeFlashcardAudioBlob,
   uploadFlashcardAudioBlob
 } from '@/core-logic/flashcard-audio-logic.ts'
+import {
+  fetchFlashcardPictureBlob,
+  removeFlashcardPictureBlob,
+  uploadFlashcardPictureBlob
+} from '@/core-logic/flashcard-picture-logic.ts'
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const removed = defineModel<boolean>('removed', { default: false })
 const audioChanged = defineModel<boolean>('audioChanged', { default: false })
+const pictureChanged = defineModel<boolean>('pictureChanged', { default: false })
 
 const toggleStore = useToggleStore()
 const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
 const audioStore = useAudioStore()
 const audioCache = useAudioCache()
+const pictureStore = usePictureStore()
+const pictureCache = usePictureCache()
 const toaster = useSpaceToaster()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
@@ -91,10 +103,16 @@ const frontSide = ref(flashcard.value?.frontSide ?? '')
 const frontSideAudioId = ref(audioStore.getAudioId(flashcard.value?.id, flashcardSides.FRONT))
 const frontSideAudio = ref<Blob | undefined>()
 const frontSideAudioSize = ref<number | undefined>()
+const frontSidePicture = ref<Blob | undefined>()
+const frontSidePictureId = ref(pictureStore.getPictureId(flashcard.value?.id, flashcardSides.FRONT))
+const frontSidePictureSize = ref<number | undefined>()
 const backSide = ref(flashcard.value?.backSide ?? '')
 const backSideAudioId = ref(audioStore.getAudioId(flashcard.value?.id, flashcardSides.BACK))
 const backSideAudio = ref<Blob | undefined>()
 const backSideAudioSize = ref<number | undefined>()
+const backSidePicture = ref<Blob | undefined>()
+const backSidePictureId = ref(pictureStore.getPictureId(flashcard.value?.id, flashcardSides.BACK))
+const backSidePictureSize = ref<number | undefined>()
 const cancelButton = ref<InstanceType<typeof SmartButton>>()
 const removeButton = ref<InstanceType<typeof SmartButton>>()
 const updateButton = ref<InstanceType<typeof SmartButton>>()
@@ -104,6 +122,7 @@ const stateChanged = computed(() => {
   return flashcard.value?.frontSide !== frontSide.value
     || flashcard.value?.backSide !== backSide.value
     || isFrontSideAudioChanged.value || isBackSideAudioChanged.value
+    || isFrontSidePictureChanged.value || isBackSidePictureChanged.value
 })
 
 const isFrontSideAudioChanged = computed(() => {
@@ -119,6 +138,22 @@ const isBackSideAudioChanged = computed(() => {
     return backSideAudio.value !== undefined && backSideAudio.value?.size > 0
   } else {
     return backSideAudioSize.value !== backSideAudio.value?.size
+  }
+})
+
+const isFrontSidePictureChanged = computed(() => {
+  if (!frontSidePictureId.value) {
+    return frontSidePicture.value !== undefined && frontSidePicture.value?.size > 0
+  } else {
+    return frontSidePictureSize.value !== frontSidePicture.value?.size
+  }
+})
+
+const isBackSidePictureChanged = computed(() => {
+  if (!backSidePictureId.value) {
+    return backSidePicture.value !== undefined && backSidePicture.value?.size > 0
+  } else {
+    return backSidePictureSize.value !== backSidePicture.value?.size
   }
 })
 
@@ -240,11 +275,130 @@ async function removeAudioIfRelevant(): Promise<boolean> {
     .then((result) => result.every(v => v))
 }
 
+async function fetchPicture() {
+  const set = flashcardSet.value
+  const card = flashcard.value
+
+  if (!set || !card) return
+
+  await Promise.all([
+    (async function () {
+      if (frontSidePictureId.value) {
+        return await fetchFlashcardPictureBlob(set.id, card.id, true)
+          .then((blob) => {
+            frontSidePicture.value = blob
+            frontSidePictureSize.value = blob?.size
+          })
+      } else {
+        frontSidePicture.value = undefined
+        frontSidePictureSize.value = undefined
+      }
+    })(),
+    (async function () {
+      if (backSidePictureId.value) {
+        return await fetchFlashcardPictureBlob(set.id, card.id, false)
+          .then((blob) => {
+            backSidePicture.value = blob
+            backSidePictureSize.value = blob?.size
+          })
+      } else {
+        backSidePicture.value = undefined
+        backSidePictureSize.value = undefined
+      }
+    })(),
+  ])
+}
+
+async function uploadPictureIfRelevant(): Promise<boolean> {
+  const set = flashcardSet.value
+  const card = flashcard.value
+
+  if (!set || !card) {
+    Log.error(LogTag.LOGIC, `Cannot upload picture: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`)
+    return true
+  }
+
+  return await Promise.all([
+    (async function () {
+      if (isFrontSidePictureChanged.value && frontSidePicture.value) {
+        return uploadFlashcardPictureBlob(set, card, frontSidePicture.value, true)
+          .then((success) => {
+            if (success) {
+              pictureChanged.value = true
+            }
+            return success
+          })
+      } else {
+        return true
+      }
+    })(),
+    (async function () {
+      if (isBackSidePictureChanged.value && backSidePicture.value) {
+        return uploadFlashcardPictureBlob(set, card, backSidePicture.value, false)
+          .then((success) => {
+            if (success) {
+              pictureChanged.value = true
+            }
+            return success
+          })
+      } else {
+        return true
+      }
+    })(),
+  ])
+    .then((results) => results.every(v => v))
+}
+
+async function removePictureIfRelevant(): Promise<boolean> {
+  const set = flashcardSet.value
+  const card = flashcard.value
+
+  if (!set || !card) {
+    Log.error(LogTag.LOGIC, `Cannot remove picture blobs: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`)
+    return true
+  }
+
+  return await Promise.all([
+    (async function () {
+      if (frontSidePictureId.value && !frontSidePicture.value && frontSidePictureSize.value) {
+        return removeFlashcardPictureBlob(set, card, frontSidePictureId.value, true)
+          .then((result) => {
+            if (result) {
+              frontSidePictureId.value = undefined
+              frontSidePictureSize.value = undefined
+              pictureChanged.value = true
+            }
+            return result
+          })
+      } else {
+        return true
+      }
+    })(),
+    (async function () {
+      if (backSidePictureId.value && !backSidePicture.value && backSidePictureSize.value) {
+        return removeFlashcardPictureBlob(set, card, backSidePictureId.value, false)
+          .then((result) => {
+            if (result) {
+              backSidePictureId.value = undefined
+              backSidePictureSize.value = undefined
+              pictureChanged.value = true
+            }
+            return result
+          })
+      } else {
+        return true
+      }
+    })(),
+  ])
+    .then((result) => result.every(v => v))
+}
+
 async function cancel() {
   await resetState()
   toggleModalForm()
   removed.value = false
   audioChanged.value = false
+  pictureChanged.value = false
 }
 
 async function remove() {
@@ -254,6 +408,7 @@ async function remove() {
     toggleModalForm()
     removed.value = true
     audioChanged.value = false
+    pictureChanged.value = false
   }
 }
 
@@ -263,9 +418,9 @@ async function update() {
     if (!sidesRef.value?.invalid) {
       const updated = await updateFlashcard()
       if (updated) {
-        const uploaded = await uploadAudioIfRelevant()
-        const removed = await removeAudioIfRelevant()
-        if (uploaded && removed) {
+        const uploaded = await Promise.all([uploadAudioIfRelevant(), uploadPictureIfRelevant()])
+        const removed = await Promise.all([removeAudioIfRelevant(), removePictureIfRelevant()])
+        if (uploaded.every(Boolean) && removed.every(Boolean)) {
           toggleModalForm()
           await resetState()
         }
@@ -286,12 +441,22 @@ async function removeFlashcard(): Promise<boolean> {
       audioStore.removeAudioId(flashcardId, flashcardSides.BACK)
       audioCache.deleteAudio(flashcardId, true)
       audioCache.deleteAudio(flashcardId, false)
+      pictureStore.removePictureId(flashcardId, flashcardSides.FRONT)
+      pictureStore.removePictureId(flashcardId, flashcardSides.BACK)
+      pictureCache.deletePicture(flashcardId, true)
+      pictureCache.deletePicture(flashcardId, false)
       frontSideAudio.value = undefined
       backSideAudio.value = undefined
       frontSideAudioId.value = undefined
       backSideAudioId.value = undefined
       frontSideAudioSize.value = undefined
       backSideAudioSize.value = undefined
+      frontSidePicture.value = undefined
+      backSidePicture.value = undefined
+      frontSidePictureId.value = undefined
+      backSidePictureId.value = undefined
+      frontSidePictureSize.value = undefined
+      backSidePictureSize.value = undefined
       toaster.bakeSuccess('Success', 'Flashcard removed', 200)
       return true
     }).catch((error) => {
@@ -332,22 +497,26 @@ async function resetState() {
   sidesRef.value?.resetState()
   frontSide.value = flashcard.value?.frontSide ?? ''
   frontSideAudioId.value = audioStore.getAudioId(flashcard.value?.id, flashcardSides.FRONT)
+  frontSidePictureId.value = pictureStore.getPictureId(flashcard.value?.id, flashcardSides.FRONT)
   backSide.value = flashcard.value?.backSide ?? ''
   backSideAudioId.value = audioStore.getAudioId(flashcard.value?.id, flashcardSides.BACK)
-  await fetchAudio()
+  backSidePictureId.value = pictureStore.getPictureId(flashcard.value?.id, flashcardSides.BACK)
+  await Promise.all([fetchAudio(), fetchPicture()])
 }
 
 watch(flashcard, async (newVal) => {
   Log.log(LogTag.DEBUG, 'watch.flashcard', newVal)
   frontSide.value = newVal?.frontSide ?? ''
   frontSideAudioId.value = audioStore.getAudioId(newVal?.id, flashcardSides.FRONT)
+  frontSidePictureId.value = pictureStore.getPictureId(newVal?.id, flashcardSides.FRONT)
   backSide.value = newVal?.backSide ?? ''
   backSideAudioId.value = audioStore.getAudioId(newVal?.id, flashcardSides.BACK)
-  await fetchAudio()
+  backSidePictureId.value = pictureStore.getPictureId(newVal?.id, flashcardSides.BACK)
+  await Promise.all([fetchAudio(), fetchPicture()])
 })
 
 onMounted(async () => {
-  await fetchAudio()
+  await Promise.all([fetchAudio(), fetchPicture()])
 })
 
 </script>

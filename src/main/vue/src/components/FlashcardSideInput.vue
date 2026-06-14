@@ -17,7 +17,16 @@
       :when="maxLengthInvalid"
       text="Your text has its own gravity! Maximum 512 characters."
     />
-    <VoiceRecorder v-model="audio"/>
+    <div class="side-media">
+      <VoiceRecorder
+        v-model:audio-blob="audio"
+        v-model:expanded="voiceRecorderExpanded"
+      />
+      <PictureUploader
+        v-model:picture-blob="picture"
+        v-model:expanded="pictureUploaderExpanded"
+      />
+    </div>
   </div>
 </template>
 
@@ -25,21 +34,31 @@
 import TextInput from '@/components/TextInput.vue'
 import ErrorText from '@/components/ErrorText.vue'
 import VoiceRecorder from '@/components/VoiceRecorder.vue'
+import PictureUploader from '@/components/PictureUploader.vue'
 import { useVuelidate } from '@vuelidate/core'
-import { maxLength, required } from '@vuelidate/validators'
+import { maxLength, requiredIf } from '@vuelidate/validators'
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
 
 defineProps<{
   placeholder: string
 }>()
 
-const text = defineModel<string>('text', { required: true })
+const text = defineModel<string | undefined>('text', { required: true })
 const audio = defineModel<Blob | undefined>('audio')
+const picture = defineModel<Blob | undefined>('picture')
 const expandedFull = defineModel<boolean>('expanded-full', { default: false })
 const expandedDown = defineModel<boolean>('expanded-down', { default: false })
 
+const voiceRecorderExpanded = ref<boolean>(false)
+const pictureUploaderExpanded = ref<boolean>(false)
+
+const pictureAbsent = computed(() => !picture.value)
+
 const $v = useVuelidate({
-    text: { required, maxLength: maxLength(512) }
+    text: {
+      requiredWhenNoPicture: requiredIf(pictureAbsent),
+      maxLength: maxLength(512),
+    }
   },
   { text }
 )
@@ -50,6 +69,12 @@ const maxLengthInvalid = computed(() =>
 )
 
 watch(text, () => {
+  if (invalid.value) {
+    $v.value.text.$reset()
+  }
+})
+
+watch(picture, () => {
   if (invalid.value) {
     $v.value.text.$reset()
   }
@@ -72,6 +97,8 @@ function validate() {
 function resetState() {
   $v.value.$reset()
   text.value = ''
+  audio.value = undefined
+  picture.value = undefined
   expandedFull.value = false
   expandedDown.value = false
 }
@@ -97,6 +124,15 @@ watch(expandedFull, (newVal) => {
     window.addEventListener('keydown', onKeydown, { capture: true })
   } else {
     window.removeEventListener('keydown', onKeydown, { capture: true })
+  }
+})
+
+watch([voiceRecorderExpanded, pictureUploaderExpanded], ([vrNewVal, puNewVal], [vrOldVal, puOldVal]) => {
+  if (vrNewVal && puNewVal && puOldVal) {
+    pictureUploaderExpanded.value = false
+  }
+  if (puNewVal && vrNewVal && vrOldVal) {
+    voiceRecorderExpanded.value = false
   }
 })
 
@@ -128,5 +164,12 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.side-media {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
 }
 </style>

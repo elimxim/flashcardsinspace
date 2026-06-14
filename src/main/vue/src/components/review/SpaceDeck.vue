@@ -42,6 +42,8 @@
         :on-edit="toggleStore.toggleFlashcardEdit"
         :front-side-audio="flashcardFrontSideAudioBlob"
         :back-side-audio="flashcardBackSideAudioBlob"
+        :front-side-picture="flashcardFrontSidePictureBlob"
+        :back-side-picture="flashcardBackSidePictureBlob"
         :class="cardAnimationClass"
         :style="cardStyle"
         @animationend="onEnterAnimationEnd"
@@ -65,6 +67,7 @@
     v-model:flashcard="currFlashcard"
     v-model:removed="flashcardWasRemoved"
     v-model:audio-changed="audioWasChanged"
+    v-model:picture-changed="pictureWasChanged"
   />
 </template>
 
@@ -80,6 +83,7 @@ import { useReviewStore } from '@/stores/review-store.ts'
 import { storeToRefs } from 'pinia'
 import { UXConfig } from '@/utils/device-utils.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
+import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 
 const props = withDefaults(defineProps<{
   sessionType: ReviewSessionType
@@ -88,8 +92,6 @@ const props = withDefaults(defineProps<{
   canSlideRight?: boolean
   swipeLeftText?: string
   swipeRightText?: string
-  onFlashcardRemoved?: () => void
-  onAudioChanged?: () => void
   onSlideLeft?: () => Promise<void> | void
   onSlideRight?: () => Promise<void> | void
 }>(), {
@@ -98,10 +100,6 @@ const props = withDefaults(defineProps<{
   canSlideRight: true,
   swipeLeftText: undefined,
   swipeRightText: undefined,
-  onFlashcardRemoved: () => {
-  },
-  onAudioChanged: () => {
-  },
   onSlideLeft: () => {
   },
   onSlideRight: () => {
@@ -111,19 +109,26 @@ const props = withDefaults(defineProps<{
 const slots = useSlots()
 const toggleStore = useToggleStore()
 
+const flashcardStore = useFlashcardStore()
 const reviewStore = useReviewStore(props.sessionType)
 
+const { flashcardSet } = storeToRefs(flashcardStore)
+
 const {
+  reviewQueue,
   currFlashcard,
   autoPlayVoice,
   autoRepeatVoice,
   flashcardFrontSideAudioBlob,
   flashcardBackSideAudioBlob,
+  flashcardFrontSidePictureBlob,
+  flashcardBackSidePictureBlob,
 } = storeToRefs(reviewStore)
 
 const deckReady = ref(false)
 const flashcardWasRemoved = ref(false)
 const audioWasChanged = ref(false)
+const pictureWasChanged = ref(false)
 const spaceCard = ref<InstanceType<typeof SpaceCard>>()
 const spaceDeckElement = ref<HTMLElement>()
 
@@ -521,15 +526,23 @@ defineExpose({
 watch(flashcardWasRemoved, (newVal) => {
   if (newVal) {
     spaceCard.value?.flipToFront()
-    props.onFlashcardRemoved()
+    reviewQueue.value.removeCurrent()
+    reviewStore.nextFlashcard(flashcardSet.value)
     flashcardWasRemoved.value = false
   }
 })
 
 watch(audioWasChanged, (newVal) => {
   if (newVal) {
-    props.onAudioChanged()
+    reviewStore.fetchAudio(flashcardSet.value)
     audioWasChanged.value = false
+  }
+})
+
+watch(pictureWasChanged, (newVal) => {
+  if (newVal) {
+    reviewStore.fetchPicture(flashcardSet.value)
+    pictureWasChanged.value = false
   }
 })
 

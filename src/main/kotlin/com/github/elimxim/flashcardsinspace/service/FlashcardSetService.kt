@@ -23,6 +23,7 @@ class FlashcardSetService(
     private val chronodayRepository: ChronodayRepository,
     private val flashcardRepository: FlashcardRepository,
     private val flashcardAudioRepository: FlashcardAudioRepository,
+    private val flashcardPictureRepository: FlashcardPictureRepository,
     private val languageService: LanguageService,
     private val requestValidator: RequestValidator,
     private val reviewSessionRepository: ReviewSessionRepository,
@@ -131,6 +132,7 @@ class FlashcardSetService(
         } else {
             flashcardSet.dayStreak = null
             flashcardAudioRepository.deleteByFlashcardSetId(id)
+            flashcardPictureRepository.deleteByFlashcardSetId(id)
             reviewSessionRepository.deleteByFlashcardSet(flashcardSet)
             flashcardSetRepository.delete(flashcardSet)
         }

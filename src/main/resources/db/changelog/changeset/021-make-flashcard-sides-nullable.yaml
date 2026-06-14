@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 021-make-flashcard-sides-nullable
+      author: elimxim
+      changes:
+        - dropNotNullConstraint:
+            tableName: flashcard
+            columnName: front_side
+            columnDataType: TEXT
+        - dropNotNullConstraint:
+            tableName: flashcard
+            columnName: back_side
+            columnDataType: TEXT
