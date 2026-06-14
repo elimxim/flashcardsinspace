@@ -21,6 +21,8 @@ databaseChangeLog:
               - column:
                   name: mime_type
                   type: VARCHAR(50)
+                  constraints:
+                    nullable: false
               - column:
                   name: picture_data
                   type: BYTEA

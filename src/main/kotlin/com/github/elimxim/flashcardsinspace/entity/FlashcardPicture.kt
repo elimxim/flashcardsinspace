@@ -17,8 +17,8 @@ open class FlashcardPicture(
     @Column(nullable = false)
     open var side: FlashcardSide,
 
-    @Column(nullable = true)
-    open var mimeType: String? = null,
+    @Column(nullable = false)
+    open var mimeType: String,
 
     @JdbcTypeCode(SqlTypes.VARBINARY)
     @Column(nullable = false)
