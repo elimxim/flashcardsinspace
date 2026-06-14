@@ -17,13 +17,11 @@
         role="button"
         class="awesome-button awesome-button--theme select-none drag-none"
         :class="{
-        'awesome-button--active': active,
-        'awesome-button--disabled': disabled,
-        'awesome-button--invisible': invisible,
-        'awesome-button--click-ripple': clickRipple,
-        'awesome-button--ripple-active': rippleActive,
-        'awesome-button--tapped': animatingOnTap,
-      }"
+          'awesome-button--active': active,
+          'awesome-button--disabled': disabled,
+          'awesome-button--invisible': invisible,
+          'awesome-button--tapped': animatingOnTap,
+        }"
         :disabled="disabled"
         v-bind="$attrs"
         @click.stop="handleClick"
@@ -74,7 +72,6 @@ import { UXConfig } from '@/utils/device-utils.ts'
 const props = withDefaults(defineProps<{
   icon: string
   fade?: boolean
-  scaleFactor?: number
   flipIcon?: string
   spinWhenFlipped?: boolean
   disabled?: boolean
@@ -83,7 +80,6 @@ const props = withDefaults(defineProps<{
   invisible?: boolean
   square?: boolean
   fillSpace?: boolean
-  clickRipple?: boolean
   animateTap?: boolean,
   tapDuration?: number
   tooltip?: string
@@ -94,7 +90,6 @@ const props = withDefaults(defineProps<{
   onHover?: () => void | Promise<void>
 }>(), {
   fade: false,
-  scaleFactor: 1.1,
   flipIcon: undefined,
   spinWhenFlipped: false,
   disabled: false,
@@ -103,7 +98,6 @@ const props = withDefaults(defineProps<{
   invisible: false,
   square: false,
   fillSpace: false,
-  clickRipple: false,
   animateTap: true,
   tapDuration: 300,
   tooltip: undefined,
@@ -124,7 +118,6 @@ const {
 } = useDeferredLoading()
 
 const pressed = ref(false)
-const rippleActive = ref(false)
 const animatingOnTap = ref(false)
 
 async function press() {
@@ -139,9 +132,7 @@ async function press() {
 
 function handleClick() {
   if (props.disabled || resolvedLoading.value) return
-  if (props.clickRipple) {
-    triggerRipple()
-  } else if (UXConfig().showAnimationOnTap && props.animateTap) {
+  if (UXConfig().showAnimationOnTap && props.animateTap) {
     startTapAnimation()
   } else {
     press()
@@ -171,14 +162,6 @@ function startTapAnimation() {
   }, props.tapDuration)
 }
 
-function triggerRipple() {
-  rippleActive.value = true
-  setTimeout(() => {
-    rippleActive.value = false
-    press()
-  }, 300)
-}
-
 function isPressed(): boolean {
   return pressed.value
 }
@@ -206,6 +189,8 @@ defineExpose({
   --a-btn--border--hover: var(--awesome-button--border--hover, none);
   --a-btn--border-radius: var(--awesome-button--border-radius, none);
   --a-btn--padding: var(--awesome-button--padding, 1px);
+  --a-btn--scale-factor--on-hover: var(--awesome-button--scale-factor--on-hover, 1.1);
+  --a-btn--scale-factor--on-active: var(--awesome-button--scale-factor--on-active, 0.9);
 }
 
 .awesome-button-wrapper {
@@ -247,8 +232,8 @@ defineExpose({
   cursor: pointer;
   margin: 0;
   padding: var(--a-btn--padding);
-  transition: all 0.3s ease-in-out;
-  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+  overflow: visible;
 }
 
 @media (hover: hover) {
@@ -282,12 +267,16 @@ defineExpose({
 
 @media (hover: hover) {
   .awesome-button-wrapper:has(.awesome-button:not(.awesome-button--disabled):hover) .awesome-icon-wrapper {
-    transform: scale(v-bind(scaleFactor));
+    transform: scale(var(--a-btn--scale-factor--on-hover));
   }
 }
 
 .awesome-button-wrapper:has(.awesome-button--tapped:not(.awesome-button--disabled)) .awesome-icon-wrapper {
-  transform: scale(v-bind(scaleFactor));
+  transform: scale(var(--a-btn--scale-factor--on-hover));
+}
+
+.awesome-button-wrapper:has(.awesome-button:not(.awesome-button--disabled):active) .awesome-icon-wrapper {
+  transform: scale(var(--a-btn--scale-factor--on-active));
 }
 
 .awesome-icon-wrapper {
@@ -331,26 +320,6 @@ defineExpose({
   100% {
     opacity: 1;
   }
-}
-
-.awesome-button--click-ripple::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-color: var(--a-btn--bg--active);
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0);
-  pointer-events: none;
-  z-index: 1;
-  transition: none;
-}
-
-.awesome-button--click-ripple.awesome-button--ripple-active::before {
-  animation: growing-circle 0.5s ease-out;
 }
 
 @keyframes growing-circle {

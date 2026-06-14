@@ -7,7 +7,6 @@
       :active="isPlaying"
       :fade="isPlaying"
       :on-click="isPlaying ? stop : play"
-      click-ripple
       square
     />
     <audio
