@@ -3,6 +3,7 @@ import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { EmptyReviewQueue, ReviewQueue, ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { defineStore, getActivePinia } from 'pinia'
 import { fetchFlashcardAudio } from '@/core-logic/flashcard-audio-logic.ts'
+import { fetchFlashcardPicture } from '@/core-logic/flashcard-picture-logic.ts'
 
 export const useReviewStore = (sessionType: ReviewSessionType) => {
   const storeId = buildStoreId(sessionType)
@@ -15,6 +16,8 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
     const autoRepeatVoice = ref(false)
     const flashcardFrontSideAudioBlob = ref<Blob>()
     const flashcardBackSideAudioBlob = ref<Blob>()
+    const flashcardFrontSidePictureBlob = ref<Blob>()
+    const flashcardBackSidePictureBlob = ref<Blob>()
     const loaded = ref(false)
 
     // getters
@@ -65,12 +68,28 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
       )
     }
 
+    async function fetchPicture(flashcardSet: FlashcardSet | undefined) {
+      await fetchFlashcardPicture(
+        flashcardSet?.id,
+        currFlashcard.value?.id,
+        flashcardFrontSidePictureBlob,
+        flashcardBackSidePictureBlob,
+      )
+    }
+
+    async function fetchMedia(flashcardSet: FlashcardSet | undefined) {
+      await Promise.all([
+        fetchAudio(flashcardSet),
+        fetchPicture(flashcardSet),
+      ])
+    }
+
     async function prevFlashcard(
       flashcardSet: FlashcardSet | undefined,
       callback: (success: boolean) => void = () => {},
     ): Promise<boolean> {
       currFlashcard.value = reviewQueue.value.prev()
-      await fetchAudio(flashcardSet)
+      await fetchMedia(flashcardSet)
       const result = currFlashcard.value !== undefined
       callback(result)
       return result
@@ -81,7 +100,7 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
       callback: (success: boolean) => void = () => {},
     ): Promise<boolean> {
       currFlashcard.value = reviewQueue.value.next()
-      await fetchAudio(flashcardSet)
+      await fetchMedia(flashcardSet)
       const result = currFlashcard.value !== undefined
       callback(result)
       return result
@@ -99,6 +118,8 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
       autoRepeatVoice.value = false
       flashcardFrontSideAudioBlob.value = undefined
       flashcardBackSideAudioBlob.value = undefined
+      flashcardFrontSidePictureBlob.value = undefined
+      flashcardBackSidePictureBlob.value = undefined
       loaded.value = false
     }
 
@@ -111,6 +132,8 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
       autoRepeatVoice,
       flashcardFrontSideAudioBlob,
       flashcardBackSideAudioBlob,
+      flashcardFrontSidePictureBlob,
+      flashcardBackSidePictureBlob,
 
       flashcardsRemaining,
       flashcardsSeen,
@@ -121,6 +144,8 @@ export const useReviewStore = (sessionType: ReviewSessionType) => {
       loadState,
       $reset,
       fetchAudio,
+      fetchPicture,
+      fetchMedia,
       prevFlashcard,
       nextFlashcard,
       setFlashcardsTotal,

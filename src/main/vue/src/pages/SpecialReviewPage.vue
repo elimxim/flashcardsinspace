@@ -63,8 +63,6 @@
           <SpaceDeck
             ref="spaceDeck"
             :session-type="reviewMode.sessionType"
-            :on-flashcard-removed="onFlashcardRemoved"
-            :on-audio-changed="onAudioChanged"
             :can-slide-left="!noPrevAvailable"
             :can-slide-right="!noNextAvailable"
             :on-slide-left="prev"
@@ -347,15 +345,6 @@ async function updateReviewSession(flashcardIds: number[], finished: boolean = f
       Log.error(LogTag.LOGIC, `Failed to update review session ${props.sessionId}`, error.response?.data)
       toaster.bakeError(userApiErrors.REVIEW_SESSION__UPDATING_FAILED, error.response?.data)
     })
-}
-
-function onFlashcardRemoved() {
-  reviewQueue.value.removeCurrent()
-  reviewStore.nextFlashcard(flashcardSet.value)
-}
-
-function onAudioChanged() {
-  reviewStore.fetchAudio(flashcardSet.value)
 }
 
 onMounted(async () => {

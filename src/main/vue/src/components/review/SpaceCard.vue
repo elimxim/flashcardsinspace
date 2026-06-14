@@ -27,9 +27,17 @@
             :on-click="handleEdit"
           />
         </div>
-        <TotemScroll>
-          <div class="space-card-content">
-            <p>{{ frontSide }}</p>
+        <TotemScroll v-if="frontHasPicture">
+          <div class="space-card-content space-card-content--picture">
+            <div class="space-card-picture">
+              <SpacePicture :picture-blob="frontSidePicture"/>
+            </div>
+            <p v-if="frontSide" class="space-card-text">{{ frontSide }}</p>
+          </div>
+        </TotemScroll>
+        <TotemScroll v-else>
+          <div class="space-card-content space-card-content--text">
+            <p class="space-card-text">{{ frontSide }}</p>
           </div>
         </TotemScroll>
         <div class="space-card-strip select-none">
@@ -88,9 +96,17 @@
             :on-click="handleEdit"
           />
         </div>
-        <TotemScroll>
-          <div class="space-card-content">
-            <p>{{ backSide }}</p>
+        <TotemScroll v-if="backHasPicture">
+          <div class="space-card-content space-card-content--picture">
+            <div class="space-card-picture">
+              <SpacePicture :picture-blob="backSidePicture"/>
+            </div>
+            <p v-if="backSide" class="space-card-text">{{ backSide }}</p>
+          </div>
+        </TotemScroll>
+        <TotemScroll v-else>
+          <div class="space-card-content space-card-content--text">
+            <p class="space-card-text">{{ backSide }}</p>
           </div>
         </TotemScroll>
         <div class="space-card-strip select-none">
@@ -135,6 +151,7 @@
 import TotemScroll from '@/components/TotemScroll.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import VoicePlayer from '@/components/VoicePlayer.vue'
+import SpacePicture from '@/components/SpacePicture.vue'
 import Tooltip from '@/components/Tooltip.vue'
 import { ref, nextTick, computed } from 'vue'
 import { stageNameMap } from '@/core-logic/stage-logic.ts'
@@ -145,10 +162,12 @@ const autoRepeatVoice = defineModel<boolean>('autoRepeatVoice', { default: false
 
 const props = withDefaults(defineProps<{
   stage?: string
-  frontSide?: string
+  frontSide?: string | undefined
   frontSideAudio?: Blob | undefined
-  backSide?: string
+  frontSidePicture?: Blob | undefined
+  backSide?: string | undefined
   backSideAudio?: Blob | undefined
+  backSidePicture?: Blob | undefined
   viewedTimes?: number
   textOnly?: boolean
   unflippable?: boolean
@@ -158,8 +177,10 @@ const props = withDefaults(defineProps<{
   stage: undefined,
   frontSide: undefined,
   frontSideAudio: undefined,
+  frontSidePicture: undefined,
   backSide: undefined,
   backSideAudio: undefined,
+  backSidePicture: undefined,
   viewedTimes: undefined,
   textOnly: false,
   unflippable: false,
@@ -178,6 +199,9 @@ const cardAnimationCompleted = ref(false)
 let flipDurationTimeout: ReturnType<typeof setTimeout> | null = null
 const frontVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
 const backVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
+
+const frontHasPicture = computed(() => !!props.frontSidePicture)
+const backHasPicture = computed(() => !!props.backSidePicture)
 
 const stageDisplayName = computed(() => {
   if (props.stage === undefined || props.stage === 'OUTER_SPACE') {
@@ -291,6 +315,7 @@ defineExpose({
   cursor: pointer;
   will-change: transform;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   perspective: 1000px;
   z-index: 10;
 }
@@ -311,6 +336,7 @@ defineExpose({
   flex: 1;
   transition: transform v-bind(flipAnimationDurationMs) cubic-bezier(0.25, 1, 0.5, 1);
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   position: relative;
   will-change: transform;
 }
@@ -321,6 +347,8 @@ defineExpose({
   height: 100%;
   padding: 0.4rem;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
   display: flex;
   flex-direction: column;
   border-radius: 24px;
@@ -373,8 +401,7 @@ defineExpose({
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-left: 4px;
-  padding-right: 4px;
+  padding: 4px;
   gap: 10px;
 }
 
@@ -388,30 +415,48 @@ defineExpose({
 
 .space-card-content {
   height: 100%;
-  display: block;
-  width: 100%;
-  min-height: 0;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  box-sizing: border-box;
+  align-items: center;
 }
 
-.space-card-content p {
-  margin: 0;
-  min-height: 100%;
+.space-card-content--picture {
+  width: 100%;
+  gap: 6px;
+}
+
+.space-card-picture {
+  flex: 1 1 0;
+  min-height: 76%;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-  padding: 10px;
+}
+
+.space-card-content--text {
+  height: auto;
+  min-height: 100%;
+  justify-content: center;
+}
+
+.space-card-text {
+  margin: 0;
+  width: 100%;
   color: var(--card--color);
   font-size: clamp(1.4rem, 2vw, 1.8rem);
   text-align: center;
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: anywhere;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.space-card-content--picture .space-card-text {
+  flex: 0 0 auto;
 }
 
 .space-card-strip-text {
