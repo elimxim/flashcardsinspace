@@ -23,8 +23,8 @@
         v-else
         key="thumb"
         ref="thumbButton"
-        class="picture-uploader-thumb-button"
         v-model:url="previewUrl"
+        class="picture-uploader-thumb-button"
         :on-click="toggleControls"
         :active="expanded"
       />

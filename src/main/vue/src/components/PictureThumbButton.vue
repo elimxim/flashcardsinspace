@@ -11,8 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-
-import { onBeforeUnmount } from 'vue';
+import { onBeforeUnmount } from 'vue'
 
 const url = defineModel<string | undefined>('url', { required: true })
 

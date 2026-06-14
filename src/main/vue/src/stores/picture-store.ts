@@ -29,7 +29,7 @@ export const usePictureStore = defineStore('picture', {
     checkStateLoaded() {
       if (!this.loaded) throw Error(`picture.checkStateLoaded: !loaded`)
     },
-    setPictureId(flashcardId: number, side: string, pictureId: number, width: number, height: number) {
+    setPictureId(flashcardId: number, side: string, pictureId: number) {
       Log.log(LogTag.STORE, `picture.setPictureId: Picture.id=${pictureId}, Flashcard.id=${flashcardId}, Flashcard.side=${side}`)
       this.checkStateLoaded()
       const key = pictureMapKey(flashcardId, side)

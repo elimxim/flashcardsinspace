@@ -55,7 +55,7 @@ export async function uploadFlashcardPictureBlob(
   return await sendFlashcardPictureUploadRequest(flashcardSet.id, flashcard.id, side, pictureBlob)
     .then((response) => {
       Log.log(LogTag.LOGIC, `Picture.id=${response.data.id} uploaded, Picture.size: ${response.data.pictureSize}, Picture.mime: ${response.data.mimeType}`)
-      pictureStore.setPictureId(flashcard.id, side, response.data.id, response.data.width, response.data.height)
+      pictureStore.setPictureId(flashcard.id, side, response.data.id)
       pictureCache.addPicture(flashcard.id, pictureBlob, isFrontSide)
       return true
     })
