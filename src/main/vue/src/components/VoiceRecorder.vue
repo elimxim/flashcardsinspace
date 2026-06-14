@@ -5,12 +5,11 @@
       class="voice-recorder-button voice-recorder-button--mic"
       style="height: 100%;"
       :on-click="toggleControls"
-      :active="isControlsExpanded"
-      :click-ripple="!expanded"
+      :active="expanded"
       square
     />
     <transition name="voice-controls-slide">
-      <div v-if="isControlsExpanded" class="voice-recorder-controls-wrapper">
+      <div v-if="expanded" class="voice-recorder-controls-wrapper">
         <div v-if="!isSupported" class="voice-warning-text">
           Your browser doesn’t support voice recording
         </div>
@@ -37,7 +36,6 @@
             {{ recordingTime }}
           </div>
           <AwesomeButton
-            v-if="!noTrash"
             icon="fa-solid fa-trash"
             class="voice-recorder-button"
             :disabled="!audioBlob"
@@ -59,19 +57,14 @@ import VoicePlayer from '@/components/VoicePlayer.vue'
 import { ref, computed, onBeforeUnmount, watch } from 'vue'
 import { Log, LogTag } from '@/utils/logger.ts'
 
-const audioBlob = defineModel<Blob | undefined>()
+const audioBlob = defineModel<Blob | undefined>('audio-blob', { required: true })
+const expanded = defineModel<boolean>('expanded', { default: false })
 
 const props = withDefaults(defineProps<{
   maxDuration?: number
-  expanded?: boolean
-  noTrash?: boolean
 }>(), {
   maxDuration: 20 * 1000,
-  expanded: false,
-  noTrash: false,
 })
-
-const isControlsExpanded = ref(props.expanded)
 const isRecording = ref(false)
 const isPaused = ref(false)
 
@@ -155,8 +148,7 @@ function stopTimer() {
 
 function toggleControls() {
   if (isRecording.value) pauseRecording()
-  if (props.expanded) return
-  isControlsExpanded.value = !isControlsExpanded.value
+  expanded.value = !expanded.value
 }
 
 async function startRecording() {
