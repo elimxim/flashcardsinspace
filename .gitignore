@@ -1,10 +1,10 @@
 .idea
 .gradle
 .kotlin
+.claude/worktrees
+.claude/workdir
 build
 out
 logs
 certs
 **/*-dev.yaml
-tasks
-SPEC.md
