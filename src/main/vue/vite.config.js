@@ -18,6 +18,9 @@ export default defineConfig(({ mode }) => {
         optimizeDeps: {
             exclude: ['@jsquash/webp'],
         },
+        worker: {
+            format: 'es',
+        },
         build: {
             outDir: '../../../build/resources/main/static',
             emptyOutDir: true,
