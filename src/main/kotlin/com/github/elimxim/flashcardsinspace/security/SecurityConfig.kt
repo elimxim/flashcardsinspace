@@ -95,7 +95,7 @@ class SecurityConfig(
                 .headers { headers ->
                     headers
                         .xssProtection { xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK) }
-                        .contentSecurityPolicy { csp -> csp.policyDirectives("script-src 'self'") }
+                        .contentSecurityPolicy { csp -> csp.policyDirectives("script-src 'self' 'wasm-unsafe-eval'") }
                 }
                 .build()
         } else {
