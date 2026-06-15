@@ -1,161 +1,111 @@
-import { describe, it, expect, beforeAll, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+
+// @jsquash/webp is a WebAssembly codec; mock its encode so the resize/orchestration logic can be
+// exercised in jsdom without loading any wasm.
+const encodeMock = vi.fn((): Promise<ArrayBuffer> => Promise.resolve(new ArrayBuffer(64)))
+vi.mock('@jsquash/webp', () => ({ encode: () => encodeMock() }))
+
 import { processImageToWebp } from '@/utils/image-processing.ts'
-
-// OffscreenCanvas and createImageBitmap are not available in jsdom/node.
-// We mock them to exercise the logic paths.
-
-const MOCK_WEBP_BLOB = new Blob(['mock'], { type: 'image/webp' })
 
 function makeImageFile(name = 'test.jpg', type = 'image/jpeg', size = 100): File {
   const bytes = new Uint8Array(size).fill(0)
   return new File([bytes], name, { type })
 }
 
-function makeOffscreenCanvas(w: number, h: number) {
+// jsdom has no canvas backend, so stub document.createElement('canvas') with a fake whose
+// getImageData echoes the requested dimensions.
+function makeCanvas() {
   return {
-    width: w,
-    height: h,
-    getContext: () => ({ drawImage: vi.fn() }),
-    convertToBlob: () => Promise.resolve(new Blob(['webp'], { type: 'image/webp' })),
+    width: 0,
+    height: 0,
+    getContext: () => ({
+      imageSmoothingQuality: 'low',
+      drawImage: vi.fn(),
+      getImageData: (_x: number, _y: number, gw: number, gh: number) => ({
+        data: new Uint8ClampedArray(4),
+        width: gw,
+        height: gh,
+      }),
+    }),
   }
 }
 
-beforeAll(() => {
-  vi.stubGlobal('createImageBitmap', vi.fn(() =>
-    Promise.resolve({
-      width: 800,
-      height: 600,
-      close: vi.fn(),
-    })
-  ))
+// loadImage loads the blob into an <img>; jsdom never fires onload, so stub Image to resolve
+// synchronously with controllable natural dimensions (or to error).
+let nextImageSize = { width: 800, height: 600 }
 
-  vi.stubGlobal('OffscreenCanvas', vi.fn().mockImplementation(makeOffscreenCanvas))
+function stubImage(succeed = true) {
+  vi.stubGlobal('URL', { createObjectURL: vi.fn(() => 'blob:mock'), revokeObjectURL: vi.fn() })
+  vi.stubGlobal('Image', class {
+    onload: (() => void) | null = null
+    onerror: (() => void) | null = null
+    naturalWidth = 0
+    naturalHeight = 0
+    set src(_value: string) {
+      if (succeed) {
+        this.naturalWidth = nextImageSize.width
+        this.naturalHeight = nextImageSize.height
+        setTimeout(() => this.onload?.(), 0)
+      } else {
+        setTimeout(() => this.onerror?.(), 0)
+      }
+    }
+  })
+}
+
+beforeEach(() => {
+  encodeMock.mockClear()
+  nextImageSize = { width: 800, height: 600 }
+  stubImage()
+  vi.stubGlobal('document', { createElement: vi.fn(() => makeCanvas()) })
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
 })
 
 describe('processImageToWebp', () => {
   it('returns a blob with type image/webp', async () => {
-    const file = makeImageFile()
-    const result = await processImageToWebp(file)
+    const result = await processImageToWebp(makeImageFile())
     expect(result.blob.type).toBe('image/webp')
+    expect(encodeMock).toHaveBeenCalled()
   })
 
   it('returns dimensions reflecting the resized canvas (800x600 fits in 1600)', async () => {
-    const file = makeImageFile()
-    const result = await processImageToWebp(file)
-    // 800x600 fits within 1600 — no scaling needed
+    const result = await processImageToWebp(makeImageFile())
     expect(result.width).toBe(800)
     expect(result.height).toBe(600)
   })
 
   it('downscales when long edge exceeds maxDim', async () => {
-    // Simulate a 3200x2400 bitmap (long edge 3200)
-    vi.mocked(createImageBitmap).mockResolvedValueOnce({
-      width: 3200,
-      height: 2400,
-      close: vi.fn(),
-    } as unknown as ImageBitmap)
+    nextImageSize = { width: 3200, height: 2400 }
 
-    vi.stubGlobal('OffscreenCanvas', vi.fn().mockImplementation(makeOffscreenCanvas))
-
-    const file = makeImageFile()
-    const result = await processImageToWebp(file, 1600)
-
+    const result = await processImageToWebp(makeImageFile(), 1600)
     // Scale = 1600/3200 = 0.5 → 1600x1200
     expect(result.width).toBe(1600)
     expect(result.height).toBe(1200)
   })
 
   it('does not upscale a small image (200x200 stays 200x200)', async () => {
-    vi.mocked(createImageBitmap).mockResolvedValueOnce({
-      width: 200,
-      height: 200,
-      close: vi.fn(),
-    } as unknown as ImageBitmap)
+    nextImageSize = { width: 200, height: 200 }
 
-    vi.stubGlobal('OffscreenCanvas', vi.fn().mockImplementation(makeOffscreenCanvas))
-
-    const file = makeImageFile()
-    const result = await processImageToWebp(file)
+    const result = await processImageToWebp(makeImageFile())
     expect(result.width).toBe(200)
     expect(result.height).toBe(200)
   })
 
-  it('throws on non-image input (bitmap creation rejects)', async () => {
-    vi.mocked(createImageBitmap).mockRejectedValueOnce(new Error('not an image'))
-    const file = makeImageFile('data.bin', 'application/octet-stream')
-    await expect(processImageToWebp(file)).rejects.toThrow()
-  })
-
-  it('falls back to HTMLCanvasElement when OffscreenCanvas is unavailable', async () => {
-    vi.stubGlobal('OffscreenCanvas', undefined)
-
-    const canvasEl = {
-      width: 0,
-      height: 0,
-      getContext: () => ({ drawImage: vi.fn() }),
-      toBlob: (cb: (b: Blob | null) => void) => {
-        cb(new Blob(['canvas-fallback'], { type: 'image/webp' }))
-      },
-    }
-    vi.stubGlobal('document', {
-      createElement: vi.fn(() => canvasEl),
-    })
-
-    vi.mocked(createImageBitmap).mockResolvedValueOnce({
-      width: 400,
-      height: 300,
-      close: vi.fn(),
-    } as unknown as ImageBitmap)
-
-    const file = makeImageFile()
-    const result = await processImageToWebp(file)
-    expect(result.blob.type).toBe('image/webp')
-    expect(result.width).toBe(400)
-    expect(result.height).toBe(300)
-
-    // Restore for subsequent tests
-    vi.stubGlobal('OffscreenCanvas', vi.fn().mockImplementation(makeOffscreenCanvas))
-    vi.stubGlobal('document', undefined)
-  })
-
   it('aspect ratio preserved: 1920x1080 → 1600x900', async () => {
-    vi.mocked(createImageBitmap).mockResolvedValueOnce({
-      width: 1920,
-      height: 1080,
-      close: vi.fn(),
-    } as unknown as ImageBitmap)
+    nextImageSize = { width: 1920, height: 1080 }
 
-    vi.stubGlobal('OffscreenCanvas', vi.fn().mockImplementation(makeOffscreenCanvas))
-
-    const file = makeImageFile()
-    const result = await processImageToWebp(file, 1600)
-
-    // scale = 1600/1920 ≈ 0.8333 → 1600 x 900
+    const result = await processImageToWebp(makeImageFile(), 1600)
     expect(result.width).toBe(1600)
     expect(result.height).toBe(900)
-
-    // Verify aspect ratio within 1px
-    const sourceRatio = 1920 / 1080
-    const resultRatio = result.width / result.height
-    expect(Math.abs(sourceRatio - resultRatio)).toBeLessThan(0.02)
   })
 
-  // Restore stable OffscreenCanvas mock after the last test that tampers with it
-  it('uses MOCK_WEBP_BLOB type in stable mock (sanity)', async () => {
-    vi.stubGlobal('OffscreenCanvas', vi.fn().mockImplementation(() => ({
-      width: 100,
-      height: 100,
-      getContext: () => ({ drawImage: vi.fn() }),
-      convertToBlob: () => Promise.resolve(MOCK_WEBP_BLOB),
-    })))
+  it('throws when the input cannot be decoded', async () => {
+    stubImage(false)
 
-    vi.mocked(createImageBitmap).mockResolvedValueOnce({
-      width: 100,
-      height: 100,
-      close: vi.fn(),
-    } as unknown as ImageBitmap)
-
-    const result = await processImageToWebp(makeImageFile())
-    expect(result.blob.type).toBe('image/webp')
+    await expect(processImageToWebp(makeImageFile('data.bin', 'application/octet-stream')))
+      .rejects.toThrow()
   })
 })

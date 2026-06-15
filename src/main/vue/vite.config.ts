@@ -18,6 +18,9 @@ export default defineConfig(({ mode }) => {
         '@': fileURLToPath(new URL('./src', import.meta.url))
       }
     },
+    optimizeDeps: {
+      exclude: ['@jsquash/webp'],
+    },
     build: {
       outDir: '../../../build/resources/main/static',
       emptyOutDir: true,
