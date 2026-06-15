@@ -5,9 +5,8 @@ const DEFAULT_QUALITY = 85
 const DEFAULT_TARGET_BYTES = 280 * 1024
 
 /**
- * Decodes an image File with an <img> and resizes it so neither edge exceeds maxDim (never
- * upscales), returning the raw pixels. Runs on the main thread because it needs the DOM (<img>,
- * canvas); pass the result to encodeToWebp to compress it off the main thread.
+ * Decodes an image File with an <img> and resizes it so neither
+ * edge exceeds {@link maxDim} (never upscales), returning the raw pixels.
  */
 export async function decodeAndResize(file: File, maxDim: number = DEFAULT_MAX_DIM): Promise<ImageData> {
   Log.log(LogTag.SYSTEM, `imgProc: input "${file.name}" type=${file.type || 'unknown'} size=${(file.size / 1024).toFixed(1)} KB`)
@@ -18,9 +17,9 @@ export async function decodeAndResize(file: File, maxDim: number = DEFAULT_MAX_D
 }
 
 /**
- * Decodes a Blob via a plain <img>. <img> handles every format the OS supports
- * (including HEIC on Apple devices) and applies EXIF orientation
- * by default on modern browsers.
+ * Decodes a Blob via a plain <img>. <img> handles every format
+ * the OS supports (including HEIC on Apple devices) and applies
+ * EXIF orientation by default on modern browsers.
  */
 function loadImage(blob: Blob): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -39,8 +38,8 @@ function loadImage(blob: Blob): Promise<HTMLImageElement> {
 }
 
 /**
- * Resizes the image so its long edge is at most maxDim (never upscales)
- * and reads back the pixels.
+ * Resizes the image so its long edge is at most {@link maxDim}
+ * (never upscales) and reads back the pixels.
  * */
 function resizeToImageData(img: HTMLImageElement, maxDim: number): ImageData {
   const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight))
