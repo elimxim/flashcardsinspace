@@ -40,7 +40,10 @@
             :disabled="processing"
             :on-click="openPicker"
           />
-          <div class="picture-uploader-size">{{ sizeLabel }}</div>
+          <div
+            class="picture-uploader-size"
+            :class="{ 'picture-uploader-size--processing': processing }"
+          >{{ sizeLabel }}</div>
           <AwesomeButton
             icon="fa-solid fa-eye"
             class="picture-uploader-button"
@@ -76,10 +79,11 @@
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import PictureThumbButton from '@/components/PictureThumbButton.vue'
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
-import { processImageToWebp } from '@/utils/image-processing.ts'
+import { decodeAndResize, encodeToWebp } from '@/utils/image-processing.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { blob } from 'node:stream/consumers';
 
 const MAX_RAW_SIZE_BYTES = 30 * 1024 * 1024 // 30 MB
 const MAX_PROCESSED_SIZE_BYTES = 500 * 1024 // 500 KB
@@ -92,6 +96,7 @@ const fileInputRef = ref<HTMLInputElement>()
 const previewUrl = ref<string | undefined>()
 const previewOpen = ref(false)
 const processing = ref(false)
+const encodeController = ref<AbortController>()
 
 const hasPicture = computed(() => !!pictureBlob.value)
 const sizeLabel = computed(() => formatSize(pictureBlob.value?.size ?? 0))
@@ -144,8 +149,10 @@ async function handleFileChange(event: Event) {
   }
 
   processing.value = true
+  encodeController.value = new AbortController()
   try {
-    const { blob } = await processImageToWebp(file)
+    const imageData = await decodeAndResize(file)
+    const blob = await encodeToWebp(imageData, encodeController.value.signal)
     if (blob.size > MAX_PROCESSED_SIZE_BYTES) {
       useSpaceToaster().bakeError(userApiErrors.PICTURE__TOO_LARGE_AFTER_COMPRESSION)
       Log.log(LogTag.LOGIC, `PictureUploader: rejected - processed still too large (${(blob.size / 1024).toFixed(1)} KB, max 500 KB)`)
@@ -155,9 +162,14 @@ async function handleFileChange(event: Event) {
     expanded.value = true
     Log.log(LogTag.LOGIC, `PictureUploader: accepted processed webp ${(blob.size / 1024).toFixed(1)} KB`)
   } catch (error) {
+    if (encodeController.value.signal.aborted) {
+      Log.log(LogTag.LOGIC, 'PictureUploader: processing aborted')
+      return
+    }
     useSpaceToaster().bakeError(userApiErrors.PICTURE__UPLOADING_FAILED)
     Log.error(LogTag.LOGIC, 'PictureUploader: failed to process image', error)
   } finally {
+    encodeController.value = undefined
     processing.value = false
   }
 }
@@ -182,6 +194,7 @@ watch(pictureBlob, (newBlob) => {
 }, { immediate: true })
 
 onBeforeUnmount(() => {
+  encodeController.value?.abort()
   thumbButton.value?.revoke()
   window.removeEventListener('keydown', onPreviewKeydown, { capture: true })
 })
@@ -199,6 +212,7 @@ onBeforeUnmount(() => {
   --p-uploader--pick-button--bg--active: var(--picture-uploader--mic-button--bg--active, rgba(87, 87, 87, 0.18));
   --p-uploader--size--color: var(--picture-uploader--time--color, rgba(0, 0, 0, 0.9));
   --p-uploader--size--bg: var(--picture-uploader--time--bg, rgba(255, 255, 255, 0.52));
+  --p-uploader--size--stripe: var(--picture-uploader--size--stripe, rgba(87, 87, 87, 0.35));
 }
 
 .picture-uploader {
@@ -277,6 +291,37 @@ onBeforeUnmount(() => {
   text-align: center;
   text-wrap: nowrap;
   padding: 3px 12px;
+}
+
+.picture-uploader-size--processing {
+  color: transparent;
+  background-image: linear-gradient(
+    45deg,
+    var(--p-uploader--size--stripe) 25%,
+    transparent 25%,
+    transparent 50%,
+    var(--p-uploader--size--stripe) 50%,
+    var(--p-uploader--size--stripe) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 28px 28px;
+  animation: picture-uploader-barber 0.8s linear infinite;
+}
+
+@keyframes picture-uploader-barber {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 28px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .picture-uploader-size--processing {
+    animation: none;
+  }
 }
 
 .picture-uploader-controls-wrapper {

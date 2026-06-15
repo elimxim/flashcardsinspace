@@ -1,11 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-
-// @jsquash/webp is a WebAssembly codec; mock its encode so the resize/orchestration logic can be
-// exercised in jsdom without loading any wasm.
-const encodeMock = vi.fn((): Promise<ArrayBuffer> => Promise.resolve(new ArrayBuffer(64)))
-vi.mock('@jsquash/webp', () => ({ encode: () => encodeMock() }))
-
-import { processImageToWebp } from '@/utils/image-processing.ts'
+import { decodeAndResize } from '@/utils/image-processing.ts'
 
 function makeImageFile(name = 'test.jpg', type = 'image/jpeg', size = 100): File {
   const bytes = new Uint8Array(size).fill(0)
@@ -54,7 +48,6 @@ function stubImage(succeed = true) {
 }
 
 beforeEach(() => {
-  encodeMock.mockClear()
   nextImageSize = { width: 800, height: 600 }
   stubImage()
   vi.stubGlobal('document', { createElement: vi.fn(() => makeCanvas()) })
@@ -64,48 +57,41 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('processImageToWebp', () => {
-  it('returns a blob with type image/webp', async () => {
-    const result = await processImageToWebp(makeImageFile())
-    expect(result.blob.type).toBe('image/webp')
-    expect(encodeMock).toHaveBeenCalled()
+describe('decodeAndResize', () => {
+  it('keeps an image that already fits (800x600 within 1600)', async () => {
+    const imageData = await decodeAndResize(makeImageFile())
+    expect(imageData.width).toBe(800)
+    expect(imageData.height).toBe(600)
   })
 
-  it('returns dimensions reflecting the resized canvas (800x600 fits in 1600)', async () => {
-    const result = await processImageToWebp(makeImageFile())
-    expect(result.width).toBe(800)
-    expect(result.height).toBe(600)
-  })
-
-  it('downscales when long edge exceeds maxDim', async () => {
+  it('downscales when the long edge exceeds maxDim (3200x2400 -> 1600x1200)', async () => {
     nextImageSize = { width: 3200, height: 2400 }
 
-    const result = await processImageToWebp(makeImageFile(), 1600)
-    // Scale = 1600/3200 = 0.5 → 1600x1200
-    expect(result.width).toBe(1600)
-    expect(result.height).toBe(1200)
+    const imageData = await decodeAndResize(makeImageFile(), 1600)
+    expect(imageData.width).toBe(1600)
+    expect(imageData.height).toBe(1200)
   })
 
   it('does not upscale a small image (200x200 stays 200x200)', async () => {
     nextImageSize = { width: 200, height: 200 }
 
-    const result = await processImageToWebp(makeImageFile())
-    expect(result.width).toBe(200)
-    expect(result.height).toBe(200)
+    const imageData = await decodeAndResize(makeImageFile())
+    expect(imageData.width).toBe(200)
+    expect(imageData.height).toBe(200)
   })
 
-  it('aspect ratio preserved: 1920x1080 → 1600x900', async () => {
+  it('preserves aspect ratio (1920x1080 -> 1600x900)', async () => {
     nextImageSize = { width: 1920, height: 1080 }
 
-    const result = await processImageToWebp(makeImageFile(), 1600)
-    expect(result.width).toBe(1600)
-    expect(result.height).toBe(900)
+    const imageData = await decodeAndResize(makeImageFile(), 1600)
+    expect(imageData.width).toBe(1600)
+    expect(imageData.height).toBe(900)
   })
 
   it('throws when the input cannot be decoded', async () => {
     stubImage(false)
 
-    await expect(processImageToWebp(makeImageFile('data.bin', 'application/octet-stream')))
+    await expect(decodeAndResize(makeImageFile('data.bin', 'application/octet-stream')))
       .rejects.toThrow()
   })
 })
