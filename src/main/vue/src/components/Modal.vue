@@ -160,6 +160,7 @@ function handleKeyUp(event: KeyboardEvent) {
   align-items: center;
   justify-content: right;
   gap: 8px;
+  padding: 2px;
 }
 
 .modal-title {
