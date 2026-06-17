@@ -54,6 +54,16 @@ describe('parseFlashcardsFromFile', () => {
     expect(result).toHaveLength(1)
     expect(result[0]).toEqual({ frontSide: 'hello', backSide: 'world' })
   })
+
+  it('should preserve UTF-8 Cyrillic characters', async () => {
+    const file = makeCsvFile('кошка,cat\nсобака,dog')
+
+    const result = await parseFlashcardsFromFile(file)
+
+    expect(result).toHaveLength(2)
+    expect(result[0]).toEqual({ frontSide: 'кошка', backSide: 'cat' })
+    expect(result[1]).toEqual({ frontSide: 'собака', backSide: 'dog' })
+  })
 })
 
 

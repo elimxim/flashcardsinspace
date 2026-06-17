@@ -2,12 +2,15 @@ import * as XLSX from 'xlsx'
 import type { Flashcard, FlashcardContent } from '@/model/flashcard.ts'
 
 export function parseFlashcardsFromFile(file: File): Promise<FlashcardContent[]> {
+  const isCsv = file.name.toLowerCase().endsWith('.csv')
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = (e) => {
       try {
         const data = e.target?.result
-        const workbook = XLSX.read(data, { type: 'array' })
+        const workbook = isCsv
+          ? XLSX.read(data, { type: 'string' })
+          : XLSX.read(data, { type: 'array' })
         const sheet = workbook.Sheets[workbook.SheetNames[0]]
         const rows: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 })
         const result: FlashcardContent[] = []
@@ -28,7 +31,11 @@ export function parseFlashcardsFromFile(file: File): Promise<FlashcardContent[]>
       }
     }
     reader.onerror = () => reject(new Error('Failed to read file'))
-    reader.readAsArrayBuffer(file)
+    if (isCsv) {
+      reader.readAsText(file)
+    } else {
+      reader.readAsArrayBuffer(file)
+    }
   })
 }
 
