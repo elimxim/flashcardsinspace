@@ -29,16 +29,10 @@ import SpecialStageWidget from '@/components/control-panel/SpecialStageWidget.vu
 import DayStreakWidget from '@/components/control-panel/DayStreakWidget.vue'
 import LaunchWidget from '@/components/control-panel/LaunchWidget.vue'
 import QuizWidget from '@/components/control-panel/QuizWidget.vue'
-import {
-  computed,
-  onMounted,
-  onUnmounted,
-  ref,
-  type Component,
-  ComputedRef,
-} from 'vue'
+import { type Component, computed, ComputedRef, onMounted, onUnmounted, ref } from 'vue'
 import { specialStages } from '@/core-logic/stage-logic.ts'
 import { useFlip } from '@/utils/flip.ts'
+import { reviewIcons, ReviewSessionType } from '@/core-logic/review-logic.ts'
 
 const FIRST_REARRANGE_BREAKPOINT = 1000
 const SECOND_REARRANGE_BREAKPOINT = 490
@@ -98,7 +92,7 @@ const widgets: Record<string, Widget> = {
     className: 'main-panel-square-widget',
     props: {
       stage: specialStages.UNKNOWN,
-      icon: 'fa-regular fa-circle-question',
+      icon: reviewIcons.get(ReviewSessionType.UNKNOWN),
     },
     hidden: computed(() => false),
   },
@@ -108,7 +102,7 @@ const widgets: Record<string, Widget> = {
     className: 'main-panel-square-widget',
     props: {
       stage: specialStages.ATTEMPTED,
-      icon: 'fa-solid fa-rotate-right',
+      icon: reviewIcons.get(ReviewSessionType.ATTEMPTED),
     },
     hidden: computed(() => false),
   },

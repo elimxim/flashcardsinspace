@@ -17,7 +17,7 @@
     >
       <template #left>
         <div class="review-mode">
-          {{ ReviewSessionType.LIGHTSPEED }}
+          <font-awesome-icon :icon="reviewIcons.get(ReviewSessionType.LIGHTSPEED)"/>
         </div>
       </template>
       <template #right>
@@ -104,7 +104,11 @@ import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { nextStage, prevStage, Stage, } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
-import { createReviewQueue, ReviewSessionType } from '@/core-logic/review-logic.ts'
+import {
+  createReviewQueue,
+  reviewIcons,
+  ReviewSessionType
+} from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
 import { loadSelectedSetIdFromCookies, } from '@/utils/cookies.ts'
@@ -394,11 +398,7 @@ async function handleKeydown(event: KeyboardEvent) {
 
 .review-mode {
   color: rgba(243, 239, 239, 0.7);
-  font-size: clamp(0.9rem, 1.8vw, 1.1rem);
-  letter-spacing: 0.05rem;
-  word-spacing: 0.05rem;
-  text-transform: uppercase;
-  white-space: nowrap;
+  font-size: 18px;
 }
 
 .review-info {

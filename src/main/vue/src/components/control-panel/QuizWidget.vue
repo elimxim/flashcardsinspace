@@ -1,7 +1,7 @@
 <template>
   <div class="quiz-widget">
     <AwesomeButton
-      icon="fa-solid fa-q"
+      :icon="reviewIcons.get(ReviewSessionType.QUIZ)!!"
       class="cp-widget"
       :disabled="!flashcardSet"
       :on-click="toggleStore.toggleQuiz"
@@ -22,6 +22,7 @@ import AwesomeButton from '@/components/AwesomeButton.vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { storeToRefs } from 'pinia'
+import { reviewIcons, ReviewSessionType } from '@/core-logic/review-logic.ts'
 
 const toggleStore = useToggleStore()
 const flashcardStore = useFlashcardStore()

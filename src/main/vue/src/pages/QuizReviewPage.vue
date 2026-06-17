@@ -17,7 +17,7 @@
     >
       <template #left>
         <div class="review-mode">
-          Quiz
+          <font-awesome-icon :icon="reviewIcons.get(ReviewSessionType.QUIZ)"/>
         </div>
       </template>
       <template #right>
@@ -115,6 +115,7 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
   createReviewQueueForStages,
   MonoStageReviewQueue,
+  reviewIcons,
   ReviewSessionType
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
@@ -424,11 +425,7 @@ async function handleKeydown(event: KeyboardEvent) {
 
 .review-mode {
   color: rgba(243, 239, 239, 0.7);
-  font-size: clamp(0.9rem, 1.8vw, 1.1rem);
-  letter-spacing: 0.05rem;
-  word-spacing: 0.05rem;
-  text-transform: uppercase;
-  white-space: nowrap;
+  font-size: 18px;
 }
 
 .review-info {

@@ -17,7 +17,7 @@
     >
       <template v-if="reviewMode.topic" #left>
         <div class="review-mode">
-          {{ reviewMode.topic }}
+          <font-awesome-icon :icon="reviewIcons.get(reviewMode.sessionType)"/>
         </div>
       </template>
       <template #right>
@@ -140,6 +140,7 @@ import { learningStages, specialStages } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
   createReviewQueueForStages,
+  reviewIcons,
   ReviewMode,
   reviewSessionTypeToSpecialStage,
 } from '@/core-logic/review-logic.ts'
@@ -391,11 +392,7 @@ async function handleKeydown(event: KeyboardEvent) {
 
 .review-mode {
   color: rgba(243, 239, 239, 0.7);
-  font-size: clamp(0.9rem, 1.8vw, 1.1rem);
-  letter-spacing: 0.05rem;
-  word-spacing: 0.05rem;
-  text-transform: uppercase;
-  white-space: nowrap;
+  font-size: 18px;
 }
 
 .review-info {

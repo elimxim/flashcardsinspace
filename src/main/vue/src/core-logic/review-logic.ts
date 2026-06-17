@@ -49,6 +49,14 @@ export class ReviewMode {
   }
 }
 
+export const reviewIcons = new Map<ReviewSessionType, string>([
+  [ReviewSessionType.LIGHTSPEED, 'fa-solid fa-rocket'],
+  [ReviewSessionType.QUIZ, 'fa-solid fa-q'],
+  [ReviewSessionType.UNKNOWN, 'fa-regular fa-circle-question'],
+  [ReviewSessionType.ATTEMPTED, 'fa-solid fa-rotate-right'],
+  [ReviewSessionType.OUTER_SPACE, 'fa-solid fa-star'],
+])
+
 export function determineReviewMode(sessionType: string | undefined, stages: Stage[]): ReviewMode {
   if (sessionType) {
     const reviewMode = sessionToReviewMode(sessionType, stages)
