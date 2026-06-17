@@ -10,30 +10,30 @@ import {
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { Ref } from 'vue'
-import { flashcardSides, getFlashcardSide } from '@/core-logic/flashcard-logic.ts'
+import { flashcardSides } from '@/core-logic/flashcard-logic.ts'
 
 export async function fetchFlashcardPictureBlob(
   flashcardSetId: number,
   flashcardId: number,
-  isFrontSide: boolean,
+  flashcardSide: string,
 ): Promise<Blob | undefined> {
   const pictureCache = usePictureCache()
   const toaster = useSpaceToaster()
 
-  const cachedPicture = pictureCache.getPicture(flashcardId, isFrontSide)
+  const cachedPicture = pictureCache.getPicture(flashcardId, flashcardSide)
   if (cachedPicture) {
-    Log.log(LogTag.LOGIC, `Returning cached picture for Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}`)
+    Log.log(LogTag.LOGIC, `Returning cached picture for Flashcard.id=${flashcardId}, Flashcard.side=${flashcardSide}`)
     return cachedPicture
   }
 
-  return await sendFlashcardPictureGetRequest(flashcardSetId, flashcardId, getFlashcardSide(isFrontSide))
+  return await sendFlashcardPictureGetRequest(flashcardSetId, flashcardId, flashcardSide)
     .then((response) => {
       if (response.status === 204) return undefined
-      pictureCache.addPicture(flashcardId, response.data, isFrontSide)
+      pictureCache.addPicture(flashcardId, response.data, flashcardSide)
       return response.data
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to fetch picture for Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}`, error)
+      Log.error(LogTag.LOGIC, `Failed to fetch picture for Flashcard.id=${flashcardId}, Flashcard.side=${flashcardSide}`, error)
       toaster.bakeError(userApiErrors.PICTURE__FETCHING_FAILED, error.response?.data)
       return undefined
     })
@@ -43,20 +43,19 @@ export async function uploadFlashcardPictureBlob(
   flashcardSet: FlashcardSet,
   flashcard: Flashcard,
   pictureBlob: Blob,
-  isFrontSide: boolean,
+  flashcardSide: string,
 ): Promise<boolean> {
   const pictureStore = usePictureStore()
   const pictureCache = usePictureCache()
   const toaster = useSpaceToaster()
 
-  const side = getFlashcardSide(isFrontSide)
-  Log.log(LogTag.LOGIC, `Uploading picture for Flashcard.id=${flashcard.id}, side=${side}, size=${(pictureBlob.size / 1024).toFixed(1)} KB`)
+  Log.log(LogTag.LOGIC, `Uploading picture for Flashcard.id=${flashcard.id}, Flashcard.side=${flashcardSide}, size=${(pictureBlob.size / 1024).toFixed(1)} KB`)
 
-  return await sendFlashcardPictureUploadRequest(flashcardSet.id, flashcard.id, side, pictureBlob)
+  return await sendFlashcardPictureUploadRequest(flashcardSet.id, flashcard.id, flashcardSide, pictureBlob)
     .then((response) => {
       Log.log(LogTag.LOGIC, `Picture.id=${response.data.id} uploaded, Picture.size: ${response.data.pictureSize}, Picture.mime: ${response.data.mimeType}`)
-      pictureStore.setPictureId(flashcard.id, side, response.data.id)
-      pictureCache.addPicture(flashcard.id, pictureBlob, isFrontSide)
+      pictureStore.setPictureId(flashcard.id, flashcardSide, response.data.id)
+      pictureCache.addPicture(flashcard.id, pictureBlob, flashcardSide)
       return true
     })
     .catch((error) => {
@@ -74,7 +73,7 @@ export async function removeFlashcardPictureBlob(
   flashcardSet: FlashcardSet,
   flashcard: Flashcard,
   pictureId: number,
-  isFrontSide: boolean,
+  flashcardSide: string,
 ): Promise<boolean> {
   const pictureStore = usePictureStore()
   const pictureCache = usePictureCache()
@@ -83,8 +82,8 @@ export async function removeFlashcardPictureBlob(
   return await sendFlashcardPictureRemovalRequest(flashcardSet.id, flashcard.id, pictureId)
     .then(() => {
       Log.log(LogTag.LOGIC, `Picture.id=${pictureId} removed`)
-      pictureStore.removePictureId(flashcard.id, getFlashcardSide(isFrontSide))
-      pictureCache.deletePicture(flashcard.id, isFrontSide)
+      pictureStore.removePictureId(flashcard.id, flashcardSide)
+      pictureCache.deletePicture(flashcard.id, flashcardSide)
       return true
     })
     .catch((error) => {
@@ -112,7 +111,7 @@ export async function fetchFlashcardPicture(
     (async function () {
       const frontSidePictureId = pictureStore.getPictureId(flashcardId, flashcardSides.FRONT)
       if (frontSidePictureId) {
-        return await fetchFlashcardPictureBlob(flashcardSetId, flashcardId, true)
+        return await fetchFlashcardPictureBlob(flashcardSetId, flashcardId, flashcardSides.FRONT)
           .then((blob) => {
             flashcardFrontSidePictureBlob.value = blob
           })
@@ -123,7 +122,7 @@ export async function fetchFlashcardPicture(
     (async function () {
       const backSidePictureId = pictureStore.getPictureId(flashcardId, flashcardSides.BACK)
       if (backSidePictureId) {
-        return await fetchFlashcardPictureBlob(flashcardSetId, flashcardId, false)
+        return await fetchFlashcardPictureBlob(flashcardSetId, flashcardId, flashcardSides.BACK)
           .then((blob) => {
             flashcardBackSidePictureBlob.value = blob
           })

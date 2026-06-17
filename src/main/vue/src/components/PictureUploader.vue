@@ -83,7 +83,6 @@ import { decodeAndResize, encodeToWebp } from '@/utils/image-processing.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
-import { blob } from 'node:stream/consumers';
 
 const MAX_RAW_SIZE_BYTES = 30 * 1024 * 1024 // 30 MB
 const MAX_PROCESSED_SIZE_BYTES = 500 * 1024 // 500 KB

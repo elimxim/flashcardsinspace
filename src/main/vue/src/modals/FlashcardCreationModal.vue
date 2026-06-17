@@ -7,7 +7,7 @@
   >
     <template #control>
       <AwesomeButton
-        ref="infiniteLoopButton"
+        ref="infiniteLoopButtonRef"
         icon="fa-regular fa-circle"
         flip-icon="fa-solid fa-arrows-spin"
         tooltip="Infinite loop"
@@ -17,7 +17,7 @@
     </template>
 
     <FlashcardInput
-      ref="flashcardSides"
+      ref="flashcardSidesRef"
       v-model:front-text="frontSide"
       v-model:front-audio="frontSideAudioBlob"
       v-model:front-picture="frontSidePictureBlob"
@@ -39,7 +39,7 @@
         class="safe-button"
         text="Create"
         :on-click="create"
-        :disabled="flashcardSides?.invalid"
+        :disabled="flashcardSidesRef?.invalid"
         auto-blur
       />
     </div>
@@ -59,7 +59,7 @@ import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
 import { usePictureStore } from '@/stores/picture-store.ts'
-import { newFlashcard } from '@/core-logic/flashcard-logic.ts'
+import { flashcardSides, newFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { uploadFlashcardAudioBlob } from '@/core-logic/flashcard-audio-logic.ts'
 import { uploadFlashcardPictureBlob } from '@/core-logic/flashcard-picture-logic.ts'
 import { storeToRefs } from 'pinia'
@@ -89,8 +89,8 @@ const frontSidePictureBlob = ref<Blob | undefined>()
 const backSide = ref<string>()
 const backSideAudioBlob = ref<Blob | undefined>()
 const backSidePictureBlob = ref<Blob | undefined>()
-const flashcardSides = ref<InstanceType<typeof FlashcardInput>>()
-const infiniteLoopButton = ref<InstanceType<typeof AwesomeButton>>()
+const flashcardSidesRef = ref<InstanceType<typeof FlashcardInput>>()
+const infiniteLoopButtonRef = ref<InstanceType<typeof AwesomeButton>>()
 const cancelButton = ref<InstanceType<typeof SmartButton>>()
 const createButton = ref<InstanceType<typeof SmartButton>>()
 const createdFlashcard = ref<Flashcard | undefined>()
@@ -107,14 +107,14 @@ async function uploadAudioIfRelevant(): Promise<boolean> {
   return await Promise.all([
     (async function () {
       if (frontSideAudioBlob.value) {
-        return uploadFlashcardAudioBlob(set, card, frontSideAudioBlob.value, true)
+        return uploadFlashcardAudioBlob(set, card, frontSideAudioBlob.value, flashcardSides.FRONT)
       } else {
         return true
       }
     })(),
     (async function () {
       if (backSideAudioBlob.value) {
-        return uploadFlashcardAudioBlob(set, card, backSideAudioBlob.value, false)
+        return uploadFlashcardAudioBlob(set, card, backSideAudioBlob.value, flashcardSides.BACK)
       } else {
         return true
       }
@@ -135,14 +135,14 @@ async function uploadPictureIfRelevant(): Promise<boolean> {
   return await Promise.all([
     (async function () {
       if (frontSidePictureBlob.value) {
-        return uploadFlashcardPictureBlob(set, card, frontSidePictureBlob.value, true)
+        return uploadFlashcardPictureBlob(set, card, frontSidePictureBlob.value, flashcardSides.FRONT)
       } else {
         return true
       }
     })(),
     (async function () {
       if (backSidePictureBlob.value) {
-        return uploadFlashcardPictureBlob(set, card, backSidePictureBlob.value, false)
+        return uploadFlashcardPictureBlob(set, card, backSidePictureBlob.value, flashcardSides.BACK)
       } else {
         return true
       }
@@ -157,13 +157,13 @@ async function cancel() {
 }
 
 async function create() {
-  flashcardSides.value?.validate()
-  if (flashcardSides.value?.invalid) return
+  flashcardSidesRef.value?.validate()
+  if (flashcardSidesRef.value?.invalid) return
   const added = await addNewFlashcard()
   if (added) {
     const uploaded = await Promise.all([uploadAudioIfRelevant(), uploadPictureIfRelevant()])
     if (uploaded.every(Boolean)) {
-      if (!infiniteLoopButton.value?.isPressed()) {
+      if (!infiniteLoopButtonRef.value?.isPressed()) {
         toggleModalForm()
       }
       await resetState()
@@ -247,7 +247,7 @@ async function resetState() {
   frontSidePictureBlob.value = undefined
   backSideAudioBlob.value = undefined
   backSidePictureBlob.value = undefined
-  flashcardSides.value?.resetState()
+  flashcardSidesRef.value?.resetState()
 }
 
 </script>

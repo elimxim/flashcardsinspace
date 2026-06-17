@@ -166,7 +166,7 @@ async function fetchAudio() {
   await Promise.all([
     (async function () {
       if (frontSideAudioId.value) {
-        return await fetchFlashcardAudioBlob(set.id, card.id, true)
+        return await fetchFlashcardAudioBlob(set.id, card.id, flashcardSides.FRONT)
           .then((blob) => {
             frontSideAudio.value = blob
             frontSideAudioSize.value = blob?.size
@@ -178,7 +178,7 @@ async function fetchAudio() {
     })(),
     (async function () {
       if (backSideAudioId.value) {
-        return await fetchFlashcardAudioBlob(set.id, card.id, false)
+        return await fetchFlashcardAudioBlob(set.id, card.id, flashcardSides.BACK)
           .then((blob) => {
             backSideAudio.value = blob
             backSideAudioSize.value = blob?.size
@@ -203,7 +203,7 @@ async function uploadAudioIfRelevant(): Promise<boolean> {
   return await Promise.all([
     (async function () {
       if (isFrontSideAudioChanged.value && frontSideAudio.value) {
-        return uploadFlashcardAudioBlob(set, card, frontSideAudio.value, true)
+        return uploadFlashcardAudioBlob(set, card, frontSideAudio.value, flashcardSides.FRONT)
           .then((success) => {
             if (success) {
               audioChanged.value = true
@@ -216,7 +216,7 @@ async function uploadAudioIfRelevant(): Promise<boolean> {
     })(),
     (async function () {
       if (isBackSideAudioChanged.value && backSideAudio.value) {
-        return uploadFlashcardAudioBlob(set, card, backSideAudio.value, false)
+        return uploadFlashcardAudioBlob(set, card, backSideAudio.value, flashcardSides.BACK)
           .then((success) => {
             if (success) {
               audioChanged.value = true
@@ -243,7 +243,7 @@ async function removeAudioIfRelevant(): Promise<boolean> {
   return await Promise.all([
     (async function () {
       if (frontSideAudioId.value && !frontSideAudio.value && frontSideAudioSize.value) {
-        return removeFlashcardAudioBlob(set, card, frontSideAudioId.value, true)
+        return removeFlashcardAudioBlob(set, card, frontSideAudioId.value, flashcardSides.FRONT)
           .then((result) => {
             if (result) {
               frontSideAudioId.value = undefined
@@ -258,7 +258,7 @@ async function removeAudioIfRelevant(): Promise<boolean> {
     })(),
     (async function () {
       if (backSideAudioId.value && !backSideAudio.value && backSideAudioSize.value) {
-        return removeFlashcardAudioBlob(set, card, backSideAudioId.value, false)
+        return removeFlashcardAudioBlob(set, card, backSideAudioId.value, flashcardSides.BACK)
           .then((result) => {
             if (result) {
               backSideAudioId.value = undefined
@@ -284,7 +284,7 @@ async function fetchPicture() {
   await Promise.all([
     (async function () {
       if (frontSidePictureId.value) {
-        return await fetchFlashcardPictureBlob(set.id, card.id, true)
+        return await fetchFlashcardPictureBlob(set.id, card.id, flashcardSides.FRONT)
           .then((blob) => {
             frontSidePicture.value = blob
             frontSidePictureSize.value = blob?.size
@@ -296,7 +296,7 @@ async function fetchPicture() {
     })(),
     (async function () {
       if (backSidePictureId.value) {
-        return await fetchFlashcardPictureBlob(set.id, card.id, false)
+        return await fetchFlashcardPictureBlob(set.id, card.id, flashcardSides.BACK)
           .then((blob) => {
             backSidePicture.value = blob
             backSidePictureSize.value = blob?.size
@@ -321,7 +321,7 @@ async function uploadPictureIfRelevant(): Promise<boolean> {
   return await Promise.all([
     (async function () {
       if (isFrontSidePictureChanged.value && frontSidePicture.value) {
-        return uploadFlashcardPictureBlob(set, card, frontSidePicture.value, true)
+        return uploadFlashcardPictureBlob(set, card, frontSidePicture.value, flashcardSides.FRONT)
           .then((success) => {
             if (success) {
               pictureChanged.value = true
@@ -334,7 +334,7 @@ async function uploadPictureIfRelevant(): Promise<boolean> {
     })(),
     (async function () {
       if (isBackSidePictureChanged.value && backSidePicture.value) {
-        return uploadFlashcardPictureBlob(set, card, backSidePicture.value, false)
+        return uploadFlashcardPictureBlob(set, card, backSidePicture.value, flashcardSides.BACK)
           .then((success) => {
             if (success) {
               pictureChanged.value = true
@@ -361,7 +361,7 @@ async function removePictureIfRelevant(): Promise<boolean> {
   return await Promise.all([
     (async function () {
       if (frontSidePictureId.value && !frontSidePicture.value && frontSidePictureSize.value) {
-        return removeFlashcardPictureBlob(set, card, frontSidePictureId.value, true)
+        return removeFlashcardPictureBlob(set, card, frontSidePictureId.value, flashcardSides.FRONT)
           .then((result) => {
             if (result) {
               frontSidePictureId.value = undefined
@@ -376,7 +376,7 @@ async function removePictureIfRelevant(): Promise<boolean> {
     })(),
     (async function () {
       if (backSidePictureId.value && !backSidePicture.value && backSidePictureSize.value) {
-        return removeFlashcardPictureBlob(set, card, backSidePictureId.value, false)
+        return removeFlashcardPictureBlob(set, card, backSidePictureId.value, flashcardSides.BACK)
           .then((result) => {
             if (result) {
               backSidePictureId.value = undefined
@@ -439,12 +439,12 @@ async function removeFlashcard(): Promise<boolean> {
       flashcardSetStore.decrementFlashcardsNumber(setId)
       audioStore.removeAudioId(flashcardId, flashcardSides.FRONT)
       audioStore.removeAudioId(flashcardId, flashcardSides.BACK)
-      audioCache.deleteAudio(flashcardId, true)
-      audioCache.deleteAudio(flashcardId, false)
+      audioCache.deleteAudio(flashcardId, flashcardSides.FRONT)
+      audioCache.deleteAudio(flashcardId, flashcardSides.BACK)
       pictureStore.removePictureId(flashcardId, flashcardSides.FRONT)
       pictureStore.removePictureId(flashcardId, flashcardSides.BACK)
-      pictureCache.deletePicture(flashcardId, true)
-      pictureCache.deletePicture(flashcardId, false)
+      pictureCache.deletePicture(flashcardId, flashcardSides.FRONT)
+      pictureCache.deletePicture(flashcardId, flashcardSides.BACK)
       frontSideAudio.value = undefined
       backSideAudio.value = undefined
       frontSideAudioId.value = undefined

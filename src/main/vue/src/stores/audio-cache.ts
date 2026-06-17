@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { flashcardSides } from '@/core-logic/flashcard-logic.ts'
 
 const MAX_AUDIO_STORAGE_BYTES = 40 * 1024 * 1024 // 40 MB
 
@@ -78,8 +79,8 @@ export const useAudioCache = defineStore('audio-cache', () => {
     return (blob?.size ?? 0 / 1024).toFixed(1)
   }
 
-  function addAudio(flashcardId: number, audioBlob: Blob, isFrontSide: boolean) {
-    Log.log(LogTag.STORE, `audio-cache.addAudio: Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}, Audio.size=${sizeInKB(audioBlob)}`)
+  function addAudio(flashcardId: number, audioBlob: Blob, side: string) {
+    Log.log(LogTag.STORE, `audio-cache.addAudio: Flashcard.id=${flashcardId}, side=${side}, Audio.size=${sizeInKB(audioBlob)}`)
 
     const now = performance.now()
 
@@ -92,7 +93,7 @@ export const useAudioCache = defineStore('audio-cache', () => {
 
     const oldSize = entry?.size ?? 0
 
-    if (isFrontSide) {
+    if (side === flashcardSides.FRONT) {
       entry.frontAudio = audioBlob
     } else {
       entry.backAudio = audioBlob
@@ -110,8 +111,8 @@ export const useAudioCache = defineStore('audio-cache', () => {
     printCacheSize()
   }
 
-  function getAudio(flashcardId: number, isFrontSide: boolean): Blob | undefined {
-    Log.log(LogTag.STORE, `audio-cache.getAudio: Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}`)
+  function getAudio(flashcardId: number, side: string): Blob | undefined {
+    Log.log(LogTag.STORE, `audio-cache.getAudio: Flashcard.id=${flashcardId}, side=${side}`)
 
     const entry = audioMap.value.get(flashcardId)
     if (!entry) return undefined
@@ -130,18 +131,18 @@ export const useAudioCache = defineStore('audio-cache', () => {
     }
     printCacheSize()
 
-    return isFrontSide ? entry.frontAudio : entry.backAudio
+    return side === flashcardSides.FRONT ? entry.frontAudio : entry.backAudio
   }
 
-  function deleteAudio(flashcardId: number, isFrontSide: boolean): boolean {
-    Log.log(LogTag.STORE, `audio-cache.deleteAudio: Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}`)
+  function deleteAudio(flashcardId: number, side: string): boolean {
+    Log.log(LogTag.STORE, `audio-cache.deleteAudio: Flashcard.id=${flashcardId}, side=${side}`)
 
     const entry = audioMap.value.get(flashcardId)
     if (!entry) return false
 
     const oldSize = calculateEntrySize(entry)
 
-    if (isFrontSide) {
+    if (side === flashcardSides.FRONT) {
       entry.frontAudio = undefined
     } else {
       entry.backAudio = undefined

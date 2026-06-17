@@ -90,10 +90,6 @@ export function createFlashcardSet(
   }
 }
 
-export function getFlashcardSide(isFrontSide: boolean) {
-  return isFrontSide ? flashcardSides.FRONT : flashcardSides.BACK
-}
-
 export function mapFlashcardSetExtra(flashcardSetExtras: FlashcardSetExtra[]): Map<number, FlashcardSetExtra> {
   return new Map(flashcardSetExtras.map(v => [v.id, v]))
 }

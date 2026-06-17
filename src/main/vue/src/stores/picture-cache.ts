@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { Log, LogTag } from '@/utils/logger.ts'
+import { flashcardSides } from '@/core-logic/flashcard-logic.ts'
 
 const MAX_PICTURE_STORAGE_BYTES = 80 * 1024 * 1024 // 80 MB
 
@@ -76,8 +77,8 @@ export const usePictureCache = defineStore('picture-cache', () => {
     return (blob?.size ?? 0 / 1024).toFixed(1)
   }
 
-  function addPicture(flashcardId: number, pictureBlob: Blob, isFrontSide: boolean) {
-    Log.log(LogTag.STORE, `picture-cache.addPicture: Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}, Picture.size=${sizeInKB(pictureBlob)}`)
+  function addPicture(flashcardId: number, pictureBlob: Blob, side: string) {
+    Log.log(LogTag.STORE, `picture-cache.addPicture: Flashcard.id=${flashcardId}, side=${side}, Picture.size=${sizeInKB(pictureBlob)}`)
 
     const now = performance.now()
 
@@ -90,7 +91,7 @@ export const usePictureCache = defineStore('picture-cache', () => {
 
     const oldSize = entry.size
 
-    if (isFrontSide) {
+    if (side === flashcardSides.FRONT) {
       entry.frontPicture = pictureBlob
     } else {
       entry.backPicture = pictureBlob
@@ -109,8 +110,8 @@ export const usePictureCache = defineStore('picture-cache', () => {
     printCacheSize()
   }
 
-  function getPicture(flashcardId: number, isFrontSide: boolean): Blob | undefined {
-    Log.log(LogTag.STORE, `picture-cache.getPicture: Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}`)
+  function getPicture(flashcardId: number, side: string): Blob | undefined {
+    Log.log(LogTag.STORE, `picture-cache.getPicture: Flashcard.id=${flashcardId}, side=${side}`)
 
     const entry = pictureMap.value.get(flashcardId)
     if (!entry) return undefined
@@ -127,18 +128,18 @@ export const usePictureCache = defineStore('picture-cache', () => {
     }
     printCacheSize()
 
-    return isFrontSide ? entry.frontPicture : entry.backPicture
+    return side === flashcardSides.FRONT ? entry.frontPicture : entry.backPicture
   }
 
-  function deletePicture(flashcardId: number, isFrontSide: boolean): boolean {
-    Log.log(LogTag.STORE, `picture-cache.deletePicture: Flashcard.id=${flashcardId}, isFrontSide=${isFrontSide}`)
+  function deletePicture(flashcardId: number, side: string): boolean {
+    Log.log(LogTag.STORE, `picture-cache.deletePicture: Flashcard.id=${flashcardId}, side=${side}`)
 
     const entry = pictureMap.value.get(flashcardId)
     if (!entry) return false
 
     const oldSize = calculateEntrySize(entry)
 
-    if (isFrontSide) {
+    if (side === flashcardSides.FRONT) {
       entry.frontPicture = undefined
     } else {
       entry.backPicture = undefined
