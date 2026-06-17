@@ -18,14 +18,22 @@
       text="Your text has its own gravity! Maximum 512 characters."
     />
     <div class="side-media">
-      <VoiceRecorder
-        v-model:audio-blob="audio"
-        v-model:expanded="voiceRecorderExpanded"
-      />
-      <PictureUploader
-        v-model:picture-blob="picture"
-        v-model:expanded="pictureUploaderExpanded"
-      />
+      <Transition name="media-vanish" @before-leave="captureWidth" @after-leave="firstMedia = 'picture'">
+        <VoiceRecorder
+          v-show="!pictureUploaderExpanded"
+          v-model:audio-blob="audio"
+          v-model:expanded="voiceRecorderExpanded"
+          :class="{ 'side-media--reorder': firstMedia === 'voice' }"
+        />
+      </Transition>
+      <Transition name="media-vanish" @before-leave="captureWidth" @after-leave="firstMedia = 'voice'">
+        <PictureUploader
+          v-show="!voiceRecorderExpanded"
+          v-model:picture-blob="picture"
+          v-model:expanded="pictureUploaderExpanded"
+          :class="{ 'side-media--reorder': firstMedia === 'picture' }"
+        />
+      </Transition>
     </div>
   </div>
 </template>
@@ -51,6 +59,7 @@ const expandedDown = defineModel<boolean>('expanded-down', { default: false })
 
 const voiceRecorderExpanded = ref<boolean>(false)
 const pictureUploaderExpanded = ref<boolean>(false)
+const firstMedia = ref<'voice' | 'picture'>('voice')
 
 const pictureAbsent = computed(() => !picture.value)
 
@@ -101,6 +110,14 @@ function resetState() {
   picture.value = undefined
   expandedFull.value = false
   expandedDown.value = false
+  voiceRecorderExpanded.value = false
+  pictureUploaderExpanded.value = false
+  firstMedia.value = 'voice'
+}
+
+function captureWidth(el: Element) {
+  const element = el as HTMLElement
+  element.style.setProperty('--media-width', `${element.offsetWidth}px`)
 }
 
 function onKeydown(e: KeyboardEvent) {
@@ -124,15 +141,6 @@ watch(expandedFull, (newVal) => {
     window.addEventListener('keydown', onKeydown, { capture: true })
   } else {
     window.removeEventListener('keydown', onKeydown, { capture: true })
-  }
-})
-
-watch([voiceRecorderExpanded, pictureUploaderExpanded], ([vrNewVal, puNewVal], [vrOldVal, puOldVal]) => {
-  if (vrNewVal && puNewVal && puOldVal) {
-    pictureUploaderExpanded.value = false
-  }
-  if (puNewVal && vrNewVal && vrOldVal) {
-    voiceRecorderExpanded.value = false
   }
 })
 
@@ -170,6 +178,29 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+}
+
+.side-media--reorder {
+  order: -1;
+}
+
+.media-vanish-leave-active {
+  transform-origin: left center;
+  overflow: hidden;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    width 0.15s ease;
+}
+
+.media-vanish-leave-from {
+  width: var(--media-width);
+}
+
+.media-vanish-leave-to {
+  transform: scaleX(0);
+  opacity: 0;
+  width: 0;
 }
 </style>
