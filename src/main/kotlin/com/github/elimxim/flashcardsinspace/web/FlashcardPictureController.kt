@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
 @Controller
-@RequestMapping("/api/flashcard-sets/{setId:\\d+}/flashcards")
+@RequestMapping("/api/flashcard-sets/{setId:\\d+}")
 class FlashcardPictureController(
     private val flashcardPictureService: FlashcardPictureService,
 ) {
@@ -29,7 +29,7 @@ class FlashcardPictureController(
         return ResponseEntity.ok(result)
     }
 
-    @PostMapping("/{flashcardId:\\d+}/picture", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @PostMapping("/flashcards/{flashcardId:\\d+}/picture", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun uploadFlashcardPicture(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
@@ -41,7 +41,7 @@ class FlashcardPictureController(
         return ResponseEntity.ok(dto)
     }
 
-    @GetMapping("/{flashcardId:\\d+}/picture")
+    @GetMapping("/flashcards/{flashcardId:\\d+}/picture")
     fun fetchFlashcardPicture(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
@@ -56,7 +56,7 @@ class FlashcardPictureController(
         }
     }
 
-    @GetMapping("/{flashcardId:\\d+}/picture/{pictureId:\\d+}")
+    @GetMapping("/flashcards/{flashcardId:\\d+}/picture/{pictureId:\\d+}")
     fun fetchFlashcardPictureById(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
@@ -67,7 +67,7 @@ class FlashcardPictureController(
         return fetchPictureResponseEntity(picture)
     }
 
-    @DeleteMapping("/{flashcardId:\\d+}/picture/{pictureId:\\d+}")
+    @DeleteMapping("/flashcards/{flashcardId:\\d+}/picture/{pictureId:\\d+}")
     fun deleteFlashcardPicture(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,

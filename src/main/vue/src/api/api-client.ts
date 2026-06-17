@@ -142,8 +142,8 @@ export async function sendChronoBulkUpdateRequest(setId: number, status: string,
 }
 
 export async function sendFlashcardAudioMetadataGetRequest(setId: number) {
-  Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/audio/metadata`)
-  return apiClient.get<FlashcardAudioMetadata[]>(`/flashcard-sets/${setId}/flashcards/audio/metadata`)
+  Log.log(LogTag.GET, `/flashcard-sets/${setId}/audios/metadata`)
+  return apiClient.get<FlashcardAudioMetadata[]>(`/flashcard-sets/${setId}/audios/metadata`)
 }
 
 export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId: number, side: string, audioBlob: Blob) {
@@ -193,8 +193,8 @@ export async function sendFlashcardAudioRemovalRequest(setId: number, flashcardI
 }
 
 export async function sendFlashcardPictureMetadataRequest(setId: number) {
-  Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/pictures/metadata`)
-  return apiClient.get<FlashcardPictureMetadata[]>(`/flashcard-sets/${setId}/flashcards/pictures/metadata`)
+  Log.log(LogTag.GET, `/flashcard-sets/${setId}/pictures/metadata`)
+  return apiClient.get<FlashcardPictureMetadata[]>(`/flashcard-sets/${setId}/pictures/metadata`)
 }
 
 export async function sendFlashcardPictureUploadRequest(setId: number, flashcardId: number, side: string, pictureBlob: Blob) {

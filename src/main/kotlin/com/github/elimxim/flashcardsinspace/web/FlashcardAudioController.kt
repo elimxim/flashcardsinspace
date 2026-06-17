@@ -1,13 +1,13 @@
 package com.github.elimxim.flashcardsinspace.web
 
 import com.github.elimxim.flashcardsinspace.entity.FlashcardAudio
-import com.github.elimxim.flashcardsinspace.web.dto.FlashcardAudioMetadataDto
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.security.escapeJava
 import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.FlashcardAudioService
 import com.github.elimxim.flashcardsinspace.util.withLoggingContext
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardAudioDto
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardAudioMetadataDto
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
 @Controller
-@RequestMapping("/api/flashcard-sets/{setId:\\d+}/flashcards")
+@RequestMapping("/api/flashcard-sets/{setId:\\d+}")
 class FlashcardAudioController(
     private val flashcardAudioService: FlashcardAudioService,
 ) {
-    @GetMapping("/audio/metadata")
+    @GetMapping("/audios/metadata")
     fun getMetadata(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
@@ -29,7 +29,7 @@ class FlashcardAudioController(
         return ResponseEntity.ok(result)
     }
 
-    @PostMapping("/{flashcardId:\\d+}/audio", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @PostMapping("/flashcards/{flashcardId:\\d+}/audio", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun uploadFlashcardAudio(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
@@ -41,7 +41,7 @@ class FlashcardAudioController(
         return ResponseEntity.ok(dto)
     }
 
-    @GetMapping("/{flashcardId:\\d+}/audio")
+    @GetMapping("/flashcards/{flashcardId:\\d+}/audio")
     fun fetchFlashcardAudio(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
@@ -57,7 +57,7 @@ class FlashcardAudioController(
     }
 
 
-    @GetMapping("/{flashcardId:\\d+}/audio/{audioId:\\d+}")
+    @GetMapping("/flashcards/{flashcardId:\\d+}/audio/{audioId:\\d+}")
     fun fetchFlashcardAudioById(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
@@ -68,7 +68,7 @@ class FlashcardAudioController(
         return fetchAudioResponseEntity(audio)
     }
 
-    @DeleteMapping("/{flashcardId:\\d+}/audio/{audioId:\\d+}")
+    @DeleteMapping("/flashcards/{flashcardId:\\d+}/audio/{audioId:\\d+}")
     fun deleteFlashcardAudio(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
