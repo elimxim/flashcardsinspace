@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
 import Tooltip from '@/components/Tooltip.vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
 
@@ -81,7 +81,7 @@ const props = withDefaults(defineProps<{
   square?: boolean
   fillSpace?: boolean
   animateTap?: boolean,
-  tapDuration?: number
+  animationDuration?: number
   tooltip?: string
   tooltipPosition?: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
   tooltipDelay?: number
@@ -99,7 +99,7 @@ const props = withDefaults(defineProps<{
   square: false,
   fillSpace: false,
   animateTap: true,
-  tapDuration: 300,
+  animationDuration: 300,
   tooltip: undefined,
   tooltipPosition: 'top',
   tooltipDelay: 1000,
@@ -110,6 +110,8 @@ const props = withDefaults(defineProps<{
   onHover: async () => {
   },
 })
+
+const animationDurationSeconds = computed(() => `${(props.animationDuration / 1000).toFixed(1)}s`)
 
 const {
   resolvedLoading,
@@ -159,7 +161,7 @@ function startTapAnimation() {
   setTimeout(() => {
     animatingOnTap.value = false
     press()
-  }, props.tapDuration)
+  }, props.animationDuration)
 }
 
 function isPressed(): boolean {
@@ -232,7 +234,7 @@ defineExpose({
   cursor: pointer;
   margin: 0;
   padding: var(--a-btn--padding);
-  transition: all 0.2s ease-in-out;
+  transition: all v-bind(animationDurationSeconds) ease-in-out;
   overflow: visible;
 }
 
