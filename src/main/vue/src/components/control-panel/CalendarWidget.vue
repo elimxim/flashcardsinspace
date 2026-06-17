@@ -89,9 +89,9 @@ const isUserCloseToLoseDayStreak = computed(() => {
 })
 
 const timeBeforeMidnight = computed(() => {
-  const minutes = minutesBeforeMidnight.value
+  const minutes = Math.floor(minutesBeforeMidnight.value)
   if (minutes > 60) {
-    const hours = Math.floor(minutes / 60)
+    const hours = Math.round(minutes / 60)
     return `${hours} hour` + (hours > 1 ? 's' : '')
   } else {
     return `${minutes} minute` + (minutes > 1 ? 's' : '')
