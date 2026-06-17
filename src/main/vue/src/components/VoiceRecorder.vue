@@ -284,7 +284,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 6px;
   width: fit-content;
-  height: 32px;
+  height: 40px;
   border-radius: 999px;
   transition: width 0.3s ease-out;
 }
@@ -305,13 +305,13 @@ onBeforeUnmount(() => {
 }
 
 .voice-recorder-button {
-  --awesome-button--icon--size: 18px;
+  --awesome-button--icon--size: 22px;
   --awesome-button--icon--color: var(--v-recorder--button--color);
   --awesome-button--icon--color--hover: var(--v-recorder--button--color--hover);
   --awesome-button--icon--color--active: var(--v-recorder--button--color--active);
   --awesome-button--icon--color--disabled: var(--v-recorder--button--color--disabled);
   --awesome-button--border-radius: 999px;
-  --awesome-button--padding: 2px;
+  --awesome-button--padding: 4px;
 }
 
 .voice-recorder-button--mic {

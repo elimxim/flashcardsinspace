@@ -14,7 +14,6 @@
         icon="fa-solid fa-image"
         class="picture-uploader-button picture-uploader-button--pick"
         style="height: 100%;"
-        tooltip="Attach picture"
         :on-click="toggleControls"
         :active="expanded"
         square
@@ -36,7 +35,6 @@
           <AwesomeButton
             icon="fa-solid fa-file-arrow-up"
             class="picture-uploader-button"
-            :tooltip="hasPicture ? 'Replace picture' : 'Choose picture'"
             :disabled="processing"
             :on-click="openPicker"
           />
@@ -47,14 +45,12 @@
           <AwesomeButton
             icon="fa-solid fa-eye"
             class="picture-uploader-button"
-            tooltip="Preview picture"
             :disabled="!pictureBlob"
             :on-click="openPreview"
           />
           <AwesomeButton
             icon="fa-solid fa-trash"
             class="picture-uploader-button"
-            tooltip="Remove picture"
             :disabled="!pictureBlob"
             :on-click="removePicture"
           />
@@ -221,14 +217,12 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 6px;
   width: fit-content;
-  height: 32px;
+  height: 40px;
   border-radius: 999px;
   transition: width 0.3s ease-out;
   perspective: 600px;
 }
 
-/* Flip the pick icon <-> thumbnail around the Y axis when a picture is added/removed.
-   The enter eases with a slight overshoot for a playful settle. */
 .picture-toggle-flip-enter-active {
   transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.18s ease;
   backface-visibility: hidden;
@@ -260,13 +254,13 @@ onBeforeUnmount(() => {
 }
 
 .picture-uploader-button {
-  --awesome-button--icon--size: 18px;
+  --awesome-button--icon--size: 22px;
   --awesome-button--icon--color: var(--p-uploader--button--color);
   --awesome-button--icon--color--hover: var(--p-uploader--button--color--hover);
   --awesome-button--icon--color--active: var(--p-uploader--button--color--active);
   --awesome-button--icon--color--disabled: var(--p-uploader--button--color--disabled);
   --awesome-button--border-radius: 999px;
-  --awesome-button--padding: 2px;
+  --awesome-button--padding: 4px;
 }
 
 .picture-uploader-button--pick {
@@ -275,7 +269,7 @@ onBeforeUnmount(() => {
 }
 
 .picture-uploader-thumb-button {
-  --picture-thumb-button--size: 28px;
+  --picture-thumb-button--size: 36px;
   --picture-thumb-button--ring-color: var(--p-uploader--button--color);
   --picture-thumb-button--ring-color--hover: var(--p-uploader--button--color--hover);
   --picture-thumb-button--ring-color--active: var(--p-uploader--button--color--active);
@@ -330,7 +324,7 @@ onBeforeUnmount(() => {
 
 .picture-controls-slide-enter-active,
 .picture-controls-slide-leave-active {
-  transition: max-width 0.3s ease-out, opacity 0.3s ease-out;
+  transition: max-width 0.4s ease-out, opacity 0.4s ease-out;
 }
 
 .picture-controls-slide-enter-from {
