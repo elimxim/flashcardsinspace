@@ -15,7 +15,9 @@
         role="button"
         tabindex="0"
         class="mascot-img"
+        :class="{ 'mascot-img--shaking': mascotShaking }"
         @click="handleClickOnMascot"
+        @animationend="mascotShaking = false"
       />
       <div class="speech-bubble select-text">
         <p v-if="!mascotClicked">
@@ -173,6 +175,7 @@ const shuffledOverwhelmedTips = shuffle([...overwhelmedTips])
 
 const currentCategory = ref<TipsCategory>()
 const mascotClicked = ref(false)
+const mascotShaking = ref(false)
 const mascotPhrase = ref('')
 const swipeTape = ref<ComponentExposed<typeof SwipeTape>>()
 
@@ -191,6 +194,10 @@ const currentCategoryTips = computed(() => {
 
 function handleClickOnMascot() {
   mascotClicked.value = true
+  mascotShaking.value = false
+  void nextTick(() => {
+    mascotShaking.value = true
+  })
   let index = mascotPhraseIndex.value + 1
   if (index >= shuffledMascotPhrases.length) {
     index = 0
@@ -227,6 +234,32 @@ async function handleClickOnTipCategory(category: TipsCategory) {
   width: 300px;
   height: 160px;
   cursor: pointer;
+  transform-origin: center bottom;
+}
+
+.mascot-img--shaking {
+  animation: mascotShake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes mascotShake {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  20% {
+    transform: rotate(-3deg) scale(1.02);
+  }
+  40% {
+    transform: rotate(2.5deg) scale(1.02);
+  }
+  60% {
+    transform: rotate(-1.5deg) scale(1.01);
+  }
+  80% {
+    transform: rotate(1deg) scale(1);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
 }
 
 .speech-bubble {
