@@ -21,8 +21,9 @@ import {
   FlashcardSetExtra
 } from '@/model/flashcard.ts'
 import { Chronoday } from '@/model/chrono.ts'
-import { configureDateTransformers } from '@/api/axios-config.ts'
+import { configureDateTransformers } from './date-transformers.ts'
 import { configureTokenRefreshInterceptor } from '@/api/token-refresh.ts'
+import { configureRetry, DEFAULT_TIMEOUT_MS, LONG_TIMEOUT_MS } from '@/api/retry-config.ts'
 import { User } from '@/model/user.ts'
 import { ReviewSession } from '@/model/review.ts'
 import { ReviewSessionType } from '@/core-logic/review-logic.ts'
@@ -31,10 +32,12 @@ import { Log, LogTag } from '@/utils/logger.ts'
 const apiClient = axios.create({
   baseURL: '/api',
   withCredentials: true,
+  timeout: DEFAULT_TIMEOUT_MS,
 })
 
 configureDateTransformers(apiClient)
 configureTokenRefreshInterceptor(apiClient)
+configureRetry(apiClient)
 
 export default apiClient
 
@@ -165,7 +168,7 @@ export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId
     form,
     {
       headers: { 'Content-Type': 'multipart/form-data' },
-      timeout: 60_000,
+      timeout: LONG_TIMEOUT_MS,
     }
   )
 }
@@ -174,6 +177,7 @@ export async function sendFlashcardAudioGetRequest(setId: number, flashcardId: n
   Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio?side=${side}`)
   return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio`, {
     responseType: 'blob',
+    timeout: LONG_TIMEOUT_MS,
     params: {
       side: side
     },
@@ -183,7 +187,8 @@ export async function sendFlashcardAudioGetRequest(setId: number, flashcardId: n
 export async function sendFlashcardAudioFetchByIdRequest(setId: number, flashcardId: number, audioId: number) {
   Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
   return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`, {
-    responseType: 'blob'
+    responseType: 'blob',
+    timeout: LONG_TIMEOUT_MS,
   })
 }
 
@@ -209,7 +214,7 @@ export async function sendFlashcardPictureUploadRequest(setId: number, flashcard
     form,
     {
       headers: { 'Content-Type': 'multipart/form-data' },
-      timeout: 60_000,
+      timeout: LONG_TIMEOUT_MS,
     }
   )
 }
@@ -218,6 +223,7 @@ export async function sendFlashcardPictureGetRequest(setId: number, flashcardId:
   Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/${flashcardId}/picture?side=${side}`)
   return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/picture`, {
     responseType: 'blob',
+    timeout: LONG_TIMEOUT_MS,
     params: { side },
   })
 }

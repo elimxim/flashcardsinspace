@@ -1,7 +1,8 @@
 import axios from 'axios'
 import { User } from '@/model/user.ts'
 import apiClient from '@/api/api-client.ts'
-import { configureDateTransformers } from '@/api/axios-config.ts'
+import { configureDateTransformers } from './date-transformers.ts'
+import { configureRetry, DEFAULT_TIMEOUT_MS } from '@/api/retry-config.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { VerificationIntentResponse } from '@/api/communication.ts'
 import { VerificationType } from '@/core-logic/user-logic.ts'
@@ -9,9 +10,11 @@ import { VerificationType } from '@/core-logic/user-logic.ts'
 const authClient = axios.create({
   baseURL: '/auth',
   withCredentials: true,
+  timeout: DEFAULT_TIMEOUT_MS,
 })
 
 configureDateTransformers(authClient)
+configureRetry(authClient)
 
 export async function sendSignupRequest(name: string, email: string, password: string, languageId: number | undefined) {
   Log.log(LogTag.POST, '/signup')
