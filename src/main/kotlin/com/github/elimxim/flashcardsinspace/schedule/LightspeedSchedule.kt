@@ -1,12 +1,13 @@
 /*
- * Copyright (c) 2025 Maksim Eliseev. All rights reserved.
+ * Copyright (c) 2025-2026 Maksim Eliseev.
  *
  * This file is part of Flashcards in Space.
  *
- * This software is proprietary and confidential. Unauthorized copying,
- * distribution, or use is strictly prohibited.
+ * Licensed under the PolyForm Noncommercial License 1.0.0. You may use, modify,
+ * and share this software for noncommercial purposes only; all commercial rights
+ * are reserved by the licensor.
  *
- * For licensing information, see LICENSE file in the project root.
+ * For licensing information, see the LICENSE.md file in the project root.
  */
 
 package com.github.elimxim.flashcardsinspace.schedule

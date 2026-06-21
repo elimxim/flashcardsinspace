@@ -10,7 +10,7 @@
 ![GitHub Code Size](https://img.shields.io/github/languages/code-size/elimxim/flashcardsinspace)
 ![GitHub Top Language](https://img.shields.io/github/languages/top/elimxim/flashcardsinspace)
 ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green)
-![License](https://img.shields.io/badge/license-Proprietary-red)
+![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-blue)
 
 Flashcards in Space is a personal mission to make long-term learning feel less like a chore and more like an exploration. 
 It combines the proven science of spaced repetition with a modern, space-themed interface designed 
@@ -107,23 +107,26 @@ This isn't a shortcut, it's a new era of productivity where the engineer maintai
 
 ## 🤝 Contributing
 
-This project is **not accepting pull requests** due to its proprietary license. However, you're welcome to:
+Contributions are welcome! Because this project reserves all commercial rights, every
+contribution must transfer its rights to the project owner — see [CONTRIBUTING.md](CONTRIBUTING.md)
+for the contributor terms before opening a pull request. You're also welcome to:
 - 🐛 Report bugs via [Issues](https://github.com/elimxim/flashcardsinspace/issues)
 - 💡 Suggest features or improvements
 - ⭐ Star the repo if you find it interesting!
 
 ## 📜 Licensing & Use
 
-Thank you for your interest in Flashcards in Space. This project is shared so you can read and learn from the code,
-but it is **not open-source**, and usage is subject to the license terms.
+Thank you for your interest in Flashcards in Space. This project is **source-available**:
+you can read, learn from, modify, and share the code for noncommercial purposes, but it
+is **not open-source** — all commercial rights are reserved.
 
 | | |
 |---|---|
-| ✅ **Allowed** | Cloning the repository, viewing the source, and running it locally for personal, non-commercial evaluation and learning |
-| ❌ **Prohibited** | Commercial use, redistribution, modification, use in other projects, hosting as a service, or any production use (without a separate commercial license) |
-| 📄 **License** | Your use of this repository is governed by the terms in the [LICENSE](LICENSE) file |
+| ✅ **Allowed** | Viewing, running, modifying, and sharing the software for any **noncommercial** purpose (personal, study, hobby, nonprofits, schools) |
+| ❌ **Prohibited** | Any **commercial use** — selling it, running it as a business, or building a paid product or service on it (without a separate commercial license) |
+| 📄 **License** | [PolyForm Noncommercial License 1.0.0](LICENSE.md) — for a commercial license, contact elimxim@gmail.com |
 
-Please see the [LICENSE](LICENSE) file for the complete terms and conditions.
+Please see the [LICENSE.md](LICENSE.md) file for the complete terms and conditions.
 
 ---
 
