@@ -9,8 +9,9 @@
     ]"
   >
     <div class="comic-container">
-      <img
-        src="../assets/mascot.svg"
+      <SvgImage
+        path="assets/mascots/"
+        name="Melvin.svg"
         alt="Melvin"
         role="button"
         tabindex="0"
@@ -73,6 +74,7 @@
 </template>
 
 <script setup lang="ts">
+import SvgImage from '@/components/SvgImage.vue'
 import SwipeTape from '@/components/SwipeTape.vue'
 import { computed, nextTick, ref } from 'vue'
 import { shuffle } from '@/utils/utils.ts'
@@ -233,6 +235,7 @@ async function handleClickOnTipCategory(category: TipsCategory) {
 .mascot-img {
   width: 300px;
   height: 160px;
+  flex-shrink: 0;
   cursor: pointer;
   transform-origin: center bottom;
 }
