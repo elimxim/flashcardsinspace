@@ -179,6 +179,12 @@ async function login() {
 
 const rockets = [
   "assets/rockets/original",
+  "assets/rockets/cow",
+  "assets/rockets/cyan",
+  "assets/rockets/original",
+  "assets/rockets/pinky",
+  "assets/rockets/polka-dots",
+  "assets/rockets/original",
 ]
 
 const lilrocket = ref<HTMLElement>()
