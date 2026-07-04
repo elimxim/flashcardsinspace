@@ -2,7 +2,18 @@
   <nav class="navbar navbar--theme">
     <Starfield twinkle :density="40" :star-size="1.6" vertical-drift="2px"/>
     <div class="logo-container">
-      <img src="@/assets/rocket.svg" alt="Logo" class="logo-image"/>
+      <SvgImage
+        path="assets/rockets/"
+        name="original.svg"
+        alt="🚀"
+        width="clamp(40px, 10vw, 60px)"
+        height="clamp(40px, 10vw, 60px)"
+        style="{ z-index: 1; }"
+        loading="eager"
+        decoding="async"
+        fetch-priority="auto"
+        non-interactive
+      />
       <div
         class="nav-text nav-text--title"
         @click="navigateToControlPanel"
@@ -117,6 +128,7 @@
 </template>
 
 <script setup lang="ts">
+import SvgImage from '@/components/SvgImage.vue'
 import Starfield from '@/components/Starfield.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import { useAuthStore } from '@/stores/auth-store.ts'
@@ -238,7 +250,7 @@ onUnmounted(() => {
 }
 
 .nav-text--title {
-  font-size: clamp(0.85rem, 2vw, 1.5rem);
+  font-size: clamp(0.85rem, 3vw, 1.5rem);
   text-wrap: wrap;
 }
 
@@ -262,11 +274,6 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: clamp(4px, 1.5vw, 10px);
-}
-
-.logo-image {
-  height: clamp(40px, 10vw, 60px);
-  z-index: 1;
 }
 
 .pop-enter-active,

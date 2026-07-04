@@ -178,12 +178,18 @@ async function login() {
 // lilrocket>
 
 const rockets = [
-  "authentic",
+  "assets/rockets/original",
+  "assets/rockets/cow",
+  "assets/rockets/cyan",
+  "assets/rockets/original",
+  "assets/rockets/pinky",
+  "assets/rockets/polka-dots",
+  "assets/rockets/original",
 ]
 
 const lilrocket = ref<HTMLElement>()
 const currRocketIdx = ref(0)
-const currRocketImg = computed(() => `/assets/rocket/${rockets[currRocketIdx.value]}`)
+const currRocketImg = computed(() => rockets[currRocketIdx.value])
 let flyTimeout: number | undefined
 
 function setRandomLilrocket() {
