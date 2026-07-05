@@ -3,7 +3,7 @@
     <Starfield twinkle :density="40" :star-size="1.6" vertical-drift="2px"/>
     <div class="logo-container">
       <SvgImage
-        path="assets/rockets/"
+        path="assets/rockets"
         name="original.svg"
         alt="🚀"
         width="clamp(40px, 10vw, 60px)"

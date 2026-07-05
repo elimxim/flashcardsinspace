@@ -25,7 +25,7 @@
         <div class="user-mascot-orbit" :style="mascotOrbitStyle">
           <div class="user-mascot-float">
             <SvgImage
-              path="assets/mascots/"
+              path="assets/mascots"
               name="Stacy.svg"
               :width="240"
               alt="Stacy the space cow"
