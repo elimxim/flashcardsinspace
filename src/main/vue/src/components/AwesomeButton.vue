@@ -288,6 +288,9 @@ defineExpose({
   min-width: 0;
   min-height: 0;
   transition: transform 0.2s ease-in-out;
+  /* Standing compositing layer: avoids the promote/demote around the tap
+     scale that re-snaps sub-pixel positions page-wide on iOS WebKit. */
+  will-change: transform;
 }
 
 .awesome-icon {
