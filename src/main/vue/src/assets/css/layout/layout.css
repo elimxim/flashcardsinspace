@@ -31,5 +31,11 @@
 }
 
 .padding-auto {
-  padding: clamp(0.5rem, 1vh, 1rem) clamp(0.5rem, 1vw, 1rem);
+  padding: 1rem;
+}
+
+@media (max-width: 560px) {
+  .padding-auto {
+    padding: 0.5rem;
+  }
 }
