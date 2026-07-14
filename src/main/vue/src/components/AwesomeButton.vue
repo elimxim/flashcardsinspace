@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
 import Tooltip from '@/components/Tooltip.vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
 
@@ -75,6 +75,7 @@ const props = withDefaults(defineProps<{
   flipIcon?: string
   spinWhenFlipped?: boolean
   disabled?: boolean
+  disabledOnPress?: boolean
   active?: boolean
   hidden?: boolean
   invisible?: boolean
@@ -93,6 +94,7 @@ const props = withDefaults(defineProps<{
   flipIcon: undefined,
   spinWhenFlipped: false,
   disabled: false,
+  disabledOnPress: false,
   active: false,
   hidden: false,
   invisible: false,
@@ -121,19 +123,23 @@ const {
 
 const pressed = ref(false)
 const animatingOnTap = ref(false)
+const disabled = ref(props.disabled)
 
 async function press() {
   pressed.value = !pressed.value
   try {
     startLoading()
     await props.onClick()
+    if (pressed.value && props.disabledOnPress) {
+      disabled.value = true
+    }
   } finally {
     await stopLoading()
   }
 }
 
 function handleClick() {
-  if (props.disabled || resolvedLoading.value) return
+  if (disabled.value || resolvedLoading.value) return
   if (UXConfig().showAnimationOnTap && props.animateTap) {
     startTapAnimation()
   } else {
@@ -142,7 +148,7 @@ function handleClick() {
 }
 
 async function handleDoubleClick() {
-  if (props.disabled || resolvedLoading.value) return
+  if (disabled.value || resolvedLoading.value) return
   try {
     startLoading()
     await props.onDoubleClick()
@@ -152,7 +158,7 @@ async function handleDoubleClick() {
 }
 
 async function handleHover() {
-  if (props.disabled || resolvedLoading.value) return
+  if (disabled.value || resolvedLoading.value) return
   await props.onHover()
 }
 
@@ -168,9 +174,19 @@ function isPressed(): boolean {
   return pressed.value
 }
 
+function reset() {
+  pressed.value = false
+  disabled.value = false
+}
+
+watch(() => props.disabled, (newVal) => {
+  disabled.value = newVal
+})
+
 defineExpose({
   isPressed,
-  press
+  press,
+  reset,
 })
 
 </script>
@@ -324,21 +340,6 @@ defineExpose({
   }
   100% {
     opacity: 1;
-  }
-}
-
-@keyframes growing-circle {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0);
-  }
-  50% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1);
   }
 }
 
