@@ -62,6 +62,15 @@ export function selectConsecutiveDaysBefore(
   return result
 }
 
+export function nextChronoday(
+  chronodays: Chronoday[],
+  currDay: Chronoday,
+): Chronoday | undefined {
+  const currIndex = chronodays.findIndex(day => day.chronodate === currDay.chronodate)
+  if (currIndex === -1) return undefined
+  return chronodays[currIndex + 1]
+}
+
 export function calcCalendarPage(
   currMonth: Date,
   currDay: Chronoday,

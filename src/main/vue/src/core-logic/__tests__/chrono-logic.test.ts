@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { selectConsecutiveDaysBefore } from '@/core-logic/chrono-logic.ts'
+import { nextChronoday, selectConsecutiveDaysBefore } from '@/core-logic/chrono-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 
@@ -97,6 +97,50 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
 
     // then:
     expect(result).toEqual([])
+  })
+})
+
+describe('nextChronoday', () => {
+  const chronodays: Chronoday[] = [
+    makeChronoday(0, 0, chronodayStatuses.COMPLETED),
+    makeChronoday(1, 1, chronodayStatuses.COMPLETED),
+    makeChronoday(2, undefined, chronodayStatuses.OFF),
+    makeChronoday(3, 2, chronodayStatuses.NOT_STARTED),
+  ]
+
+  it('should return the day after the given day', () => {
+    // when:
+    const result = nextChronoday(chronodays, chronodays[1])
+
+    // then:
+    expect(result).toEqual(chronodays[2])
+  })
+
+  it('should return undefined when the given day is the last one', () => {
+    // when:
+    const result = nextChronoday(chronodays, chronodays[3])
+
+    // then:
+    expect(result).toBeUndefined()
+  })
+
+  it('should return undefined when the given day is not found', () => {
+    // given:
+    const unknownDay = makeChronoday(99, 99, chronodayStatuses.NOT_STARTED)
+
+    // when:
+    const result = nextChronoday(chronodays, unknownDay)
+
+    // then:
+    expect(result).toBeUndefined()
+  })
+
+  it('should return undefined when the chronodays array is empty', () => {
+    // when:
+    const result = nextChronoday([], chronodays[0])
+
+    // then:
+    expect(result).toBeUndefined()
   })
 })
 

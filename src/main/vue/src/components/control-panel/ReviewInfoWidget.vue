@@ -1,19 +1,19 @@
 <template>
   <div class="review-info-widget">
     <div class="cp-text cp-text--nowrap">
-      To review
+      {{ title }}
     </div>
     <div class="review-list">
       <div
-        v-for="review in currDayStageReviews"
-        :key="review.stage"
+        v-for="rs in reviewStages"
+        :key="rs.stage"
         class="review-item"
       >
         <div class="cp-text cp-text--light cp-text--left cp-text--nowrap">
-          {{ review.stage }}
+          {{ rs.stage }}
         </div>
         <div class="cp-count-box">
-          {{ review.count }}
+          {{ rs.count }}
         </div>
       </div>
       <div class="review-item review-item--total">
@@ -21,7 +21,7 @@
           Total
         </div>
         <div class="cp-count-box">
-          {{ currDayReviewTotal }}
+          {{ reviewTotal }}
         </div>
       </div>
     </div>
@@ -33,21 +33,37 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
-import { calcStageReviews, StageReview } from '@/core-logic/review-logic.ts'
+import { calcStageReviews, ReviewStage } from '@/core-logic/review-logic.ts'
+import { chronodayStatuses, nextChronoday } from '@/core-logic/chrono-logic.ts'
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 
 const { flashcards } = storeToRefs(flashcardStore)
-const { currDay } = storeToRefs(chronoStore)
+const { currDay, chronodays } = storeToRefs(chronoStore)
 
-const currDayStageReviews = computed<StageReview[]>(() => {
-  if (!currDay.value) return []
-  return calcStageReviews(flashcards.value, currDay.value)
+const shouldShowTomorrow = computed(() =>
+  currDay.value.status === chronodayStatuses.COMPLETED || currDay.value.status === chronodayStatuses.OFF
+)
+
+const reviewDay = computed(() => {
+  if (shouldShowTomorrow.value) {
+    return nextChronoday(chronodays.value, currDay.value)
+  }
+  return currDay.value
 })
 
-const currDayReviewTotal = computed(() =>
-  currDayStageReviews.value.reduce((acc, v) => acc + v.count, 0)
+const title = computed(() =>
+  shouldShowTomorrow.value ? 'Tomorrow' : 'Today'
+)
+
+const reviewStages = computed<ReviewStage[]>(() => {
+  if (!reviewDay.value) return []
+  return calcStageReviews(flashcards.value, reviewDay.value)
+})
+
+const reviewTotal = computed(() =>
+  reviewStages.value.reduce((acc, v) => acc + v.count, 0)
 )
 </script>
 
