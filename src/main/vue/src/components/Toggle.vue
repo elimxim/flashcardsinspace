@@ -51,25 +51,28 @@ const props = withDefaults(defineProps<{
 
 const trackLengthFactor = computed(() => {
   switch (props.trackLength) {
-    case 'S': return 1;
-    case 'M': return 1.5;
-    case 'L': return 2;
+    case 'S': return 1
+    case 'M': return 1.5
+    case 'L': return 2
+    default: return 1
   }
 })
 
 const trackSize = computed(() => {
   switch (props.size) {
-    case 'S': return '30px';
-    case 'M': return '40px';
-    case 'L': return '60px';
+    case 'S': return '30px'
+    case 'M': return '40px'
+    case 'L': return '60px'
+    default: return '40px'
   }
 })
 
 const thickness = computed(() => {
   switch (props.size) {
-    case 'S': return '16px';
-    case 'M': return '24px';
-    case 'L': return '30px';
+    case 'S': return '16px'
+    case 'M': return '24px'
+    case 'L': return '30px'
+    default: return '24px'
   }
 })
 
