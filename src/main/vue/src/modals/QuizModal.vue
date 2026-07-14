@@ -32,43 +32,49 @@
       </div>
       <div class="modal-main-area--inner">
         <div class="quiz-stage-grid">
-          <div
-            class="quiz-stage-grid-row"
-            :class="{ 'quiz-stage-grid-row--selected': includeUnknown }"
-          >
-            <div class="quiz-stage-checkbox">
-              <SmartCheckbox
+          <div class="quiz-stage-grid-row">
+            <div class="quiz-stage-toggle">
+              <Toggle
                 v-model="includeUnknown"
-                :label="specialStages.UNKNOWN.displayName"
-              />
+                size="L"
+                track-length="S"
+              >
+                <span class="quiz-toggle-label">
+                  {{ specialStages.UNKNOWN.displayName }}
+                </span>
+              </Toggle>
             </div>
             <div class="quiz-stage-flashcard-count">
               {{ unknownCount }}
             </div>
           </div>
-          <div
-            class="quiz-stage-grid-row"
-            :class="{ 'quiz-stage-grid-row--selected': includeAttempted }"
-          >
-            <div class="quiz-stage-checkbox">
-              <SmartCheckbox
+          <div class="quiz-stage-grid-row">
+            <div class="quiz-stage-toggle">
+              <Toggle
                 v-model="includeAttempted"
-                :label="specialStages.ATTEMPTED.displayName"
-              />
+                size="L"
+                track-length="S"
+              >
+                <span class="quiz-toggle-label">
+                  {{ specialStages.ATTEMPTED.displayName }}
+                </span>
+              </Toggle>
             </div>
             <div class="quiz-stage-flashcard-count">
               {{ attemptedCount }}
             </div>
           </div>
-          <div
-            class="quiz-stage-grid-row"
-            :class="{ 'quiz-stage-grid-row--selected': includeOuterSpace }"
-          >
-            <div class="quiz-stage-checkbox">
-              <SmartCheckbox
+          <div class="quiz-stage-grid-row">
+            <div class="quiz-stage-toggle">
+              <Toggle
                 v-model="includeOuterSpace"
-                :label="specialStages.OUTER_SPACE.displayName"
-              />
+                size="L"
+                track-length="S"
+              >
+                <span class="quiz-toggle-label">
+                  {{ specialStages.OUTER_SPACE.displayName }}
+                </span>
+              </Toggle>
             </div>
             <div class="quiz-stage-flashcard-count">
               {{ outerSpaceCount }}
@@ -107,7 +113,7 @@
 <script setup lang="ts">
 import Modal from '@/components/Modal.vue'
 import SmartButton from '@/components/SmartButton.vue'
-import SmartCheckbox from '@/components/SmartCheckbox.vue'
+import Toggle from '@/components/Toggle.vue'
 import AwesomeButton from '@/components/AwesomeButton.vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useRouter } from 'vue-router'
@@ -276,32 +282,12 @@ onMounted(async () => {
   align-items: center;
   gap: 10px;
   padding: 4px;
-  border: 1px solid #b8c4d6;
-  border-radius: 6px;
   transition: border-color 0.2s ease-in-out;
 }
 
-@media (hover: hover) {
-  .quiz-stage-grid-row:not(.quiz-stage-grid-row--selected):hover {
-    border-color: #007BFFFF;
-  }
-
-  .quiz-stage-grid-row:has(.quiz-stage-grid-row--selected):hover {
-    border-color: #0056B3FF;
-  }
-}
-
-.quiz-stage-grid-row--selected {
-  border-color: #007BFFFF;
-}
-
-.quiz-stage-checkbox {
+.quiz-stage-toggle {
   flex: 1;
   font-size: 1rem;
-  --smart-checkbox--color-unchecked: #007BFFFF;
-  --smart-checkbox--color-unchecked--hover: #0056B3FF;
-  --smart-checkbox--color-checked: #0056B3FF;
-  --smart-checkbox--color-checked--hover: #007BFFFF;
 }
 
 .quiz-stage-flashcard-count {
@@ -351,6 +337,15 @@ onMounted(async () => {
   --awesome-button--icon--size: 1rem;
   --awesome-button--icon--color: #9bcdff;
   --awesome-button--icon--color--hover: #cfe9fb;
+}
+
+.quiz-toggle-label {
+  font-size: 1rem;
+  color: #45454a;
+  line-height: 1.5;
+  display: inline-block;
+  vertical-align: middle;
+  text-wrap: nowrap;
 }
 
 </style>
