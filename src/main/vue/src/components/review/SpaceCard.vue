@@ -18,14 +18,25 @@
               {{ stageDisplayName }}
             </Tooltip>
           </span>
-          <AwesomeButton
-            v-if="!textOnly"
-            icon="fa-solid fa-pen-to-square"
-            class="space-card-button"
-            tooltip="Edit flashcard"
-            tooltip-position="bottom-left"
-            :on-click="handleEdit"
-          />
+          <div v-if="!textOnly" class="space-card-strip-group">
+            <AwesomeButton
+              ref="frontCopyButton"
+              icon="fa-regular fa-clone"
+              flip-icon="fa-solid fa-check"
+              class="space-card-button"
+              tooltip="Copy text"
+              tooltip-position="bottom-left"
+              :on-click="copySideToClipboard"
+              disabled-on-press
+            />
+            <AwesomeButton
+              icon="fa-solid fa-pen-to-square"
+              class="space-card-button"
+              tooltip="Edit flashcard"
+              tooltip-position="bottom-left"
+              :on-click="handleEdit"
+            />
+          </div>
         </div>
         <TotemScroll v-if="frontHasPicture">
           <div class="space-card-content space-card-content--picture">
@@ -87,14 +98,26 @@
               {{ stageDisplayName }}
             </Tooltip>
           </span>
-          <AwesomeButton
-            v-if="!textOnly"
-            icon="fa-solid fa-pen-to-square"
-            class="space-card-button"
-            tooltip="Edit flashcard"
-            tooltip-position="bottom-left"
-            :on-click="handleEdit"
-          />
+          <div v-if="!textOnly" class="space-card-strip-group">
+            <AwesomeButton
+              ref="backCopyButton"
+              icon="fa-regular fa-clone"
+              flip-icon="fa-solid fa-check"
+              class="space-card-button"
+              tooltip="Copy text"
+              tooltip-position="bottom-left"
+              :disabled="!backSide"
+              :on-click="copySideToClipboard"
+              disabled-on-press
+            />
+            <AwesomeButton
+              icon="fa-solid fa-pen-to-square"
+              class="space-card-button"
+              tooltip="Edit flashcard"
+              tooltip-position="bottom-left"
+              :on-click="handleEdit"
+            />
+          </div>
         </div>
         <TotemScroll v-if="backHasPicture">
           <div class="space-card-content space-card-content--picture">
@@ -199,6 +222,8 @@ const cardAnimationCompleted = ref(false)
 let flipDurationTimeout: ReturnType<typeof setTimeout> | null = null
 const frontVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
 const backVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
+const frontCopyButton = ref<InstanceType<typeof AwesomeButton>>()
+const backCopyButton = ref<InstanceType<typeof AwesomeButton>>()
 
 const frontHasPicture = computed(() => !!props.frontSidePicture)
 const backHasPicture = computed(() => !!props.backSidePicture)
@@ -272,6 +297,19 @@ function playCurrentSideVoice() {
 function handleEdit() {
   stopAllVoices()
   props.onEdit()
+}
+
+async function copySideToClipboard() {
+  let side
+  if (flipped.value) {
+    side = props.backSide
+    frontCopyButton.value?.reset()
+  } else {
+    side = props.frontSide
+    backCopyButton.value?.reset()
+  }
+
+  if (side) await navigator.clipboard.writeText(side)
 }
 
 function onCardAnimationComplete() {
