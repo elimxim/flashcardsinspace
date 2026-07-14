@@ -43,13 +43,16 @@
           />
         </AwesomeContainer>
       </div>
-      <div class="modal-main-area--checkbox">
-        <SmartCheckbox
+      <div class="modal-main-area--toggle">
+        <Toggle
           v-model="newSuspended"
-          label="Active"
-          checked-label="Suspended (vacation mode 🌴)"
+          size="L"
           reverse
-        />
+        >
+          <span class="toggle-label">
+            Suspended (vacation mode 🌴)
+          </span>
+        </Toggle>
       </div>
       <div class="modal-main-area--actions">
         <FlashcardSetImportExport/>
@@ -87,7 +90,7 @@
 import Modal from '@/components/Modal.vue'
 import SmartInput from '@/components/SmartInput.vue'
 import SmartButton from '@/components/SmartButton.vue'
-import SmartCheckbox from '@/components/SmartCheckbox.vue'
+import Toggle from '@/components/Toggle.vue'
 import FuzzySelect from '@/components/FuzzySelect.vue'
 import AwesomeContainer from '@/components/AwesomeContainer.vue'
 import ErrorText from '@/components/ErrorText.vue'
@@ -308,11 +311,12 @@ watch(newLanguage, () => {
   gap: 4px;
 }
 
-.modal-main-area--checkbox {
+.modal-main-area--toggle {
   display: flex;
   flex-direction: column;
   gap: 4px;
   padding-left: 8px;
+  padding-right: 2px;
 }
 
 .modal-main-area--actions {
@@ -324,5 +328,14 @@ watch(newLanguage, () => {
   flex-direction: row;
   justify-content: space-between;
   gap: 10px;
+}
+
+.toggle-label {
+  font-size: 1rem;
+  color: #45454a;
+  line-height: 1.5;
+  display: inline-block;
+  vertical-align: middle;
+  text-wrap: nowrap;
 }
 </style>

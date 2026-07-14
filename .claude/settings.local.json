@@ -14,7 +14,8 @@
       "Bash(git checkout:*)",
       "Bash(git rev-parse:*)",
       "Bash(git worktree:*)",
-      "mcp__github__issue_read"
+      "mcp__github__issue_read",
+      "WebSearch"
     ]
   }
 }
