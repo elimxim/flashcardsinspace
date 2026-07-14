@@ -329,7 +329,7 @@ export function countFlashcards(flashcards: Flashcard[], stage: Stage, currDay: 
   }
 }
 
-export interface StageReview {
+export interface ReviewStage {
   stage: string
   count: number
 }
@@ -337,7 +337,7 @@ export interface StageReview {
 export function calcStageReviews(
   flashcards: Flashcard[],
   currDay: Chronoday,
-): StageReview[] {
+): ReviewStage[] {
   const queue = createReviewQueue(flashcards, currDay)
   return currDay.stages
     .map(v => stageNameMap.get(v))
