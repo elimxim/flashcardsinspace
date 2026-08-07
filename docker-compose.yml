@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: flashcardsinspace-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-flashcardsinspace}
+      POSTGRES_USER: ${DB_USER:-fins}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-fins}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-flashcardsinspace} -d ${DB_NAME:-flashcardsinspace}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flashcardsinspace-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker,dev
+      APP_PORT: ${APP_PORT:-8442}
+      APP_DATASOURCE_URL: jdbc:postgresql://db:${DB_PORT:-5432}/${DB_NAME:-flashcardsinspace}
+      APP_DATASOURCE_USERNAME: ${DB_USER:-fins}
+      APP_DATASOURCE_PASSWORD: ${DB_PASSWORD:-fins}
+      APP_SECURITY_JWT_SECRET: ${APP_SECURITY_JWT_SECRET:-VOyWwmqaktRJ0PHYs6q3FBHrcuBwkacf02akxwqemoySEYxwkLceALCAQrmInkjAU3v12T1x5L6xBSwPlTD87g==}
+      APP_MAIL_API_KEY: ${APP_MAIL_API_KEY:-dev-dummy-key}
+      APP_MAIL_SENDER_NAME: ${APP_MAIL_SENDER_NAME:-Flashcards in Space (Local/Test)}
+      APP_MAIL_SENDER_DOMAIN: ${APP_MAIL_SENDER_DOMAIN:-flashcardsinspace.com}
+      APP_MAIL_REPLY_TO_EMAIL: ${APP_MAIL_REPLY_TO_EMAIL:-noreply@flashcardsinspace.com}
+    volumes:
+      - ./props/application.yaml:/app/config/application.yaml:ro
+    command: ["--spring.config.additional-location=file:/app/config/"]
+    ports:
+      - "${APP_PORT:-8442}:${APP_PORT:-8442}"
+
+volumes:
+  db_data:
