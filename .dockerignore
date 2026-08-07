@@ -1,0 +1,9 @@
+.git
+.gradle
+build
+out
+src/main/vue/node_modules
+src/main/vue/dist
+.idea
+*.md
+.env
