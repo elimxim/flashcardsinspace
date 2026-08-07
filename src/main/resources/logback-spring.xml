@@ -11,35 +11,49 @@
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/app.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/app.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
-        <encoder>
-            <pattern>${FILE_LOG_PATTERN}</pattern>
-        </encoder>
-    </appender>
+    <springProfile name="!docker">
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>logs/app.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>logs/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+                <maxHistory>30</maxHistory>
+            </rollingPolicy>
+            <encoder>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
 
-    <appender name="REQUESTS_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/requests.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/requests.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS, UTC} || %m%n</pattern>
-        </encoder>
-    </appender>
+        <appender name="REQUESTS_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>logs/requests.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>logs/requests.%d{yyyy-MM-dd}.log</fileNamePattern>
+                <maxHistory>30</maxHistory>
+            </rollingPolicy>
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS, UTC} || %m%n</pattern>
+            </encoder>
+        </appender>
+    </springProfile>
 
-    <logger name="com.github.elimxim.flashcardsinspace.web.filter.RequestLoggingFilter" level="INFO" additivity="false">
-        <appender-ref ref="REQUESTS_LOG_FILE"/>
-    </logger>
+    <springProfile name="docker">
+        <logger name="com.github.elimxim.flashcardsinspace.web.filter.RequestLoggingFilter" level="INFO" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
 
-    <root level="INFO">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="FILE" />
-    </root>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+        </root>
+    </springProfile>
+
+    <springProfile name="!docker">
+        <logger name="com.github.elimxim.flashcardsinspace.web.filter.RequestLoggingFilter" level="INFO" additivity="false">
+            <appender-ref ref="REQUESTS_LOG_FILE"/>
+        </logger>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="FILE" />
+        </root>
+    </springProfile>
 
 </configuration>
