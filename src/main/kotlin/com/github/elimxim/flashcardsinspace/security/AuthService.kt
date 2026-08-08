@@ -6,7 +6,8 @@ import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
 import com.github.elimxim.flashcardsinspace.service.LanguageService
 import com.github.elimxim.flashcardsinspace.service.UserService
 import com.github.elimxim.flashcardsinspace.service.mail.EmailService
-import com.github.elimxim.flashcardsinspace.service.mail.Recipient
+import com.github.elimxim.flashcardsinspace.service.mail.MailProperties
+import com.github.elimxim.flashcardsinspace.service.mail.client.Recipient
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.TokenHelper
 import com.github.elimxim.flashcardsinspace.util.withLoggingContext
@@ -39,8 +40,10 @@ class AuthService(
     private val requestValidator: RequestValidator,
     private val emailService: EmailService,
     private val verificationCodeService: VerificationCodeService,
-    private val userService: UserService,
+    mailProperties: MailProperties,
 ) {
+    private val shouldVerifyEmail: Boolean = mailProperties.enabled
+
     @Transactional
     fun signUp(request: SignUpRequest, response: HttpServletResponse): User {
         log.info("Sign up attempt ${maskSecret(request.email?.escapeJava())}")
@@ -57,7 +60,7 @@ class AuthService(
 
         val user = User(
             email = email,
-            emailVerified = false,
+            emailVerified = !shouldVerifyEmail,
             name = name,
             secret = passwordEncoder.encode(secret.unmasked()),
             language = language,
@@ -71,7 +74,9 @@ class AuthService(
 
         emailService.sendWelcomeEmail(recipient = Recipient(user.email, user.name))
         jwtService.setCookies(user, response)
-        verificationCodeService.send(savedUser, savedUser.email, VerificationType.REGISTRATION_REQUEST, response)
+        if (shouldVerifyEmail) {
+            verificationCodeService.send(savedUser, savedUser.email, VerificationType.REGISTRATION_REQUEST, response)
+        }
         return savedUser
     }
 

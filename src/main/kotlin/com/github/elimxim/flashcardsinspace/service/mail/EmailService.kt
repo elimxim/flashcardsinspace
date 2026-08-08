@@ -2,6 +2,9 @@ package com.github.elimxim.flashcardsinspace.service.mail
 
 import com.github.elimxim.flashcardsinspace.entity.VerificationType
 import com.github.elimxim.flashcardsinspace.security.maskSecret
+import com.github.elimxim.flashcardsinspace.service.mail.client.Mail
+import com.github.elimxim.flashcardsinspace.service.mail.client.MailClient
+import com.github.elimxim.flashcardsinspace.service.mail.client.Recipient
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.thymeleaf.TemplateEngine
@@ -11,7 +14,7 @@ private val log = LoggerFactory.getLogger(EmailService::class.java)
 
 @Service
 class EmailService(
-    private val mailClient: BrevoMailClient,
+    private val mailClient: MailClient,
     private val templateEngine: TemplateEngine
 ) {
 

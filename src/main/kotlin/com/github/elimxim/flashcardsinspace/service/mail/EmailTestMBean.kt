@@ -4,6 +4,7 @@ import com.github.elimxim.flashcardsinspace.entity.VerificationType
 import com.github.elimxim.flashcardsinspace.security.SecurityProperties
 import com.github.elimxim.flashcardsinspace.security.getSecurityTokenProperties
 import com.github.elimxim.flashcardsinspace.security.maskSecret
+import com.github.elimxim.flashcardsinspace.service.mail.client.Recipient
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.jmx.export.annotation.ManagedOperation

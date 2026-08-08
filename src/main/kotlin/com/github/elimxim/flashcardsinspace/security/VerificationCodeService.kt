@@ -6,7 +6,7 @@ import com.github.elimxim.flashcardsinspace.entity.VerificationType
 import com.github.elimxim.flashcardsinspace.entity.repository.VerificationIntentRepository
 import com.github.elimxim.flashcardsinspace.service.UserService
 import com.github.elimxim.flashcardsinspace.service.mail.EmailService
-import com.github.elimxim.flashcardsinspace.service.mail.Recipient
+import com.github.elimxim.flashcardsinspace.service.mail.client.Recipient
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.*
 import com.github.elimxim.flashcardsinspace.web.dto.VerificationCodeRequest
