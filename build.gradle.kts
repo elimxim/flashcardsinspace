@@ -78,14 +78,6 @@ application {
     )
 }
 
-sourceSets {
-    main {
-        resources {
-            exclude("**/application-dev.yaml")
-        }
-    }
-}
-
 springBoot {
     mainClass.set("com.github.elimxim.flashcardsinspace.AppKt")
 }
