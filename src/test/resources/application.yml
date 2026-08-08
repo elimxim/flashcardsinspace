@@ -16,6 +16,7 @@ app:
         length: 4
         max-age: 40
   mail:
+    enabled: true
     api-key: "dummy-api-Key"
     sender-name: "test-name"
     sender-domain: "test-domain-com"
