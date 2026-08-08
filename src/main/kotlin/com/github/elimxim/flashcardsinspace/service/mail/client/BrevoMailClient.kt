@@ -1,4 +1,4 @@
-package com.github.elimxim.flashcardsinspace.service.mail
+package com.github.elimxim.flashcardsinspace.service.mail.client
 
 import brevo.Configuration
 import brevo.auth.ApiKeyAuth
@@ -7,22 +7,13 @@ import brevoModel.SendSmtpEmail
 import brevoModel.SendSmtpEmailReplyTo
 import brevoModel.SendSmtpEmailSender
 import brevoModel.SendSmtpEmailTo
-import org.slf4j.LoggerFactory
+import com.github.elimxim.flashcardsinspace.service.mail.MailProperties
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty
 import org.springframework.stereotype.Service
 
-private val log = LoggerFactory.getLogger(BrevoMailClient::class.java)
-
-class MailClientException(cause: Exception) : RuntimeException(cause)
-
-data class Recipient(val email: String, val name: String? = null)
-
-sealed class Mail(val subject: String, val htmlContent: String) {
-    class WelcomeMail(subject: String, htmlContent: String) : Mail(subject, htmlContent)
-    class SecurityMail(subject: String, htmlContent: String) : Mail(subject, htmlContent)
-}
-
 @Service
-class BrevoMailClient(private val mailProperties: MailProperties) {
+@ConditionalOnBooleanProperty("app.mail.enabled")
+class BrevoMailClient(private val mailProperties: MailProperties): MailClient {
 
     private val welcomeEmail: String
         get() = "welcome@${mailProperties.senderDomain}"
@@ -30,7 +21,7 @@ class BrevoMailClient(private val mailProperties: MailProperties) {
     private val securityEmail: String
         get() = "security@${mailProperties.senderDomain}"
 
-    fun send(recipient: Recipient, mail: Mail) {
+    override fun send(recipient: Recipient, mail: Mail) {
         val apiClient = Configuration.getDefaultApiClient()
         val auth = apiClient.getAuthentication("api-key") as ApiKeyAuth
         auth.apiKey = mailProperties.apiKey

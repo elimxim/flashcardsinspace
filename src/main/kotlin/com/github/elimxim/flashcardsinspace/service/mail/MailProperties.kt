@@ -4,6 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "app.mail")
 data class MailProperties(
+    val enabled: Boolean,
     val apiKey: String,
     val senderName: String,
     val senderDomain: String,
