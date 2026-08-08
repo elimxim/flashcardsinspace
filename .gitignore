@@ -7,4 +7,4 @@ build
 out
 logs
 certs
-**/*-dev.yaml
+**/*-dev*.yaml
