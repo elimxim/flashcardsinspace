@@ -65,6 +65,7 @@ daily ritual a little better every time you return.
 - Java 24+
 - Node.js 22+
 - PostgreSQL
+- Docker
 
 ### Tech Stack
 
@@ -82,20 +83,34 @@ daily ritual a little better every time you return.
 
 ### Local Setup
 
-1. Clone the repository:
+Clone the repository:
+
+```bash
+git clone https://github.com/elimxim/flashcardsinspace.git
+cd flashcardsinspace
+```
+
+#### Quick setup
+
+Build and run the app and database:
+
+```bash
+docker compose up -d
+```
+
+#### Dev setup
+
+1. Database.
    ```bash
-   git clone https://github.com/elimxim/flashcardsinspace.git
-   cd flashcardsinspace
+   docker compose up db -d
    ```
 
-2. Configure the database in `props/application.yaml`
-
-3. Build and run:
-   ```bash
+2. Backend. To run/debug through IDEA, the cfg file is in `.run`. Otherwise:
+   ```bash  
    ./gradlew bootRun
-   ```
+    ```
 
-4. For frontend development:
+3. Frontend.
    ```bash
    cd src/main/vue
    npm install
