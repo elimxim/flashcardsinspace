@@ -39,8 +39,8 @@
 </template>
 
 <script setup lang="ts">
-import TextInput from '@/components/TextInput.vue'
-import ErrorText from '@/components/ErrorText.vue'
+import TextInput from '@/components/common/TextInput.vue'
+import ErrorText from '@/components/common/ErrorText.vue'
 import VoiceRecorder from '@/components/VoiceRecorder.vue'
 import PictureUploader from '@/components/PictureUploader.vue'
 import { useVuelidate } from '@vuelidate/core'

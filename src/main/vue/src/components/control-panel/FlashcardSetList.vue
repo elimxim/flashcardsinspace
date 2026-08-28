@@ -35,8 +35,8 @@
 </template>
 
 <script setup lang="ts">
-import AwesomeContainer from '@/components/AwesomeContainer.vue'
-import KineticRingSpinner from '@/components/KineticRingSpinner.vue'
+import AwesomeContainer from '@/components/common/AwesomeContainer.vue'
+import KineticRingSpinner from '@/components/spinners/KineticRingSpinner.vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'

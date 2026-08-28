@@ -72,9 +72,9 @@
 </template>
 
 <script setup lang="ts">
-import Modal from '@/components/Modal.vue'
-import SmartButton from '@/components/SmartButton.vue'
-import KineticRingSpinner from '@/components/KineticRingSpinner.vue'
+import Modal from '@/components/common/Modal.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
+import KineticRingSpinner from '@/components/spinners/KineticRingSpinner.vue'
 import { computed, onUnmounted, ref } from 'vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useEventStore } from '@/stores/event-store.ts'

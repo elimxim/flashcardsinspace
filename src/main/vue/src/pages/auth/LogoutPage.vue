@@ -33,7 +33,7 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { sendLogoutRequest } from '@/api/auth-client.ts'
-import Progressbar from '@/components/Progressbar.vue'
+import Progressbar from '@/components/common/Progressbar.vue'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { resetAllPiniaStores } from '@/utils/pinia-reset-plugin.ts'
 

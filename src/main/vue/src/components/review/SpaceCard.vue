@@ -171,11 +171,11 @@
 </template>
 
 <script setup lang="ts">
-import TotemScroll from '@/components/TotemScroll.vue'
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import TotemScroll from '@/components/common/TotemScroll.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import VoicePlayer from '@/components/VoicePlayer.vue'
 import SpacePicture from '@/components/SpacePicture.vue'
-import Tooltip from '@/components/Tooltip.vue'
+import Tooltip from '@/components/common/Tooltip.vue'
 import { ref, nextTick, computed } from 'vue'
 import { stageNameMap } from '@/core-logic/stage-logic.ts'
 import { UXConfig } from '@/utils/device-utils.ts'

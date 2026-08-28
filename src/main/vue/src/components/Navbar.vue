@@ -128,9 +128,9 @@
 </template>
 
 <script setup lang="ts">
-import SvgImage from '@/components/SvgImage.vue'
-import Starfield from '@/components/Starfield.vue'
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import SvgImage from '@/components/common/SvgImage.vue'
+import Starfield from '@/components/common/Starfield.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { storeToRefs } from 'pinia'
 import { routeNames } from '@/router'

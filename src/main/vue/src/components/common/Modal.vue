@@ -25,8 +25,8 @@
 </template>
 
 <script setup lang="ts">
-import AwesomeButton from '@/components/AwesomeButton.vue'
-import SmartButton from '@/components/SmartButton.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
 import { nextTick, ref, watch, onUnmounted, onMounted } from 'vue'
 
 const props = withDefaults(defineProps<{

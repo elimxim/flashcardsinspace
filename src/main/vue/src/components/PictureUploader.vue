@@ -72,8 +72,8 @@
 </template>
 
 <script lang="ts" setup>
-import AwesomeButton from '@/components/AwesomeButton.vue'
-import PictureThumbButton from '@/components/PictureThumbButton.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
+import PictureThumbButton from '@/components/common/PictureThumbButton.vue'
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import { decodeAndResize, encodeToWebp } from '@/utils/image-processing.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'

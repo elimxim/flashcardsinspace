@@ -74,9 +74,9 @@
 </template>
 
 <script setup lang="ts">
-import DoughnutChart from '@/components/DoughnutChart.vue'
-import SmartButton from '@/components/SmartButton.vue'
-import Clock from '@/components/Clock.vue'
+import DoughnutChart from '@/components/common/DoughnutChart.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
+import Clock from '@/components/common/Clock.vue'
 
 withDefaults(defineProps<{
   elapsedTime: number

@@ -99,12 +99,12 @@
 
 <script setup lang="ts">
 import ControlBar from '@/components/ControlBar.vue'
-import KineticRingSpinner from '@/components/KineticRingSpinner.vue'
-import Progressbar from '@/components/Progressbar.vue'
+import KineticRingSpinner from '@/components/spinners/KineticRingSpinner.vue'
+import Progressbar from '@/components/common/Progressbar.vue'
 import SpaceDeck from '@/components/review/SpaceDeck.vue'
-import SmartButton from '@/components/SmartButton.vue'
-import AwesomeButton from '@/components/AwesomeButton.vue'
-import SpaceToast from '@/components/SpaceToast.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
+import SpaceToast from '@/components/common/SpaceToast.vue'
 import QuizResult from '@/components/review/QuizResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useStopWatch } from '@/utils/stop-watch.ts'

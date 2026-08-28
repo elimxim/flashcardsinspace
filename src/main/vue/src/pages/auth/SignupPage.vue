@@ -111,12 +111,12 @@
 </template>
 
 <script setup lang="ts">
-import FuzzySelect from '@/components/FuzzySelect.vue'
-import AwesomeContainer from '@/components/AwesomeContainer.vue'
-import SmartInput from '@/components/SmartInput.vue'
-import SmartButton from '@/components/SmartButton.vue'
-import SpaceToast from '@/components/SpaceToast.vue'
-import ErrorText from '@/components/ErrorText.vue'
+import FuzzySelect from '@/components/common/FuzzySelect.vue'
+import AwesomeContainer from '@/components/common/AwesomeContainer.vue'
+import SmartInput from '@/components/common/SmartInput.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
+import SpaceToast from '@/components/common/SpaceToast.vue'
+import ErrorText from '@/components/common/ErrorText.vue'
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from "@/stores/auth-store.ts"

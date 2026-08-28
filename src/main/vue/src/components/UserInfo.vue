@@ -79,11 +79,11 @@
 </template>
 
 <script setup lang="ts">
-import AwesomeContainer from '@/components/AwesomeContainer.vue'
-import SmartInput from '@/components/SmartInput.vue'
-import SmartButton from '@/components/SmartButton.vue'
-import FuzzySelect from '@/components/FuzzySelect.vue'
-import ErrorText from '@/components/ErrorText.vue'
+import AwesomeContainer from '@/components/common/AwesomeContainer.vue'
+import SmartInput from '@/components/common/SmartInput.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
+import FuzzySelect from '@/components/common/FuzzySelect.vue'
+import ErrorText from '@/components/common/ErrorText.vue'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'

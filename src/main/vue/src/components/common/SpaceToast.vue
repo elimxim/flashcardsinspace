@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import Starfield from './Starfield.vue'
-import Progressbar from '@/components/Progressbar.vue'
+import Progressbar from '@/components/common/Progressbar.vue'
 import { onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ToastType, useSpaceToaster } from '@/stores/toast-store.ts'

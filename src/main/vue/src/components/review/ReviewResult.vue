@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { deckEmptyMessage } from '@/core-logic/review-logic.ts'
-import SmartButton from '@/components/SmartButton.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
 import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
 

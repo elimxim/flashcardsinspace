@@ -53,8 +53,8 @@
 </template>
 
 <script setup lang="ts">
-import AuroraWaves from '@/components/AuroraWaves.vue'
-import GlassCard from '@/components/GlassCard.vue'
+import AuroraWaves from '@/components/common/AuroraWaves.vue'
+import GlassCard from '@/components/common/GlassCard.vue'
 import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
 

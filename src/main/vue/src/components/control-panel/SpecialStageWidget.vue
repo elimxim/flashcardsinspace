@@ -34,7 +34,7 @@ import { storeToRefs } from 'pinia'
 import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
 import { useChronoStore } from '@/stores/chrono-store.ts'
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
 
 const props = defineProps<{
   stage: Stage

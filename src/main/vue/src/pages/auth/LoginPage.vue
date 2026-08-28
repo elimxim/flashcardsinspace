@@ -77,11 +77,11 @@
 </template>
 
 <script setup lang="ts">
-import SmartInput from '@/components/SmartInput.vue'
-import SmartButton from '@/components/SmartButton.vue'
-import SpaceToast from '@/components/SpaceToast.vue'
-import SmartPicture from '@/components/SmartPicture.vue'
-import ErrorText from '@/components/ErrorText.vue'
+import SmartInput from '@/components/common/SmartInput.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
+import SpaceToast from '@/components/common/SpaceToast.vue'
+import SmartPicture from '@/components/common/SmartPicture.vue'
+import ErrorText from '@/components/common/ErrorText.vue'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { email, maxLength, required } from '@vuelidate/validators'

@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import Tooltip from '@/components/Tooltip.vue'
+import Tooltip from '@/components/common/Tooltip.vue'
 import { computed, ref, watch } from 'vue'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { UXConfig } from '@/utils/device-utils.ts'

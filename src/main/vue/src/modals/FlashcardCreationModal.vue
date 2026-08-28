@@ -47,10 +47,10 @@
 </template>
 
 <script setup lang="ts">
-import SmartButton from '@/components/SmartButton.vue'
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import FlashcardInput from '@/components/FlashcardInput.vue'
-import Modal from '@/components/Modal.vue'
+import Modal from '@/components/common/Modal.vue'
 import { ref } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'

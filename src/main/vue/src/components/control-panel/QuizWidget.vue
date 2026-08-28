@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { storeToRefs } from 'pinia'

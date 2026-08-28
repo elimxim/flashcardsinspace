@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'

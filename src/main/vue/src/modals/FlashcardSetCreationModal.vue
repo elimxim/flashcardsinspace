@@ -65,12 +65,12 @@
 </template>
 
 <script setup lang="ts">
-import Modal from '@/components/Modal.vue'
-import SmartInput from '@/components/SmartInput.vue'
-import SmartButton from '@/components/SmartButton.vue'
-import FuzzySelect from '@/components/FuzzySelect.vue'
-import AwesomeContainer from '@/components/AwesomeContainer.vue'
-import ErrorText from '@/components/ErrorText.vue'
+import Modal from '@/components/common/Modal.vue'
+import SmartInput from '@/components/common/SmartInput.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
+import FuzzySelect from '@/components/common/FuzzySelect.vue'
+import AwesomeContainer from '@/components/common/AwesomeContainer.vue'
+import ErrorText from '@/components/common/ErrorText.vue'
 import { computed, ref, watch } from 'vue'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'

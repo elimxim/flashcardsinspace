@@ -73,7 +73,7 @@
 
 <script setup lang="ts">
 import SpaceCard from '@/components/review/SpaceCard.vue'
-import UfoLoader from '@/components/UfoLoader.vue'
+import UfoLoader from '@/components/spinners/UfoLoader.vue'
 import FlashcardEditModal from '@/modals/FlashcardEditModal.vue'
 import { computed, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'

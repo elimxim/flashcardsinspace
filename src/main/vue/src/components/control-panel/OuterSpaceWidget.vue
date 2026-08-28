@@ -24,8 +24,8 @@
 </template>
 
 <script setup lang="ts">
-import Starfield from '@/components/Starfield.vue'
-import SmartButton from '@/components/SmartButton.vue'
+import Starfield from '@/components/common/Starfield.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
 import { computed } from 'vue'
 import { countFlashcards, ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'

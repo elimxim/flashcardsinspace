@@ -62,10 +62,10 @@
 </template>
 
 <script setup lang="ts">
-import SpaceToast from '@/components/SpaceToast.vue'
-import SmartInput from '@/components/SmartInput.vue'
-import SmartButton from '@/components/SmartButton.vue'
-import ErrorText from '@/components/ErrorText.vue'
+import SpaceToast from '@/components/common/SpaceToast.vue'
+import SmartInput from '@/components/common/SmartInput.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
+import ErrorText from '@/components/common/ErrorText.vue'
 import { computed, ref } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { helpers, maxLength, minLength, required } from '@vuelidate/validators'

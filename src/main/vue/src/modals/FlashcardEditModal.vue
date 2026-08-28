@@ -46,10 +46,10 @@
 </template>
 
 <script setup lang="ts">
-import Modal from '@/components/Modal.vue'
-import SmartButton from '@/components/SmartButton.vue'
+import Modal from '@/components/common/Modal.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
 import FlashcardInput from '@/components/FlashcardInput.vue'
-import SpaceToast from '@/components/SpaceToast.vue'
+import SpaceToast from '@/components/common/SpaceToast.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'

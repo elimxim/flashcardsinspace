@@ -111,10 +111,10 @@
 </template>
 
 <script setup lang="ts">
-import Modal from '@/components/Modal.vue'
-import SmartButton from '@/components/SmartButton.vue'
-import Toggle from '@/components/Toggle.vue'
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import Modal from '@/components/common/Modal.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
+import Toggle from '@/components/common/Toggle.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'

@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import { computed, ref } from 'vue'
 
 const model = defineModel<string | undefined>()

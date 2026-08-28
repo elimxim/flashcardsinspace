@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import Navbar from '@/components/Navbar.vue'
-import SpaceToast from '@/components/SpaceToast.vue'
+import SpaceToast from '@/components/common/SpaceToast.vue'
 import { onMounted } from 'vue'
 import { loadLanguageStore } from '@/utils/store-loading.ts'
 

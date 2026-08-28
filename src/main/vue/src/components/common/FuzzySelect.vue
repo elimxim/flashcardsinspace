@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts" generic="T extends object">
-import SmartInput from '@/components/SmartInput.vue'
+import SmartInput from '@/components/common/SmartInput.vue'
 import { ref, computed, nextTick, watch } from 'vue'
 
 const model = defineModel<T>({ default: null })

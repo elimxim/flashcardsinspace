@@ -83,9 +83,9 @@
 </template>
 
 <script setup lang="ts">
-import Modal from '@/components/Modal.vue'
-import SmartButton from '@/components/SmartButton.vue'
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import Modal from '@/components/common/Modal.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import {
   computed,
   onMounted,
@@ -108,7 +108,7 @@ import { useAuthStore, UserRole } from '@/stores/auth-store.ts'
 import { dateNextMonth, datePrevMonth, parseIsoDate } from '@/utils/utils.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
-import SwipeTape from '@/components/SwipeTape.vue'
+import SwipeTape from '@/components/common/SwipeTape.vue'
 import { ComponentExposed } from 'vue-component-type-helpers'
 
 const toggleStore = useToggleStore()

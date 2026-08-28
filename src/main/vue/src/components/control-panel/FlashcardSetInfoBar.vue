@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import AwesomeContainer from '@/components/AwesomeContainer.vue'
+import AwesomeContainer from '@/components/common/AwesomeContainer.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'

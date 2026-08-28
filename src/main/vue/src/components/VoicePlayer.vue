@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import { ref, onBeforeUnmount, watch, onMounted } from 'vue'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { usePlaybackControl } from '@/stores/playback-store.ts'

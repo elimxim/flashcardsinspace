@@ -42,11 +42,11 @@
 
 
 <script setup lang="ts">
-import DeferredLoading from '@/components/DeferredLoading.vue'
+import DeferredLoading from '@/components/common/DeferredLoading.vue'
 import UserInfo from '@/components/UserInfo.vue'
 import UserInfoSkeleton from '@/components/UserInfoSkeleton.vue'
-import SpaceToast from '@/components/SpaceToast.vue'
-import SvgImage from '@/components/SvgImage.vue'
+import SpaceToast from '@/components/common/SpaceToast.vue'
+import SvgImage from '@/components/common/SvgImage.vue'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'

@@ -105,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import Starfield from '@/components/Starfield.vue'
+import Starfield from '@/components/common/Starfield.vue'
 
 const stages = [
   {

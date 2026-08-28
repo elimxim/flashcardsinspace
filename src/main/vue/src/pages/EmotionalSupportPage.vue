@@ -74,8 +74,8 @@
 </template>
 
 <script setup lang="ts">
-import SvgImage from '@/components/SvgImage.vue'
-import SwipeTape from '@/components/SwipeTape.vue'
+import SvgImage from '@/components/common/SvgImage.vue'
+import SwipeTape from '@/components/common/SwipeTape.vue'
 import { computed, nextTick, ref } from 'vue'
 import { shuffle } from '@/utils/utils.ts'
 import { ComponentExposed } from 'vue-component-type-helpers'

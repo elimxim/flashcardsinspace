@@ -52,10 +52,10 @@
 
 <script setup lang="ts">
 import ControlBar from '@/components/ControlBar.vue'
-import DeferredLoading from '@/components/DeferredLoading.vue'
+import DeferredLoading from '@/components/common/DeferredLoading.vue'
 import FlashcardSetList from '@/components/control-panel/FlashcardSetList.vue'
 import FlashcardSetListSkeleton from '@/components/control-panel/FlashcardSetListSkeleton.vue'
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'

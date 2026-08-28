@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import SpaceToast from '@/components/SpaceToast.vue'
+import SpaceToast from '@/components/common/SpaceToast.vue'
 import CodeVerificationDevice from '@/components/CodeVerificationDevice.vue'
 import { computed, onMounted, ref } from 'vue'
 import {
@@ -111,7 +111,7 @@ import { userApiErrors } from '@/api/user-api-error.ts'
 import { VerificationIntentResponse } from '@/api/communication.ts'
 import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
 
 const props = withDefaults(defineProps<{
   type?: VerificationType

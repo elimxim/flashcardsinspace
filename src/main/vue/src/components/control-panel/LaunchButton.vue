@@ -31,8 +31,8 @@
 </template>
 
 <script setup lang="ts">
-import Starfield from '@/components/Starfield.vue'
-import AwesomeButton from '@/components/AwesomeButton.vue'
+import Starfield from '@/components/common/Starfield.vue'
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
 
 withDefaults(defineProps<{
   disabled?: boolean
