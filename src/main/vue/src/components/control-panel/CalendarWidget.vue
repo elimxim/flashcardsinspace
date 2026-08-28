@@ -28,12 +28,14 @@
       v-if="isUserCloseToLoseDayStreak"
       class="calendar-info-button"
       icon="fa-solid fa-circle-exclamation"
-      :on-hover="togglePreviousDaysPopup"
+      :on-hover="hoverEnabled ? toggleAlarmPopup : undefined"
+      :on-click="hoverEnabled ? undefined : toggleAlarmPopup"
     />
     <transition name="slide-fade">
       <div
-        v-if="isUserCloseToLoseDayStreak && showPreviousDaysPopup"
+        v-if="isUserCloseToLoseDayStreak && showAlarmPopup"
         class="calendar-popup"
+        @click="showAlarmPopup = false"
       >
         <div class="calendar-popup-layout">
           <div class="cp-text cp-text--sub cp-text--nowrap">
@@ -58,6 +60,7 @@ import { storeToRefs } from 'pinia'
 import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 import { tomorrowMidnight } from '@/utils/utils.ts'
 import { createReviewQueue } from '@/core-logic/review-logic.ts'
+import { deviceInteraction } from '@/utils/device-utils.ts'
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
@@ -66,12 +69,14 @@ const toggleStore = useToggleStore()
 const { flashcardSet, flashcards, isSuspended } = storeToRefs(flashcardStore)
 const { currDay, isDayOff } = storeToRefs(chronoStore)
 
-const showPreviousDaysPopup = ref(false)
+const showAlarmPopup = ref(false)
 const minutesBeforeMidnight = ref(-1)
 let alarmInterval: ReturnType<typeof setInterval> | null = null
 
-const togglePreviousDaysPopup = () => {
-  showPreviousDaysPopup.value = !showPreviousDaysPopup.value
+const hoverEnabled = deviceInteraction().isHover
+
+const toggleAlarmPopup = () => {
+  showAlarmPopup.value = !showAlarmPopup.value
 }
 
 const isOnVacation = computed(() => isSuspended.value || isDayOff.value)
@@ -84,7 +89,7 @@ const isUserCloseToLoseDayStreak = computed(() => {
     return false
   } else {
     const minutes = minutesBeforeMidnight.value
-    return minutes > 0 && minutes < 6 * 60 // 6 hours
+    return minutes > 0 && minutes < 10 * 60 // 6 hours
   }
 })
 
