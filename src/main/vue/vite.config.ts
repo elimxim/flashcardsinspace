@@ -46,6 +46,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
         },
+        '/actuator': {
+          target: 'http://localhost:8442',
+          changeOrigin: true,
+          secure: false,
+        },
       }
     }
   }
