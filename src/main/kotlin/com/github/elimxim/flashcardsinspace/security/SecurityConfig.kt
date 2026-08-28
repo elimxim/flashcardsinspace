@@ -6,10 +6,10 @@ import io.hawt.springboot.HawtioEndpoint
 import org.jolokia.support.spring.actuator.JolokiaEndpoint
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
 import org.springframework.boot.actuate.health.HealthEndpoint
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.env.Environment
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -31,7 +31,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableMethodSecurity
 @EnableConfigurationProperties(SecurityProperties::class)
 class SecurityConfig(
-    private val env: Environment,
     private val securityProperties: SecurityProperties,
     private val requestLoggingFilter: RequestLoggingFilter,
 ) {
@@ -57,57 +56,46 @@ class SecurityConfig(
         JwtAuthFilter(jwtService, userDetailsService)
 
     @Bean
+    @ConditionalOnBooleanProperty("app.security.enabled", matchIfMissing = true)
     fun apiSecurityFilterChain(
         http: HttpSecurity,
         jwtAuthFilter: JwtAuthFilter,
-    ): SecurityFilterChain =
-        if (securityProperties.enabled) {
-            // resolve HTTP -> HTTPS redirect loop when run in dev mode
-            if (env.activeProfiles.none { it == "dev" }) {
-                http.requiresChannel { channel ->
-                    channel
-                        .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).requiresInsecure()
-                        .anyRequest().requiresSecure()
-                }
-            } else {
-                http.authorizeHttpRequests { auth ->
-                    auth
-                        .requestMatchers(EndpointRequest.to(HawtioEndpoint::class.java)).permitAll()
-                        .requestMatchers(EndpointRequest.to(JolokiaEndpoint::class.java)).permitAll()
-                }
-            }
-
-            http
-                .cors { it.configurationSource(corsConfigurationSource()) }
-                .csrf { it.disable() }
-                .logout { it.disable() }
-                .authorizeHttpRequests { auth ->
-                    auth
-                        .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).permitAll()
-                        .requestMatchers("/api/**").authenticated()
-                        .requestMatchers("/api-public/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
-                        .anyRequest().permitAll()
-                }
-                .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
-                .addFilterAfter(requestLoggingFilter, UsernamePasswordAuthenticationFilter::class.java)
-                .headers { headers ->
-                    headers
-                        .xssProtection { xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK) }
-                        .contentSecurityPolicy { csp -> csp.policyDirectives("script-src 'self' 'wasm-unsafe-eval'") }
-                }
-                .build()
-        } else {
-            http
-                .cors { it.disable() }
-                .csrf { it.disable() }
-                .logout { it.disable() }
-                .authorizeHttpRequests { auth ->
-                    auth.anyRequest().permitAll()
-                }
-                .build()
+    ): SecurityFilterChain = http
+        .cors { it.configurationSource(corsConfigurationSource()) }
+        .csrf { it.disable() }
+        .logout { it.disable() }
+        .authorizeHttpRequests { auth ->
+            auth
+                .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).permitAll()
+                .requestMatchers(EndpointRequest.to(HawtioEndpoint::class.java)).permitAll()
+                .requestMatchers(EndpointRequest.to(JolokiaEndpoint::class.java)).permitAll()
+                .requestMatchers("/api/**").authenticated()
+                .requestMatchers("/api-public/**").permitAll()
+                .requestMatchers("/auth/**").permitAll()
+                .anyRequest().permitAll()
         }
+        .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
+        .addFilterAfter(requestLoggingFilter, UsernamePasswordAuthenticationFilter::class.java)
+        .headers { headers ->
+            headers
+                .xssProtection { xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK) }
+                .contentSecurityPolicy { csp -> csp.policyDirectives("script-src 'self' 'wasm-unsafe-eval'") }
+        }
+        .build()
+
+    @Bean
+    @ConditionalOnBooleanProperty("app.security.enabled", havingValue = false)
+    fun disabledApiSecurityFilterChain(
+        http: HttpSecurity,
+    ): SecurityFilterChain = http
+        .cors { it.disable() }
+        .csrf { it.disable() }
+        .logout { it.disable() }
+        .authorizeHttpRequests { auth ->
+            auth.anyRequest().permitAll()
+        }
+        .build()
 
     private fun corsConfigurationSource() = UrlBasedCorsConfigurationSource().apply {
         val configuration = CorsConfiguration()
