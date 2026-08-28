@@ -205,7 +205,7 @@ onUnmounted(() => {
   height: 100%;
   min-height: 48px;
   max-width: 132px;
-  padding: 6px;
+  padding: 4px 2px;
   gap: 2px;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 -2px 2px rgba(255, 255, 255, 0.1);
   overflow: hidden;
@@ -236,9 +236,9 @@ onUnmounted(() => {
   background: var(--cp--count-box--bg);
   border-radius: 3px;
   padding: 2px;
-  width: 70%;
+  width: 90%;
   min-width: 26px;
-  max-width: 40px;
+  max-width: 42px;
   text-align: center;
 }
 </style>
