@@ -105,12 +105,53 @@ docker compose up -d
    docker compose up db -d
    ```
 
-2. Backend. To run/debug through IDEA, the cfg file is in `.run`. Otherwise:
+2. Create and place your app properties file with settings to override:
+   <details>
+   <summary>Example of props/application-dev.yaml</summary>
+   
+   ```yaml
+   server:
+     port: 8442 # this port is used in vite.config.ts to proxy API calls to the server over HTTP
+   spring:
+     datasource: # DB is required for the app
+       url: jdbc:postgresql://localhost:5432/flashcardsinspace?sessionTimezone=UTC
+       username: fins
+       password: fins
+
+   app:
+     security: 
+       jwt:
+         secret: <random base-64 key>
+         access-token-expiration-ms: 144000000 # 40 hours
+         refresh-token-expiration-ms: 6912000000 # 80 days
+       cors:
+         allowed-origins:
+           - http://localhost:5174
+       verification-tokens:
+         registration-request:
+           length: 4
+           max-age: 86400 # 1 day
+         password-reset-request:
+           length: 4
+           max-age: 3600 # 1 hour
+         password-reset-access:
+           length: 4
+           max-age: 600 # 10 minutes
+     mail: # optional
+       enabled: false # change to true if you have Brevo API key and want to send/receive emails 
+       api-key: <Brevo API key>
+       sender-name: <sender name>
+       sender-domain: <sender domain>
+       reply-to-email: <your email>
+   ```
+   </details>
+
+3. Backend. To run/debug through IDEA, the cfg file is in `.run`. Otherwise:
    ```bash  
    ./gradlew bootRun
     ```
 
-3. Frontend.
+4. Frontend.
    ```bash
    cd src/main/vue
    npm install
