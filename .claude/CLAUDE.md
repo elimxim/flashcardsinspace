@@ -113,4 +113,6 @@ PostgreSQL with Liquibase. Schema: `flashcardsinspace`. Migrations in `src/main/
 
 ### Dev Environment
 
-Vite dev server (port 5174) proxies `/api`, `/api-public`, and `/auth` to backend on port 8442. The `dev` Spring profile disables HTTPS redirect and enables Hawtio/Jolokia monitoring endpoints. Runtime config lives in `props/` (sibling to `src/`): `application.yaml`, `postgresql.conf`, and a `dev/` subdirectory for dev-specific overrides.
+Vite dev server (port 5174) proxies `/api`, `/api-public`, `/auth`, and `/actuator` to backend on port 8442.
+
+Runtime config lives in `props/` (sibling to `src/`), passed via `--spring.config.additional-location=file:props/`: `application.yaml` (production, env-var placeholders), `application-dev.yaml` (`dev` profile overrides), and `postgresql.conf`. The release workflow copies only `application.yaml` and does not activate the `dev` profile, so `application-dev.yaml` is safe for local-only settings.
