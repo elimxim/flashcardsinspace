@@ -108,6 +108,10 @@ export interface ReviewQueue {
 
   next(): Flashcard | undefined
 
+  lookahead(count: number): Flashcard[]
+
+  lookbehind(count: number): Flashcard[]
+
   remaining(stage?: Stage): number
 
   remainingFlashcards(): Flashcard[]
@@ -125,6 +129,14 @@ export class EmptyReviewQueue implements ReviewQueue {
 
   public next(): Flashcard | undefined {
     return undefined
+  }
+
+  public lookahead(): Flashcard[] {
+    return []
+  }
+
+  public lookbehind(): Flashcard[] {
+    return []
   }
 
   public remaining(): number {
@@ -172,6 +184,28 @@ export class MultiStageReviewQueue implements ReviewQueue {
     } else {
       return flashcards.shift()
     }
+  }
+
+  public lookahead(count: number): Flashcard[] {
+    const result: Flashcard[] = []
+    if (count <= 0) return result
+
+    for (let i = this.currStage.order; i >= learningStages.S1.order; i--) {
+      const stage = stageOrderMap.get(i)
+      if (stage === undefined) continue
+      const flashcards = this.flashcardMap.get(stage)
+      if (flashcards === undefined) continue
+      for (const flashcard of flashcards) {
+        result.push(flashcard)
+        if (result.length === count) return result
+      }
+    }
+
+    return result
+  }
+
+  public lookbehind(): Flashcard[] {
+    return []
   }
 
   private nextStage(): Stage | undefined {
@@ -228,6 +262,16 @@ export class MonoStageReviewQueue implements ReviewQueue {
   public next(): Flashcard | undefined {
     if (this.index >= this.flashcards.length) return undefined
     return this.flashcards[++this.index]
+  }
+
+  public lookahead(count: number): Flashcard[] {
+    if (count <= 0) return []
+    return this.flashcards.slice(this.index + 1, this.index + 1 + count)
+  }
+
+  public lookbehind(count: number): Flashcard[] {
+    if (count <= 0 || this.index <= 0) return []
+    return this.flashcards.slice(Math.max(0, this.index - count), this.index)
   }
 
   public remaining(): number {

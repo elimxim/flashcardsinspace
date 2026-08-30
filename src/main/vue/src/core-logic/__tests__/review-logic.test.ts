@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
+  EmptyReviewQueue,
   MonoStageReviewQueue,
   MultiStageReviewQueue,
   ReviewQueue,
@@ -87,6 +88,77 @@ describe('MultiStageReviewQueue', () => {
 
     // then:
     expect(reviewQueue.next()).toBeUndefined()
+  })
+
+  it('should look ahead without consuming and across stages', () => {
+    // given:
+    const f51 = flashcard(51, learningStages.S5)
+    const f31 = flashcard(31, learningStages.S3)
+    const f11 = flashcard(11, learningStages.S1)
+    const flashcardMap = new Map<Stage, Flashcard[]>([
+      [learningStages.S1, [f11]],
+      [learningStages.S3, [f31]],
+      [learningStages.S5, [f51]],
+    ])
+
+    // when:
+    const reviewQueue = new MultiStageReviewQueue(flashcardMap)
+
+    // then:
+    expect(reviewQueue.lookahead(3)).toEqual([f51, f31, f11])
+    expect(reviewQueue.lookahead(3)).toEqual([f51, f31, f11])
+    expect(reviewQueue.remaining()).toBe(3)
+    expect(queueResult(reviewQueue)).toEqual([f51, f31, f11])
+  })
+
+  it('should look ahead from the current stage after the queue has advanced', () => {
+    // given:
+    const f52 = flashcard(52, learningStages.S5)
+    const f53 = flashcard(53, learningStages.S5)
+    const f21 = flashcard(21, learningStages.S2)
+    const flashcardMap = new Map<Stage, Flashcard[]>([
+      [learningStages.S2, [f21]],
+      [learningStages.S5, [f52, f53]],
+    ])
+
+    // when:
+    const reviewQueue = new MultiStageReviewQueue(flashcardMap)
+    reviewQueue.next()
+
+    // then:
+    expect(reviewQueue.lookahead(2)).toEqual([f53, f21])
+    expect(reviewQueue.next()).toBe(f53)
+    expect(reviewQueue.lookahead(2)).toEqual([f21])
+  })
+
+  it('should skip empty stages when looking ahead', () => {
+    // given:
+    const f21 = flashcard(21, learningStages.S2)
+    const flashcardMap = new Map<Stage, Flashcard[]>([
+      [learningStages.S5, []],
+      [learningStages.S4, []],
+      [learningStages.S2, [f21]],
+    ])
+
+    // when:
+    const reviewQueue = new MultiStageReviewQueue(flashcardMap)
+
+    // then:
+    expect(reviewQueue.lookahead(1)).toEqual([f21])
+    expect(reviewQueue.next()).toBe(f21)
+  })
+
+  it('should return an empty lookahead for a non-positive count', () => {
+    // given:
+    const f11 = flashcard(11, learningStages.S1)
+    const flashcardMap = new Map<Stage, Flashcard[]>([[learningStages.S1, [f11]]])
+
+    // when:
+    const reviewQueue = new MultiStageReviewQueue(flashcardMap)
+
+    // then:
+    expect(reviewQueue.lookahead(0)).toEqual([])
+    expect(reviewQueue.lookahead(-1)).toEqual([])
   })
 })
 
@@ -249,6 +321,74 @@ describe('MonoStageReviewQueue', () => {
     expect(queue.remaining()).toBe(0)
   })
 
+  it('should look ahead without consuming', () => {
+    // given:
+    const f11 = flashcard(1, learningStages.S1)
+    const f12 = flashcard(2, learningStages.S1)
+    const f13 = flashcard(3, learningStages.S1)
+
+    // when:
+    const queue = new MonoStageReviewQueue([f11, f12, f13])
+
+    // then:
+    expect(queue.lookahead(2)).toEqual([f11, f12])
+    expect(queue.lookahead(2)).toEqual([f11, f12])
+    expect(queue.next()).toBe(f11)
+    expect(queue.lookahead(2)).toEqual([f12, f13])
+  })
+
+  it('should clamp the lookahead at the end of the queue', () => {
+    // given:
+    const f11 = flashcard(1, learningStages.S1)
+    const f12 = flashcard(2, learningStages.S1)
+
+    // when:
+    const queue = new MonoStageReviewQueue([f11, f12])
+    queue.next()
+
+    // then:
+    expect(queue.lookahead(5)).toEqual([f12])
+    queue.next()
+    expect(queue.lookahead(5)).toEqual([])
+  })
+
+  it('should keep the lookahead stable across removeCurrent', () => {
+    // given:
+    const f11 = flashcard(1, learningStages.S1)
+    const f12 = flashcard(2, learningStages.S1)
+    const f13 = flashcard(3, learningStages.S1)
+
+    // when:
+    const queue = new MonoStageReviewQueue([f11, f12, f13])
+    queue.next()
+
+    // then:
+    expect(queue.lookahead(2)).toEqual([f12, f13])
+    queue.removeCurrent()
+    expect(queue.lookahead(2)).toEqual([f12, f13])
+    expect(queue.next()).toBe(f12)
+  })
+
+})
+
+describe('EmptyReviewQueue', () => {
+  it('should never look ahead', () => {
+    // given:
+    // when:
+    const queue: ReviewQueue = new EmptyReviewQueue()
+
+    // then:
+    expect(queue.lookahead(3)).toEqual([])
+  })
+
+  it('should never look behind', () => {
+    // given:
+    // when:
+    const queue: ReviewQueue = new EmptyReviewQueue()
+
+    // then:
+    expect(queue.lookbehind(3)).toEqual([])
+  })
 })
 
 function flashcard(id: number, stage: Stage): Flashcard {
