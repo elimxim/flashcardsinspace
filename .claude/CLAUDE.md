@@ -69,7 +69,7 @@ Standard Spring Boot layered architecture:
 - `components/` — Reusable components built from scratch (no UI framework). `control-panel/` contains the main dashboard widgets; `review/` contains the review session UI (SpaceDeck, ReviewRouter, ReviewResult)
 - `modals/` — Modal dialog components used across pages and features (confirmations, forms, and focused workflows)
 - `stores/` — Pinia stores (flashcard-store, chrono-store, review-store, auth-store, audio-store, etc.)
-- `core-logic/` — Pure business logic with Vitest unit tests: `stage-logic.ts` (stage progression S1-S7 + OUTER_SPACE), `review-logic.ts` (review queue algorithms), `chrono-logic.ts`
+- `core-logic/` — Pure business logic with Vitest unit tests: `stage-logic.ts` (stage progression S1-S7 + OUTER_SPACE), `review-logic.ts` (review queue algorithms), `chrono-logic.ts`, plus the media layer: `flashcard-audio-logic.ts` / `flashcard-picture-logic.ts` (fetch/upload/remove), `flashcard-media-prefetch.ts`
 - `api/` — Axios API client (`api-client.ts` for authenticated, `auth-client.ts` for auth, `public-api-client.ts` for public). `token-refresh.ts` handles automatic JWT refresh.
 - `model/` — TypeScript model types
 - `utils/` — Shared utilities
@@ -82,6 +82,8 @@ Standard Spring Boot layered architecture:
 **Chronodays**: Each day in a flashcard set's timeline. The Lightspeed Schedule determines which stages are reviewed on each chronoday based on spaced repetition intervals. Statuses: INITIAL, NOT_STARTED, IN_PROGRESS, COMPLETED, OFF (suspended).
 
 **Review Sessions**: Types include LIGHTSPEED (normal schedule-based), UNKNOWN, ATTEMPTED, OUTER_SPACE (special stage reviews), and QUIZ.
+
+**Flashcard media (audio/pictures)**: During a review session the `FlashcardMediaPrefetcher` (`flashcard-media-prefetch.ts`, one instance per review store) is the *only* thing that fetches media.
 
 **Day Streak**: Tracks consecutive learning days. Off days (OFF status) do not break the streak; IN_PROGRESS days do break it.
 
