@@ -33,8 +33,13 @@ export const useEventStore = defineStore('event', () => {
     subscribers.get(event)?.forEach(cb => cb(payload))
   }
 
+  function $reset() {
+    subscribers.clear()
+  }
+
   return {
     subscribe,
     emit,
+    $reset,
   }
 })
