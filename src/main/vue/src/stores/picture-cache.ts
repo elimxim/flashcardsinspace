@@ -74,7 +74,7 @@ export const usePictureCache = defineStore('picture-cache', () => {
   }
 
   function sizeInKB(blob: Blob | undefined): string {
-    return (blob?.size ?? 0 / 1024).toFixed(1)
+    return ((blob?.size ?? 0) / 1024).toFixed(1)
   }
 
   function addPicture(flashcardId: number, pictureBlob: Blob, side: string) {
