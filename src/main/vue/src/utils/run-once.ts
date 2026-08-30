@@ -3,27 +3,24 @@ import { Log, LogTag } from '@/utils/logger.ts'
 
 /**
  * Ensures task runs exactly once.
- * Subsequent calls are ignored.
+ * Subsequent calls are ignored and resolve with the first call's result,
+ * so arguments only matter on the first call.
  */
-export function useRunOnce<T extends (...args: unknown[]) => Promise<unknown> | unknown>(
-  task: T,
-  ...args: Parameters<T>
-) {
+export function useRunOnce<A extends unknown[], R>(task: (...args: A) => R | Promise<R>) {
   const executed = ref(false)
   const isPending = ref(false)
 
-  let taskPromise: Promise<ReturnType<T> | undefined> | null = null
+  let runPromise: Promise<R | undefined> | null = null
 
-  const runOnce = async (): Promise<ReturnType<T> | undefined> => {
-    // Synchronous Gate: Executed instantly in the current tick
-    if (executed.value) return taskPromise ?? undefined
+  const runOnce = async (...args: A): Promise<R | undefined> => {
+    if (executed.value) return runPromise ?? undefined
 
     executed.value = true
     isPending.value = true
 
-    taskPromise = (async () => {
+    runPromise = (async () => {
       try {
-        return await task(...args) as ReturnType<T>
+        return await task(...args)
       } catch (error) {
         Log.error(LogTag.SYSTEM, 'Task failed:', error)
         return undefined
@@ -32,7 +29,7 @@ export function useRunOnce<T extends (...args: unknown[]) => Promise<unknown> | 
       }
     })()
 
-    return taskPromise
+    return runPromise
   }
 
   return {
