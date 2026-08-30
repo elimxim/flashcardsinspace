@@ -134,6 +134,7 @@ import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
 import { useRunOnce } from '@/utils/run-once.ts'
+import { Chronoday } from "@/model/chrono.ts"
 
 const props = defineProps<{
   sessionId?: number,
@@ -167,12 +168,10 @@ const {
   noNextAvailable,
 } = storeToRefs(reviewStore)
 
-const {
-  runOnce: startReviewOnce,
-  isPending: reviewStarting,
-} = useRunOnce(startReview)
-
+const { runOnce: startReviewOnce, isPending: reviewStarting } = useRunOnce(startReview)
 const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
+const { runOnce: markDaysAsInProgressOnce } = useRunOnce(markDaysAsInProgress)
+const { runOnce: markDaysAsCompletedOnce } = useRunOnce(markDaysAsCompleted)
 
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
@@ -272,20 +271,21 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
 
 async function getNextAndMarkDays(flashcardSet: FlashcardSet) {
   if (await reviewStore.nextFlashcard(flashcardSet)) {
-    await markDaysAsInProgress(flashcardSet)
+    await markDaysAsInProgressOnce(flashcardSet)
   } else {
-    await markDaysAsCompleted(flashcardSet)
+    await markDaysAsCompletedOnce(flashcardSet)
   }
 }
 
 async function markDaysAs(
   flashcardSetId: number,
+  day: Chronoday,
   status: string,
   acceptedStatuses: Set<string>,
 ) {
-  if (!acceptedStatuses.has(currDay.value.status)) return
+  if (!acceptedStatuses.has(day.status)) return
 
-  await sendChronoBulkUpdateRequest(flashcardSetId, status, [currDay.value])
+  await sendChronoBulkUpdateRequest(flashcardSetId, status, [day])
     .then((response) => {
       chronoStore.updateDays(response.data.chronodays)
       chronoStore.updateDayStreak(response.data.dayStreak)
@@ -297,11 +297,11 @@ async function markDaysAs(
 }
 
 async function markDaysAsInProgress(flashcardSet: FlashcardSet) {
-  await markDaysAs(flashcardSet.id, chronodayStatuses.IN_PROGRESS, chronodayStatusesToProgressDay)
+  await markDaysAs(flashcardSet.id, currDay.value, chronodayStatuses.IN_PROGRESS, chronodayStatusesToProgressDay)
 }
 
 async function markDaysAsCompleted(flashcardSet: FlashcardSet) {
-  await markDaysAs(flashcardSet.id, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
+  await markDaysAs(flashcardSet.id, currDay.value, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
 }
 
 const currFlashcardWatcher = watch(currFlashcard, async (newVal, oldVal) => {
