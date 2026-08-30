@@ -157,7 +157,7 @@ const {
   stopLoading,
 } = useDeferredLoading()
 
-const reviewStore = useReviewStore(ReviewSessionType.LIGHTSPEED)
+const reviewStore = useReviewStore(ReviewSessionType.LIGHTSPEED, flashcardSet)
 
 const {
   flashcardsTotal,
@@ -199,7 +199,7 @@ async function startReview() {
     }
     reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value))
     await createReviewSession()
-    await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
+    await reviewStore.nextFlashcard((success) => {
       if (success) startWatch()
     })
     Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
@@ -210,22 +210,18 @@ async function startReview() {
 }
 
 async function finishReview() {
-  if (reviewStarting.value) {
-    await startReviewOnce()
-  }
-
-  Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
-  currFlashcardWatcher.stop()
   try {
+    if (reviewStarting.value) await startReviewOnce()
+    Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
+    currFlashcardWatcher.stop()
     if (flashcardSet.value && noNextAvailable.value) {
-      await markDaysAsCompleted(flashcardSet.value)
+      await markDaysAsCompletedOnce(flashcardSet.value)
     }
   } finally {
     stopWatch()
     reviewedFlashcardIds.value = []
     incorrectFlashcards.value = []
-    reviewStore.$reset()
-    destroyReviewStore(ReviewSessionType.LIGHTSPEED)
+    destroyReviewStore(reviewStore)
   }
 }
 
@@ -270,7 +266,7 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
 }
 
 async function getNextAndMarkDays(flashcardSet: FlashcardSet) {
-  if (await reviewStore.nextFlashcard(flashcardSet)) {
+  if (await reviewStore.nextFlashcard()) {
     await markDaysAsInProgressOnce(flashcardSet)
   } else {
     await markDaysAsCompletedOnce(flashcardSet)
@@ -364,7 +360,6 @@ onMounted(async () => {
 
 onUnmounted(async () => {
   await finishReviewOnce()
-  destroyReviewStore(ReviewSessionType.LIGHTSPEED)
   document.removeEventListener('keydown', handleKeydown)
 })
 

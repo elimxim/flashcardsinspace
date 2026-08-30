@@ -73,15 +73,16 @@ import { userApiErrors } from '@/api/user-api-error.ts'
 import { useAudioCache } from '@/stores/audio-cache.ts'
 import { usePictureCache } from '@/stores/picture-cache.ts'
 import {
-  fetchFlashcardAudioBlob,
   removeFlashcardAudioBlob,
+  requestFlashcardAudioBlob,
   uploadFlashcardAudioBlob
 } from '@/core-logic/flashcard-audio-logic.ts'
 import {
-  fetchFlashcardPictureBlob,
   removeFlashcardPictureBlob,
+  requestFlashcardPictureBlob,
   uploadFlashcardPictureBlob
 } from '@/core-logic/flashcard-picture-logic.ts'
+import { errorResponseData } from "@/core-logic/media-error.ts"
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const removed = defineModel<boolean>('removed', { default: false })
@@ -156,6 +157,22 @@ const isBackSidePictureChanged = computed(() => {
     return backSidePictureSize.value !== backSidePicture.value?.size
   }
 })
+
+async function fetchFlashcardAudioBlob(
+  flashcardSetId: number,
+  flashcardId: number,
+  flashcardSide: string,
+): Promise<Blob | undefined> {
+  const toaster = useSpaceToaster()
+
+  try {
+    return await requestFlashcardAudioBlob(flashcardSetId, flashcardId, flashcardSide)
+  } catch (error) {
+    Log.error(LogTag.LOGIC, `Failed to fetch audio for Flashcard.id=${flashcardId}, Flashcard.side=${flashcardSide}`, error)
+    toaster.bakeError(userApiErrors.AUDIO__FETCHING_FAILED, errorResponseData(error))
+    return undefined
+  }
+}
 
 async function fetchAudio() {
   const set = flashcardSet.value
@@ -273,6 +290,22 @@ async function removeAudioIfRelevant(): Promise<boolean> {
     })(),
   ])
     .then((result) => result.every(v => v))
+}
+
+async function fetchFlashcardPictureBlob(
+  flashcardSetId: number,
+  flashcardId: number,
+  flashcardSide: string,
+): Promise<Blob | undefined> {
+  const toaster = useSpaceToaster()
+
+  try {
+    return await requestFlashcardPictureBlob(flashcardSetId, flashcardId, flashcardSide)
+  } catch (error) {
+    Log.error(LogTag.LOGIC, `Failed to fetch picture for Flashcard.id=${flashcardId}, Flashcard.side=${flashcardSide}`, error)
+    toaster.bakeError(userApiErrors.PICTURE__FETCHING_FAILED, errorResponseData(error))
+    return undefined
+  }
 }
 
 async function fetchPicture() {

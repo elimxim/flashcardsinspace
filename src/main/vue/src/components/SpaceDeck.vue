@@ -110,9 +110,9 @@ const slots = useSlots()
 const toggleStore = useToggleStore()
 
 const flashcardStore = useFlashcardStore()
-const reviewStore = useReviewStore(props.sessionType)
-
 const { flashcardSet } = storeToRefs(flashcardStore)
+
+const reviewStore = useReviewStore(props.sessionType, flashcardSet)
 
 const {
   reviewQueue,
@@ -527,21 +527,21 @@ watch(flashcardWasRemoved, (newVal) => {
   if (newVal) {
     spaceCard.value?.flipToFront()
     reviewQueue.value.removeCurrent()
-    reviewStore.nextFlashcard(flashcardSet.value)
+    reviewStore.nextFlashcard()
     flashcardWasRemoved.value = false
   }
 })
 
 watch(audioWasChanged, (newVal) => {
   if (newVal) {
-    reviewStore.fetchAudio(flashcardSet.value)
+    reviewStore.refetchMedia()
     audioWasChanged.value = false
   }
 })
 
 watch(pictureWasChanged, (newVal) => {
   if (newVal) {
-    reviewStore.fetchPicture(flashcardSet.value)
+    reviewStore.refetchMedia()
     pictureWasChanged.value = false
   }
 })

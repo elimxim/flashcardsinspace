@@ -160,7 +160,7 @@ const {
   stopLoading,
 } = useDeferredLoading()
 
-const reviewStore = useReviewStore(ReviewSessionType.QUIZ)
+const reviewStore = useReviewStore(ReviewSessionType.QUIZ, flashcardSet)
 
 const {
   reviewQueue,
@@ -172,11 +172,7 @@ const {
   noNextAvailable,
 } = storeToRefs(reviewStore)
 
-const {
-  runOnce: startReviewOnce,
-  isPending: reviewStarting,
-} = useRunOnce(startReview)
-
+const { runOnce: startReviewOnce, isPending: reviewStarting } = useRunOnce(startReview)
 const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
 
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
@@ -209,7 +205,7 @@ async function startReview() {
     reviewStore.loadState(createReviewQueueForStages(flashcards.value, props.stages, currDay.value))
     quizOverallTotal.value = flashcardsTotal.value
     await loadOrCreateQuizSession()
-    await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
+    await reviewStore.nextFlashcard((success) => {
       if (success) startWatch()
     })
     Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
@@ -237,14 +233,14 @@ function resetState() {
 }
 
 async function finishReview() {
-  if (reviewStarting.value) {
-    await startReviewOnce()
+  try {
+    if (reviewStarting.value) await startReviewOnce()
+    Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.QUIZ}`)
+    currFlashcardWatcher.stop()
+    resetState()
+  } finally {
+    destroyReviewStore(reviewStore)
   }
-  Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.QUIZ}`)
-  currFlashcardWatcher.stop()
-  resetState()
-  reviewStore.$reset()
-  destroyReviewStore(ReviewSessionType.QUIZ)
 }
 
 async function finishReviewAndLeave() {
@@ -261,7 +257,7 @@ async function quizAnswer(know: boolean) {
     incorrectFlashcards.value.push(currFlashcard.value)
     await updateQuizSession([currFlashcard.value.id], [currFlashcard.value.id])
   }
-  await reviewStore.nextFlashcard(flashcardSet.value)
+  await reviewStore.nextFlashcard()
 }
 
 async function startNextQuizRound() {
@@ -292,7 +288,7 @@ async function startNextQuizRound() {
 
       startWatch()
 
-      return reviewStore.nextFlashcard(flashcardSet.value)
+      return reviewStore.nextFlashcard()
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to create child review session`, error.response?.data)

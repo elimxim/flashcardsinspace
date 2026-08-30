@@ -108,6 +108,10 @@ export const userApiErrors = {
     title: 'Could not upload the audio',
     message: 'Please try to repeat the action.'
   } as UserApiError,
+  MEDIA__FETCHING_FAILED: {
+    title: 'Could not load the flashcard media',
+    message: 'Please try again later.'
+  } as UserApiError,
   AUDIO__FETCHING_FAILED: {
     title: 'Could not fetch the audio',
     message: 'Please refresh the page and repeat the action.'

@@ -176,11 +176,7 @@ const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
 const flashcardStore = useFlashcardStore()
 
-const {
-  runOnce: startReviewOnce,
-  isPending: reviewStarting,
-} = useRunOnce(startReview)
-
+const { runOnce: startReviewOnce, isPending: reviewStarting } = useRunOnce(startReview)
 const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
 
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
@@ -193,7 +189,7 @@ const {
   stopLoading,
 } = useDeferredLoading()
 
-const reviewStore = useReviewStore(props.reviewMode.sessionType)
+const reviewStore = useReviewStore(props.reviewMode.sessionType, flashcardSet)
 
 const {
   reviewQueue,
@@ -231,7 +227,7 @@ async function startReview() {
     const stage = reviewSessionTypeToSpecialStage(props.reviewMode.sessionType) ?? specialStages.UNKNOWN
     reviewStore.loadState(createReviewQueueForStages(flashcards.value, [stage], currDay.value))
     await createReviewSession()
-    await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
+    await reviewStore.nextFlashcard((success) => {
       if (success) startWatch()
     })
     Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
@@ -243,18 +239,14 @@ async function startReview() {
 }
 
 async function finishReview() {
-  if (reviewStarting.value) {
-    await startReviewOnce()
-  }
-
-  Log.log(LogTag.LOGIC, `Finishing review: ${props.reviewMode.sessionType}`)
   try {
+    if (reviewStarting.value) await startReviewOnce()
+    Log.log(LogTag.LOGIC, `Finishing review: ${props.reviewMode.sessionType}`)
     await updateReviewSession(reviewedFlashcardIds.value, true)
   } finally {
     stopWatch()
     reviewedFlashcardIds.value = []
-    reviewStore.$reset()
-    destroyReviewStore(props.reviewMode.sessionType)
+    destroyReviewStore(reviewStore)
   }
 }
 
@@ -266,14 +258,14 @@ async function finishReviewAndLeave() {
 async function prev() {
   if (noPrevAvailable.value) return
   await updateReviewSession([])
-  await reviewStore.prevFlashcard(flashcardSet.value)
+  await reviewStore.prevFlashcard()
 }
 
 async function next() {
   if (!currFlashcard.value || noNextAvailable.value) return
   reviewedFlashcardIds.value.push(currFlashcard.value.id)
   await updateReviewSession([currFlashcard.value.id])
-  await reviewStore.nextFlashcard(flashcardSet.value)
+  await reviewStore.nextFlashcard()
 }
 
 async function moveBack() {
@@ -290,7 +282,7 @@ async function moveBack() {
   if (success) {
     reviewQueue.value.removeCurrent()
     await spaceDeck.value?.animateOutLeft(true)
-    await reviewStore.nextFlashcard(flashcardSet.value)
+    await reviewStore.nextFlashcard()
   }
 }
 

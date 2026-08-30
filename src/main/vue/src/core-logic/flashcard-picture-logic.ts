@@ -9,16 +9,14 @@ import {
 } from '@/api/api-client.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
-import { Ref } from 'vue'
-import { flashcardSides } from '@/core-logic/flashcard-logic.ts'
 
-export async function fetchFlashcardPictureBlob(
+export async function requestFlashcardPictureBlob(
   flashcardSetId: number,
   flashcardId: number,
   flashcardSide: string,
+  signal?: AbortSignal,
 ): Promise<Blob | undefined> {
   const pictureCache = usePictureCache()
-  const toaster = useSpaceToaster()
 
   const cachedPicture = pictureCache.getPicture(flashcardId, flashcardSide)
   if (cachedPicture) {
@@ -26,17 +24,11 @@ export async function fetchFlashcardPictureBlob(
     return cachedPicture
   }
 
-  return await sendFlashcardPictureGetRequest(flashcardSetId, flashcardId, flashcardSide)
-    .then((response) => {
-      if (response.status === 204) return undefined
-      pictureCache.addPicture(flashcardId, response.data, flashcardSide)
-      return response.data
-    })
-    .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to fetch picture for Flashcard.id=${flashcardId}, Flashcard.side=${flashcardSide}`, error)
-      toaster.bakeError(userApiErrors.PICTURE__FETCHING_FAILED, error.response?.data)
-      return undefined
-    })
+  const response = await sendFlashcardPictureGetRequest(flashcardSetId, flashcardId, flashcardSide, signal)
+  if (response.status === 204) return undefined
+
+  pictureCache.addPicture(flashcardId, response.data, flashcardSide)
+  return response.data
 }
 
 export async function uploadFlashcardPictureBlob(
@@ -91,44 +83,4 @@ export async function removeFlashcardPictureBlob(
       toaster.bakeError(userApiErrors.PICTURE__REMOVAL_FAILED, error.response?.data)
       return false
     })
-}
-
-export async function fetchFlashcardPicture(
-  flashcardSetId: number | undefined,
-  flashcardId: number | undefined,
-  flashcardFrontSidePictureBlob: Ref<Blob | undefined>,
-  flashcardBackSidePictureBlob: Ref<Blob | undefined>,
-) {
-  if (!flashcardSetId || !flashcardId) {
-    flashcardFrontSidePictureBlob.value = undefined
-    flashcardBackSidePictureBlob.value = undefined
-    return
-  }
-
-  const pictureStore = usePictureStore()
-
-  await Promise.all([
-    (async function () {
-      const frontSidePictureId = pictureStore.getPictureId(flashcardId, flashcardSides.FRONT)
-      if (frontSidePictureId) {
-        return await fetchFlashcardPictureBlob(flashcardSetId, flashcardId, flashcardSides.FRONT)
-          .then((blob) => {
-            flashcardFrontSidePictureBlob.value = blob
-          })
-      } else {
-        flashcardFrontSidePictureBlob.value = undefined
-      }
-    })(),
-    (async function () {
-      const backSidePictureId = pictureStore.getPictureId(flashcardId, flashcardSides.BACK)
-      if (backSidePictureId) {
-        return await fetchFlashcardPictureBlob(flashcardSetId, flashcardId, flashcardSides.BACK)
-          .then((blob) => {
-            flashcardBackSidePictureBlob.value = blob
-          })
-      } else {
-        flashcardBackSidePictureBlob.value = undefined
-      }
-    })(),
-  ])
 }
