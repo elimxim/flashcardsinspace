@@ -17,7 +17,7 @@
     >
       <template #left>
         <div class="review-mode">
-          <font-awesome-icon :icon="reviewIcons.get(ReviewSessionType.LIGHTSPEED)"/>
+          <font-awesome-icon :icon="reviewIcons.get(ReviewSessionType.LIGHTSPEED)!!"/>
         </div>
       </template>
       <template #right>

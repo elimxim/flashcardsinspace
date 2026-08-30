@@ -17,7 +17,7 @@
     >
       <template v-if="reviewMode.topic" #left>
         <div class="review-mode">
-          <font-awesome-icon :icon="reviewIcons.get(reviewMode.sessionType)"/>
+          <font-awesome-icon :icon="reviewIcons.get(reviewMode.sessionType)!!"/>
         </div>
       </template>
       <template #right>

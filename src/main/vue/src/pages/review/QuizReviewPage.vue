@@ -17,7 +17,7 @@
     >
       <template #left>
         <div class="review-mode">
-          <font-awesome-icon :icon="reviewIcons.get(ReviewSessionType.QUIZ)"/>
+          <font-awesome-icon :icon="reviewIcons.get(ReviewSessionType.QUIZ)!!"/>
         </div>
       </template>
       <template #right>
