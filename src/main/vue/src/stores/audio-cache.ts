@@ -76,7 +76,7 @@ export const useAudioCache = defineStore('audio-cache', () => {
   }
 
   function sizeInKB(blob: Blob | undefined): string {
-    return (blob?.size ?? 0 / 1024).toFixed(1)
+    return ((blob?.size ?? 0) / 1024).toFixed(1)
   }
 
   function addAudio(flashcardId: number, audioBlob: Blob, side: string) {
@@ -103,6 +103,7 @@ export const useAudioCache = defineStore('audio-cache', () => {
     const sizeDifference = newSize - oldSize
 
     evictIfNeeded(sizeDifference)
+    entry.size = newSize
     audioMap.value.set(flashcardId, entry)
     totalSize.value -= oldSize
     totalSize.value += newSize
