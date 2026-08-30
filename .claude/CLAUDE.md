@@ -112,14 +112,6 @@ PostgreSQL with Liquibase. Schema: `flashcardsinspace`. Migrations in `src/main/
 - **No `any` type** in `.ts` and `.vue` files — ESLint forbids it. Use explicit types, generics, or a named alias with a targeted `as` cast where a heterogeneous collection forces it.
 - **Globally registered components** (those registered at runtime via `app.component(...)` in `main.ts`) must be declared in `env.d.ts` under `declare module 'vue' { interface GlobalComponents { ... } }`. Locally imported SFCs need nothing — the import is the registration. Without the declaration neither `vue-tsc` nor the IDE type-checks the tag's props.
 
-### TypeScript Project Layout
-
-`tsconfig.json` is the single app project (includes `env.d.ts` plus everything under `src/`, declares the `@vue/typescript-plugin`, and defines the `@/*` path alias); `tsconfig.node.json` covers build-tool config files and is referenced from it.
-
-Do **not** add a second tsconfig whose `include` overlaps `src/` (e.g. a `tsconfig.app.json`). `tsserver` binds each `.vue` file to whichever project claims it, and a project without the `plugins` entry loses all Vue template intelligence — components and directives like `:class` show as unknown in the IDE.
-
-Keep `vue-tsc` and `@vue/typescript-plugin` on the same major/minor as the Vue language server bundled with the IDE (IntelliJ: `plugins/vuejs-plugin/vue-language-tools/language-server/`). A mismatch breaks hybrid mode with `Unrecognized JSON command: _vue:projectInfo` in `idea.log` and kills template resolution.
-
 ### Dev Environment
 
 Vite dev server (port 5174) proxies `/api`, `/api-public`, `/auth`, and `/actuator` to backend on port 8442.
