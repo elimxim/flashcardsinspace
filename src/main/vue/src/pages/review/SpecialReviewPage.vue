@@ -2,7 +2,7 @@
   <div
     :class="[
       'page',
-      'page--bg--light',
+      { 'page--bg--light': !reviewMode.isOuterSpace() },
       'flex-column',
       'flex-center',
       'scroll-none',
@@ -12,12 +12,12 @@
     <ControlBar
       style="z-index: 10;"
       :title="flashcardSetName"
-      :center-title-padding="40"
+      :center-title-padding="100"
       center-title
     >
-      <template #left>
+      <template v-if="reviewMode.topic" #left>
         <div class="review-mode">
-          <font-awesome-icon :icon="reviewIcons.get(ReviewSessionType.QUIZ)"/>
+          <font-awesome-icon :icon="reviewIcons.get(reviewMode.sessionType)"/>
         </div>
       </template>
       <template #right>
@@ -31,7 +31,18 @@
       </template>
     </ControlBar>
     <div class="review-layout">
-      <KineticRingSpinner v-if="resolvedLoading" :ring-size="240"/>
+      <Starfield
+        v-if="reviewMode.isOuterSpace()"
+        :density="120"
+        :star-size="1.8"
+        twinkle
+        vertical-drift="3px"
+      />
+      <KineticRingSpinner
+        v-if="resolvedLoading"
+        :ring-size="240"
+        :track-color="reviewMode.isOuterSpace() ? 'rgb(28,20,57)' : '#f1f5f9'"
+      />
       <template v-else-if="!loadingStarted">
         <div class="review-progressbar">
           <Progressbar
@@ -51,41 +62,55 @@
         <div class="review-body">
           <SpaceDeck
             ref="spaceDeck"
-            :session-type="ReviewSessionType.QUIZ"
-            :can-slide-left="!noNextAvailable"
+            :session-type="reviewMode.sessionType"
+            :can-slide-left="!noPrevAvailable"
             :can-slide-right="!noNextAvailable"
-            :on-slide-left="() => quizAnswer(false)"
-            :on-slide-right="() => quizAnswer(true)"
-            swipe-left-text="Don't know"
-            swipe-right-text="Know"
+            :on-slide-left="prev"
+            :on-slide-right="next"
+            swipe-left-text="Prev"
+            swipe-right-text="Next"
           >
-            <QuizResult
-              :elapsed-time="elapsedTime"
-              :round="quizRound"
-              :overall-total="quizOverallTotal"
-              :overall-correct="quizOverallCorrect"
-              :round-total="flashcardsTotal"
-              :round-failed="incorrectFlashcards.length"
-              :on-next-round="startNextQuizRound"
-              :on-finish="finishReviewAndLeave"
-            />
+            <ReviewResult/>
           </SpaceDeck>
           <div v-if="UXConfig().showNavButtons" class="review-nav">
             <SmartButton
-              class="decision-button dangerous-button"
-              text="Don't know"
-              :disabled="noNextAvailable"
-              :hidden="noNextAvailable"
+              class="calm-button"
+              text="Prev"
+              :disabled="noPrevAvailable"
               :on-click="spaceDeck?.slideLeft"
               auto-blur
               rounded
             />
             <SmartButton
-              class="decision-button safe-button"
-              text="Know"
+              v-if="reviewMode.isOuterSpace()"
+              class="decision-button dangerous-button"
+              text="Move back"
               :disabled="noNextAvailable"
               :hidden="noNextAvailable"
+              :on-click="moveBack"
+              :hold-time="1.2"
+              auto-blur
+              rounded
+            />
+            <SmartButton
+              class="calm-button"
+              text="Next"
+              :disabled="noNextAvailable"
               :on-click="spaceDeck?.slideRight"
+              auto-blur
+              rounded
+            />
+          </div>
+          <div
+            v-else-if="reviewMode.isOuterSpace()"
+            class="review-nav review-nav--centered"
+          >
+            <SmartButton
+              class="decision-button dangerous-button"
+              text="Move back"
+              :disabled="noNextAvailable"
+              :on-click="moveBack"
+              :hold-time="1.2"
               auto-blur
               rounded
             />
@@ -101,47 +126,48 @@
 import ControlBar from '@/components/ControlBar.vue'
 import KineticRingSpinner from '@/components/spinners/KineticRingSpinner.vue'
 import Progressbar from '@/components/common/Progressbar.vue'
-import SpaceDeck from '@/components/review/SpaceDeck.vue'
+import SpaceDeck from '@/components/SpaceDeck.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SpaceToast from '@/components/common/SpaceToast.vue'
-import QuizResult from '@/components/review/QuizResult.vue'
+import Starfield from '@/components/common/Starfield.vue'
+import ReviewResult from '@/components/ReviewResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { useStopWatch } from '@/utils/stop-watch.ts'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { Stage } from '@/core-logic/stage-logic.ts'
+import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
+import { learningStages, specialStages } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
   createReviewQueueForStages,
-  MonoStageReviewQueue,
   reviewIcons,
-  ReviewSessionType
+  ReviewMode,
+  reviewSessionTypeToSpecialStage,
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
-import { useRouter } from 'vue-router'
-import { loadSelectedSetIdFromCookies, } from '@/utils/cookies.ts'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
+import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
-import { Flashcard } from '@/model/flashcard.ts'
+import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { loadStoresForFlashcardSetId } from '@/utils/store-loading.ts'
 import {
-  sendReviewSessionChildCreateRequest,
+  sendFlashcardUpdateRequest,
   sendReviewSessionCreateRequest,
-  sendReviewSessionGetRequest,
-  sendReviewSessionUpdateRequest,
+  sendReviewSessionUpdateRequest
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
+import { useStopWatch } from '@/utils/stop-watch.ts'
+import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
 import { useRunOnce } from '@/utils/run-once.ts'
 
 const props = defineProps<{
   sessionId?: number,
-  stages: Stage[],
+  reviewMode: ReviewMode,
 }>()
 
 const router = useRouter()
@@ -149,6 +175,13 @@ const toaster = useSpaceToaster()
 const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
 const flashcardStore = useFlashcardStore()
+
+const {
+  runOnce: startReviewOnce,
+  isPending: reviewStarting,
+} = useRunOnce(startReview)
+
+const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
 
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
@@ -160,7 +193,7 @@ const {
   stopLoading,
 } = useDeferredLoading()
 
-const reviewStore = useReviewStore(ReviewSessionType.QUIZ)
+const reviewStore = useReviewStore(props.reviewMode.sessionType)
 
 const {
   reviewQueue,
@@ -169,31 +202,20 @@ const {
   flashcardsRemaining,
   flashcardsSeen,
   progress,
+  noPrevAvailable,
   noNextAvailable,
 } = storeToRefs(reviewStore)
 
-const {
-  runOnce: startReviewOnce,
-  isPending: reviewStarting,
-} = useRunOnce(startReview)
-
-const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
-
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
+const reviewedFlashcardIds = ref<number[]>([])
 
 const elapsedTime = ref(0)
 const { startWatch, stopWatch } = useStopWatch(elapsedTime)
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
-const quizRound = ref(1)
-const quizOverallTotal = ref(0)
-const quizOverallCorrect = ref(0)
-const reviewedFlashcardIds = ref<number[]>([])
-const incorrectFlashcards = ref<Flashcard[]>([])
-
 async function startReview() {
-  Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.QUIZ}`)
+  Log.log(LogTag.LOGIC, `Starting review: ${props.reviewMode.sessionType}`)
   try {
     startLoading()
     reviewStore.$reset()
@@ -206,45 +228,34 @@ async function startReview() {
         Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
       }
     }
-    reviewStore.loadState(createReviewQueueForStages(flashcards.value, props.stages, currDay.value))
-    quizOverallTotal.value = flashcardsTotal.value
-    await loadOrCreateQuizSession()
+    const stage = reviewSessionTypeToSpecialStage(props.reviewMode.sessionType) ?? specialStages.UNKNOWN
+    reviewStore.loadState(createReviewQueueForStages(flashcards.value, [stage], currDay.value))
+    await createReviewSession()
     await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
       if (success) startWatch()
     })
     Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+
   } finally {
     await stopLoading()
   }
   spaceDeck.value?.setDeckReady()
 }
 
-async function loadOrCreateQuizSession() {
-  if (props.sessionId) {
-    await loadQuizSession(props.sessionId)
-  } else {
-    await createQuizSession()
-  }
-}
-
-function resetState() {
-  stopWatch()
-  reviewStore.$reset()
-  reviewedFlashcardIds.value = []
-  incorrectFlashcards.value = []
-  quizOverallTotal.value = 0
-  quizOverallCorrect.value = 0
-}
-
 async function finishReview() {
   if (reviewStarting.value) {
     await startReviewOnce()
   }
-  Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.QUIZ}`)
-  currFlashcardWatcher.stop()
-  resetState()
-  reviewStore.$reset()
-  destroyReviewStore(ReviewSessionType.QUIZ)
+
+  Log.log(LogTag.LOGIC, `Finishing review: ${props.reviewMode.sessionType}`)
+  try {
+    await updateReviewSession(reviewedFlashcardIds.value, true)
+  } finally {
+    stopWatch()
+    reviewedFlashcardIds.value = []
+    reviewStore.$reset()
+    destroyReviewStore(props.reviewMode.sessionType)
+  }
 }
 
 async function finishReviewAndLeave() {
@@ -252,80 +263,62 @@ async function finishReviewAndLeave() {
   await router.push({ name: routeNames.controlPanel })
 }
 
-async function quizAnswer(know: boolean) {
-  if (!currFlashcard.value) return
-  if (know) {
-    quizOverallCorrect.value = quizOverallCorrect.value + 1
-    await updateQuizSession([currFlashcard.value.id], [])
-  } else {
-    incorrectFlashcards.value.push(currFlashcard.value)
-    await updateQuizSession([currFlashcard.value.id], [currFlashcard.value.id])
-  }
+async function prev() {
+  if (noPrevAvailable.value) return
+  await updateReviewSession([])
+  await reviewStore.prevFlashcard(flashcardSet.value)
+}
+
+async function next() {
+  if (!currFlashcard.value || noNextAvailable.value) return
+  reviewedFlashcardIds.value.push(currFlashcard.value.id)
+  await updateReviewSession([currFlashcard.value.id])
   await reviewStore.nextFlashcard(flashcardSet.value)
 }
 
-async function startNextQuizRound() {
-  if (!flashcardSet.value || !props.sessionId) return
-  if (incorrectFlashcards.value.length === 0) {
-    Log.error(LogTag.LOGIC, 'Cannot start new round: no incorrect flashcards')
+async function moveBack() {
+  if (!flashcardSet.value || !currFlashcard.value) {
+    Log.error(LogTag.LOGIC, `moveBack is impossible:`,
+      `FlashcardSet.id=${flashcardSet.value?.id ?? 'undefined'}`,
+      `current Flashcard.id=${currFlashcard.value?.id ?? 'undefined'}`
+    )
     return
   }
+  const flashcard = copyFlashcard(currFlashcard.value)
+  updateFlashcard(flashcard, learningStages.S1, currDay.value.chronodate)
+  const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
+  if (success) {
+    reviewQueue.value.removeCurrent()
+    await spaceDeck.value?.animateOutLeft(true)
+    await reviewStore.nextFlashcard(flashcardSet.value)
+  }
+}
 
-  await sendReviewSessionChildCreateRequest(flashcardSet.value.id, props.sessionId, {
-    type: ReviewSessionType.QUIZ,
-    chronodayId: currDay.value.id,
-  })
+async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flashcard): Promise<boolean> {
+  return await sendFlashcardUpdateRequest(flashcardSet.id, flashcard)
     .then((response) => {
-      Log.log(LogTag.LOGIC, `Child review session ${response.data.id} created, parent: ${props.sessionId}`)
-      router.replace({
-        query: {
-          ...router.currentRoute.value.query,
-          sessionId: response.data.id,
-        }
-      })
-
-      reviewStore.loadState(new MonoStageReviewQueue(incorrectFlashcards.value))
-      quizRound.value = quizRound.value + 1
-      incorrectFlashcards.value = []
-
-      spaceDeck.value?.setDeckReady()
-
-      startWatch()
-
-      return reviewStore.nextFlashcard(flashcardSet.value)
+      flashcardStore.changeFlashcard(response.data)
+      currFlashcard.value = response.data
+      return true
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to create child review session`, error.response?.data)
-      toaster.bakeError(userApiErrors.QUIZ_SESSION__NEXT_ROUND_FAILED, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to update Flashcard.id=${flashcard.id}`, error.response?.data)
+      toaster.bakeError(userApiErrors.FLASHCARD__PROGRESSION_FAILED, error.response?.data)
+      return false
     })
 }
 
-const currFlashcardWatcher = watch(currFlashcard, async (newVal) => {
-  if (!newVal) {
-    stopWatch()
-    await updateQuizSession(
-      reviewedFlashcardIds.value,
-      incorrectFlashcards.value.map(f => f.id),
-      true
-    )
-  }
-})
-
-async function createQuizSession() {
+async function createReviewSession() {
   if (!flashcardSet.value) return
 
   const request: ReviewSessionCreateRequest = {
-    type: ReviewSessionType.QUIZ,
+    type: props.reviewMode.sessionType,
     chronodayId: currDay.value.id,
-    metadata: {
-      currRoundFlashcardIds: reviewQueue.value.remainingFlashcards().map(f => f.id),
-      overallTotalCount: reviewQueue.value.remaining(),
-    }
   }
 
   await sendReviewSessionCreateRequest(flashcardSet.value.id, request)
     .then((response) => {
-      Log.log(LogTag.LOGIC, `Quiz session ${response.data.id} created`)
+      Log.log(LogTag.LOGIC, `Review session ${response.data.id} created`)
       router.replace({
         query: {
           ...router.currentRoute.value.query,
@@ -334,53 +327,23 @@ async function createQuizSession() {
       })
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to create a quiz session`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to create a review session`, error.response?.data)
       toaster.bakeError(userApiErrors.REVIEW_SESSION__CREATION_FAILED, error.response?.data)
     })
 }
 
-async function loadQuizSession(sessionId: number) {
-  if (!flashcardSet.value) return
-  await sendReviewSessionGetRequest(flashcardSet.value.id, sessionId)
-    .then((response) => {
-      elapsedTime.value = response.data.elapsedTime
-      quizRound.value = response.data.metadata?.round ?? 1
-      quizOverallCorrect.value = response.data.metadata?.overallCorrectCount ?? 0
-      quizOverallTotal.value = response.data.metadata?.overallTotalCount ?? 0
-      const reviewedFlashcardIdSet = new Set(response.data.flashcardIds ?? [])
-      const nextRoundFlashcardIdSet = new Set(response.data.metadata?.nextRoundFlashcardIds ?? [])
-      const currRoundFlashcardIdSet = new Set(response.data.metadata?.currRoundFlashcardIds ?? [])
-      const currRoundFlashcards = flashcards.value.filter(f => currRoundFlashcardIdSet.has(f.id))
-      const flashcardsForReview = currRoundFlashcards.filter(f => !reviewedFlashcardIdSet.has(f.id))
-      reviewedFlashcardIds.value = [...reviewedFlashcardIdSet]
-      incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIdSet.has(f.id))
-      reviewStore.loadState(new MonoStageReviewQueue(flashcardsForReview))
-      reviewStore.setFlashcardsTotal(currRoundFlashcards.length)
-      Log.log(LogTag.LOGIC, `Quiz session ${sessionId} retrieved`)
-    })
-    .catch((error) => {
-      resetState()
-      Log.error(LogTag.LOGIC, `Failed to retrieve quiz session ${sessionId}`, error.response?.data)
-      toaster.bakeError(userApiErrors.REVIEW_SESSION__FETCHING_FAILED, error.response?.data)
-    })
-}
-
-async function updateQuizSession(reviewedFlashcardIds: number[], nextRoundFlashcardIds: number[], finished: boolean = false) {
+async function updateReviewSession(flashcardIds: number[], finished: boolean = false) {
   if (!flashcardSet.value || !props.sessionId) return
   await sendReviewSessionUpdateRequest(flashcardSet.value.id, props.sessionId, {
     elapsedTime: elapsedTime.value,
-    flashcardIds: reviewedFlashcardIds.map(id => ({ id: id })),
+    flashcardIds: flashcardIds.map(id => ({ id: id })),
     finished: finished,
-    metadata: {
-      nextRoundFlashcardIds: nextRoundFlashcardIds,
-      overallCorrectCount: quizOverallCorrect.value,
-    },
   })
     .then(() => {
-      Log.log(LogTag.LOGIC, `Quiz session ${props.sessionId} updated`)
+      Log.log(LogTag.LOGIC, `Review session ${props.sessionId} updated`)
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to update quiz session ${props.sessionId}`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to update review session ${props.sessionId}`, error.response?.data)
       toaster.bakeError(userApiErrors.REVIEW_SESSION__UPDATING_FAILED, error.response?.data)
     })
 }
@@ -390,9 +353,13 @@ onMounted(async () => {
   document.addEventListener('keydown', handleKeydown)
 })
 
-onUnmounted(async () => {
+onBeforeRouteLeave(async () => {
   await finishReviewOnce()
+})
+
+onUnmounted(async () => {
   document.removeEventListener('keydown', handleKeydown)
+  await finishReviewOnce()
 })
 
 async function handleKeydown(event: KeyboardEvent) {
@@ -453,6 +420,10 @@ async function handleKeydown(event: KeyboardEvent) {
   width: 100%;
   height: fit-content;
   gap: 10px;
+}
+
+.review-nav--centered {
+  justify-content: center;
 }
 
 .decision-button {

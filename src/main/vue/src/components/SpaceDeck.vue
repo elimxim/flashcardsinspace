@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import SpaceCard from '@/components/review/SpaceCard.vue'
+import SpaceCard from '@/components/SpaceCard.vue'
 import UfoLoader from '@/components/spinners/UfoLoader.vue'
 import FlashcardEditModal from '@/modals/FlashcardEditModal.vue'
 import { computed, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'

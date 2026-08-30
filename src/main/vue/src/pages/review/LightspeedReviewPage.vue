@@ -2,7 +2,7 @@
   <div
     :class="[
       'page',
-      { 'page--bg--light': !reviewMode.isOuterSpace() },
+      'page--bg--light',
       'flex-column',
       'flex-center',
       'scroll-none',
@@ -15,9 +15,9 @@
       :center-title-padding="100"
       center-title
     >
-      <template v-if="reviewMode.topic" #left>
+      <template #left>
         <div class="review-mode">
-          <font-awesome-icon :icon="reviewIcons.get(reviewMode.sessionType)"/>
+          <font-awesome-icon :icon="reviewIcons.get(ReviewSessionType.LIGHTSPEED)"/>
         </div>
       </template>
       <template #right>
@@ -31,18 +31,7 @@
       </template>
     </ControlBar>
     <div class="review-layout">
-      <Starfield
-        v-if="reviewMode.isOuterSpace()"
-        :density="120"
-        :star-size="1.8"
-        twinkle
-        vertical-drift="3px"
-      />
-      <KineticRingSpinner
-        v-if="resolvedLoading"
-        :ring-size="240"
-        :track-color="reviewMode.isOuterSpace() ? 'rgb(28,20,57)' : '#f1f5f9'"
-      />
+      <KineticRingSpinner v-if="resolvedLoading" :ring-size="240"/>
       <template v-else-if="!loadingStarted">
         <div class="review-progressbar">
           <Progressbar
@@ -62,55 +51,32 @@
         <div class="review-body">
           <SpaceDeck
             ref="spaceDeck"
-            :session-type="reviewMode.sessionType"
-            :can-slide-left="!noPrevAvailable"
+            :session-type="ReviewSessionType.LIGHTSPEED"
+            :can-slide-left="!noNextAvailable"
             :can-slide-right="!noNextAvailable"
-            :on-slide-left="prev"
-            :on-slide-right="next"
-            swipe-left-text="Prev"
-            swipe-right-text="Next"
+            :on-slide-left="stageDown"
+            :on-slide-right="stageUp"
+            swipe-left-text="Don't know"
+            swipe-right-text="Know"
           >
             <ReviewResult/>
           </SpaceDeck>
           <div v-if="UXConfig().showNavButtons" class="review-nav">
             <SmartButton
-              class="calm-button"
-              text="Prev"
-              :disabled="noPrevAvailable"
+              text="Don't know"
+              class="decision-button dangerous-button"
+              :disabled="noNextAvailable"
+              :hidden="noNextAvailable"
               :on-click="spaceDeck?.slideLeft"
               auto-blur
               rounded
             />
             <SmartButton
-              v-if="reviewMode.isOuterSpace()"
-              class="decision-button dangerous-button"
-              text="Move back"
+              text="Know"
+              class="decision-button safe-button"
               :disabled="noNextAvailable"
               :hidden="noNextAvailable"
-              :on-click="moveBack"
-              :hold-time="1.2"
-              auto-blur
-              rounded
-            />
-            <SmartButton
-              class="calm-button"
-              text="Next"
-              :disabled="noNextAvailable"
               :on-click="spaceDeck?.slideRight"
-              auto-blur
-              rounded
-            />
-          </div>
-          <div
-            v-else-if="reviewMode.isOuterSpace()"
-            class="review-nav review-nav--centered"
-          >
-            <SmartButton
-              class="decision-button dangerous-button"
-              text="Move back"
-              :disabled="noNextAvailable"
-              :on-click="moveBack"
-              :hold-time="1.2"
               auto-blur
               rounded
             />
@@ -126,48 +92,52 @@
 import ControlBar from '@/components/ControlBar.vue'
 import KineticRingSpinner from '@/components/spinners/KineticRingSpinner.vue'
 import Progressbar from '@/components/common/Progressbar.vue'
-import SpaceDeck from '@/components/review/SpaceDeck.vue'
+import SpaceDeck from '@/components/SpaceDeck.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SpaceToast from '@/components/common/SpaceToast.vue'
-import Starfield from '@/components/common/Starfield.vue'
-import ReviewResult from '@/components/review/ReviewResult.vue'
+import ReviewResult from '@/components/ReviewResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useStopWatch } from '@/utils/stop-watch.ts'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
-import { learningStages, specialStages } from '@/core-logic/stage-logic.ts'
+import { nextStage, prevStage, Stage, } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
-  createReviewQueueForStages,
+  createReviewQueue,
   reviewIcons,
-  ReviewMode,
-  reviewSessionTypeToSpecialStage,
+  ReviewSessionType
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
-import { onBeforeRouteLeave, useRouter } from 'vue-router'
-import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
+import { useRouter } from 'vue-router'
+import { loadSelectedSetIdFromCookies, } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { loadStoresForFlashcardSetId } from '@/utils/store-loading.ts'
 import {
+  sendChronoBulkUpdateRequest,
   sendFlashcardUpdateRequest,
   sendReviewSessionCreateRequest,
-  sendReviewSessionUpdateRequest
+  sendReviewSessionUpdateRequest,
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
+import {
+  chronodayStatuses,
+  chronodayStatusesToCompleteDay,
+  chronodayStatusesToProgressDay,
+} from '@/core-logic/chrono-logic.ts'
+import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
-import { useStopWatch } from '@/utils/stop-watch.ts'
-import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
 import { useRunOnce } from '@/utils/run-once.ts'
 
 const props = defineProps<{
   sessionId?: number,
-  reviewMode: ReviewMode,
+  stages: Stage[],
 }>()
 
 const router = useRouter()
@@ -175,13 +145,6 @@ const toaster = useSpaceToaster()
 const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
 const flashcardStore = useFlashcardStore()
-
-const {
-  runOnce: startReviewOnce,
-  isPending: reviewStarting,
-} = useRunOnce(startReview)
-
-const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
 
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
@@ -193,29 +156,36 @@ const {
   stopLoading,
 } = useDeferredLoading()
 
-const reviewStore = useReviewStore(props.reviewMode.sessionType)
+const reviewStore = useReviewStore(ReviewSessionType.LIGHTSPEED)
 
 const {
-  reviewQueue,
   flashcardsTotal,
   currFlashcard,
   flashcardsRemaining,
   flashcardsSeen,
   progress,
-  noPrevAvailable,
   noNextAvailable,
 } = storeToRefs(reviewStore)
 
+const {
+  runOnce: startReviewOnce,
+  isPending: reviewStarting,
+} = useRunOnce(startReview)
+
+const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
+
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
-const reviewedFlashcardIds = ref<number[]>([])
 
 const elapsedTime = ref(0)
 const { startWatch, stopWatch } = useStopWatch(elapsedTime)
 
+const reviewedFlashcardIds = ref<number[]>([])
+const incorrectFlashcards = ref<Flashcard[]>([])
+
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 async function startReview() {
-  Log.log(LogTag.LOGIC, `Starting review: ${props.reviewMode.sessionType}`)
+  Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.LIGHTSPEED}`)
   try {
     startLoading()
     reviewStore.$reset()
@@ -228,14 +198,12 @@ async function startReview() {
         Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
       }
     }
-    const stage = reviewSessionTypeToSpecialStage(props.reviewMode.sessionType) ?? specialStages.UNKNOWN
-    reviewStore.loadState(createReviewQueueForStages(flashcards.value, [stage], currDay.value))
+    reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value))
     await createReviewSession()
     await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
       if (success) startWatch()
     })
     Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
-
   } finally {
     await stopLoading()
   }
@@ -247,14 +215,18 @@ async function finishReview() {
     await startReviewOnce()
   }
 
-  Log.log(LogTag.LOGIC, `Finishing review: ${props.reviewMode.sessionType}`)
+  Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
+  currFlashcardWatcher.stop()
   try {
-    await updateReviewSession(reviewedFlashcardIds.value, true)
+    if (flashcardSet.value && noNextAvailable.value) {
+      await markDaysAsCompleted(flashcardSet.value)
+    }
   } finally {
     stopWatch()
     reviewedFlashcardIds.value = []
+    incorrectFlashcards.value = []
     reviewStore.$reset()
-    destroyReviewStore(props.reviewMode.sessionType)
+    destroyReviewStore(ReviewSessionType.LIGHTSPEED)
   }
 }
 
@@ -263,34 +235,24 @@ async function finishReviewAndLeave() {
   await router.push({ name: routeNames.controlPanel })
 }
 
-async function prev() {
-  if (noPrevAvailable.value) return
-  await updateReviewSession([])
-  await reviewStore.prevFlashcard(flashcardSet.value)
-}
-
-async function next() {
-  if (!currFlashcard.value || noNextAvailable.value) return
-  reviewedFlashcardIds.value.push(currFlashcard.value.id)
-  await updateReviewSession([currFlashcard.value.id])
-  await reviewStore.nextFlashcard(flashcardSet.value)
-}
-
-async function moveBack() {
-  if (!flashcardSet.value || !currFlashcard.value) {
-    Log.error(LogTag.LOGIC, `moveBack is impossible:`,
-      `FlashcardSet.id=${flashcardSet.value?.id ?? 'undefined'}`,
-      `current Flashcard.id=${currFlashcard.value?.id ?? 'undefined'}`
-    )
-    return
-  }
+async function stageDown() {
+  if (!flashcardSet.value || !currFlashcard.value) return
   const flashcard = copyFlashcard(currFlashcard.value)
-  updateFlashcard(flashcard, learningStages.S1, currDay.value.chronodate)
+  updateFlashcard(flashcard, prevStage(flashcard.stage), currDay.value.chronodate)
+  const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
+  incorrectFlashcards.value.push(currFlashcard.value)
+  if (success) {
+    await getNextAndMarkDays(flashcardSet.value)
+  }
+}
+
+async function stageUp() {
+  if (!flashcardSet.value || !currFlashcard.value) return
+  const flashcard = copyFlashcard(currFlashcard.value)
+  updateFlashcard(flashcard, nextStage(flashcard.stage), currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   if (success) {
-    reviewQueue.value.removeCurrent()
-    await spaceDeck.value?.animateOutLeft(true)
-    await reviewStore.nextFlashcard(flashcardSet.value)
+    await getNextAndMarkDays(flashcardSet.value)
   }
 }
 
@@ -308,11 +270,58 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
     })
 }
 
+async function getNextAndMarkDays(flashcardSet: FlashcardSet) {
+  if (await reviewStore.nextFlashcard(flashcardSet)) {
+    await markDaysAsInProgress(flashcardSet)
+  } else {
+    await markDaysAsCompleted(flashcardSet)
+  }
+}
+
+async function markDaysAs(
+  flashcardSetId: number,
+  status: string,
+  acceptedStatuses: Set<string>,
+) {
+  if (!acceptedStatuses.has(currDay.value.status)) return
+
+  await sendChronoBulkUpdateRequest(flashcardSetId, status, [currDay.value])
+    .then((response) => {
+      chronoStore.updateDays(response.data.chronodays)
+      chronoStore.updateDayStreak(response.data.dayStreak)
+    })
+    .catch((error) => {
+      Log.error(LogTag.LOGIC, `Failed to mark days as ${status} for FlashcardSet.id=${flashcardSetId}`, error.response?.data)
+      toaster.bakeError(userApiErrors.SCHEDULE__UPDATING_FAILED, error.response?.data)
+    })
+}
+
+async function markDaysAsInProgress(flashcardSet: FlashcardSet) {
+  await markDaysAs(flashcardSet.id, chronodayStatuses.IN_PROGRESS, chronodayStatusesToProgressDay)
+}
+
+async function markDaysAsCompleted(flashcardSet: FlashcardSet) {
+  await markDaysAs(flashcardSet.id, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
+}
+
+const currFlashcardWatcher = watch(currFlashcard, async (newVal, oldVal) => {
+  if (oldVal) {
+    Log.log(LogTag.DEBUG, `oldVal`)
+    reviewedFlashcardIds.value.push(oldVal.id)
+    await updateReviewSession([oldVal.id])
+  }
+  if (!newVal) {
+    Log.log(LogTag.DEBUG, `!newVal`)
+    stopWatch()
+    await updateReviewSession(reviewedFlashcardIds.value, true)
+  }
+})
+
 async function createReviewSession() {
   if (!flashcardSet.value) return
 
   const request: ReviewSessionCreateRequest = {
-    type: props.reviewMode.sessionType,
+    type: ReviewSessionType.LIGHTSPEED,
     chronodayId: currDay.value.id,
   }
 
@@ -343,7 +352,7 @@ async function updateReviewSession(flashcardIds: number[], finished: boolean = f
       Log.log(LogTag.LOGIC, `Review session ${props.sessionId} updated`)
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to update review session ${props.sessionId}`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to updated review session ${props.sessionId}`, error.response?.data)
       toaster.bakeError(userApiErrors.REVIEW_SESSION__UPDATING_FAILED, error.response?.data)
     })
 }
@@ -353,13 +362,10 @@ onMounted(async () => {
   document.addEventListener('keydown', handleKeydown)
 })
 
-onBeforeRouteLeave(async () => {
-  await finishReviewOnce()
-})
-
 onUnmounted(async () => {
-  document.removeEventListener('keydown', handleKeydown)
   await finishReviewOnce()
+  destroyReviewStore(ReviewSessionType.LIGHTSPEED)
+  document.removeEventListener('keydown', handleKeydown)
 })
 
 async function handleKeydown(event: KeyboardEvent) {
@@ -420,10 +426,6 @@ async function handleKeydown(event: KeyboardEvent) {
   width: 100%;
   height: fit-content;
   gap: 10px;
-}
-
-.review-nav--centered {
-  justify-content: center;
 }
 
 .decision-button {

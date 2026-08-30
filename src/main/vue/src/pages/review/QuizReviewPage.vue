@@ -12,12 +12,12 @@
     <ControlBar
       style="z-index: 10;"
       :title="flashcardSetName"
-      :center-title-padding="100"
+      :center-title-padding="40"
       center-title
     >
       <template #left>
         <div class="review-mode">
-          <font-awesome-icon :icon="reviewIcons.get(ReviewSessionType.LIGHTSPEED)"/>
+          <font-awesome-icon :icon="reviewIcons.get(ReviewSessionType.QUIZ)"/>
         </div>
       </template>
       <template #right>
@@ -51,20 +51,29 @@
         <div class="review-body">
           <SpaceDeck
             ref="spaceDeck"
-            :session-type="ReviewSessionType.LIGHTSPEED"
+            :session-type="ReviewSessionType.QUIZ"
             :can-slide-left="!noNextAvailable"
             :can-slide-right="!noNextAvailable"
-            :on-slide-left="stageDown"
-            :on-slide-right="stageUp"
+            :on-slide-left="() => quizAnswer(false)"
+            :on-slide-right="() => quizAnswer(true)"
             swipe-left-text="Don't know"
             swipe-right-text="Know"
           >
-            <ReviewResult/>
+            <QuizResult
+              :elapsed-time="elapsedTime"
+              :round="quizRound"
+              :overall-total="quizOverallTotal"
+              :overall-correct="quizOverallCorrect"
+              :round-total="flashcardsTotal"
+              :round-failed="incorrectFlashcards.length"
+              :on-next-round="startNextQuizRound"
+              :on-finish="finishReviewAndLeave"
+            />
           </SpaceDeck>
           <div v-if="UXConfig().showNavButtons" class="review-nav">
             <SmartButton
-              text="Don't know"
               class="decision-button dangerous-button"
+              text="Don't know"
               :disabled="noNextAvailable"
               :hidden="noNextAvailable"
               :on-click="spaceDeck?.slideLeft"
@@ -72,8 +81,8 @@
               rounded
             />
             <SmartButton
-              text="Know"
               class="decision-button safe-button"
+              text="Know"
               :disabled="noNextAvailable"
               :hidden="noNextAvailable"
               :on-click="spaceDeck?.slideRight"
@@ -92,20 +101,20 @@
 import ControlBar from '@/components/ControlBar.vue'
 import KineticRingSpinner from '@/components/spinners/KineticRingSpinner.vue'
 import Progressbar from '@/components/common/Progressbar.vue'
-import SpaceDeck from '@/components/review/SpaceDeck.vue'
+import SpaceDeck from '@/components/SpaceDeck.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SpaceToast from '@/components/common/SpaceToast.vue'
-import ReviewResult from '@/components/review/ReviewResult.vue'
+import QuizResult from '@/components/QuizResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useStopWatch } from '@/utils/stop-watch.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
-import { nextStage, prevStage, Stage, } from '@/core-logic/stage-logic.ts'
+import { Stage } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
-  createReviewQueue,
+  createReviewQueueForStages,
+  MonoStageReviewQueue,
   reviewIcons,
   ReviewSessionType
 } from '@/core-logic/review-logic.ts'
@@ -113,20 +122,15 @@ import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
 import { loadSelectedSetIdFromCookies, } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
-import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
+import { Flashcard } from '@/model/flashcard.ts'
 import { loadStoresForFlashcardSetId } from '@/utils/store-loading.ts'
 import {
-  sendChronoBulkUpdateRequest,
-  sendFlashcardUpdateRequest,
+  sendReviewSessionChildCreateRequest,
   sendReviewSessionCreateRequest,
+  sendReviewSessionGetRequest,
   sendReviewSessionUpdateRequest,
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import {
-  chronodayStatuses,
-  chronodayStatusesToCompleteDay,
-  chronodayStatusesToProgressDay,
-} from '@/core-logic/chrono-logic.ts'
 import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
@@ -156,9 +160,10 @@ const {
   stopLoading,
 } = useDeferredLoading()
 
-const reviewStore = useReviewStore(ReviewSessionType.LIGHTSPEED)
+const reviewStore = useReviewStore(ReviewSessionType.QUIZ)
 
 const {
+  reviewQueue,
   flashcardsTotal,
   currFlashcard,
   flashcardsRemaining,
@@ -179,13 +184,16 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 const elapsedTime = ref(0)
 const { startWatch, stopWatch } = useStopWatch(elapsedTime)
 
+const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
+
+const quizRound = ref(1)
+const quizOverallTotal = ref(0)
+const quizOverallCorrect = ref(0)
 const reviewedFlashcardIds = ref<number[]>([])
 const incorrectFlashcards = ref<Flashcard[]>([])
 
-const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
-
 async function startReview() {
-  Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.LIGHTSPEED}`)
+  Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.QUIZ}`)
   try {
     startLoading()
     reviewStore.$reset()
@@ -198,8 +206,9 @@ async function startReview() {
         Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
       }
     }
-    reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value))
-    await createReviewSession()
+    reviewStore.loadState(createReviewQueueForStages(flashcards.value, props.stages, currDay.value))
+    quizOverallTotal.value = flashcardsTotal.value
+    await loadOrCreateQuizSession()
     await reviewStore.nextFlashcard(flashcardSet.value, (success) => {
       if (success) startWatch()
     })
@@ -210,24 +219,32 @@ async function startReview() {
   spaceDeck.value?.setDeckReady()
 }
 
+async function loadOrCreateQuizSession() {
+  if (props.sessionId) {
+    await loadQuizSession(props.sessionId)
+  } else {
+    await createQuizSession()
+  }
+}
+
+function resetState() {
+  stopWatch()
+  reviewStore.$reset()
+  reviewedFlashcardIds.value = []
+  incorrectFlashcards.value = []
+  quizOverallTotal.value = 0
+  quizOverallCorrect.value = 0
+}
+
 async function finishReview() {
   if (reviewStarting.value) {
     await startReviewOnce()
   }
-
-  Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
+  Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.QUIZ}`)
   currFlashcardWatcher.stop()
-  try {
-    if (flashcardSet.value && noNextAvailable.value) {
-      await markDaysAsCompleted(flashcardSet.value)
-    }
-  } finally {
-    stopWatch()
-    reviewedFlashcardIds.value = []
-    incorrectFlashcards.value = []
-    reviewStore.$reset()
-    destroyReviewStore(ReviewSessionType.LIGHTSPEED)
-  }
+  resetState()
+  reviewStore.$reset()
+  destroyReviewStore(ReviewSessionType.QUIZ)
 }
 
 async function finishReviewAndLeave() {
@@ -235,99 +252,80 @@ async function finishReviewAndLeave() {
   await router.push({ name: routeNames.controlPanel })
 }
 
-async function stageDown() {
-  if (!flashcardSet.value || !currFlashcard.value) return
-  const flashcard = copyFlashcard(currFlashcard.value)
-  updateFlashcard(flashcard, prevStage(flashcard.stage), currDay.value.chronodate)
-  const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
-  incorrectFlashcards.value.push(currFlashcard.value)
-  if (success) {
-    await getNextAndMarkDays(flashcardSet.value)
-  }
-}
-
-async function stageUp() {
-  if (!flashcardSet.value || !currFlashcard.value) return
-  const flashcard = copyFlashcard(currFlashcard.value)
-  updateFlashcard(flashcard, nextStage(flashcard.stage), currDay.value.chronodate)
-  const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
-  if (success) {
-    await getNextAndMarkDays(flashcardSet.value)
-  }
-}
-
-async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flashcard): Promise<boolean> {
-  return await sendFlashcardUpdateRequest(flashcardSet.id, flashcard)
-    .then((response) => {
-      flashcardStore.changeFlashcard(response.data)
-      currFlashcard.value = response.data
-      return true
-    })
-    .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to update Flashcard.id=${flashcard.id}`, error.response?.data)
-      toaster.bakeError(userApiErrors.FLASHCARD__PROGRESSION_FAILED, error.response?.data)
-      return false
-    })
-}
-
-async function getNextAndMarkDays(flashcardSet: FlashcardSet) {
-  if (await reviewStore.nextFlashcard(flashcardSet)) {
-    await markDaysAsInProgress(flashcardSet)
+async function quizAnswer(know: boolean) {
+  if (!currFlashcard.value) return
+  if (know) {
+    quizOverallCorrect.value = quizOverallCorrect.value + 1
+    await updateQuizSession([currFlashcard.value.id], [])
   } else {
-    await markDaysAsCompleted(flashcardSet)
+    incorrectFlashcards.value.push(currFlashcard.value)
+    await updateQuizSession([currFlashcard.value.id], [currFlashcard.value.id])
   }
+  await reviewStore.nextFlashcard(flashcardSet.value)
 }
 
-async function markDaysAs(
-  flashcardSetId: number,
-  status: string,
-  acceptedStatuses: Set<string>,
-) {
-  if (!acceptedStatuses.has(currDay.value.status)) return
+async function startNextQuizRound() {
+  if (!flashcardSet.value || !props.sessionId) return
+  if (incorrectFlashcards.value.length === 0) {
+    Log.error(LogTag.LOGIC, 'Cannot start new round: no incorrect flashcards')
+    return
+  }
 
-  await sendChronoBulkUpdateRequest(flashcardSetId, status, [currDay.value])
+  await sendReviewSessionChildCreateRequest(flashcardSet.value.id, props.sessionId, {
+    type: ReviewSessionType.QUIZ,
+    chronodayId: currDay.value.id,
+  })
     .then((response) => {
-      chronoStore.updateDays(response.data.chronodays)
-      chronoStore.updateDayStreak(response.data.dayStreak)
+      Log.log(LogTag.LOGIC, `Child review session ${response.data.id} created, parent: ${props.sessionId}`)
+      router.replace({
+        query: {
+          ...router.currentRoute.value.query,
+          sessionId: response.data.id,
+        }
+      })
+
+      reviewStore.loadState(new MonoStageReviewQueue(incorrectFlashcards.value))
+      quizRound.value = quizRound.value + 1
+      incorrectFlashcards.value = []
+
+      spaceDeck.value?.setDeckReady()
+
+      startWatch()
+
+      return reviewStore.nextFlashcard(flashcardSet.value)
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to mark days as ${status} for FlashcardSet.id=${flashcardSetId}`, error.response?.data)
-      toaster.bakeError(userApiErrors.SCHEDULE__UPDATING_FAILED, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to create child review session`, error.response?.data)
+      toaster.bakeError(userApiErrors.QUIZ_SESSION__NEXT_ROUND_FAILED, error.response?.data)
     })
 }
 
-async function markDaysAsInProgress(flashcardSet: FlashcardSet) {
-  await markDaysAs(flashcardSet.id, chronodayStatuses.IN_PROGRESS, chronodayStatusesToProgressDay)
-}
-
-async function markDaysAsCompleted(flashcardSet: FlashcardSet) {
-  await markDaysAs(flashcardSet.id, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
-}
-
-const currFlashcardWatcher = watch(currFlashcard, async (newVal, oldVal) => {
-  if (oldVal) {
-    Log.log(LogTag.DEBUG, `oldVal`)
-    reviewedFlashcardIds.value.push(oldVal.id)
-    await updateReviewSession([oldVal.id])
-  }
+const currFlashcardWatcher = watch(currFlashcard, async (newVal) => {
   if (!newVal) {
-    Log.log(LogTag.DEBUG, `!newVal`)
     stopWatch()
-    await updateReviewSession(reviewedFlashcardIds.value, true)
+    await updateQuizSession(
+      reviewedFlashcardIds.value,
+      incorrectFlashcards.value.map(f => f.id),
+      true
+    )
   }
 })
 
-async function createReviewSession() {
+async function createQuizSession() {
   if (!flashcardSet.value) return
 
   const request: ReviewSessionCreateRequest = {
-    type: ReviewSessionType.LIGHTSPEED,
+    type: ReviewSessionType.QUIZ,
     chronodayId: currDay.value.id,
+    metadata: {
+      currRoundFlashcardIds: reviewQueue.value.remainingFlashcards().map(f => f.id),
+      overallTotalCount: reviewQueue.value.remaining(),
+    }
   }
 
   await sendReviewSessionCreateRequest(flashcardSet.value.id, request)
     .then((response) => {
-      Log.log(LogTag.LOGIC, `Review session ${response.data.id} created`)
+      Log.log(LogTag.LOGIC, `Quiz session ${response.data.id} created`)
       router.replace({
         query: {
           ...router.currentRoute.value.query,
@@ -336,23 +334,53 @@ async function createReviewSession() {
       })
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to create a review session`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to create a quiz session`, error.response?.data)
       toaster.bakeError(userApiErrors.REVIEW_SESSION__CREATION_FAILED, error.response?.data)
     })
 }
 
-async function updateReviewSession(flashcardIds: number[], finished: boolean = false) {
+async function loadQuizSession(sessionId: number) {
+  if (!flashcardSet.value) return
+  await sendReviewSessionGetRequest(flashcardSet.value.id, sessionId)
+    .then((response) => {
+      elapsedTime.value = response.data.elapsedTime
+      quizRound.value = response.data.metadata?.round ?? 1
+      quizOverallCorrect.value = response.data.metadata?.overallCorrectCount ?? 0
+      quizOverallTotal.value = response.data.metadata?.overallTotalCount ?? 0
+      const reviewedFlashcardIdSet = new Set(response.data.flashcardIds ?? [])
+      const nextRoundFlashcardIdSet = new Set(response.data.metadata?.nextRoundFlashcardIds ?? [])
+      const currRoundFlashcardIdSet = new Set(response.data.metadata?.currRoundFlashcardIds ?? [])
+      const currRoundFlashcards = flashcards.value.filter(f => currRoundFlashcardIdSet.has(f.id))
+      const flashcardsForReview = currRoundFlashcards.filter(f => !reviewedFlashcardIdSet.has(f.id))
+      reviewedFlashcardIds.value = [...reviewedFlashcardIdSet]
+      incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIdSet.has(f.id))
+      reviewStore.loadState(new MonoStageReviewQueue(flashcardsForReview))
+      reviewStore.setFlashcardsTotal(currRoundFlashcards.length)
+      Log.log(LogTag.LOGIC, `Quiz session ${sessionId} retrieved`)
+    })
+    .catch((error) => {
+      resetState()
+      Log.error(LogTag.LOGIC, `Failed to retrieve quiz session ${sessionId}`, error.response?.data)
+      toaster.bakeError(userApiErrors.REVIEW_SESSION__FETCHING_FAILED, error.response?.data)
+    })
+}
+
+async function updateQuizSession(reviewedFlashcardIds: number[], nextRoundFlashcardIds: number[], finished: boolean = false) {
   if (!flashcardSet.value || !props.sessionId) return
   await sendReviewSessionUpdateRequest(flashcardSet.value.id, props.sessionId, {
     elapsedTime: elapsedTime.value,
-    flashcardIds: flashcardIds.map(id => ({ id: id })),
+    flashcardIds: reviewedFlashcardIds.map(id => ({ id: id })),
     finished: finished,
+    metadata: {
+      nextRoundFlashcardIds: nextRoundFlashcardIds,
+      overallCorrectCount: quizOverallCorrect.value,
+    },
   })
     .then(() => {
-      Log.log(LogTag.LOGIC, `Review session ${props.sessionId} updated`)
+      Log.log(LogTag.LOGIC, `Quiz session ${props.sessionId} updated`)
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to updated review session ${props.sessionId}`, error.response?.data)
+      Log.error(LogTag.LOGIC, `Failed to update quiz session ${props.sessionId}`, error.response?.data)
       toaster.bakeError(userApiErrors.REVIEW_SESSION__UPDATING_FAILED, error.response?.data)
     })
 }
@@ -364,7 +392,6 @@ onMounted(async () => {
 
 onUnmounted(async () => {
   await finishReviewOnce()
-  destroyReviewStore(ReviewSessionType.LIGHTSPEED)
   document.removeEventListener('keydown', handleKeydown)
 })
 

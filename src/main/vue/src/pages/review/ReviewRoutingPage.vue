@@ -17,9 +17,9 @@
 </template>
 
 <script setup lang="ts">
-import LightspeedReviewPage from '@/pages/LightspeedReviewPage.vue'
-import SpecialReviewPage from '@/pages/SpecialReviewPage.vue'
-import QuizReviewPage from '@/pages/QuizReviewPage.vue'
+import LightspeedReviewPage from '@/pages/review/LightspeedReviewPage.vue'
+import SpecialReviewPage from '@/pages/review/SpecialReviewPage.vue'
+import QuizReviewPage from '@/pages/review/QuizReviewPage.vue'
 import { Stage } from '@/core-logic/stage-logic.ts'
 import { computed } from 'vue'
 import { determineReviewMode } from '@/core-logic/review-logic.ts'
