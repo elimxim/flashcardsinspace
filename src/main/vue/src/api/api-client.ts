@@ -173,14 +173,13 @@ export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId
   )
 }
 
-export async function sendFlashcardAudioGetRequest(setId: number, flashcardId: number, side: string) {
+export async function sendFlashcardAudioGetRequest(setId: number, flashcardId: number, side: string, signal?: AbortSignal) {
   Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio?side=${side}`)
   return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio`, {
     responseType: 'blob',
     timeout: LONG_TIMEOUT_MS,
-    params: {
-      side: side
-    },
+    params: { side: side },
+    signal: signal,
   })
 }
 
@@ -219,12 +218,13 @@ export async function sendFlashcardPictureUploadRequest(setId: number, flashcard
   )
 }
 
-export async function sendFlashcardPictureGetRequest(setId: number, flashcardId: number, side: string) {
+export async function sendFlashcardPictureGetRequest(setId: number, flashcardId: number, side: string, signal?: AbortSignal) {
   Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/${flashcardId}/picture?side=${side}`)
   return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/picture`, {
     responseType: 'blob',
     timeout: LONG_TIMEOUT_MS,
     params: { side },
+    signal: signal,
   })
 }
 
