@@ -98,28 +98,25 @@ import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SpaceToast from '@/components/common/SpaceToast.vue'
 import ReviewResult from '@/components/ReviewResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { useStopWatch } from '@/utils/stop-watch.ts'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
-import { nextStage, prevStage, Stage, } from '@/core-logic/stage-logic.ts'
+import { nextStage, prevStage, Stage } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
   createReviewQueue,
   reviewIcons,
-  ReviewSessionType
+  ReviewSessionType,
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
-import { useRouter } from 'vue-router'
-import { loadSelectedSetIdFromCookies, } from '@/utils/cookies.ts'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
+import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { loadStoresForFlashcardSetId } from '@/utils/store-loading.ts'
 import {
   sendChronoBulkUpdateRequest,
   sendFlashcardUpdateRequest,
-  sendReviewSessionCreateRequest,
-  sendReviewSessionUpdateRequest,
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import {
@@ -127,7 +124,6 @@ import {
   chronodayStatusesToCompleteDay,
   chronodayStatusesToProgressDay,
 } from '@/core-logic/chrono-logic.ts'
-import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
@@ -135,8 +131,9 @@ import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
 import { useRunOnce } from '@/utils/run-once.ts'
 import { Chronoday } from "@/model/chrono.ts"
+import { createReviewSessionAttendant } from "@/core-logic/review-session-attendant.ts"
 
-const props = defineProps<{
+defineProps<{
   sessionId?: number,
   stages: Stage[],
 }>()
@@ -157,6 +154,7 @@ const {
   stopLoading,
 } = useDeferredLoading()
 
+const sessionRunner = createReviewSessionAttendant(ReviewSessionType.LIGHTSPEED, flashcardSet, currDay)
 const reviewStore = useReviewStore(ReviewSessionType.LIGHTSPEED, flashcardSet)
 
 const {
@@ -173,17 +171,12 @@ const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
 
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
-const elapsedTime = ref(0)
-const { startWatch, stopWatch } = useStopWatch(elapsedTime)
-
-const reviewedFlashcardIds = ref<number[]>([])
-const incorrectFlashcards = ref<Flashcard[]>([])
-
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 async function startReview() {
   Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.LIGHTSPEED}`)
   try {
+    sessionRunner.clear()
     startLoading()
     reviewStore.$reset()
     if (!flashcardStore.loaded) {
@@ -196,10 +189,10 @@ async function startReview() {
       }
     }
     reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value))
-    await createReviewSession()
-    await reviewStore.nextFlashcard((success) => {
-      if (success) startWatch()
-    })
+
+    await sessionRunner.create()
+    await reviewStore.nextFlashcard()
+
     Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
   } finally {
     await stopLoading()
@@ -208,19 +201,13 @@ async function startReview() {
 }
 
 async function finishReview() {
-  try {
-    if (reviewStarting.value) await startReviewOnce()
-    Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
-    currFlashcardWatcher.stop()
-    if (flashcardSet.value && noNextAvailable.value) {
-      await markDaysAsCompleted(flashcardSet.value, currDay.value)
-    }
-  } finally {
-    stopWatch()
-    reviewedFlashcardIds.value = []
-    incorrectFlashcards.value = []
-    destroyReviewStore(reviewStore)
+  Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
+  if (reviewStarting.value) await startReviewOnce()
+  await sessionRunner.flush({ all: true })
+  if (flashcardSet.value && noNextAvailable.value) {
+    await markDaysAsCompleted(flashcardSet.value, currDay.value)
   }
+  Log.log(LogTag.LOGIC, `Finished review: ${ReviewSessionType.LIGHTSPEED}`)
 }
 
 async function finishReviewAndLeave() {
@@ -233,8 +220,9 @@ async function stageDown() {
   const flashcard = copyFlashcard(currFlashcard.value)
   updateFlashcard(flashcard, prevStage(flashcard.stage), currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
-  incorrectFlashcards.value.push(currFlashcard.value)
   if (success) {
+    sessionRunner.track(currFlashcard.value.id)
+    await sessionRunner.flush()
     await getNextAndMarkDays(flashcardSet.value, currDay.value)
   }
 }
@@ -245,6 +233,8 @@ async function stageUp() {
   updateFlashcard(flashcard, nextStage(flashcard.stage), currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   if (success) {
+    sessionRunner.track(currFlashcard.value.id)
+    await sessionRunner.flush()
     await getNextAndMarkDays(flashcardSet.value, currDay.value)
   }
 }
@@ -299,66 +289,19 @@ async function markDaysAsCompleted(flashcardSet: FlashcardSet, currDay: Chronoda
   await markDaysAs(flashcardSet.id, currDay, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
 }
 
-const currFlashcardWatcher = watch(currFlashcard, async (newVal, oldVal) => {
-  if (oldVal) {
-    Log.log(LogTag.DEBUG, `oldVal: ${oldVal.id}`)
-    reviewedFlashcardIds.value.push(oldVal.id)
-    await updateReviewSession([oldVal.id])
-  }
-  if (!newVal) {
-    Log.log(LogTag.DEBUG, `!newVal`)
-    stopWatch()
-    await updateReviewSession(reviewedFlashcardIds.value, true)
-  }
-})
-
-async function createReviewSession() {
-  if (!flashcardSet.value) return
-
-  const request: ReviewSessionCreateRequest = {
-    type: ReviewSessionType.LIGHTSPEED,
-    chronodayId: currDay.value.id,
-  }
-
-  await sendReviewSessionCreateRequest(flashcardSet.value.id, request)
-    .then((response) => {
-      Log.log(LogTag.LOGIC, `Review session ${response.data.id} created`)
-      router.replace({
-        query: {
-          ...router.currentRoute.value.query,
-          sessionId: response.data.id,
-        }
-      })
-    })
-    .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to create a review session`, error.response?.data)
-      toaster.bakeError(userApiErrors.REVIEW_SESSION__CREATION_FAILED, error.response?.data)
-    })
-}
-
-async function updateReviewSession(flashcardIds: number[], finished: boolean = false) {
-  if (!flashcardSet.value || !props.sessionId) return
-  await sendReviewSessionUpdateRequest(flashcardSet.value.id, props.sessionId, {
-    elapsedTime: elapsedTime.value,
-    flashcardIds: flashcardIds.map(id => ({ id: id })),
-    finished: finished,
-  })
-    .then(() => {
-      Log.log(LogTag.LOGIC, `Review session ${props.sessionId} updated`)
-    })
-    .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to updated review session ${props.sessionId}`, error.response?.data)
-      toaster.bakeError(userApiErrors.REVIEW_SESSION__UPDATING_FAILED, error.response?.data)
-    })
-}
-
 onMounted(async () => {
   await startReviewOnce()
   document.addEventListener('keydown', handleKeydown)
 })
 
+onBeforeRouteLeave(async () => {
+  await finishReviewOnce()
+})
+
 onUnmounted(async () => {
   await finishReviewOnce()
+  sessionRunner.clear()
+  destroyReviewStore(reviewStore)
   document.removeEventListener('keydown', handleKeydown)
 })
 

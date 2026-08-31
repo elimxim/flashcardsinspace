@@ -107,8 +107,7 @@ import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SpaceToast from '@/components/common/SpaceToast.vue'
 import QuizResult from '@/components/QuizResult.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { useStopWatch } from '@/utils/stop-watch.ts'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { Stage } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
@@ -116,28 +115,29 @@ import {
   createReviewQueueForStages,
   MonoStageReviewQueue,
   reviewIcons,
-  ReviewSessionType
+  ReviewSessionType,
 } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
-import { useRouter } from 'vue-router'
-import { loadSelectedSetIdFromCookies, } from '@/utils/cookies.ts'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
+import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard } from '@/model/flashcard.ts'
 import { loadStoresForFlashcardSetId } from '@/utils/store-loading.ts'
 import {
   sendReviewSessionChildCreateRequest,
-  sendReviewSessionCreateRequest,
-  sendReviewSessionGetRequest,
-  sendReviewSessionUpdateRequest,
 } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
-import { ReviewSessionCreateRequest } from '@/api/communication.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
 import { useRunOnce } from '@/utils/run-once.ts'
+import {
+  createReviewSessionAttendant,
+} from "@/core-logic/review-session-attendant.ts"
+import { ReviewSession } from "@/model/review.ts"
+import { errorResponseData } from "@/core-logic/media-error.ts"
 
 const props = defineProps<{
   sessionId?: number,
@@ -160,6 +160,10 @@ const {
   stopLoading,
 } = useDeferredLoading()
 
+const sessionRunner = createReviewSessionAttendant(ReviewSessionType.QUIZ, flashcardSet, currDay)
+
+const { elapsedTime } = sessionRunner
+
 const reviewStore = useReviewStore(ReviewSessionType.QUIZ, flashcardSet)
 
 const {
@@ -177,15 +181,11 @@ const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
 
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
-const elapsedTime = ref(0)
-const { startWatch, stopWatch } = useStopWatch(elapsedTime)
-
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 const quizRound = ref(1)
 const quizOverallTotal = ref(0)
 const quizOverallCorrect = ref(0)
-const reviewedFlashcardIds = ref<number[]>([])
 const incorrectFlashcards = ref<Flashcard[]>([])
 
 async function startReview() {
@@ -204,10 +204,17 @@ async function startReview() {
     }
     reviewStore.loadState(createReviewQueueForStages(flashcards.value, props.stages, currDay.value))
     quizOverallTotal.value = flashcardsTotal.value
-    await loadOrCreateQuizSession()
-    await reviewStore.nextFlashcard((success) => {
-      if (success) startWatch()
+
+    await sessionRunner.loadOrCreate({
+      sessionId: props.sessionId,
+      metadata: {
+        currRoundFlashcardIds: reviewQueue.value.remainingFlashcards().map(f => f.id),
+        overallTotalCount: reviewQueue.value.remaining(),
+      },
+      onboarding: onboardSession,
     })
+    await reviewStore.nextFlashcard()
+
     Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
   } finally {
     await stopLoading()
@@ -215,32 +222,19 @@ async function startReview() {
   spaceDeck.value?.setDeckReady()
 }
 
-async function loadOrCreateQuizSession() {
-  if (props.sessionId) {
-    await loadQuizSession(props.sessionId)
-  } else {
-    await createQuizSession()
-  }
-}
-
 function resetState() {
-  stopWatch()
+  sessionRunner.clear()
   reviewStore.$reset()
-  reviewedFlashcardIds.value = []
   incorrectFlashcards.value = []
   quizOverallTotal.value = 0
   quizOverallCorrect.value = 0
 }
 
 async function finishReview() {
-  try {
-    if (reviewStarting.value) await startReviewOnce()
-    Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.QUIZ}`)
-    currFlashcardWatcher.stop()
-    resetState()
-  } finally {
-    destroyReviewStore(reviewStore)
-  }
+  Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.QUIZ}`)
+  if (reviewStarting.value) await startReviewOnce()
+  await sessionRunner.flush({ all: true })
+  Log.log(LogTag.LOGIC, `Finished review: ${ReviewSessionType.QUIZ}`)
 }
 
 async function finishReviewAndLeave() {
@@ -250,135 +244,77 @@ async function finishReviewAndLeave() {
 
 async function quizAnswer(know: boolean) {
   if (!currFlashcard.value) return
+
+  sessionRunner.track(currFlashcard.value.id)
   if (know) {
     quizOverallCorrect.value = quizOverallCorrect.value + 1
-    await updateQuizSession([currFlashcard.value.id], [])
+    await sessionRunner.flush({
+      metadata: {
+        nextRoundFlashcardIds: [],
+        overallCorrectCount: quizOverallCorrect.value,
+      },
+    })
   } else {
     incorrectFlashcards.value.push(currFlashcard.value)
-    await updateQuizSession([currFlashcard.value.id], [currFlashcard.value.id])
+    await sessionRunner.flush({
+      metadata: {
+        nextRoundFlashcardIds: [currFlashcard.value.id],
+        overallCorrectCount: quizOverallCorrect.value,
+      },
+    })
   }
+
   await reviewStore.nextFlashcard()
 }
 
 async function startNextQuizRound() {
-  if (!flashcardSet.value || !props.sessionId) return
+  if (!flashcardSet.value || !sessionRunner.sessionId) return
   if (incorrectFlashcards.value.length === 0) {
-    Log.error(LogTag.LOGIC, 'Cannot start new round: no incorrect flashcards')
+    Log.error(LogTag.LOGIC, 'Cannot start new round: no flashcards')
     return
   }
 
-  await sendReviewSessionChildCreateRequest(flashcardSet.value.id, props.sessionId, {
-    type: ReviewSessionType.QUIZ,
-    chronodayId: currDay.value.id,
-  })
-    .then((response) => {
-      Log.log(LogTag.LOGIC, `Child review session ${response.data.id} created, parent: ${props.sessionId}`)
-      router.replace({
-        query: {
-          ...router.currentRoute.value.query,
-          sessionId: response.data.id,
-        }
-      })
-
-      reviewStore.loadState(new MonoStageReviewQueue(incorrectFlashcards.value))
-      quizRound.value = quizRound.value + 1
-      incorrectFlashcards.value = []
-
-      spaceDeck.value?.setDeckReady()
-
-      startWatch()
-
-      return reviewStore.nextFlashcard()
+  try {
+    const response = await sendReviewSessionChildCreateRequest(flashcardSet.value.id, sessionRunner.sessionId, {
+      type: ReviewSessionType.QUIZ,
+      chronodayId: currDay.value.id,
     })
-    .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to create child review session`, error.response?.data)
-      toaster.bakeError(userApiErrors.QUIZ_SESSION__NEXT_ROUND_FAILED, error.response?.data)
-    })
-}
 
-const currFlashcardWatcher = watch(currFlashcard, async (newVal) => {
-  if (!newVal) {
-    stopWatch()
-    await updateQuizSession(
-      reviewedFlashcardIds.value,
-      incorrectFlashcards.value.map(f => f.id),
-      true
-    )
+    Log.log(LogTag.LOGIC, `Child review session ${response.data.id} created, parent: ${sessionRunner.sessionId}`)
+    await router.replace({
+      query: {
+        ...router.currentRoute.value.query,
+        sessionId: response.data.id,
+      },
+    })
+    resetState()
+    onboardSession(response.data)
+    sessionRunner.init(response.data)
+    spaceDeck.value?.setDeckReady()
+    return reviewStore.nextFlashcard()
+  } catch (error) {
+    Log.error(LogTag.LOGIC, `Failed to create child review session`, error)
+    toaster.bakeError(userApiErrors.QUIZ_SESSION__NEXT_ROUND_FAILED, errorResponseData(error))
   }
-})
-
-async function createQuizSession() {
-  if (!flashcardSet.value) return
-
-  const request: ReviewSessionCreateRequest = {
-    type: ReviewSessionType.QUIZ,
-    chronodayId: currDay.value.id,
-    metadata: {
-      currRoundFlashcardIds: reviewQueue.value.remainingFlashcards().map(f => f.id),
-      overallTotalCount: reviewQueue.value.remaining(),
-    }
-  }
-
-  await sendReviewSessionCreateRequest(flashcardSet.value.id, request)
-    .then((response) => {
-      Log.log(LogTag.LOGIC, `Quiz session ${response.data.id} created`)
-      router.replace({
-        query: {
-          ...router.currentRoute.value.query,
-          sessionId: response.data.id,
-        }
-      })
-    })
-    .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to create a quiz session`, error.response?.data)
-      toaster.bakeError(userApiErrors.REVIEW_SESSION__CREATION_FAILED, error.response?.data)
-    })
 }
 
-async function loadQuizSession(sessionId: number) {
-  if (!flashcardSet.value) return
-  await sendReviewSessionGetRequest(flashcardSet.value.id, sessionId)
-    .then((response) => {
-      elapsedTime.value = response.data.elapsedTime
-      quizRound.value = response.data.metadata?.round ?? 1
-      quizOverallCorrect.value = response.data.metadata?.overallCorrectCount ?? 0
-      quizOverallTotal.value = response.data.metadata?.overallTotalCount ?? 0
-      const reviewedFlashcardIdSet = new Set(response.data.flashcardIds ?? [])
-      const nextRoundFlashcardIdSet = new Set(response.data.metadata?.nextRoundFlashcardIds ?? [])
-      const currRoundFlashcardIdSet = new Set(response.data.metadata?.currRoundFlashcardIds ?? [])
-      const currRoundFlashcards = flashcards.value.filter(f => currRoundFlashcardIdSet.has(f.id))
-      const flashcardsForReview = currRoundFlashcards.filter(f => !reviewedFlashcardIdSet.has(f.id))
-      reviewedFlashcardIds.value = [...reviewedFlashcardIdSet]
-      incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIdSet.has(f.id))
-      reviewStore.loadState(new MonoStageReviewQueue(flashcardsForReview))
-      reviewStore.setFlashcardsTotal(currRoundFlashcards.length)
-      Log.log(LogTag.LOGIC, `Quiz session ${sessionId} retrieved`)
-    })
-    .catch((error) => {
-      resetState()
-      Log.error(LogTag.LOGIC, `Failed to retrieve quiz session ${sessionId}`, error.response?.data)
-      toaster.bakeError(userApiErrors.REVIEW_SESSION__FETCHING_FAILED, error.response?.data)
-    })
-}
+function onboardSession(session: ReviewSession) {
+  quizRound.value = session.metadata?.round ?? 1
+  quizOverallCorrect.value = session.metadata?.overallCorrectCount ?? 0
+  quizOverallTotal.value = session.metadata?.overallTotalCount ?? 0
 
-async function updateQuizSession(reviewedFlashcardIds: number[], nextRoundFlashcardIds: number[], finished: boolean = false) {
-  if (!flashcardSet.value || !props.sessionId) return
-  await sendReviewSessionUpdateRequest(flashcardSet.value.id, props.sessionId, {
-    elapsedTime: elapsedTime.value,
-    flashcardIds: reviewedFlashcardIds.map(id => ({ id: id })),
-    finished: finished,
-    metadata: {
-      nextRoundFlashcardIds: nextRoundFlashcardIds,
-      overallCorrectCount: quizOverallCorrect.value,
-    },
-  })
-    .then(() => {
-      Log.log(LogTag.LOGIC, `Quiz session ${props.sessionId} updated`)
-    })
-    .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to update quiz session ${props.sessionId}`, error.response?.data)
-      toaster.bakeError(userApiErrors.REVIEW_SESSION__UPDATING_FAILED, error.response?.data)
-    })
+  const reviewedFlashcardIdSet = new Set(session.flashcardIds ?? [])
+  const nextRoundFlashcardIdSet = new Set(session.metadata?.nextRoundFlashcardIds ?? [])
+  const currRoundFlashcardIdSet = new Set(session.metadata?.currRoundFlashcardIds ?? [])
+  const currRoundFlashcards = flashcards.value.filter(f => currRoundFlashcardIdSet.has(f.id))
+  const flashcardsForReview = currRoundFlashcards.filter(f => !reviewedFlashcardIdSet.has(f.id))
+
+  incorrectFlashcards.value = currRoundFlashcards.filter(f => nextRoundFlashcardIdSet.has(f.id))
+
+  reviewStore.loadState(new MonoStageReviewQueue(flashcardsForReview))
+  reviewStore.setFlashcardsTotal(currRoundFlashcards.length)
+
+  Log.log(LogTag.LOGIC, `Quiz session ${session.id} onboarded`)
 }
 
 onMounted(async () => {
@@ -386,8 +322,14 @@ onMounted(async () => {
   document.addEventListener('keydown', handleKeydown)
 })
 
+onBeforeRouteLeave(async () => {
+  await finishReviewOnce()
+})
+
 onUnmounted(async () => {
   await finishReviewOnce()
+  resetState()
+  destroyReviewStore(reviewStore)
   document.removeEventListener('keydown', handleKeydown)
 })
 
