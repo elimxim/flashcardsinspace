@@ -170,8 +170,6 @@ const {
 
 const { runOnce: startReviewOnce, isPending: reviewStarting } = useRunOnce(startReview)
 const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
-const { runOnce: markDaysAsInProgressOnce } = useRunOnce(markDaysAsInProgress)
-const { runOnce: markDaysAsCompletedOnce } = useRunOnce(markDaysAsCompleted)
 
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
@@ -215,7 +213,7 @@ async function finishReview() {
     Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
     currFlashcardWatcher.stop()
     if (flashcardSet.value && noNextAvailable.value) {
-      await markDaysAsCompletedOnce(flashcardSet.value)
+      await markDaysAsCompleted(flashcardSet.value, currDay.value)
     }
   } finally {
     stopWatch()
@@ -237,7 +235,7 @@ async function stageDown() {
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   incorrectFlashcards.value.push(currFlashcard.value)
   if (success) {
-    await getNextAndMarkDays(flashcardSet.value)
+    await getNextAndMarkDays(flashcardSet.value, currDay.value)
   }
 }
 
@@ -247,7 +245,7 @@ async function stageUp() {
   updateFlashcard(flashcard, nextStage(flashcard.stage), currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   if (success) {
-    await getNextAndMarkDays(flashcardSet.value)
+    await getNextAndMarkDays(flashcardSet.value, currDay.value)
   }
 }
 
@@ -265,23 +263,24 @@ async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flash
     })
 }
 
-async function getNextAndMarkDays(flashcardSet: FlashcardSet) {
+async function getNextAndMarkDays(flashcardSet: FlashcardSet, currDay: Chronoday) {
   if (await reviewStore.nextFlashcard()) {
-    await markDaysAsInProgressOnce(flashcardSet)
+    await markDaysAsInProgress(flashcardSet, currDay)
   } else {
-    await markDaysAsCompletedOnce(flashcardSet)
+    await markDaysAsCompleted(flashcardSet, currDay)
   }
 }
 
 async function markDaysAs(
   flashcardSetId: number,
-  day: Chronoday,
+  currDay: Chronoday,
   status: string,
   acceptedStatuses: Set<string>,
 ) {
-  if (!acceptedStatuses.has(day.status)) return
+  if (!acceptedStatuses.has(currDay.status)) return
+  if (currDay.status === status) return
 
-  await sendChronoBulkUpdateRequest(flashcardSetId, status, [day])
+  await sendChronoBulkUpdateRequest(flashcardSetId, status, [currDay])
     .then((response) => {
       chronoStore.updateDays(response.data.chronodays)
       chronoStore.updateDayStreak(response.data.dayStreak)
@@ -292,17 +291,17 @@ async function markDaysAs(
     })
 }
 
-async function markDaysAsInProgress(flashcardSet: FlashcardSet) {
-  await markDaysAs(flashcardSet.id, currDay.value, chronodayStatuses.IN_PROGRESS, chronodayStatusesToProgressDay)
+async function markDaysAsInProgress(flashcardSet: FlashcardSet, currDay: Chronoday) {
+  await markDaysAs(flashcardSet.id, currDay, chronodayStatuses.IN_PROGRESS, chronodayStatusesToProgressDay)
 }
 
-async function markDaysAsCompleted(flashcardSet: FlashcardSet) {
-  await markDaysAs(flashcardSet.id, currDay.value, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
+async function markDaysAsCompleted(flashcardSet: FlashcardSet, currDay: Chronoday) {
+  await markDaysAs(flashcardSet.id, currDay, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
 }
 
 const currFlashcardWatcher = watch(currFlashcard, async (newVal, oldVal) => {
   if (oldVal) {
-    Log.log(LogTag.DEBUG, `oldVal`)
+    Log.log(LogTag.DEBUG, `oldVal: ${oldVal.id}`)
     reviewedFlashcardIds.value.push(oldVal.id)
     await updateReviewSession([oldVal.id])
   }
