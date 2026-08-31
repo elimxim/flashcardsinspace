@@ -89,7 +89,7 @@ const isUserCloseToLoseDayStreak = computed(() => {
     return false
   } else {
     const minutes = minutesBeforeMidnight.value
-    return minutes > 0 && minutes < 10 * 60 // 6 hours
+    return minutes > 0 && minutes < 6 * 60 // 6 hours
   }
 })
 
