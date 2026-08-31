@@ -37,7 +37,7 @@ export interface FlashcardAudioMetadata {
 export interface FlashcardPicture {
   id: number
   side: string
-  mimeType: string
+  mimeType?: string | undefined
   pictureSize: number
   width: number
   height: number
