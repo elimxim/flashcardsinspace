@@ -37,9 +37,9 @@ class ReviewSessionController(
         @PathVariable setId: Long,
         @PathVariable id: Long,
         @RequestBody request: ReviewSessionUpdateRequest,
-    ): ResponseEntity<Unit> = withLoggingContext(user) {
-        reviewSessionService.updateReviewSession(user, setId, id, request.normalize())
-        return ResponseEntity.ok().build()
+    ): ResponseEntity<ReviewSessionDto> = withLoggingContext(user) {
+        val dto = reviewSessionService.updateReviewSession(user, setId, id, request.normalize())
+        return ResponseEntity.ok(dto)
     }
 
     @PostMapping("/{parentId:\\d+}/children")

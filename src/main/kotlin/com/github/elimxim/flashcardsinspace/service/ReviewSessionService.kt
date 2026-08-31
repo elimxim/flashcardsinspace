@@ -42,7 +42,7 @@ class ReviewSessionService(
     }
 
     @Transactional
-    fun updateReviewSession(user: User, setId: Long, id: Long, request: ReviewSessionUpdateRequest) {
+    fun updateReviewSession(user: User, setId: Long, id: Long, request: ReviewSessionUpdateRequest): ReviewSessionDto {
         log.info("Updating review session $id for set $setId")
         user.checkVerified()
         val session = getEntity(id)
@@ -53,8 +53,10 @@ class ReviewSessionService(
         val changed = mergeReviewSession(session, validRequest)
         if (changed) {
             session.lastUpdatedAt = ZonedDateTime.now()
-            reviewSessionRepository.save(session)
+            val updatedSession = reviewSessionRepository.save(session)
+            return updatedSession.toDto()
         }
+        return session.toDto()
     }
 
     private fun mergeReviewSession(session: ReviewSession, request: ValidReviewSessionUpdateRequest): Boolean {
@@ -68,7 +70,7 @@ class ReviewSessionService(
             val sessionFlashcardIds = session.flashcardIds?.toSet() ?: emptySet()
             val totalFlashcardIds = sessionFlashcardIds + request.flashcardIds
             session.flashcardIds = totalFlashcardIds.toLongArray()
-            changed = sessionFlashcardIds.size != totalFlashcardIds.size
+            changed = changed || sessionFlashcardIds.size != totalFlashcardIds.size
         }
 
         if (request.finished) {
@@ -107,16 +109,15 @@ class ReviewSessionService(
             )
         }
 
+        if (parentSession.finishedAt == null) {
+            parentSession.finishedAt = ZonedDateTime.now()
+        }
+
         val session = createNewReviewSession(parentSession.flashcardSet, validRequest).apply {
             parentSessionId = parentSession.id
         }
+
         if (session.type == ReviewSessionType.QUIZ) {
-            if (parentSession.type != ReviewSessionType.QUIZ) {
-                throw HttpBadRequestException(
-                    ApiErrorCode.STM400,
-                    "Parent session ${parentSession.id} is not ${ReviewSessionType.QUIZ}"
-                )
-            }
             addQuizMetadata(session, validRequest, parentSession)
         }
         val savedSession = reviewSessionRepository.save(session)

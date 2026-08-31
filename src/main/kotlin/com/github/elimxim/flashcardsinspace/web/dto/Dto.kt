@@ -87,7 +87,7 @@ data class ChronodayDto(
 data class ReviewSessionDto(
     val id: Long,
     val type: String,
-    val flashcardIds: List<Long>?,
+    val flashcardIds: List<Long>,
     val elapsedTime: Long,
     val startedAt: ZonedDateTime,
     val finishedAt: ZonedDateTime?,

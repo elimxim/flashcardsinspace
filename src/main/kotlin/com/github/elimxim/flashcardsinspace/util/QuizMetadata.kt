@@ -12,7 +12,7 @@ fun addQuizMetadata(
     request: ValidReviewSessionCreateRequest,
     parentSession: ReviewSession? = null
 ) {
-    val metadata = if (parentSession != null && parentSession.metadata != null) {
+    val metadata = if (parentSession?.metadata != null) {
         val parentMetadata = parentSession.metadata
         if (parentMetadata !is QuizMetadata) {
             throw HttpBadRequestException(
