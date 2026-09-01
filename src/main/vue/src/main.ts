@@ -44,14 +44,14 @@ async function bootstrap() {
     const loaderDuration = performance.now() - loaderAppearedAt
     const remainingTime = Math.max(0, 1000 - loaderDuration)
     // wait for at least 200ms (transition) + 800ms to avoid layout blink
-    await new Promise(resolve => setTimeout(resolve, remainingTime))
+    await new Promise((resolve) => setTimeout(resolve, remainingTime))
     loader.classList.remove('visible')
     // wait for 200ms (transition) before mounting the app
-    await new Promise(resolve => setTimeout(resolve, 200))
+    await new Promise((resolve) => setTimeout(resolve, 200))
   }
 
   app.mount('#app')
-  Log.log(LogTag.SYSTEM, "App mounted to #app")
+  Log.log(LogTag.SYSTEM, 'App mounted to #app')
   loader?.remove()
 }
 

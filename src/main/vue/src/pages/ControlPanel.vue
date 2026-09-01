@@ -1,16 +1,6 @@
 <template>
-  <div
-    :class="[
-      'page',
-      'page--bg--light',
-      'flex-row',
-    ]"
-  >
-    <SideBar
-      ref="sidebar"
-      style="z-index: 200;"
-      :on-flashcard-set-changed="onFlashcardSetChanged"
-    />
+  <div :class="['page', 'page--bg--light', 'flex-row']">
+    <SideBar ref="sidebar" style="z-index: 200" :on-flashcard-set-changed="onFlashcardSetChanged" />
     <div class="control-panel-layout">
       <ControlBar :title="flashcardSetName" shadow>
         <template #left>
@@ -34,8 +24,8 @@
         </template>
       </ControlBar>
       <div class="control-panel-content scrollbar-hidden">
-        <KineticRingSpinner v-if="resolvedLoading"/>
-        <WelcomeWidget v-else-if="!loadingStarted && !flashcardSet" class="control-welcome"/>
+        <KineticRingSpinner v-if="resolvedLoading" />
+        <WelcomeWidget v-else-if="!loadingStarted && !flashcardSet" class="control-welcome" />
         <WidgetBoard
           v-else-if="!loadingStarted"
           :show-info-bar="sidebarExpandedCookie && !isSidebarOverlay"
@@ -43,13 +33,13 @@
       </div>
     </div>
   </div>
-  <FlashcardSetSettingsModal/>
-  <FlashcardSetCreationModal/>
-  <FlashcardCreationModal/>
-  <CalendarModal/>
-  <QuizModal/>
-  <FlashcardSetUploadModal/>
-  <SpaceToast/>
+  <FlashcardSetSettingsModal />
+  <FlashcardSetCreationModal />
+  <FlashcardCreationModal />
+  <CalendarModal />
+  <QuizModal />
+  <FlashcardSetUploadModal />
+  <SpaceToast />
 </template>
 
 <script setup lang="ts">
@@ -86,13 +76,8 @@ const toggleStore = useToggleStore()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
 
-const {
-  loadingStarted,
-  resolvedLoading,
-  startLoading,
-  stopLoading,
-  resetLoading,
-} = useDeferredLoading()
+const { loadingStarted, resolvedLoading, startLoading, stopLoading, resetLoading } =
+  useDeferredLoading()
 
 const flashcardSetName = ref<string>()
 
@@ -131,18 +116,16 @@ watch(flashcardSet, (newVal) => {
 onMounted(async () => {
   try {
     startLoading()
-    await loadFlashcardSetStore()
-      .then((loaded) => {
-        if (loaded) {
-          return loadStoresForCurrFlashcardSet()
-        }
-      })
+    await loadFlashcardSetStore().then((loaded) => {
+      if (loaded) {
+        return loadStoresForCurrFlashcardSet()
+      }
+    })
   } finally {
     flashcardSetName.value = flashcardSet.value?.name ?? ''
     await stopLoading()
   }
 })
-
 </script>
 
 <style scoped>
@@ -169,6 +152,4 @@ onMounted(async () => {
 .control-welcome {
   margin: auto;
 }
-
 </style>
-

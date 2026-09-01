@@ -7,11 +7,9 @@
       'flex-center',
       'padding-auto',
       'scrollbar-hidden',
-  ]">
-    <div
-      class="auth-container"
-      :class="{ 'auth-container--error': formInvalid }"
-    >
+    ]"
+  >
+    <div class="auth-container" :class="{ 'auth-container--error': formInvalid }">
       <form class="auth-form" novalidate @submit.prevent="changePassword">
         <SmartInput
           id="password"
@@ -24,15 +22,15 @@
         />
         <ErrorText
           :errors="[
-        {
-          when: newPasswordMinLengthInvalid,
-          text: 'Your password must be stronger than a piece of space junk. Please use 6 or more characters'
-        },
-        {
-          when: newPasswordMaxLengthInvalid,
-          text: 'This secret is expanding faster than the universe! Please keep it under 64 characters'
-        }
-      ]"
+            {
+              when: newPasswordMinLengthInvalid,
+              text: 'Your password must be stronger than a piece of space junk. Please use 6 or more characters',
+            },
+            {
+              when: newPasswordMaxLengthInvalid,
+              text: 'This secret is expanding faster than the universe! Please keep it under 64 characters',
+            },
+          ]"
         />
         <SmartInput
           id="confirm-password"
@@ -58,7 +56,7 @@
       </form>
     </div>
   </div>
-  <SpaceToast/>
+  <SpaceToast />
 </template>
 
 <script setup lang="ts">
@@ -80,39 +78,39 @@ const toaster = useSpaceToaster()
 const newPassword = ref('')
 const confirmedPassword = ref('')
 
-const passwordConfirmed = helpers.withParams(
-  { type: 'confirmed' },
-  (value) => {
-    if (!value) return true
-    return value === newPassword.value
-  }
-)
-
-const $v = useVuelidate({
-  newPassword: {
-    required,
-    minLength: minLength(6),
-    maxLength: maxLength(64),
-  },
-  confirmPassword: { required, passwordConfirmed },
-}, {
-  newPassword: newPassword,
-  confirmPassword: confirmedPassword,
+const passwordConfirmed = helpers.withParams({ type: 'confirmed' }, (value) => {
+  if (!value) return true
+  return value === newPassword.value
 })
+
+const $v = useVuelidate(
+  {
+    newPassword: {
+      required,
+      minLength: minLength(6),
+      maxLength: maxLength(64),
+    },
+    confirmPassword: { required, passwordConfirmed },
+  },
+  {
+    newPassword: newPassword,
+    confirmPassword: confirmedPassword,
+  },
+)
 
 const formInvalid = computed(() => $v.value.$errors.length > 0)
 const newPasswordInvalid = computed(() => $v.value.newPassword.$errors.length > 0)
-const newPasswordMinLengthInvalid = computed(() =>
-  $v.value.newPassword.$errors.find(v => v.$validator === 'minLength') !== undefined
+const newPasswordMinLengthInvalid = computed(
+  () => $v.value.newPassword.$errors.find((v) => v.$validator === 'minLength') !== undefined,
 )
-const newPasswordMaxLengthInvalid = computed(() =>
-  $v.value.newPassword.$errors.find(v => v.$validator === 'maxLength') !== undefined
+const newPasswordMaxLengthInvalid = computed(
+  () => $v.value.newPassword.$errors.find((v) => v.$validator === 'maxLength') !== undefined,
 )
-const confirmPasswordInvalid = computed(() =>
-  $v.value.confirmPassword.$errors.length > 0
-)
-const confirmPasswordMismatch = computed(() =>
-  $v.value.confirmPassword.$errors.find(v => v.$validator === 'passwordConfirmed') !== undefined
+const confirmPasswordInvalid = computed(() => $v.value.confirmPassword.$errors.length > 0)
+const confirmPasswordMismatch = computed(
+  () =>
+    $v.value.confirmPassword.$errors.find((v) => v.$validator === 'passwordConfirmed') !==
+    undefined,
 )
 
 async function changePassword() {
@@ -131,5 +129,4 @@ async function changePassword() {
       toaster.bakeError(userApiErrors.PASSWORD_RESET__FAILED, error.response?.data)
     })
 }
-
 </script>

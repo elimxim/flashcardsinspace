@@ -22,7 +22,4 @@ watch(selectedSetIdCookie, (newVal) => {
   }
 })
 
-export {
-  sidebarExpandedCookie,
-  selectedSetIdCookie,
-}
+export { sidebarExpandedCookie, selectedSetIdCookie }

@@ -3,11 +3,7 @@
     <div class="welcome-text">
       {{ welcomeText() }}
     </div>
-    <SmartButton
-      :text="buttonText()"
-      class="welcome-button"
-      :on-click="toggleModal"
-    />
+    <SmartButton :text="buttonText()" class="welcome-button" :on-click="toggleModal" />
   </div>
 </template>
 
@@ -26,7 +22,7 @@ function welcomeText(): string {
   if (isNoFlashcardSets.value) {
     return 'Welcome to Control Panel! We wish you a happy journey!'
   } else {
-    return 'Welcome back! We hope you\'re having a blast!'
+    return "Welcome back! We hope you're having a blast!"
   }
 }
 

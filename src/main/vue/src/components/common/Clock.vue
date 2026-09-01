@@ -7,12 +7,12 @@
           <span class="clock-segment-value">{{ hours }}</span>
           <span class="clock-segment-label">HRS</span>
         </div>
-        <span v-if="moreThanOneHour || alwaysShowHours" class="clock-segment-partition"/>
+        <span v-if="moreThanOneHour || alwaysShowHours" class="clock-segment-partition" />
         <div class="clock-segment-group">
           <span class="clock-segment-value">{{ minutes }}</span>
           <span class="clock-segment-label">MIN</span>
         </div>
-        <span class="clock-segment-partition"/>
+        <span class="clock-segment-partition" />
         <div class="clock-segment-group">
           <span class="clock-segment-value">{{ seconds }}</span>
           <span class="clock-segment-label">SEC</span>
@@ -25,15 +25,18 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-const props = withDefaults(defineProps<{
-  time?: number
-  topLabel?: string
-  alwaysShowHours?: boolean
-}>(), {
-  time: 0,
-  topLabel: undefined,
-  alwaysShowHours: false,
-})
+const props = withDefaults(
+  defineProps<{
+    time?: number
+    topLabel?: string
+    alwaysShowHours?: boolean
+  }>(),
+  {
+    time: 0,
+    topLabel: undefined,
+    alwaysShowHours: false,
+  },
+)
 
 const moreThanOneHour = computed(() => props.time > 3600000)
 
@@ -51,7 +54,6 @@ const seconds = computed(() => {
   const s = Math.floor((props.time % 60000) / 1000)
   return s.toString().padStart(2, '0')
 })
-
 </script>
 
 <style scoped>
@@ -133,4 +135,3 @@ const seconds = computed(() => {
   color: var(--sw--label--color);
 }
 </style>
-

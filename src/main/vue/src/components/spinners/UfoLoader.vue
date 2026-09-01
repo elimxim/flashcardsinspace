@@ -1,10 +1,10 @@
 <template>
   <div class="ufo-loader" role="status" aria-label="Loading next flashcard">
     <svg class="ufo-svg" viewBox="0 0 220 132" aria-hidden="true">
-      <ellipse class="shadow" cx="110" cy="118" rx="64" ry="9" fill="#3f4368" opacity="0.12"/>
+      <ellipse class="shadow" cx="110" cy="118" rx="64" ry="9" fill="#3f4368" opacity="0.12" />
       <g class="craft">
-        <ellipse cx="110" cy="76" rx="95" ry="24" fill="#3f4368"/>
-        <path d="M 72 60 A 38 38 0 0 1 148 60 Z" fill="#8aa9e0"/>
+        <ellipse cx="110" cy="76" rx="95" ry="24" fill="#3f4368" />
+        <path d="M 72 60 A 38 38 0 0 1 148 60 Z" fill="#8aa9e0" />
         <g class="lights">
           <circle
             v-for="(light, index) in lights"
@@ -67,7 +67,8 @@ const lights = lightDefs.map((light, index) => ({
 }
 
 @keyframes ufo-bob {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(-3px);
   }
   50% {
@@ -76,7 +77,8 @@ const lights = lightDefs.map((light, index) => ({
 }
 
 @keyframes ufo-light-chase {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.3;
   }
   9% {
@@ -88,7 +90,8 @@ const lights = lightDefs.map((light, index) => ({
 }
 
 @keyframes ufo-light-soft {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.35;
   }
   50% {

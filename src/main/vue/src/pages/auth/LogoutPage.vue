@@ -1,12 +1,5 @@
 <template>
-  <div
-    :class="[
-      'page',
-      'page--bg--light',
-      'flex-column',
-      'padding-auto',
-      'scrollbar-hidden',
-  ]">
+  <div :class="['page', 'page--bg--light', 'flex-column', 'padding-auto', 'scrollbar-hidden']">
     <Progressbar
       class="logout-progressbar"
       :duration="redirectDelay"
@@ -18,9 +11,9 @@
     <section class="logout-card" aria-live="polite">
       <h1>Mission complete — you’re safely logged out</h1>
       <p>
-        Your session has re-entered the atmosphere and touched down at Mission Control.
-        Your progress is stowed securely in the cargo bay, ready for your next launch.
-        When you’re ready to explore again, head back to the login pad to lift off.
+        Your session has re-entered the atmosphere and touched down at Mission Control. Your
+        progress is stowed securely in the cargo bay, ready for your next launch. When you’re ready
+        to explore again, head back to the login pad to lift off.
       </p>
       <span class="logout-redirect">
         Preparing next launch window… redirecting to Login in {{ secondsLeft }}s
@@ -85,7 +78,7 @@ onMounted(() => {
       authStore.resetUser()
       resetAllPiniaStores()
     })
-    .catch(error => {
+    .catch((error) => {
       Log.error(LogTag.LOGIC, 'Failed to log out: ', error)
     })
     .finally(() => {
@@ -135,5 +128,4 @@ onBeforeUnmount(clearTimers)
   font-weight: 500;
   letter-spacing: 0.02em;
 }
-
 </style>

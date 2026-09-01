@@ -1,47 +1,38 @@
 <template>
   <div class="lightspeed-schedule select-text">
-    <h1 class="section-header" style="margin-bottom: 20px;">
-      <span class="section-title section-title--centered">
-        Lightspeed Schedule
-      </span>
+    <h1 class="section-header" style="margin-bottom: 20px">
+      <span class="section-title section-title--centered"> Lightspeed Schedule </span>
     </h1>
 
     <div class="section-description">
       <strong>What is spaced repetition?</strong>
       <p class="section-description">
-        Spaced repetition is a science-based method of learning new concepts or vocabulary
-        in a manageable amount of time. Instead of spending hours at a desk studying the
-        same words repeatedly, you can use spaced repetition to learn the same concepts
-        in a fraction of the time. It gives you a straightforward way to know what to study
-        and when to study it. All you have to do is create flashcards and follow the spaced
-        repetition schedule.
+        Spaced repetition is a science-based method of learning new concepts or vocabulary in a
+        manageable amount of time. Instead of spending hours at a desk studying the same words
+        repeatedly, you can use spaced repetition to learn the same concepts in a fraction of the
+        time. It gives you a straightforward way to know what to study and when to study it. All you
+        have to do is create flashcards and follow the spaced repetition schedule.
       </p>
-      <strong>How does Lightspeed Schedule work?</strong><br/>
+      <strong>How does Lightspeed Schedule work?</strong><br />
       <p class="section-description">
-        Our <em>Lightspeed Schedule</em> is a custom spaced repetition
-        algorithm that we created based on Leitner's System. It consists of 7 stages which
-        are designed to accelerate learning by optimizing the timing of reviews. The schedule
-        is designed to be followed daily, with reviews becoming less frequent as you progress
-        through the stages. When you remember a flashcard, you complete the stage and the
-        flashcard moves to the next one. But when you forget a card, it goes back to the
-        first stage and its journey starts over. When you complete the last stage, the flashcard
-        moves to the <strong>Outer Space</strong> stage, which means that you have mastered
-        the cards and they are now permanently stored in your long-term memory. You can still
-        review cards though if you want to reinforce your memory.
+        Our <em>Lightspeed Schedule</em> is a custom spaced repetition algorithm that we created
+        based on Leitner's System. It consists of 7 stages which are designed to accelerate learning
+        by optimizing the timing of reviews. The schedule is designed to be followed daily, with
+        reviews becoming less frequent as you progress through the stages. When you remember a
+        flashcard, you complete the stage and the flashcard moves to the next one. But when you
+        forget a card, it goes back to the first stage and its journey starts over. When you
+        complete the last stage, the flashcard moves to the <strong>Outer Space</strong> stage,
+        which means that you have mastered the cards and they are now permanently stored in your
+        long-term memory. You can still review cards though if you want to reinforce your memory.
       </p>
     </div>
 
     <div class="learning-timeline">
-      <Starfield
-        :density="120"
-        :star-size="1.8"
-        vertical-drift="20px"
-        twinkle
-      />
+      <Starfield :density="120" :star-size="1.8" vertical-drift="20px" twinkle />
       <div v-for="(stage, index) in stages" :key="index" class="timeline-stage">
         <div v-if="index < stages.length - 1" class="stage-connector"></div>
         <div class="stage-icon" :class="stage.iconClass">
-          <font-awesome-icon :icon="stage.icon"/>
+          <font-awesome-icon :icon="stage.icon" />
         </div>
         <div class="stage-content">
           <h3 class="stage-title">{{ stage.title }}</h3>
@@ -56,34 +47,31 @@
     <div class="section-description">
       <p class="section-description">
         Additionally, our schedule has two special stages: <em>Unknown</em> and <em>Attempted</em>.
-        We added them to give you more control over your learning process. You can review them
-        at any time. You can even create a custom review session for them.
+        We added them to give you more control over your learning process. You can review them at
+        any time. You can even create a custom review session for them.
       </p>
-      <strong>What are Unknown and Attempted stages?</strong><br/>
+      <strong>What are Unknown and Attempted stages?</strong><br />
       <p class="section-description">
         The <em>Unknown</em> stage contains flashcards that you have just created. You can review
         them an unlimited number of times before they move to the first stage on the next day.
       </p>
       <p class="section-description">
-        The <em>Attempted</em> stage contains flashcards that you have already seen
-        but forgot. Before going back to the first stage, they move to the <em>Attempted</em>
-        stage. But just for a day. Like the <em>Unknown</em> stage, you can review them
-        an unlimited number of times.
+        The <em>Attempted</em> stage contains flashcards that you have already seen but forgot.
+        Before going back to the first stage, they move to the <em>Attempted</em> stage. But just
+        for a day. Like the <em>Unknown</em> stage, you can review them an unlimited number of
+        times.
       </p>
     </div>
 
     <div class="feature-card">
       <div class="feature-icon">
-        <font-awesome-icon icon="fa-solid fa-graduation-cap"/>
+        <font-awesome-icon icon="fa-solid fa-graduation-cap" />
       </div>
-      <h3 class="feature-title">
-        The Science Behind the Mission
-      </h3>
+      <h3 class="feature-title">The Science Behind the Mission</h3>
       <p class="feature-description">
-        Spaced repetition leverages the psychological spacing effect -
-        the phenomenon where information is better retained when
-        learning sessions are spaced out over time rather than massed together.
-        Modern meta-analyses confirm what Ebbinghaus discovered: distributed
+        Spaced repetition leverages the psychological spacing effect - the phenomenon where
+        information is better retained when learning sessions are spaced out over time rather than
+        massed together. Modern meta-analyses confirm what Ebbinghaus discovered: distributed
         practice is significantly more effective than cramming.
       </p>
       <div class="feature-stats">
@@ -109,42 +97,46 @@ import Starfield from '@/components/common/Starfield.vue'
 
 const stages = [
   {
-    title: "Launch Preparation",
-    description: "Create your flashcards and prepare for liftoff. Add text, and audio to both sides.",
-    icon: "fa-solid fa-rocket",
-    iconClass: "stage-icon--launch",
-    timing: "Stage S1 • Daily"
+    title: 'Launch Preparation',
+    description:
+      'Create your flashcards and prepare for liftoff. Add text, and audio to both sides.',
+    icon: 'fa-solid fa-rocket',
+    iconClass: 'stage-icon--launch',
+    timing: 'Stage S1 • Daily',
   },
   {
-    title: "Initial Orbit",
-    description: "Begin your learning journey. Review new cards frequently as your brain establishes neural pathways.",
-    icon: "fa-solid fa-satellite",
-    iconClass: "stage-icon--orbit",
-    timing: "Stage S2-S3 • Every 2-4 days"
+    title: 'Initial Orbit',
+    description:
+      'Begin your learning journey. Review new cards frequently as your brain establishes neural pathways.',
+    icon: 'fa-solid fa-satellite',
+    iconClass: 'stage-icon--orbit',
+    timing: 'Stage S2-S3 • Every 2-4 days',
   },
   {
-    title: "Stable Trajectory",
-    description: "Knowledge stabilizes in medium-term memory. Review intervals increase as retention strengthens.",
-    icon: "fa-solid fa-globe",
-    iconClass: "stage-icon--stable",
-    timing: "Stage S4-S5 • Every 1-2 weeks"
+    title: 'Stable Trajectory',
+    description:
+      'Knowledge stabilizes in medium-term memory. Review intervals increase as retention strengthens.',
+    icon: 'fa-solid fa-globe',
+    iconClass: 'stage-icon--stable',
+    timing: 'Stage S4-S5 • Every 1-2 weeks',
   },
   {
-    title: "Deep Space Mission",
-    description: "Information reaches long-term memory. Reviews become less frequent but maintain knowledge orbit.",
-    icon: "fa-solid fa-space-shuttle",
-    iconClass: "stage-icon--deep",
-    timing: "Stage S6-S7 • Every 1-2 months"
+    title: 'Deep Space Mission',
+    description:
+      'Information reaches long-term memory. Reviews become less frequent but maintain knowledge orbit.',
+    icon: 'fa-solid fa-space-shuttle',
+    iconClass: 'stage-icon--deep',
+    timing: 'Stage S6-S7 • Every 1-2 months',
   },
   {
-    title: "Outer Space Mastery",
-    description: "After competing Stage S7, information is permanently stored in long-term memory. No further reviews needed.",
-    icon: "fa-solid fa-star",
-    iconClass: "stage-icon--mastery",
-    timing: "Outer Space • Mastered"
-  }
+    title: 'Outer Space Mastery',
+    description:
+      'After competing Stage S7, information is permanently stored in long-term memory. No further reviews needed.',
+    icon: 'fa-solid fa-star',
+    iconClass: 'stage-icon--mastery',
+    timing: 'Outer Space • Mastered',
+  },
 ]
-
 </script>
 
 <style scoped>
@@ -221,7 +213,8 @@ const stages = [
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
   }
   50% {
@@ -263,5 +256,4 @@ const stages = [
   color: #00d4ff;
   font-weight: 500;
 }
-
 </style>

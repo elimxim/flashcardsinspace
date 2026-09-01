@@ -1,18 +1,7 @@
 <template>
-  <div
-    :class="[
-      'page',
-      'flex-column',
-      'padding-auto',
-      'scroll-none',
-      'touch-none',
-    ]"
-  >
+  <div :class="['page', 'flex-column', 'padding-auto', 'scroll-none', 'touch-none']">
     <div v-if="cannotProceedPasswordReset" class="dead-end-section">
-      <p class="instructions">
-        Your session has expired.
-        Please try again.
-      </p>
+      <p class="instructions">Your session has expired. Please try again.</p>
       <div class="start-over-button-wrapper">
         <AwesomeButton
           icon="fa-solid fa-door-closed"
@@ -35,44 +24,38 @@
         Your email has been verified.
       </p>
       <p v-else-if="verificationResult === VerificationResult.FOUND" class="instructions">
-        Enter the verification code sent to your email.
-        Haven't received it? Press <strong>↻</strong> to resend.
+        Enter the verification code sent to your email. Haven't received it? Press
+        <strong>↻</strong> to resend.
       </p>
       <p v-else-if="verificationResult === VerificationResult.NOT_FOUND" class="instructions">
-        No valid verification code found.
-        Press <strong>↻</strong> to request a new one.
+        No valid verification code found. Press <strong>↻</strong> to request a new one.
       </p>
       <p v-else-if="verificationResult === VerificationResult.SESSION_EXPIRED" class="instructions">
-        Your session has expired.
-        Press <strong>↻</strong> to request a new verification code.
+        Your session has expired. Press <strong>↻</strong> to request a new verification code.
       </p>
       <p v-else-if="verificationResult === VerificationResult.EXPIRED" class="instructions">
-        The verification code has expired.
-        Press <strong>↻</strong> to request a new one.
+        The verification code has expired. Press <strong>↻</strong> to request a new one.
       </p>
       <p v-else-if="verificationResult === VerificationResult.INVALID" class="instructions">
-        Invalid verification code.
-        Please try again.
+        Invalid verification code. Please try again.
       </p>
       <p v-else-if="verificationResult === VerificationResult.USED" class="instructions">
-        The verification code has been used.
-        Press <strong>↻</strong> to request a new one.
+        The verification code has been used. Press <strong>↻</strong> to request a new one.
       </p>
       <p v-else-if="verificationResult === VerificationResult.LOCKED" class="instructions">
-        You have reached the maximum number of attempts.
-        Press <strong>↻</strong> to request a new one.
+        You have reached the maximum number of attempts. Press <strong>↻</strong> to request a new
+        one.
       </p>
       <p v-else-if="verificationResult === VerificationResult.LIMITED" class="instructions">
-        You have reached the maximum number of verification codes per hour.
-        Please try again later.
+        You have reached the maximum number of verification codes per hour. Please try again later.
       </p>
       <p v-else-if="codeResent" class="instructions">
-        A new verification code has been sent to your email.
-        Please check your inbox and enter the code below.
+        A new verification code has been sent to your email. Please check your inbox and enter the
+        code below.
       </p>
       <p v-else class="instructions">
-        Enter the verification code sent to your email.
-        Haven't received it? Press <strong>↻</strong> to resend.
+        Enter the verification code sent to your email. Haven't received it? Press
+        <strong>↻</strong> to resend.
       </p>
 
       <div class="control-device">
@@ -85,7 +68,7 @@
       </div>
     </div>
   </div>
-  <SpaceToast/>
+  <SpaceToast />
 </template>
 
 <script setup lang="ts">
@@ -104,7 +87,7 @@ import {
   toVerificationCodeResult,
   VerificationResult,
   VerificationType,
-  whoAmI
+  whoAmI,
 } from '@/core-logic/user-logic.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
@@ -113,11 +96,14 @@ import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 
-const props = withDefaults(defineProps<{
-  type?: VerificationType
-}>(), {
-  type: undefined,
-})
+const props = withDefaults(
+  defineProps<{
+    type?: VerificationType
+  }>(),
+  {
+    type: undefined,
+  },
+)
 
 const router = useRouter()
 const toaster = useSpaceToaster()
@@ -129,12 +115,12 @@ const codeResent = ref(false)
 const verificationResult = ref<VerificationResult | undefined>()
 const ccd = ref<InstanceType<typeof CodeVerificationDevice>>()
 
-const isRegistrationRequest = computed(() =>
-  verificationType.value === VerificationType.REGISTRATION_REQUEST
+const isRegistrationRequest = computed(
+  () => verificationType.value === VerificationType.REGISTRATION_REQUEST,
 )
 
-const isPasswordResetRequest = computed(() =>
-  verificationType.value === VerificationType.PASSWORD_RESET_REQUEST
+const isPasswordResetRequest = computed(
+  () => verificationType.value === VerificationType.PASSWORD_RESET_REQUEST,
 )
 
 const cannotProceedPasswordReset = computed(() => {
@@ -175,7 +161,7 @@ async function resendCode(): Promise<void> {
         ccd.value?.triggerFailure()
       }
     })
-  console.log("after resend code")
+  console.log('after resend code')
 }
 
 async function processVerificationResponse(response: VerificationIntentResponse) {
@@ -255,7 +241,6 @@ onMounted(async () => {
       Log.error(LogTag.LOGIC, 'Failed to get verification code context', error)
     })
 })
-
 </script>
 
 <style scoped>
@@ -284,7 +269,11 @@ onMounted(async () => {
 .start-over-button {
   --awesome-button--icon--size: 80px;
   --awesome-button--bg: linear-gradient(135deg, rgb(113, 91, 145) 0%, rgb(83, 110, 125) 100%);
-  --awesome-button--bg--hover: linear-gradient(135deg, rgb(161, 130, 205) 0%, rgb(137, 180, 204) 100%);
+  --awesome-button--bg--hover: linear-gradient(
+    135deg,
+    rgb(161, 130, 205) 0%,
+    rgb(137, 180, 204) 100%
+  );
   --awesome-button--border: 1px solid var(--cp--border-color);
   --awesome-button--border-radius: 22px;
 }

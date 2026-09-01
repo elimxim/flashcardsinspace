@@ -11,10 +11,7 @@ import {
   createMediaPrefetcher,
   FlashcardMediaPrefetcher,
 } from '@/core-logic/flashcard-media-prefetch.ts'
-import {
-  sendFlashcardAudioGetRequest,
-  sendFlashcardPictureGetRequest,
-} from '@/api/api-client.ts'
+import { sendFlashcardAudioGetRequest, sendFlashcardPictureGetRequest } from '@/api/api-client.ts'
 
 vi.mock('@/api/api-client.ts', () => ({
   sendFlashcardAudioGetRequest: vi.fn(),
@@ -49,18 +46,22 @@ function flashcard(id: number): Flashcard {
 }
 
 function loadMediaMetadata(flashcardIds: number[]) {
-  useAudioStore().loadState(flashcardIds.map(id => ({
-    audioId: id * 10,
-    flashcardId: id,
-    flashcardSide: flashcardSides.FRONT,
-  })))
-  usePictureStore().loadState(flashcardIds.map(id => ({
-    pictureId: id * 100,
-    flashcardId: id,
-    flashcardSide: flashcardSides.BACK,
-    width: 10,
-    height: 10,
-  })))
+  useAudioStore().loadState(
+    flashcardIds.map((id) => ({
+      audioId: id * 10,
+      flashcardId: id,
+      flashcardSide: flashcardSides.FRONT,
+    })),
+  )
+  usePictureStore().loadState(
+    flashcardIds.map((id) => ({
+      pictureId: id * 100,
+      flashcardId: id,
+      flashcardSide: flashcardSides.BACK,
+      width: 10,
+      height: 10,
+    })),
+  )
 }
 
 describe('flashcard-media-prefetch', () => {
@@ -121,9 +122,11 @@ describe('flashcard-media-prefetch', () => {
   it('should serve the flashcard on screen from work the window already started', async () => {
     loadMediaMetadata([1, 2])
     let resolveAudio: (response: AxiosResponse<Blob>) => void = () => {}
-    audioGet.mockReturnValue(new Promise((resolve) => {
-      resolveAudio = resolve
-    }))
+    audioGet.mockReturnValue(
+      new Promise((resolve) => {
+        resolveAudio = resolve
+      }),
+    )
 
     // the window starts flashcard 1, then the user reaches it before it lands
     prefetcher.slide(undefined, [flashcard(1), flashcard(2)], [])
@@ -131,7 +134,7 @@ describe('flashcard-media-prefetch', () => {
     resolveAudio(blobResponse())
 
     expect((await foreground).frontAudio).toBeDefined()
-    expect(audioGet.mock.calls.filter(call => call[1] === 1).length).toBe(1)
+    expect(audioGet.mock.calls.filter((call) => call[1] === 1).length).toBe(1)
   })
 
   it('should fetch one flashcard at a time', async () => {
@@ -141,8 +144,9 @@ describe('flashcard-media-prefetch', () => {
     const track = async (flashcardId: number) => {
       inFlight.add(flashcardId)
       maxInFlight = Math.max(maxInFlight, inFlight.size)
-      return new Promise<AxiosResponse<Blob>>(resolve => setTimeout(resolve, 0, blobResponse()))
-        .finally(() => inFlight.delete(flashcardId))
+      return new Promise<AxiosResponse<Blob>>((resolve) =>
+        setTimeout(resolve, 0, blobResponse()),
+      ).finally(() => inFlight.delete(flashcardId))
     }
     audioGet.mockImplementation((_setId, flashcardId) => track(flashcardId))
     pictureGet.mockImplementation((_setId, flashcardId) => track(flashcardId))
@@ -202,7 +206,7 @@ describe('flashcard-media-prefetch', () => {
   it('should keep the queue moving after a failure', async () => {
     loadMediaMetadata([1, 2])
     audioGet.mockImplementation((_setId, flashcardId) =>
-      flashcardId === 1 ? Promise.reject(new Error('boom')) : Promise.resolve(blobResponse())
+      flashcardId === 1 ? Promise.reject(new Error('boom')) : Promise.resolve(blobResponse()),
     )
 
     prefetcher.slide(undefined, [flashcard(1), flashcard(2)], [])
@@ -232,7 +236,7 @@ describe('flashcard-media-prefetch', () => {
     // nothing runs ahead, but the flashcard on screen still gets its media
     expect(disabled.size()).toBe(0)
     expect((await disabled.media(1)).frontAudio).toBeDefined()
-    expect(audioGet.mock.calls.map(call => call[1])).toEqual([1])
+    expect(audioGet.mock.calls.map((call) => call[1])).toEqual([1])
 
     disabled.dispose()
   })
@@ -252,7 +256,7 @@ describe('flashcard-media-prefetch', () => {
     const settled = Symbol('settled')
     const race = await Promise.race([
       prefetcher.media(1).then(() => settled),
-      new Promise(resolve => setTimeout(resolve, 50, 'still waiting')),
+      new Promise((resolve) => setTimeout(resolve, 50, 'still waiting')),
     ])
     expect(race).toBe(settled)
   })

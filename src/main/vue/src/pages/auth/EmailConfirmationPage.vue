@@ -7,11 +7,9 @@
       'flex-center',
       'padding-auto',
       'scrollbar-hidden',
-  ]">
-    <div
-      class="auth-container"
-      :class="{ 'auth-container--error': formInvalid }"
-    >
+    ]"
+  >
+    <div class="auth-container" :class="{ 'auth-container--error': formInvalid }">
       <form class="auth-form" novalidate @submit.prevent="sendCode">
         <SmartInput
           id="username"
@@ -37,7 +35,7 @@
       </form>
     </div>
   </div>
-  <SpaceToast/>
+  <SpaceToast />
 </template>
 
 <script setup lang="ts">
@@ -49,9 +47,7 @@ import { computed, ref } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { email, required } from '@vuelidate/validators'
 import { Log, LogTag } from '@/utils/logger.ts'
-import {
-  sendVerificationRequestWithBody,
-} from '@/api/auth-client.ts'
+import { sendVerificationRequestWithBody } from '@/api/auth-client.ts'
 import { VerificationType } from '@/core-logic/user-logic.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
@@ -63,16 +59,19 @@ const toaster = useSpaceToaster()
 
 const userEmail = ref('')
 
-const $v = useVuelidate({
-  userEmail: { required, email },
-}, {
-  userEmail: userEmail,
-})
+const $v = useVuelidate(
+  {
+    userEmail: { required, email },
+  },
+  {
+    userEmail: userEmail,
+  },
+)
 
 const formInvalid = computed(() => $v.value.$errors.length > 0)
 const userEmailInvalid = computed(() => $v.value.userEmail.$errors.length > 0)
-const userEmailWrongFormat = computed(() =>
-  $v.value.userEmail.$errors.find(v => v.$validator === 'email') !== undefined
+const userEmailWrongFormat = computed(
+  () => $v.value.userEmail.$errors.find((v) => v.$validator === 'email') !== undefined,
 )
 
 async function sendCode() {
@@ -86,7 +85,7 @@ async function sendCode() {
     .then(async () => {
       await router.push({
         name: routeNames.codeVerification,
-        query: { type: VerificationType.PASSWORD_RESET_REQUEST }
+        query: { type: VerificationType.PASSWORD_RESET_REQUEST },
       })
     })
     .catch((error) => {
@@ -98,9 +97,6 @@ async function sendCode() {
       }
     })
 }
-
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

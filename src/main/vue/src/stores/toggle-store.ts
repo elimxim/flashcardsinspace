@@ -45,13 +45,15 @@ export const useToggleStore = defineStore('toggle', {
       this.fileUploadOpen = !this.fileUploadOpen
     },
     isAnyModalOpen(): boolean {
-      return this.flashcardSetSettingsOpen
-        || this.flashcardSetCreationOpen
-        || this.flashcardCreationOpen
-        || this.flashcardEditOpen
-        || this.calendarOpen
-        || this.quizOpen
-        || this.fileUploadOpen
+      return (
+        this.flashcardSetSettingsOpen ||
+        this.flashcardSetCreationOpen ||
+        this.flashcardCreationOpen ||
+        this.flashcardEditOpen ||
+        this.calendarOpen ||
+        this.quizOpen ||
+        this.fileUploadOpen
+      )
     },
-  }
+  },
 })

@@ -1,36 +1,35 @@
 <template>
-  <div
-    :class="[
-      'page',
-      'flex-column',
-      'padding-auto',
-      'scrollbar-hidden',
-      'website-guide-page',
-    ]"
-  >
+  <div :class="['page', 'flex-column', 'padding-auto', 'scrollbar-hidden', 'website-guide-page']">
     <div class="tutorial-section select-text">
       <h1 class="section-header">
-        <span class="section-title section-title--centered">
-          In-Depth Tutorial
-        </span>
+        <span class="section-title section-title--centered"> In-Depth Tutorial </span>
       </h1>
       <div class="section-description">
-        A complete, step-by-step guide to mastering Flashcards in Space.
-        Learn how to create the most of your Flashcards in Space experience.
+        A complete, step-by-step guide to mastering Flashcards in Space. Learn how to create the
+        most of your Flashcards in Space experience.
       </div>
       <div class="video-wrapper">
         <div class="video-container">
           <iframe
             src="https://www.youtube.com/embed/nvnR1z9cUTs"
             title="Flashcard In Space In-Depth Tutorial"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen>
+            allow="
+              accelerometer;
+              autoplay;
+              clipboard-write;
+              encrypted-media;
+              gyroscope;
+              picture-in-picture;
+              web-share;
+            "
+            allowfullscreen
+          >
           </iframe>
         </div>
       </div>
     </div>
     <div class="schedule-section">
-      <LightspeedScheduleSection/>
+      <LightspeedScheduleSection />
     </div>
   </div>
 </template>
@@ -45,23 +44,24 @@ onMounted(() => {
   schemaScript = document.createElement('script')
   schemaScript.type = 'application/ld+json'
   schemaScript.text = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "VideoObject",
-    "name": "Flashcard In Space In-Depth Tutorial",
-    "description": "A complete, step-by-step guide to mastering Flashcards in Space. Learn how to create the most of your Flashcards in Space experience.",
-    "thumbnailUrl": "https://img.youtube.com/vi/nvnR1z9cUTs/maxresdefault.jpg",
-    "uploadDate": "2026-02-23",
-    "duration": "PT24M8S",
-    "contentUrl": "https://www.youtube.com/watch?v=nvnR1z9cUTs",
-    "embedUrl": "https://www.youtube.com/embed/nvnR1z9cUTs",
-    "publisher": {
-      "@type": "Organization",
-      "name": "Flashcards in Space",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://flashcardsinspace.com/logo.png"
-      }
-    }
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: 'Flashcard In Space In-Depth Tutorial',
+    description:
+      'A complete, step-by-step guide to mastering Flashcards in Space. Learn how to create the most of your Flashcards in Space experience.',
+    thumbnailUrl: 'https://img.youtube.com/vi/nvnR1z9cUTs/maxresdefault.jpg',
+    uploadDate: '2026-02-23',
+    duration: 'PT24M8S',
+    contentUrl: 'https://www.youtube.com/watch?v=nvnR1z9cUTs',
+    embedUrl: 'https://www.youtube.com/embed/nvnR1z9cUTs',
+    publisher: {
+      '@type': 'Organization',
+      name: 'Flashcards in Space',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://flashcardsinspace.com/logo.png',
+      },
+    },
   })
   document.head.appendChild(schemaScript)
 })
@@ -116,5 +116,4 @@ onUnmounted(() => {
   flex: 1;
   width: 100%;
 }
-
 </style>

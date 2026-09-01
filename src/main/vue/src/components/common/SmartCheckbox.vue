@@ -2,15 +2,10 @@
   <label
     class="smart-checkbox smart-checkbox--theme"
     :class="{
-      'smart-checkbox--reversed': reverse
+      'smart-checkbox--reversed': reverse,
     }"
   >
-    <input
-      v-model="model"
-      type="checkbox"
-      class="checkbox-input"
-      v-bind="$attrs"
-    />
+    <input v-model="model" type="checkbox" class="checkbox-input" v-bind="$attrs" />
     <span class="checkbox-icon-container">
       <font-awesome-icon
         icon="fa-solid fa-square-check"
@@ -36,15 +31,18 @@ import { computed } from 'vue'
 
 const model = defineModel<boolean>({ default: false })
 
-const props = withDefaults(defineProps<{
-  label?: string
-  checkedLabel?: string
-  reverse?: boolean
-}>(), {
-  label: '',
-  checkedLabel: '',
-  reverse: false,
-})
+const props = withDefaults(
+  defineProps<{
+    label?: string
+    checkedLabel?: string
+    reverse?: boolean
+  }>(),
+  {
+    label: '',
+    checkedLabel: '',
+    reverse: false,
+  },
+)
 
 const currentLabel = computed(() => {
   if (model.value && props.checkedLabel) {
@@ -99,7 +97,9 @@ const currentLabel = computed(() => {
 
 .checkbox-icon {
   font-size: var(--chkbx--size);
-  transition: opacity 0.2s ease, color 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    color 0.2s ease;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -145,5 +145,4 @@ const currentLabel = computed(() => {
   vertical-align: middle;
   text-wrap: nowrap;
 }
-
 </style>

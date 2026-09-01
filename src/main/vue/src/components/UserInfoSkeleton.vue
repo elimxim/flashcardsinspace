@@ -1,16 +1,15 @@
 <template>
   <div class="user-info-skeleton">
-    <div class="skeleton user-info-row-skeleton"/>
-    <div class="skeleton user-info-row-skeleton"/>
-    <div class="skeleton user-info-row-skeleton"/>
-    <div class="skeleton user-info-row-skeleton--thin"/>
-    <div class="skeleton user-info-row-skeleton--thin user-info-row-skeleton--short"/>
+    <div class="skeleton user-info-row-skeleton" />
+    <div class="skeleton user-info-row-skeleton" />
+    <div class="skeleton user-info-row-skeleton" />
+    <div class="skeleton user-info-row-skeleton--thin" />
+    <div class="skeleton user-info-row-skeleton--thin user-info-row-skeleton--short" />
   </div>
-  <div class="skeleton user-controls-skeleton"/>
+  <div class="skeleton user-controls-skeleton" />
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <style scoped>
 .user-info-skeleton {
@@ -42,5 +41,4 @@
   height: 40px;
   max-width: 600px;
 }
-
 </style>

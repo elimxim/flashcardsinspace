@@ -41,7 +41,7 @@
         <TotemScroll v-if="frontHasPicture">
           <div class="space-card-content space-card-content--picture">
             <div class="space-card-picture">
-              <SpacePicture :picture-blob="frontSidePicture"/>
+              <SpacePicture :picture-blob="frontSidePicture" />
             </div>
             <p v-if="frontSide" class="space-card-text">{{ frontSide }}</p>
           </div>
@@ -54,7 +54,7 @@
         <div class="space-card-strip select-none">
           <span v-if="!textOnly">
             <Tooltip text="Viewed Times" position="top-right">
-              <font-awesome-icon icon="fa-regular fa-eye"/>
+              <font-awesome-icon icon="fa-regular fa-eye" />
             </Tooltip>
             {{ viewedTimes }}
           </span>
@@ -122,7 +122,7 @@
         <TotemScroll v-if="backHasPicture">
           <div class="space-card-content space-card-content--picture">
             <div class="space-card-picture">
-              <SpacePicture :picture-blob="backSidePicture"/>
+              <SpacePicture :picture-blob="backSidePicture" />
             </div>
             <p v-if="backSide" class="space-card-text">{{ backSide }}</p>
           </div>
@@ -135,7 +135,7 @@
         <div class="space-card-strip select-none">
           <span v-if="!textOnly">
             <Tooltip text="Viewed Times" position="top-right">
-              <font-awesome-icon icon="fa-regular fa-eye"/>
+              <font-awesome-icon icon="fa-regular fa-eye" />
             </Tooltip>
             {{ viewedTimes }}
           </span>
@@ -183,34 +183,36 @@ import { UXConfig } from '@/utils/device-utils.ts'
 const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })
 const autoRepeatVoice = defineModel<boolean>('autoRepeatVoice', { default: false })
 
-const props = withDefaults(defineProps<{
-  stage?: string
-  frontSide?: string | undefined
-  frontSideAudio?: Blob | undefined
-  frontSidePicture?: Blob | undefined
-  backSide?: string | undefined
-  backSideAudio?: Blob | undefined
-  backSidePicture?: Blob | undefined
-  viewedTimes?: number
-  textOnly?: boolean
-  unflippable?: boolean
-  transparent?: boolean
-  onEdit?: () => void
-}>(), {
-  stage: undefined,
-  frontSide: undefined,
-  frontSideAudio: undefined,
-  frontSidePicture: undefined,
-  backSide: undefined,
-  backSideAudio: undefined,
-  backSidePicture: undefined,
-  viewedTimes: undefined,
-  textOnly: false,
-  unflippable: false,
-  transparent: false,
-  onEdit: () => {
+const props = withDefaults(
+  defineProps<{
+    stage?: string
+    frontSide?: string | undefined
+    frontSideAudio?: Blob | undefined
+    frontSidePicture?: Blob | undefined
+    backSide?: string | undefined
+    backSideAudio?: Blob | undefined
+    backSidePicture?: Blob | undefined
+    viewedTimes?: number
+    textOnly?: boolean
+    unflippable?: boolean
+    transparent?: boolean
+    onEdit?: () => void
+  }>(),
+  {
+    stage: undefined,
+    frontSide: undefined,
+    frontSideAudio: undefined,
+    frontSidePicture: undefined,
+    backSide: undefined,
+    backSideAudio: undefined,
+    backSidePicture: undefined,
+    viewedTimes: undefined,
+    textOnly: false,
+    unflippable: false,
+    transparent: false,
+    onEdit: () => {},
   },
-})
+)
 
 const FLIP_ANIMATION_DURATION_MS = 500
 
@@ -327,7 +329,6 @@ defineExpose({
   flipToFrontAndWait,
   onCardAnimationComplete,
 })
-
 </script>
 
 <style scoped>
@@ -509,5 +510,4 @@ defineExpose({
   --awesome-button--icon--color--hover: var(--card--color--strip--hover);
   --awesome-button--icon--color--active: var(--card--color--strip--hover);
 }
-
 </style>

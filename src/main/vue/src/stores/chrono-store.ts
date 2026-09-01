@@ -18,7 +18,7 @@ export const useChronoStore = defineStore('chrono', {
       currDay: defaultCurrDay(),
       dayStreak: {
         streak: 0,
-        lastDate: asIsoDateStr(new Date())
+        lastDate: asIsoDateStr(new Date()),
       },
       loaded: false,
     }
@@ -33,7 +33,10 @@ export const useChronoStore = defineStore('chrono', {
   },
   actions: {
     loadState(chronodays: Chronoday[], currDay: Chronoday, dayStreak: DayStreak) {
-      Log.log(LogTag.STORE, `chrono.loadState: currDay.chronodate=${currDay.chronodate} + ${chronodays.length} chronodays, dayStreak=${dayStreak} `)
+      Log.log(
+        LogTag.STORE,
+        `chrono.loadState: currDay.chronodate=${currDay.chronodate} + ${chronodays.length} chronodays, dayStreak=${dayStreak} `,
+      )
       this.$reset()
       this.chronodays = chronodays
       this.currDay = currDay
@@ -46,7 +49,10 @@ export const useChronoStore = defineStore('chrono', {
     canGoPrev(): boolean {
       this.checkStateLoaded()
       if (this.currDay.seqNumber === undefined || this.currDay.seqNumber === 0) {
-        Log.log(LogTag.STORE, `chrono.canGoPrev: no prev day, currDay.status=${this.currDay.status}`)
+        Log.log(
+          LogTag.STORE,
+          `chrono.canGoPrev: no prev day, currDay.status=${this.currDay.status}`,
+        )
         return false
       }
 
@@ -63,12 +69,12 @@ export const useChronoStore = defineStore('chrono', {
       return true
     },
     updateDays(updatedDays: Chronoday[]) {
-      updatedDays.forEach(newDay => {
+      updatedDays.forEach((newDay) => {
         if (this.currDay.id === newDay.id) {
           this.currDay = newDay
         }
 
-        const idx = this.chronodays.findIndex(v => v.id === newDay.id)
+        const idx = this.chronodays.findIndex((v) => v.id === newDay.id)
         if (idx !== -1) {
           this.chronodays[idx] = newDay
         } else {
@@ -79,7 +85,7 @@ export const useChronoStore = defineStore('chrono', {
     updateDayStreak(dayStreak: DayStreak) {
       this.dayStreak = dayStreak
     },
-  }
+  },
 })
 
 const defaultCurrDay = (): Chronoday => {

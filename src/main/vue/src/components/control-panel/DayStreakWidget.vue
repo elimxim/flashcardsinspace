@@ -4,9 +4,7 @@
       <div class="day-steak-number">
         {{ dayStreak.streak }}
       </div>
-      <div class="cp-text cp-text--active">
-        Day Streak
-      </div>
+      <div class="cp-text cp-text--active">Day Streak</div>
     </div>
   </div>
 </template>
@@ -18,7 +16,6 @@ import { storeToRefs } from 'pinia'
 const chronoStore = useChronoStore()
 
 const { dayStreak } = storeToRefs(chronoStore)
-
 </script>
 
 <style scoped>
@@ -50,5 +47,4 @@ const { dayStreak } = storeToRefs(chronoStore)
   text-align: center;
   line-height: 1;
 }
-
 </style>

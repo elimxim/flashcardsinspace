@@ -10,13 +10,9 @@
     >
       <template #below>
         <div class="calendar-button-slot">
-          <div class="cp-text">
-            Day
-          </div>
+          <div class="cp-text">Day</div>
           <div class="cp-count-box">
-            <template v-if="isOnVacation">
-              🌴
-            </template>
+            <template v-if="isOnVacation"> 🌴 </template>
             <template v-else>
               {{ currDayNumber }}
             </template>
@@ -38,9 +34,7 @@
         @click="showAlarmPopup = false"
       >
         <div class="calendar-popup-layout">
-          <div class="cp-text cp-text--sub cp-text--nowrap">
-            Don't forget to do your review
-          </div>
+          <div class="cp-text cp-text--sub cp-text--nowrap">Don't forget to do your review</div>
           <div class="cp-text cp-text--sub">
             You just have {{ timeBeforeMidnight }} before midnight
           </div>
@@ -81,7 +75,7 @@ const toggleAlarmPopup = () => {
 
 const isOnVacation = computed(() => isSuspended.value || isDayOff.value)
 const currDayNumber = computed(() =>
-  isOnVacation.value ? '🌴' : currDay.value?.seqNumber ?? '?'
+  isOnVacation.value ? '🌴' : (currDay.value?.seqNumber ?? '?'),
 )
 
 const isUserCloseToLoseDayStreak = computed(() => {
@@ -134,7 +128,6 @@ onUnmounted(() => {
     clearInterval(alarmInterval)
   }
 })
-
 </script>
 
 <style scoped>
@@ -206,5 +199,4 @@ onUnmounted(() => {
 .slide-fade-leave-to {
   opacity: 0;
 }
-
 </style>

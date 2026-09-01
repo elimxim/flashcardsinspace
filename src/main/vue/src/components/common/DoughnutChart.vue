@@ -27,9 +27,7 @@
         <div class="doughnut-total">
           {{ total }}
         </div>
-        <div class="doughnut-total-label">
-          Total
-        </div>
+        <div class="doughnut-total-label">Total</div>
       </div>
     </div>
     <div class="doughnut-legend">
@@ -41,9 +39,7 @@
       </div>
       <div class="doughnut-legend-item">
         <span class="doughnut-legend-color left"></span>
-        <span class="legend-text">
-          {{ legendLeft }}: {{ leftCount }} ({{ leftPercentage }}%)
-        </span>
+        <span class="legend-text"> {{ legendLeft }}: {{ leftCount }} ({{ leftPercentage }}%) </span>
       </div>
     </div>
   </div>
@@ -57,17 +53,20 @@ import { computed } from 'vue'
 const RADIUS = 42
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
-const props = withDefaults(defineProps<{
-  total: number
-  left: number
-  showLegend?: boolean
-  legendLeft?: string
-  legendRight?: string
-}>(), {
-  showLegend: true,
-  legendLeft: 'Left',
-  legendRight: 'Right',
-})
+const props = withDefaults(
+  defineProps<{
+    total: number
+    left: number
+    showLegend?: boolean
+    legendLeft?: string
+    legendRight?: string
+  }>(),
+  {
+    showLegend: true,
+    legendLeft: 'Left',
+    legendRight: 'Right',
+  },
+)
 
 const rightCount = computed(() => props.total - props.left)
 const leftCount = computed(() => props.left)
@@ -104,7 +103,6 @@ const leftDashArray = computed(() => {
   const gap = CIRCUMFERENCE - arcLength
   return `${arcLength} ${gap}`
 })
-
 </script>
 
 <style scoped>

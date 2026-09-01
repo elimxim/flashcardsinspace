@@ -30,21 +30,24 @@ let nextImageSize = { width: 800, height: 600 }
 
 function stubImage(succeed = true) {
   vi.stubGlobal('URL', { createObjectURL: vi.fn(() => 'blob:mock'), revokeObjectURL: vi.fn() })
-  vi.stubGlobal('Image', class {
-    onload: (() => void) | null = null
-    onerror: (() => void) | null = null
-    naturalWidth = 0
-    naturalHeight = 0
-    set src(_value: string) {
-      if (succeed) {
-        this.naturalWidth = nextImageSize.width
-        this.naturalHeight = nextImageSize.height
-        setTimeout(() => this.onload?.(), 0)
-      } else {
-        setTimeout(() => this.onerror?.(), 0)
+  vi.stubGlobal(
+    'Image',
+    class {
+      onload: (() => void) | null = null
+      onerror: (() => void) | null = null
+      naturalWidth = 0
+      naturalHeight = 0
+      set src(_value: string) {
+        if (succeed) {
+          this.naturalWidth = nextImageSize.width
+          this.naturalHeight = nextImageSize.height
+          setTimeout(() => this.onload?.(), 0)
+        } else {
+          setTimeout(() => this.onerror?.(), 0)
+        }
       }
-    }
-  })
+    },
+  )
 }
 
 beforeEach(() => {
@@ -91,7 +94,8 @@ describe('decodeAndResize', () => {
   it('throws when the input cannot be decoded', async () => {
     stubImage(false)
 
-    await expect(decodeAndResize(makeImageFile('data.bin', 'application/octet-stream')))
-      .rejects.toThrow()
+    await expect(
+      decodeAndResize(makeImageFile('data.bin', 'application/octet-stream')),
+    ).rejects.toThrow()
   })
 })

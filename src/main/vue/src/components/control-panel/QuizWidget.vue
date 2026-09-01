@@ -9,9 +9,7 @@
       square
     >
       <template #below>
-        <div class="cp-text quiz-text">
-          Start Quiz
-        </div>
+        <div class="cp-text quiz-text">Start Quiz</div>
       </template>
     </AwesomeButton>
   </div>

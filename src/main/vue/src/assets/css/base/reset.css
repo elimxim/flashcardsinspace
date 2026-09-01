@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   overscroll-behavior: none;
@@ -38,6 +39,6 @@ textarea {
 }
 
 /* Hide the default password reveal eye icon in Microsoft Edge */
-input[type="password"]::-ms-reveal {
+input[type='password']::-ms-reveal {
   display: none;
 }

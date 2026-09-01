@@ -9,21 +9,17 @@
         @touchmove="onTouchMove"
         @touchend="onTouchEnd"
       >
-        <div
-          v-for="(frame, index) in frames"
-          :key="index"
-          class="tape-frame"
-        >
-          <slot :frame="frame" :index="index"/>
+        <div v-for="(frame, index) in frames" :key="index" class="tape-frame">
+          <slot :frame="frame" :index="index" />
         </div>
       </div>
       <div
         v-if="showProgress"
         class="tape-progress"
         :class="{
-        'tape-progress--light': progressTheme === 'light',
-        'tape-progress--dark': progressTheme === 'dark',
-      }"
+          'tape-progress--light': progressTheme === 'light',
+          'tape-progress--dark': progressTheme === 'dark',
+        }"
       >
         <p>{{ tapeProgress }}</p>
       </div>
@@ -31,24 +27,24 @@
         v-if="showNavigation"
         class="tape-navigation tape-navigation--left"
         :class="{
-        'tape-navigation--light': navigationTheme === 'light',
-        'tape-navigation--dark': navigationTheme === 'dark',
-      }"
+          'tape-navigation--light': navigationTheme === 'light',
+          'tape-navigation--dark': navigationTheme === 'dark',
+        }"
       >
         <div class="navigation-button" @click.stop="triggerSwipe('right')">
-          <font-awesome-icon icon="fa-solid fa-chevron-left" class="navigation-icon"/>
+          <font-awesome-icon icon="fa-solid fa-chevron-left" class="navigation-icon" />
         </div>
       </div>
       <div
         v-if="showNavigation"
         class="tape-navigation tape-navigation--right"
         :class="{
-        'tape-navigation--light': navigationTheme === 'light',
-        'tape-navigation--dark': navigationTheme === 'dark',
-      }"
+          'tape-navigation--light': navigationTheme === 'light',
+          'tape-navigation--dark': navigationTheme === 'dark',
+        }"
       >
         <div class="navigation-button" @click.stop="triggerSwipe('left')">
-          <font-awesome-icon icon="fa-solid fa-chevron-right" class="navigation-icon"/>
+          <font-awesome-icon icon="fa-solid fa-chevron-right" class="navigation-icon" />
         </div>
       </div>
     </div>
@@ -58,38 +54,39 @@
 <script setup lang="ts" generic="T">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-const props = withDefaults(defineProps<{
-  frames: T[]
-  snapDuration?: number
-  threshold?: number
-  velocityThreshold?: number
-  frameGap?: number
-  onSwipeLeft?: () => void
-  onSwipeRight?: () => void
-  dynamicTape?: boolean
-  showMiddleFrame?: boolean
-  showProgress?: boolean
-  progressTheme?: 'light' | 'dark'
-  showNavigation?: boolean
-  navigationTheme?: 'light' | 'dark'
-  loopedTape?: boolean
-}>(), {
-  snapDuration: 200,
-  threshold: 100,
-  velocityThreshold: 0.3,
-  frameGap: 10,
-  onSwipeLeft: () => {
+const props = withDefaults(
+  defineProps<{
+    frames: T[]
+    snapDuration?: number
+    threshold?: number
+    velocityThreshold?: number
+    frameGap?: number
+    onSwipeLeft?: () => void
+    onSwipeRight?: () => void
+    dynamicTape?: boolean
+    showMiddleFrame?: boolean
+    showProgress?: boolean
+    progressTheme?: 'light' | 'dark'
+    showNavigation?: boolean
+    navigationTheme?: 'light' | 'dark'
+    loopedTape?: boolean
+  }>(),
+  {
+    snapDuration: 200,
+    threshold: 100,
+    velocityThreshold: 0.3,
+    frameGap: 10,
+    onSwipeLeft: () => {},
+    onSwipeRight: () => {},
+    dynamicTape: false,
+    showMiddleFrame: false,
+    showProgress: false,
+    progressTheme: 'light',
+    showNavigation: false,
+    navigationTheme: 'light',
+    loopedTape: false,
   },
-  onSwipeRight: () => {
-  },
-  dynamicTape: false,
-  showMiddleFrame: false,
-  showProgress: false,
-  progressTheme: 'light',
-  showNavigation: false,
-  navigationTheme: 'light',
-  loopedTape: false,
-})
+)
 
 const swipeTape = ref<HTMLElement>()
 const trackRef = ref<HTMLElement>()
@@ -125,7 +122,9 @@ const tapeStyle = computed(() => {
 
   return {
     transform: `translateX(${totalOffset}px)`,
-    transition: isSwipeActive.value ? 'none' : `transform ${props.snapDuration}ms cubic-bezier(0.33, 0, 0.2, 1)`,
+    transition: isSwipeActive.value
+      ? 'none'
+      : `transform ${props.snapDuration}ms cubic-bezier(0.33, 0, 0.2, 1)`,
   }
 })
 
@@ -265,9 +264,7 @@ function triggerSwipe(direction: 'left' | 'right') {
   if (isAnimatingOut.value) return
 
   const width = frameWidth.value
-  const exitOffset = direction === 'left'
-    ? -width - props.frameGap
-    : width + props.frameGap
+  const exitOffset = direction === 'left' ? -width - props.frameGap : width + props.frameGap
 
   isAnimatingOut.value = true
 
@@ -303,7 +300,7 @@ function goToFirstFrame() {
 
 defineExpose({
   triggerSwipe,
-  goToFirstFrame
+  goToFirstFrame,
 })
 
 onMounted(() => {
@@ -435,6 +432,4 @@ onUnmounted(() => {
 .tape-navigation--dark:hover .navigation-button {
   background: rgba(255, 255, 255, 0.1);
 }
-
 </style>
-

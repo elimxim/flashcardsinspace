@@ -8,11 +8,5 @@ import {
 } from '@fortawesome/free-regular-svg-icons'
 
 export function applyFaRegularIcons() {
-  library.add(
-    faCircle,
-    faCircleQuestion,
-    faClone,
-    faEye,
-    faSquare,
-  )
+  library.add(faCircle, faCircleQuestion, faClone, faEye, faSquare)
 }

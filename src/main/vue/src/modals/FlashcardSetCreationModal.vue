@@ -20,11 +20,11 @@
           :errors="[
             {
               when: nameMaxLengthInvalid,
-              text: 'Too long. Maximum 64 characters'
+              text: 'Too long. Maximum 64 characters',
             },
             {
               when: nameRegexMismatch,
-              text: 'Please use only letters, numbers, dashes, underscores, and spaces'
+              text: 'Please use only letters, numbers, dashes, underscores, and spaces',
             },
           ]"
         />
@@ -82,10 +82,7 @@ import { useLanguageStore } from '@/stores/language-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { createFlashcardSet } from '@/core-logic/flashcard-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
-import {
-  sendChronoSyncRequest,
-  sendFlashcardSetCreationRequest
-} from '@/api/api-client.ts'
+import { sendChronoSyncRequest, sendFlashcardSetCreationRequest } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
@@ -121,18 +118,14 @@ const $v = useVuelidate(validationRules, {
 })
 
 const formInvalid = computed(() => $v.value.$errors.length > 0)
-const nameInvalid = computed(() =>
-  $v.value.name.$errors.length > 0
+const nameInvalid = computed(() => $v.value.name.$errors.length > 0)
+const nameMaxLengthInvalid = computed(
+  () => $v.value.name.$errors.find((v) => v.$validator === 'maxLength') !== undefined,
 )
-const nameMaxLengthInvalid = computed(() =>
-  $v.value.name.$errors.find(v => v.$validator === 'maxLength') !== undefined
+const nameRegexMismatch = computed(
+  () => $v.value.name.$errors.find((v) => v.$validator === 'regex') !== undefined,
 )
-const nameRegexMismatch = computed(() =>
-  $v.value.name.$errors.find(v => v.$validator === 'regex') !== undefined
-)
-const languageInvalid = computed(() =>
-  $v.value.language.$errors.length > 0
-)
+const languageInvalid = computed(() => $v.value.language.$errors.length > 0)
 
 function cancel() {
   toggleStore.toggleFlashcardSetCreation()
@@ -182,7 +175,6 @@ function resetState() {
   $v.value.$reset()
 }
 
-
 watch(name, () => {
   if (nameInvalid.value) {
     $v.value.name.$reset()
@@ -194,7 +186,6 @@ watch(language, () => {
     $v.value.language.$reset()
   }
 })
-
 </script>
 
 <style scoped>

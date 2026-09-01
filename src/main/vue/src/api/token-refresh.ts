@@ -2,7 +2,7 @@ import {
   AxiosError,
   type AxiosInstance,
   type AxiosResponse,
-  type InternalAxiosRequestConfig
+  type InternalAxiosRequestConfig,
 } from 'axios'
 import { sendRefreshTokenRequest } from '@/api/auth-client.ts'
 import { useAuthStore } from '@/stores/auth-store.ts'
@@ -19,7 +19,7 @@ export function configureTokenRefreshInterceptor(axiosInstance: AxiosInstance) {
       } else {
         return handleUnauthorizedError(error, axiosInstance)
       }
-    }
+    },
   )
 }
 
@@ -87,7 +87,10 @@ async function refreshToken(): Promise<boolean> {
   }
 }
 
-async function handleUnauthorizedError(error: AxiosError, axiosInstance: AxiosInstance): Promise<AxiosResponse> {
+async function handleUnauthorizedError(
+  error: AxiosError,
+  axiosInstance: AxiosInstance,
+): Promise<AxiosResponse> {
   if (error.response?.status === 401 || error.response?.status === 403) {
     Log.log(LogTag.SYSTEM, `Handling ${error.response?.status} error`)
     const originalRequest = error.config as InternalAxiosRequestConfig

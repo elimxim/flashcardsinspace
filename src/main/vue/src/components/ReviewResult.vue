@@ -56,5 +56,4 @@ function goToControlPanel() {
 .exit-review-button {
   --smart-button--padding: 10px;
 }
-
 </style>

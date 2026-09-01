@@ -303,7 +303,6 @@ describe('MonoStageReviewQueue', () => {
     expect(queue.lookahead(2)).toEqual([f12, f13])
     expect(queue.next()).toBe(f12)
   })
-
 })
 
 describe('EmptyReviewQueue', () => {

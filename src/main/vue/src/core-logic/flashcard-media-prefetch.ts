@@ -72,13 +72,15 @@ export function createMediaPrefetcher(
       const audioId = (side: string) => audioStore.getAudioId(flashcardId, side)
       const pictureId = (side: string) => pictureStore.getPictureId(flashcardId, side)
 
-      const audio = (side: string) => audioId(side)
-        ? requestFlashcardAudioBlob(flashcardSetId, flashcardId, side, signal)
-        : Promise.resolve(undefined)
+      const audio = (side: string) =>
+        audioId(side)
+          ? requestFlashcardAudioBlob(flashcardSetId, flashcardId, side, signal)
+          : Promise.resolve(undefined)
 
-      const picture = (side: string) => pictureId(side)
-        ? requestFlashcardPictureBlob(flashcardSetId, flashcardId, side, signal)
-        : Promise.resolve(undefined)
+      const picture = (side: string) =>
+        pictureId(side)
+          ? requestFlashcardPictureBlob(flashcardSetId, flashcardId, side, signal)
+          : Promise.resolve(undefined)
 
       const [frontAudio, backAudio, frontPicture, backPicture] = await Promise.all([
         audio(flashcardSides.FRONT),
@@ -88,10 +90,10 @@ export function createMediaPrefetcher(
       ])
 
       Log.log(LogTag.SYSTEM, `Media fetched for Flashcard.id=${flashcardId}`, {
-        frontAudio: frontAudio ? "yes" : "no",
-        backAudio: backAudio ? "yes" : "no",
-        frontPicture: frontPicture ? "yes" : "no",
-        backPicture: backPicture ? "yes" : "no",
+        frontAudio: frontAudio ? 'yes' : 'no',
+        backAudio: backAudio ? 'yes' : 'no',
+        frontPicture: frontPicture ? 'yes' : 'no',
+        backPicture: backPicture ? 'yes' : 'no',
       })
 
       return {
@@ -148,14 +150,14 @@ export function createMediaPrefetcher(
 
       const retained = new Set<number>()
       if (current) retained.add(current.id)
-      ahead.forEach(flashcard => retained.add(flashcard.id))
-      behind.forEach(flashcard => retained.add(flashcard.id))
+      ahead.forEach((flashcard) => retained.add(flashcard.id))
+      behind.forEach((flashcard) => retained.add(flashcard.id))
 
       entries.forEach((_, flashcardId) => {
         if (!retained.has(flashcardId)) drop(flashcardId)
       })
 
-      ahead.forEach(flashcard => entry(flashcard.id))
+      ahead.forEach((flashcard) => entry(flashcard.id))
     },
 
     forget(flashcardId: number) {
@@ -165,7 +167,7 @@ export function createMediaPrefetcher(
     dispose() {
       disposed = true
       entries.clear()
-      controllers.forEach(controller => controller.abort())
+      controllers.forEach((controller) => controller.abort())
       controllers.clear()
     },
 

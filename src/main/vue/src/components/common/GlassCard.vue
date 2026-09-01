@@ -16,14 +16,16 @@
 import { ref } from 'vue'
 import { UXConfig } from '@/utils/device-utils.ts'
 
-const props = withDefaults(defineProps<{
-  text?: string
-  onClick?: () => void
-}>(), {
-  text: '',
-  onClick: () => {
+const props = withDefaults(
+  defineProps<{
+    text?: string
+    onClick?: () => void
+  }>(),
+  {
+    text: '',
+    onClick: () => {},
   },
-})
+)
 
 const animatingOnTap = ref(false)
 
@@ -69,7 +71,9 @@ function startTapAnimation() {
   padding: var(--gc--rim-size);
   will-change: transform;
   transform: translateZ(0);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .glass-face {
@@ -77,12 +81,14 @@ function startTapAnimation() {
   height: 100%;
   position: relative;
   border-radius: calc(var(--gc--border-radius) - 2px);
-  background: radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 100%),
-  linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
   backdrop-filter: blur(10px) saturate(1.5);
   -webkit-backdrop-filter: blur(10px) saturate(1.5);
-  box-shadow: inset 1px 1px 0 0 rgba(255, 255, 255, 0.5),
-  inset -1px -1px 0 0 rgba(0, 0, 0, 0.2);
+  box-shadow:
+    inset 1px 1px 0 0 rgba(255, 255, 255, 0.5),
+    inset -1px -1px 0 0 rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   justify-content: center;
@@ -92,7 +98,7 @@ function startTapAnimation() {
 }
 
 .glass-face::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: -100%;
@@ -118,9 +124,10 @@ function startTapAnimation() {
   }
 
   .glass-rim:hover .glass-face {
-    box-shadow: inset 1px 1px 0 0 rgba(255, 255, 255, 0.8),
-    inset -1px -1px 0 0 rgba(0, 0, 0, 0.1),
-    inset 0 0 20px rgba(255, 255, 255, 0.2);
+    box-shadow:
+      inset 1px 1px 0 0 rgba(255, 255, 255, 0.8),
+      inset -1px -1px 0 0 rgba(0, 0, 0, 0.1),
+      inset 0 0 20px rgba(255, 255, 255, 0.2);
   }
 
   .glass-rim:hover .glass-face::after {
@@ -135,9 +142,10 @@ function startTapAnimation() {
 }
 
 .glass-rim--tapped .glass-face {
-  box-shadow: inset 1px 1px 0 0 rgba(255, 255, 255, 0.8),
-  inset -1px -1px 0 0 rgba(0, 0, 0, 0.1),
-  inset 0 0 20px rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 1px 1px 0 0 rgba(255, 255, 255, 0.8),
+    inset -1px -1px 0 0 rgba(0, 0, 0, 0.1),
+    inset 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
 .glass-rim--tapped .glass-face::after {
@@ -150,11 +158,7 @@ function startTapAnimation() {
   font-size: var(--gc--font-size);
   font-weight: var(--gc--font-weight);
   text-transform: uppercase;
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(255, 255, 255, 0.8) 100%
-  );
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;

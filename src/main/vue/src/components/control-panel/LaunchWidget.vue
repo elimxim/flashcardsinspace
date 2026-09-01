@@ -1,9 +1,6 @@
 <template>
   <div class="launch-widget">
-    <LaunchButton
-      :on-click="startReview"
-      :disabled="isDisabled"
-    />
+    <LaunchButton :on-click="startReview" :disabled="isDisabled" />
   </div>
 </template>
 
@@ -29,14 +26,12 @@ const noFlashcardsForReview = computed<boolean>(() => {
   return queue.remaining() === 0
 })
 
-const isDisabled = computed(() =>
-  isEmpty.value || isSuspended.value || noFlashcardsForReview.value
-)
+const isDisabled = computed(() => isEmpty.value || isSuspended.value || noFlashcardsForReview.value)
 
 function startReview() {
   router.push({
     name: routeNames.review,
-    query: { sessionType: ReviewSessionType.LIGHTSPEED }
+    query: { sessionType: ReviewSessionType.LIGHTSPEED },
   })
 }
 </script>

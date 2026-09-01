@@ -1,12 +1,6 @@
 <template>
   <div class="space-picture">
-    <img
-      v-if="imageUrl"
-      :src="imageUrl"
-      class="space-picture-img"
-      alt="Image"
-      aria-hidden="true"
-    />
+    <img v-if="imageUrl" :src="imageUrl" class="space-picture-img" alt="Image" aria-hidden="true" />
   </div>
 </template>
 
@@ -14,11 +8,14 @@
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { Log, LogTag } from '@/utils/logger.ts'
 
-const props = withDefaults(defineProps<{
-  pictureBlob?: Blob | undefined
-}>(), {
-  pictureBlob: undefined,
-})
+const props = withDefaults(
+  defineProps<{
+    pictureBlob?: Blob | undefined
+  }>(),
+  {
+    pictureBlob: undefined,
+  },
+)
 
 const imageUrl = ref<string | undefined>()
 
@@ -40,9 +37,12 @@ function applyBlob(blob: Blob | undefined) {
   }
 }
 
-watch(() => props.pictureBlob, (newBlob) => {
-  applyBlob(newBlob)
-})
+watch(
+  () => props.pictureBlob,
+  (newBlob) => {
+    applyBlob(newBlob)
+  },
+)
 
 onMounted(() => {
   if (props.pictureBlob) {
@@ -53,7 +53,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   revokeImage()
 })
-
 </script>
 
 <style scoped>
@@ -74,5 +73,4 @@ onBeforeUnmount(() => {
   display: block;
   border-radius: 12px;
 }
-
 </style>

@@ -1,21 +1,18 @@
 <template>
-  <div
-    class="control-bar"
-    :class="{ 'shadow': shadow }"
-  >
+  <div class="control-bar" :class="{ shadow: shadow }">
     <div class="left-controls">
-      <slot name="left"/>
+      <slot name="left" />
     </div>
-    <div v-if="resolvedLoading" class="skeleton skeleton--dark control-bar-title-skeleton"/>
+    <div v-if="resolvedLoading" class="skeleton skeleton--dark control-bar-title-skeleton" />
     <div
       v-else-if="!isDelaying || !loadingStarted"
       class="control-bar-title select-text"
-      :class="{ 'centered': centerTitle }"
+      :class="{ centered: centerTitle }"
     >
       {{ title }}
     </div>
     <div class="right-controls">
-      <slot name="right"/>
+      <slot name="right" />
     </div>
   </div>
 </template>
@@ -24,41 +21,41 @@
 import { computed, onMounted, watch } from 'vue'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 
-const props = withDefaults(defineProps<{
-  title: string | undefined
-  centerTitle?: boolean
-  centerTitlePadding?: number
-  shadow?: boolean
-}>(), {
-  centerTitle: false,
-  centerTitlePadding: 0,
-  shadow: false,
-})
+const props = withDefaults(
+  defineProps<{
+    title: string | undefined
+    centerTitle?: boolean
+    centerTitlePadding?: number
+    shadow?: boolean
+  }>(),
+  {
+    centerTitle: false,
+    centerTitlePadding: 0,
+    shadow: false,
+  },
+)
 
-const {
-  isDelaying,
-  loadingStarted,
-  resolvedLoading,
-  startLoading,
-  stopLoading,
-} = useDeferredLoading()
+const { isDelaying, loadingStarted, resolvedLoading, startLoading, stopLoading } =
+  useDeferredLoading()
 
 const centerTitlePaddingPx = computed(() => `${props.centerTitlePadding}px`)
 
-watch(() => props.title, (newVal) => {
-  if (newVal !== undefined) {
-    stopLoading()
-  } else {
-    startLoading()
-  }
-})
+watch(
+  () => props.title,
+  (newVal) => {
+    if (newVal !== undefined) {
+      stopLoading()
+    } else {
+      startLoading()
+    }
+  },
+)
 
 onMounted(() => {
   if (!props.title) {
     startLoading()
   }
 })
-
 </script>
 
 <style scoped>
@@ -124,5 +121,4 @@ onMounted(() => {
   height: 80%;
   width: 60%;
 }
-
 </style>

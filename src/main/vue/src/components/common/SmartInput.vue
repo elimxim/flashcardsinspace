@@ -1,14 +1,11 @@
 <template>
-  <div
-    class="smart-input smart-input--theme"
-    :class="{ 'smart-input--error': invalid }"
-  >
+  <div class="smart-input smart-input--theme" :class="{ 'smart-input--error': invalid }">
     <input
       v-if="readonly"
       ref="readonlyInput"
       v-model="model"
       v-bind="$attrs"
-      style="transition: border-color 0.2s ease-in-out;"
+      style="transition: border-color 0.2s ease-in-out"
       :type="inputType"
       :placeholder="inputPlaceholder"
       :readonly="readonly"
@@ -18,7 +15,7 @@
       ref="input"
       v-model="model"
       v-bind="$attrs"
-      style="transition: border-color 0.2s ease-in-out;"
+      style="transition: border-color 0.2s ease-in-out"
       :type="inputType"
       :placeholder="inputPlaceholder"
     />
@@ -30,7 +27,7 @@
       tabindex="-1"
       @click="toggleShowPassword"
     >
-      <font-awesome-icon :icon="showPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"/>
+      <font-awesome-icon :icon="showPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'" />
     </button>
   </div>
 </template>
@@ -42,16 +39,19 @@ type Type = 'text' | 'password' | 'email'
 
 const model = defineModel<string>({ default: '' })
 
-const props = withDefaults(defineProps<{
-  type: Type
-  invalid?: boolean
-  readonly?: boolean
-  placeholder?: string
-}>(), {
-  invalid: false,
-  readonly: false,
-  placeholder: '',
-})
+const props = withDefaults(
+  defineProps<{
+    type: Type
+    invalid?: boolean
+    readonly?: boolean
+    placeholder?: string
+  }>(),
+  {
+    invalid: false,
+    readonly: false,
+    placeholder: '',
+  },
+)
 
 const isPassword = computed(() => props.type === 'password')
 const showPassword = ref(false)
@@ -69,7 +69,7 @@ const inputType = computed(() => {
 })
 
 const inputPlaceholder = computed(() =>
-  props.invalid ? props.placeholder + '!' : props.placeholder
+  props.invalid ? props.placeholder + '!' : props.placeholder,
 )
 
 function toggleShowPassword() {
@@ -86,9 +86,8 @@ function focus() {
 }
 
 defineExpose({
-  focus
+  focus,
 })
-
 </script>
 
 <style scoped>
@@ -178,5 +177,4 @@ defineExpose({
     color: var(--inpt--secret-button--color--hover);
   }
 }
-
 </style>

@@ -10,15 +10,10 @@
       :class="{
         'sidebar--collapsed': !sidebarExpandedCookie,
         'sidebar--overlay': isOverlay,
-        'sidebar--no-transition': isTransitioning
+        'sidebar--no-transition': isTransitioning,
       }"
     >
-      <ControlBar
-        class="sidebar-control-bar"
-        title="FLASHCARD SETS"
-        center-title
-        shadow
-      >
+      <ControlBar class="sidebar-control-bar" title="FLASHCARD SETS" center-title shadow>
         <template #left>
           <AwesomeButton
             ref="createButton"
@@ -40,9 +35,9 @@
       </ControlBar>
       <div class="sidebar-content">
         <DeferredLoading :wait-for="flashcardSetListAwaitCond">
-          <FlashcardSetList :on-flashcard-set-changed="onFlashcardSetChanged"/>
+          <FlashcardSetList :on-flashcard-set-changed="onFlashcardSetChanged" />
           <template #fallback>
-            <FlashcardSetListSkeleton/>
+            <FlashcardSetListSkeleton />
           </template>
         </DeferredLoading>
       </div>
@@ -76,10 +71,8 @@ const flashcardSetStore = useFlashcardSetStore()
 const isOverlay = ref(window.innerWidth <= OVERLAY_BREAKPOINT)
 const isTransitioning = ref(false)
 
-const flashcardSetListAwaitCond = () => Promise.all([
-  waitUntilStoreLoaded(languageStore),
-  waitUntilStoreLoaded(flashcardSetStore),
-])
+const flashcardSetListAwaitCond = () =>
+  Promise.all([waitUntilStoreLoaded(languageStore), waitUntilStoreLoaded(flashcardSetStore)])
 
 function updateOverlayMode() {
   const wasOverlay = isOverlay.value
@@ -205,5 +198,4 @@ onUnmounted(() => {
 .sidebar-control-bar {
   --control-bar--title--font-size: clamp(0.9rem, 1.5vw, 1.1rem);
 }
-
 </style>

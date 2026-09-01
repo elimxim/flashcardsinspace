@@ -26,10 +26,7 @@
 import { Stage } from '@/core-logic/stage-logic.ts'
 import { computed } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import {
-  countFlashcards,
-  specialStageToReviewSessionType
-} from '@/core-logic/review-logic.ts'
+import { countFlashcards, specialStageToReviewSessionType } from '@/core-logic/review-logic.ts'
 import { storeToRefs } from 'pinia'
 import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
@@ -49,7 +46,7 @@ const { flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
 const flashcardsCount = computed(() =>
-  countFlashcards(flashcards.value, props.stage, currDay.value)
+  countFlashcards(flashcards.value, props.stage, currDay.value),
 )
 
 function startReview() {
@@ -57,10 +54,9 @@ function startReview() {
   const sessionType = specialStageToReviewSessionType(props.stage)
   router.push({
     name: routeNames.review,
-    query: { sessionType: sessionType }
+    query: { sessionType: sessionType },
   })
 }
-
 </script>
 
 <style scoped>
@@ -77,5 +73,4 @@ function startReview() {
   align-items: center;
   gap: 4px;
 }
-
 </style>

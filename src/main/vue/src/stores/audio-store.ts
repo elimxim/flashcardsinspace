@@ -19,10 +19,10 @@ export const useAudioStore = defineStore('audio', {
       Log.log(LogTag.STORE, `audio.loadState: ${audioMetadata.length} metadata size`)
       this.$reset()
       this.audioIdMap = new Map(
-        audioMetadata.map(metadata => [
+        audioMetadata.map((metadata) => [
           audioMapKey(metadata.flashcardId, metadata.flashcardSide),
-          metadata.audioId
-        ])
+          metadata.audioId,
+        ]),
       )
       this.loaded = true
     },
@@ -30,7 +30,10 @@ export const useAudioStore = defineStore('audio', {
       if (!this.loaded) throw Error(`audio.checkStateLoaded: !loaded`)
     },
     setAudioId(flashcardId: number, side: string, audioId: number) {
-      Log.log(LogTag.STORE, `audio.setAudioId: Audio.id=${audioId}, Flashcard.id=${flashcardId}, Flashcard.side=${side}`)
+      Log.log(
+        LogTag.STORE,
+        `audio.setAudioId: Audio.id=${audioId}, Flashcard.id=${flashcardId}, Flashcard.side=${side}`,
+      )
       this.checkStateLoaded()
       this.audioIdMap.set(audioMapKey(flashcardId, side), audioId)
     },
@@ -41,12 +44,15 @@ export const useAudioStore = defineStore('audio', {
       return this.audioIdMap.get(audioMapKey(flashcardId, side))
     },
     removeAudioId(flashcardId: number, side: string) {
-      Log.log(LogTag.STORE, `audio.removeAudioId: Flashcard.id=${flashcardId}, Flashcard.side=${side}`)
+      Log.log(
+        LogTag.STORE,
+        `audio.removeAudioId: Flashcard.id=${flashcardId}, Flashcard.side=${side}`,
+      )
       this.checkStateLoaded()
       this.audioIdMap.delete(audioMapKey(flashcardId, side))
     },
-  }
+  },
 })
 
-const audioMapKey: (flashcardId: number, side: string) => string =
-  (flashcardId, side) => `${flashcardId}-${side}`
+const audioMapKey: (flashcardId: number, side: string) => string = (flashcardId, side) =>
+  `${flashcardId}-${side}`

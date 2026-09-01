@@ -1,16 +1,10 @@
 <template>
   <div class="flashcard-set-list-skeleton">
-    <div
-      v-for="i in 4"
-      :key="i"
-      class="skeleton skeleton--dark flashcard-set-skeleton"
-    >
-    </div>
+    <div v-for="i in 4" :key="i" class="skeleton skeleton--dark flashcard-set-skeleton"></div>
   </div>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <style scoped>
 .flashcard-set-list-skeleton {

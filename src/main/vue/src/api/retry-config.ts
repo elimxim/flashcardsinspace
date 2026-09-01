@@ -21,7 +21,10 @@ export function configureRetry(axiosInstance: AxiosInstance) {
     retryCondition: isNetworkOrIdempotentRequestError,
     retryDelay: (retryCount, error) => exponentialDelay(retryCount, error, BASE_DELAY_MS),
     onRetry: (retryCount, error, config) => {
-      Log.log(LogTag.API, `Retry ${retryCount}/${MAX_RETRIES} for ${config.method?.toUpperCase()} ${config.url} (${describeError(error)})`)
+      Log.log(
+        LogTag.API,
+        `Retry ${retryCount}/${MAX_RETRIES} for ${config.method?.toUpperCase()} ${config.url} (${describeError(error)})`,
+      )
     },
   })
 }

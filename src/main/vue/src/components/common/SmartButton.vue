@@ -22,13 +22,13 @@
     @click.stop="handleClick"
     @contextmenu.prevent
   >
-    <span class="smart-button-progress" :style="{ width: progressPercentage }"/>
+    <span class="smart-button-progress" :style="{ width: progressPercentage }" />
     <span class="smart-button-title-wrapper">
       <span v-if="resolvedLoading">
-        <font-awesome-icon icon="fa-solid fa-spinner" spin-pulse class="smart-button-spinner"/>
+        <font-awesome-icon icon="fa-solid fa-spinner" spin-pulse class="smart-button-spinner" />
       </span>
       <template v-else>
-        <slot v-if="hasSlot"/>
+        <slot v-if="hasSlot" />
         <span v-else class="smart-button-title">
           {{ text }}
         </span>
@@ -42,36 +42,38 @@ import { computed, onMounted, onUnmounted, ref, useSlots } from 'vue'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
 
-const props = withDefaults(defineProps<{
-  text?: string
-  disabled?: boolean
-  hidden?: boolean
-  rounded?: boolean
-  holdTime?: number
-  autoBlur?: boolean
-  fillWidth?: boolean
-  fillHeight?: boolean
-  fitContent?: boolean
-  titleScale?: number
-  animateTap?: boolean
-  tapDuration?: number
-  onClick?: () => void | Promise<void>
-}>(), {
-  text: '',
-  disabled: false,
-  hidden: false,
-  rounded: false,
-  holdTime: 0,
-  autoBlur: false,
-  fillWidth: false,
-  fillHeight: false,
-  fitContent: false,
-  titleScale: 1,
-  animateTap: true,
-  tapDuration: 200,
-  onClick: async () => {
+const props = withDefaults(
+  defineProps<{
+    text?: string
+    disabled?: boolean
+    hidden?: boolean
+    rounded?: boolean
+    holdTime?: number
+    autoBlur?: boolean
+    fillWidth?: boolean
+    fillHeight?: boolean
+    fitContent?: boolean
+    titleScale?: number
+    animateTap?: boolean
+    tapDuration?: number
+    onClick?: () => void | Promise<void>
+  }>(),
+  {
+    text: '',
+    disabled: false,
+    hidden: false,
+    rounded: false,
+    holdTime: 0,
+    autoBlur: false,
+    fillWidth: false,
+    fillHeight: false,
+    fitContent: false,
+    titleScale: 1,
+    animateTap: true,
+    tapDuration: 200,
+    onClick: async () => {},
   },
-})
+)
 
 const { resolvedLoading, startLoading, stopLoading } = useDeferredLoading()
 
@@ -209,15 +211,14 @@ function handleGlobalMouseUp() {
     button.value.blur()
   }
 }
-
 </script>
 
 <style scoped>
 .smart-button--theme {
   --s-btn--font-family: var(--button--font-family);
   --s-btn--title--font-size: var(--smart-button--title--font-size, 16px);
-  --s-btn--title--color: var(--smart-button--title--color, #FAF9F6);
-  --s-btn--title--color--hover: var(--smart-button--title--color--hover, #FAF9F6);
+  --s-btn--title--color: var(--smart-button--title--color, #faf9f6);
+  --s-btn--title--color--hover: var(--smart-button--title--color--hover, #faf9f6);
   --s-btn--title--color--disabled: var(--smart-button--title--color--disabled, #a3a3a3);
   --s-btn--title--word-spacing: var(--smart-button--title--word-spacing, 0.05rem);
   --s-btn--title--letter-spacing: var(--smart-button--title--letter-spacing, 0.05rem);
@@ -233,8 +234,8 @@ function handleGlobalMouseUp() {
   --s-btn--bg: var(--smart-button--bg, #323232);
   --s-btn--bg--hover: var(--smart-button--bg--hover, #515151);
   --s-btn--bg--progress: var(--smart-button--bg--progress, #515151);
-  --s-btn--bg--disabled: var(--smart-button--bg--disabled, #C8C8C8FF);
-  --s-btn--bg--loading: var(--smart-button--bg--loading, #C8C8C8FF);
+  --s-btn--bg--disabled: var(--smart-button--bg--disabled, #c8c8c8ff);
+  --s-btn--bg--loading: var(--smart-button--bg--loading, #c8c8c8ff);
 }
 
 .smart-button {
@@ -245,9 +246,10 @@ function handleGlobalMouseUp() {
   background: var(--s-btn--bg);
   outline: var(--s-btn--border-width) solid var(--s-btn--border-color);
   position: relative;
-  transition: background-color 0.2s ease-in-out,
-  outline 0.2s ease-in-out,
-  box-shadow 0.2s ease-in-out;
+  transition:
+    background-color 0.2s ease-in-out,
+    outline 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
   width: var(--s-btn--width);
   height: var(--s-btn--height);
   cursor: pointer;
@@ -305,7 +307,8 @@ function handleGlobalMouseUp() {
   background: var(--s-btn--bg--hover);
 }
 
-.smart-button:has(.smart-button--tapped:not(.smart-button--disabled):not(.smart-button--loading)) .smart-button-title {
+.smart-button:has(.smart-button--tapped:not(.smart-button--disabled):not(.smart-button--loading))
+  .smart-button-title {
   transform: scale(v-bind(titleScale));
 }
 
@@ -341,5 +344,4 @@ function handleGlobalMouseUp() {
   --smart-button--width: fit-content;
   --smart-button--height: fit-content;
 }
-
 </style>

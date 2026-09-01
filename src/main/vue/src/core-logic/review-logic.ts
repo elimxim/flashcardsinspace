@@ -9,9 +9,7 @@ import {
   specialStageSet,
 } from '@/core-logic/stage-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
-import {
-  chronodayStatusesToStartReview,
-} from '@/core-logic/chrono-logic.ts'
+import { chronodayStatusesToStartReview } from '@/core-logic/chrono-logic.ts'
 import { shuffle } from '@/utils/utils.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 
@@ -26,7 +24,7 @@ export enum ReviewSessionType {
 export class ReviewMode {
   constructor(
     public sessionType: ReviewSessionType,
-    public topic: string
+    public topic: string,
   ) {}
 
   isLightspeed(): boolean {
@@ -79,7 +77,7 @@ export function sessionToReviewMode(sessionType: string, stages: Stage[]): Revie
     case ReviewSessionType.OUTER_SPACE:
       return new ReviewMode(ReviewSessionType.OUTER_SPACE, '')
     case ReviewSessionType.QUIZ:
-      if (stages.every(s => specialStageSet.has(s))) {
+      if (stages.every((s) => specialStageSet.has(s))) {
         return new ReviewMode(ReviewSessionType.QUIZ, 'Quiz')
       }
   }
@@ -120,8 +118,7 @@ export interface ReviewQueue {
 }
 
 export class EmptyReviewQueue implements ReviewQueue {
-  public shuffle() {
-  }
+  public shuffle() {}
 
   public prev(): Flashcard | undefined {
     return undefined
@@ -147,8 +144,7 @@ export class EmptyReviewQueue implements ReviewQueue {
     return []
   }
 
-  public removeCurrent() {
-  }
+  public removeCurrent() {}
 }
 
 export class MultiStageReviewQueue implements ReviewQueue {
@@ -236,8 +232,7 @@ export class MultiStageReviewQueue implements ReviewQueue {
     return [...this.flashcardMap.values()].flat()
   }
 
-  public removeCurrent() {
-  }
+  public removeCurrent() {}
 }
 
 export class MonoStageReviewQueue implements ReviewQueue {
@@ -290,57 +285,69 @@ export class MonoStageReviewQueue implements ReviewQueue {
   }
 }
 
-export function createReviewQueue(
-  flashcards: Flashcard[],
-  currDay: Chronoday,
-): ReviewQueue {
+export function createReviewQueue(flashcards: Flashcard[], currDay: Chronoday): ReviewQueue {
   if (!chronodayStatusesToStartReview.has(currDay.status)) return new EmptyReviewQueue()
 
   const reviewStages = new Set(currDay.stages)
   const result = new Map<Stage, Flashcard[]>()
-  flashcards.filter(f => {
-    const isStageAvailable = reviewStages.has(f.stage)
-    if (f.stage === learningStages.S1.name) {
-      return isStageAvailable
-        && !isUnknownFlashcard(f, currDay)
-        && !isReviewedFlashcard(f, currDay)
-    }
-    return isStageAvailable && !isReviewedFlashcard(f, currDay)
-  }).forEach(f => {
-    const stage = getStage(f.stage)
-    if (!result.has(stage)) {
-      result.set(stage, [f])
-    } else {
-      result.get(stage)?.push(f)
-    }
-  })
+  flashcards
+    .filter((f) => {
+      const isStageAvailable = reviewStages.has(f.stage)
+      if (f.stage === learningStages.S1.name) {
+        return (
+          isStageAvailable && !isUnknownFlashcard(f, currDay) && !isReviewedFlashcard(f, currDay)
+        )
+      }
+      return isStageAvailable && !isReviewedFlashcard(f, currDay)
+    })
+    .forEach((f) => {
+      const stage = getStage(f.stage)
+      if (!result.has(stage)) {
+        result.set(stage, [f])
+      } else {
+        result.get(stage)?.push(f)
+      }
+    })
 
   const queue = new MultiStageReviewQueue(result)
   queue.shuffle()
   return queue
 }
 
-export function createReviewQueueForStages(flashcards: Flashcard[], stages: Stage[], currDay: Chronoday): ReviewQueue {
-  Log.log(LogTag.LOGIC, `Creating review queue for stages: ${stages.map(s => s.name).join(', ')}`)
-  const stageNameSet = new Set(stages.map(s => s.name))
+export function createReviewQueueForStages(
+  flashcards: Flashcard[],
+  stages: Stage[],
+  currDay: Chronoday,
+): ReviewQueue {
+  Log.log(LogTag.LOGIC, `Creating review queue for stages: ${stages.map((s) => s.name).join(', ')}`)
+  const stageNameSet = new Set(stages.map((s) => s.name))
 
   const result: Flashcard[] = []
   if (stageNameSet.has(specialStages.UNKNOWN.name)) {
-    result.push(...flashcards.filter(f =>
-      f.stage === learningStages.S1.name && isUnknownFlashcard(f, currDay)
-    ))
+    result.push(
+      ...flashcards.filter(
+        (f) => f.stage === learningStages.S1.name && isUnknownFlashcard(f, currDay),
+      ),
+    )
   }
   if (stageNameSet.has(specialStages.ATTEMPTED.name)) {
-    result.push(...flashcards.filter(f =>
-      f.stage === learningStages.S1.name && isReviewedFlashcard(f, currDay)
-    ))
+    result.push(
+      ...flashcards.filter(
+        (f) => f.stage === learningStages.S1.name && isReviewedFlashcard(f, currDay),
+      ),
+    )
   }
   if (stageNameSet.has(learningStages.S1.name)) {
-    result.push(...flashcards.filter(f =>
-      f.stage === learningStages.S1.name && !isUnknownFlashcard(f, currDay) && !isReviewedFlashcard(f, currDay)
-    ))
+    result.push(
+      ...flashcards.filter(
+        (f) =>
+          f.stage === learningStages.S1.name &&
+          !isUnknownFlashcard(f, currDay) &&
+          !isReviewedFlashcard(f, currDay),
+      ),
+    )
   }
-  result.push(...flashcards.filter(f => stageNameSet.has(f.stage)))
+  result.push(...flashcards.filter((f) => stageNameSet.has(f.stage)))
 
   const queue = new MonoStageReviewQueue(result)
   queue.shuffle()
@@ -357,19 +364,22 @@ function isReviewedFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
 
 export function countFlashcards(flashcards: Flashcard[], stage: Stage, currDay: Chronoday): number {
   if (stage === specialStages.UNKNOWN) {
-    return flashcards.filter(f =>
-      f.stage === learningStages.S1.name && isUnknownFlashcard(f, currDay)
+    return flashcards.filter(
+      (f) => f.stage === learningStages.S1.name && isUnknownFlashcard(f, currDay),
     ).length
   } else if (stage === specialStages.ATTEMPTED) {
-    return flashcards.filter(f =>
-      f.stage === learningStages.S1.name && isReviewedFlashcard(f, currDay)
+    return flashcards.filter(
+      (f) => f.stage === learningStages.S1.name && isReviewedFlashcard(f, currDay),
     ).length
   } else if (stage == learningStages.S1) {
-    return flashcards.filter(f =>
-      f.stage === learningStages.S1.name && !isUnknownFlashcard(f, currDay) && !isReviewedFlashcard(f, currDay)
+    return flashcards.filter(
+      (f) =>
+        f.stage === learningStages.S1.name &&
+        !isUnknownFlashcard(f, currDay) &&
+        !isReviewedFlashcard(f, currDay),
     ).length
   } else {
-    return flashcards.filter(f => f.stage === stage.name).length
+    return flashcards.filter((f) => f.stage === stage.name).length
   }
 }
 
@@ -378,16 +388,13 @@ export interface ReviewStage {
   count: number
 }
 
-export function calcStageReviews(
-  flashcards: Flashcard[],
-  currDay: Chronoday,
-): ReviewStage[] {
+export function calcStageReviews(flashcards: Flashcard[], currDay: Chronoday): ReviewStage[] {
   const queue = createReviewQueue(flashcards, currDay)
   return currDay.stages
-    .map(v => stageNameMap.get(v))
-    .filter(v => v !== undefined)
+    .map((v) => stageNameMap.get(v))
+    .filter((v) => v !== undefined)
     .sort((a, b) => b.order - a.order)
-    .map(stage => {
+    .map((stage) => {
       const count = queue.remaining(stage)
       return {
         stage: stage.displayName,

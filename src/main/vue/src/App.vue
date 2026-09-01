@@ -1,9 +1,9 @@
 <template>
   <div id="app" class="app">
-    <Navbar/>
-    <router-view/>
+    <Navbar />
+    <router-view />
   </div>
-  <SpaceToast/>
+  <SpaceToast />
 </template>
 
 <script setup lang="ts">
@@ -15,8 +15,6 @@ import { loadLanguageStore } from '@/utils/store-loading.ts'
 onMounted(() => {
   loadLanguageStore()
 })
-
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

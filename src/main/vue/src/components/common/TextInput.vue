@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="text-input text-input--theme"
-    :class="{ 'text-input--error': invalid }"
-  >
+  <div class="text-input text-input--theme" :class="{ 'text-input--error': invalid }">
     <div v-if="showToolbar" class="text-input--toolbar">
       <AwesomeButton
         v-if="showExpandDown"
@@ -34,29 +31,30 @@ const model = defineModel<string | undefined>()
 const expandedFull = defineModel<boolean>('expanded-full', { default: false })
 const expandedDown = defineModel<boolean>('expanded-down', { default: false })
 
-const props = withDefaults(defineProps<{
-  invalid?: boolean
-  placeholder?: string
-  showExpandFull?: boolean
-  showExpandDown?: boolean
-  rows?: number
-}>(), {
-  invalid: false,
-  placeholder: '',
-  showExpandFull: false,
-  showExpandDown: false,
-  rows: 1,
-})
+const props = withDefaults(
+  defineProps<{
+    invalid?: boolean
+    placeholder?: string
+    showExpandFull?: boolean
+    showExpandDown?: boolean
+    rows?: number
+  }>(),
+  {
+    invalid: false,
+    placeholder: '',
+    showExpandFull: false,
+    showExpandDown: false,
+    rows: 1,
+  },
+)
 
 const textArea = ref<HTMLTextAreaElement>()
 
 const inputPlaceholder = computed(() =>
-  props.invalid ? props.placeholder + '!' : props.placeholder
+  props.invalid ? props.placeholder + '!' : props.placeholder,
 )
 
-const showToolbar = computed(() =>
-  props.showExpandFull || props.showExpandDown
-)
+const showToolbar = computed(() => props.showExpandFull || props.showExpandDown)
 
 function toggleExpandedFull() {
   expandedFull.value = !expandedFull.value
@@ -78,7 +76,6 @@ defineExpose({
   focus,
   scrollIntoView,
 })
-
 </script>
 
 <style scoped>
@@ -145,5 +142,4 @@ defineExpose({
   font-size: var(--tx-inpt--font-size--error);
   color: var(--tx-inpt--color--error);
 }
-
 </style>

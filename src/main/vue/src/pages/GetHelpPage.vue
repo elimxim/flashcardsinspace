@@ -1,12 +1,5 @@
 <template>
-  <div
-    :class="[
-      'page',
-      'flex-column',
-      'flex-center',
-      'padding-auto',
-    ]"
-  >
+  <div :class="['page', 'flex-column', 'flex-center', 'padding-auto']">
     <AuroraWaves
       :colors="['#c63aed', '#5864ed', '#00d2ff']"
       :min-length="2"
@@ -67,7 +60,6 @@ function goToEmotionalSupport() {
 function goToWebsiteGuide() {
   router.push({ name: routeNames.websiteGuide })
 }
-
 </script>
 
 <style scoped>
@@ -158,12 +150,11 @@ function goToWebsiteGuide() {
   }
 
   .help-card-description {
-    width: 280px
+    width: 280px;
   }
 
   .help-card-description p {
     font-size: 0.9rem;
   }
 }
-
 </style>

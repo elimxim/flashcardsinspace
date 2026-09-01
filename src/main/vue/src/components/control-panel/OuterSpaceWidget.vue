@@ -1,11 +1,6 @@
 <template>
   <div class="outer-space-widget">
-    <Starfield
-      twinkle
-      :star-size="2"
-      :density="100"
-      vertical-drift="2px"
-    />
+    <Starfield twinkle :star-size="2" :density="100" vertical-drift="2px" />
     <div class="left-spacer"></div>
     <SmartButton
       class="outer-space-button"
@@ -47,14 +42,12 @@ const flashcardCount = computed(() => {
 })
 const isDisabled = computed(() => flashcardCount.value === 0)
 
-
 function startReview() {
   router.push({
     name: routeNames.review,
-    query: { sessionType: ReviewSessionType.OUTER_SPACE }
+    query: { sessionType: ReviewSessionType.OUTER_SPACE },
   })
 }
-
 </script>
 
 <style scoped>
@@ -80,5 +73,4 @@ function startReview() {
   justify-content: flex-start;
   padding-left: 10px;
 }
-
 </style>

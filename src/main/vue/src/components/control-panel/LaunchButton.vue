@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="launch-button launch-button--theme"
-    :class="{ 'launch-button--disabled': disabled }"
-  >
+  <div class="launch-button launch-button--theme" :class="{ 'launch-button--disabled': disabled }">
     <Starfield
       class="launch-button-starfield"
       :star-size="4"
@@ -19,12 +16,8 @@
     />
     <div class="curtain">
       <div class="curtain-text">
-        <template v-if="!disabled">
-          Start Review
-        </template>
-        <template v-else>
-          Nothing to Review
-        </template>
+        <template v-if="!disabled"> Start Review </template>
+        <template v-else> Nothing to Review </template>
       </div>
     </div>
   </div>
@@ -34,12 +27,14 @@
 import Starfield from '@/components/common/Starfield.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 
-withDefaults(defineProps<{
-  disabled?: boolean
-}>(), {
-  disabled: false,
-})
-
+withDefaults(
+  defineProps<{
+    disabled?: boolean
+  }>(),
+  {
+    disabled: false,
+  },
+)
 </script>
 
 <style scoped>

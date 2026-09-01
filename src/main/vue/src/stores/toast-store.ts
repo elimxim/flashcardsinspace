@@ -19,12 +19,12 @@ export interface Toast {
 }
 
 export interface ToastState {
-  toast: Toast | null,
-  show: boolean,
-  paused: boolean,
-  timeout: number | null,
-  remaining: number,
-  startedAt: number,
+  toast: Toast | null
+  show: boolean
+  paused: boolean
+  timeout: number | null
+  remaining: number
+  startedAt: number
 }
 
 export const useSpaceToaster = defineStore('space-toaster', {
@@ -86,7 +86,7 @@ export const useSpaceToaster = defineStore('space-toaster', {
         if (this.toast.persistent) return
         this.remaining = this.toast.duration
         this.startedAt = performance.now()
-        this.timeout = window.setTimeout(() => this.show = false, this.remaining)
+        this.timeout = window.setTimeout(() => (this.show = false), this.remaining)
       }
     },
     pause() {
@@ -103,7 +103,7 @@ export const useSpaceToaster = defineStore('space-toaster', {
         if (this.toast.persistent || this.timeout !== null) return
         this.paused = false
         this.startedAt = performance.now()
-        this.timeout = window.setTimeout(() => this.show = false, this.remaining)
+        this.timeout = window.setTimeout(() => (this.show = false), this.remaining)
       }
     },
     dismiss() {
@@ -123,5 +123,5 @@ export const useSpaceToaster = defineStore('space-toaster', {
         state.startedAt = 0
       })
     },
-  }
+  },
 })

@@ -86,8 +86,8 @@ function triggerSide(side: 'front' | 'back' | null) {
   if (ref) setTimeout(() => ref.scrollIntoView(), EXPANSION_TRANSITION_MS)
 }
 
-const invalid = computed(() =>
-  (frontRef.value?.invalid ?? false) || (backRef.value?.invalid ?? false)
+const invalid = computed(
+  () => (frontRef.value?.invalid ?? false) || (backRef.value?.invalid ?? false),
 )
 
 const EXPANSION_TRANSITION_MS = 300

@@ -18,9 +18,7 @@
           </div>
         </AwesomeContainer>
       </div>
-      <div v-if="!extraLoaded" class="cp-count-box cp-count-box--pulsing">
-        #
-      </div>
+      <div v-if="!extraLoaded" class="cp-count-box cp-count-box--pulsing">#</div>
       <div v-else class="cp-count-box">
         {{ getFlashcardsNumber(set) }}
       </div>
@@ -28,7 +26,11 @@
         v-if="set.id === selectedSetIdCookie && resolvedLoading"
         class="flashcard-set-spinner-container"
       >
-        <KineticRingSpinner :ring-size="42" :track-size="6" :track-color="'rgba(241,245,249,0.2)'"/>
+        <KineticRingSpinner
+          :ring-size="42"
+          :track-size="6"
+          :track-color="'rgba(241,245,249,0.2)'"
+        />
       </div>
     </div>
   </div>
@@ -53,11 +55,7 @@ const props = defineProps<{
 const languageStore = useLanguageStore()
 const flashcardSetStore = useFlashcardSetStore()
 
-const {
-  resolvedLoading,
-  startLoading,
-  stopLoading
-} = useDeferredLoading()
+const { resolvedLoading, startLoading, stopLoading } = useDeferredLoading()
 
 const { flashcardSets, extraLoaded } = storeToRefs(flashcardSetStore)
 
@@ -84,7 +82,6 @@ function getFlashcardsNumber(set: FlashcardSet) {
 onMounted(async () => {
   await loadFlashcardSetExtras()
 })
-
 </script>
 
 <style scoped>
@@ -104,7 +101,9 @@ onMounted(async () => {
   background: var(--cp--widget--color);
   border: 1px solid var(--cp--border-color);
   border-radius: 6px;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
 }
 
 .flashcard-set--loading {
@@ -188,5 +187,4 @@ onMounted(async () => {
   align-items: center;
   background: rgba(255, 255, 255, 0.4);
 }
-
 </style>

@@ -280,10 +280,12 @@ describe('review-session-attendant', () => {
     })
 
     it('should resume when only the next round has cards left', async () => {
-      await loadStored(quizMetadata({
-        currRoundFlashcardIds: [],
-        nextRoundFlashcardIds: [3],
-      }))
+      await loadStored(
+        quizMetadata({
+          currRoundFlashcardIds: [],
+          nextRoundFlashcardIds: [3],
+        }),
+      )
 
       expect(attendant.sessionId).toBe(55)
     })
@@ -296,10 +298,12 @@ describe('review-session-attendant', () => {
     })
 
     it('should start over when neither round has cards left', async () => {
-      await loadStored(quizMetadata({
-        currRoundFlashcardIds: [],
-        nextRoundFlashcardIds: [],
-      }))
+      await loadStored(
+        quizMetadata({
+          currRoundFlashcardIds: [],
+          nextRoundFlashcardIds: [],
+        }),
+      )
 
       expect(createRequest).toHaveBeenCalledOnce()
       expect(attendant.sessionId).toBe(SESSION_ID)
@@ -318,9 +322,13 @@ describe('review-session-attendant', () => {
 
     beforeEach(() => {
       specialAttendant = createReviewSessionAttendant(ReviewSessionType.OUTER_SPACE, set, day)
-      createRequest.mockResolvedValue(okResponse(reviewSession({
-        type: ReviewSessionType.OUTER_SPACE,
-      })))
+      createRequest.mockResolvedValue(
+        okResponse(
+          reviewSession({
+            type: ReviewSessionType.OUTER_SPACE,
+          }),
+        ),
+      )
     })
 
     afterEach(() => {
@@ -328,10 +336,14 @@ describe('review-session-attendant', () => {
     })
 
     it('should resume a session that was never finished', async () => {
-      getRequest.mockResolvedValue(okResponse(reviewSession({
-        id: 55,
-        type: ReviewSessionType.OUTER_SPACE,
-      })))
+      getRequest.mockResolvedValue(
+        okResponse(
+          reviewSession({
+            id: 55,
+            type: ReviewSessionType.OUTER_SPACE,
+          }),
+        ),
+      )
 
       await specialAttendant.loadOrCreate({ sessionId: 55 })
 
@@ -340,11 +352,15 @@ describe('review-session-attendant', () => {
     })
 
     it('should start over when the stored session is already finished', async () => {
-      getRequest.mockResolvedValue(okResponse(reviewSession({
-        id: 55,
-        type: ReviewSessionType.OUTER_SPACE,
-        finishedAt: new Date('2026-08-31T11:00:00Z'),
-      })))
+      getRequest.mockResolvedValue(
+        okResponse(
+          reviewSession({
+            id: 55,
+            type: ReviewSessionType.OUTER_SPACE,
+            finishedAt: new Date('2026-08-31T11:00:00Z'),
+          }),
+        ),
+      )
 
       await specialAttendant.loadOrCreate({ sessionId: 55 })
 
@@ -416,10 +432,14 @@ describe('review-session-attendant', () => {
       // and: the session is still there to be finished
       attendant.track(1)
       await attendant.flush({ all: true })
-      expect(updateRequest).toHaveBeenLastCalledWith(SET_ID, SESSION_ID, expect.objectContaining({
-        finished: true,
-        flashcardIds: [{ id: 1 }],
-      }))
+      expect(updateRequest).toHaveBeenLastCalledWith(
+        SET_ID,
+        SESSION_ID,
+        expect.objectContaining({
+          finished: true,
+          flashcardIds: [{ id: 1 }],
+        }),
+      )
     })
 
     it('should do nothing without a session', async () => {
@@ -479,10 +499,12 @@ describe('review-session-attendant', () => {
     it('should not start counting for a session that is already finished', () => {
       vi.useFakeTimers()
 
-      attendant.init(reviewSession({
-        elapsedTime: 5000,
-        finishedAt: new Date('2026-08-31T11:00:00Z'),
-      }))
+      attendant.init(
+        reviewSession({
+          elapsedTime: 5000,
+          finishedAt: new Date('2026-08-31T11:00:00Z'),
+        }),
+      )
       vi.advanceTimersByTime(3000)
 
       expect(attendant.elapsedTime.value).toBe(5000)
@@ -510,10 +532,14 @@ describe('review-session-attendant', () => {
       track(1)
       await flush({ all: true })
 
-      expect(updateRequest).toHaveBeenCalledWith(SET_ID, SESSION_ID, expect.objectContaining({
-        finished: true,
-        flashcardIds: [{ id: 1 }],
-      }))
+      expect(updateRequest).toHaveBeenCalledWith(
+        SET_ID,
+        SESSION_ID,
+        expect.objectContaining({
+          finished: true,
+          flashcardIds: [{ id: 1 }],
+        }),
+      )
 
       // and:
       clear()

@@ -1,12 +1,6 @@
 <template>
   <div
-    :class="[
-      'page',
-      'flex-column',
-      'padding-auto',
-      'scrollbar-hidden',
-      'emotional-support-page',
-    ]"
+    :class="['page', 'flex-column', 'padding-auto', 'scrollbar-hidden', 'emotional-support-page']"
   >
     <div class="comic-container">
       <SvgImage
@@ -22,8 +16,8 @@
       />
       <div class="speech-bubble select-text">
         <p v-if="!mascotClicked">
-          Hi, my name is Melvin. I am an emotional support possum.
-          Don't panic! I'm here to help you. What seems to be the problem?
+          Hi, my name is Melvin. I am an emotional support possum. Don't panic! I'm here to help
+          you. What seems to be the problem?
         </p>
         <p v-else>
           {{ mascotPhrase }}
@@ -110,61 +104,61 @@ const mascotPhrases = [
 
 const memoryTips = [
   `Take that one word that refuses to be memorized, and make it super memorable. ` +
-  `Create a weird mnemonic, create a crazy sentence with it, ` +
-  `say it to your family that doesn't speak the language and explain what it means.`,
+    `Create a weird mnemonic, create a crazy sentence with it, ` +
+    `say it to your family that doesn't speak the language and explain what it means.`,
 
   `Even the best astronauts forget things, try using a different approach ` +
-  `like singing the word in an operatic voice, or say it while dancing, ` +
-  `or even singing it in the shower.`,
+    `like singing the word in an operatic voice, or say it while dancing, ` +
+    `or even singing it in the shower.`,
 
   `Brain refusing to cooperate? Imagine the word written in neon lights on a giant ` +
-  `piece of trash floating in space. Sounds weird? Good. Weird sticks.`,
+    `piece of trash floating in space. Sounds weird? Good. Weird sticks.`,
 
   `Try "acting out" the word with your hands. Even if it's an abstract concept. ` +
-  `Flail your arms. Your brain remembers movement better than text.`,
+    `Flail your arms. Your brain remembers movement better than text.`,
 ]
 
 const motivationTips = [
   `Can't start? Chill out, eat a moon pie or another tasty snack and learn words for 5 mins.`,
 
   `You are not a boring person, so add some personality to your studying! ` +
-  `Have a specific study spot that has some cozy things like pillows, blankets, or snacks. ` +
-  `Maybe it has some cool lighting to help you get into a cool, calm, and collected mood. ` +
-  `And don’t forget your unique taste in music to top it all off!`,
+    `Have a specific study spot that has some cozy things like pillows, blankets, or snacks. ` +
+    `Maybe it has some cool lighting to help you get into a cool, calm, and collected mood. ` +
+    `And don’t forget your unique taste in music to top it all off!`,
 
   `Can't do a full session? Fine. Do exactly three cards. Just three. ` +
-  `If you still hate it after three, you have my permission to go back to sleep.`,
+    `If you still hate it after three, you have my permission to go back to sleep.`,
 
   `Pretend you are an alien spy sent to Earth. You *need* to learn this vocabulary ` +
-  `to blend in with the humans. Don't blow your cover!`,
+    `to blend in with the humans. Don't blow your cover!`,
 
   `I am a simple creature. I see snack, I do task. Have you tried putting a piece of chocolate ` +
-  `next to the SpaceBar? One card = one bite.`,
+    `next to the SpaceBar? One card = one bite.`,
 ]
 
 const overwhelmedTips = [
   `You don't need to be the superman of flashcards in space all the time. ` +
-  `Set a realistic number of words you want to look at today, and when you reach it, stop. ` +
-  `Here at flashcards in space, we think you are doing great no matter the number of cards ` +
-  `you have in your review sessions ❤️`,
+    `Set a realistic number of words you want to look at today, and when you reach it, stop. ` +
+    `Here at flashcards in space, we think you are doing great no matter the number of cards ` +
+    `you have in your review sessions ❤️`,
 
   `Feeling overwhelmed with number of words? Don't add new words for a while.`,
 
   `You can always take a vacation 🌴 Don't forget to enable vacation mode until you ` +
-  `feel less overwhelmed and ready to continue. But please be aware that the vacation mode ` +
-  `ends your streak.`,
+    `feel less overwhelmed and ready to continue. But please be aware that the vacation mode ` +
+    `ends your streak.`,
 
   `Whoa, space cowboy. Your review pile is taller than a rocket. ` +
-  `Stop adding "New Cards" immediately! Throw them out the airlock until you feel better.`,
+    `Stop adding "New Cards" immediately! Throw them out the airlock until you feel better.`,
 
   `The number of reviews is scary? Squint your eyes until the number looks blurry. There. ` +
-  `Now it's just a friendly blob. Tackle the blob for 5 minutes.`,
+    `Now it's just a friendly blob. Tackle the blob for 5 minutes.`,
 
   `So what if you have 500 reviews? They aren't going anywhere. They will wait. ` +
-  `The void is patient, and so am I. Just do what you can.`,
+    `The void is patient, and so am I. Just do what you can.`,
 
   `Some cards are just "leeches" sucking your energy. Suspend them! ` +
-  `Banish them to the dark side of the moon! You can relearn them next year.`,
+    `Banish them to the dark side of the moon! You can relearn them next year.`,
 ]
 
 type TipsCategory = 'memory' | 'motivation' | 'overwhelmed'
@@ -213,7 +207,6 @@ async function handleClickOnTipCategory(category: TipsCategory) {
   await nextTick()
   swipeTape.value?.goToFirstFrame()
 }
-
 </script>
 
 <style scoped>
@@ -290,7 +283,7 @@ async function handleClickOnTipCategory(category: TipsCategory) {
 }
 
 .speech-bubble::before {
-  content: "";
+  content: '';
   position: absolute;
   left: -24px; /* Push out to left */
   top: 50%; /* Center vertically */
@@ -301,7 +294,7 @@ async function handleClickOnTipCategory(category: TipsCategory) {
 }
 
 .speech-bubble::after {
-  content: "";
+  content: '';
   position: absolute;
   left: -19px; /* Slightly right of the black one */
   top: 50%;
@@ -367,7 +360,7 @@ async function handleClickOnTipCategory(category: TipsCategory) {
 }
 
 @media (hover: hover) {
-  .tip-category:not([class*="--active"]):hover {
+  .tip-category:not([class*='--active']):hover {
     background: rgba(255, 255, 255, 0.15);
     color: #fff;
   }
@@ -524,5 +517,4 @@ async function handleClickOnTipCategory(category: TipsCategory) {
     font-size: 0.9rem;
   }
 }
-
 </style>

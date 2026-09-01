@@ -8,11 +8,7 @@
       'awesome-button-wrapper--growing--square': fillSpace && square,
     }"
   >
-    <Tooltip
-      :text="tooltip"
-      :delay="tooltipDelay"
-      :position="tooltipPosition"
-    >
+    <Tooltip :text="tooltip" :delay="tooltipDelay" :position="tooltipPosition">
       <div
         role="button"
         class="awesome-button awesome-button--theme select-none drag-none"
@@ -30,14 +26,10 @@
         @mouseleave="handleHover"
       >
         <div v-if="resolvedLoading" class="awesome-icon-wrapper">
-          <font-awesome-icon
-            icon="fa-solid fa-spinner"
-            class="awesome-icon"
-            spin-pulse
-          />
+          <font-awesome-icon icon="fa-solid fa-spinner" class="awesome-icon" spin-pulse />
         </div>
         <template v-else>
-          <slot name="above"/>
+          <slot name="above" />
           <div class="awesome-icon-wrapper">
             <font-awesome-icon
               v-if="pressed && flipIcon"
@@ -50,13 +42,9 @@
               :icon="icon"
               class="awesome-icon awesome--icon--fading"
             />
-            <font-awesome-icon
-              v-else
-              :icon="icon"
-              class="awesome-icon"
-            />
+            <font-awesome-icon v-else :icon="icon" class="awesome-icon" />
           </div>
-          <slot name="below"/>
+          <slot name="below" />
         </template>
       </div>
     </Tooltip>
@@ -69,57 +57,61 @@ import { computed, ref, watch } from 'vue'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
 
-const props = withDefaults(defineProps<{
-  icon: string
-  fade?: boolean
-  flipIcon?: string
-  spinWhenFlipped?: boolean
-  disabled?: boolean
-  disabledOnPress?: boolean
-  active?: boolean
-  hidden?: boolean
-  invisible?: boolean
-  square?: boolean
-  fillSpace?: boolean
-  animateTap?: boolean,
-  animationDuration?: number
-  tooltip?: string
-  tooltipPosition?: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
-  tooltipDelay?: number
-  onClick?: () => void | Promise<void>
-  onDoubleClick?: () => void | Promise<void>
-  onHover?: () => void | Promise<void>
-}>(), {
-  fade: false,
-  flipIcon: undefined,
-  spinWhenFlipped: false,
-  disabled: false,
-  disabledOnPress: false,
-  active: false,
-  hidden: false,
-  invisible: false,
-  square: false,
-  fillSpace: false,
-  animateTap: true,
-  animationDuration: 300,
-  tooltip: undefined,
-  tooltipPosition: 'top',
-  tooltipDelay: 1000,
-  onClick: async () => {
+const props = withDefaults(
+  defineProps<{
+    icon: string
+    fade?: boolean
+    flipIcon?: string
+    spinWhenFlipped?: boolean
+    disabled?: boolean
+    disabledOnPress?: boolean
+    active?: boolean
+    hidden?: boolean
+    invisible?: boolean
+    square?: boolean
+    fillSpace?: boolean
+    animateTap?: boolean
+    animationDuration?: number
+    tooltip?: string
+    tooltipPosition?:
+      | 'top'
+      | 'bottom'
+      | 'left'
+      | 'right'
+      | 'top-left'
+      | 'top-right'
+      | 'bottom-left'
+      | 'bottom-right'
+    tooltipDelay?: number
+    onClick?: () => void | Promise<void>
+    onDoubleClick?: () => void | Promise<void>
+    onHover?: () => void | Promise<void>
+  }>(),
+  {
+    fade: false,
+    flipIcon: undefined,
+    spinWhenFlipped: false,
+    disabled: false,
+    disabledOnPress: false,
+    active: false,
+    hidden: false,
+    invisible: false,
+    square: false,
+    fillSpace: false,
+    animateTap: true,
+    animationDuration: 300,
+    tooltip: undefined,
+    tooltipPosition: 'top',
+    tooltipDelay: 1000,
+    onClick: async () => {},
+    onDoubleClick: async () => {},
+    onHover: async () => {},
   },
-  onDoubleClick: async () => {
-  },
-  onHover: async () => {
-  },
-})
+)
 
 const animationDurationSeconds = computed(() => `${(props.animationDuration / 1000).toFixed(1)}s`)
 
-const {
-  resolvedLoading,
-  startLoading,
-  stopLoading,
-} = useDeferredLoading()
+const { resolvedLoading, startLoading, stopLoading } = useDeferredLoading()
 
 const pressed = ref(false)
 const animatingOnTap = ref(false)
@@ -179,16 +171,18 @@ function reset() {
   disabled.value = false
 }
 
-watch(() => props.disabled, (newVal) => {
-  disabled.value = newVal
-})
+watch(
+  () => props.disabled,
+  (newVal) => {
+    disabled.value = newVal
+  },
+)
 
 defineExpose({
   isPressed,
   press,
   reset,
 })
-
 </script>
 
 <style scoped>
@@ -284,16 +278,19 @@ defineExpose({
 }
 
 @media (hover: hover) {
-  .awesome-button-wrapper:has(.awesome-button:not(.awesome-button--disabled):hover) .awesome-icon-wrapper {
+  .awesome-button-wrapper:has(.awesome-button:not(.awesome-button--disabled):hover)
+    .awesome-icon-wrapper {
     transform: scale(var(--a-btn--scale-factor--on-hover));
   }
 }
 
-.awesome-button-wrapper:has(.awesome-button--tapped:not(.awesome-button--disabled)) .awesome-icon-wrapper {
+.awesome-button-wrapper:has(.awesome-button--tapped:not(.awesome-button--disabled))
+  .awesome-icon-wrapper {
   transform: scale(var(--a-btn--scale-factor--on-hover));
 }
 
-.awesome-button-wrapper:has(.awesome-button:not(.awesome-button--disabled):active) .awesome-icon-wrapper {
+.awesome-button-wrapper:has(.awesome-button:not(.awesome-button--disabled):active)
+  .awesome-icon-wrapper {
   transform: scale(var(--a-btn--scale-factor--on-active));
 }
 
@@ -342,5 +339,4 @@ defineExpose({
     opacity: 1;
   }
 }
-
 </style>

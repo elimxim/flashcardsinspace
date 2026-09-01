@@ -1,8 +1,5 @@
 ﻿<template>
-  <div
-    class="side"
-    :class="{ 'side--fullscreen': expandedFull }"
-  >
+  <div class="side" :class="{ 'side--fullscreen': expandedFull }">
     <TextInput
       ref="textInputRef"
       v-model="text"
@@ -18,7 +15,11 @@
       text="Your text has its own gravity! Maximum 512 characters."
     />
     <div class="side-media">
-      <Transition name="media-vanish" @before-leave="captureWidth" @after-leave="firstMedia = 'picture'">
+      <Transition
+        name="media-vanish"
+        @before-leave="captureWidth"
+        @after-leave="firstMedia = 'picture'"
+      >
         <VoiceRecorder
           v-show="!pictureUploaderExpanded"
           v-model:audio-blob="audio"
@@ -26,7 +27,11 @@
           :class="{ 'side-media--reorder': firstMedia === 'voice' }"
         />
       </Transition>
-      <Transition name="media-vanish" @before-leave="captureWidth" @after-leave="firstMedia = 'voice'">
+      <Transition
+        name="media-vanish"
+        @before-leave="captureWidth"
+        @after-leave="firstMedia = 'voice'"
+      >
         <PictureUploader
           v-show="!voiceRecorderExpanded"
           v-model:picture-blob="picture"
@@ -63,18 +68,19 @@ const firstMedia = ref<'voice' | 'picture'>('voice')
 
 const pictureAbsent = computed(() => !picture.value)
 
-const $v = useVuelidate({
+const $v = useVuelidate(
+  {
     text: {
       requiredWhenNoPicture: requiredIf(pictureAbsent),
       maxLength: maxLength(512),
-    }
+    },
   },
-  { text }
+  { text },
 )
 
 const invalid = computed(() => $v.value.text.$errors.length > 0)
 const maxLengthInvalid = computed(() =>
-  $v.value.text.$errors.some(e => e.$validator === 'maxLength')
+  $v.value.text.$errors.some((e) => e.$validator === 'maxLength'),
 )
 
 watch(text, () => {
@@ -147,7 +153,6 @@ watch(expandedFull, (newVal) => {
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeydown, { capture: true })
 })
-
 </script>
 
 <style scoped>

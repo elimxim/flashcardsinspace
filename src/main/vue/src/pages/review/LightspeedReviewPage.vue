@@ -1,23 +1,16 @@
 <template>
   <div
-    :class="[
-      'page',
-      'page--bg--light',
-      'flex-column',
-      'flex-center',
-      'scroll-none',
-      'touch-none',
-    ]"
+    :class="['page', 'page--bg--light', 'flex-column', 'flex-center', 'scroll-none', 'touch-none']"
   >
     <ControlBar
-      style="z-index: 10;"
+      style="z-index: 10"
       :title="flashcardSetName"
       :center-title-padding="100"
       center-title
     >
       <template #left>
         <div class="review-mode">
-          <font-awesome-icon :icon="reviewIcons.get(ReviewSessionType.LIGHTSPEED)!!"/>
+          <font-awesome-icon :icon="reviewIcons.get(ReviewSessionType.LIGHTSPEED)!!" />
         </div>
       </template>
       <template #right>
@@ -31,14 +24,10 @@
       </template>
     </ControlBar>
     <div class="review-layout">
-      <KineticRingSpinner v-if="resolvedLoading" :ring-size="240"/>
+      <KineticRingSpinner v-if="resolvedLoading" :ring-size="240" />
       <template v-else-if="!loadingStarted">
         <div class="review-progressbar">
-          <Progressbar
-            :progress="progress"
-            height="16px"
-            glide
-          />
+          <Progressbar :progress="progress" height="16px" glide />
         </div>
         <div class="review-info">
           <div class="cp-count-box cp-count-box--big">
@@ -59,7 +48,7 @@
             swipe-left-text="Don't know"
             swipe-right-text="Know"
           >
-            <ReviewResult/>
+            <ReviewResult />
           </SpaceDeck>
           <div v-if="UXConfig().showNavButtons" class="review-nav">
             <SmartButton
@@ -85,7 +74,7 @@
       </template>
     </div>
   </div>
-  <SpaceToast/>
+  <SpaceToast />
 </template>
 
 <script setup lang="ts">
@@ -103,21 +92,14 @@ import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { nextStage, prevStage, Stage } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
-import {
-  createReviewQueue,
-  reviewIcons,
-  ReviewSessionType,
-} from '@/core-logic/review-logic.ts'
+import { createReviewQueue, reviewIcons, ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { loadStoresForFlashcardSetId } from '@/utils/store-loading.ts'
-import {
-  sendChronoBulkUpdateRequest,
-  sendFlashcardUpdateRequest,
-} from '@/api/api-client.ts'
+import { sendChronoBulkUpdateRequest, sendFlashcardUpdateRequest } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import {
   chronodayStatuses,
@@ -130,12 +112,12 @@ import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
 import { useRunOnce } from '@/utils/run-once.ts'
-import { Chronoday } from "@/model/chrono.ts"
-import { createReviewSessionAttendant } from "@/core-logic/review-session-attendant.ts"
+import { Chronoday } from '@/model/chrono.ts'
+import { createReviewSessionAttendant } from '@/core-logic/review-session-attendant.ts'
 
 defineProps<{
-  sessionId?: number,
-  stages: Stage[],
+  sessionId?: number
+  stages: Stage[]
 }>()
 
 const router = useRouter()
@@ -147,14 +129,13 @@ const flashcardStore = useFlashcardStore()
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
-const {
-  loadingStarted,
-  resolvedLoading,
-  startLoading,
-  stopLoading,
-} = useDeferredLoading()
+const { loadingStarted, resolvedLoading, startLoading, stopLoading } = useDeferredLoading()
 
-const sessionRunner = createReviewSessionAttendant(ReviewSessionType.LIGHTSPEED, flashcardSet, currDay)
+const sessionRunner = createReviewSessionAttendant(
+  ReviewSessionType.LIGHTSPEED,
+  flashcardSet,
+  currDay,
+)
 const reviewStore = useReviewStore(ReviewSessionType.LIGHTSPEED, flashcardSet)
 
 const {
@@ -240,7 +221,10 @@ async function stageUp() {
   }
 }
 
-async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flashcard): Promise<boolean> {
+async function sendUpdatedFlashcard(
+  flashcardSet: FlashcardSet,
+  flashcard: Flashcard,
+): Promise<boolean> {
   return await sendFlashcardUpdateRequest(flashcardSet.id, flashcard)
     .then((response) => {
       flashcardStore.changeFlashcard(response.data)
@@ -277,17 +261,31 @@ async function markDaysAs(
       chronoStore.updateDayStreak(response.data.dayStreak)
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to mark days as ${status} for FlashcardSet.id=${flashcardSetId}`, error.response?.data)
+      Log.error(
+        LogTag.LOGIC,
+        `Failed to mark days as ${status} for FlashcardSet.id=${flashcardSetId}`,
+        error.response?.data,
+      )
       toaster.bakeError(userApiErrors.SCHEDULE__UPDATING_FAILED, error.response?.data)
     })
 }
 
 async function markDaysAsInProgress(flashcardSet: FlashcardSet, currDay: Chronoday) {
-  await markDaysAs(flashcardSet.id, currDay, chronodayStatuses.IN_PROGRESS, chronodayStatusesToProgressDay)
+  await markDaysAs(
+    flashcardSet.id,
+    currDay,
+    chronodayStatuses.IN_PROGRESS,
+    chronodayStatusesToProgressDay,
+  )
 }
 
 async function markDaysAsCompleted(flashcardSet: FlashcardSet, currDay: Chronoday) {
-  await markDaysAs(flashcardSet.id, currDay, chronodayStatuses.COMPLETED, chronodayStatusesToCompleteDay)
+  await markDaysAs(
+    flashcardSet.id,
+    currDay,
+    chronodayStatuses.COMPLETED,
+    chronodayStatusesToCompleteDay,
+  )
 }
 
 onMounted(async () => {
@@ -320,7 +318,6 @@ async function handleKeydown(event: KeyboardEvent) {
     await spaceDeck?.value?.slideRight()
   }
 }
-
 </script>
 
 <style scoped>
@@ -369,5 +366,4 @@ async function handleKeydown(event: KeyboardEvent) {
 .decision-button {
   --smart-button--width: 130px;
 }
-
 </style>

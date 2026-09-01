@@ -69,7 +69,7 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
       }
     },
     findSet(id: number): FlashcardSet | undefined {
-      return this.flashcardSets.find(v => v.id === id)
+      return this.flashcardSets.find((v) => v.id === id)
     },
     addExtra(id: number) {
       if (!this.extra.has(id)) {
@@ -91,5 +91,5 @@ export const useFlashcardSetStore = defineStore('flashcard-set', {
         extra.flashcardsNumber -= 1
       }
     },
-  }
+  },
 })

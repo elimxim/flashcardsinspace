@@ -9,32 +9,35 @@
         backgroundColor: color,
         width: sizePx,
         height: sizePx,
-        left: `calc(${(i - 1)} * (${sizePx} + ${gapPx}))`,
+        left: `calc(${i - 1} * (${sizePx} + ${gapPx}))`,
         '--packet-distance': calculatedDistancePx,
-        animationDuration: durationSec
+        animationDuration: durationSec,
       }"
     ></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { computed, ref } from 'vue'
 
-const props = withDefaults(defineProps<{
-  gap?: number
-  count?: number
-  size?: number
-  duration?: number
-  color?: string
-  distance?: number
-}>(), {
-  gap: 0,
-  count: 4,
-  size: 20,
-  duration: 2.5,
-  color: 'rgba(255, 255, 255, 0.1)',
-  distance: 100,
-})
+const props = withDefaults(
+  defineProps<{
+    gap?: number
+    count?: number
+    size?: number
+    duration?: number
+    color?: string
+    distance?: number
+  }>(),
+  {
+    gap: 0,
+    count: 4,
+    size: 20,
+    duration: 2.5,
+    color: 'rgba(255, 255, 255, 0.1)',
+    distance: 100,
+  },
+)
 
 const packetLoader = ref<HTMLElement>()
 
@@ -42,7 +45,6 @@ const gapPx = computed(() => `${props.gap}px`)
 const sizePx = computed(() => `${props.size}px`)
 const durationSec = computed(() => `${props.duration}s`)
 const calculatedDistancePx = computed(() => `${props.distance}px`)
-
 </script>
 
 <style scoped>
@@ -88,52 +90,64 @@ const calculatedDistancePx = computed(() => `${props.distance}px`)
 
 /* Square 1: Moves LAST out, FIRST back */
 @keyframes move-1 {
-  0%, 25% {
+  0%,
+  25% {
     transform: translateX(0);
   }
-  45%, 55% {
+  45%,
+  55% {
     transform: translateX(var(--packet-distance));
   }
-  75%, 100% {
+  75%,
+  100% {
     transform: translateX(0);
   }
 }
 
 /* Square 2 */
 @keyframes move-2 {
-  0%, 18% {
+  0%,
+  18% {
     transform: translateX(0);
   }
-  38%, 62% {
+  38%,
+  62% {
     transform: translateX(var(--packet-distance));
   }
-  82%, 100% {
+  82%,
+  100% {
     transform: translateX(0);
   }
 }
 
 /* Square 3 */
 @keyframes move-3 {
-  0%, 11% {
+  0%,
+  11% {
     transform: translateX(0);
   }
-  31%, 69% {
+  31%,
+  69% {
     transform: translateX(var(--packet-distance));
   }
-  89%, 100% {
+  89%,
+  100% {
     transform: translateX(0);
   }
 }
 
 /* Square 4: Moves FIRST out, LAST back */
 @keyframes move-4 {
-  0%, 4% {
+  0%,
+  4% {
     transform: translateX(0);
   }
-  24%, 76% {
+  24%,
+  76% {
     transform: translateX(var(--packet-distance));
   }
-  96%, 100% {
+  96%,
+  100% {
     transform: translateX(0);
   }
 }

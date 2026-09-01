@@ -12,9 +12,7 @@
         <div class="cp-count-box cp-count-box--big">
           {{ flashcardCount }}
         </div>
-        <div class="flashcards-info-text">
-          Flashcards
-        </div>
+        <div class="flashcards-info-text">Flashcards</div>
       </div>
     </div>
   </transition>
@@ -27,20 +25,21 @@ import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useLanguageStore } from '@/stores/language-store.ts'
 
-withDefaults(defineProps<{
-  hidden?: boolean
-}>(), {
-  hidden: false,
-})
+withDefaults(
+  defineProps<{
+    hidden?: boolean
+  }>(),
+  {
+    hidden: false,
+  },
+)
 
 const flashcardStore = useFlashcardStore()
 const languageStore = useLanguageStore()
 
 const { flashcards, flashcardSet } = storeToRefs(flashcardStore)
 
-const language = computed(() =>
-  languageStore.getLanguage(flashcardSet.value?.languageId ?? -1)
-)
+const language = computed(() => languageStore.getLanguage(flashcardSet.value?.languageId ?? -1))
 const flashcardCount = computed(() => flashcards.value.length)
 </script>
 
@@ -91,7 +90,9 @@ const flashcardCount = computed(() => flashcards.value.length)
 
 .fade-slide-enter-active,
 .fade-slide-leave-active {
-  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+  transition:
+    max-height 0.3s ease-out,
+    opacity 0.3s ease-out;
 }
 
 .fade-slide-enter-from {

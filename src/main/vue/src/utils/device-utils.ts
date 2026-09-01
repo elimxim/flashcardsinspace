@@ -6,7 +6,7 @@ export const deviceType = () => {
 
   const isTablet =
     /(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(userAgent) ||
-    (userAgent.includes("macintosh") && maxPoints > 1) // modern iPads
+    (userAgent.includes('macintosh') && maxPoints > 1) // modern iPads
 
   const isMobile = /mobile|iphone|ipod|android|blackberry|iemobile/i.test(userAgent) && !isTablet
 
@@ -15,7 +15,7 @@ export const deviceType = () => {
   return {
     isMobile,
     isTablet,
-    isDesktop
+    isDesktop,
   }
 }
 
@@ -36,7 +36,7 @@ export const deviceInteraction = () => {
     // Any secondary input supports hover (e.g., mouse plugged into tablet)
     isAnyHover: window.matchMedia('(any-hover: hover)').matches,
     // Hardware capability
-    hasTouch: hasTouchHardware
+    hasTouch: hasTouchHardware,
   }
 }
 

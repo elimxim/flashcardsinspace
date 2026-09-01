@@ -1,13 +1,9 @@
 <template>
-  <Modal
-    title="Upload Flashcards"
-    :visible="toggleStore.fileUploadOpen"
-    :on-exit="cancel"
-  >
+  <Modal title="Upload Flashcards" :visible="toggleStore.fileUploadOpen" :on-exit="cancel">
     <div class="modal-main-area">
       <p class="note-paragraph">
-        Please be careful when uploading a lot of flashcards.
-        They will be added to UNKNOWN all at once and be available for review next day.
+        Please be careful when uploading a lot of flashcards. They will be added to UNKNOWN all at
+        once and be available for review next day.
       </p>
       <div class="spinner-container">
         <KineticRingSpinner
@@ -40,18 +36,16 @@
         <div class="count-text">
           {{ parsedCount }} flashcard{{ parsedCount !== 1 ? 's' : '' }} parsed
         </div>
-        <div class="duplicate-text" :style="{ visibility: duplicateCount > 0 ? 'visible' : 'hidden' }">
+        <div
+          class="duplicate-text"
+          :style="{ visibility: duplicateCount > 0 ? 'visible' : 'hidden' }"
+        >
           {{ duplicateCount }} duplicate{{ duplicateCount !== 1 ? 's' : '' }} skipped
         </div>
       </div>
     </div>
     <div class="modal-control-buttons">
-      <SmartButton
-        class="off-button"
-        text="Cancel"
-        :on-click="cancel"
-        auto-blur
-      />
+      <SmartButton class="off-button" text="Cancel" :on-click="cancel" auto-blur />
       <SmartButton
         class="calm-button counter-button"
         :on-click="upload"
@@ -59,9 +53,7 @@
         auto-blur
       >
         <span class="counter-button--layout">
-          <span class="counter-button--text">
-            Upload
-          </span>
+          <span class="counter-button--text"> Upload </span>
           <span class="counter-button--number">
             {{ uploadCount }}
           </span>
@@ -109,8 +101,8 @@ const duplicateIndices = ref<Set<number>>(new Set())
 
 const parsedCount = computed(() => parsedRows.value.length)
 const duplicateCount = computed(() => duplicateIndices.value.size)
-const uploadCount = computed(() =>
-  parsedRows.value.filter((_, i) => !duplicateIndices.value.has(i)).length
+const uploadCount = computed(
+  () => parsedRows.value.filter((_, i) => !duplicateIndices.value.has(i)).length,
 )
 
 async function parseFile(file: File) {
@@ -150,17 +142,21 @@ async function upload() {
     return
   }
 
-  const newFlashcards = uniqueFlashcards.map(r => newFlashcard(r.frontSide, r.backSide, today))
+  const newFlashcards = uniqueFlashcards.map((r) => newFlashcard(r.frontSide, r.backSide, today))
 
   const success = await sendFlashcardBulkCreationRequest(setId, newFlashcards)
     .then((response) => {
       if (response.data.initialized) {
-        if (!response.data.flashcardSet
-          || !response.data.flashcards
-          || !response.data.chronodays
-          || !response.data.currDay
+        if (
+          !response.data.flashcardSet ||
+          !response.data.flashcards ||
+          !response.data.chronodays ||
+          !response.data.currDay
         ) {
-          Log.log(LogTag.LOGIC, `Response doesn't have required fields: ${JSON.stringify(response.data)}`)
+          Log.log(
+            LogTag.LOGIC,
+            `Response doesn't have required fields: ${JSON.stringify(response.data)}`,
+          )
           toaster.bakeError(userApiErrors.FLASHCARD__CREATION_FAILED)
           return false
         }
@@ -172,19 +168,22 @@ async function upload() {
           flashcardStore.addNewFlashcard(flashcard)
           flashcardSetStore.incrementFlashcardsNumber(setId)
         }
-        chronoStore.loadState(
-          response.data.chronodays,
-          response.data.currDay,
-          {
-            streak: 0,
-            lastDate: currDay.value.chronodate
-          }
+        chronoStore.loadState(response.data.chronodays, response.data.currDay, {
+          streak: 0,
+          lastDate: currDay.value.chronodate,
+        })
+        toaster.bakeSuccess(
+          'Success',
+          `${response.data.flashcards.length} flashcard${response.data.flashcards.length !== 1 ? 's' : ''} uploaded`,
+          400,
         )
-        toaster.bakeSuccess('Success', `${response.data.flashcards.length} flashcard${response.data.flashcards.length !== 1 ? 's' : ''} uploaded`, 400)
         return true
       } else {
         if (!response.data.flashcards) {
-          Log.log(LogTag.LOGIC, `Response doesn't have flashcards: ${JSON.stringify(response.data)}`)
+          Log.log(
+            LogTag.LOGIC,
+            `Response doesn't have flashcards: ${JSON.stringify(response.data)}`,
+          )
           toaster.bakeError(userApiErrors.FLASHCARD__BULK_CREATION_FAILED)
           return false
         }
@@ -193,19 +192,27 @@ async function upload() {
           flashcardStore.addNewFlashcard(flashcard)
           flashcardSetStore.incrementFlashcardsNumber(setId)
         }
-        toaster.bakeSuccess('Success', `${response.data.flashcards.length} flashcard${response.data.flashcards.length !== 1 ? 's' : ''} uploaded`, 400)
+        toaster.bakeSuccess(
+          'Success',
+          `${response.data.flashcards.length} flashcard${response.data.flashcards.length !== 1 ? 's' : ''} uploaded`,
+          400,
+        )
         return true
       }
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to bulk-create flashcards for FlashcardSet.id=${setId}`, error)
+      Log.error(
+        LogTag.LOGIC,
+        `Failed to bulk-create flashcards for FlashcardSet.id=${setId}`,
+        error,
+      )
       toaster.bakeError(userApiErrors.FLASHCARD__BULK_CREATION_FAILED, error.response?.data)
       return false
     })
 
-    if (success) {
-      toggleStore.toggleFileUpload()
-    }
+  if (success) {
+    toggleStore.toggleFileUpload()
+  }
 }
 
 function cancel() {
@@ -219,7 +226,6 @@ const unsubscribeFileSelected = eventStore.subscribe('flashcard-file:selected', 
 onUnmounted(() => {
   unsubscribeFileSelected()
 })
-
 </script>
 
 <style scoped>
@@ -296,5 +302,4 @@ onUnmounted(() => {
   justify-content: space-between;
   gap: 10px;
 }
-
 </style>

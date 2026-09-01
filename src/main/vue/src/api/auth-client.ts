@@ -16,7 +16,12 @@ const authClient = axios.create({
 configureDateTransformers(authClient)
 configureRetry(authClient)
 
-export async function sendSignupRequest(name: string, email: string, password: string, languageId: number | undefined) {
+export async function sendSignupRequest(
+  name: string,
+  email: string,
+  password: string,
+  languageId: number | undefined,
+) {
   Log.log(LogTag.POST, '/signup')
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   return await authClient.post<User>('/signup', {

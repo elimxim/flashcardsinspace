@@ -59,7 +59,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/home',
     name: routeNames.home,
-    component: HomePage
+    component: HomePage,
   },
   {
     path: '/get-help',
@@ -130,13 +130,13 @@ const routes: RouteRecordRaw[] = [
     component: CodeVerificationPage,
     props: (route) => ({
       type: parseVerificationType(route.query.type),
-    })
+    }),
   },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 })
 
 router.beforeEach(async (to, _, next) => {
@@ -192,7 +192,10 @@ router.beforeEach(async (to, _, next) => {
 export default router
 
 function isOnAuthPage() {
-  return router.currentRoute.value.name === routeNames.login || router.currentRoute.value.name === routeNames.signup
+  return (
+    router.currentRoute.value.name === routeNames.login ||
+    router.currentRoute.value.name === routeNames.signup
+  )
 }
 
 export async function redirectToLoginPage() {

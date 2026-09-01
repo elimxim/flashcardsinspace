@@ -1,8 +1,5 @@
 import { ref, watch } from 'vue'
-import {
-  loadLoggingEnabledFromCookies,
-  saveLoggingEnabledToCookies
-} from '@/utils/cookies.ts'
+import { loadLoggingEnabledFromCookies, saveLoggingEnabledToCookies } from '@/utils/cookies.ts'
 
 declare global {
   interface Window {
@@ -31,7 +28,11 @@ if (typeof window !== 'undefined') {
 
 export enum LogTag {
   DEFAULT = 'DEFAULT',
-  API = 'API', GET = 'GET', POST = 'POST', PUT = 'PUT', DELETE = 'DELETE',
+  API = 'API',
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  DELETE = 'DELETE',
   STORE = 'STORE',
   COOKIES = 'COOKIES',
   LOGIC = 'LOGIC',

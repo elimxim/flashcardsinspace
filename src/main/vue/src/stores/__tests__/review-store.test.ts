@@ -8,11 +8,8 @@ import { learningStages } from '@/core-logic/stage-logic.ts'
 import { flashcardSides } from '@/core-logic/flashcard-logic.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
 import { usePictureStore } from '@/stores/picture-store.ts'
-import {
-  sendFlashcardAudioGetRequest,
-  sendFlashcardPictureGetRequest,
-} from '@/api/api-client.ts'
-import { ref } from "vue"
+import { sendFlashcardAudioGetRequest, sendFlashcardPictureGetRequest } from '@/api/api-client.ts'
+import { ref } from 'vue'
 
 vi.mock('@/api/api-client.ts', () => ({
   sendFlashcardAudioGetRequest: vi.fn(),
@@ -55,11 +52,13 @@ function blobResponse(blob: Blob): AxiosResponse<Blob> {
 }
 
 function loadFrontAudioMetadata(flashcardIds: number[]) {
-  useAudioStore().loadState(flashcardIds.map(id => ({
-    audioId: id * 10,
-    flashcardId: id,
-    flashcardSide: flashcardSides.FRONT,
-  })))
+  useAudioStore().loadState(
+    flashcardIds.map((id) => ({
+      audioId: id * 10,
+      flashcardId: id,
+      flashcardSide: flashcardSides.FRONT,
+    })),
+  )
   usePictureStore().loadState([])
 }
 
@@ -84,23 +83,25 @@ describe('review-store media', () => {
 
     // the flashcard on screen was fetched exactly once, by the window
     const currentId = store.currFlashcard?.id
-    expect(audioGet.mock.calls.filter(call => call[1] === currentId).length).toBe(1)
+    expect(audioGet.mock.calls.filter((call) => call[1] === currentId).length).toBe(1)
     expect(store.flashcardFrontSideAudioBlob).toBeDefined()
   })
 
   it('should keep the window topped up as the review advances', async () => {
     loadFrontAudioMetadata([1, 2, 3, 4])
     const store = reviewStore()
-    store.loadState(new MonoStageReviewQueue([flashcard(1), flashcard(2), flashcard(3), flashcard(4)]))
+    store.loadState(
+      new MonoStageReviewQueue([flashcard(1), flashcard(2), flashcard(3), flashcard(4)]),
+    )
 
     await store.nextFlashcard()
     await store.nextFlashcard()
 
     // the flashcard on screen plus the next two are all covered
-    const wanted = [store.currFlashcard!.id, ...store.reviewQueue.lookahead(2).map(f => f.id)]
+    const wanted = [store.currFlashcard!.id, ...store.reviewQueue.lookahead(2).map((f) => f.id)]
     await vi.waitFor(() => {
-      const requested = audioGet.mock.calls.map(call => call[1])
-      wanted.forEach(id => expect(requested).toContain(id))
+      const requested = audioGet.mock.calls.map((call) => call[1])
+      wanted.forEach((id) => expect(requested).toContain(id))
     })
   })
 
@@ -113,7 +114,7 @@ describe('review-store media', () => {
     await store.nextFlashcard()
     await store.nextFlashcard()
 
-    const requested = audioGet.mock.calls.map(call => call[1])
+    const requested = audioGet.mock.calls.map((call) => call[1])
     expect(requested.length).toBe(new Set(requested).size)
   })
 
@@ -179,10 +180,12 @@ describe('review-store media', () => {
     // three flashcards, each with its own audio
     loadFrontAudioMetadata([1, 2, 3])
     const blobs = new Map<number, Blob>([
-      [1, new Blob(['one'])], [2, new Blob(['two'])], [3, new Blob(['three'])],
+      [1, new Blob(['one'])],
+      [2, new Blob(['two'])],
+      [3, new Blob(['three'])],
     ])
     audioGet.mockImplementation((_setId, flashcardId) =>
-      Promise.resolve(blobResponse(blobs.get(flashcardId)!))
+      Promise.resolve(blobResponse(blobs.get(flashcardId)!)),
     )
     const store = reviewStore()
     store.loadState(new MonoStageReviewQueue([flashcard(1), flashcard(2), flashcard(3)]))
@@ -219,6 +222,6 @@ describe('review-store media', () => {
     store.$reset()
 
     expect(signals.length).toBeGreaterThan(0)
-    expect(signals.every(signal => signal.aborted)).toBe(true)
+    expect(signals.every((signal) => signal.aborted)).toBe(true)
   })
 })

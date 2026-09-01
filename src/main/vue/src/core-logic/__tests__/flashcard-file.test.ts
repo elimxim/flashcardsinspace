@@ -1,8 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect } from 'vitest'
-import {
-  parseFlashcardsFromFile,
-} from '@/core-logic/flashcard-file-logic.ts'
+import { parseFlashcardsFromFile } from '@/core-logic/flashcard-file-logic.ts'
 
 function makeCsvFile(content: string): File {
   const bytes = new TextEncoder().encode(content)
@@ -65,5 +63,3 @@ describe('parseFlashcardsFromFile', () => {
     expect(result[1]).toEqual({ frontSide: 'собака', backSide: 'dog' })
   })
 })
-
-

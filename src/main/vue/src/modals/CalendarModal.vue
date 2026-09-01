@@ -1,9 +1,5 @@
 <template>
-  <Modal
-    :visible="toggleStore.calendarOpen"
-    :on-exit="exit"
-    overflow="hidden"
-  >
+  <Modal :visible="toggleStore.calendarOpen" :on-exit="exit" overflow="hidden">
     <div class="calendar calendar--theme">
       <div class="calendar-month">
         <AwesomeButton
@@ -19,11 +15,7 @@
         />
       </div>
       <div class="calendar-weekdays">
-        <div
-          v-for="day in weekdays"
-          :key="day"
-          class="calendar-weekday"
-        >
+        <div v-for="day in weekdays" :key="day" class="calendar-weekday">
           {{ day }}
         </div>
       </div>
@@ -49,9 +41,7 @@
               <div v-if="canShowSeq(day)" class="calendar-cell-seq">
                 {{ day.seqNumber }}
               </div>
-              <div v-if="isVacationDay(day)" class="calendar-cell-vacation">
-                🌴
-              </div>
+              <div v-if="isVacationDay(day)" class="calendar-cell-vacation">🌴</div>
               <div v-if="canShowStages(day)" class="calendar-cell-stages">
                 {{ day.stages }}
               </div>
@@ -86,20 +76,10 @@
 import Modal from '@/components/common/Modal.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
-import {
-  computed,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch
-} from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
-import {
-  calcCalendarPage,
-  type CalendarDay,
-  chronodayStatuses
-} from '@/core-logic/chrono-logic.ts'
+import { calcCalendarPage, type CalendarDay, chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { sendChronoSyncNextDay, sendChronoSyncPrevDay } from '@/api/api-client.ts'
@@ -196,7 +176,7 @@ function dayCssClasses(day: CalendarDay): string {
     result.push('calendar-day--streak')
   }
 
-  return result.join(" ")
+  return result.join(' ')
 }
 
 function canShowSeq(day: CalendarDay): boolean {
@@ -238,9 +218,7 @@ async function goNextDay() {
     })
 }
 
-const isDaySwitchPossible = computed(() =>
-  isStarted.value
-)
+const isDaySwitchPossible = computed(() => isStarted.value)
 
 watch(currDay, (newValue) => {
   currMonth.value = parseIsoDate(newValue.chronodate)
@@ -261,7 +239,6 @@ function handleKeydown(event: KeyboardEvent) {
     navigateNextMonth()
   }
 }
-
 </script>
 
 <style scoped>
@@ -277,16 +254,28 @@ function handleKeydown(event: KeyboardEvent) {
   --day--empty--bg-color: var(--calendar--day--empty--bg-color, rgba(115, 115, 115, 0.4));
   --day--initial--color: var(--calendar--day--initial--color, white);
   --day--initial--bg-color: var(--calendar--day--initial--bg-color, #f59e0b);
-  --day--initial--stripe-color: var(--calendar--day--initial--stripe-color, rgba(245, 158, 11, 0.35));
+  --day--initial--stripe-color: var(
+    --calendar--day--initial--stripe-color,
+    rgba(245, 158, 11, 0.35)
+  );
   --day--completed--color: var(--calendar--day--completed--color, white);
   --day--completed--bg-color: var(--calendar--day--completed--bg-color, #34d399);
-  --day--completed--stripe-color: var(--calendar--day--completed--stripe-color, rgba(52, 211, 153, 0.35));
+  --day--completed--stripe-color: var(
+    --calendar--day--completed--stripe-color,
+    rgba(52, 211, 153, 0.35)
+  );
   --day--in-progress--color: var(--calendar--day--in-progress--color, white);
   --day--in-progress--bg-color: var(--calendar--day--in-progress--bg-color, #244fac);
-  --day--in-progress--stripe-color: var(--calendar--day--in-progress--stripe-color, rgba(14, 49, 126, 0.35));
+  --day--in-progress--stripe-color: var(
+    --calendar--day--in-progress--stripe-color,
+    rgba(14, 49, 126, 0.35)
+  );
   --day--not-started--color: var(--calendar--day--not-started--color, white);
   --day--not-started--bg-color: var(--calendar--day--not-started--bg-color, #e5e7eb);
-  --day--not-started--stripe-color: var(--calendar--day--not-started--stripe-color, rgba(115, 115, 115, 0.35));
+  --day--not-started--stripe-color: var(
+    --calendar--day--not-started--stripe-color,
+    rgba(115, 115, 115, 0.35)
+  );
   --day--off--color: var(--calendar--day--off--color, white);
   --day--off--bg-color: var(--calendar--day--off--bg-color, #43938a);
   --day--off--stripe-color: var(--calendar--day--off--stripe-color, rgba(115, 115, 115, 0.35));
@@ -392,7 +381,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .calendar-day--completed:not(.calendar-day--streak)::before {
-  content: "✔";
+  content: '✔';
   position: absolute;
   top: 0;
   left: 0;
@@ -441,7 +430,7 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 .calendar-day--streak::before {
-  content: "★";
+  content: '★';
   position: absolute;
   top: 0;
   left: 0;
@@ -508,5 +497,4 @@ function handleKeydown(event: KeyboardEvent) {
   justify-content: center;
   gap: 10px;
 }
-
 </style>

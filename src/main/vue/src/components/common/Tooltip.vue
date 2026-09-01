@@ -1,18 +1,11 @@
 <template>
-  <div
-    class="tooltip tooltip--theme"
-    @mouseenter="show"
-    @mouseleave="hide"
-  >
-    <slot/>
+  <div class="tooltip tooltip--theme" @mouseenter="show" @mouseleave="hide">
+    <slot />
     <template v-if="UXConfig().showTooltips">
       <transition name="tooltip-fade">
-        <div
-          v-if="visible && text"
-          :class="['tooltip-message', `tooltip--${position}`]"
-        >
+        <div v-if="visible && text" :class="['tooltip-message', `tooltip--${position}`]">
           {{ text }}
-          <div class="tooltip-arrow"/>
+          <div class="tooltip-arrow" />
         </div>
       </transition>
     </template>
@@ -23,15 +16,26 @@
 import { ref } from 'vue'
 import { UXConfig } from '@/utils/device-utils.ts'
 
-const props = withDefaults(defineProps<{
-  text?: string
-  delay?: number
-  position?: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
-}>(), {
-  text: undefined,
-  delay: 1000,
-  position: 'top',
-})
+const props = withDefaults(
+  defineProps<{
+    text?: string
+    delay?: number
+    position?:
+      | 'top'
+      | 'bottom'
+      | 'left'
+      | 'right'
+      | 'top-left'
+      | 'top-right'
+      | 'bottom-left'
+      | 'bottom-right'
+  }>(),
+  {
+    text: undefined,
+    delay: 1000,
+    position: 'top',
+  },
+)
 
 const visible = ref(false)
 let timeout: ReturnType<typeof setTimeout> | null = null
@@ -204,4 +208,3 @@ function hide() {
   opacity: 0;
 }
 </style>
-

@@ -10,14 +10,14 @@
     ]"
   >
     <ControlBar
-      style="z-index: 10;"
+      style="z-index: 10"
       :title="flashcardSetName"
       :center-title-padding="100"
       center-title
     >
       <template v-if="reviewMode.topic" #left>
         <div class="review-mode">
-          <font-awesome-icon :icon="reviewIcons.get(reviewMode.sessionType)!!"/>
+          <font-awesome-icon :icon="reviewIcons.get(reviewMode.sessionType)!!" />
         </div>
       </template>
       <template #right>
@@ -45,11 +45,7 @@
       />
       <template v-else-if="!loadingStarted">
         <div class="review-progressbar">
-          <Progressbar
-            :progress="progress"
-            height="16px"
-            glide
-          />
+          <Progressbar :progress="progress" height="16px" glide />
         </div>
         <div class="review-info">
           <div class="cp-count-box cp-count-box--big">
@@ -70,7 +66,7 @@
             swipe-left-text="Prev"
             swipe-right-text="Next"
           >
-            <ReviewResult/>
+            <ReviewResult />
           </SpaceDeck>
           <div v-if="UXConfig().showNavButtons" class="review-nav">
             <SmartButton
@@ -101,10 +97,7 @@
               rounded
             />
           </div>
-          <div
-            v-else-if="reviewMode.isOuterSpace()"
-            class="review-nav review-nav--centered"
-          >
+          <div v-else-if="reviewMode.isOuterSpace()" class="review-nav review-nav--centered">
             <SmartButton
               class="decision-button dangerous-button"
               text="Move back"
@@ -119,7 +112,7 @@
       </template>
     </div>
   </div>
-  <SpaceToast/>
+  <SpaceToast />
 </template>
 
 <script setup lang="ts">
@@ -150,9 +143,7 @@ import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { loadStoresForFlashcardSetId } from '@/utils/store-loading.ts'
-import {
-  sendFlashcardUpdateRequest,
-} from '@/api/api-client.ts'
+import { sendFlashcardUpdateRequest } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
@@ -160,11 +151,11 @@ import { destroyReviewStore, useReviewStore } from '@/stores/review-store.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
 import { useRunOnce } from '@/utils/run-once.ts'
-import { createReviewSessionAttendant } from "@/core-logic/review-session-attendant.ts"
+import { createReviewSessionAttendant } from '@/core-logic/review-session-attendant.ts'
 
 const props = defineProps<{
-  sessionId?: number,
-  reviewMode: ReviewMode,
+  sessionId?: number
+  reviewMode: ReviewMode
 }>()
 
 const router = useRouter()
@@ -179,14 +170,13 @@ const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
-const {
-  loadingStarted,
-  resolvedLoading,
-  startLoading,
-  stopLoading,
-} = useDeferredLoading()
+const { loadingStarted, resolvedLoading, startLoading, stopLoading } = useDeferredLoading()
 
-const sessionRunner = createReviewSessionAttendant(props.reviewMode.sessionType, flashcardSet, currDay)
+const sessionRunner = createReviewSessionAttendant(
+  props.reviewMode.sessionType,
+  flashcardSet,
+  currDay,
+)
 const reviewStore = useReviewStore(props.reviewMode.sessionType, flashcardSet)
 
 const {
@@ -218,14 +208,14 @@ async function startReview() {
         Log.log(LogTag.LOGIC, 'Flashcard set not found in cookies')
       }
     }
-    const stage = reviewSessionTypeToSpecialStage(props.reviewMode.sessionType) ?? specialStages.UNKNOWN
+    const stage =
+      reviewSessionTypeToSpecialStage(props.reviewMode.sessionType) ?? specialStages.UNKNOWN
     reviewStore.loadState(createReviewQueueForStages(flashcards.value, [stage], currDay.value))
 
     await sessionRunner.create()
     await reviewStore.nextFlashcard()
 
     Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
-
   } finally {
     await stopLoading()
   }
@@ -259,7 +249,9 @@ async function next() {
 
 async function moveBack() {
   if (!flashcardSet.value || !currFlashcard.value) {
-    Log.error(LogTag.LOGIC, `moveBack is impossible:`,
+    Log.error(
+      LogTag.LOGIC,
+      `moveBack is impossible:`,
       `FlashcardSet.id=${flashcardSet.value?.id ?? 'undefined'}`,
       `current Flashcard.id=${currFlashcard.value?.id ?? 'undefined'}`,
     )
@@ -275,7 +267,10 @@ async function moveBack() {
   }
 }
 
-async function sendUpdatedFlashcard(flashcardSet: FlashcardSet, flashcard: Flashcard): Promise<boolean> {
+async function sendUpdatedFlashcard(
+  flashcardSet: FlashcardSet,
+  flashcard: Flashcard,
+): Promise<boolean> {
   return await sendFlashcardUpdateRequest(flashcardSet.id, flashcard)
     .then((response) => {
       flashcardStore.changeFlashcard(response.data)
@@ -319,7 +314,6 @@ async function handleKeydown(event: KeyboardEvent) {
     await spaceDeck?.value?.slideRight()
   }
 }
-
 </script>
 
 <style scoped>
@@ -372,5 +366,4 @@ async function handleKeydown(event: KeyboardEvent) {
 .decision-button {
   --smart-button--width: 130px;
 }
-
 </style>

@@ -6,12 +6,14 @@
           v-for="(color, index) in colors"
           :id="`grad-${index}`"
           :key="`grad-${index}`"
-          x1="0%" y1="0%"
-          x2="100%" y2="0%"
+          x1="0%"
+          y1="0%"
+          x2="100%"
+          y2="0%"
         >
-          <stop offset="0%" :stop-color="color" stop-opacity="0"/>
-          <stop offset="50%" :stop-color="color" stop-opacity="1"/>
-          <stop offset="100%" :stop-color="color" stop-opacity="0"/>
+          <stop offset="0%" :stop-color="color" stop-opacity="0" />
+          <stop offset="50%" :stop-color="color" stop-opacity="1" />
+          <stop offset="100%" :stop-color="color" stop-opacity="0" />
         </linearGradient>
       </defs>
 
@@ -28,7 +30,7 @@
           '--wave--line-length': line.length,
           '--wave--gap-length': '1000',
           '--wave--base-thick': line.thickness,
-          '--wave--peak-thick': (line.thickness * pulsePeak),
+          '--wave--peak-thick': line.thickness * pulsePeak,
         }"
       />
     </svg>
@@ -38,35 +40,38 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 
-const props = withDefaults(defineProps<{
-  colors?: string[]
-  minLength?: number
-  maxLength?: number
-  minThickness?: number
-  maxThickness?: number
-  pulsePeak?: number
-  minDuration?: number
-  maxDuration?: number
-  minAmplitude?: number
-  maxAmplitude?: number
-  spawnInterval?: number
-  maxLines?: number
-  blurAmount?: number
-}>(), {
-  colors: () => ['#00ffb3', '#c63aed', '#3a64ed', '#00d2ff'],
-  minLength: 0.3,
-  maxLength: 0.6,
-  minThickness: 1,
-  maxThickness: 3,
-  pulsePeak: 1.2,
-  minDuration: 15,
-  maxDuration: 30,
-  minAmplitude: 0.5,
-  maxAmplitude: 1.5,
-  spawnInterval: 500,
-  maxLines: 20,
-  blurAmount: 10,
-})
+const props = withDefaults(
+  defineProps<{
+    colors?: string[]
+    minLength?: number
+    maxLength?: number
+    minThickness?: number
+    maxThickness?: number
+    pulsePeak?: number
+    minDuration?: number
+    maxDuration?: number
+    minAmplitude?: number
+    maxAmplitude?: number
+    spawnInterval?: number
+    maxLines?: number
+    blurAmount?: number
+  }>(),
+  {
+    colors: () => ['#00ffb3', '#c63aed', '#3a64ed', '#00d2ff'],
+    minLength: 0.3,
+    maxLength: 0.6,
+    minThickness: 1,
+    maxThickness: 3,
+    pulsePeak: 1.2,
+    minDuration: 15,
+    maxDuration: 30,
+    minAmplitude: 0.5,
+    maxAmplitude: 1.5,
+    spawnInterval: 500,
+    maxLines: 20,
+    blurAmount: 10,
+  },
+)
 
 interface WaveLine {
   id: number
@@ -90,13 +95,13 @@ let rapidSpawnId: ReturnType<typeof setInterval> | null = null
 // Center Y: 50 (Middle)
 const pathShapes = [
   // Gentle Sine
-  "M -20,50 C 20,30 50,70 80,50 S 110,30 140,50",
+  'M -20,50 C 20,30 50,70 80,50 S 110,30 140,50',
   // Deep Valley
-  "M -20,50 C 20,80 50,90 80,50 S 110,20 140,50",
+  'M -20,50 C 20,80 50,90 80,50 S 110,20 140,50',
   // High Arch
-  "M -20,50 C 20,20 50,10 80,50 S 110,80 140,50",
+  'M -20,50 C 20,20 50,10 80,50 S 110,80 140,50',
   // Diagonal Flow
-  "M -20,70 C 20,70 50,30 80,30 S 110,70 140,30"
+  'M -20,70 C 20,70 50,30 80,30 S 110,70 140,30',
 ]
 
 const wavesBlur = computed(() => `${props.blurAmount}px`)
@@ -118,14 +123,17 @@ const addLine = () => {
     duration: duration,
     length: random(scaleUnit(props.minLength), scaleUnit(props.maxLength)),
     thickness: random(props.minThickness, props.maxThickness),
-    amplitude: random(props.minAmplitude, props.maxAmplitude)
+    amplitude: random(props.minAmplitude, props.maxAmplitude),
   }
 
   lines.value.push(newLine)
 
-  setTimeout(() => {
-    lines.value = lines.value.filter(l => l.id !== id)
-  }, duration * 1000 + 1000)
+  setTimeout(
+    () => {
+      lines.value = lines.value.filter((l) => l.id !== id)
+    },
+    duration * 1000 + 1000,
+  )
 }
 
 onMounted(() => {
@@ -189,8 +197,9 @@ onUnmounted(() => {
   stroke-dashoffset: var(--wave--line-length);
   transform-origin: center;
   will-change: transform, stroke-dashoffset;
-  animation: snakeTravel var(--wave--duration) linear forwards,
-  pulseAlive 3s ease-in-out infinite alternate;
+  animation:
+    snakeTravel var(--wave--duration) linear forwards,
+    pulseAlive 3s ease-in-out infinite alternate;
 }
 
 @keyframes snakeTravel {

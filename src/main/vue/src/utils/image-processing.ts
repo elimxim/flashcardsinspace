@@ -8,11 +8,20 @@ const DEFAULT_TARGET_BYTES = 280 * 1024
  * Decodes an image File with an <img> and resizes it so neither
  * edge exceeds {@link maxDim} (never upscales), returning the raw pixels.
  */
-export async function decodeAndResize(file: File, maxDim: number = DEFAULT_MAX_DIM): Promise<ImageData> {
-  Log.log(LogTag.SYSTEM, `imgProc: input "${file.name}" type=${file.type || 'unknown'} size=${(file.size / 1024).toFixed(1)} KB`)
+export async function decodeAndResize(
+  file: File,
+  maxDim: number = DEFAULT_MAX_DIM,
+): Promise<ImageData> {
+  Log.log(
+    LogTag.SYSTEM,
+    `imgProc: input "${file.name}" type=${file.type || 'unknown'} size=${(file.size / 1024).toFixed(1)} KB`,
+  )
   const img = await loadImage(file)
   const imageData = resizeToImageData(img, maxDim)
-  Log.log(LogTag.SYSTEM, `imgProc: ${img.naturalWidth}x${img.naturalHeight} -> ${imageData.width}x${imageData.height}`)
+  Log.log(
+    LogTag.SYSTEM,
+    `imgProc: ${img.naturalWidth}x${img.naturalHeight} -> ${imageData.width}x${imageData.height}`,
+  )
   return imageData
 }
 
@@ -65,17 +74,19 @@ export function encodeToWebp(
   imageData: ImageData,
   signal?: AbortSignal,
   quality: number = DEFAULT_QUALITY,
-  targetBytes: number = DEFAULT_TARGET_BYTES
+  targetBytes: number = DEFAULT_TARGET_BYTES,
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
-    const worker = new Worker(new URL('./image-encoder.worker.ts', import.meta.url), { type: 'module' })
+    const worker = new Worker(new URL('./image-encoder.worker.ts', import.meta.url), {
+      type: 'module',
+    })
 
     const onAbort = () => {
       worker.terminate()
       reject(new DOMException('Image encoding aborted', 'AbortError'))
     }
 
-    worker.onmessage = ({ data }: MessageEvent<{ buffer?: ArrayBuffer, error?: string }>) => {
+    worker.onmessage = ({ data }: MessageEvent<{ buffer?: ArrayBuffer; error?: string }>) => {
       worker.terminate()
       signal?.removeEventListener('abort', onAbort)
       if (data.buffer) {
@@ -102,9 +113,10 @@ export function encodeToWebp(
         buffer,
         width: imageData.width,
         height: imageData.height,
-        quality, targetBytes
+        quality,
+        targetBytes,
       },
-      [buffer]
+      [buffer],
     )
   })
 }

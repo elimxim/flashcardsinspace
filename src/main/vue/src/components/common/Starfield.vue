@@ -1,7 +1,7 @@
 <template>
   <div class="starfield starfield--theme">
-    <span v-for="s in stars" :key="s.id" class="starfield__star" :style="starStyle(s)"/>
-    <slot/>
+    <span v-for="s in stars" :key="s.id" class="starfield__star" :style="starStyle(s)" />
+    <slot />
   </div>
 </template>
 
@@ -9,31 +9,34 @@
 import { computed } from 'vue'
 import { mulberry32 } from '@/utils/utils.ts'
 
-const props = withDefaults(defineProps<{
-  /** How many stars */
-  density?: number
-  /** Average star size */
-  starSize?: number
-  /** Enable twinkle animation */
-  twinkle?: boolean
-  /** Vertical drift amplitude; 0 disables drift */
-  verticalDrift?: string
-  /** Seed for deterministic field */
-  seed?: number | null
-}>(), {
-  density: 24,
-  starSize: 1.4,
-  twinkle: false,
-  verticalDrift: "0px",
-  seed: null,
-})
+const props = withDefaults(
+  defineProps<{
+    /** How many stars */
+    density?: number
+    /** Average star size */
+    starSize?: number
+    /** Enable twinkle animation */
+    twinkle?: boolean
+    /** Vertical drift amplitude; 0 disables drift */
+    verticalDrift?: string
+    /** Seed for deterministic field */
+    seed?: number | null
+  }>(),
+  {
+    density: 24,
+    starSize: 1.4,
+    twinkle: false,
+    verticalDrift: '0px',
+    seed: null,
+  },
+)
 
 interface Star {
-  id: number;
-  top: number;
-  left: number;
-  size: number;
-  twinkleDuration: number;
+  id: number
+  top: number
+  left: number
+  size: number
+  twinkleDuration: number
   verticalDriftDuration: number
 }
 
@@ -50,7 +53,7 @@ const stars = computed<Star[]>(() => {
       top: rand() * 100,
       left: rand() * 100,
       size: starSize,
-      twinkleDuration:  twinkleDuration,
+      twinkleDuration: twinkleDuration,
       verticalDriftDuration: verticalDriftDuration,
     })
   }
@@ -97,25 +100,25 @@ function starStyle(s: Star) {
 
 @keyframes twinkle {
   0% {
-    opacity: .35
+    opacity: 0.35;
   }
   50% {
-    opacity: 1
+    opacity: 1;
   }
   100% {
-    opacity: .35
+    opacity: 0.35;
   }
 }
 
 @keyframes verticalDrift {
   0% {
-    transform: translateY(0)
+    transform: translateY(0);
   }
   50% {
-    transform: translateY(v-bind(verticalDrift))
+    transform: translateY(v-bind(verticalDrift));
   }
   100% {
-    transform: translateY(0)
+    transform: translateY(0);
   }
 }
 </style>

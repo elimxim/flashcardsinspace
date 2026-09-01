@@ -1,23 +1,23 @@
 .select-none {
-  user-select: none;         /* Standard */
+  user-select: none; /* Standard */
   -webkit-user-select: none; /* Safari, Chrome */
-  -moz-user-select: none;    /* Firefox */
-  -ms-user-select: none;     /* Edge */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Edge */
 }
 
 .select-text {
-  user-select: text;         /* Standard */
+  user-select: text; /* Standard */
   -webkit-user-select: text; /* Safari, Chrome */
-  -moz-user-select: text;    /* Firefox */
-  -ms-user-select: text;     /* Edge */
+  -moz-user-select: text; /* Firefox */
+  -ms-user-select: text; /* Edge */
 }
 
 /* Stops image drag ghosting */
 .drag-none {
-  user-drag: none;           /* Standard */
-  -webkit-user-drag: none;   /* Safari, Chrome */
-  -moz-user-drag: none;      /* Firefox */
-  -ms-user-drag: none;       /* Edge */
+  user-drag: none; /* Standard */
+  -webkit-user-drag: none; /* Safari, Chrome */
+  -moz-user-drag: none; /* Firefox */
+  -ms-user-drag: none; /* Edge */
 }
 
 /* Prevents “Save Image” callout on long press */
@@ -26,12 +26,12 @@
 }
 
 .scrollbar-hidden {
-  scrollbar-width: none;     /* Firefox */
-  -ms-overflow-style: none;  /* IE 10+ */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
 }
 
 .scrollbar-hidden::-webkit-scrollbar {
-  display: none;             /* Safari, Chrome */
+  display: none; /* Safari, Chrome */
 }
 
 .scroll-none {

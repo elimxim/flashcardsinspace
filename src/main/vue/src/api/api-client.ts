@@ -18,7 +18,7 @@ import {
   FlashcardPicture,
   FlashcardPictureMetadata,
   FlashcardSet,
-  FlashcardSetExtra
+  FlashcardSetExtra,
 } from '@/model/flashcard.ts'
 import { Chronoday } from '@/model/chrono.ts'
 import { configureDateTransformers } from './date-transformers.ts'
@@ -83,7 +83,10 @@ export async function sendFlashcardsGetRequest(setId: number): Promise<Flashcard
     const response = await sendFlashcardsGetPageRequest(setId, page)
     const pageContent = response.data.content
     const last = response.data.last
-    Log.log(LogTag.DEBUG, `Fetched page ${page} (last: ${last}): ${all.length} + ${pageContent.length} flashcards`)
+    Log.log(
+      LogTag.DEBUG,
+      `Fetched page ${page} (last: ${last}): ${all.length} + ${pageContent.length} flashcards`,
+    )
     all.push(...pageContent)
     if (last) break
   }
@@ -102,7 +105,9 @@ export async function sendFlashcardCreationRequest(setId: number, flashcard: Fla
 
 export async function sendFlashcardBulkCreationRequest(setId: number, flashcards: Flashcard[]) {
   Log.log(LogTag.POST, `/flashcard-sets/${setId}/flashcards/bulk`)
-  return apiClient.post<FlashcardCreationResponse>(`/flashcard-sets/${setId}/flashcards/bulk`, { requests: flashcards })
+  return apiClient.post<FlashcardCreationResponse>(`/flashcard-sets/${setId}/flashcards/bulk`, {
+    requests: flashcards,
+  })
 }
 
 export async function sendFlashcardUpdateRequest(setId: number, flashcard: Flashcard) {
@@ -117,7 +122,7 @@ export async function sendFlashcardRemovalRequest(setId: number, id: number) {
 
 export async function sendChronoSyncRequest(setId: number) {
   const request: ChronoSyncRequest = {
-    clientDatetime: new Date()
+    clientDatetime: new Date(),
   }
 
   Log.log(LogTag.POST, `/flashcard-sets/${setId}/chrono/sync`)
@@ -134,11 +139,15 @@ export async function sendChronoSyncPrevDay(setId: number) {
   return apiClient.post<void>(`/flashcard-sets/${setId}/chrono/sync/prev`)
 }
 
-export async function sendChronoBulkUpdateRequest(setId: number, status: string, days: Chronoday[]) {
+export async function sendChronoBulkUpdateRequest(
+  setId: number,
+  status: string,
+  days: Chronoday[],
+) {
   Log.log(LogTag.PUT, `/flashcard-sets/${setId}/chrono/bulk`)
   const request: ChronoBulkUpdateRequest = {
     ids: days.map((v): ChronodayId => ({ id: v.id })),
-    status: status
+    status: status,
   }
 
   return apiClient.put<ChronoUpdateResponse>(`/flashcard-sets/${setId}/chrono/bulk`, request)
@@ -149,31 +158,46 @@ export async function sendFlashcardAudioMetadataGetRequest(setId: number) {
   return apiClient.get<FlashcardAudioMetadata[]>(`/flashcard-sets/${setId}/audios/metadata`)
 }
 
-export async function sendFlashcardAudioUploadRequest(setId: number, flashcardId: number, side: string, audioBlob: Blob) {
-  const ext =
-    audioBlob.type.includes('ogg') ? 'ogg'
-      : audioBlob.type.includes('mp4') ? 'm4a'
-        : audioBlob.type.includes('webm') ? 'webm'
-          : 'unknown'
+export async function sendFlashcardAudioUploadRequest(
+  setId: number,
+  flashcardId: number,
+  side: string,
+  audioBlob: Blob,
+) {
+  const ext = audioBlob.type.includes('ogg')
+    ? 'ogg'
+    : audioBlob.type.includes('mp4')
+      ? 'm4a'
+      : audioBlob.type.includes('webm')
+        ? 'webm'
+        : 'unknown'
 
   const form = new FormData()
   form.append('side', side)
-  form.append('file', new File([audioBlob], `voice-${Date.now()}.${ext}`, {
+  form.append(
+    'file',
+    new File([audioBlob], `voice-${Date.now()}.${ext}`, {
       type: audioBlob.type,
-    })
+    }),
   )
 
   Log.log(LogTag.POST, `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio?side=${side}`)
-  return apiClient.post<FlashcardAudio>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio`,
+  return apiClient.post<FlashcardAudio>(
+    `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio`,
     form,
     {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: LONG_TIMEOUT_MS,
-    }
+    },
   )
 }
 
-export async function sendFlashcardAudioGetRequest(setId: number, flashcardId: number, side: string, signal?: AbortSignal) {
+export async function sendFlashcardAudioGetRequest(
+  setId: number,
+  flashcardId: number,
+  side: string,
+  signal?: AbortSignal,
+) {
   Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio?side=${side}`)
   return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio`, {
     responseType: 'blob',
@@ -183,15 +207,26 @@ export async function sendFlashcardAudioGetRequest(setId: number, flashcardId: n
   })
 }
 
-export async function sendFlashcardAudioFetchByIdRequest(setId: number, flashcardId: number, audioId: number) {
+export async function sendFlashcardAudioFetchByIdRequest(
+  setId: number,
+  flashcardId: number,
+  audioId: number,
+) {
   Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
-  return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`, {
-    responseType: 'blob',
-    timeout: LONG_TIMEOUT_MS,
-  })
+  return apiClient.get<Blob>(
+    `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`,
+    {
+      responseType: 'blob',
+      timeout: LONG_TIMEOUT_MS,
+    },
+  )
 }
 
-export async function sendFlashcardAudioRemovalRequest(setId: number, flashcardId: number, audioId: number) {
+export async function sendFlashcardAudioRemovalRequest(
+  setId: number,
+  flashcardId: number,
+  audioId: number,
+) {
   Log.log(LogTag.DELETE, `/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
   return apiClient.delete(`/flashcard-sets/${setId}/flashcards/${flashcardId}/audio/${audioId}`)
 }
@@ -201,24 +236,38 @@ export async function sendFlashcardPictureMetadataRequest(setId: number) {
   return apiClient.get<FlashcardPictureMetadata[]>(`/flashcard-sets/${setId}/pictures/metadata`)
 }
 
-export async function sendFlashcardPictureUploadRequest(setId: number, flashcardId: number, side: string, pictureBlob: Blob) {
+export async function sendFlashcardPictureUploadRequest(
+  setId: number,
+  flashcardId: number,
+  side: string,
+  pictureBlob: Blob,
+) {
   const form = new FormData()
   form.append('side', side)
-  form.append('file', new File([pictureBlob], `picture-${Date.now()}.webp`, {
-    type: 'image/webp',
-  }))
+  form.append(
+    'file',
+    new File([pictureBlob], `picture-${Date.now()}.webp`, {
+      type: 'image/webp',
+    }),
+  )
 
   Log.log(LogTag.POST, `/flashcard-sets/${setId}/flashcards/${flashcardId}/picture?side=${side}`)
-  return apiClient.post<FlashcardPicture>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/picture`,
+  return apiClient.post<FlashcardPicture>(
+    `/flashcard-sets/${setId}/flashcards/${flashcardId}/picture`,
     form,
     {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: LONG_TIMEOUT_MS,
-    }
+    },
   )
 }
 
-export async function sendFlashcardPictureGetRequest(setId: number, flashcardId: number, side: string, signal?: AbortSignal) {
+export async function sendFlashcardPictureGetRequest(
+  setId: number,
+  flashcardId: number,
+  side: string,
+  signal?: AbortSignal,
+) {
   Log.log(LogTag.GET, `/flashcard-sets/${setId}/flashcards/${flashcardId}/picture?side=${side}`)
   return apiClient.get<Blob>(`/flashcard-sets/${setId}/flashcards/${flashcardId}/picture`, {
     responseType: 'blob',
@@ -228,12 +277,20 @@ export async function sendFlashcardPictureGetRequest(setId: number, flashcardId:
   })
 }
 
-export async function sendFlashcardPictureRemovalRequest(setId: number, flashcardId: number, pictureId: number) {
+export async function sendFlashcardPictureRemovalRequest(
+  setId: number,
+  flashcardId: number,
+  pictureId: number,
+) {
   Log.log(LogTag.DELETE, `/flashcard-sets/${setId}/flashcards/${flashcardId}/picture/${pictureId}`)
   return apiClient.delete(`/flashcard-sets/${setId}/flashcards/${flashcardId}/picture/${pictureId}`)
 }
 
-export async function sendUserUpdateRequest(username: string, userEmail: string, languageId: number | undefined) {
+export async function sendUserUpdateRequest(
+  username: string,
+  userEmail: string,
+  languageId: number | undefined,
+) {
   Log.log(LogTag.PUT, `/users`)
   return apiClient.put<User>(`/users`, {
     name: username,
@@ -242,9 +299,14 @@ export async function sendUserUpdateRequest(username: string, userEmail: string,
   })
 }
 
-export async function sendLatestUncompletedReviewSessionGetRequest(setId: number, type: ReviewSessionType) {
+export async function sendLatestUncompletedReviewSessionGetRequest(
+  setId: number,
+  type: ReviewSessionType,
+) {
   Log.log(LogTag.GET, `/flashcard-sets/${setId}/review-sessions/latest-uncompleted?type=${type}`)
-  return apiClient.get<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/latest-uncompleted?type=${type}`)
+  return apiClient.get<ReviewSession>(
+    `/flashcard-sets/${setId}/review-sessions/latest-uncompleted?type=${type}`,
+  )
 }
 
 export async function sendReviewSessionGetRequest(setId: number, id: number) {
@@ -252,17 +314,31 @@ export async function sendReviewSessionGetRequest(setId: number, id: number) {
   return apiClient.get<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${id}`)
 }
 
-export async function sendReviewSessionCreateRequest(setId: number, request: ReviewSessionCreateRequest) {
+export async function sendReviewSessionCreateRequest(
+  setId: number,
+  request: ReviewSessionCreateRequest,
+) {
   Log.log(LogTag.POST, `/flashcard-sets/${setId}/review-sessions`)
   return apiClient.post<ReviewSession>(`/flashcard-sets/${setId}/review-sessions`, request)
 }
 
-export async function sendReviewSessionChildCreateRequest(setId: number, parentId: number, request: ReviewSessionCreateRequest) {
+export async function sendReviewSessionChildCreateRequest(
+  setId: number,
+  parentId: number,
+  request: ReviewSessionCreateRequest,
+) {
   Log.log(LogTag.POST, `/flashcard-sets/${setId}/review-sessions/${parentId}/children`)
-  return apiClient.post<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${parentId}/children`, request)
+  return apiClient.post<ReviewSession>(
+    `/flashcard-sets/${setId}/review-sessions/${parentId}/children`,
+    request,
+  )
 }
 
-export async function sendReviewSessionUpdateRequest(setId: number, id: number, request: ReviewSessionUpdateRequest) {
+export async function sendReviewSessionUpdateRequest(
+  setId: number,
+  id: number,
+  request: ReviewSessionUpdateRequest,
+) {
   Log.log(LogTag.PUT, `/flashcard-sets/${setId}/review-sessions/${id}`)
   return apiClient.put<ReviewSession>(`/flashcard-sets/${setId}/review-sessions/${id}`, request)
 }

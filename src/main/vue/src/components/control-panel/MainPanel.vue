@@ -1,20 +1,9 @@
 <template>
   <div ref="mainPanel" class="main-panel">
-    <div
-      v-for="row in widgetRows"
-      :key="row.id"
-      class="main-panel-row"
-    >
-      <template
-        v-for="widget in row.widgets"
-        :key="widget.id"
-      >
-        <div
-          v-if="!widget.hidden.value"
-          :class="widget.className"
-          :flip-key="widget.id"
-        >
-          <component v-bind="widget.props" :is="widget.component"/>
+    <div v-for="row in widgetRows" :key="row.id" class="main-panel-row">
+      <template v-for="widget in row.widgets" :key="widget.id">
+        <div v-if="!widget.hidden.value" :class="widget.className" :flip-key="widget.id">
+          <component v-bind="widget.props" :is="widget.component" />
         </div>
       </template>
     </div>
@@ -129,33 +118,20 @@ const widgetRows = computed(() => {
     return [
       {
         id: 'row-1',
-        widgets: [
-          widgets.flashcard,
-          widgets.calendar,
-        ],
+        widgets: [widgets.flashcard, widgets.calendar],
       },
       {
         id: 'row-2',
-        widgets: [
-          widgets.reviewInfo,
-          widgets.dayStreak,
-        ],
+        widgets: [widgets.reviewInfo, widgets.dayStreak],
       },
       {
         id: 'row-3',
-        widgets: [
-          widgets.launch,
-          widgets.quiz,
-        ],
+        widgets: [widgets.launch, widgets.quiz],
       },
       {
         id: 'row-4',
-        widgets: [
-          widgets.unknown,
-          widgets.attempted,
-        ],
+        widgets: [widgets.unknown, widgets.attempted],
       },
-
     ]
   }
 
@@ -163,26 +139,15 @@ const widgetRows = computed(() => {
     return [
       {
         id: 'row-1',
-        widgets: [
-          widgets.flashcard,
-          widgets.calendar,
-          widgets.dayStreak,
-        ],
+        widgets: [widgets.flashcard, widgets.calendar, widgets.dayStreak],
       },
       {
         id: 'row-2',
-        widgets: [
-          widgets.reviewInfo,
-          widgets.launch,
-        ],
+        widgets: [widgets.reviewInfo, widgets.launch],
       },
       {
         id: 'row-3',
-        widgets: [
-          widgets.unknown,
-          widgets.attempted,
-          widgets.quiz,
-        ],
+        widgets: [widgets.unknown, widgets.attempted, widgets.quiz],
       },
     ]
   }
@@ -191,21 +156,11 @@ const widgetRows = computed(() => {
     return [
       {
         id: 'row-1',
-        widgets: [
-          widgets.flashcard,
-          widgets.calendar,
-          widgets.dayStreak,
-          widgets.reviewInfo,
-        ],
+        widgets: [widgets.flashcard, widgets.calendar, widgets.dayStreak, widgets.reviewInfo],
       },
       {
         id: 'row-2',
-        widgets: [
-          widgets.unknown,
-          widgets.attempted,
-          widgets.quiz,
-          widgets.launch,
-        ],
+        widgets: [widgets.unknown, widgets.attempted, widgets.quiz, widgets.launch],
       },
     ]
   }

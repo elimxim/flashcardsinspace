@@ -3,7 +3,7 @@
     <AwesomeButton
       icon="fa-solid fa-microphone"
       class="voice-recorder-button voice-recorder-button--mic"
-      style="height: 100%;"
+      style="height: 100%"
       :on-click="toggleControls"
       :active="expanded"
       square
@@ -60,11 +60,14 @@ import { Log, LogTag } from '@/utils/logger.ts'
 const audioBlob = defineModel<Blob | undefined>('audio-blob', { required: true })
 const expanded = defineModel<boolean>('expanded', { default: false })
 
-const props = withDefaults(defineProps<{
-  maxDuration?: number
-}>(), {
-  maxDuration: 20 * 1000,
-})
+const props = withDefaults(
+  defineProps<{
+    maxDuration?: number
+  }>(),
+  {
+    maxDuration: 20 * 1000,
+  },
+)
 const isRecording = ref(false)
 const isPaused = ref(false)
 
@@ -84,8 +87,12 @@ const mimeCandidates: string[] = [
 ]
 
 const isSupported = computed(() => {
-  return typeof window !== 'undefined' && 'MediaRecorder' in window
-    && typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia
+  return (
+    typeof window !== 'undefined' &&
+    'MediaRecorder' in window &&
+    typeof navigator !== 'undefined' &&
+    !!navigator.mediaDevices?.getUserMedia
+  )
 })
 
 const recordingTime = computed(() => {
@@ -116,14 +123,14 @@ async function ensureStream(): Promise<MediaStream> {
       noiseSuppression: true,
       autoGainControl: true,
       channelCount: 1,
-    }
+    },
   }
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia(constraints)
     mediaStream.value = stream
     return stream
-  } catch(error) {
+  } catch (error) {
     Log.error(LogTag.SYSTEM, 'Advanced constraints failed, falling back to basic audio', error)
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
     mediaStream.value = stream
@@ -162,7 +169,7 @@ async function startRecording() {
   blobChunks.value = []
 
   const options: MediaRecorderOptions = {
-    audioBitsPerSecond: 128000
+    audioBitsPerSecond: 128000,
   }
 
   if (mimeType) {
@@ -215,7 +222,7 @@ function stopRecording() {
   stopTimer()
 
   if (mediaStream.value) {
-    mediaStream.value.getTracks().forEach(track => track.stop())
+    mediaStream.value.getTracks().forEach((track) => track.stop())
     mediaStream.value = undefined
   }
 
@@ -258,7 +265,6 @@ watch(audioBlob, (newVal) => {
 onBeforeUnmount(() => {
   resetState()
 })
-
 </script>
 
 <style scoped>
@@ -267,13 +273,34 @@ onBeforeUnmount(() => {
   --v-recorder--time--bg: var(--voice-recorder--time--bg, rgba(255, 255, 255, 0.52));
   --v-recorder--controls--bg: var(--voice-recorder--controls--bg, rgba(87, 87, 87, 0.15));
   --v-recorder--button--color: var(--voice-recorder--button--color, rgba(87, 87, 87, 0.86));
-  --v-recorder--button--color--hover: var(--voice-recorder--button--color--hover, rgba(0, 0, 0, 0.9));
-  --v-recorder--button--color--active: var(--voice-recorder--button--color--active, rgba(0, 0, 0, 0.9));
-  --v-recorder--button--color--disabled: var(--voice-recorder--button--color--disabled, rgba(202, 202, 202, 0.9));
-  --v-recorder--mic-button--bg--hover: var(--voice-recorder--mic-button--bg--hover, rgba(87, 87, 87, 0.12));
-  --v-recorder--mic-button--bg--active: var(--voice-recorder--mic-button--bg--active, rgba(87, 87, 87, 0.18));
-  --v-recorder--play-button--bg--hover: var(--voice-recorder--play-button--bg--hover, rgba(87, 87, 87, 0.12));
-  --v-recorder--play-button--bg--active: var(--voice-recorder--play-button--bg--active, rgba(87, 87, 87, 0.18));
+  --v-recorder--button--color--hover: var(
+    --voice-recorder--button--color--hover,
+    rgba(0, 0, 0, 0.9)
+  );
+  --v-recorder--button--color--active: var(
+    --voice-recorder--button--color--active,
+    rgba(0, 0, 0, 0.9)
+  );
+  --v-recorder--button--color--disabled: var(
+    --voice-recorder--button--color--disabled,
+    rgba(202, 202, 202, 0.9)
+  );
+  --v-recorder--mic-button--bg--hover: var(
+    --voice-recorder--mic-button--bg--hover,
+    rgba(87, 87, 87, 0.12)
+  );
+  --v-recorder--mic-button--bg--active: var(
+    --voice-recorder--mic-button--bg--active,
+    rgba(87, 87, 87, 0.18)
+  );
+  --v-recorder--play-button--bg--hover: var(
+    --voice-recorder--play-button--bg--hover,
+    rgba(87, 87, 87, 0.12)
+  );
+  --v-recorder--play-button--bg--active: var(
+    --voice-recorder--play-button--bg--active,
+    rgba(87, 87, 87, 0.18)
+  );
   --v-recorder--warning-text--color: var(--voice-recorder--warning-text--color, #404040);
 }
 
@@ -342,7 +369,9 @@ onBeforeUnmount(() => {
 
 .voice-controls-slide-enter-active,
 .voice-controls-slide-leave-active {
-  transition: max-width 0.3s ease-out, opacity 0.3s ease-out;
+  transition:
+    max-width 0.3s ease-out,
+    opacity 0.3s ease-out;
 }
 
 .voice-controls-slide-enter-from {
@@ -364,5 +393,4 @@ onBeforeUnmount(() => {
   max-width: 0;
   opacity: 0;
 }
-
 </style>

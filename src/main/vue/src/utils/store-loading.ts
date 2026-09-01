@@ -70,7 +70,7 @@ export function waitUntilStoreLoaded<T extends object>(
           resolve()
         }
       },
-      { immediate: true }
+      { immediate: true },
     )
   })
 }
@@ -85,10 +85,11 @@ export async function loadLanguageStore(): Promise<boolean> {
   }
 
   return await sendLanguagesGetRequest()
-    .then(response => {
+    .then((response) => {
       languageStore.loadState(response.data)
       return true
-    }).catch(error => {
+    })
+    .catch((error) => {
       Log.error(LogTag.STORE, 'Failed to load language store', error)
       toaster.bakeError(userApiErrors.DATA_LOADING, error.response?.data)
       return false
@@ -132,7 +133,10 @@ export async function loadFlashcardSetExtras(): Promise<boolean> {
     })
 }
 
-export async function loadStoresForFlashcardSet(flashcardSet: FlashcardSet, forced: boolean = false): Promise<boolean> {
+export async function loadStoresForFlashcardSet(
+  flashcardSet: FlashcardSet,
+  forced: boolean = false,
+): Promise<boolean> {
   const toaster = useSpaceToaster()
   const flashcardStore = useFlashcardStore()
   const chronoStore = useChronoStore()
@@ -192,7 +196,10 @@ export async function loadStoresForCurrFlashcardSet(forced: boolean = false): Pr
   }
 }
 
-export async function loadStoresForFlashcardSetId(setId: number, forced: boolean = false): Promise<boolean> {
+export async function loadStoresForFlashcardSetId(
+  setId: number,
+  forced: boolean = false,
+): Promise<boolean> {
   const toaster = useSpaceToaster()
 
   return await sendFlashcardSetGetRequest(setId)
@@ -210,7 +217,10 @@ export async function loadStoresForFlashcardSetId(setId: number, forced: boolean
 // To keep the day streak the user needs to log in every day but doesn't need to start the review;
 // If there is nothing to review (the review button is simply locked in this case) -
 // fewer frictions = happier user.
-export async function markCurrDayAsCompleted(flashcardSetId: number, currDay: Chronoday): Promise<void> {
+export async function markCurrDayAsCompleted(
+  flashcardSetId: number,
+  currDay: Chronoday,
+): Promise<void> {
   const flashcardStore = useFlashcardStore()
   const chronoStore = useChronoStore()
 
@@ -218,7 +228,11 @@ export async function markCurrDayAsCompleted(flashcardSetId: number, currDay: Ch
 
   if (currDay.status === chronodayStatuses.NOT_STARTED && flashcardsToReview === 0) {
     try {
-      const response = await sendChronoBulkUpdateRequest(flashcardSetId, chronodayStatuses.COMPLETED, [currDay])
+      const response = await sendChronoBulkUpdateRequest(
+        flashcardSetId,
+        chronodayStatuses.COMPLETED,
+        [currDay],
+      )
       chronoStore.updateDays(response.data.chronodays)
       chronoStore.updateDayStreak(response.data.dayStreak)
     } catch (error) {

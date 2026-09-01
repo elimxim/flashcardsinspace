@@ -18,9 +18,7 @@ export const usePictureCache = defineStore('picture-cache', () => {
   const accessOrder = ref<number[]>([]) // oldest first
 
   const storageSize = computed(() => totalSize.value)
-  const storagePercentage = computed(() =>
-    (totalSize.value / MAX_PICTURE_STORAGE_BYTES) * 100
-  )
+  const storagePercentage = computed(() => (totalSize.value / MAX_PICTURE_STORAGE_BYTES) * 100)
 
   function updateAccessOrder(id: number, accessTime: number) {
     let left = 0
@@ -78,7 +76,10 @@ export const usePictureCache = defineStore('picture-cache', () => {
   }
 
   function addPicture(flashcardId: number, pictureBlob: Blob, side: string) {
-    Log.log(LogTag.STORE, `picture-cache.addPicture: Flashcard.id=${flashcardId}, side=${side}, Picture.size=${sizeInKB(pictureBlob)}`)
+    Log.log(
+      LogTag.STORE,
+      `picture-cache.addPicture: Flashcard.id=${flashcardId}, side=${side}, Picture.size=${sizeInKB(pictureBlob)}`,
+    )
 
     const now = performance.now()
 

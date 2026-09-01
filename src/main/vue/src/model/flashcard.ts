@@ -70,5 +70,5 @@ export interface FlashcardSetExtra {
 
 export interface FlashcardContent {
   frontSide?: string | undefined
-  backSide? : string | undefined
+  backSide?: string | undefined
 }

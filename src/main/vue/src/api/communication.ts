@@ -10,29 +10,29 @@ export interface Page<T> {
 export interface ErrorResponseBody {
   timestamp: Date
   statusCode: number
-  statusError: string,
-  errorCode: string,
-  message?: string,
+  statusError: string
+  errorCode: string
+  message?: string
 }
 
 export interface ChronoSyncRequest {
-  clientDatetime: Date,
+  clientDatetime: Date
 }
 
 export interface ChronoSyncResponse {
   chronodays: Chronoday[]
-  currDay: Chronoday,
-  dayStreak: DayStreak,
+  currDay: Chronoday
+  dayStreak: DayStreak
 }
 
 export interface ChronoBulkUpdateRequest {
-  ids: ChronodayId[],
-  status: string,
+  ids: ChronodayId[]
+  status: string
 }
 
 export interface ChronoUpdateResponse {
   chronodays: Chronoday[]
-  dayStreak: DayStreak,
+  dayStreak: DayStreak
 }
 
 export interface ChronodayId {
@@ -41,30 +41,30 @@ export interface ChronodayId {
 
 export interface FlashcardCreationResponse {
   initialized: boolean
-  flashcardSet?: FlashcardSet,
-  flashcard?: Flashcard,
-  flashcards?: Flashcard[],
-  currDay?: Chronoday,
-  chronodays?: Chronoday[],
+  flashcardSet?: FlashcardSet
+  flashcard?: Flashcard
+  flashcards?: Flashcard[]
+  currDay?: Chronoday
+  chronodays?: Chronoday[]
 }
 
 export interface FlashcardSetSuspendResponse {
-  flashcardSet: FlashcardSet,
-  currDay: Chronoday,
-  chronodays: Chronoday[],
+  flashcardSet: FlashcardSet
+  currDay: Chronoday
+  chronodays: Chronoday[]
 }
 
 export interface ReviewSessionCreateRequest {
-  type: string,
-  chronodayId: number,
-  metadata?: Record<string, unknown>,
+  type: string
+  chronodayId: number
+  metadata?: Record<string, unknown>
 }
 
 export interface ReviewSessionUpdateRequest {
-  elapsedTime: number,
-  flashcardIds?: FlashcardId[],
-  finished?: boolean,
-  metadata?: Record<string, unknown>,
+  elapsedTime: number
+  flashcardIds?: FlashcardId[]
+  finished?: boolean
+  metadata?: Record<string, unknown>
 }
 
 export interface FlashcardId {
@@ -72,7 +72,7 @@ export interface FlashcardId {
 }
 
 export interface VerificationIntentResponse {
-  result: string,
-  type?: string,
-  attempts?: number,
+  result: string
+  type?: string
+  attempts?: number
 }

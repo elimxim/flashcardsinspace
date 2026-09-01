@@ -2,15 +2,11 @@
   <div class="totem-scroll totem-scroll--theme">
     <div ref="viewport" class="scroll-viewport" @scroll="handleScroll">
       <div ref="contentRef" class="scroll-content">
-        <slot/>
+        <slot />
       </div>
     </div>
 
-    <div
-      v-show="isScrollable"
-      class="scroll-track-wrapper"
-      :style="{ width: `${trackWidth}px` }"
-    >
+    <div v-show="isScrollable" class="scroll-track-wrapper" :style="{ width: `${trackWidth}px` }">
       <button
         v-if="UXConfig().showNavButtons"
         class="scroll-nav-btn top"
@@ -19,7 +15,8 @@
       >
         <svg viewBox="0 0 24 24" fill="currentColor">
           <path
-            d="M12 5.5c-0.8 0-1.5 0.5-2 1.5L4.5 16.5c-0.8 1.5 0.2 3.5 2 3.5h11c1.8 0 2.8-2 2-3.5L14 7c-0.5-1-1.2-1.5-2-1.5z"/>
+            d="M12 5.5c-0.8 0-1.5 0.5-2 1.5L4.5 16.5c-0.8 1.5 0.2 3.5 2 3.5h11c1.8 0 2.8-2 2-3.5L14 7c-0.5-1-1.2-1.5-2-1.5z"
+          />
         </svg>
       </button>
       <div class="scroll-track" :style="{ gap: `${spacing}px` }">
@@ -40,7 +37,8 @@
       >
         <svg viewBox="0 0 24 24" fill="currentColor">
           <path
-            d="M12 18.5c0.8 0 1.5-0.5 2-1.5l5.5-9.5c0.8-1.5-0.2-3.5-2-3.5H6.5c-1.8 0-2.8 2-2 3.5l5.5 9.5c0.5 1 1.2 1.5 2 1.5z"/>
+            d="M12 18.5c0.8 0 1.5-0.5 2-1.5l5.5-9.5c0.8-1.5-0.2-3.5-2-3.5H6.5c-1.8 0-2.8 2-2 3.5l5.5 9.5c0.5 1 1.2 1.5 2 1.5z"
+          />
         </svg>
       </button>
     </div>
@@ -51,19 +49,22 @@
 import { ref, onMounted, onBeforeUnmount, computed, nextTick } from 'vue'
 import { UXConfig } from '@/utils/device-utils.ts'
 
-const props = withDefaults(defineProps<{
-  dotCount?: number
-  dotSize?: number
-  trackWidth?: number
-  buttonSize?: number
-  spacing?: number
-}>(), {
-  dotCount: 4,
-  dotSize: 14,
-  trackWidth: 32,
-  buttonSize: 22,
-  spacing: 10,
-})
+const props = withDefaults(
+  defineProps<{
+    dotCount?: number
+    dotSize?: number
+    trackWidth?: number
+    buttonSize?: number
+    spacing?: number
+  }>(),
+  {
+    dotCount: 4,
+    dotSize: 14,
+    trackWidth: 32,
+    buttonSize: 22,
+    spacing: 10,
+  },
+)
 
 const viewport = ref<HTMLElement | null>(null)
 const contentRef = ref<HTMLElement | null>(null)
@@ -76,12 +77,12 @@ let mutationObserver: MutationObserver | null = null
 
 const dotStyle = computed(() => ({
   width: `${props.dotSize}px`,
-  height: `${props.dotSize}px`
+  height: `${props.dotSize}px`,
 }))
 
 const buttonStyle = computed(() => ({
   width: `${props.buttonSize}px`,
-  height: `${props.buttonSize}px`
+  height: `${props.buttonSize}px`,
 }))
 
 const updateMetrics = () => {
@@ -117,7 +118,7 @@ const updateMetrics = () => {
   let size = 1
   if (visibleRatio > 0.75) {
     size = 3
-  } else if (visibleRatio > 0.50) {
+  } else if (visibleRatio > 0.5) {
     size = 2
   }
   thumbSize.value = Math.min(size, props.dotCount)
@@ -142,7 +143,7 @@ const handleResizeOrMutation = () => {
 }
 
 const isDotActive = (index: number) => {
-  return index >= thumbStart.value && index < (thumbStart.value + thumbSize.value)
+  return index >= thumbStart.value && index < thumbStart.value + thumbSize.value
 }
 
 const scrollStep = (direction: number) => {
@@ -150,7 +151,7 @@ const scrollStep = (direction: number) => {
   const { scrollTop, scrollHeight, clientHeight } = viewport.value
   const step = clientHeight * 0.5
   const maxScroll = scrollHeight - clientHeight
-  const targetPos = scrollTop + (direction * step)
+  const targetPos = scrollTop + direction * step
   const normalizedTargetPos = Math.max(0, Math.min(targetPos, maxScroll))
   if (Math.abs(normalizedTargetPos - scrollTop) < 1) return
   viewport.value.scrollTo({ top: normalizedTargetPos, behavior: 'smooth' })
@@ -175,7 +176,7 @@ onMounted(() => {
     mutationObserver.observe(contentRef.value, {
       childList: true,
       subtree: true,
-      characterData: true
+      characterData: true,
     })
   }
 })
@@ -265,9 +266,10 @@ onBeforeUnmount(() => {
   box-sizing: border-box;
   background-color: transparent;
   cursor: pointer;
-  transition: background-color 0.2s ease,
-  border-color 0.2s ease,
-  transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .scroll-track-dot.is-active {
@@ -284,7 +286,9 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   color: inherit;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
 }
 
 @media (hover: hover) {

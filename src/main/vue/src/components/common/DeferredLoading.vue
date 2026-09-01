@@ -1,10 +1,10 @@
 <template>
   <Transition name="fade" mode="out-in">
     <div v-if="resolvedLoading" key="fallback">
-      <slot name="fallback"/>
+      <slot name="fallback" />
     </div>
     <div v-else-if="!isDelaying" key="content">
-      <slot name="default"/>
+      <slot name="default" />
     </div>
   </Transition>
 </template>
@@ -13,23 +13,21 @@
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { onMounted } from 'vue'
 
-const props = withDefaults(defineProps<{
-  waitFor: () => Promise<unknown>
-  delayEntry?: number
-  minDuration?: number
-}>(), {
-  delayEntry: 200,
-  minDuration: 800,
-})
+const props = withDefaults(
+  defineProps<{
+    waitFor: () => Promise<unknown>
+    delayEntry?: number
+    minDuration?: number
+  }>(),
+  {
+    delayEntry: 200,
+    minDuration: 800,
+  },
+)
 
-const {
-  isDelaying,
-  resolvedLoading,
-  startLoading,
-  stopLoading
-} = useDeferredLoading({
+const { isDelaying, resolvedLoading, startLoading, stopLoading } = useDeferredLoading({
   delayEntry: props.delayEntry,
-  minDuration: props.minDuration
+  minDuration: props.minDuration,
 })
 
 onMounted(async () => {
@@ -37,7 +35,6 @@ onMounted(async () => {
   await props.waitFor()
   await stopLoading()
 })
-
 </script>
 
 <style scoped>

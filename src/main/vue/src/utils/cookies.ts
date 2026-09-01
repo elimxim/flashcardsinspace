@@ -18,12 +18,12 @@ function saveCookie(name: string, value: string, expires: number) {
 
 function loadCookie(name: string): string | undefined {
   const value = Cookies.get(name)
-  Log.log(LogTag.COOKIES,`${name} => ${value}`)
+  Log.log(LogTag.COOKIES, `${name} => ${value}`)
   return value
 }
 
 function removeCookie(name: string) {
-  Log.log(LogTag.COOKIES,`${name} => x_x`)
+  Log.log(LogTag.COOKIES, `${name} => x_x`)
   Cookies.remove(name)
 }
 

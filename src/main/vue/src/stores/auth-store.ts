@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import type { User } from '@/model/user.ts'
 
 export interface AuthState {
-  user: User | undefined,
+  user: User | undefined
 }
 
 export enum UserRole {
@@ -22,7 +22,7 @@ export const useAuthStore = defineStore('auth', {
     },
     isEmailVerified(): boolean {
       return this.user?.emailVerified ?? false
-    }
+    },
   },
   actions: {
     setUser(user: User | undefined) {
@@ -38,6 +38,6 @@ export const useAuthStore = defineStore('auth', {
       if (this.user !== undefined) {
         this.user.emailVerified = true
       }
-    }
-  }
+    },
+  },
 })

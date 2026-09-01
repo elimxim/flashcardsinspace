@@ -4,7 +4,7 @@
       ref="fileInputRef"
       type="file"
       accept="image/*"
-      style="display: none;"
+      style="display: none"
       @change="handleFileChange"
     />
     <transition name="picture-toggle-flip" mode="out-in">
@@ -13,7 +13,7 @@
         key="pick"
         icon="fa-solid fa-image"
         class="picture-uploader-button picture-uploader-button--pick"
-        style="height: 100%;"
+        style="height: 100%"
         :on-click="toggleControls"
         :active="expanded"
         square
@@ -41,7 +41,9 @@
           <div
             class="picture-uploader-size"
             :class="{ 'picture-uploader-size--processing': processing }"
-          >{{ sizeLabel }}</div>
+          >
+            {{ sizeLabel }}
+          </div>
           <AwesomeButton
             icon="fa-solid fa-eye"
             class="picture-uploader-button"
@@ -59,12 +61,8 @@
     </transition>
     <Teleport to="body">
       <transition name="picture-preview-fade">
-        <div
-          v-if="previewOpen && previewUrl"
-          class="picture-preview-overlay"
-          @click="closePreview"
-        >
-          <img :src="previewUrl" class="picture-preview-image" alt="Picture preview"/>
+        <div v-if="previewOpen && previewUrl" class="picture-preview-overlay" @click="closePreview">
+          <img :src="previewUrl" class="picture-preview-image" alt="Picture preview" />
         </div>
       </transition>
     </Teleport>
@@ -136,10 +134,16 @@ async function handleFileChange(event: Event) {
   input.value = ''
   if (!file) return
 
-  Log.log(LogTag.LOGIC, `PictureUploader: selected "${file.name}" type=${file.type || 'unknown'} size=${(file.size / 1024).toFixed(1)} KB`)
+  Log.log(
+    LogTag.LOGIC,
+    `PictureUploader: selected "${file.name}" type=${file.type || 'unknown'} size=${(file.size / 1024).toFixed(1)} KB`,
+  )
   if (file.size > MAX_RAW_SIZE_BYTES) {
     useSpaceToaster().bakeError(userApiErrors.PICTURE__TOO_LARGE)
-    Log.log(LogTag.LOGIC, `PictureUploader: rejected - raw file too large (${(file.size / 1024 / 1024).toFixed(1)} MB, max 4 MB)`)
+    Log.log(
+      LogTag.LOGIC,
+      `PictureUploader: rejected - raw file too large (${(file.size / 1024 / 1024).toFixed(1)} MB, max 4 MB)`,
+    )
     return
   }
 
@@ -150,12 +154,18 @@ async function handleFileChange(event: Event) {
     const blob = await encodeToWebp(imageData, encodeController.value.signal)
     if (blob.size > MAX_PROCESSED_SIZE_BYTES) {
       useSpaceToaster().bakeError(userApiErrors.PICTURE__TOO_LARGE_AFTER_COMPRESSION)
-      Log.log(LogTag.LOGIC, `PictureUploader: rejected - processed still too large (${(blob.size / 1024).toFixed(1)} KB, max 500 KB)`)
+      Log.log(
+        LogTag.LOGIC,
+        `PictureUploader: rejected - processed still too large (${(blob.size / 1024).toFixed(1)} KB, max 500 KB)`,
+      )
       return
     }
     pictureBlob.value = blob
     expanded.value = true
-    Log.log(LogTag.LOGIC, `PictureUploader: accepted processed webp ${(blob.size / 1024).toFixed(1)} KB`)
+    Log.log(
+      LogTag.LOGIC,
+      `PictureUploader: accepted processed webp ${(blob.size / 1024).toFixed(1)} KB`,
+    )
   } catch (error) {
     if (encodeController.value.signal.aborted) {
       Log.log(LogTag.LOGIC, 'PictureUploader: processing aborted')
@@ -175,36 +185,54 @@ function removePicture() {
   Log.log(LogTag.LOGIC, 'PictureUploader: picture removed')
 }
 
-watch(pictureBlob, (newBlob) => {
-  thumbButton.value?.revoke()
-  if (newBlob) {
-    try {
-      previewUrl.value = URL.createObjectURL(newBlob)
-    } catch (error) {
-      Log.error(LogTag.LOGIC, 'PictureUploader: failed to create object URL for preview', error)
+watch(
+  pictureBlob,
+  (newBlob) => {
+    thumbButton.value?.revoke()
+    if (newBlob) {
+      try {
+        previewUrl.value = URL.createObjectURL(newBlob)
+      } catch (error) {
+        Log.error(LogTag.LOGIC, 'PictureUploader: failed to create object URL for preview', error)
+      }
+    } else {
+      previewOpen.value = false
     }
-  } else {
-    previewOpen.value = false
-  }
-}, { immediate: true })
+  },
+  { immediate: true },
+)
 
 onBeforeUnmount(() => {
   encodeController.value?.abort()
   thumbButton.value?.revoke()
   window.removeEventListener('keydown', onPreviewKeydown, { capture: true })
 })
-
 </script>
 
 <style scoped>
 .picture-uploader--theme {
   --p-uploader--button--color: var(--picture-uploader--button--color, rgba(87, 87, 87, 0.86));
-  --p-uploader--button--color--hover: var(--picture-uploader--button--color--hover, rgba(0, 0, 0, 0.9));
-  --p-uploader--button--color--active: var(--picture-uploader--button--color--active, rgba(0, 0, 0, 0.9));
-  --p-uploader--button--color--disabled: var(--picture-uploader--button--color--disabled, rgba(202, 202, 202, 0.9));
+  --p-uploader--button--color--hover: var(
+    --picture-uploader--button--color--hover,
+    rgba(0, 0, 0, 0.9)
+  );
+  --p-uploader--button--color--active: var(
+    --picture-uploader--button--color--active,
+    rgba(0, 0, 0, 0.9)
+  );
+  --p-uploader--button--color--disabled: var(
+    --picture-uploader--button--color--disabled,
+    rgba(202, 202, 202, 0.9)
+  );
   --p-uploader--controls--bg: var(--picture-uploader--controls--bg, rgba(87, 87, 87, 0.15));
-  --p-uploader--pick-button--bg--hover: var(--picture-uploader--mic-button--bg--hover, rgba(87, 87, 87, 0.12));
-  --p-uploader--pick-button--bg--active: var(--picture-uploader--mic-button--bg--active, rgba(87, 87, 87, 0.18));
+  --p-uploader--pick-button--bg--hover: var(
+    --picture-uploader--mic-button--bg--hover,
+    rgba(87, 87, 87, 0.12)
+  );
+  --p-uploader--pick-button--bg--active: var(
+    --picture-uploader--mic-button--bg--active,
+    rgba(87, 87, 87, 0.18)
+  );
   --p-uploader--size--color: var(--picture-uploader--time--color, rgba(0, 0, 0, 0.9));
   --p-uploader--size--bg: var(--picture-uploader--time--bg, rgba(255, 255, 255, 0.52));
   --p-uploader--size--stripe: var(--picture-uploader--size--stripe, rgba(87, 87, 87, 0.35));
@@ -224,12 +252,16 @@ onBeforeUnmount(() => {
 }
 
 .picture-toggle-flip-enter-active {
-  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.18s ease;
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.18s ease;
   backface-visibility: hidden;
 }
 
 .picture-toggle-flip-leave-active {
-  transition: transform 0.15s ease-in, opacity 0.15s ease-in;
+  transition:
+    transform 0.15s ease-in,
+    opacity 0.15s ease-in;
   backface-visibility: hidden;
 }
 
@@ -324,7 +356,9 @@ onBeforeUnmount(() => {
 
 .picture-controls-slide-enter-active,
 .picture-controls-slide-leave-active {
-  transition: max-width 0.4s ease-out, opacity 0.4s ease-out;
+  transition:
+    max-width 0.4s ease-out,
+    opacity 0.4s ease-out;
 }
 
 .picture-controls-slide-enter-from {

@@ -6,7 +6,7 @@
     title="Picture options"
     @click="onClick"
   >
-    <img v-if="url" :src="url" class="picture-thumb-button-image" alt="Picture preview"/>
+    <img v-if="url" :src="url" class="picture-thumb-button-image" alt="Picture preview" />
   </button>
 </template>
 
@@ -15,14 +15,16 @@ import { onBeforeUnmount } from 'vue'
 
 const url = defineModel<string | undefined>('url', { required: true })
 
-withDefaults(defineProps<{
-  active?: boolean
-  onClick?: () => void
-}>(), {
-  active: false,
-  onClick: () => {
-  }
-})
+withDefaults(
+  defineProps<{
+    active?: boolean
+    onClick?: () => void
+  }>(),
+  {
+    active: false,
+    onClick: () => {},
+  },
+)
 
 function revoke() {
   if (url.value) {
@@ -32,13 +34,12 @@ function revoke() {
 }
 
 defineExpose({
-  revoke
+  revoke,
 })
 
 onBeforeUnmount(() => {
   revoke()
 })
-
 </script>
 
 <style scoped>

@@ -15,7 +15,7 @@
           'swipe-indicator--right': fingerOffset > 0,
         }"
       >
-        <div class="swipe-indicator-line" :style="swipeLineStyle"/>
+        <div class="swipe-indicator-line" :style="swipeLineStyle" />
         <span class="swipe-indicator-text" :style="swipeTextStyle">
           {{ swipeLabelText }}
         </span>
@@ -49,17 +49,11 @@
         @animationend="onEnterAnimationEnd"
       />
       <template v-else>
-        <slot v-if="hasSlot && showSlot && deckReady"/>
-        <SpaceCard
-          v-else
-          :front-side="emptyMessage"
-          unflippable
-          text-only
-          transparent
-        />
+        <slot v-if="hasSlot && showSlot && deckReady" />
+        <SpaceCard v-else :front-side="emptyMessage" unflippable text-only transparent />
       </template>
       <Transition name="loader-fade">
-        <component :is="UfoLoader" v-if="resolvedLoading" class="deck-loader"/>
+        <component :is="UfoLoader" v-if="resolvedLoading" class="deck-loader" />
       </Transition>
     </div>
   </div>
@@ -85,26 +79,27 @@ import { UXConfig } from '@/utils/device-utils.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 
-const props = withDefaults(defineProps<{
-  sessionType: ReviewSessionType
-  showSlot?: boolean
-  canSlideLeft?: boolean
-  canSlideRight?: boolean
-  swipeLeftText?: string
-  swipeRightText?: string
-  onSlideLeft?: () => Promise<void> | void
-  onSlideRight?: () => Promise<void> | void
-}>(), {
-  showSlot: true,
-  canSlideLeft: true,
-  canSlideRight: true,
-  swipeLeftText: undefined,
-  swipeRightText: undefined,
-  onSlideLeft: () => {
+const props = withDefaults(
+  defineProps<{
+    sessionType: ReviewSessionType
+    showSlot?: boolean
+    canSlideLeft?: boolean
+    canSlideRight?: boolean
+    swipeLeftText?: string
+    swipeRightText?: string
+    onSlideLeft?: () => Promise<void> | void
+    onSlideRight?: () => Promise<void> | void
+  }>(),
+  {
+    showSlot: true,
+    canSlideLeft: true,
+    canSlideRight: true,
+    swipeLeftText: undefined,
+    swipeRightText: undefined,
+    onSlideLeft: () => {},
+    onSlideRight: () => {},
   },
-  onSlideRight: () => {
-  },
-})
+)
 
 const slots = useSlots()
 const toggleStore = useToggleStore()
@@ -187,11 +182,15 @@ function isDeckEmpty() {
   return !currFlashcard.value
 }
 
-watch(currFlashcard, (newVal) => {
-  if (newVal) {
-    lastFlashcard.value = newVal
-  }
-}, { immediate: true })
+watch(
+  currFlashcard,
+  (newVal) => {
+    if (newVal) {
+      lastFlashcard.value = newVal
+    }
+  },
+  { immediate: true },
+)
 
 function getExitOffset(): number {
   const el = spaceDeckElement.value
@@ -215,9 +214,7 @@ function getInvisibleDuration(direction: 'left' | 'right'): number {
 
   const rect = el.getBoundingClientRect()
   const totalDistance = getExitOffset()
-  const distanceToEdge = direction === 'right'
-    ? window.innerWidth - rect.left
-    : rect.right
+  const distanceToEdge = direction === 'right' ? window.innerWidth - rect.left : rect.right
 
   // Calculate duration proportionally based on distance ratio
   const ratio = distanceToEdge / totalDistance
@@ -244,7 +241,9 @@ const cardStyle = computed(() => {
 
   return {
     transform: `translateX(${swipeOffset.value}px)${rotation ? ` rotate(${rotation}deg)` : ''}`,
-    transition: isTouching.value ? 'none' : `transform ${transitionDuration}ms cubic-bezier(0.33, 0, 0.2, 1)`,
+    transition: isTouching.value
+      ? 'none'
+      : `transform ${transitionDuration}ms cubic-bezier(0.33, 0, 0.2, 1)`,
   }
 })
 
@@ -431,7 +430,11 @@ async function triggerSlideRight() {
   enterAnimation.value = 'zoom-in'
 }
 
-function animateSwipe(direction: 'left' | 'right', onCompleteCallback: () => Promise<void> | void, slow = false): Promise<boolean> {
+function animateSwipe(
+  direction: 'left' | 'right',
+  onCompleteCallback: () => Promise<void> | void,
+  slow = false,
+): Promise<boolean> {
   return new Promise((resolve) => {
     if (isAnimating.value || isTouching.value) {
       resolve(false)
@@ -499,15 +502,23 @@ async function slideRight() {
 }
 
 function animateOutLeft(slow = false): Promise<boolean> {
-  return animateSwipe('left', () => {
-    enterAnimation.value = 'zoom-in'
-  }, slow)
+  return animateSwipe(
+    'left',
+    () => {
+      enterAnimation.value = 'zoom-in'
+    },
+    slow,
+  )
 }
 
 function animateOutRight(slow = false): Promise<boolean> {
-  return animateSwipe('right', () => {
-    enterAnimation.value = 'zoom-in'
-  }, slow)
+  return animateSwipe(
+    'right',
+    () => {
+      enterAnimation.value = 'zoom-in'
+    },
+    slow,
+  )
 }
 
 function onEnterAnimationEnd() {
@@ -562,7 +573,6 @@ function handleKeydown(event: KeyboardEvent) {
     spaceCard.value?.flip()
   }
 }
-
 </script>
 
 <style scoped>
@@ -690,5 +700,4 @@ function handleKeydown(event: KeyboardEvent) {
 .loader-fade-leave-to {
   opacity: 0;
 }
-
 </style>

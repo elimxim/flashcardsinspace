@@ -74,13 +74,10 @@ export const specialStageSet = new Set([
 ])
 
 export function toSortedOrderNumbers(stages: string[]): number[] {
-  return stages.map(name =>
-    stageNameMap.get(name.toString())?.order
-  ).filter(order =>
-    order !== undefined
-  ).sort(
-    (a, b) => b - a
-  )
+  return stages
+    .map((name) => stageNameMap.get(name.toString())?.order)
+    .filter((order) => order !== undefined)
+    .sort((a, b) => b - a)
 }
 
 /**
@@ -129,18 +126,21 @@ export function toLearningStages(value: unknown): Stage[] {
   if (value === undefined || value === null) {
     return []
   } else if (typeof value === 'string') {
-    return String(value).trim().toUpperCase().split(',')
-      .filter(s => s.trim() !== '')
-      .map(s => s.trim())
-      .map(s => stageNameMap.get(s))
-      .filter(s => s !== undefined)
+    return String(value)
+      .trim()
+      .toUpperCase()
+      .split(',')
+      .filter((s) => s.trim() !== '')
+      .map((s) => s.trim())
+      .map((s) => stageNameMap.get(s))
+      .filter((s) => s !== undefined)
   } else if (Array.isArray(value)) {
     return value
-      .filter(v => typeof v === 'string')
-      .map(s => String(s).trim().toUpperCase())
-      .filter(s => s !== '')
-      .map(s => stageNameMap.get(s))
-      .filter(s => s !== undefined)
+      .filter((v) => typeof v === 'string')
+      .map((s) => String(s).trim().toUpperCase())
+      .filter((s) => s !== '')
+      .map((s) => stageNameMap.get(s))
+      .filter((s) => s !== undefined)
   } else {
     return []
   }

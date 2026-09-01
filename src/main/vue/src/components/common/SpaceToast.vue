@@ -8,23 +8,27 @@
         @mouseenter="toaster.pause()"
         @mouseleave="toaster.resume()"
       >
-        <Starfield twinkle vertical-drift="2px"/>
-        <div class="space-toast__mixin"/>
+        <Starfield twinkle vertical-drift="2px" />
+        <div class="space-toast__mixin" />
         <div class="space-toast__content">
           <div class="space-toast__content__icon__box">
             <font-awesome-icon
               v-if="toast?.type === ToastType.SUCCESS"
-              icon="fa-solid fa-circle-check"/>
+              icon="fa-solid fa-circle-check"
+            />
             <font-awesome-icon
               v-else-if="toast?.type === ToastType.ERROR"
-              icon="fa-solid fa-circle-exclamation"/>
+              icon="fa-solid fa-circle-exclamation"
+            />
             <font-awesome-icon
               v-else-if="toast?.type === ToastType.INFO"
-              icon="fa-solid fa-info-circle"/>
+              icon="fa-solid fa-info-circle"
+            />
             <font-awesome-icon
               v-else-if="toast?.type === ToastType.WARNING"
-              icon="fa-solid fa-triangle-exclamation"/>
-            <font-awesome-icon v-else icon="fa-solid fa-circle-question"/>
+              icon="fa-solid fa-triangle-exclamation"
+            />
+            <font-awesome-icon v-else icon="fa-solid fa-circle-question" />
           </div>
           <div class="space-toast__content__body">
             <div class="space-toast__content__body__title">
@@ -35,18 +39,14 @@
             </div>
           </div>
           <button class="space-toast__content__button" @click="toaster.dismiss()">
-            <font-awesome-icon icon="fa-solid fa-xmark"/>
+            <font-awesome-icon icon="fa-solid fa-xmark" />
           </button>
         </div>
         <div v-if="toast?.footer" class="space-toast__footer">
           {{ toast?.footer }}
         </div>
         <div v-if="toast !== null && !toast.persistent" class="space-toast__progress">
-          <Progressbar
-            height="8px"
-            :duration="toast?.duration"
-            :paused="paused"
-          />
+          <Progressbar height="8px" :duration="toast?.duration" :paused="paused" />
         </div>
       </div>
     </transition>
@@ -91,7 +91,7 @@ onUnmounted(() => toaster.$reset())
   --default-toast--bg: rgba(0, 0, 0, 0.8);
   --default-icon-box--color: rgba(255, 255, 255, 0.8);
   --default-icon-box--bg: rgba(0, 0, 0, 0.1);
-  --default-icon-box--glow: rgba(255, 255, 255, 0.10);
+  --default-icon-box--glow: rgba(255, 255, 255, 0.1);
   --default-title--color: rgba(0, 0, 0, 0.9);
   --default-msg--color: rgba(226, 232, 240, 0.9);
   --default-button--color: rgba(0, 0, 0, 0.9);
@@ -101,7 +101,7 @@ onUnmounted(() => toaster.$reset())
   --default-starfield__star--color: white;
 }
 
-.space-toast-theme[toast-type="success"] {
+.space-toast-theme[toast-type='success'] {
   --color--from: var(--success-toast--from, var(--default-color-from));
   --color--via: var(--success-toast--via, var(--default-color-via));
   --color--to: var(--success-toast--to, var(--default-color-to));
@@ -113,13 +113,22 @@ onUnmounted(() => toaster.$reset())
   --title--color: var(--space-toast--title--color, var(--default-title--color));
   --msg--color: var(--space-toast--msg--color, var(--default-msg--color));
   --button--color: var(--space-toast--button--color, var(--default-button--color));
-  --button--hover--color: var(--space-toast--button--hover--color, var(--default-button--hover--color));
+  --button--hover--color: var(
+    --space-toast--button--hover--color,
+    var(--default-button--hover--color)
+  );
   --button--hover--bg: var(--space-toast--button--hover--bg, var(--default-button--hover--bg));
-  --progressbar--bg-color: var(--space-toast--progressbar--bg-color, var(--default-progressbar--bg-color));
-  --starfield--star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
+  --progressbar--bg-color: var(
+    --space-toast--progressbar--bg-color,
+    var(--default-progressbar--bg-color)
+  );
+  --starfield--star--color: var(
+    --space-toast--starfield__star--color,
+    var(--default-starfield__star--color)
+  );
 }
 
-.space-toast-theme[toast-type="error"] {
+.space-toast-theme[toast-type='error'] {
   --color--from: var(--error-toast--from, var(--default-color-from));
   --color--via: var(--error-toast--via, var(--default-color-via));
   --color--to: var(--error-toast--to, var(--default-color-to));
@@ -131,13 +140,22 @@ onUnmounted(() => toaster.$reset())
   --title--color: var(--space-toast--title--color, var(--default-title--color));
   --msg--color: var(--space-toast--msg--color, var(--default-msg--color));
   --button--color: var(--space-toast--button--color, var(--default-button--color));
-  --button--hover--color: var(--space-toast--button--hover--color, var(--default-button--hover--color));
+  --button--hover--color: var(
+    --space-toast--button--hover--color,
+    var(--default-button--hover--color)
+  );
   --button--hover--bg: var(--space-toast--button--hover--bg, var(--default-button--hover--bg));
-  --progressbar--bg-color: var(--space-toast--progressbar--bg-color, var(--default-progressbar--bg-color));
-  --starfield--star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
+  --progressbar--bg-color: var(
+    --space-toast--progressbar--bg-color,
+    var(--default-progressbar--bg-color)
+  );
+  --starfield--star--color: var(
+    --space-toast--starfield__star--color,
+    var(--default-starfield__star--color)
+  );
 }
 
-.space-toast-theme[toast-type="info"] {
+.space-toast-theme[toast-type='info'] {
   --color--from: var(--info-toast--from, var(--default-color-from));
   --color--via: var(--info-toast--via, var(--default-color-via));
   --color--to: var(--info-toast--to, var(--default-color-to));
@@ -149,13 +167,22 @@ onUnmounted(() => toaster.$reset())
   --title--color: var(--space-toast--title--color, var(--default-title--color));
   --msg--color: var(--space-toast--msg--color, var(--default-msg--color));
   --button--color: var(--space-toast--button--color, var(--default-button--color));
-  --button--hover--color: var(--space-toast--button--hover--color, var(--default-button--hover--color));
+  --button--hover--color: var(
+    --space-toast--button--hover--color,
+    var(--default-button--hover--color)
+  );
   --button--hover--bg: var(--space-toast--button--hover--bg, var(--default-button--hover--bg));
-  --progressbar--bg-color: var(--space-toast--progressbar--bg-color, var(--default-progressbar--bg-color));
-  --starfield--star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
+  --progressbar--bg-color: var(
+    --space-toast--progressbar--bg-color,
+    var(--default-progressbar--bg-color)
+  );
+  --starfield--star--color: var(
+    --space-toast--starfield__star--color,
+    var(--default-starfield__star--color)
+  );
 }
 
-.space-toast-theme[toast-type="warning"] {
+.space-toast-theme[toast-type='warning'] {
   --color--from: var(--warning-toast--from, var(--default-color-from));
   --color--via: var(--warning-toast--via, var(--default-color-via));
   --color--to: var(--warning-toast--to, var(--default-color-to));
@@ -167,10 +194,19 @@ onUnmounted(() => toaster.$reset())
   --title--color: var(--space-toast--title--color, var(--default-title--color));
   --msg--color: var(--space-toast--msg--color, var(--default-msg--color));
   --button--color: var(--space-toast--button--color, var(--default-button--color));
-  --button--hover--color: var(--space-toast--button--hover--color, var(--default-button--hover--color));
+  --button--hover--color: var(
+    --space-toast--button--hover--color,
+    var(--default-button--hover--color)
+  );
   --button--hover--bg: var(--space-toast--button--hover--bg, var(--default-button--hover--bg));
-  --progressbar--bg-color: var(--space-toast--progressbar--bg-color, var(--default-progressbar--bg-color));
-  --starfield--star--color: var(--space-toast--starfield__star--color, var(--default-starfield__star--color));
+  --progressbar--bg-color: var(
+    --space-toast--progressbar--bg-color,
+    var(--default-progressbar--bg-color)
+  );
+  --starfield--star--color: var(
+    --space-toast--starfield__star--color,
+    var(--default-starfield__star--color)
+  );
 }
 
 .space-toast {
@@ -190,14 +226,9 @@ onUnmounted(() => toaster.$reset())
   position: absolute;
   inset: -1px;
   border-radius: 1rem;
-  opacity: 0.40;
+  opacity: 0.4;
   pointer-events: none;
-  background-image: linear-gradient(
-    45deg,
-    var(--color--from),
-    var(--color--via),
-    var(--color--to)
-  );
+  background-image: linear-gradient(45deg, var(--color--from), var(--color--via), var(--color--to));
 }
 
 .space-toast__content {
@@ -298,5 +329,4 @@ onUnmounted(() => toaster.$reset())
 }
 
 /* <transition */
-
 </style>

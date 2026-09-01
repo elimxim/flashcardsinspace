@@ -1,27 +1,24 @@
-import {
-  ReviewSessionCreateRequest,
-  ReviewSessionUpdateRequest,
-} from "@/api/communication.ts"
+import { ReviewSessionCreateRequest, ReviewSessionUpdateRequest } from '@/api/communication.ts'
 import {
   sendReviewSessionCreateRequest,
   sendReviewSessionGetRequest,
   sendReviewSessionUpdateRequest,
-} from "@/api/api-client.ts"
-import { Log, LogTag } from "@/utils/logger.ts"
-import { userApiErrors } from "@/api/user-api-error.ts"
-import { FlashcardSet } from "@/model/flashcard.ts"
-import router from "@/router"
-import { useSpaceToaster } from "@/stores/toast-store.ts"
-import { ref, Ref } from "vue"
-import { ReviewSessionType } from "@/core-logic/review-logic.ts"
-import { Chronoday } from "@/model/chrono.ts"
-import { errorResponseData } from "@/core-logic/media-error.ts"
-import { useStopWatch } from "@/utils/stop-watch.ts"
-import { ReviewSession } from "@/model/review.ts"
+} from '@/api/api-client.ts'
+import { Log, LogTag } from '@/utils/logger.ts'
+import { userApiErrors } from '@/api/user-api-error.ts'
+import { FlashcardSet } from '@/model/flashcard.ts'
+import router from '@/router'
+import { useSpaceToaster } from '@/stores/toast-store.ts'
+import { ref, Ref } from 'vue'
+import { ReviewSessionType } from '@/core-logic/review-logic.ts'
+import { Chronoday } from '@/model/chrono.ts'
+import { errorResponseData } from '@/core-logic/media-error.ts'
+import { useStopWatch } from '@/utils/stop-watch.ts'
+import { ReviewSession } from '@/model/review.ts'
 
 export interface CreateOptions {
   elapsedTime?: number
-  idsToTrack?: number[],
+  idsToTrack?: number[]
   metadata?: Record<string, unknown> | undefined
 }
 
@@ -61,11 +58,7 @@ export function createReviewSessionAttendant(
   let finished = false
   const sessionElapsedTime = ref(0)
 
-  const {
-    startWatch,
-    stopWatch,
-    resetWatch,
-  } = useStopWatch(sessionElapsedTime)
+  const { startWatch, stopWatch, resetWatch } = useStopWatch(sessionElapsedTime)
 
   const trackedFlashcardIds: number[] = []
 
@@ -84,7 +77,10 @@ export function createReviewSessionAttendant(
     const { elapsedTime = 0, idsToTrack = [], metadata = undefined } = options
 
     if (!flashcardSet.value) {
-      Log.log(LogTag.SYSTEM, `Can't create review session ${sessionType}, FlashcardSet is undefined`)
+      Log.log(
+        LogTag.SYSTEM,
+        `Can't create review session ${sessionType}, FlashcardSet is undefined`,
+      )
       return Promise.resolve()
     }
 
@@ -127,12 +123,14 @@ export function createReviewSessionAttendant(
       idsToTrack = [],
       metadata = undefined,
       sessionId = undefined,
-      onboarding = () => {
-      },
+      onboarding = () => {},
     } = options
 
     if (!flashcardSet.value) {
-      Log.log(LogTag.SYSTEM, `Can't create review session ${sessionType}, FlashcardSet is undefined`)
+      Log.log(
+        LogTag.SYSTEM,
+        `Can't create review session ${sessionType}, FlashcardSet is undefined`,
+      )
       return Promise.resolve()
     }
 
@@ -157,7 +155,7 @@ export function createReviewSessionAttendant(
       const correct = session.metadata?.overallCorrectCount ?? 0
       const currRoundLength = session.metadata?.currRoundFlashcardIds?.length ?? 0
       const nextRoundLength = session.metadata?.nextRoundFlashcardIds?.length ?? 0
-      return (total !== correct) && (currRoundLength !== 0 || nextRoundLength !== 0)
+      return total !== correct && (currRoundLength !== 0 || nextRoundLength !== 0)
     }
     return !session.finishedAt
   }
@@ -170,7 +168,10 @@ export function createReviewSessionAttendant(
       Log.log(LogTag.SYSTEM, `Can't flush review session ${sessionType}, FlashcardSet is undefined`)
       return Promise.resolve()
     } else if (!reviewSession) {
-      Log.log(LogTag.SYSTEM, `Can't flush lost review session for FlashcardSet ${flashcardSet.value.id}`)
+      Log.log(
+        LogTag.SYSTEM,
+        `Can't flush lost review session for FlashcardSet ${flashcardSet.value.id}`,
+      )
       return Promise.resolve()
     }
 
@@ -183,7 +184,7 @@ export function createReviewSessionAttendant(
     if (all) {
       finished = true
       stopWatch()
-      request.flashcardIds = [...trackedFlashcardIds].map(id => ({ id: id }))
+      request.flashcardIds = [...trackedFlashcardIds].map((id) => ({ id: id }))
     } else {
       const lastFlashcardId = trackedFlashcardIds.at(-1)
       request.flashcardIds = lastFlashcardId ? [{ id: lastFlashcardId }] : []
@@ -209,42 +210,66 @@ export function createReviewSessionAttendant(
       return reviewSession?.id
     },
     elapsedTime: sessionElapsedTime,
-    init, create, loadOrCreate, flush, track, clear,
+    init,
+    create,
+    loadOrCreate,
+    flush,
+    track,
+    clear,
   }
 }
 
-export async function fetchReviewSession(flashcardSet: FlashcardSet, sessionId: number): Promise<ReviewSession | undefined> {
+export async function fetchReviewSession(
+  flashcardSet: FlashcardSet,
+  sessionId: number,
+): Promise<ReviewSession | undefined> {
   return await sendReviewSessionGetRequest(flashcardSet.id, sessionId)
     .then((response) => {
       return response.data
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, `Failed to fetch review session ${sessionId}`, error.response?.data)
-      useSpaceToaster().bakeError(userApiErrors.REVIEW_SESSION__FETCHING_FAILED, error.response?.data)
+      useSpaceToaster().bakeError(
+        userApiErrors.REVIEW_SESSION__FETCHING_FAILED,
+        error.response?.data,
+      )
       return undefined
     })
 }
 
-export async function createReviewSession(flashcardSet: FlashcardSet, request: ReviewSessionCreateRequest): Promise<ReviewSession | undefined> {
+export async function createReviewSession(
+  flashcardSet: FlashcardSet,
+  request: ReviewSessionCreateRequest,
+): Promise<ReviewSession | undefined> {
   try {
     const response = await sendReviewSessionCreateRequest(flashcardSet.id, request)
     Log.log(LogTag.LOGIC, `Review session ${request.type}-${response.data.id} created`)
     return response.data
   } catch (error) {
     Log.error(LogTag.LOGIC, `Failed to create review session ${request.type}`, error)
-    useSpaceToaster().bakeError(userApiErrors.REVIEW_SESSION__CREATION_FAILED, errorResponseData(error))
+    useSpaceToaster().bakeError(
+      userApiErrors.REVIEW_SESSION__CREATION_FAILED,
+      errorResponseData(error),
+    )
     return undefined
   }
 }
 
-export async function updateReviewSession(flashcardSet: FlashcardSet, sessionId: number, request: ReviewSessionUpdateRequest): Promise<ReviewSession | undefined> {
+export async function updateReviewSession(
+  flashcardSet: FlashcardSet,
+  sessionId: number,
+  request: ReviewSessionUpdateRequest,
+): Promise<ReviewSession | undefined> {
   try {
     const response = await sendReviewSessionUpdateRequest(flashcardSet.id, sessionId, request)
     Log.log(LogTag.LOGIC, `Review session ${sessionId} updated`)
     return response.data
   } catch (error) {
     Log.error(LogTag.LOGIC, `Failed to update review session ${sessionId}`, error)
-    useSpaceToaster().bakeError(userApiErrors.REVIEW_SESSION__UPDATING_FAILED, errorResponseData(error))
+    useSpaceToaster().bakeError(
+      userApiErrors.REVIEW_SESSION__UPDATING_FAILED,
+      errorResponseData(error),
+    )
     return undefined
   }
 }

@@ -23,14 +23,17 @@ export const useEventStore = defineStore('event', () => {
     callbacks.add(callback)
 
     return () => {
-      Log.log(LogTag.STORE, `delete a subscriber for event ${event}, remaining: ${callbacks?.size - 1}`)
+      Log.log(
+        LogTag.STORE,
+        `delete a subscriber for event ${event}, remaining: ${callbacks?.size - 1}`,
+      )
       callbacks?.delete(callback)
     }
   }
 
   function emit<K extends keyof AppEvents>(event: K, payload: AppEvents[K]): void {
     Log.log(LogTag.STORE, `fire the event ${event}`)
-    subscribers.get(event)?.forEach(cb => cb(payload))
+    subscribers.get(event)?.forEach((cb) => cb(payload))
   }
 
   function $reset() {

@@ -3,7 +3,7 @@ import {
   FlashcardContent,
   type FlashcardSet,
   FlashcardSetExtra,
-  type ReviewInfo
+  type ReviewInfo,
 } from '@/model/flashcard.ts'
 import { learningStages, type Stage } from '@/core-logic/stage-logic.ts'
 import type { Language } from '@/model/language.ts'
@@ -19,7 +19,11 @@ export const flashcardSides = {
   BACK: 'BACK',
 }
 
-export function newFlashcard(frontSide: string | undefined, backSide: string | undefined, chronodate: string): Flashcard {
+export function newFlashcard(
+  frontSide: string | undefined,
+  backSide: string | undefined,
+  chronodate: string,
+): Flashcard {
   return {
     id: 0,
     frontSide: frontSide,
@@ -31,7 +35,11 @@ export function newFlashcard(frontSide: string | undefined, backSide: string | u
   }
 }
 
-export function changeFlashcardSides(flashcard: Flashcard, frontSide: string, backSide: string): boolean {
+export function changeFlashcardSides(
+  flashcard: Flashcard,
+  frontSide: string,
+  backSide: string,
+): boolean {
   let changed = false
   if (flashcard.frontSide !== frontSide) {
     flashcard.frontSide = frontSide
@@ -77,10 +85,7 @@ export function updateFlashcard(flashcard: Flashcard, stage: Stage, chronodate: 
   return flashcard
 }
 
-export function createFlashcardSet(
-  name: string,
-  language: Language,
-): FlashcardSet {
+export function createFlashcardSet(name: string, language: Language): FlashcardSet {
   return {
     id: 0,
     name: name,
@@ -90,13 +95,18 @@ export function createFlashcardSet(
   }
 }
 
-export function mapFlashcardSetExtra(flashcardSetExtras: FlashcardSetExtra[]): Map<number, FlashcardSetExtra> {
-  return new Map(flashcardSetExtras.map(v => [v.id, v]))
+export function mapFlashcardSetExtra(
+  flashcardSetExtras: FlashcardSetExtra[],
+): Map<number, FlashcardSetExtra> {
+  return new Map(flashcardSetExtras.map((v) => [v.id, v]))
 }
 
 export function findDuplicates(candidates: FlashcardContent[], existing: Flashcard[]): Set<number> {
   const existingSet = new Set(
-    existing.map(f => `${f.frontSide?.trim().toLowerCase() ?? ''}::${f.backSide?.trim().toLowerCase() ?? ''}`)
+    existing.map(
+      (f) =>
+        `${f.frontSide?.trim().toLowerCase() ?? ''}::${f.backSide?.trim().toLowerCase() ?? ''}`,
+    ),
   )
   const duplicates = new Set<number>()
   const seen = new Set<string>()

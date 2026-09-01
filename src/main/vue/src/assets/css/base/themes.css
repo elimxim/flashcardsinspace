@@ -141,9 +141,15 @@
 
   --fuzzy-select--drop-down--color: #45454a;
   --fuzzy-select--drop-down--border-color: #007bff;
-  --fuzzy-select--drop-down--bg-color--hover: rgb(from var(--fuzzy-select--drop-down--border-color) r g b / 0.1);
-  --fuzzy-select--scrollbar--color: rgb(from var(--fuzzy-select--drop-down--border-color) r g b / 0.6);
-  --fuzzy-select--scrollbar--color--hover: rgb(from var(--fuzzy-select--drop-down--border-color) r g b / 0.8);
+  --fuzzy-select--drop-down--bg-color--hover: rgb(
+    from var(--fuzzy-select--drop-down--border-color) r g b / 0.1
+  );
+  --fuzzy-select--scrollbar--color: rgb(
+    from var(--fuzzy-select--drop-down--border-color) r g b / 0.6
+  );
+  --fuzzy-select--scrollbar--color--hover: rgb(
+    from var(--fuzzy-select--drop-down--border-color) r g b / 0.8
+  );
 
   /* toasts */
 
@@ -200,7 +206,13 @@
   --space-card--box-shadow--hover: 0 12px 16px rgba(0, 0, 0, 0.2);
   --space-card--border-color: rgba(0, 0, 0, 0.05);
   --space-card--front--bg-color: #fdfdfd;
-  --space-card--front--bg-image: linear-gradient(0deg, transparent 5px, rgba(34, 34, 34, 0.15) 5px, rgba(34, 34, 34, 0.15) 6px, transparent 5px);
+  --space-card--front--bg-image: linear-gradient(
+    0deg,
+    transparent 5px,
+    rgba(34, 34, 34, 0.15) 5px,
+    rgba(34, 34, 34, 0.15) 6px,
+    transparent 5px
+  );
   --space-card--front--bg-size: 100% 32px;
   --space-card--back--bg-color: #fdfdfd;
 
@@ -218,8 +230,16 @@
 
   --cp--widget--color: linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%);
   --cp--launch--color: linear-gradient(135deg, rgb(91, 91, 145) 0%, rgb(105, 83, 125) 100%);
-  --cp--widget--color--active: linear-gradient(135deg, rgb(142, 110, 189) 0%, rgb(215, 91, 209) 100%);
-  --cp--widget--color--inactive: linear-gradient(135deg, rgb(121, 121, 121) 0%, rgb(64, 64, 64) 100%);
+  --cp--widget--color--active: linear-gradient(
+    135deg,
+    rgb(142, 110, 189) 0%,
+    rgb(215, 91, 209) 100%
+  );
+  --cp--widget--color--inactive: linear-gradient(
+    135deg,
+    rgb(121, 121, 121) 0%,
+    rgb(64, 64, 64) 100%
+  );
   --cp--text--color: rgba(13, 18, 74, 0.6);
   --cp--text--color--active: rgba(255, 255, 255, 0.6);
   --cp--text--color--inactive: rgba(255, 255, 255, 0.2);

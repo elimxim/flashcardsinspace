@@ -4,13 +4,11 @@
     :class="{ 'stages-widget--expanded': isExpanded }"
     :style="{
       '--stage-height-base': `${baseHeight}px`,
-      '--stage-height-expanded': `${baseHeight * props.growMultiplier}px`
+      '--stage-height-expanded': `${baseHeight * props.growMultiplier}px`,
     }"
     @click="toggleExpand"
   >
-    <div class="stages-title">
-      Learning Stages
-    </div>
+    <div class="stages-title">Learning Stages</div>
     <div ref="gridRef" class="stage-grid">
       <div
         v-for="stageInfo in stageInfoData"
@@ -43,11 +41,14 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 
-const props = withDefaults(defineProps<{
-  growMultiplier?: number
-}>(), {
-  growMultiplier: 2,
-})
+const props = withDefaults(
+  defineProps<{
+    growMultiplier?: number
+  }>(),
+  {
+    growMultiplier: 2,
+  },
+)
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
@@ -63,20 +64,20 @@ const baseHeight = ref(80)
 const NAME_SHORT_GRID_WIDTH_THRESHOLD = 520
 
 interface StageInfo extends Stage {
-   flashcardCount: number
+  flashcardCount: number
   ratio?: number
 }
 
 const stageInfoData = computed<StageInfo[]>(() => {
-  const infoItems: StageInfo[] = learningStageArray.map(stage => ({
+  const infoItems: StageInfo[] = learningStageArray.map((stage) => ({
     ...stage,
-    flashcardCount: countFlashcards(flashcards.value, stage, currDay.value)
+    flashcardCount: countFlashcards(flashcards.value, stage, currDay.value),
   }))
 
-  const maxCount = Math.max(...infoItems.map(info => info.flashcardCount))
+  const maxCount = Math.max(...infoItems.map((info) => info.flashcardCount))
 
-  return infoItems.map(info => {
-    const ratio = maxCount === 0 ? 0 : (info.flashcardCount / maxCount)
+  return infoItems.map((info) => {
+    const ratio = maxCount === 0 ? 0 : info.flashcardCount / maxCount
     return { ...info, ratio } as StageInfo
   })
 })
@@ -99,7 +100,7 @@ function toggleExpand() {
 }
 
 defineExpose({
-  expand: () => isExpanded.value = true
+  expand: () => (isExpanded.value = true),
 })
 
 onMounted(() => {
@@ -207,7 +208,9 @@ onUnmounted(() => {
   max-width: 132px;
   padding: 4px 2px;
   gap: 2px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 -2px 2px rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 -2px 2px rgba(255, 255, 255, 0.1);
   overflow: hidden;
 }
 

@@ -21,39 +21,41 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-const props = withDefaults(defineProps<{
-  /** Path to the SVG file, e.g. '/assets/' */
-  path: string
-  /** SVG file name, e.g. 'Melvin.svg' */
-  name: string
-  /** Alt text for <img> */
-  alt?: string
-  /** Rendered width */
-  width?: number | string
-  /** Rendered height */
-  height?: number | string
-  /** Native lazy/eager loading hint */
-  loading?: 'lazy' | 'eager'
-  /** Native decoding hint */
-  decoding?: 'sync' | 'async' | 'auto'
-  /** Fetch priority hint */
-  fetchPriority?: 'high' | 'low' | 'auto'
-  /** Makes <img> non-selectable, non-draggable, non-context-interactive */
-  nonInteractive?: boolean
-}>(), {
-  alt: 'No image',
-  width: undefined,
-  height: undefined,
-  loading: 'lazy',
-  decoding: 'async',
-  fetchPriority: 'auto',
-  nonInteractive: false,
-})
+const props = withDefaults(
+  defineProps<{
+    /** Path to the SVG file, e.g. '/assets/' */
+    path: string
+    /** SVG file name, e.g. 'Melvin.svg' */
+    name: string
+    /** Alt text for <img> */
+    alt?: string
+    /** Rendered width */
+    width?: number | string
+    /** Rendered height */
+    height?: number | string
+    /** Native lazy/eager loading hint */
+    loading?: 'lazy' | 'eager'
+    /** Native decoding hint */
+    decoding?: 'sync' | 'async' | 'auto'
+    /** Fetch priority hint */
+    fetchPriority?: 'high' | 'low' | 'auto'
+    /** Makes <img> non-selectable, non-draggable, non-context-interactive */
+    nonInteractive?: boolean
+  }>(),
+  {
+    alt: 'No image',
+    width: undefined,
+    height: undefined,
+    loading: 'lazy',
+    decoding: 'async',
+    fetchPriority: 'auto',
+    nonInteractive: false,
+  },
+)
 
 const imagePath = computed(() => `${props.path}/${props.name}`)
 
-const toCssSize = (v: number | string | undefined) =>
-  typeof v === 'number' ? `${v}px` : v
+const toCssSize = (v: number | string | undefined) => (typeof v === 'number' ? `${v}px` : v)
 
 const containerStyle = computed(() => {
   const style: Record<string, string> = {}
@@ -91,11 +93,11 @@ const onContextMenu = (e: MouseEvent) => {
 }
 
 .non-interactive {
-  user-select: none;         /* Standard */
+  user-select: none; /* Standard */
   -webkit-user-select: none; /* Safari, Chrome */
-  -webkit-user-drag: none;   /* Safari, Chrome */
-  -moz-user-select: none;    /* Firefox */
-  -ms-user-select: none;     /* Edge */
+  -webkit-user-drag: none; /* Safari, Chrome */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Edge */
   -webkit-touch-callout: none;
 }
 

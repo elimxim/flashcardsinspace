@@ -1,17 +1,17 @@
 <template>
   <div ref="container" class="void">
-    <svg width="0" height="0" style="position: absolute;">
+    <svg width="0" height="0" style="position: absolute">
       <defs>
         <filter id="liquid-fusion" x="-100%" y="-100%" width="300%" height="300%">
-          <feGaussianBlur in="SourceGraphic" :stdDeviation="gooeyIntensity"/>
-          <feColorMatrix type="matrix" :values="`1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 ${matrixAlpha}`"/>
+          <feGaussianBlur in="SourceGraphic" :stdDeviation="gooeyIntensity" />
+          <feColorMatrix type="matrix" :values="`1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 ${matrixAlpha}`" />
         </filter>
 
         <filter id="ethereal-glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur in="SourceGraphic" :stdDeviation="glowAmount / 2" result="blur"/>
+          <feGaussianBlur in="SourceGraphic" :stdDeviation="glowAmount / 2" result="blur" />
           <feMerge>
-            <feMergeNode in="blur"/>
-            <feMergeNode in="SourceGraphic"/>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
       </defs>
@@ -22,36 +22,39 @@
         <div
           class="body b1"
           :style="{
-            width: bodySizes[0] + 'px', height: bodySizes[0] + 'px',
+            width: bodySizes[0] + 'px',
+            height: bodySizes[0] + 'px',
             backgroundColor: bodyColors[0],
             animationDuration: animationDuration(4.7),
             '--tx': physics.b1.limitX + 'px',
             '--ty': physics.b1.limitY * -1 + 'px',
             '--tx-mid': physics.b1.limitX * -1 + 'px',
-            '--ty-mid': physics.b1.limitY + 'px'
+            '--ty-mid': physics.b1.limitY + 'px',
           }"
         />
 
         <div
           class="body b2"
           :style="{
-            width: bodySizes[1] + 'px', height: bodySizes[1] + 'px',
+            width: bodySizes[1] + 'px',
+            height: bodySizes[1] + 'px',
             backgroundColor: bodyColors[1],
             animationDuration: animationDuration(3.1),
             '--tx': physics.b2.limitX * -1 + 'px',
             '--ty': physics.b2.limitY * -1 + 'px',
             '--tx-mid': physics.b2.limitX + 'px',
-            '--ty-mid': physics.b2.limitY + 'px'
+            '--ty-mid': physics.b2.limitY + 'px',
           }"
         />
 
         <div
           class="body b3"
           :style="{
-            width: bodySizes[2] + 'px', height: bodySizes[2] + 'px',
+            width: bodySizes[2] + 'px',
+            height: bodySizes[2] + 'px',
             backgroundColor: bodyColors[2],
             animationDuration: animationDuration(5.9),
-            '--orbit': physics.b3.orbit + 'px'
+            '--orbit': physics.b3.orbit + 'px',
           }"
         />
       </div>
@@ -62,23 +65,26 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-const props = withDefaults(defineProps<{
-  voidSize?: number
-  fillSpace?: boolean
-  bodySizes?: number[]
-  bodyColors?: string[]
-  speed?: number
-  gooeyIntensity?: number
-  glowAmount?: number
-}>(), {
-  voidSize: 100,
-  fillSpace: false,
-  bodySizes: () => [14, 11, 12],
-  bodyColors: () => ['#c63aed', '#5864ed', '#00d2ff'],
-  speed: 1,
-  gooeyIntensity: 2,
-  glowAmount: 2,
-})
+const props = withDefaults(
+  defineProps<{
+    voidSize?: number
+    fillSpace?: boolean
+    bodySizes?: number[]
+    bodyColors?: string[]
+    speed?: number
+    gooeyIntensity?: number
+    glowAmount?: number
+  }>(),
+  {
+    voidSize: 100,
+    fillSpace: false,
+    bodySizes: () => [14, 11, 12],
+    bodyColors: () => ['#c63aed', '#5864ed', '#00d2ff'],
+    speed: 1,
+    gooeyIntensity: 2,
+    glowAmount: 2,
+  },
+)
 
 const container = ref<HTMLElement>()
 
@@ -91,9 +97,9 @@ const animationDuration = (base: number) => `${base / props.speed}s`
 
 const physics = computed(() => {
   const radius = containerSize.value / 2
-  const buffer = props.gooeyIntensity + (props.glowAmount / 2) + 4
+  const buffer = props.gooeyIntensity + props.glowAmount / 2 + 4
 
-  const getLimit = (bodySize: number) => radius - (bodySize / 2) - buffer
+  const getLimit = (bodySize: number) => radius - bodySize / 2 - buffer
 
   return {
     b1: {
@@ -110,14 +116,10 @@ const physics = computed(() => {
   }
 })
 
-const matrixAlpha = computed(() =>
-  props.gooeyIntensity === 0 ? "0 0 0 1 0" : "0 0 0 18 -7"
-)
+const matrixAlpha = computed(() => (props.gooeyIntensity === 0 ? '0 0 0 1 0' : '0 0 0 18 -7'))
 
 // todo resize observer
-
 </script>
-
 
 <style scoped>
 .void {
@@ -154,7 +156,8 @@ const matrixAlpha = computed(() =>
 }
 
 @keyframes chaos-1 {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(var(--tx), var(--ty));
   }
   50% {
@@ -163,7 +166,8 @@ const matrixAlpha = computed(() =>
 }
 
 @keyframes chaos-2 {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(var(--tx), var(--ty));
   }
   50% {

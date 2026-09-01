@@ -9,7 +9,10 @@ export interface FlipOptions {
  * FLIP (First, Last, Invert, Play) animation
  * Smoothly animates elements when they change position in the DOM
  */
-export function useFlip(containerRef: Ref<HTMLElement | null | undefined>, options: FlipOptions = {}) {
+export function useFlip(
+  containerRef: Ref<HTMLElement | null | undefined>,
+  options: FlipOptions = {},
+) {
   const { duration = 0.5 } = options
   const positions = new Map<string, DOMRect>()
   let isAnimating = false
@@ -112,4 +115,3 @@ export function useFlip(containerRef: Ref<HTMLElement | null | undefined>, optio
     setupAuto,
   }
 }
-

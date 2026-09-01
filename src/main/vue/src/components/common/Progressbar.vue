@@ -1,8 +1,8 @@
 <template>
   <div class="progress progress--theme">
     <div class="progress__track">
-      <div v-if="!indeterminate" class="progress__bar"/>
-      <div v-else class="progress__bar progress__bar--indeterminate"/>
+      <div v-if="!indeterminate" class="progress__bar" />
+      <div v-else class="progress__bar progress__bar--indeterminate" />
     </div>
   </div>
 </template>
@@ -10,41 +10,44 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-const props = withDefaults(defineProps<{
-  /** Progress in [0,1] */
-  progress?: number | null
-  /** Total duration (ms) */
-  duration?: number
-  /** Start automatically on mount */
-  autoStart?: boolean
-  /** Pause timer */
-  paused?: boolean
-  /** Height */
-  height?: string
-  /** Rounds the ends of the track */
-  trackRounded?: boolean
-  /** Rounds the ends of the bar */
-  barRounded?: boolean
-  /** Right-to-left fill */
-  reverse?: boolean
-  /** Indeterminate visual */
-  indeterminate?: boolean
-  /** Optional delay before starting (ms) */
-  delay?: number
-  /** Make the bar glide in */
-  glide?: boolean
-}>(), {
-  progress: null,
-  duration: 4000,
-  autoStart: true,
-  paused: false,
-  height: '8px',
-  trackRounded: false,
-  barRounded: false,
-  reverse: false,
-  indeterminate: false,
-  delay: 0,
-})
+const props = withDefaults(
+  defineProps<{
+    /** Progress in [0,1] */
+    progress?: number | null
+    /** Total duration (ms) */
+    duration?: number
+    /** Start automatically on mount */
+    autoStart?: boolean
+    /** Pause timer */
+    paused?: boolean
+    /** Height */
+    height?: string
+    /** Rounds the ends of the track */
+    trackRounded?: boolean
+    /** Rounds the ends of the bar */
+    barRounded?: boolean
+    /** Right-to-left fill */
+    reverse?: boolean
+    /** Indeterminate visual */
+    indeterminate?: boolean
+    /** Optional delay before starting (ms) */
+    delay?: number
+    /** Make the bar glide in */
+    glide?: boolean
+  }>(),
+  {
+    progress: null,
+    duration: 4000,
+    autoStart: true,
+    paused: false,
+    height: '8px',
+    trackRounded: false,
+    barRounded: false,
+    reverse: false,
+    indeterminate: false,
+    delay: 0,
+  },
+)
 
 const emit = defineEmits<{ (e: 'done'): void }>()
 
@@ -106,19 +109,25 @@ function cancel() {
   }
 }
 
-watch(() => props.paused, (newValue) => {
-  if (isControlled.value) return
-  const now = performance.now()
-  if (newValue) {
-    carried += now - startAt
-  } else {
-    startAt = now
-  }
-})
+watch(
+  () => props.paused,
+  (newValue) => {
+    if (isControlled.value) return
+    const now = performance.now()
+    if (newValue) {
+      carried += now - startAt
+    } else {
+      startAt = now
+    }
+  },
+)
 
-watch(() => props.duration, () => {
-  if (!isControlled.value) start()
-})
+watch(
+  () => props.duration,
+  () => {
+    if (!isControlled.value) start()
+  },
+)
 
 onMounted(() => {
   if (!isControlled.value && props.autoStart) start()
@@ -139,12 +148,11 @@ const barTransition = computed(() => {
 })
 
 const trackHeight = computed(() => props.height)
-const trackBorderRadius = computed(() => props.trackRounded ? `${props.height}` : '0')
-const barBorderRadius = computed(() => props.barRounded ? `${props.height}` : '0')
+const trackBorderRadius = computed(() => (props.trackRounded ? `${props.height}` : '0'))
+const barBorderRadius = computed(() => (props.barRounded ? `${props.height}` : '0'))
 const barWidth = computed(() => `${Math.round(barWidthPercent.value * 10000) / 100}%`)
-const barLeft = computed(() => props.reverse ? 'auto' : '0')
-const barRight = computed(() => props.reverse ? '0' : 'auto')
-
+const barLeft = computed(() => (props.reverse ? 'auto' : '0'))
+const barRight = computed(() => (props.reverse ? '0' : 'auto'))
 </script>
 
 <style scoped>
@@ -152,7 +160,7 @@ const barRight = computed(() => props.reverse ? '0' : 'auto')
   --bar--from: var(--progressbar--from, #9f9f9f);
   --bar--via: var(--progressbar--via, #c1c1c1);
   --bar--to: var(--progressbar--to, #6e6e6e);
-  --track--bg-color: var(--progressbar--bg-color, rgba(255, 255, 255, 0.10));
+  --track--bg-color: var(--progressbar--bg-color, rgba(255, 255, 255, 0.1));
 }
 
 .progress {

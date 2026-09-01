@@ -30,15 +30,14 @@
         <li
           v-for="(option, index) in filteredOptions"
           :key="index"
-          :class="{ 'highlighted': index === highlightedIndex }"
+          :class="{ highlighted: index === highlightedIndex }"
           @click.stop="selectOption(option)"
-          @mouseover="highlightedIndex = index">
+          @mouseover="highlightedIndex = index"
+        >
           {{ optionLabel(option) }}
         </li>
       </template>
-      <li v-else>
-        No signal from this language
-      </li>
+      <li v-else>No signal from this language</li>
     </ul>
   </div>
 </template>
@@ -49,21 +48,24 @@ import { ref, computed, nextTick, watch } from 'vue'
 
 const model = defineModel<T | null>({ default: null })
 
-const props = withDefaults(defineProps<{
-  options: T[]
-  optionLabel: (option: T) => string
-  optionPlaceholder?: string
-  searchPlaceholder?: string
-  leftEdgeShift?: number
-  rightEdgeShift?: number
-  invalid?: boolean
-}>(), {
-  optionPlaceholder: 'Select an option',
-  searchPlaceholder: 'Search..',
-  leftEdgeShift: 2,
-  rightEdgeShift: -4,
-  invalid: false,
-})
+const props = withDefaults(
+  defineProps<{
+    options: T[]
+    optionLabel: (option: T) => string
+    optionPlaceholder?: string
+    searchPlaceholder?: string
+    leftEdgeShift?: number
+    rightEdgeShift?: number
+    invalid?: boolean
+  }>(),
+  {
+    optionPlaceholder: 'Select an option',
+    searchPlaceholder: 'Search..',
+    leftEdgeShift: 2,
+    rightEdgeShift: -4,
+    invalid: false,
+  },
+)
 
 const fuzzyContainer = ref<HTMLElement>()
 const searchInput = ref<InstanceType<typeof SmartInput>>()
@@ -87,7 +89,7 @@ const optionLabel = (option: T): string => {
 const filteredOptions = computed(() => {
   if (!searchQuery.value) return props.options
   return props.options.filter((option) =>
-    optionLabel(option).toLowerCase().includes(searchQuery.value.toLowerCase())
+    optionLabel(option).toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
 
@@ -165,14 +167,16 @@ async function scrollHighlightedOptionIntoView() {
     highlightedElement?.scrollIntoView({ block: 'nearest' })
   })
 }
-
 </script>
 
 <style scoped>
 .fuzzy-select--theme {
   --drop-down--color: var(--fuzzy-select--drop-down--color, rgba(0, 0, 0, 0.8));
   --drop-down--border-color: var(--fuzzy-select--drop-down--border-color, rgba(205, 205, 205, 0.8));
-  --drop-down--bg-color--hover: var(--fuzzy-select--drop-down--bg-color--hover, rgba(213, 213, 213, 0.5));
+  --drop-down--bg-color--hover: var(
+    --fuzzy-select--drop-down--bg-color--hover,
+    rgba(213, 213, 213, 0.5)
+  );
   --scrollbar--color: var(--fuzzy-select--scrollbar--color, rgba(170, 170, 170, 0.6));
   --scrollbar--color--hover: var(--fuzzy-select--scrollbar--color--hover, rgba(170, 170, 170, 0.8));
 }

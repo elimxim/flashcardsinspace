@@ -37,10 +37,13 @@ export const useFlashcardStore = defineStore('flashcard', {
   },
   actions: {
     loadState(flashcardSet: FlashcardSet, flashcards: Flashcard[]) {
-      Log.log(LogTag.STORE, `flashcard.loadState: FlashcardSet.id=${flashcardSet.id} + ${flashcards.length} flashcards`)
+      Log.log(
+        LogTag.STORE,
+        `flashcard.loadState: FlashcardSet.id=${flashcardSet.id} + ${flashcards.length} flashcards`,
+      )
       this.$reset()
       this.flashcardSet = flashcardSet
-      this.flashcardMap = new Map(flashcards.map(v => [v.id, v]))
+      this.flashcardMap = new Map(flashcards.map((v) => [v.id, v]))
       this.loaded = true
     },
     checkStateLoaded() {
@@ -51,28 +54,42 @@ export const useFlashcardStore = defineStore('flashcard', {
       Log.log(LogTag.STORE, `flashcard.changeSet: FlashcardSet.id=${flashcardSet.id}`)
       this.checkStateLoaded()
       if (this.flashcardSet?.id !== flashcardSet.id) {
-        throw Error(`flashcard.changeSet: (current FlashcardSet.id) ${this.flashcardSet?.id} != ${flashcardSet.id} (new FlashcardSet.id)`)
+        throw Error(
+          `flashcard.changeSet: (current FlashcardSet.id) ${this.flashcardSet?.id} != ${flashcardSet.id} (new FlashcardSet.id)`,
+        )
       }
       this.flashcardSet = flashcardSet
     },
     addFlashcards(flashcards: Flashcard[]) {
-      Log.log(LogTag.STORE, `flashcard.addFlashcards: FlashcardSet.id=${this.flashcardSet?.id} + ${flashcards.length} flashcards`)
+      Log.log(
+        LogTag.STORE,
+        `flashcard.addFlashcards: FlashcardSet.id=${this.flashcardSet?.id} + ${flashcards.length} flashcards`,
+      )
       this.checkStateLoaded()
-      this.flashcardMap = new Map(flashcards.map(v => [v.id, v]))
+      this.flashcardMap = new Map(flashcards.map((v) => [v.id, v]))
     },
     addNewFlashcard(flashcard: Flashcard) {
-      Log.log(LogTag.STORE, `flashcard.addNewFlashcard: FlashcardSet.id=${this.flashcardSet?.id} + Flashcard.id=${flashcard.id}`)
+      Log.log(
+        LogTag.STORE,
+        `flashcard.addNewFlashcard: FlashcardSet.id=${this.flashcardSet?.id} + Flashcard.id=${flashcard.id}`,
+      )
       this.checkStateLoaded()
       this.flashcardMap.set(flashcard.id, flashcard)
     },
     changeFlashcard(flashcard: Flashcard) {
-      Log.log(LogTag.STORE, `flashcard.changeFlashcard: FlashcardSet.id=${this.flashcardSet?.id} + Flashcard.id=${flashcard.id}`)
+      Log.log(
+        LogTag.STORE,
+        `flashcard.changeFlashcard: FlashcardSet.id=${this.flashcardSet?.id} + Flashcard.id=${flashcard.id}`,
+      )
       this.checkStateLoaded()
       const currFlashcard = this.flashcardMap.get(flashcard.id) as Flashcard | undefined
       if (!currFlashcard) {
         Log.error(LogTag.STORE, `flashcard.changeFlashcard: Flashcard.id=${flashcard.id} not found`)
       } else if (currFlashcard.id !== flashcard.id) {
-        Log.error(LogTag.STORE, `flashcard.changeFlashcard: (current Flashcard.id) ${currFlashcard.id} != ${flashcard.id} (new Flashcard.id)`)
+        Log.error(
+          LogTag.STORE,
+          `flashcard.changeFlashcard: (current Flashcard.id) ${currFlashcard.id} != ${flashcard.id} (new Flashcard.id)`,
+        )
       } else {
         this.flashcardMap.set(flashcard.id, flashcard)
       }
@@ -80,5 +97,5 @@ export const useFlashcardStore = defineStore('flashcard', {
     removeFlashcard(id: number) {
       this.flashcardMap.delete(id)
     },
-  }
+  },
 })

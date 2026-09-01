@@ -22,24 +22,23 @@ export enum VerificationType {
 }
 
 export function toVerificationCodeResult(result: string): VerificationResult | undefined {
-  return Object.values(VerificationResult).find(v => v === result)
+  return Object.values(VerificationResult).find((v) => v === result)
 }
 
 export function parseVerificationType(value?: unknown): VerificationType | undefined {
   if (value === undefined || value === null || typeof value !== 'string') return undefined
-  return Object.values(VerificationType).find(v => v === value)
+  return Object.values(VerificationType).find((v) => v === value)
 }
 
 export async function whoAmI() {
-  return sendUserGetRequest()
-    .then(async (response) => {
-      if (response.status === 200) {
-        Log.log(LogTag.API, `Who Am I: ${response.data}`)
-        useAuthStore().setUser(response.data)
-        return true
-      } else {
-        Log.log(LogTag.API, `Who Am I: ${response.status}`)
-        return attemptTokenRefresh()
-      }
-    })
+  return sendUserGetRequest().then(async (response) => {
+    if (response.status === 200) {
+      Log.log(LogTag.API, `Who Am I: ${response.data}`)
+      useAuthStore().setUser(response.data)
+      return true
+    } else {
+      Log.log(LogTag.API, `Who Am I: ${response.status}`)
+      return attemptTokenRefresh()
+    }
+  })
 }

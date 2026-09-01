@@ -1,8 +1,8 @@
 <template>
   <div class="code-hud">
-    <div class="glass-glare"/>
-    <div class="top-left-edge-highlight"/>
-    <div class="bottom-right-edge-highlight"/>
+    <div class="glass-glare" />
+    <div class="top-left-edge-highlight" />
+    <div class="bottom-right-edge-highlight" />
 
     <div class="hud-display-wrapper">
       <div class="dots-container">
@@ -12,8 +12,9 @@
           class="dot-indicator"
           :class="{
             'dot-indicator--active': i > attempts,
-            'dot-indicator--locked': i <= attempts
-        }"></div>
+            'dot-indicator--locked': i <= attempts,
+          }"
+        ></div>
       </div>
       <div class="hud-display" :class="`hud-display--${status.toLowerCase()}`">
         <div class="display-header">
@@ -22,19 +23,14 @@
             <span class="display-title-main">CODE CONTROL</span>
           </div>
           <div class="signal-flow">
-          <span
-            v-for="s in 3"
-            :key="s"
-            class="chevron"
-            :class="{ 'pulse': status === 'SYNCING' }"
-          >
-            ›
-          </span>
+            <span v-for="s in 3" :key="s" class="chevron" :class="{ pulse: status === 'SYNCING' }">
+              ›
+            </span>
           </div>
         </div>
 
         <div class="code-field">
-          <div class="code-progress-bar" :style="{ width: (input.length * 25) + '%' }"/>
+          <div class="code-progress-bar" :style="{ width: input.length * 25 + '%' }" />
           <div class="code-digits-overlay">
             <span class="code-digit">{{ input[0] || '*' }}</span>
             <span class="code-digit">{{ input[1] || '*' }}</span>
@@ -53,7 +49,7 @@
         class="hud-grid-key"
         :class="{
           'hud-grid-key--locked': isDigitKeyLocked,
-          'hud-grid-key--tapped': animatingKeys[n.toString()] && !isDigitKeyLocked
+          'hud-grid-key--tapped': animatingKeys[n.toString()] && !isDigitKeyLocked,
         }"
         @click="handleKeyPress(n.toString())"
       >
@@ -64,7 +60,7 @@
         class="hud-grid-key hud-clear-key"
         :class="{
           'hud-grid-key--locked': isClearKeyLocked,
-          'hud-clear-key--tapped': animatingKeys['C'] && !isClearKeyLocked
+          'hud-clear-key--tapped': animatingKeys['C'] && !isClearKeyLocked,
         }"
         @click="handleKeyPress('C')"
       >
@@ -74,7 +70,7 @@
         class="hud-grid-key"
         :class="{
           'hud-grid-key--locked': isDigitKeyLocked,
-          'hud-grid-key--tapped': animatingKeys['0'] && !isDigitKeyLocked
+          'hud-grid-key--tapped': animatingKeys['0'] && !isDigitKeyLocked,
         }"
         @click="handleKeyPress('0')"
       >
@@ -84,7 +80,7 @@
         class="hud-grid-key hud-resend-key"
         :class="{
           'hud-grid-key--locked': isResetKeyLocked,
-          'hud-resend-key--tapped': animatingKeys['R'] && !isResetKeyLocked
+          'hud-resend-key--tapped': animatingKeys['R'] && !isResetKeyLocked,
         }"
         @click="handleKeyPress('R')"
       >
@@ -118,7 +114,11 @@ let successTimeout: ReturnType<typeof setTimeout> | null = null
 let failureTimeout: ReturnType<typeof setTimeout> | null = null
 
 const isResetKeyLocked = computed(() => {
-  return status.value === 'SUCCESS' || status.value !== 'OFF' && dirty.value || status.value === 'LOCKED'
+  return (
+    status.value === 'SUCCESS' ||
+    (status.value !== 'OFF' && dirty.value) ||
+    status.value === 'LOCKED'
+  )
 })
 
 const isDigitKeyLocked = computed(() => {
@@ -180,11 +180,11 @@ const resendCode = async () => {
   clearInput()
 }
 
-const triggerIdle = () => status.value = 'IDLE'
+const triggerIdle = () => (status.value = 'IDLE')
 
-const switchOff = () => status.value = 'OFF'
+const switchOff = () => (status.value = 'OFF')
 
-const lock = () => status.value = 'LOCKED'
+const lock = () => (status.value = 'LOCKED')
 
 const triggerSuccess = async (): Promise<void> => {
   return new Promise((resolve) => {
@@ -230,7 +230,6 @@ defineExpose({
   switchOff,
   lock,
 })
-
 </script>
 
 <style scoped>
@@ -280,9 +279,13 @@ defineExpose({
   border-top: 2px solid rgba(255, 255, 255, 0.6);
   border-left: 2px solid rgba(255, 255, 255, 0.6);
   border-top-left-radius: 44px;
-  mask-image: linear-gradient(to right, white 80%, transparent), linear-gradient(to bottom, white 80%, transparent);
+  mask-image:
+    linear-gradient(to right, white 80%, transparent),
+    linear-gradient(to bottom, white 80%, transparent);
   mask-composite: intersect;
-  -webkit-mask-image: linear-gradient(to right, white 80%, transparent), linear-gradient(to bottom, white 80%, transparent);
+  -webkit-mask-image:
+    linear-gradient(to right, white 80%, transparent),
+    linear-gradient(to bottom, white 80%, transparent);
   -webkit-mask-composite: source-in;
   pointer-events: none;
 }
@@ -298,9 +301,13 @@ defineExpose({
   border-right: 2px solid rgba(255, 255, 255, 0.6);
   border-bottom-right-radius: 44px;
   pointer-events: none;
-  mask-image: linear-gradient(to left, white 80%, transparent), linear-gradient(to top, white 80%, transparent);
+  mask-image:
+    linear-gradient(to left, white 80%, transparent),
+    linear-gradient(to top, white 80%, transparent);
   mask-composite: intersect;
-  -webkit-mask-image: linear-gradient(to left, white 80%, transparent), linear-gradient(to top, white 80%, transparent);
+  -webkit-mask-image:
+    linear-gradient(to left, white 80%, transparent),
+    linear-gradient(to top, white 80%, transparent);
   -webkit-mask-composite: source-in;
 }
 
@@ -528,7 +535,8 @@ defineExpose({
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.3;
   }
   50% {
@@ -537,7 +545,8 @@ defineExpose({
 }
 
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
   20% {

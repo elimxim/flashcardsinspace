@@ -42,7 +42,7 @@
       />
     </div>
   </Modal>
-  <SpaceToast/>
+  <SpaceToast />
 </template>
 
 <script setup lang="ts">
@@ -64,10 +64,7 @@ import {
   copyFlashcard,
 } from '@/core-logic/flashcard-logic.ts'
 import { storeToRefs } from 'pinia'
-import {
-  sendFlashcardRemovalRequest,
-  sendFlashcardUpdateRequest,
-} from '@/api/api-client.ts'
+import { sendFlashcardRemovalRequest, sendFlashcardUpdateRequest } from '@/api/api-client.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { useAudioCache } from '@/stores/audio-cache.ts'
@@ -75,14 +72,14 @@ import { usePictureCache } from '@/stores/picture-cache.ts'
 import {
   removeFlashcardAudioBlob,
   requestFlashcardAudioBlob,
-  uploadFlashcardAudioBlob
+  uploadFlashcardAudioBlob,
 } from '@/core-logic/flashcard-audio-logic.ts'
 import {
   removeFlashcardPictureBlob,
   requestFlashcardPictureBlob,
-  uploadFlashcardPictureBlob
+  uploadFlashcardPictureBlob,
 } from '@/core-logic/flashcard-picture-logic.ts'
-import { errorResponseData } from "@/core-logic/media-error.ts"
+import { errorResponseData } from '@/core-logic/media-error.ts'
 
 const flashcard = defineModel<Flashcard | undefined>('flashcard', { default: undefined })
 const removed = defineModel<boolean>('removed', { default: false })
@@ -120,10 +117,14 @@ const updateButton = ref<InstanceType<typeof SmartButton>>()
 const sidesRef = ref<InstanceType<typeof FlashcardInput>>()
 
 const stateChanged = computed(() => {
-  return flashcard.value?.frontSide !== frontSide.value
-    || flashcard.value?.backSide !== backSide.value
-    || isFrontSideAudioChanged.value || isBackSideAudioChanged.value
-    || isFrontSidePictureChanged.value || isBackSidePictureChanged.value
+  return (
+    flashcard.value?.frontSide !== frontSide.value ||
+    flashcard.value?.backSide !== backSide.value ||
+    isFrontSideAudioChanged.value ||
+    isBackSideAudioChanged.value ||
+    isFrontSidePictureChanged.value ||
+    isBackSidePictureChanged.value
+  )
 })
 
 const isFrontSideAudioChanged = computed(() => {
@@ -168,7 +169,11 @@ async function fetchFlashcardAudioBlob(
   try {
     return await requestFlashcardAudioBlob(flashcardSetId, flashcardId, flashcardSide)
   } catch (error) {
-    Log.error(LogTag.LOGIC, `Failed to fetch audio for Flashcard.id=${flashcardId}, Flashcard.side=${flashcardSide}`, error)
+    Log.error(
+      LogTag.LOGIC,
+      `Failed to fetch audio for Flashcard.id=${flashcardId}, Flashcard.side=${flashcardSide}`,
+      error,
+    )
     toaster.bakeError(userApiErrors.AUDIO__FETCHING_FAILED, errorResponseData(error))
     return undefined
   }
@@ -183,11 +188,10 @@ async function fetchAudio() {
   await Promise.all([
     (async function () {
       if (frontSideAudioId.value) {
-        return await fetchFlashcardAudioBlob(set.id, card.id, flashcardSides.FRONT)
-          .then((blob) => {
-            frontSideAudio.value = blob
-            frontSideAudioSize.value = blob?.size
-          })
+        return await fetchFlashcardAudioBlob(set.id, card.id, flashcardSides.FRONT).then((blob) => {
+          frontSideAudio.value = blob
+          frontSideAudioSize.value = blob?.size
+        })
       } else {
         frontSideAudio.value = undefined
         frontSideAudioSize.value = undefined
@@ -195,11 +199,10 @@ async function fetchAudio() {
     })(),
     (async function () {
       if (backSideAudioId.value) {
-        return await fetchFlashcardAudioBlob(set.id, card.id, flashcardSides.BACK)
-          .then((blob) => {
-            backSideAudio.value = blob
-            backSideAudioSize.value = blob?.size
-          })
+        return await fetchFlashcardAudioBlob(set.id, card.id, flashcardSides.BACK).then((blob) => {
+          backSideAudio.value = blob
+          backSideAudioSize.value = blob?.size
+        })
       } else {
         backSideAudio.value = undefined
         frontSideAudioSize.value = undefined
@@ -213,39 +216,43 @@ async function uploadAudioIfRelevant(): Promise<boolean> {
   const card = flashcard.value
 
   if (!set || !card) {
-    Log.error(LogTag.LOGIC, `Cannot upload audio: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`)
+    Log.error(
+      LogTag.LOGIC,
+      `Cannot upload audio: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`,
+    )
     return true
   }
 
   return await Promise.all([
     (async function () {
       if (isFrontSideAudioChanged.value && frontSideAudio.value) {
-        return uploadFlashcardAudioBlob(set, card, frontSideAudio.value, flashcardSides.FRONT)
-          .then((success) => {
+        return uploadFlashcardAudioBlob(set, card, frontSideAudio.value, flashcardSides.FRONT).then(
+          (success) => {
             if (success) {
               audioChanged.value = true
             }
             return success
-          })
+          },
+        )
       } else {
         return true
       }
     })(),
     (async function () {
       if (isBackSideAudioChanged.value && backSideAudio.value) {
-        return uploadFlashcardAudioBlob(set, card, backSideAudio.value, flashcardSides.BACK)
-          .then((success) => {
+        return uploadFlashcardAudioBlob(set, card, backSideAudio.value, flashcardSides.BACK).then(
+          (success) => {
             if (success) {
               audioChanged.value = true
             }
             return success
-          })
+          },
+        )
       } else {
         return true
       }
     })(),
-  ])
-    .then((results) => results.every(v => v))
+  ]).then((results) => results.every((v) => v))
 }
 
 async function removeAudioIfRelevant(): Promise<boolean> {
@@ -253,43 +260,50 @@ async function removeAudioIfRelevant(): Promise<boolean> {
   const card = flashcard.value
 
   if (!set || !card) {
-    Log.error(LogTag.LOGIC, `Cannot remove audio blobs: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`)
+    Log.error(
+      LogTag.LOGIC,
+      `Cannot remove audio blobs: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`,
+    )
     return true
   }
 
   return await Promise.all([
     (async function () {
       if (frontSideAudioId.value && !frontSideAudio.value && frontSideAudioSize.value) {
-        return removeFlashcardAudioBlob(set, card, frontSideAudioId.value, flashcardSides.FRONT)
-          .then((result) => {
-            if (result) {
-              frontSideAudioId.value = undefined
-              frontSideAudioSize.value = undefined
-              audioChanged.value = true
-            }
-            return result
-          })
+        return removeFlashcardAudioBlob(
+          set,
+          card,
+          frontSideAudioId.value,
+          flashcardSides.FRONT,
+        ).then((result) => {
+          if (result) {
+            frontSideAudioId.value = undefined
+            frontSideAudioSize.value = undefined
+            audioChanged.value = true
+          }
+          return result
+        })
       } else {
         return true
       }
     })(),
     (async function () {
       if (backSideAudioId.value && !backSideAudio.value && backSideAudioSize.value) {
-        return removeFlashcardAudioBlob(set, card, backSideAudioId.value, flashcardSides.BACK)
-          .then((result) => {
+        return removeFlashcardAudioBlob(set, card, backSideAudioId.value, flashcardSides.BACK).then(
+          (result) => {
             if (result) {
               backSideAudioId.value = undefined
               backSideAudioSize.value = undefined
               audioChanged.value = true
             }
             return result
-          })
+          },
+        )
       } else {
         return true
       }
     })(),
-  ])
-    .then((result) => result.every(v => v))
+  ]).then((result) => result.every((v) => v))
 }
 
 async function fetchFlashcardPictureBlob(
@@ -302,7 +316,11 @@ async function fetchFlashcardPictureBlob(
   try {
     return await requestFlashcardPictureBlob(flashcardSetId, flashcardId, flashcardSide)
   } catch (error) {
-    Log.error(LogTag.LOGIC, `Failed to fetch picture for Flashcard.id=${flashcardId}, Flashcard.side=${flashcardSide}`, error)
+    Log.error(
+      LogTag.LOGIC,
+      `Failed to fetch picture for Flashcard.id=${flashcardId}, Flashcard.side=${flashcardSide}`,
+      error,
+    )
     toaster.bakeError(userApiErrors.PICTURE__FETCHING_FAILED, errorResponseData(error))
     return undefined
   }
@@ -317,11 +335,12 @@ async function fetchPicture() {
   await Promise.all([
     (async function () {
       if (frontSidePictureId.value) {
-        return await fetchFlashcardPictureBlob(set.id, card.id, flashcardSides.FRONT)
-          .then((blob) => {
+        return await fetchFlashcardPictureBlob(set.id, card.id, flashcardSides.FRONT).then(
+          (blob) => {
             frontSidePicture.value = blob
             frontSidePictureSize.value = blob?.size
-          })
+          },
+        )
       } else {
         frontSidePicture.value = undefined
         frontSidePictureSize.value = undefined
@@ -329,11 +348,12 @@ async function fetchPicture() {
     })(),
     (async function () {
       if (backSidePictureId.value) {
-        return await fetchFlashcardPictureBlob(set.id, card.id, flashcardSides.BACK)
-          .then((blob) => {
+        return await fetchFlashcardPictureBlob(set.id, card.id, flashcardSides.BACK).then(
+          (blob) => {
             backSidePicture.value = blob
             backSidePictureSize.value = blob?.size
-          })
+          },
+        )
       } else {
         backSidePicture.value = undefined
         backSidePictureSize.value = undefined
@@ -347,39 +367,49 @@ async function uploadPictureIfRelevant(): Promise<boolean> {
   const card = flashcard.value
 
   if (!set || !card) {
-    Log.error(LogTag.LOGIC, `Cannot upload picture: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`)
+    Log.error(
+      LogTag.LOGIC,
+      `Cannot upload picture: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`,
+    )
     return true
   }
 
   return await Promise.all([
     (async function () {
       if (isFrontSidePictureChanged.value && frontSidePicture.value) {
-        return uploadFlashcardPictureBlob(set, card, frontSidePicture.value, flashcardSides.FRONT)
-          .then((success) => {
-            if (success) {
-              pictureChanged.value = true
-            }
-            return success
-          })
+        return uploadFlashcardPictureBlob(
+          set,
+          card,
+          frontSidePicture.value,
+          flashcardSides.FRONT,
+        ).then((success) => {
+          if (success) {
+            pictureChanged.value = true
+          }
+          return success
+        })
       } else {
         return true
       }
     })(),
     (async function () {
       if (isBackSidePictureChanged.value && backSidePicture.value) {
-        return uploadFlashcardPictureBlob(set, card, backSidePicture.value, flashcardSides.BACK)
-          .then((success) => {
-            if (success) {
-              pictureChanged.value = true
-            }
-            return success
-          })
+        return uploadFlashcardPictureBlob(
+          set,
+          card,
+          backSidePicture.value,
+          flashcardSides.BACK,
+        ).then((success) => {
+          if (success) {
+            pictureChanged.value = true
+          }
+          return success
+        })
       } else {
         return true
       }
     })(),
-  ])
-    .then((results) => results.every(v => v))
+  ]).then((results) => results.every((v) => v))
 }
 
 async function removePictureIfRelevant(): Promise<boolean> {
@@ -387,43 +417,53 @@ async function removePictureIfRelevant(): Promise<boolean> {
   const card = flashcard.value
 
   if (!set || !card) {
-    Log.error(LogTag.LOGIC, `Cannot remove picture blobs: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`)
+    Log.error(
+      LogTag.LOGIC,
+      `Cannot remove picture blobs: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`,
+    )
     return true
   }
 
   return await Promise.all([
     (async function () {
       if (frontSidePictureId.value && !frontSidePicture.value && frontSidePictureSize.value) {
-        return removeFlashcardPictureBlob(set, card, frontSidePictureId.value, flashcardSides.FRONT)
-          .then((result) => {
-            if (result) {
-              frontSidePictureId.value = undefined
-              frontSidePictureSize.value = undefined
-              pictureChanged.value = true
-            }
-            return result
-          })
+        return removeFlashcardPictureBlob(
+          set,
+          card,
+          frontSidePictureId.value,
+          flashcardSides.FRONT,
+        ).then((result) => {
+          if (result) {
+            frontSidePictureId.value = undefined
+            frontSidePictureSize.value = undefined
+            pictureChanged.value = true
+          }
+          return result
+        })
       } else {
         return true
       }
     })(),
     (async function () {
       if (backSidePictureId.value && !backSidePicture.value && backSidePictureSize.value) {
-        return removeFlashcardPictureBlob(set, card, backSidePictureId.value, flashcardSides.BACK)
-          .then((result) => {
-            if (result) {
-              backSidePictureId.value = undefined
-              backSidePictureSize.value = undefined
-              pictureChanged.value = true
-            }
-            return result
-          })
+        return removeFlashcardPictureBlob(
+          set,
+          card,
+          backSidePictureId.value,
+          flashcardSides.BACK,
+        ).then((result) => {
+          if (result) {
+            backSidePictureId.value = undefined
+            backSidePictureSize.value = undefined
+            pictureChanged.value = true
+          }
+          return result
+        })
       } else {
         return true
       }
     })(),
-  ])
-    .then((result) => result.every(v => v))
+  ]).then((result) => result.every((v) => v))
 }
 
 async function cancel() {
@@ -492,7 +532,8 @@ async function removeFlashcard(): Promise<boolean> {
       backSidePictureSize.value = undefined
       toaster.bakeSuccess('Success', 'Flashcard removed', 200)
       return true
-    }).catch((error) => {
+    })
+    .catch((error) => {
       toaster.bakeError(userApiErrors.FLASHCARD__REMOVING_FAILED, error.response?.data)
       return false
     })
@@ -515,7 +556,11 @@ async function updateFlashcard(): Promise<boolean> {
       return true
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to update Flashcard.id=${flashcardCopy.id}`, error.response?.data)
+      Log.error(
+        LogTag.LOGIC,
+        `Failed to update Flashcard.id=${flashcardCopy.id}`,
+        error.response?.data,
+      )
       toaster.bakeError(userApiErrors.FLASHCARD__UPDATING_FAILED, error.response?.data)
       return false
     })
@@ -551,7 +596,6 @@ watch(flashcard, async (newVal) => {
 onMounted(async () => {
   await Promise.all([fetchAudio(), fetchPicture()])
 })
-
 </script>
 
 <style scoped>

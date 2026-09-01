@@ -100,7 +100,10 @@ async function uploadAudioIfRelevant(): Promise<boolean> {
   const card = createdFlashcard.value
 
   if (!set || !card) {
-    Log.log(LogTag.LOGIC, `Cannot upload audio: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`)
+    Log.log(
+      LogTag.LOGIC,
+      `Cannot upload audio: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`,
+    )
     return true
   }
 
@@ -119,8 +122,7 @@ async function uploadAudioIfRelevant(): Promise<boolean> {
         return true
       }
     })(),
-  ])
-    .then((results) => results.every(v => v))
+  ]).then((results) => results.every((v) => v))
 }
 
 async function uploadPictureIfRelevant(): Promise<boolean> {
@@ -128,14 +130,22 @@ async function uploadPictureIfRelevant(): Promise<boolean> {
   const card = createdFlashcard.value
 
   if (!set || !card) {
-    Log.log(LogTag.LOGIC, `Cannot upload picture: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`)
+    Log.log(
+      LogTag.LOGIC,
+      `Cannot upload picture: both FlashcardSet.id=${set?.id} and Flashcard.id=${card?.id} must be defined`,
+    )
     return true
   }
 
   return await Promise.all([
     (async function () {
       if (frontSidePictureBlob.value) {
-        return uploadFlashcardPictureBlob(set, card, frontSidePictureBlob.value, flashcardSides.FRONT)
+        return uploadFlashcardPictureBlob(
+          set,
+          card,
+          frontSidePictureBlob.value,
+          flashcardSides.FRONT,
+        )
       } else {
         return true
       }
@@ -147,8 +157,7 @@ async function uploadPictureIfRelevant(): Promise<boolean> {
         return true
       }
     })(),
-  ])
-    .then((results) => results.every(v => v))
+  ]).then((results) => results.every((v) => v))
 }
 
 async function cancel() {
@@ -178,12 +187,16 @@ async function addNewFlashcard(): Promise<boolean> {
   return await sendFlashcardCreationRequest(setId, flashcard)
     .then(async (response) => {
       if (response.data.initialized) {
-        if (!response.data.flashcardSet
-          || !response.data.flashcard
-          || !response.data.chronodays
-          || !response.data.currDay
+        if (
+          !response.data.flashcardSet ||
+          !response.data.flashcard ||
+          !response.data.chronodays ||
+          !response.data.currDay
         ) {
-          Log.log(LogTag.LOGIC, `Response doesn't have required fields: ${JSON.stringify(response.data)}`)
+          Log.log(
+            LogTag.LOGIC,
+            `Response doesn't have required fields: ${JSON.stringify(response.data)}`,
+          )
           toaster.bakeError(userApiErrors.FLASHCARD__CREATION_FAILED)
           return false
         }
@@ -192,14 +205,10 @@ async function addNewFlashcard(): Promise<boolean> {
         flashcardSetStore.updateSet(response.data.flashcardSet)
         flashcardStore.changeSet(response.data.flashcardSet)
         flashcardStore.addNewFlashcard(response.data.flashcard)
-        chronoStore.loadState(
-          response.data.chronodays,
-          response.data.currDay,
-          {
-            streak: 0,
-            lastDate: currDay.value.chronodate
-          }
-        )
+        chronoStore.loadState(response.data.chronodays, response.data.currDay, {
+          streak: 0,
+          lastDate: currDay.value.chronodate,
+        })
         flashcardSetStore.addExtra(setId)
         flashcardSetStore.incrementFlashcardsNumber(setId)
 
@@ -231,7 +240,11 @@ async function addNewFlashcard(): Promise<boolean> {
       }
     })
     .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to add a flashcard to FlashcardSet.id=${setId}`, error.response?.data)
+      Log.error(
+        LogTag.LOGIC,
+        `Failed to add a flashcard to FlashcardSet.id=${setId}`,
+        error.response?.data,
+      )
       toaster.bakeError(userApiErrors.FLASHCARD__CREATION_FAILED, error.response?.data)
       return false
     })
@@ -249,7 +262,6 @@ async function resetState() {
   backSidePictureBlob.value = undefined
   flashcardSidesRef.value?.resetState()
 }
-
 </script>
 
 <style scoped>

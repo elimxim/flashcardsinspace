@@ -1,24 +1,15 @@
 <template>
-  <div
-    v-if="visible"
-    ref="modalOverlay"
-    class="modal-overlay"
-    role="dialog"
-    tabindex="-1"
-  >
+  <div v-if="visible" ref="modalOverlay" class="modal-overlay" role="dialog" tabindex="-1">
     <div ref="modalWindow" class="modal-window touch-none" tabindex="-1">
       <div class="modal-top-control">
-        <slot name="control"/>
-        <AwesomeButton
-          icon="fa-solid fa-circle-xmark"
-          :on-click="pressExit"
-        />
+        <slot name="control" />
+        <AwesomeButton icon="fa-solid fa-circle-xmark" :on-click="pressExit" />
       </div>
       <div v-if="title" class="modal-title select-text">
         {{ title }}
       </div>
       <div class="modal-body">
-        <slot/>
+        <slot />
       </div>
     </div>
   </div>
@@ -29,25 +20,27 @@ import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import { nextTick, ref, watch, onUnmounted, onMounted } from 'vue'
 
-const props = withDefaults(defineProps<{
-  visible: boolean
-  title?: string
-  focusOn?: HTMLElement
-  overflow?: string
-  exitButton?: InstanceType<typeof SmartButton>
-  enterButton?: InstanceType<typeof SmartButton>
-  deleteButton?: InstanceType<typeof SmartButton>
-  onExit?: () => void
-}>(), {
-  title: '',
-  focusOn: undefined,
-  overflow: 'auto',
-  exitButton: undefined,
-  enterButton: undefined,
-  deleteButton: undefined,
-  onExit: () => {
+const props = withDefaults(
+  defineProps<{
+    visible: boolean
+    title?: string
+    focusOn?: HTMLElement
+    overflow?: string
+    exitButton?: InstanceType<typeof SmartButton>
+    enterButton?: InstanceType<typeof SmartButton>
+    deleteButton?: InstanceType<typeof SmartButton>
+    onExit?: () => void
+  }>(),
+  {
+    title: '',
+    focusOn: undefined,
+    overflow: 'auto',
+    exitButton: undefined,
+    enterButton: undefined,
+    deleteButton: undefined,
+    onExit: () => {},
   },
-})
+)
 
 const modalWindow = ref<HTMLDivElement>()
 
@@ -68,17 +61,20 @@ function releaseDelete() {
   props.deleteButton?.release()
 }
 
-watch(() => props.visible, (newVal) => {
-  if (newVal) {
-    nextTick().then(() => {
-      if (props.focusOn) {
-        props.focusOn.focus()
-      } else {
-        modalWindow.value?.focus()
-      }
-    })
-  }
-})
+watch(
+  () => props.visible,
+  (newVal) => {
+    if (newVal) {
+      nextTick().then(() => {
+        if (props.focusOn) {
+          props.focusOn.focus()
+        } else {
+          modalWindow.value?.focus()
+        }
+      })
+    }
+  },
+)
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
@@ -119,7 +115,6 @@ function handleKeyUp(event: KeyboardEvent) {
     releaseDelete()
   }
 }
-
 </script>
 
 <style scoped>

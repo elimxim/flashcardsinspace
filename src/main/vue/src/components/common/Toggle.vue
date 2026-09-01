@@ -14,16 +14,11 @@
     }"
   >
     <label class="toggle-track">
-      <input
-        v-model="model"
-        type="checkbox"
-        role="switch"
-        class="toggle-input"
-      />
-      <span class="toggle-switcher" aria-hidden="true"/>
+      <input v-model="model" type="checkbox" role="switch" class="toggle-input" />
+      <span class="toggle-switcher" aria-hidden="true" />
     </label>
     <div v-if="$slots.default" class="toggle-label-container">
-      <slot/>
+      <slot />
     </div>
   </div>
 </template>
@@ -33,49 +28,63 @@ import { computed } from 'vue'
 
 const model = defineModel<boolean>({ default: false })
 
-const props = withDefaults(defineProps<{
-  position?: 'horizontal' | 'vertical'
-  size?: 'S' | 'M' | 'L'
-  overhang?: boolean
-  trackLength?: 'S' | 'M' | 'L'
-  speed?: number
-  reverse?: boolean
-}>(), {
-  position: 'horizontal',
-  size: 'M',
-  overhang: false,
-  trackLength: 'S',
-  speed: 200,
-  reverse: false,
-})
+const props = withDefaults(
+  defineProps<{
+    position?: 'horizontal' | 'vertical'
+    size?: 'S' | 'M' | 'L'
+    overhang?: boolean
+    trackLength?: 'S' | 'M' | 'L'
+    speed?: number
+    reverse?: boolean
+  }>(),
+  {
+    position: 'horizontal',
+    size: 'M',
+    overhang: false,
+    trackLength: 'S',
+    speed: 200,
+    reverse: false,
+  },
+)
 
 const trackLengthFactor = computed(() => {
   switch (props.trackLength) {
-    case 'S': return 1
-    case 'M': return 1.5
-    case 'L': return 2
-    default: return 1
+    case 'S':
+      return 1
+    case 'M':
+      return 1.5
+    case 'L':
+      return 2
+    default:
+      return 1
   }
 })
 
 const trackSize = computed(() => {
   switch (props.size) {
-    case 'S': return '30px'
-    case 'M': return '40px'
-    case 'L': return '60px'
-    default: return '40px'
+    case 'S':
+      return '30px'
+    case 'M':
+      return '40px'
+    case 'L':
+      return '60px'
+    default:
+      return '40px'
   }
 })
 
 const thickness = computed(() => {
   switch (props.size) {
-    case 'S': return '16px'
-    case 'M': return '24px'
-    case 'L': return '30px'
-    default: return '24px'
+    case 'S':
+      return '16px'
+    case 'M':
+      return '24px'
+    case 'L':
+      return '30px'
+    default:
+      return '24px'
   }
 })
-
 </script>
 
 <style scoped>
@@ -94,7 +103,9 @@ const thickness = computed(() => {
   --tgl--track-length: calc(var(--tgl--track-size) * var(--tgl--track-length-factor));
   --tgl--inset: var(--tgl--border-width);
   --tgl--switcher-size: calc(var(--tgl--thickness) - 2 * var(--tgl--inset));
-  --tgl--switcher-offset: calc((var(--tgl--thickness) - var(--tgl--switcher-size)) / 2 - var(--tgl--inset));
+  --tgl--switcher-offset: calc(
+    (var(--tgl--thickness) - var(--tgl--switcher-size)) / 2 - var(--tgl--inset)
+  );
   --tgl--travel: calc(var(--tgl--track-length) - var(--tgl--thickness));
 }
 
@@ -214,5 +225,4 @@ const thickness = computed(() => {
   display: flex;
   align-items: center;
 }
-
 </style>

@@ -1,40 +1,30 @@
 <template>
   <div class="quiz-result">
-    <div class="quiz-title">
-      Quiz Round {{ round }}
-    </div>
+    <div class="quiz-title">Quiz Round {{ round }}</div>
     <div class="quiz-info">
       <div class="quiz-stats">
-        <div class="quiz-stats-title">
-          Overall Stats
-        </div>
+        <div class="quiz-stats-title">Overall Stats</div>
         <div class="quiz-stats-row">
-          <div class="quiz-stats-text">
-            Correct
-          </div>
+          <div class="quiz-stats-text">Correct</div>
           <div class="quiz-stats-number">
             {{ overallCorrect }}
           </div>
         </div>
         <div class="quiz-stats-row">
-          <div class="quiz-stats-text">
-            Incorrect
-          </div>
+          <div class="quiz-stats-text">Incorrect</div>
           <div class="quiz-stats-number">
             {{ roundFailed }}
           </div>
         </div>
         <div class="quiz-stats-row">
-          <div class="quiz-stats-text">
-            Total
-          </div>
+          <div class="quiz-stats-text">Total</div>
           <div class="quiz-stats-number">
             {{ overallTotal }}
           </div>
         </div>
       </div>
       <div class="quiz-clock">
-        <Clock :time="elapsedTime" top-label="Round Time"/>
+        <Clock :time="elapsedTime" top-label="Round Time" />
       </div>
     </div>
     <div class="quiz-chart-wrapper">
@@ -50,7 +40,7 @@
     <div
       :class="{
         'quiz-central-button': roundFailed === 0,
-        'quiz-left-button': roundFailed > 0
+        'quiz-left-button': roundFailed > 0,
       }"
     >
       <SmartButton
@@ -78,22 +68,22 @@ import DoughnutChart from '@/components/common/DoughnutChart.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import Clock from '@/components/common/Clock.vue'
 
-withDefaults(defineProps<{
-  elapsedTime: number
-  round: number
-  overallTotal: number
-  overallCorrect: number
-  roundTotal: number
-  roundFailed: number
-  onNextRound?: () => void
-  onFinish?: () => void
-}>(), {
-  onNextRound: () => {
+withDefaults(
+  defineProps<{
+    elapsedTime: number
+    round: number
+    overallTotal: number
+    overallCorrect: number
+    roundTotal: number
+    roundFailed: number
+    onNextRound?: () => void
+    onFinish?: () => void
+  }>(),
+  {
+    onNextRound: () => {},
+    onFinish: () => {},
   },
-  onFinish: () => {
-  },
-})
-
+)
 </script>
 
 <style scoped>

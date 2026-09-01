@@ -15,9 +15,9 @@
         <h2 class="select-text">Welcome aboard, {{ user?.name ?? 'Unknown' }}!</h2>
         <div class="select-text">{{ randomDayPhrase }}</div>
         <DeferredLoading :wait-for="userInfoAwait">
-          <UserInfo :user="user"/>
+          <UserInfo :user="user" />
           <template #fallback>
-            <UserInfoSkeleton/>
+            <UserInfoSkeleton />
           </template>
         </DeferredLoading>
       </div>
@@ -37,9 +37,8 @@
       </div>
     </div>
   </div>
-  <SpaceToast/>
+  <SpaceToast />
 </template>
-
 
 <script setup lang="ts">
 import DeferredLoading from '@/components/common/DeferredLoading.vue'
@@ -52,7 +51,7 @@ import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
-import { deviceInteraction, } from '@/utils/device-utils.ts'
+import { deviceInteraction } from '@/utils/device-utils.ts'
 
 const { isAnyHover } = deviceInteraction()
 
@@ -73,10 +72,13 @@ const daysSinceRegistration = computed(() => {
 })
 
 const daysPhrases = [
-  (days: number) => `Floating in zero gravity for ${days} days (and somehow still haven't lost your keys)`,
-  (days: number) => `You've been floating with us for ${days} days - that's ${days} days without doing laundry!`,
+  (days: number) =>
+    `Floating in zero gravity for ${days} days (and somehow still haven't lost your keys)`,
+  (days: number) =>
+    `You've been floating with us for ${days} days - that's ${days} days without doing laundry!`,
   (days: number) => `Floating majestically for ${days} days (like a graceful space walrus)`,
-  (days: number) => `You've survived ${days} days without a towel - impressive for a space traveler`,
+  (days: number) =>
+    `You've survived ${days} days without a towel - impressive for a space traveler`,
   (days: number) => `${days} days in space - congratulations, you're now 0.00001% closer to Mars`,
   (days: number) => `${days} days in space - your Earth insurance probably doesn't cover this`,
 ]
@@ -142,7 +144,6 @@ onBeforeUnmount(() => {
   if (isAnyHover) window.removeEventListener('pointermove', onPointerMove)
   if (rafId !== 0) cancelAnimationFrame(rafId)
 })
-
 </script>
 
 <style scoped>
@@ -222,5 +223,4 @@ onBeforeUnmount(() => {
     max-width: 600px;
   }
 }
-
 </style>

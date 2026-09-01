@@ -10,9 +10,7 @@
           tooltip-position="top-right"
           :on-click="goToIo"
         />
-        <div class="ie-text">
-          Import / Export flashcards
-        </div>
+        <div class="ie-text">Import / Export flashcards</div>
       </div>
       <div v-else-if="panel === 'io'" key="io" class="buttons-panel">
         <AwesomeButton
@@ -157,7 +155,6 @@ function onFileSelected(event: Event) {
     input.value = ''
   }
 }
-
 </script>
 
 <style scoped>
@@ -213,9 +210,8 @@ function onFileSelected(event: Event) {
 }
 
 .ie-btn--excel {
-  --awesome-button--icon--color: #1D6F42;
-  --awesome-button--icon--color--hover: #1D6F42;
-
+  --awesome-button--icon--color: #1d6f42;
+  --awesome-button--icon--color--hover: #1d6f42;
 }
 
 .ie-btn--back {
@@ -230,7 +226,8 @@ function onFileSelected(event: Event) {
 }
 
 @keyframes bounce-hint {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   6% {
@@ -272,7 +269,9 @@ function onFileSelected(event: Event) {
 }
 
 .bubble-leave-active {
-  transition: transform 140ms ease-in, opacity 140ms ease-in;
+  transition:
+    transform 140ms ease-in,
+    opacity 140ms ease-in;
   transform-origin: center;
 }
 

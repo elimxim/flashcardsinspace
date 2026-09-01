@@ -18,15 +18,18 @@ interface ErrorItem {
   text: string
 }
 
-const props = withDefaults(defineProps<{
-  when?: boolean
-  text?: string
-  errors?: ErrorItem[]
-}>(), {
-  when: false,
-  text: undefined,
-  errors: () => []
-})
+const props = withDefaults(
+  defineProps<{
+    when?: boolean
+    text?: string
+    errors?: ErrorItem[]
+  }>(),
+  {
+    when: false,
+    text: undefined,
+    errors: () => [],
+  },
+)
 
 const firstErrorText = computed(() => {
   if (props.text && props.when) {
@@ -34,13 +37,12 @@ const firstErrorText = computed(() => {
   }
 
   if (props.errors && props.errors.length > 0) {
-    const visibleText = props.errors.find(item => item.when)
+    const visibleText = props.errors.find((item) => item.when)
     return visibleText?.text
   }
 
   return undefined
 })
-
 </script>
 
 <style scoped>

@@ -1,6 +1,6 @@
 .off-button {
   --smart-button--bg: var(--off-button--bg-color);
-  --smart-button--bg--hover: var(--off-button--bg-color--hover)
+  --smart-button--bg--hover: var(--off-button--bg-color--hover);
 }
 
 .dangerous-button {
@@ -35,7 +35,7 @@
 .navigation-button {
   --awesome-button--icon--size: 1.3rem;
   --awesome-button--icon--width: 40px;
-  --awesome-button--icon--color: #FAF9F6;
+  --awesome-button--icon--color: #faf9f6;
   --awesome-button--icon--color--hover: #dad0f8;
   --awesome-button--icon--color--active: #dad0f8;
   --awesome-button--icon--color--disabled: rgba(250, 249, 246, 0.15);

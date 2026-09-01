@@ -1,7 +1,7 @@
 <template>
   <div class="kinetic-ring-spinner kinetic-ring-spinner--theme">
     <div class="kinetic-ring">
-      <div class="ring-track"/>
+      <div class="ring-track" />
       <div
         class="ring-beam"
         :class="{
@@ -15,22 +15,24 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-const props = withDefaults(defineProps<{
-  ringSize?: number
-  trackSize?: number
-  beamSpeed?: number
-  freeze?: boolean
-}>(), {
-  ringSize: 160,
-  trackSize: 12,
-  beamSpeed: 1.2,
-  freeze: false,
-})
+const props = withDefaults(
+  defineProps<{
+    ringSize?: number
+    trackSize?: number
+    beamSpeed?: number
+    freeze?: boolean
+  }>(),
+  {
+    ringSize: 160,
+    trackSize: 12,
+    beamSpeed: 1.2,
+    freeze: false,
+  },
+)
 
 const ringSizePx = computed(() => `${props.ringSize}px`)
 const trackSizePx = computed(() => `${props.trackSize}px`)
 const beamSpeedSeconds = computed(() => `${props.beamSpeed}s`)
-
 </script>
 
 <style scoped>
@@ -76,13 +78,16 @@ const beamSpeedSeconds = computed(() => `${props.beamSpeed}s`)
   border-radius: 50%;
   border: var(--ring-track--size) solid transparent;
   background: conic-gradient(
-    from 0deg,
-    transparent 0%,
-    var(--beam--color-1) 15%,
-    var(--beam--color-2) 25%,
-    transparent 35%
-  ) border-box;
-  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+      from 0deg,
+      transparent 0%,
+      var(--beam--color-1) 15%,
+      var(--beam--color-2) 25%,
+      transparent 35%
+    )
+    border-box;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) padding-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: destination-out;
   mask-composite: exclude;
   animation: rotate var(--beam--speed) linear infinite;

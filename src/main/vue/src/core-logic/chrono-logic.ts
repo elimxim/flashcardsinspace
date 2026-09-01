@@ -21,9 +21,7 @@ export interface CalendarDay {
   isStreak: boolean
 }
 
-export const chronodayStatusesToProgressDay = new Set([
-  chronodayStatuses.NOT_STARTED,
-])
+export const chronodayStatusesToProgressDay = new Set([chronodayStatuses.NOT_STARTED])
 
 export const chronodayStatusesToCompleteDay = new Set([
   chronodayStatuses.NOT_STARTED,
@@ -44,7 +42,7 @@ export function selectConsecutiveDaysBefore(
   if (chronodays.length === 0) return []
   if (startDay.status === chronodayStatuses.INITIAL) return []
 
-  const startDayIndex = chronodays.findIndex(day => day.id === startDay.id)
+  const startDayIndex = chronodays.findIndex((day) => day.id === startDay.id)
   const startIndex = including ? startDayIndex : startDayIndex - 1
   if (startIndex === -1) {
     throw Error(`Start day ${startDay.id} not found in chronodays`)
@@ -62,11 +60,8 @@ export function selectConsecutiveDaysBefore(
   return result
 }
 
-export function nextChronoday(
-  chronodays: Chronoday[],
-  currDay: Chronoday,
-): Chronoday | undefined {
-  const currIndex = chronodays.findIndex(day => day.chronodate === currDay.chronodate)
+export function nextChronoday(chronodays: Chronoday[], currDay: Chronoday): Chronoday | undefined {
+  const currIndex = chronodays.findIndex((day) => day.chronodate === currDay.chronodate)
   if (currIndex === -1) return undefined
   return chronodays[currIndex + 1]
 }
@@ -77,7 +72,7 @@ export function calcCalendarPage(
   chronodays: Chronoday[],
   dayStreak: DayStreak,
 ): CalendarDay[] {
-  const chronodayMap = new Map(chronodays.map(day => [day.chronodate, day]))
+  const chronodayMap = new Map(chronodays.map((day) => [day.chronodate, day]))
   const year = currMonth.getFullYear()
   const month = currMonth.getMonth()
 
@@ -166,5 +161,3 @@ export function calcCalendarPage(
 function totalDays(year: number, month: number): number {
   return new Date(year, month, 0).getDate()
 }
-
-

@@ -1,6 +1,6 @@
 <template>
   <nav class="navbar navbar--theme">
-    <Starfield twinkle :density="40" :star-size="1.6" vertical-drift="2px"/>
+    <Starfield twinkle :density="40" :star-size="1.6" vertical-drift="2px" />
     <div class="logo-container">
       <SvgImage
         path="assets/rockets"
@@ -14,10 +14,7 @@
         fetch-priority="auto"
         non-interactive
       />
-      <div
-        class="nav-text nav-text--title"
-        @click="navigateToControlPanel"
-      >
+      <div class="nav-text nav-text--title" @click="navigateToControlPanel">
         Flashcards in&nbsp;Space
       </div>
     </div>
@@ -44,7 +41,7 @@
             Control Panel
           </div>
           <div class="nav-item-partition">
-            <font-awesome-icon icon="fa-solid fa-circle"/>
+            <font-awesome-icon icon="fa-solid fa-circle" />
           </div>
         </div>
       </transition>
@@ -70,7 +67,7 @@
             Home
           </div>
           <div class="nav-item-partition">
-            <font-awesome-icon icon="fa-solid fa-circle"/>
+            <font-awesome-icon icon="fa-solid fa-circle" />
           </div>
         </div>
       </transition>
@@ -96,7 +93,7 @@
             Get Help
           </div>
           <div class="nav-item-partition">
-            <font-awesome-icon icon="fa-solid fa-circle"/>
+            <font-awesome-icon icon="fa-solid fa-circle" />
           </div>
         </div>
       </transition>
@@ -146,7 +143,9 @@ const { isAuthenticated } = storeToRefs(authStore)
 
 const showIcons = ref(window.innerWidth <= ICONS_SWITCH_BREAKPOINT)
 
-const controlPanelActive = computed(() => router.currentRoute.value.name === routeNames.controlPanel)
+const controlPanelActive = computed(
+  () => router.currentRoute.value.name === routeNames.controlPanel,
+)
 const homeActive = computed(() => router.currentRoute.value.name === routeNames.home)
 const supportActive = computed(() => router.currentRoute.value.name === routeNames.getHelp)
 const userActive = computed(() => router.currentRoute.value.name === routeNames.user)
@@ -185,7 +184,7 @@ onUnmounted(() => {
 .navbar--theme {
   --nav--font-family: var(--navbar--font-family);
   --nav--bg: transparent;
-  --nav--text--color: #FAF9F6;
+  --nav--text--color: #faf9f6;
   --nav--text--color--hover: #dad0f8;
   --starfield--star--color: #dad0f8;
 }
@@ -278,7 +277,9 @@ onUnmounted(() => {
 
 .pop-enter-active,
 .pop-leave-active {
-  transition: opacity 150ms ease, transform 150ms ease;
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
 }
 
 .pop-enter-from {
@@ -296,5 +297,4 @@ onUnmounted(() => {
   opacity: 1;
   transform: scale(1);
 }
-
 </style>

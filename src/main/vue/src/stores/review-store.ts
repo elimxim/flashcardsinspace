@@ -1,4 +1,4 @@
-import {computed, readonly, Ref, ref} from 'vue'
+import { computed, readonly, Ref, ref } from 'vue'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { EmptyReviewQueue, ReviewQueue, ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { defineStore, getActivePinia } from 'pinia'
@@ -9,11 +9,14 @@ import {
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { errorResponseData } from '@/core-logic/media-error.ts'
-import { Log, LogTag } from "@/utils/logger.ts"
+import { Log, LogTag } from '@/utils/logger.ts'
 
 export type ReviewStore = ReturnType<typeof useReviewStore>
 
-export const useReviewStore = (sessionType: ReviewSessionType, flashcardSet: Ref<FlashcardSet | undefined>) => {
+export const useReviewStore = (
+  sessionType: ReviewSessionType,
+  flashcardSet: Ref<FlashcardSet | undefined>,
+) => {
   const storeId = buildStoreId(sessionType)
   return defineStore(storeId, () => {
     // state
@@ -36,7 +39,7 @@ export const useReviewStore = (sessionType: ReviewSessionType, flashcardSet: Ref
     })
 
     const flashcardsSeen = computed(() =>
-      Math.max(0, flashcardsTotal.value - flashcardsRemaining.value)
+      Math.max(0, flashcardsTotal.value - flashcardsRemaining.value),
     )
 
     const noOneAvailable = computed(() => {
@@ -98,7 +101,10 @@ export const useReviewStore = (sessionType: ReviewSessionType, flashcardSet: Ref
       flashcardBackSidePictureBlob.value = media.backPicture
 
       if (media.error !== undefined) {
-        useSpaceToaster().bakeError(userApiErrors.MEDIA__FETCHING_FAILED, errorResponseData(media.error))
+        useSpaceToaster().bakeError(
+          userApiErrors.MEDIA__FETCHING_FAILED,
+          errorResponseData(media.error),
+        )
       }
     }
 
@@ -195,7 +201,7 @@ export const useReviewStore = (sessionType: ReviewSessionType, flashcardSet: Ref
   })()
 }
 
-function buildStoreId(sessionType: string){
+function buildStoreId(sessionType: string) {
   return `review-${sessionType}`
 }
 

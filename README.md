@@ -63,7 +63,7 @@ daily ritual a little better every time you return.
 
 ### Prerequisites
 - Java 24+
-- Node.js 22+
+- Node.js 26+
 - PostgreSQL
 - Docker
 

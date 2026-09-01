@@ -1,11 +1,9 @@
 <template>
-  <FlashcardSetInfoBar
-    :hidden="showInfoBar"
-  />
-  <MainPanel/>
-  <LearningStagesWidget ref="learningStagesWidget" :grow-multiplier="2.5"/>
+  <FlashcardSetInfoBar :hidden="showInfoBar" />
+  <MainPanel />
+  <LearningStagesWidget ref="learningStagesWidget" :grow-multiplier="2.5" />
   <div class="control-outer-space-panel">
-    <OuterSpaceWidget/>
+    <OuterSpaceWidget />
   </div>
 </template>
 
@@ -28,7 +26,7 @@ onMounted(() => {
     nextTick().then(() =>
       setTimeout(() => {
         learningStagesWidget.value?.expand()
-      }, 1000)
+      }, 1000),
     )
   }
 })

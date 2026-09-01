@@ -15,12 +15,12 @@
         :errors="[
           {
             when: usernameRegexMismatch,
-            text: 'Please use only letters, numbers, dashes, underscores, and spaces'
+            text: 'Please use only letters, numbers, dashes, underscores, and spaces',
           },
           {
             when: usernameMaxLengthInvalid,
-            text: 'This username is expanding faster than the universe! Please keep it under 64 characters'
-            },
+            text: 'This username is expanding faster than the universe! Please keep it under 64 characters',
+          },
         ]"
       />
     </div>
@@ -56,17 +56,9 @@
     <div class="user-info-item select-text">
       Registered at: {{ user?.registeredAt ?? 'Unknown' }}
     </div>
-    <div class="user-info-item select-text">
-      Timezone: {{ user?.timezone ?? 'Unknown' }}
-    </div>
+    <div class="user-info-item select-text">Timezone: {{ user?.timezone ?? 'Unknown' }}</div>
     <div class="user-controls">
-      <SmartButton
-        text="Logout"
-        class="off-button"
-        :on-click="logout"
-        fill-width
-        auto-blur
-      />
+      <SmartButton text="Logout" class="off-button" :on-click="logout" fill-width auto-blur />
       <SmartButton
         text="Save"
         class="calm-button"
@@ -100,7 +92,7 @@ import { userApiErrors } from '@/api/user-api-error.ts'
 import { User } from '@/model/user.ts'
 
 const props = defineProps<{
-  user: User | undefined,
+  user: User | undefined
 }>()
 
 const authStore = useAuthStore()
@@ -112,41 +104,44 @@ const { languages } = storeToRefs(languageStore)
 
 const username = ref(props.user?.name ?? 'Unknown')
 const userEmail = ref(props.user?.email ?? 'Unknown')
-const language = ref<Language | undefined>(
-  languageStore.getLanguage(props.user?.languageId ?? -1)
-)
+const language = ref<Language | undefined>(languageStore.getLanguage(props.user?.languageId ?? -1))
 
 const stateChanged = computed(() => {
-  return username.value !== props.user?.name ||
+  return (
+    username.value !== props.user?.name ||
     userEmail.value !== props.user?.email ||
     language.value?.id !== props.user?.languageId
+  )
 })
 
-const $v = useVuelidate({
-  username: {
-    required,
-    maxLength: maxLength(64),
-    regex: helpers.regex(/^[A-Za-z0-9 _-]+$/),
+const $v = useVuelidate(
+  {
+    username: {
+      required,
+      maxLength: maxLength(64),
+      regex: helpers.regex(/^[A-Za-z0-9 _-]+$/),
+    },
+    userEmail: { required, email },
+    language: { required },
   },
-  userEmail: { required, email },
-  language: { required },
-}, {
-  username: username,
-  userEmail: userEmail,
-  language: language,
-})
+  {
+    username: username,
+    userEmail: userEmail,
+    language: language,
+  },
+)
 
 const validationFailed = computed(() => $v.value.$errors.length > 0)
 const usernameInvalid = computed(() => $v.value.username.$errors.length > 0)
-const usernameRegexMismatch = computed(() =>
-  $v.value.username.$errors.find(v => v.$validator === 'regex') !== undefined
+const usernameRegexMismatch = computed(
+  () => $v.value.username.$errors.find((v) => v.$validator === 'regex') !== undefined,
 )
-const usernameMaxLengthInvalid = computed(() =>
-  $v.value.username.$errors.find(v => v.$validator === 'maxLength') !== undefined
+const usernameMaxLengthInvalid = computed(
+  () => $v.value.username.$errors.find((v) => v.$validator === 'maxLength') !== undefined,
 )
 const userEmailInvalid = computed(() => $v.value.userEmail.$errors.length > 0)
-const userEmailWrongFormat = computed(() =>
-  $v.value.userEmail.$errors.find(v => v.$validator === 'email') !== undefined
+const userEmailWrongFormat = computed(
+  () => $v.value.userEmail.$errors.find((v) => v.$validator === 'email') !== undefined,
 )
 const languageInvalid = computed(() => $v.value.language.$errors.length > 0)
 
@@ -190,7 +185,6 @@ watch(language, () => {
     $v.value.language.$reset()
   }
 })
-
 </script>
 
 <style scoped>
@@ -226,5 +220,4 @@ watch(language, () => {
   gap: 10px;
   margin-top: 20px;
 }
-
 </style>

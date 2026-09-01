@@ -36,49 +36,52 @@ import { computed } from 'vue'
 
 type Format = 'avif' | 'webp' | 'jpg' | 'jpeg' | 'png'
 
-const props = withDefaults(defineProps<{
-  /** Image base path, e.g. '/img/hero' */
-  base: string
-  /** Alt text for <img> */
-  alt?: string
-  /** Image formats order (without fallbackExt) */
-  formats?: Format[]
-  /** Fallback extension for <img> */
-  fallbackExt?: Format
-  /** widths for width-based srcset (ignored in dpr mode) */
-  widths?: number[]
-  /** Intrinsic dimensions to prevent Cumulative Layout Shift (CLS) */
-  dimensions?: { width: number; height: number }
-  /** Overrides fetchPriority; defaults high if hero */
-  fetchPriority?: 'high' | 'low' | 'auto'
-  /** Automatic sizes builder inputs */
-  breakpoints?: Array<{ max: number; vw: number }>
-  /** Final absolute px width after the last breakpoint */
-  containerMaxPx?: number
-  /** DPR (Device Pixel Ratio) mode for avatars */
-  dpr?: boolean
-  /** LCP (Largest Contentful Paint) hero mode */
-  hero?: boolean
-  /** Makes <img> non-selectable, non-draggable, non-context-interactive */
-  nonInteractive?: boolean
-}>(), {
-  alt: 'No image available',
-  fallbackExt: 'jpg',
-  widths: () => [640, 960, 1280, 1920],
-  dimensions: undefined,
-  formats: () => ['avif', 'webp'],
-  fetchPriority: undefined,
-  breakpoints: () => ([
-    { max: 640, vw: 96 },
-    { max: 1200, vw: 90 },
-  ]),
-  containerMaxPx: 1200,
-  dpr: false,
-  hero: false,
-  nonInteractive: false,
-})
+const props = withDefaults(
+  defineProps<{
+    /** Image base path, e.g. '/img/hero' */
+    base: string
+    /** Alt text for <img> */
+    alt?: string
+    /** Image formats order (without fallbackExt) */
+    formats?: Format[]
+    /** Fallback extension for <img> */
+    fallbackExt?: Format
+    /** widths for width-based srcset (ignored in dpr mode) */
+    widths?: number[]
+    /** Intrinsic dimensions to prevent Cumulative Layout Shift (CLS) */
+    dimensions?: { width: number; height: number }
+    /** Overrides fetchPriority; defaults high if hero */
+    fetchPriority?: 'high' | 'low' | 'auto'
+    /** Automatic sizes builder inputs */
+    breakpoints?: Array<{ max: number; vw: number }>
+    /** Final absolute px width after the last breakpoint */
+    containerMaxPx?: number
+    /** DPR (Device Pixel Ratio) mode for avatars */
+    dpr?: boolean
+    /** LCP (Largest Contentful Paint) hero mode */
+    hero?: boolean
+    /** Makes <img> non-selectable, non-draggable, non-context-interactive */
+    nonInteractive?: boolean
+  }>(),
+  {
+    alt: 'No image available',
+    fallbackExt: 'jpg',
+    widths: () => [640, 960, 1280, 1920],
+    dimensions: undefined,
+    formats: () => ['avif', 'webp'],
+    fetchPriority: undefined,
+    breakpoints: () => [
+      { max: 640, vw: 96 },
+      { max: 1200, vw: 90 },
+    ],
+    containerMaxPx: 1200,
+    dpr: false,
+    hero: false,
+    nonInteractive: false,
+  },
+)
 
-const imgLoading = computed(() => props.hero ? 'eager' : 'lazy')
+const imgLoading = computed(() => (props.hero ? 'eager' : 'lazy'))
 const imgDecoding = computed(() => (props.hero ? 'sync' : 'async'))
 const imgFetchPriority = computed<'high' | 'low' | 'auto'>(() => {
   if (props.fetchPriority) return props.fetchPriority
@@ -88,7 +91,7 @@ const imgFetchPriority = computed<'high' | 'low' | 'auto'>(() => {
 const imgSizes = computed(() => {
   const parts = [...props.breakpoints]
     .sort((a, b) => a.max - b.max)
-    .map(b => `(max-width: ${b.max}px) ${Math.min(Math.max(b.vw, 1), 100)}vw`)
+    .map((b) => `(max-width: ${b.max}px) ${Math.min(Math.max(b.vw, 1), 100)}vw`)
   parts.push(`${props.containerMaxPx}px`)
   return parts.join(', ')
 })
@@ -104,7 +107,7 @@ function srcsetFor(format: Format) {
     const x4 = `${props.base}@4x.${format}`
     return `${x1} 1x, ${x2} 2x, ${x4} 4x`
   }
-  return props.widths.map(w => `${props.base}-${w}.${format} ${w}w`).join(', ')
+  return props.widths.map((w) => `${props.base}-${w}.${format} ${w}w`).join(', ')
 }
 
 const fallbackImgSrcset = computed(() => srcsetFor(props.fallbackExt))
@@ -129,11 +132,11 @@ const onContextMenu = (e: MouseEvent) => {
 <style scoped>
 .non-interactive,
 .non-interactive * {
-  user-select: none;         /* Standard */
+  user-select: none; /* Standard */
   -webkit-user-select: none; /* Safari, Chrome */
-  -webkit-user-drag: none;   /* Safari, Chrome */
-  -moz-user-select: none;    /* Firefox */
-  -ms-user-select: none;     /* Edge */
+  -webkit-user-drag: none; /* Safari, Chrome */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Edge */
   -webkit-touch-callout: none;
 }
 

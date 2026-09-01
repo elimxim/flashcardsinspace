@@ -7,11 +7,9 @@
       'flex-center',
       'padding-auto',
       'scrollbar-hidden',
-  ]">
-    <div
-      class="auth-container"
-      :class="{ 'auth-container--error': signupFailed }"
-    >
+    ]"
+  >
+    <div class="auth-container" :class="{ 'auth-container--error': signupFailed }">
       <form class="auth-form" novalidate @submit.prevent="signup">
         <SmartInput
           id="name"
@@ -26,11 +24,11 @@
           :errors="[
             {
               when: usernameRegexMismatch,
-              text: 'Please use only letters, numbers, dashes, underscores, and spaces'
+              text: 'Please use only letters, numbers, dashes, underscores, and spaces',
             },
             {
               when: usernameMaxLengthInvalid,
-              text: 'This username is expanding faster than the universe! Please keep it under 64 characters'
+              text: 'This username is expanding faster than the universe! Please keep it under 64 characters',
             },
           ]"
         />
@@ -71,12 +69,12 @@
           :errors="[
             {
               when: userPasswordMinLengthInvalid,
-              text: 'Your password must be stronger than a piece of space junk. Please use 6 or more characters'
+              text: 'Your password must be stronger than a piece of space junk. Please use 6 or more characters',
             },
             {
               when: userPasswordMaxLengthInvalid,
-              text: 'This secret is expanding faster than the universe! Please keep it under 64 characters'
-            }
+              text: 'This secret is expanding faster than the universe! Please keep it under 64 characters',
+            },
           ]"
         />
         <SmartInput
@@ -107,7 +105,7 @@
       </form>
     </div>
   </div>
-  <SpaceToast/>
+  <SpaceToast />
 </template>
 
 <script setup lang="ts">
@@ -119,8 +117,8 @@ import SpaceToast from '@/components/common/SpaceToast.vue'
 import ErrorText from '@/components/common/ErrorText.vue'
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from "@/stores/auth-store.ts"
-import { routeNames } from "@/router"
+import { useAuthStore } from '@/stores/auth-store.ts'
+import { routeNames } from '@/router'
 import type { Language } from '@/model/language.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { storeToRefs } from 'pinia'
@@ -147,59 +145,61 @@ const userPassword = ref('')
 const confirmedPassword = ref('')
 const signupFailed = ref(false)
 
-const passwordConfirmed = helpers.withParams(
-  { type: 'confirmed' },
-  (value) => {
-    if (!value) return true
-    return value === userPassword.value
-  }
-)
-
-const $v = useVuelidate({
-  username: {
-    required,
-    maxLength: maxLength(64),
-    regex: helpers.regex(/^[A-Za-z0-9 _-]+$/),
-  },
-  userEmail: { required, email },
-  language: { required },
-  userPassword: {
-    required,
-    minLength: minLength(6),
-    maxLength: maxLength(64),
-  },
-  confirmPassword: { required, passwordConfirmed },
-}, {
-  username: username,
-  userEmail: userEmail,
-  language: language,
-  userPassword: userPassword,
-  confirmPassword: confirmedPassword,
+const passwordConfirmed = helpers.withParams({ type: 'confirmed' }, (value) => {
+  if (!value) return true
+  return value === userPassword.value
 })
+
+const $v = useVuelidate(
+  {
+    username: {
+      required,
+      maxLength: maxLength(64),
+      regex: helpers.regex(/^[A-Za-z0-9 _-]+$/),
+    },
+    userEmail: { required, email },
+    language: { required },
+    userPassword: {
+      required,
+      minLength: minLength(6),
+      maxLength: maxLength(64),
+    },
+    confirmPassword: { required, passwordConfirmed },
+  },
+  {
+    username: username,
+    userEmail: userEmail,
+    language: language,
+    userPassword: userPassword,
+    confirmPassword: confirmedPassword,
+  },
+)
 
 const formInvalid = computed(() => $v.value.$errors.length > 0)
 const usernameInvalid = computed(() => $v.value.username.$errors.length > 0)
-const usernameRegexMismatch = computed(() =>
-  $v.value.username.$errors.find(v => v.$validator === 'regex') !== undefined
+const usernameRegexMismatch = computed(
+  () => $v.value.username.$errors.find((v) => v.$validator === 'regex') !== undefined,
 )
-const usernameMaxLengthInvalid = computed(() =>
-  $v.value.username.$errors.find(v => v.$validator === 'maxLength') !== undefined
+const usernameMaxLengthInvalid = computed(
+  () => $v.value.username.$errors.find((v) => v.$validator === 'maxLength') !== undefined,
 )
 const userEmailInvalid = computed(() => $v.value.userEmail.$errors.length > 0)
-const userEmailWrongFormat = computed(() =>
-  $v.value.userEmail.$errors.find(v => v.$validator === 'email') !== undefined
+const userEmailWrongFormat = computed(
+  () => $v.value.userEmail.$errors.find((v) => v.$validator === 'email') !== undefined,
 )
 const languageInvalid = computed(() => $v.value.language.$errors.length > 0)
 const userPasswordInvalid = computed(() => $v.value.userPassword.$errors.length > 0)
-const userPasswordMinLengthInvalid = computed(() =>
-  $v.value.userPassword.$errors.find(v => v.$validator === 'minLength') !== undefined
+const userPasswordMinLengthInvalid = computed(
+  () => $v.value.userPassword.$errors.find((v) => v.$validator === 'minLength') !== undefined,
 )
-const userPasswordMaxLengthInvalid = computed(() =>
-  $v.value.userPassword.$errors.find(v => v.$validator === 'maxLength') !== undefined
+const userPasswordMaxLengthInvalid = computed(
+  () => $v.value.userPassword.$errors.find((v) => v.$validator === 'maxLength') !== undefined,
 )
 const confirmPasswordInvalid = computed(() => $v.value.confirmPassword.$errors.length > 0)
-const confirmPasswordMismatch = computed(() =>
-  $v.value.confirmPassword.$errors.find(v => v.$validator === 'passwordConfirmed') !== undefined
+const confirmPasswordMismatch = computed(
+  () =>
+    $v.value.confirmPassword.$errors.find((v) => v.$validator === 'passwordConfirmed') !==
+    undefined,
 )
 
 watch(username, () => {
@@ -252,34 +252,30 @@ async function signup() {
     return
   }
 
-  await sendSignupRequest(
-    username.value,
-    userEmail.value,
-    userPassword.value,
-    language.value?.id
-  ).then(async (response) => {
-    Log.log(LogTag.LOGIC, 'Successfully signed up: ', authStore.user?.id)
-    authStore.setUser(response.data)
-    saveUserSignedUpToCookies(true)
-    await router.push({
-      name: routeNames.codeVerification,
-      query: { type: VerificationType.REGISTRATION_REQUEST },
+  await sendSignupRequest(username.value, userEmail.value, userPassword.value, language.value?.id)
+    .then(async (response) => {
+      Log.log(LogTag.LOGIC, 'Successfully signed up: ', authStore.user?.id)
+      authStore.setUser(response.data)
+      saveUserSignedUpToCookies(true)
+      await router.push({
+        name: routeNames.codeVerification,
+        query: { type: VerificationType.REGISTRATION_REQUEST },
+      })
     })
-  }).catch(error => {
-    signupFailed.value = true
+    .catch((error) => {
+      signupFailed.value = true
 
-    if (error.response?.status === 400) {
-      toaster.bakeError(userApiErrors.AUTH_BAD_DATA, error.response?.data)
-    } else if (error.response?.status === 409) {
-      toaster.bakeError(userApiErrors.USER__ALREADY_EXISTS, error.response?.data)
-    } else {
-      toaster.bakeError(userApiErrors.AUTH_FAILED, error.response?.data)
-    }
+      if (error.response?.status === 400) {
+        toaster.bakeError(userApiErrors.AUTH_BAD_DATA, error.response?.data)
+      } else if (error.response?.status === 409) {
+        toaster.bakeError(userApiErrors.USER__ALREADY_EXISTS, error.response?.data)
+      } else {
+        toaster.bakeError(userApiErrors.AUTH_FAILED, error.response?.data)
+      }
 
-    Log.error(LogTag.LOGIC, 'Failed to sign up: ', error)
-  })
+      Log.error(LogTag.LOGIC, 'Failed to sign up: ', error)
+    })
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

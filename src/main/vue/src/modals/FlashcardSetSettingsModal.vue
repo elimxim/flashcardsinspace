@@ -20,11 +20,11 @@
           :errors="[
             {
               when: curNameMaxLengthInvalid,
-              text: 'Too long. Maximum 64 characters'
+              text: 'Too long. Maximum 64 characters',
             },
             {
               when: curNameRegexMismatch,
-              text: 'Please use only letters, numbers, dashes, underscores, and spaces'
+              text: 'Please use only letters, numbers, dashes, underscores, and spaces',
             },
           ]"
         />
@@ -44,18 +44,12 @@
         </AwesomeContainer>
       </div>
       <div class="modal-main-area--toggle">
-        <Toggle
-          v-model="newSuspended"
-          size="L"
-          reverse
-        >
-          <span class="toggle-label">
-            Suspended (vacation mode 🌴)
-          </span>
+        <Toggle v-model="newSuspended" size="L" reverse>
+          <span class="toggle-label"> Suspended (vacation mode 🌴) </span>
         </Toggle>
       </div>
       <div class="modal-main-area--actions">
-        <FlashcardSetImportExport/>
+        <FlashcardSetImportExport />
       </div>
     </div>
     <div class="modal-control-buttons">
@@ -127,9 +121,7 @@ const { languages } = storeToRefs(languageStore)
 const { flashcardSet } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
-const language = computed(() =>
-  languageStore.getLanguage(flashcardSet.value?.languageId ?? -1)
-)
+const language = computed(() => languageStore.getLanguage(flashcardSet.value?.languageId ?? -1))
 const cancelButton = ref<InstanceType<typeof SmartButton>>()
 const removeButton = ref<InstanceType<typeof SmartButton>>()
 const updateButton = ref<InstanceType<typeof SmartButton>>()
@@ -137,17 +129,15 @@ const nameInput = ref<HTMLElement>()
 const newName = ref<string | undefined>(flashcardSet.value?.name)
 const newLanguage = ref<Language | undefined>(language.value)
 const newSuspended = ref<boolean>(flashcardSet.value?.status === flashcardSetStatuses.SUSPENDED)
-const wasSuspended = computed(() =>
-  flashcardSet.value?.status === flashcardSetStatuses.SUSPENDED
-)
-const becameSuspended = computed(() =>
-  !wasSuspended.value && newSuspended.value
-)
+const wasSuspended = computed(() => flashcardSet.value?.status === flashcardSetStatuses.SUSPENDED)
+const becameSuspended = computed(() => !wasSuspended.value && newSuspended.value)
 
 const stateChanged = computed(() => {
-  return flashcardSet.value?.name !== newName.value
-    || language.value !== newLanguage.value
-    || wasSuspended.value !== newSuspended.value
+  return (
+    flashcardSet.value?.name !== newName.value ||
+    language.value !== newLanguage.value ||
+    wasSuspended.value !== newSuspended.value
+  )
 })
 
 const validationRules = {
@@ -165,18 +155,14 @@ const $v = useVuelidate(validationRules, {
 })
 
 const formInvalid = computed(() => $v.value.$errors.length > 0)
-const curNameInvalid = computed(() =>
-  $v.value.name.$errors.length > 0
+const curNameInvalid = computed(() => $v.value.name.$errors.length > 0)
+const curNameMaxLengthInvalid = computed(
+  () => $v.value.name.$errors.find((v) => v.$validator === 'maxLength') !== undefined,
 )
-const curNameMaxLengthInvalid = computed(() =>
-  $v.value.name.$errors.find(v => v.$validator === 'maxLength') !== undefined
+const curNameRegexMismatch = computed(
+  () => $v.value.name.$errors.find((v) => v.$validator === 'regex') !== undefined,
 )
-const curNameRegexMismatch = computed(() =>
-  $v.value.name.$errors.find(v => v.$validator === 'regex') !== undefined
-)
-const curLanguageInvalid = computed(() =>
-  $v.value.language.$errors.length > 0
-)
+const curLanguageInvalid = computed(() => $v.value.language.$errors.length > 0)
 
 function cancel() {
   toggleStore.toggleFlashcardSetSettings()
@@ -186,11 +172,10 @@ function cancel() {
 async function remove() {
   const removed = await removeFlashcardSet()
   if (removed) {
-    await loadStoresForCurrFlashcardSet(true)
-      .then(() => {
-        toggleStore.toggleFlashcardSetSettings()
-        resetState()
-      })
+    await loadStoresForCurrFlashcardSet(true).then(() => {
+      toggleStore.toggleFlashcardSetSettings()
+      resetState()
+    })
   }
 }
 
@@ -237,23 +222,22 @@ async function updateFlashcardSet(): Promise<boolean> {
   const updatedSet = copyFlashcardSet(flashcardSet.value)
   updatedSet.name = newName.value ?? updatedSet.name
   updatedSet.languageId = newLanguage.value?.id ?? updatedSet.languageId
-  updatedSet.status = newSuspended.value ? flashcardSetStatuses.SUSPENDED : flashcardSetStatuses.ACTIVE
+  updatedSet.status = newSuspended.value
+    ? flashcardSetStatuses.SUSPENDED
+    : flashcardSetStatuses.ACTIVE
 
   if (becameSuspended.value) {
     return await sendFlashcardSetSuspendRequest(updatedSet.id, updatedSet)
       .then((response) => {
         flashcardSetStore.updateSet(response.data.flashcardSet)
         flashcardStore.changeSet(response.data.flashcardSet)
-        chronoStore.loadState(
-          response.data.chronodays,
-          response.data.currDay,
-          {
-            streak: 0,
-            lastDate: currDay.value.chronodate
-          }
-        )
+        chronoStore.loadState(response.data.chronodays, response.data.currDay, {
+          streak: 0,
+          lastDate: currDay.value.chronodate,
+        })
         return true
-      }).catch((error) => {
+      })
+      .catch((error) => {
         Log.error(LogTag.LOGIC, `Failed to suspend FlashcardSet.id=${updatedSet.id}`, error)
         toaster.bakeError(userApiErrors.FLASHCARD_SET__SUSPENDING_FAILED, error.response?.data)
         return false
@@ -293,7 +277,6 @@ watch(newLanguage, () => {
     $v.value.language.$reset()
   }
 })
-
 </script>
 
 <style scoped>

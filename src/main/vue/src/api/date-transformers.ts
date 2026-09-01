@@ -77,7 +77,7 @@ export function configureDateTransformers(axiosInstance: AxiosInstance) {
     },
     (error) => {
       return Promise.reject(error)
-    }
+    },
   )
 
   axiosInstance.interceptors.response.use(
@@ -93,6 +93,6 @@ export function configureDateTransformers(axiosInstance: AxiosInstance) {
         error.response.data = transformResponseDates(error.response.data)
       }
       return Promise.reject(error)
-    }
+    },
   )
 }

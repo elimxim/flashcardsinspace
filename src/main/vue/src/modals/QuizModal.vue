@@ -1,44 +1,24 @@
 <template>
-  <Modal
-    title="Quiz Settings"
-    :visible="quizOpen"
-    :on-exit="exit"
-  >
+  <Modal title="Quiz Settings" :visible="quizOpen" :on-exit="exit">
     <div class="modal-main-area">
       <p class="note-paragraph">
-        Practice flashcards from selected stages.
-        Missed cards repeat each round until you know them all.
-        Doing this will help those tough cards stick better into your long-term memory.
+        Practice flashcards from selected stages. Missed cards repeat each round until you know them
+        all. Doing this will help those tough cards stick better into your long-term memory.
       </p>
       <div v-if="latestUncompletedSessionId && showBanner" class="quiz-banner">
-        <div class="quiz-banner-text">
-          You have an uncompleted quiz session
-        </div>
+        <div class="quiz-banner-text">You have an uncompleted quiz session</div>
         <div class="quiz-banner-exit">
-          <AwesomeButton
-            icon="fa-solid fa-xmark"
-            :on-click="hideBanner"
-          />
+          <AwesomeButton icon="fa-solid fa-xmark" :on-click="hideBanner" />
         </div>
         <div class="quiz-banner-button">
-          <SmartButton
-            text="Continue"
-            :on-click="start"
-            fill-height
-            fill-width
-            auto-blur
-          />
+          <SmartButton text="Continue" :on-click="start" fill-height fill-width auto-blur />
         </div>
       </div>
       <div class="modal-main-area--inner">
         <div class="quiz-stage-grid">
           <div class="quiz-stage-grid-row">
             <div class="quiz-stage-toggle">
-              <Toggle
-                v-model="includeUnknown"
-                size="L"
-                track-length="S"
-              >
+              <Toggle v-model="includeUnknown" size="L" track-length="S">
                 <span class="quiz-toggle-label">
                   {{ specialStages.UNKNOWN.displayName }}
                 </span>
@@ -50,11 +30,7 @@
           </div>
           <div class="quiz-stage-grid-row">
             <div class="quiz-stage-toggle">
-              <Toggle
-                v-model="includeAttempted"
-                size="L"
-                track-length="S"
-              >
+              <Toggle v-model="includeAttempted" size="L" track-length="S">
                 <span class="quiz-toggle-label">
                   {{ specialStages.ATTEMPTED.displayName }}
                 </span>
@@ -66,11 +42,7 @@
           </div>
           <div class="quiz-stage-grid-row">
             <div class="quiz-stage-toggle">
-              <Toggle
-                v-model="includeOuterSpace"
-                size="L"
-                track-length="S"
-              >
+              <Toggle v-model="includeOuterSpace" size="L" track-length="S">
                 <span class="quiz-toggle-label">
                   {{ specialStages.OUTER_SPACE.displayName }}
                 </span>
@@ -83,12 +55,7 @@
         </div>
       </div>
       <div class="modal-control-buttons">
-        <SmartButton
-          class="off-button"
-          text="Cancel"
-          :on-click="cancel"
-          auto-blur
-        />
+        <SmartButton class="off-button" text="Cancel" :on-click="cancel" auto-blur />
         <SmartButton
           class="calm-button counter-button"
           text="Start"
@@ -97,9 +64,7 @@
           auto-blur
         >
           <span class="counter-button--layout">
-            <span class="counter-button--text">
-              Start
-            </span>
+            <span class="counter-button--text"> Start </span>
             <span class="counter-button--number">
               {{ reviewCount }}
             </span>
@@ -155,13 +120,13 @@ const reviewStages = (): string[] => {
 }
 
 const unknownCount = computed(() =>
-  countFlashcards(flashcards.value, specialStages.UNKNOWN, currDay.value)
+  countFlashcards(flashcards.value, specialStages.UNKNOWN, currDay.value),
 )
 const attemptedCount = computed(() =>
-  countFlashcards(flashcards.value, specialStages.ATTEMPTED, currDay.value)
+  countFlashcards(flashcards.value, specialStages.ATTEMPTED, currDay.value),
 )
 const outerSpaceCount = computed(() =>
-  countFlashcards(flashcards.value, specialStages.OUTER_SPACE, currDay.value)
+  countFlashcards(flashcards.value, specialStages.OUTER_SPACE, currDay.value),
 )
 
 const reviewCount = computed(() => {
@@ -206,8 +171,8 @@ function start(fresh: boolean = false) {
     query: {
       sessionType: ReviewSessionType.QUIZ,
       sessionId: fresh ? undefined : latestUncompletedSessionId.value,
-      stages: reviewStages()
-    }
+      stages: reviewStages(),
+    },
   })
   exit()
 }
@@ -218,7 +183,10 @@ function hideBanner() {
 
 async function getLatestUncompletedQuizSessionId(): Promise<number | undefined> {
   if (!flashcardSet.value) return undefined
-  return await sendLatestUncompletedReviewSessionGetRequest(flashcardSet.value.id, ReviewSessionType.QUIZ)
+  return await sendLatestUncompletedReviewSessionGetRequest(
+    flashcardSet.value.id,
+    ReviewSessionType.QUIZ,
+  )
     .then((response) => {
       if (response.status === 204) {
         return undefined
@@ -241,7 +209,6 @@ watch(flashcardSet, async (newVal, oldValue) => {
 onMounted(async () => {
   latestUncompletedSessionId.value = await getLatestUncompletedQuizSessionId()
 })
-
 </script>
 
 <style scoped>
@@ -347,5 +314,4 @@ onMounted(async () => {
   vertical-align: middle;
   text-wrap: nowrap;
 }
-
 </style>

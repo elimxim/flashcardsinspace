@@ -1,8 +1,8 @@
 import { ref } from 'vue'
 
 export interface DeferredLoadingOptions {
-  delayEntry?: number,
-  minDuration?: number,
+  delayEntry?: number
+  minDuration?: number
 }
 
 export function useDeferredLoading(options?: DeferredLoadingOptions) {
@@ -37,7 +37,7 @@ export function useDeferredLoading(options?: DeferredLoadingOptions) {
       const remaining = Math.max(0, minDuration - elapsed)
 
       if (remaining > 0) {
-        await new Promise(resolved => setTimeout(resolved, remaining))
+        await new Promise((resolved) => setTimeout(resolved, remaining))
       }
 
       resolvedLoading.value = false
@@ -62,6 +62,6 @@ export function useDeferredLoading(options?: DeferredLoadingOptions) {
     resolvedLoading,
     startLoading,
     stopLoading,
-    resetLoading
+    resetLoading,
   }
 }

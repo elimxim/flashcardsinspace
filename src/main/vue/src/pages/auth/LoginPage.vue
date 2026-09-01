@@ -7,26 +7,20 @@
       'flex-center',
       'padding-auto',
       'scrollbar-hidden',
-  ]">
-    <div
-      ref="lilrocket"
-      class="lilrocket"
-      @click="onClickRocket"
-    >
+    ]"
+  >
+    <div ref="lilrocket" class="lilrocket" @click="onClickRocket">
       <SmartPicture
         alt="Lilrocket"
         :base="currRocketImg"
         :formats="['webp']"
         fallback-ext="png"
-        :dimensions="{width: 128, height: 128}"
+        :dimensions="{ width: 128, height: 128 }"
         non-interactive
         dpr
       />
     </div>
-    <div
-      class="auth-container"
-      :class="{ 'auth-container--error': loginFailed }"
-    >
+    <div class="auth-container" :class="{ 'auth-container--error': loginFailed }">
       <form class="auth-form" novalidate @submit.prevent="login">
         <SmartInput
           id="username"
@@ -73,7 +67,7 @@
       </form>
     </div>
   </div>
-  <SpaceToast/>
+  <SpaceToast />
 </template>
 
 <script setup lang="ts">
@@ -86,8 +80,8 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { email, maxLength, required } from '@vuelidate/validators'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from "@/stores/auth-store.ts"
-import { routeNames } from "@/router"
+import { useAuthStore } from '@/stores/auth-store.ts'
+import { routeNames } from '@/router'
 import { sendLoginRequest } from '@/api/auth-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { saveUserSignedUpToCookies } from '@/utils/cookies.ts'
@@ -108,25 +102,28 @@ const rocketVerticalAngleMinusOneDeg = computed(() => `${rocketVerticalAngle.val
 const rocketHorizontalAngle = ref(-40)
 const rocketHorizontalAngleDeg = computed(() => `${rocketHorizontalAngle.value}deg`)
 
-const $v = useVuelidate({
-  userEmail: { required, email },
-  userPassword: {
-    required,
-    maxLength: maxLength(64),
-  }
-}, {
-  userEmail: userEmail,
-  userPassword: userPassword,
-})
+const $v = useVuelidate(
+  {
+    userEmail: { required, email },
+    userPassword: {
+      required,
+      maxLength: maxLength(64),
+    },
+  },
+  {
+    userEmail: userEmail,
+    userPassword: userPassword,
+  },
+)
 
 const formInvalid = computed(() => $v.value.$errors.length > 0)
 const userEmailInvalid = computed(() => $v.value.userEmail.$errors.length > 0)
-const userEmailFormatWrong = computed(() =>
-  $v.value.userEmail.$errors.find(v => v.$validator === 'email') !== undefined
+const userEmailFormatWrong = computed(
+  () => $v.value.userEmail.$errors.find((v) => v.$validator === 'email') !== undefined,
 )
 const userPasswordInvalid = computed(() => $v.value.userPassword.$errors.length > 0)
-const userPasswordMaxLengthInvalid = computed(() =>
-  $v.value.userPassword.$errors.find(v => v.$validator === 'maxLength') !== undefined
+const userPasswordMaxLengthInvalid = computed(
+  () => $v.value.userPassword.$errors.find((v) => v.$validator === 'maxLength') !== undefined,
 )
 
 watch(userEmail, () => {
@@ -153,38 +150,40 @@ async function login() {
     return
   }
 
-  await sendLoginRequest(userEmail.value, userPassword.value).then(async (response) => {
-    Log.log(LogTag.LOGIC, 'Successfully logged in: ', authStore.user?.id)
-    authStore.setUser(response.data)
-    saveUserSignedUpToCookies(true)
-    await router.push({ name: routeNames.controlPanel })
-  }).catch(error => {
-    loginFailed.value = true
+  await sendLoginRequest(userEmail.value, userPassword.value)
+    .then(async (response) => {
+      Log.log(LogTag.LOGIC, 'Successfully logged in: ', authStore.user?.id)
+      authStore.setUser(response.data)
+      saveUserSignedUpToCookies(true)
+      await router.push({ name: routeNames.controlPanel })
+    })
+    .catch((error) => {
+      loginFailed.value = true
 
-    if (error.response?.status === 400) {
-      toaster.bakeError(userApiErrors.AUTH_BAD_DATA, error.response?.data)
-    } else if (error.response?.status === 401) {
-      toaster.bakeError(userApiErrors.USER__UNAUTHORIZED, error.response?.data)
-    } else if (error.response?.status === 404) {
-      toaster.bakeError(userApiErrors.USER__NOT_FOUND, error.response?.data)
-    } else {
-      toaster.bakeError(userApiErrors.AUTH_FAILED, error.response?.data)
-    }
+      if (error.response?.status === 400) {
+        toaster.bakeError(userApiErrors.AUTH_BAD_DATA, error.response?.data)
+      } else if (error.response?.status === 401) {
+        toaster.bakeError(userApiErrors.USER__UNAUTHORIZED, error.response?.data)
+      } else if (error.response?.status === 404) {
+        toaster.bakeError(userApiErrors.USER__NOT_FOUND, error.response?.data)
+      } else {
+        toaster.bakeError(userApiErrors.AUTH_FAILED, error.response?.data)
+      }
 
-    Log.error(LogTag.LOGIC, 'Failed to log in: ', error)
-  })
+      Log.error(LogTag.LOGIC, 'Failed to log in: ', error)
+    })
 }
 
 // lilrocket>
 
 const rockets = [
-  "assets/rockets/original",
-  "assets/rockets/cow",
-  "assets/rockets/cyan",
-  "assets/rockets/original",
-  "assets/rockets/pinky",
-  "assets/rockets/polka-dots",
-  "assets/rockets/original",
+  'assets/rockets/original',
+  'assets/rockets/cow',
+  'assets/rockets/cyan',
+  'assets/rockets/original',
+  'assets/rockets/pinky',
+  'assets/rockets/polka-dots',
+  'assets/rockets/original',
 ]
 
 const lilrocket = ref<HTMLElement>()
@@ -224,7 +223,6 @@ onMounted(() => {
 })
 
 // <lilrocket
-
 </script>
 
 <style scoped>
@@ -295,7 +293,7 @@ onMounted(() => {
 
   /* 2. Powering-up */
   12% {
-    transform: translate(1px, 1px) rotate(v-bind(rocketVerticalAnglePlusOneDeg)) scale(1.0);
+    transform: translate(1px, 1px) rotate(v-bind(rocketVerticalAnglePlusOneDeg)) scale(1);
   }
   14% {
     transform: translate(-1px, -2px) rotate(v-bind(rocketVerticalAngleMinusOneDeg)) scale(1.02);
@@ -325,7 +323,7 @@ onMounted(() => {
     transform: translate(1px, 2px) rotate(v-bind(rocketVerticalAngleDeg)) scale(1.02);
   }
   32% {
-    transform: translate(1px, -2px) rotate(v-bind(rocketVerticalAngleMinusOneDeg)) scale(1.0);
+    transform: translate(1px, -2px) rotate(v-bind(rocketVerticalAngleMinusOneDeg)) scale(1);
   }
   34% {
     transform: translate(3px, 1px) rotate(v-bind(rocketVerticalAngleMinusOneDeg)) scale(1.06);
@@ -337,28 +335,27 @@ onMounted(() => {
     transform: translate(1px, 2px) rotate(v-bind(rocketVerticalAngleMinusOneDeg)) scale(1.02);
   }
   40% {
-    transform: translate(1px, -2px) rotate(v-bind(rocketVerticalAngleDeg)) scale(1.0);
+    transform: translate(1px, -2px) rotate(v-bind(rocketVerticalAngleDeg)) scale(1);
   }
 
   /* 3. Flies to the top of the screen */
   55% {
-    transform: translateY(-60vh) rotate(v-bind(rocketVerticalAngleDeg)) scale(1.0);
+    transform: translateY(-60vh) rotate(v-bind(rocketVerticalAngleDeg)) scale(1);
   }
 
   /* 5. Teleportation to the right and awaiting */
   55.01% {
-    transform: translateX(80vw) translateY(0vh) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1.0);
+    transform: translateX(80vw) translateY(0vh) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1);
   }
 
   /* 6. Wait for a little bit */
   65% {
-    transform: translateX(80vw) translateY(0vh) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1.0);
+    transform: translateX(80vw) translateY(0vh) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1);
   }
 
   /* 7. Flies from the right to the left */
   100% {
-    transform: translateX(-80vw) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1.0);
+    transform: translateX(-80vw) rotate(v-bind(rocketHorizontalAngleDeg)) scale(1);
   }
 }
-
 </style>

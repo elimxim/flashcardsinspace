@@ -18,9 +18,7 @@ export const useAudioCache = defineStore('audio-cache', () => {
   const accessOrder = ref<number[]>([]) // oldest first
 
   const storageSize = computed(() => totalSize.value)
-  const storagePercentage = computed(() =>
-    (totalSize.value / MAX_AUDIO_STORAGE_BYTES) * 100
-  )
+  const storagePercentage = computed(() => (totalSize.value / MAX_AUDIO_STORAGE_BYTES) * 100)
 
   function updateAccessOrder(id: number, accessTime: number) {
     // Binary search to find the insertion point
@@ -80,7 +78,10 @@ export const useAudioCache = defineStore('audio-cache', () => {
   }
 
   function addAudio(flashcardId: number, audioBlob: Blob, side: string) {
-    Log.log(LogTag.STORE, `audio-cache.addAudio: Flashcard.id=${flashcardId}, side=${side}, Audio.size=${sizeInKB(audioBlob)}`)
+    Log.log(
+      LogTag.STORE,
+      `audio-cache.addAudio: Flashcard.id=${flashcardId}, side=${side}, Audio.size=${sizeInKB(audioBlob)}`,
+    )
 
     const now = performance.now()
 

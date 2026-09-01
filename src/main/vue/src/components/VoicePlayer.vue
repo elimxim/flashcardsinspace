@@ -25,13 +25,16 @@ import { ref, onBeforeUnmount, watch, onMounted } from 'vue'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { usePlaybackControl } from '@/stores/playback-store.ts'
 
-const props = withDefaults(defineProps<{
-  audioBlob?: Blob | undefined,
-  loopPlay?: boolean,
-}>(), {
-  audioBlob: undefined,
-  loopPlay: false,
-})
+const props = withDefaults(
+  defineProps<{
+    audioBlob?: Blob | undefined
+    loopPlay?: boolean
+  }>(),
+  {
+    audioBlob: undefined,
+    loopPlay: false,
+  },
+)
 
 const playbackControl = usePlaybackControl()
 
@@ -53,10 +56,9 @@ function play() {
   }
 
   audio.currentTime = 0
-  audio.play()
-    .catch((error) => {
-      Log.error(LogTag.LOGIC, 'Audio play failed:', error)
-    })
+  audio.play().catch((error) => {
+    Log.error(LogTag.LOGIC, 'Audio play failed:', error)
+  })
 }
 
 function stop(notifyStore = true) {
@@ -115,13 +117,19 @@ function updateAudioUrl(blob: Blob | undefined) {
   }
 }
 
-watch(() => props.audioBlob, (newVal) => {
-  updateAudioUrl(newVal)
-})
+watch(
+  () => props.audioBlob,
+  (newVal) => {
+    updateAudioUrl(newVal)
+  },
+)
 
-watch(() => props.loopPlay, (newVal) => {
-  isLooping.value = newVal
-})
+watch(
+  () => props.loopPlay,
+  (newVal) => {
+    isLooping.value = newVal
+  },
+)
 
 onMounted(() => {
   if (props.audioBlob) {
@@ -146,7 +154,6 @@ defineExpose({
   play,
   stop,
 })
-
 </script>
 
 <style scoped>
@@ -160,5 +167,4 @@ defineExpose({
 .voice-player-button {
   height: 100%;
 }
-
 </style>

@@ -1,175 +1,179 @@
 export interface UserApiError {
-  title: string,
-  message: string,
+  title: string
+  message: string
 }
 
 export const userApiErrors = {
   DATA_LOADING: {
     title: 'Could not load data from server',
-    message: 'Please reload the page and try again.'
+    message: 'Please reload the page and try again.',
   } as UserApiError,
   AUTH_BAD_DATA: {
     title: 'Anomaly detected',
-    message: 'Please check your credentials and try again.'
+    message: 'Please check your credentials and try again.',
   } as UserApiError,
   AUTH_FAILED: {
     title: 'Authentication is not successful',
-    message: 'There was a glitch in our identity scanners. Please try to establish a connection again.'
+    message:
+      'There was a glitch in our identity scanners. Please try to establish a connection again.',
   } as UserApiError,
   VERIFICATION__CONTEXT_FAILED: {
     title: 'Could not load the verification context',
-    message: 'Please reload the page and try again.'
+    message: 'Please reload the page and try again.',
   } as UserApiError,
   VERIFICATION__REQUEST_FAILED: {
     title: 'Could not request verification',
-    message: 'Please try again later.'
+    message: 'Please try again later.',
   } as UserApiError,
   VERIFICATION__CODE_FAILED: {
     title: 'Could not test the verification code',
-    message: 'Please try again later.'
+    message: 'Please try again later.',
   } as UserApiError,
   VERIFICATION__UNKNOWN_TYPE: {
-    title: 'Couldn\'t complete the action',
-    message: 'Please try again.'
+    title: "Couldn't complete the action",
+    message: 'Please try again.',
   } as UserApiError,
   VERIFICATION__TOO_MANY_REQUESTS: {
     title: 'Too many requests',
-    message: 'You have reached the maximum number of verification codes per hour. Please try again later.'
+    message:
+      'You have reached the maximum number of verification codes per hour. Please try again later.',
   } as UserApiError,
   PASSWORD_RESET__FAILED: {
-    title: 'Couldn\'t reset the password',
-    message: 'Please try again.'
+    title: "Couldn't reset the password",
+    message: 'Please try again.',
   } as UserApiError,
   USER__UNAUTHORIZED: {
-    title: 'We couldn\'t recognize you',
-    message: 'Please try again later.'
+    title: "We couldn't recognize you",
+    message: 'Please try again later.',
   } as UserApiError,
   USER__NOT_FOUND: {
     title: 'We have an Unidentified Flying Object...',
-    message: 'Just kidding, we just don\'t recognize you. Please check your credentials or sign up to join the fleet.'
+    message:
+      "Just kidding, we just don't recognize you. Please check your credentials or sign up to join the fleet.",
   } as UserApiError,
   USER__FORBIDDEN: {
     title: 'Mission Control has not authorized this action',
-    message: 'You do not have permission to proceed.'
+    message: 'You do not have permission to proceed.',
   } as UserApiError,
   USER__UPDATING_FAILED: {
     title: 'Could not update the user',
-    message: 'Please try to repeat the action.'
+    message: 'Please try to repeat the action.',
   } as UserApiError,
   USER__ALREADY_EXISTS: {
     title: 'This email is already taken',
-    message: 'Please use a different email.'
+    message: 'Please use a different email.',
   } as UserApiError,
   FLASHCARD_SET__SUSPENDING_FAILED: {
     title: 'Could not suspend the flashcard set',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   FLASHCARD_SET__UPDATING_FAILED: {
     title: 'Could not update the flashcard set',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   FLASHCARD_SET__REMOVING_FAILED: {
     title: 'Could not remove the flashcard set',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   FLASHCARD_SET__CREATION_FAILED: {
     title: 'Could not create the flashcard set',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   FLASHCARD__CREATION_FAILED: {
     title: 'Could not add the flashcard',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   FLASHCARD__UPDATING_FAILED: {
     title: 'Could not update the flashcard',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   FLASHCARD__PROGRESSION_FAILED: {
     title: 'Could not track review progress',
-    message: 'Your progress might not be saved.'
+    message: 'Your progress might not be saved.',
   } as UserApiError,
   FLASHCARD__REMOVING_FAILED: {
     title: 'Could not remove the flashcard',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   SCHEDULE__PREV_FAILED: {
     title: 'Could not go to the previous day',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   SCHEDULE__NEXT_FAILED: {
     title: 'Could not go to the next day',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   SCHEDULE__UPDATING_FAILED: {
     title: 'Could not update the schedule',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   AUDIO__UPLOADING_FAILED: {
     title: 'Could not upload the audio',
-    message: 'Please try to repeat the action.'
+    message: 'Please try to repeat the action.',
   } as UserApiError,
   MEDIA__FETCHING_FAILED: {
     title: 'Could not load the flashcard media',
-    message: 'Please try again later.'
+    message: 'Please try again later.',
   } as UserApiError,
   AUDIO__FETCHING_FAILED: {
     title: 'Could not fetch the audio',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   AUDIO__REMOVAL_FAILED: {
     title: 'Could not remove the audio',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   PICTURE__UPLOADING_FAILED: {
     title: 'Could not upload the picture',
-    message: 'Make sure the file is a valid image, and try again.'
+    message: 'Make sure the file is a valid image, and try again.',
   } as UserApiError,
   PICTURE__TOO_LARGE: {
     title: 'Could not process the picture',
-    message: 'Make sure the file is no larger than 8 MB, and try again.'
+    message: 'Make sure the file is no larger than 8 MB, and try again.',
   } as UserApiError,
   PICTURE__TOO_LARGE_AFTER_COMPRESSION: {
     title: 'Picture is too large',
-    message: 'Even after compression this image is too large to upload. Please choose a smaller or simpler picture.'
+    message:
+      'Even after compression this image is too large to upload. Please choose a smaller or simpler picture.',
   } as UserApiError,
   PICTURE__FETCHING_FAILED: {
     title: 'Could not fetch the picture',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   PICTURE__REMOVAL_FAILED: {
     title: 'Could not remove the picture',
-    message: 'Please refresh the page and repeat the action.'
+    message: 'Please refresh the page and repeat the action.',
   } as UserApiError,
   FLASHCARD__DOWNLOAD_FAILED: {
     title: 'Could not download the flashcards',
-    message: 'Please try again.'
+    message: 'Please try again.',
   } as UserApiError,
   FLASHCARD__FILE_PARSE_FAILED: {
     title: 'Could not parse the file',
-    message: 'Please check the file format and try again.'
+    message: 'Please check the file format and try again.',
   } as UserApiError,
   FLASHCARD__ALL_DUPLICATES: {
     title: 'All flashcards are duplicates',
-    message: 'The file contains only flashcards that already exist in this set.'
+    message: 'The file contains only flashcards that already exist in this set.',
   } as UserApiError,
   FLASHCARD__BULK_CREATION_FAILED: {
     title: 'Could not upload flashcards',
-    message: 'Please try again.'
+    message: 'Please try again.',
   } as UserApiError,
   REVIEW_SESSION__FETCHING_FAILED: {
     title: 'Could not fetch an active review session',
-    message: 'Please exit the current review session and try again.'
+    message: 'Please exit the current review session and try again.',
   } as UserApiError,
   REVIEW_SESSION__CREATION_FAILED: {
     title: 'Could not create a review session',
-    message: 'Please try to repeat the action.'
+    message: 'Please try to repeat the action.',
   } as UserApiError,
   REVIEW_SESSION__UPDATING_FAILED: {
     title: 'Could not update a review session',
-    message: 'Your progress might not be saved.'
+    message: 'Your progress might not be saved.',
   } as UserApiError,
   QUIZ_SESSION__NEXT_ROUND_FAILED: {
     title: 'Could not start a new quiz round',
-    message: 'Please try to repeat the action.'
+    message: 'Please try to repeat the action.',
   } as UserApiError,
 }

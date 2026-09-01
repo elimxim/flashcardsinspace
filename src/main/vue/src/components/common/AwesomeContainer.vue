@@ -1,7 +1,7 @@
 <template>
   <div class="awesome-container awesome-container--theme">
     <div class="awesome-container-icon-wrapper">
-      <font-awesome-icon :icon="icon" class="awesome-container-icon"/>
+      <font-awesome-icon :icon="icon" class="awesome-container-icon" />
     </div>
     <slot></slot>
   </div>
@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 defineProps<{
-  icon: string,
+  icon: string
 }>()
 </script>
 

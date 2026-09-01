@@ -9,9 +9,7 @@
       square
     >
       <template #below>
-        <div class="cp-text">
-          Add flashcard
-        </div>
+        <div class="cp-text">Add flashcard</div>
       </template>
     </AwesomeButton>
   </div>
@@ -27,7 +25,6 @@ const toggleStore = useToggleStore()
 const flashcardStore = useFlashcardStore()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
-
 </script>
 
 <style scoped>
@@ -36,6 +33,4 @@ const { flashcardSet } = storeToRefs(flashcardStore)
   height: 100%;
   width: fit-content;
 }
-
 </style>
-
