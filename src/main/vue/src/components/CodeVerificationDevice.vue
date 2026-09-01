@@ -245,7 +245,6 @@ defineExpose({
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 44px;
   overflow: hidden;
-  font-family: 'Rajdhani', sans-serif;
   color: white;
   box-shadow: 0 3cqb 3cqb rgba(0, 0, 0, 0.4);
 }

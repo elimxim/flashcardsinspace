@@ -1,5 +1,6 @@
 @layer base, layout, shared, components;
 
+@import '@/assets/css/base/fonts.css';
 @import '@/assets/css/base/reset.css' layer(base);
 @import '@/assets/css/base/themes.css' layer(base);
 @import '@/assets/css/layout/layout.css' layer(layout);

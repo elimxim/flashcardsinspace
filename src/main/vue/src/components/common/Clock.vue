@@ -110,7 +110,7 @@ const seconds = computed(() => {
   font-size: clamp(1.5rem, 30cqw, 4rem);
   font-weight: 300;
   color: var(--sw--text--color);
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Quicksand Variable', Arial, sans-serif;
   line-height: 1;
 }
 

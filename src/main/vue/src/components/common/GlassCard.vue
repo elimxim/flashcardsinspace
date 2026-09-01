@@ -53,7 +53,7 @@ function startTapAnimation() {
   --gc--border-radius: var(--glass-card--border-radius, 16px);
   --gc--rim-size: var(--glass-card--rim-size, 8px);
   --gc--bg: var(--glass-card--bg, none);
-  --gc--font-family: var(--glass-card--font-family, 'Quicksand', sans-serif);
+  --gc--font-family: var(--glass-card--font-family, 'Quicksand Variable', sans-serif);
   --gc--font-size: var(--glass-card--font-size, 2rem);
   --gc--font-weight: var(--glass-card--font-weight, 400);
 }
