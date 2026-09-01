@@ -16,13 +16,10 @@ class FlashcardBulkCreationRequestValidatorTest {
 
     @Test
     fun `should pass validation if request is valid`() {
-        // given:
         val request = validRequest()
 
-        // when:
         val validRequest = validator.validate(request)
 
-        // then:
         assertThat(validRequest.requests).hasSize(2)
         assertThat(validRequest.requests[0].frontSide).isEqualTo("Front 1")
         assertThat(validRequest.requests[0].backSide).isEqualTo("Back 1")
@@ -32,29 +29,23 @@ class FlashcardBulkCreationRequestValidatorTest {
 
     @Test
     fun `should fail validation if requests list is null`() {
-        // given:
         val request = FlashcardBulkCreationRequest(requests = null)
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("requests")
     }
 
     @Test
     fun `should fail validation if requests list is empty`() {
-        // given:
         val request = FlashcardBulkCreationRequest(requests = emptyList())
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("requests")
     }
 
@@ -100,7 +91,6 @@ class FlashcardBulkCreationRequestValidatorTest {
 
     @Test
     fun `should fail validation if an item frontSide exceeds 512 characters`() {
-        // given:
         val request = FlashcardBulkCreationRequest(
             requests = listOf(
                 FlashcardCreationRequest(
@@ -112,18 +102,15 @@ class FlashcardBulkCreationRequestValidatorTest {
             )
         )
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("frontSide")
     }
 
     @Test
     fun `should fail validation if an item backSide exceeds 512 characters`() {
-        // given:
         val request = FlashcardBulkCreationRequest(
             requests = listOf(
                 FlashcardCreationRequest(
@@ -135,12 +122,10 @@ class FlashcardBulkCreationRequestValidatorTest {
             )
         )
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("backSide")
     }
 

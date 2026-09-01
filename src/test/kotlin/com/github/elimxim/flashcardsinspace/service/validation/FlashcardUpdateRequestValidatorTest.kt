@@ -17,13 +17,10 @@ class FlashcardUpdateRequestValidatorTest {
 
     @Test
     fun `should pass validation if request is valid`() {
-        // given:
         val request = validRequest()
 
-        // when:
         val validRequest = validator.validate(request)
 
-        // then:
         assertThat(validRequest.frontSide).isEqualTo("Updated front")
         assertThat(validRequest.backSide).isEqualTo("Updated back")
         assertThat(validRequest.stage).isEqualTo(FlashcardStage.S1)
@@ -36,81 +33,65 @@ class FlashcardUpdateRequestValidatorTest {
 
     @Test
     fun `should fail validation if frontSide is too long`() {
-        // given:
         val request = validRequest().apply {
             frontSide = "a".repeat(513)
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("frontSide")
     }
 
     @Test
     fun `should fail validation if backSide is too long`() {
-        // given:
         val request = validRequest().apply {
             backSide = "a".repeat(513)
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("backSide")
     }
 
     @Test
     fun `should fail validation if stage is invalid`() {
-        // given:
         val request = validRequest().apply { stage = "INVALID" }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("stage")
     }
 
     @Test
     fun `should fail validation if reviewCount is not a number`() {
-        // given:
         val request = validRequest().apply { timesReviewed = "abc" }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("timesReviewed")
     }
 
     @Test
     fun `should fail validation if reviewedAt is not a valid date`() {
-        // given:
         val request = validRequest().apply { lastReviewDate = "2025/09/15" }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("lastReviewDate")
     }
 
     @Test
     fun `should fail validation if reviewHistory contains invalid stage`() {
-        // given:
         val request = validRequest().apply {
             reviewHistory?.history = listOf(
                 FlashcardUpdateRequest.ReviewInfo().apply {
@@ -120,18 +101,15 @@ class FlashcardUpdateRequestValidatorTest {
             )
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("stage")
     }
 
     @Test
     fun `should fail validation if reviewHistory contains invalid date`() {
-        // given:
         val request = validRequest().apply {
             reviewHistory = FlashcardUpdateRequest.ReviewHistory(
                 history = listOf(FlashcardUpdateRequest.ReviewInfo().apply {
@@ -141,30 +119,25 @@ class FlashcardUpdateRequestValidatorTest {
             )
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("reviewDate")
     }
 
     @Test
     fun `should fail validation with multiple invalid fields`() {
-        // given:
         val request = validRequest().apply {
             frontSide = "a".repeat(513)
             timesReviewed = "abc"
             lastReviewDate = "2025-13-01"
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactlyInAnyOrder("frontSide", "timesReviewed", "lastReviewDate")
     }
 

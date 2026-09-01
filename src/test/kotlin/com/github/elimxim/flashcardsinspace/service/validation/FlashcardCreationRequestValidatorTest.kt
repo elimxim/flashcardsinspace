@@ -17,13 +17,10 @@ class FlashcardCreationRequestValidatorTest {
 
     @Test
     fun `should pass validation if request is valid`() {
-        // given:
         val request = validRequest()
 
-        // when:
         val validRequest = validator.validate(request)
 
-        // then:
         assertThat(validRequest.frontSide).isEqualTo("What is the largest black hole?")
         assertThat(validRequest.backSide).isEqualTo("TON\n618")
         assertThat(validRequest.stage).isEqualTo(FlashcardStage.S1)
@@ -56,17 +53,14 @@ class FlashcardCreationRequestValidatorTest {
 
     @Test
     fun `should fail validation if frontSide is too long`() {
-        // given:
         val request = validRequest().apply {
             frontSide = "a".repeat(513)
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("frontSide")
     }
 
@@ -96,151 +90,123 @@ class FlashcardCreationRequestValidatorTest {
 
     @Test
     fun `should fail validation if backSide is too long`() {
-        // given:
         val request = validRequest().apply {
             backSide = "a".repeat(513)
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("backSide")
     }
 
     @Test
     fun `should fail validation if stage is null`() {
-        // given:
         val request = validRequest().apply {
             stage = null
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("stage")
     }
 
     @Test
     fun `should fail validation if stage is empty`() {
-        // given:
         val request = validRequest().apply {
             stage = ""
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("stage")
     }
 
     @Test
     fun `should fail validation if stage is blank`() {
-        // given:
         val request = validRequest().apply {
             stage = "   "
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("stage")
     }
 
     @Test
     fun `should fail validation if stage is invalid`() {
-        // given:
         val request = validRequest().apply {
             stage = "INVALID_STAGE"
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("stage")
     }
 
     @Test
     fun `should fail validation if createdAt is null`() {
-        // given:
         val request = validRequest().apply {
             creationDate = null
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("creationDate")
     }
 
     @Test
     fun `should fail validation if createdAt is empty`() {
-        // given:
         val request = validRequest().apply {
             creationDate = ""
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("creationDate")
     }
 
     @Test
     fun `should fail validation if createdAt is blank`() {
-        // given:
         val request = validRequest().apply {
             creationDate = "   "
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("creationDate")
     }
 
     @Test
     fun `should fail validation if createdAt has invalid format`() {
-        // given:
         val request = validRequest().apply {
             creationDate = "2025/01/01"
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactly("creationDate")
     }
 
     @Test
     fun `should fail validation if all fields are invalid`() {
-        // given:
         val request = FlashcardCreationRequest().apply {
             frontSide = "a".repeat(513)
             backSide = "b".repeat(513)
@@ -248,12 +214,10 @@ class FlashcardCreationRequestValidatorTest {
             creationDate = "invalid-date"
         }
 
-        // when:
         val exception = assertThrows<HttpInvalidRequestFieldsException> {
             validator.validate(request)
         }
 
-        // then:
         assertThat(exception.fields).containsExactlyInAnyOrder("frontSide", "backSide", "stage", "creationDate")
     }
 

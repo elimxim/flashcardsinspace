@@ -14,88 +14,67 @@ describe('selectConsecutiveDaysBeforeIncluding', () => {
   ]
 
   it('should return an empty array if the condition is not met for the start day', () => {
-    // given:
     const startDay = chronodays[5]
     const acceptedStatuses = new Set([chronodayStatuses.COMPLETED])
 
-    // when:
     const result = selectConsecutiveDaysBefore(chronodays, startDay, acceptedStatuses)
 
-    // then:
     expect(result).toEqual([])
   })
 
   it('should skip OFF days and continue collecting days that meet the condition', () => {
-    // given:
     const startDay = chronodays[3]
     const acceptedStatuses = new Set([chronodayStatuses.COMPLETED])
 
-    // when:
     const result = selectConsecutiveDaysBefore(chronodays, startDay, acceptedStatuses)
 
-    // then:
     // Should include day 3, skip OFF day 2, and include days 1 and 0
     expect(result).toEqual([chronodays[3], chronodays[1], chronodays[0]])
   })
 
   it('should return all consecutive days that meet the condition, skipping OFF days', () => {
-    // given:
     const startDay = chronodays[4]
     const acceptedStatuses = new Set([chronodayStatuses.COMPLETED])
 
-    // when:
     const result = selectConsecutiveDaysBefore(chronodays, startDay, acceptedStatuses)
 
-    // then:
     // Should include days 4, 3, skip OFF day 2, and include days 1 and 0
     expect(result).toEqual([chronodays[4], chronodays[3], chronodays[1], chronodays[0]])
   })
 
   it('should stop when a non-OFF day that does not meet the condition is found', () => {
-    // given:
     const startDay = chronodays[5]
     const acceptedStatuses = new Set([chronodayStatuses.COMPLETED])
 
-    // when:
     const result = selectConsecutiveDaysBefore(chronodays, startDay, acceptedStatuses)
 
-    // then:
     // Should stop at day 5 (NOT_STARTED) which doesn't meet the condition
     expect(result).toEqual([])
   })
 
   it('should return all days from the start day to the beginning if they all meet the condition', () => {
-    // given:
     const startDay = chronodays[1]
     const acceptedStatuses = new Set([chronodayStatuses.COMPLETED])
 
-    // when:
     const result = selectConsecutiveDaysBefore(chronodays, startDay, acceptedStatuses)
 
-    // then:
     expect(result).toEqual([chronodays[1], chronodays[0]])
   })
 
   it('should work correctly when startDay is the first day in the array', () => {
-    // given:
     const startDay = chronodays[0]
     const acceptedStatuses = new Set([chronodayStatuses.COMPLETED])
 
-    // when:
     const result = selectConsecutiveDaysBefore(chronodays, startDay, acceptedStatuses)
 
-    // then:
     expect(result).toEqual([startDay])
   })
 
   it('should return an empty array when the provided chronodays array is empty', () => {
-    // given:
     const dummyStartDay = makeChronoday(0, 0, 'COMPLETED')
 
-    // when:
     const result = selectConsecutiveDaysBefore([], dummyStartDay, new Set())
 
-    // then:
     expect(result).toEqual([])
   })
 })
@@ -109,37 +88,28 @@ describe('nextChronoday', () => {
   ]
 
   it('should return the day after the given day', () => {
-    // when:
     const result = nextChronoday(chronodays, chronodays[1])
 
-    // then:
     expect(result).toEqual(chronodays[2])
   })
 
   it('should return undefined when the given day is the last one', () => {
-    // when:
     const result = nextChronoday(chronodays, chronodays[3])
 
-    // then:
     expect(result).toBeUndefined()
   })
 
   it('should return undefined when the given day is not found', () => {
-    // given:
     const unknownDay = makeChronoday(99, 99, chronodayStatuses.NOT_STARTED)
 
-    // when:
     const result = nextChronoday(chronodays, unknownDay)
 
-    // then:
     expect(result).toBeUndefined()
   })
 
   it('should return undefined when the chronodays array is empty', () => {
-    // when:
     const result = nextChronoday([], chronodays[0])
 
-    // then:
     expect(result).toBeUndefined()
   })
 })
