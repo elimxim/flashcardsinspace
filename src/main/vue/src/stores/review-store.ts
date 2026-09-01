@@ -31,7 +31,7 @@ export const useReviewStore = (sessionType: ReviewSessionType, flashcardSet: Ref
 
     // getters
     const flashcardsRemaining = computed(() => {
-      if (noNextAvailable.value) return 0
+      if (currFlashcard.value === undefined) return 0
       return reviewQueue.value.remaining() + 1
     })
 
@@ -39,15 +39,19 @@ export const useReviewStore = (sessionType: ReviewSessionType, flashcardSet: Ref
       Math.max(0, flashcardsTotal.value - flashcardsRemaining.value)
     )
 
-    const noNextAvailable = computed(() => {
+    const noOneAvailable = computed(() => {
       return currFlashcard.value === undefined
     })
 
     const noPrevAvailable = computed(() => {
       if (flashcardsTotal.value === 1) {
-        return !noNextAvailable.value
+        return currFlashcard.value !== undefined
       }
       return flashcardsTotal.value === flashcardsRemaining.value
+    })
+
+    const noNextAvailable = computed(() => {
+      return reviewQueue.value.remaining() === 0
     })
 
     const progress = computed(() => {
@@ -175,8 +179,9 @@ export const useReviewStore = (sessionType: ReviewSessionType, flashcardSet: Ref
 
       flashcardsRemaining,
       flashcardsSeen,
-      noNextAvailable,
+      noOneAvailable,
       noPrevAvailable,
+      noNextAvailable,
       progress,
 
       loadState,

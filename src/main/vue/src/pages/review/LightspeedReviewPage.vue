@@ -52,8 +52,8 @@
           <SpaceDeck
             ref="spaceDeck"
             :session-type="ReviewSessionType.LIGHTSPEED"
-            :can-slide-left="!noNextAvailable"
-            :can-slide-right="!noNextAvailable"
+            :can-slide-left="!noOneAvailable"
+            :can-slide-right="!noOneAvailable"
             :on-slide-left="stageDown"
             :on-slide-right="stageUp"
             swipe-left-text="Don't know"
@@ -65,8 +65,8 @@
             <SmartButton
               text="Don't know"
               class="decision-button dangerous-button"
-              :disabled="noNextAvailable"
-              :hidden="noNextAvailable"
+              :disabled="noOneAvailable"
+              :hidden="noOneAvailable"
               :on-click="spaceDeck?.slideLeft"
               auto-blur
               rounded
@@ -74,8 +74,8 @@
             <SmartButton
               text="Know"
               class="decision-button safe-button"
-              :disabled="noNextAvailable"
-              :hidden="noNextAvailable"
+              :disabled="noOneAvailable"
+              :hidden="noOneAvailable"
               :on-click="spaceDeck?.slideRight"
               auto-blur
               rounded
@@ -163,6 +163,7 @@ const {
   flashcardsRemaining,
   flashcardsSeen,
   progress,
+  noOneAvailable,
   noNextAvailable,
 } = storeToRefs(reviewStore)
 
@@ -204,7 +205,7 @@ async function finishReview() {
   Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
   if (reviewStarting.value) await startReviewOnce()
   await sessionRunner.flush({ all: true })
-  if (flashcardSet.value && noNextAvailable.value) {
+  if (flashcardSet.value && noOneAvailable.value) {
     await markDaysAsCompleted(flashcardSet.value, currDay.value)
   }
   Log.log(LogTag.LOGIC, `Finished review: ${ReviewSessionType.LIGHTSPEED}`)
@@ -222,7 +223,7 @@ async function stageDown() {
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   if (success) {
     sessionRunner.track(currFlashcard.value.id)
-    await sessionRunner.flush()
+    await sessionRunner.flush({ all: noNextAvailable.value })
     await getNextAndMarkDays(flashcardSet.value, currDay.value)
   }
 }
@@ -234,7 +235,7 @@ async function stageUp() {
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   if (success) {
     sessionRunner.track(currFlashcard.value.id)
-    await sessionRunner.flush()
+    await sessionRunner.flush({ all: noNextAvailable.value })
     await getNextAndMarkDays(flashcardSet.value, currDay.value)
   }
 }

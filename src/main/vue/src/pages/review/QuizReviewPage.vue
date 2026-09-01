@@ -52,8 +52,8 @@
           <SpaceDeck
             ref="spaceDeck"
             :session-type="ReviewSessionType.QUIZ"
-            :can-slide-left="!noNextAvailable"
-            :can-slide-right="!noNextAvailable"
+            :can-slide-left="!noOneAvailable"
+            :can-slide-right="!noOneAvailable"
             :on-slide-left="() => quizAnswer(false)"
             :on-slide-right="() => quizAnswer(true)"
             swipe-left-text="Don't know"
@@ -74,8 +74,8 @@
             <SmartButton
               class="decision-button dangerous-button"
               text="Don't know"
-              :disabled="noNextAvailable"
-              :hidden="noNextAvailable"
+              :disabled="noOneAvailable"
+              :hidden="noOneAvailable"
               :on-click="spaceDeck?.slideLeft"
               auto-blur
               rounded
@@ -83,8 +83,8 @@
             <SmartButton
               class="decision-button safe-button"
               text="Know"
-              :disabled="noNextAvailable"
-              :hidden="noNextAvailable"
+              :disabled="noOneAvailable"
+              :hidden="noOneAvailable"
               :on-click="spaceDeck?.slideRight"
               auto-blur
               rounded
@@ -173,6 +173,7 @@ const {
   flashcardsRemaining,
   flashcardsSeen,
   progress,
+  noOneAvailable,
   noNextAvailable,
 } = storeToRefs(reviewStore)
 
@@ -249,6 +250,7 @@ async function quizAnswer(know: boolean) {
   if (know) {
     quizOverallCorrect.value = quizOverallCorrect.value + 1
     await sessionRunner.flush({
+      all: noNextAvailable.value,
       metadata: {
         nextRoundFlashcardIds: [],
         overallCorrectCount: quizOverallCorrect.value,
@@ -257,6 +259,7 @@ async function quizAnswer(know: boolean) {
   } else {
     incorrectFlashcards.value.push(currFlashcard.value)
     await sessionRunner.flush({
+      all: noNextAvailable.value,
       metadata: {
         nextRoundFlashcardIds: [currFlashcard.value.id],
         overallCorrectCount: quizOverallCorrect.value,

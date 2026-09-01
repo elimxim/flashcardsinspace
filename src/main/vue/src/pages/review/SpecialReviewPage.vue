@@ -64,7 +64,7 @@
             ref="spaceDeck"
             :session-type="reviewMode.sessionType"
             :can-slide-left="!noPrevAvailable"
-            :can-slide-right="!noNextAvailable"
+            :can-slide-right="!noOneAvailable"
             :on-slide-left="prev"
             :on-slide-right="next"
             swipe-left-text="Prev"
@@ -85,8 +85,8 @@
               v-if="reviewMode.isOuterSpace()"
               class="decision-button dangerous-button"
               text="Move back"
-              :disabled="noNextAvailable"
-              :hidden="noNextAvailable"
+              :disabled="noOneAvailable"
+              :hidden="noOneAvailable"
               :on-click="moveBack"
               :hold-time="1.2"
               auto-blur
@@ -95,7 +95,7 @@
             <SmartButton
               class="calm-button"
               text="Next"
-              :disabled="noNextAvailable"
+              :disabled="noOneAvailable"
               :on-click="spaceDeck?.slideRight"
               auto-blur
               rounded
@@ -108,7 +108,7 @@
             <SmartButton
               class="decision-button dangerous-button"
               text="Move back"
-              :disabled="noNextAvailable"
+              :disabled="noOneAvailable"
               :on-click="moveBack"
               :hold-time="1.2"
               auto-blur
@@ -197,7 +197,7 @@ const {
   flashcardsSeen,
   progress,
   noPrevAvailable,
-  noNextAvailable,
+  noOneAvailable,
 } = storeToRefs(reviewStore)
 
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
@@ -251,7 +251,7 @@ async function prev() {
 }
 
 async function next() {
-  if (!currFlashcard.value || noNextAvailable.value) return
+  if (!currFlashcard.value || noOneAvailable.value) return
   sessionRunner.track(currFlashcard.value.id)
   await sessionRunner.flush()
   await reviewStore.nextFlashcard()
