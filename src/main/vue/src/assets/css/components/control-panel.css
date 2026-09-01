@@ -10,6 +10,10 @@
   --awesome-button--border-radius: 6px;
 }
 
+.cp-widget--special-stage {
+  --awesome-button--icon--size: 44px;
+}
+
 .cp-text {
   color: var(--cp--text--color);
   font-weight: 600;
