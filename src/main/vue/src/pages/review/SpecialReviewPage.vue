@@ -172,7 +172,7 @@ const { currDay } = storeToRefs(chronoStore)
 
 const { loadingStarted, resolvedLoading, startLoading, stopLoading } = useDeferredLoading()
 
-const sessionRunner = createReviewSessionAttendant(
+const sessionAttendant = createReviewSessionAttendant(
   props.reviewMode.sessionType,
   flashcardSet,
   currDay,
@@ -212,7 +212,7 @@ async function startReview() {
       reviewSessionTypeToSpecialStage(props.reviewMode.sessionType) ?? specialStages.UNKNOWN
     reviewStore.loadState(createReviewQueueForStages(flashcards.value, [stage], currDay.value))
 
-    await sessionRunner.create()
+    await sessionAttendant.create()
     await reviewStore.nextFlashcard()
 
     Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
@@ -225,7 +225,7 @@ async function startReview() {
 async function finishReview() {
   Log.log(LogTag.LOGIC, `Finishing review: ${props.reviewMode.sessionType}`)
   if (reviewStarting.value) await startReviewOnce()
-  await sessionRunner.flush({ all: true })
+  await sessionAttendant.flush({ all: true })
   Log.log(LogTag.LOGIC, `Finished review: ${props.reviewMode.sessionType}`)
 }
 
@@ -236,14 +236,14 @@ async function finishReviewAndLeave() {
 
 async function prev() {
   if (noPrevAvailable.value) return
-  await sessionRunner.flush()
+  await sessionAttendant.flush()
   await reviewStore.prevFlashcard()
 }
 
 async function next() {
   if (!currFlashcard.value || noOneAvailable.value) return
-  sessionRunner.track(currFlashcard.value.id)
-  await sessionRunner.flush()
+  sessionAttendant.track(currFlashcard.value.id)
+  await sessionAttendant.flush()
   await reviewStore.nextFlashcard()
 }
 
@@ -295,7 +295,7 @@ onBeforeRouteLeave(async () => {
 
 onUnmounted(async () => {
   await finishReviewOnce()
-  sessionRunner.clear()
+  sessionAttendant.clear()
   destroyReviewStore(reviewStore)
   document.removeEventListener('keydown', handleKeydown)
 })

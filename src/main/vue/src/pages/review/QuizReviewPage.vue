@@ -140,9 +140,9 @@ const { currDay } = storeToRefs(chronoStore)
 
 const { loadingStarted, resolvedLoading, startLoading, stopLoading } = useDeferredLoading()
 
-const sessionRunner = createReviewSessionAttendant(ReviewSessionType.QUIZ, flashcardSet, currDay)
+const sessionAttendant = createReviewSessionAttendant(ReviewSessionType.QUIZ, flashcardSet, currDay)
 
-const { elapsedTime } = sessionRunner
+const { elapsedTime } = sessionAttendant
 
 const reviewStore = useReviewStore(ReviewSessionType.QUIZ, flashcardSet)
 
@@ -186,7 +186,7 @@ async function startReview() {
     reviewStore.loadState(createReviewQueueForStages(flashcards.value, props.stages, currDay.value))
     quizOverallTotal.value = flashcardsTotal.value
 
-    await sessionRunner.loadOrCreate({
+    await sessionAttendant.loadOrCreate({
       sessionId: props.sessionId,
       metadata: {
         currRoundFlashcardIds: reviewQueue.value.remainingFlashcards().map((f) => f.id),
@@ -204,7 +204,7 @@ async function startReview() {
 }
 
 function resetState() {
-  sessionRunner.clear()
+  sessionAttendant.clear()
   reviewStore.$reset()
   incorrectFlashcards.value = []
   quizOverallTotal.value = 0
@@ -214,7 +214,7 @@ function resetState() {
 async function finishReview() {
   Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.QUIZ}`)
   if (reviewStarting.value) await startReviewOnce()
-  await sessionRunner.flush({ all: true })
+  await sessionAttendant.flush({ all: true })
   Log.log(LogTag.LOGIC, `Finished review: ${ReviewSessionType.QUIZ}`)
 }
 
@@ -226,10 +226,10 @@ async function finishReviewAndLeave() {
 async function quizAnswer(know: boolean) {
   if (!currFlashcard.value) return
 
-  sessionRunner.track(currFlashcard.value.id)
+  sessionAttendant.track(currFlashcard.value.id)
   if (know) {
     quizOverallCorrect.value = quizOverallCorrect.value + 1
-    await sessionRunner.flush({
+    await sessionAttendant.flush({
       all: noNextAvailable.value,
       metadata: {
         nextRoundFlashcardIds: [],
@@ -238,7 +238,7 @@ async function quizAnswer(know: boolean) {
     })
   } else {
     incorrectFlashcards.value.push(currFlashcard.value)
-    await sessionRunner.flush({
+    await sessionAttendant.flush({
       all: noNextAvailable.value,
       metadata: {
         nextRoundFlashcardIds: [currFlashcard.value.id],
@@ -251,26 +251,21 @@ async function quizAnswer(know: boolean) {
 }
 
 async function startNextQuizRound() {
-  if (!flashcardSet.value || !sessionRunner.sessionId) return
+  const sessionId = sessionAttendant.sessionId.value
+
+  if (!flashcardSet.value || !sessionId) return
   if (incorrectFlashcards.value.length === 0) {
     Log.error(LogTag.LOGIC, 'Cannot start new round: no flashcards')
     return
   }
 
   try {
-    const response = await sendReviewSessionChildCreateRequest(
-      flashcardSet.value.id,
-      sessionRunner.sessionId,
-      {
-        type: ReviewSessionType.QUIZ,
-        chronodayId: currDay.value.id,
-      },
-    )
+    const response = await sendReviewSessionChildCreateRequest(flashcardSet.value.id, sessionId, {
+      type: ReviewSessionType.QUIZ,
+      chronodayId: currDay.value.id,
+    })
 
-    Log.log(
-      LogTag.LOGIC,
-      `Child review session ${response.data.id} created, parent: ${sessionRunner.sessionId}`,
-    )
+    Log.log(LogTag.LOGIC, `Child review session ${response.data.id} created, parent: ${sessionId}`)
     await router.replace({
       query: {
         ...router.currentRoute.value.query,
@@ -279,7 +274,7 @@ async function startNextQuizRound() {
     })
     resetState()
     onboardSession(response.data)
-    sessionRunner.init(response.data)
+    sessionAttendant.init(response.data)
     spaceDeck.value?.setDeckReady()
     return reviewStore.nextFlashcard()
   } catch (error) {
