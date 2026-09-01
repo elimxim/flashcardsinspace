@@ -47,9 +47,9 @@ export interface ReviewSessionAttendant {
 
   flush(options?: FlushOptions): Promise<void>
 
-  clear(): void
-
   track(flashcardId: number): void
+
+  clear(): void
 }
 
 export function createReviewSessionAttendant(
@@ -69,48 +69,6 @@ export function createReviewSessionAttendant(
 
   const trackedFlashcardIds: number[] = []
 
-  async function flush(options: FlushOptions = {}): Promise<void> {
-    if (finished) return
-    const { metadata = undefined, all = false } = options
-
-    if (!flashcardSet.value) {
-      Log.log(LogTag.SYSTEM, `Can't flush review session ${sessionType}, FlashcardSet is undefined`)
-      return Promise.resolve()
-    } else if (!reviewSession) {
-      Log.log(LogTag.SYSTEM, `Can't flush lost review session for FlashcardSet ${flashcardSet.value.id}`)
-      return Promise.resolve()
-    }
-
-    const request: ReviewSessionUpdateRequest = {
-      elapsedTime: sessionElapsedTime.value,
-      finished: all,
-      metadata: metadata,
-    }
-
-    if (all) {
-      finished = true
-      stopWatch()
-      request.flashcardIds = [...trackedFlashcardIds].map(id => ({ id: id }))
-    } else {
-      const lastFlashcardId = trackedFlashcardIds.at(-1)
-      request.flashcardIds = lastFlashcardId ? [{ id: lastFlashcardId }] : []
-    }
-
-    const result = await updateReviewSession(flashcardSet.value, reviewSession.id, request)
-    if (result) reviewSession = result
-  }
-
-  function clear() {
-    reviewSession = undefined
-    finished = false
-    trackedFlashcardIds.length = 0
-    resetWatch()
-  }
-
-  function track(flashcardId: number) {
-    trackedFlashcardIds.push(flashcardId)
-  }
-
   function init(session: ReviewSession) {
     clear()
 
@@ -119,7 +77,7 @@ export function createReviewSessionAttendant(
     sessionElapsedTime.value = session.elapsedTime
     finished = !!session.finishedAt
 
-    startWatch()
+    if (!finished) startWatch()
   }
 
   async function create(options: CreateOptions = {}) {
@@ -182,21 +140,76 @@ export function createReviewSessionAttendant(
 
     if (sessionId) {
       const existingSession = await fetchReviewSession(flashcardSet.value, sessionId)
-      if (!existingSession || existingSession.finishedAt) {
-        await create({ elapsedTime, idsToTrack, metadata })
-      } else {
+      if (existingSession && canBeOnboarded(existingSession)) {
         onboarding(existingSession)
         init(existingSession)
+      } else {
+        await create({ elapsedTime, idsToTrack, metadata })
       }
     } else {
       await create({ elapsedTime, idsToTrack, metadata })
     }
   }
 
+  function canBeOnboarded(session: ReviewSession): boolean {
+    if (session.type === ReviewSessionType.QUIZ) {
+      const total = session.metadata?.overallTotalCount ?? 0
+      const correct = session.metadata?.overallCorrectCount ?? 0
+      const currRoundLength = session.metadata?.currRoundFlashcardIds?.length ?? 0
+      const nextRoundLength = session.metadata?.nextRoundFlashcardIds?.length ?? 0
+      return (total !== correct) && (currRoundLength !== 0 || nextRoundLength !== 0)
+    }
+    return !session.finishedAt
+  }
+
+  async function flush(options: FlushOptions = {}): Promise<void> {
+    if (finished) return
+    const { metadata = undefined, all = false } = options
+
+    if (!flashcardSet.value) {
+      Log.log(LogTag.SYSTEM, `Can't flush review session ${sessionType}, FlashcardSet is undefined`)
+      return Promise.resolve()
+    } else if (!reviewSession) {
+      Log.log(LogTag.SYSTEM, `Can't flush lost review session for FlashcardSet ${flashcardSet.value.id}`)
+      return Promise.resolve()
+    }
+
+    const request: ReviewSessionUpdateRequest = {
+      elapsedTime: sessionElapsedTime.value,
+      finished: all,
+      metadata: metadata,
+    }
+
+    if (all) {
+      finished = true
+      stopWatch()
+      request.flashcardIds = [...trackedFlashcardIds].map(id => ({ id: id }))
+    } else {
+      const lastFlashcardId = trackedFlashcardIds.at(-1)
+      request.flashcardIds = lastFlashcardId ? [{ id: lastFlashcardId }] : []
+    }
+
+    const result = await updateReviewSession(flashcardSet.value, reviewSession.id, request)
+    if (result) reviewSession = result
+  }
+
+  function track(flashcardId: number) {
+    trackedFlashcardIds.push(flashcardId)
+  }
+
+  function clear() {
+    reviewSession = undefined
+    finished = false
+    trackedFlashcardIds.length = 0
+    resetWatch()
+  }
+
   return {
-    get sessionId() { return reviewSession?.id },
+    get sessionId() {
+      return reviewSession?.id
+    },
     elapsedTime: sessionElapsedTime,
-    init, create, loadOrCreate, flush, clear, track,
+    init, create, loadOrCreate, flush, track, clear,
   }
 }
 
