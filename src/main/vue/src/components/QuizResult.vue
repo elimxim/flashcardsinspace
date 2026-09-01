@@ -34,7 +34,7 @@
         </div>
       </div>
       <div class="quiz-clock">
-        <Clock :time="elapsedTime" top-label="Elapsed Total"/>
+        <Clock :time="elapsedTime" top-label="Round Time"/>
       </div>
     </div>
     <div class="quiz-chart-wrapper">
