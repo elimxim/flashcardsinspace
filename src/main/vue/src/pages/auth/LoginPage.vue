@@ -177,13 +177,13 @@ async function login() {
 // lilrocket>
 
 const rockets = [
-  'assets/rockets/original',
-  'assets/rockets/cow',
-  'assets/rockets/cyan',
-  'assets/rockets/original',
-  'assets/rockets/pinky',
-  'assets/rockets/polka-dots',
-  'assets/rockets/original',
+  'images/rockets/original',
+  'images/rockets/cow',
+  'images/rockets/cyan',
+  'images/rockets/original',
+  'images/rockets/pinky',
+  'images/rockets/polka-dots',
+  'images/rockets/original',
 ]
 
 const lilrocket = ref<HTMLElement>()

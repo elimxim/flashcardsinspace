@@ -4,7 +4,7 @@
   >
     <div class="comic-container">
       <SvgImage
-        path="assets/mascots"
+        path="images/mascots"
         name="Melvin.svg"
         alt="Melvin"
         role="button"

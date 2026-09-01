@@ -23,7 +23,7 @@ import { computed } from 'vue'
 
 const props = withDefaults(
   defineProps<{
-    /** Path to the SVG file, e.g. '/assets/' */
+    /** Path to the SVG file, e.g. '/images/' */
     path: string
     /** SVG file name, e.g. 'Melvin.svg' */
     name: string
