@@ -163,7 +163,7 @@ onUnmounted(() => {
 
 .calendar-popup {
   position: absolute;
-  top: 35%;
+  top: 40%;
   left: 50%;
   transform: translateX(-50%);
   background-color: transparent;
