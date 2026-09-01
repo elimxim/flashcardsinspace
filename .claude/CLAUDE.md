@@ -69,7 +69,7 @@ Standard Spring Boot layered architecture:
 - `components/` — Reusable components built from scratch (no UI framework). `control-panel/` contains the main dashboard widgets; `review/` contains the review session UI (SpaceDeck, ReviewRouter, ReviewResult)
 - `modals/` — Modal dialog components used across pages and features (confirmations, forms, and focused workflows)
 - `stores/` — Pinia stores (flashcard-store, chrono-store, review-store, auth-store, audio-store, etc.)
-- `core-logic/` — Pure business logic with Vitest unit tests: `stage-logic.ts` (stage progression S1-S7 + OUTER_SPACE), `review-logic.ts` (review queue algorithms), `chrono-logic.ts`, plus the media layer: `flashcard-audio-logic.ts` / `flashcard-picture-logic.ts` (fetch/upload/remove), `flashcard-media-prefetch.ts`
+- `core-logic/` — Pure business logic with Vitest unit tests: `stage-logic.ts` (stage progression S1-S7 + OUTER_SPACE), `review-logic.ts` (review queue algorithms), `chrono-logic.ts`, `review-session-attendant.ts` (review session lifecycle), plus the media layer: `flashcard-audio-logic.ts` / `flashcard-picture-logic.ts` (fetch/upload/remove), `flashcard-media-prefetch.ts`
 - `api/` — Axios API client (`api-client.ts` for authenticated, `auth-client.ts` for auth, `public-api-client.ts` for public). `token-refresh.ts` handles automatic JWT refresh.
 - `model/` — TypeScript model types
 - `utils/` — Shared utilities
@@ -84,6 +84,8 @@ Standard Spring Boot layered architecture:
 **Review Sessions**: Types include LIGHTSPEED (normal schedule-based), UNKNOWN, ATTEMPTED, OUTER_SPACE (special stage reviews), and QUIZ.
 
 **Flashcard media (audio/pictures)**: During a review session the `FlashcardMediaPrefetcher` (`flashcard-media-prefetch.ts`, one instance per review store) is the *only* thing that fetches media.
+
+**Review session lifecycle**: Review pages never call the review-session endpoints directly. Each page owns one `ReviewSessionAttendant` (`review-session-attendant.ts`, built by `createReviewSessionAttendant`) that holds the session, its stopwatch, and the ids of the flashcards reviewed so far. Pages `create`/`loadOrCreate` a session on start, `track(flashcardId)` *after* a flashcard write succeeds, `flush()` to persist progress, and `flush({ all: true })` to finish. A session is finished only by `finishReview()` — the exit button, `onBeforeRouteLeave`, or `onUnmounted` — never mid-review; the attendant refuses to finish twice, since the backend rejects that with `SAF400`. `onUnmounted` (not the route guard) is where `clear()` and `destroyReviewStore` belong, so a cancelled navigation cannot tear down a live page. Quiz rounds chain through child sessions: creating a child closes its parent server-side in `createChildReviewSession`. `loadOrCreate` resumes a stored session only if `canBeOnboarded` accepts it — for a quiz, one whose metadata still shows unanswered cards; for any other type, one that was never finished — otherwise it starts a fresh session.
 
 **Day Streak**: Tracks consecutive learning days. Off days (OFF status) do not break the streak; IN_PROGRESS days do break it.
 
