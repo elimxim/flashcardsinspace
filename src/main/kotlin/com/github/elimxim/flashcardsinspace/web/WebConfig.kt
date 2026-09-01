@@ -6,9 +6,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.CacheControl
 import org.springframework.util.AntPathMatcher
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import java.util.concurrent.TimeUnit
 
 @Configuration
 class WebConfig : WebMvcConfigurer {
@@ -23,6 +26,23 @@ class WebConfig : WebMvcConfigurer {
                 // Enable JavaTimeModule for proper LocalDate and ZonedDateTime serialization
                 .modulesToInstall(JavaTimeModule())
         }
+    }
+
+    override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
+        registry.addResourceHandler("/assets/**")
+            .addResourceLocations("classpath:/static/assets/")
+            .setCacheControl(
+                CacheControl.maxAge(30, TimeUnit.DAYS)
+                    .cachePublic()
+                    .immutable()
+            )
+
+        registry.addResourceHandler("/images/**")
+            .addResourceLocations("classpath:/static/images/")
+            .setCacheControl(
+                CacheControl.maxAge(30, TimeUnit.DAYS)
+                    .cachePublic()
+            )
     }
 
     override fun configurePathMatch(configurer: PathMatchConfigurer) {
