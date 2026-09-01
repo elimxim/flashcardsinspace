@@ -32,11 +32,13 @@ const mainPanelWidth = ref(0)
 const rowHeight = ref(106)
 const rowHeightPx = computed(() => `${rowHeight.value}px`)
 
-const { setupAuto } = useFlip(mainPanel, { duration: 1 })
+const { setupAuto } = useFlip(mainPanel, { duration: 0.5 })
 
 let resizeObserver: ResizeObserver | null = null
 
 setupAuto()
+
+type Arrangement = 'single-row' | 'two-rows' | 'three-rows' | 'four-rows'
 
 interface Widget {
   id: string
@@ -111,10 +113,17 @@ const widgets: Record<string, Widget> = {
   },
 }
 
-const widgetRows = computed(() => {
+const arrangement = computed<Arrangement>(() => {
   const width = mainPanelWidth.value
 
-  if (width < THIRD_REARRANGE_BREAKPOINT) {
+  if (width < THIRD_REARRANGE_BREAKPOINT) return 'four-rows'
+  if (width < SECOND_REARRANGE_BREAKPOINT) return 'three-rows'
+  if (width < FIRST_REARRANGE_BREAKPOINT) return 'two-rows'
+  return 'single-row'
+})
+
+const widgetRows = computed(() => {
+  if (arrangement.value === 'four-rows') {
     return [
       {
         id: 'row-1',
@@ -135,7 +144,7 @@ const widgetRows = computed(() => {
     ]
   }
 
-  if (width < SECOND_REARRANGE_BREAKPOINT) {
+  if (arrangement.value === 'three-rows') {
     return [
       {
         id: 'row-1',
@@ -152,7 +161,7 @@ const widgetRows = computed(() => {
     ]
   }
 
-  if (width < FIRST_REARRANGE_BREAKPOINT) {
+  if (arrangement.value === 'two-rows') {
     return [
       {
         id: 'row-1',
