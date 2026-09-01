@@ -1,9 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="App" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
     <option name="ACTIVE_PROFILES" value="dev" />
-    <envs>
-      <env name="-spring.config.additional-location" value="file:props/" />
-    </envs>
+    <option name="PROGRAM_PARAMETERS" value="--spring.config.additional-location=file:props/" />
     <module name="flash-cards-in-space.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.github.elimxim.flashcardsinspace.App" />
     <method v="2">
