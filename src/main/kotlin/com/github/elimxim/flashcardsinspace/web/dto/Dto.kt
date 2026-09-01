@@ -1,5 +1,7 @@
 package com.github.elimxim.flashcardsinspace.web.dto
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonUnwrapped
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
@@ -45,6 +47,13 @@ data class FlashcardDto(
     val creationDate: LocalDate,
     val lastReviewDate: LocalDate?,
     val lastUpdatedAt: ZonedDateTime?,
+)
+
+data class FlashcardUpdateResponse(
+    @field:JsonUnwrapped
+    val flashcard: FlashcardDto,
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    val session: ReviewSessionDto? = null,
 )
 
 data class FlashcardAudioDto(

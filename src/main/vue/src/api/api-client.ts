@@ -7,6 +7,8 @@ import {
   ChronoUpdateResponse,
   FlashcardCreationResponse,
   FlashcardSetSuspendResponse,
+  FlashcardUpdateRequest,
+  FlashcardUpdateResponse,
   Page,
   ReviewSessionCreateRequest,
   ReviewSessionUpdateRequest,
@@ -113,6 +115,21 @@ export async function sendFlashcardBulkCreationRequest(setId: number, flashcards
 export async function sendFlashcardUpdateRequest(setId: number, flashcard: Flashcard) {
   Log.log(LogTag.PUT, `/flashcard-sets/${setId}/flashcards/${flashcard.id}`)
   return apiClient.put<Flashcard>(`/flashcard-sets/${setId}/flashcards/${flashcard.id}`, flashcard)
+}
+
+export async function sendFlashcardUpdateRequestWithinSession(
+  setId: number,
+  flashcard: Flashcard,
+  sessionId: number,
+  sessionRequest: ReviewSessionUpdateRequest,
+) {
+  const request: FlashcardUpdateRequest = { ...flashcard, sessionRequest: sessionRequest }
+  Log.log(LogTag.PUT, `/flashcard-sets/${setId}/flashcards/${flashcard.id}`)
+  return apiClient.put<FlashcardUpdateResponse>(
+    `/flashcard-sets/${setId}/flashcards/${flashcard.id}`,
+    request,
+    { params: { sessionId: sessionId } },
+  )
 }
 
 export async function sendFlashcardRemovalRequest(setId: number, id: number) {

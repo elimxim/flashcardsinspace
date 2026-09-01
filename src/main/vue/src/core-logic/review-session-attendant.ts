@@ -18,7 +18,7 @@ import { ReviewSession } from '@/model/review.ts'
 
 export interface CreateOptions {
   elapsedTime?: number
-  idsToTrack?: number[]
+  flashcardIdsToTrack?: number[]
   metadata?: Record<string, unknown> | undefined
 }
 
@@ -33,7 +33,7 @@ export interface FlushOptions {
 }
 
 export interface ReviewSessionAttendant {
-  readonly sessionId: number | undefined
+  readonly sessionId: Ref<number | undefined>
   readonly elapsedTime: Ref<number>
 
   init(session: ReviewSession): void
@@ -43,6 +43,8 @@ export interface ReviewSessionAttendant {
   loadOrCreate(options?: LoadOrCreateOptions): Promise<void>
 
   flush(options?: FlushOptions): Promise<void>
+
+  touch(options?: FlushOptions): ReviewSessionUpdateRequest | undefined
 
   track(flashcardId: number): void
 
@@ -54,18 +56,17 @@ export function createReviewSessionAttendant(
   flashcardSet: Ref<FlashcardSet | undefined>,
   chronoDay: Ref<Chronoday>,
 ): ReviewSessionAttendant {
-  let reviewSession: ReviewSession | undefined
-  let finished = false
+  const sessionId: Ref<number | undefined> = ref()
   const sessionElapsedTime = ref(0)
-
   const { startWatch, stopWatch, resetWatch } = useStopWatch(sessionElapsedTime)
 
   const trackedFlashcardIds: number[] = []
+  let finished = false
 
   function init(session: ReviewSession) {
     clear()
 
-    reviewSession = session
+    sessionId.value = session.id
     trackedFlashcardIds.push(...session.flashcardIds)
     sessionElapsedTime.value = session.elapsedTime
     finished = !!session.finishedAt
@@ -74,7 +75,7 @@ export function createReviewSessionAttendant(
   }
 
   async function create(options: CreateOptions = {}) {
-    const { elapsedTime = 0, idsToTrack = [], metadata = undefined } = options
+    const { elapsedTime = 0, flashcardIdsToTrack = [], metadata = undefined } = options
 
     if (!flashcardSet.value) {
       Log.log(
@@ -87,7 +88,7 @@ export function createReviewSessionAttendant(
     clear()
 
     sessionElapsedTime.value = elapsedTime
-    trackedFlashcardIds.push(...idsToTrack)
+    trackedFlashcardIds.push(...flashcardIdsToTrack)
 
     const request: ReviewSessionCreateRequest = {
       type: sessionType,
@@ -95,7 +96,7 @@ export function createReviewSessionAttendant(
       metadata: metadata,
     }
 
-    reviewSession = await createReviewSession(flashcardSet.value, request)
+    const reviewSession = await createReviewSession(flashcardSet.value, request)
     if (!reviewSession) {
       clear()
       await router.replace({
@@ -106,6 +107,7 @@ export function createReviewSessionAttendant(
       })
       return
     } else {
+      sessionId.value = reviewSession.id
       await router.replace({
         query: {
           ...router.currentRoute.value.query,
@@ -120,7 +122,7 @@ export function createReviewSessionAttendant(
   async function loadOrCreate(options: LoadOrCreateOptions = {}) {
     const {
       elapsedTime = 0,
-      idsToTrack = [],
+      flashcardIdsToTrack = [],
       metadata = undefined,
       sessionId = undefined,
       onboarding = () => {},
@@ -142,10 +144,10 @@ export function createReviewSessionAttendant(
         onboarding(existingSession)
         init(existingSession)
       } else {
-        await create({ elapsedTime, idsToTrack, metadata })
+        await create({ elapsedTime, flashcardIdsToTrack, metadata })
       }
     } else {
-      await create({ elapsedTime, idsToTrack, metadata })
+      await create({ elapsedTime, flashcardIdsToTrack, metadata })
     }
   }
 
@@ -162,18 +164,28 @@ export function createReviewSessionAttendant(
 
   async function flush(options: FlushOptions = {}): Promise<void> {
     if (finished) return
-    const { metadata = undefined, all = false } = options
 
     if (!flashcardSet.value) {
       Log.log(LogTag.SYSTEM, `Can't flush review session ${sessionType}, FlashcardSet is undefined`)
       return Promise.resolve()
-    } else if (!reviewSession) {
+    } else if (!sessionId.value) {
       Log.log(
         LogTag.SYSTEM,
         `Can't flush lost review session for FlashcardSet ${flashcardSet.value.id}`,
       )
       return Promise.resolve()
     }
+
+    const request = touch(options)
+    if (!request) return
+
+    await updateReviewSession(flashcardSet.value, sessionId.value, request)
+  }
+
+  function touch(options: FlushOptions = {}) {
+    if (finished) return
+
+    const { metadata = undefined, all = false } = options
 
     const request: ReviewSessionUpdateRequest = {
       elapsedTime: sessionElapsedTime.value,
@@ -184,14 +196,14 @@ export function createReviewSessionAttendant(
     if (all) {
       finished = true
       stopWatch()
+
       request.flashcardIds = [...trackedFlashcardIds].map((id) => ({ id: id }))
     } else {
       const lastFlashcardId = trackedFlashcardIds.at(-1)
       request.flashcardIds = lastFlashcardId ? [{ id: lastFlashcardId }] : []
     }
 
-    const result = await updateReviewSession(flashcardSet.value, reviewSession.id, request)
-    if (result) reviewSession = result
+    return request
   }
 
   function track(flashcardId: number) {
@@ -199,21 +211,20 @@ export function createReviewSessionAttendant(
   }
 
   function clear() {
-    reviewSession = undefined
+    sessionId.value = undefined
     finished = false
     trackedFlashcardIds.length = 0
     resetWatch()
   }
 
   return {
-    get sessionId() {
-      return reviewSession?.id
-    },
+    sessionId: sessionId,
     elapsedTime: sessionElapsedTime,
     init,
     create,
     loadOrCreate,
     flush,
+    touch,
     track,
     clear,
   }

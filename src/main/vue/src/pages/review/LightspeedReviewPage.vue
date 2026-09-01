@@ -99,7 +99,11 @@ import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { loadStoresForFlashcardSetId } from '@/utils/store-loading.ts'
-import { sendChronoBulkUpdateRequest, sendFlashcardUpdateRequest } from '@/api/api-client.ts'
+import {
+  sendChronoBulkUpdateRequest,
+  sendFlashcardUpdateRequest,
+  sendFlashcardUpdateRequestWithinSession,
+} from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import {
   chronodayStatuses,
@@ -114,6 +118,7 @@ import { UXConfig } from '@/utils/device-utils.ts'
 import { useRunOnce } from '@/utils/run-once.ts'
 import { Chronoday } from '@/model/chrono.ts'
 import { createReviewSessionAttendant } from '@/core-logic/review-session-attendant.ts'
+import { errorResponseData } from '@/core-logic/media-error.ts'
 
 defineProps<{
   sessionId?: number
@@ -131,7 +136,7 @@ const { currDay } = storeToRefs(chronoStore)
 
 const { loadingStarted, resolvedLoading, startLoading, stopLoading } = useDeferredLoading()
 
-const sessionRunner = createReviewSessionAttendant(
+const sessionAttendant = createReviewSessionAttendant(
   ReviewSessionType.LIGHTSPEED,
   flashcardSet,
   currDay,
@@ -158,7 +163,7 @@ const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 async function startReview() {
   Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.LIGHTSPEED}`)
   try {
-    sessionRunner.clear()
+    sessionAttendant.clear()
     startLoading()
     reviewStore.$reset()
     if (!flashcardStore.loaded) {
@@ -172,7 +177,7 @@ async function startReview() {
     }
     reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value))
 
-    await sessionRunner.create()
+    await sessionAttendant.create()
     await reviewStore.nextFlashcard()
 
     Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
@@ -185,7 +190,7 @@ async function startReview() {
 async function finishReview() {
   Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.LIGHTSPEED}`)
   if (reviewStarting.value) await startReviewOnce()
-  await sessionRunner.flush({ all: true })
+  await sessionAttendant.flush({ all: true })
   if (flashcardSet.value && noOneAvailable.value) {
     await markDaysAsCompleted(flashcardSet.value, currDay.value)
   }
@@ -203,8 +208,6 @@ async function stageDown() {
   updateFlashcard(flashcard, prevStage(flashcard.stage), currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   if (success) {
-    sessionRunner.track(currFlashcard.value.id)
-    await sessionRunner.flush({ all: noNextAvailable.value })
     await getNextAndMarkDays(flashcardSet.value, currDay.value)
   }
 }
@@ -215,8 +218,6 @@ async function stageUp() {
   updateFlashcard(flashcard, nextStage(flashcard.stage), currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   if (success) {
-    sessionRunner.track(currFlashcard.value.id)
-    await sessionRunner.flush({ all: noNextAvailable.value })
     await getNextAndMarkDays(flashcardSet.value, currDay.value)
   }
 }
@@ -225,17 +226,37 @@ async function sendUpdatedFlashcard(
   flashcardSet: FlashcardSet,
   flashcard: Flashcard,
 ): Promise<boolean> {
-  return await sendFlashcardUpdateRequest(flashcardSet.id, flashcard)
-    .then((response) => {
+  const sessionId = sessionAttendant.sessionId.value
+  sessionAttendant.track(flashcard.id)
+
+  try {
+    const sessionRequest = sessionId
+      ? sessionAttendant.touch({ all: noNextAvailable.value })
+      : undefined
+
+    if (sessionId && sessionRequest) {
+      const response = await sendFlashcardUpdateRequestWithinSession(
+        flashcardSet.id,
+        flashcard,
+        sessionId,
+        sessionRequest,
+      )
+
+      const { session, ...updatedFlashcard } = response.data
+      flashcardStore.changeFlashcard(updatedFlashcard)
+      currFlashcard.value = updatedFlashcard
+    } else {
+      const response = await sendFlashcardUpdateRequest(flashcardSet.id, flashcard)
+
       flashcardStore.changeFlashcard(response.data)
       currFlashcard.value = response.data
-      return true
-    })
-    .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to update Flashcard.id=${flashcard.id}`, error.response?.data)
-      toaster.bakeError(userApiErrors.FLASHCARD__PROGRESSION_FAILED, error.response?.data)
-      return false
-    })
+    }
+    return true
+  } catch (error) {
+    Log.error(LogTag.LOGIC, `Failed to update Flashcard.id=${flashcard.id}`, error)
+    toaster.bakeError(userApiErrors.FLASHCARD__PROGRESSION_FAILED, errorResponseData(error))
+    return false
+  }
 }
 
 async function getNextAndMarkDays(flashcardSet: FlashcardSet, currDay: Chronoday) {
@@ -299,7 +320,7 @@ onBeforeRouteLeave(async () => {
 
 onUnmounted(async () => {
   await finishReviewOnce()
-  sessionRunner.clear()
+  sessionAttendant.clear()
   destroyReviewStore(reviewStore)
   document.removeEventListener('keydown', handleKeydown)
 })

@@ -81,6 +81,7 @@ fun FlashcardUpdateRequest.normalize() = FlashcardUpdateRequest(
         }
     ),
     lastReviewDate = lastReviewDate?.normalize(),
+    sessionRequest = sessionRequest?.normalize(),
 )
 
 fun FlashcardUpdateRequest.escapeJava() = FlashcardUpdateRequest(
@@ -97,6 +98,7 @@ fun FlashcardUpdateRequest.escapeJava() = FlashcardUpdateRequest(
         }
     ),
     lastReviewDate = lastReviewDate?.escapeJava(),
+    sessionRequest = sessionRequest?.escapeJava(),
 )
 
 fun FlashcardSetCreationRequest.normalize() = FlashcardSetCreationRequest(

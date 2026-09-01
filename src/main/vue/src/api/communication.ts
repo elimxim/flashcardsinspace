@@ -1,5 +1,6 @@
 import type { Chronoday, DayStreak } from '@/model/chrono.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
+import { ReviewSession } from '@/model/review.ts'
 
 export interface Page<T> {
   content: T[]
@@ -46,6 +47,14 @@ export interface FlashcardCreationResponse {
   flashcards?: Flashcard[]
   currDay?: Chronoday
   chronodays?: Chronoday[]
+}
+
+export interface FlashcardUpdateRequest extends Flashcard {
+  sessionRequest?: ReviewSessionUpdateRequest | undefined
+}
+
+export interface FlashcardUpdateResponse extends Flashcard {
+  session?: ReviewSession | undefined
 }
 
 export interface FlashcardSetSuspendResponse {

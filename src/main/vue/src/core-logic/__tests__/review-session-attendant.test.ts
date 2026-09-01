@@ -128,7 +128,7 @@ describe('review-session-attendant', () => {
     it('should expose the id of the session it just created', async () => {
       await attendant.create()
 
-      expect(attendant.sessionId).toBe(SESSION_ID)
+      expect(attendant.sessionId.value).toBe(SESSION_ID)
     })
 
     it('should create the session for the current type and chronoday', async () => {
@@ -155,15 +155,15 @@ describe('review-session-attendant', () => {
       await attendant.create()
 
       expect(createRequest).not.toHaveBeenCalled()
-      expect(attendant.sessionId).toBeUndefined()
+      expect(attendant.sessionId.value).toBeUndefined()
     })
 
     it('should hold no session and strip the route query when creation fails', async () => {
       createRequest.mockRejectedValue(new Error('boom'))
 
-      await attendant.create({ idsToTrack: [1, 2] })
+      await attendant.create({ flashcardIdsToTrack: [1, 2] })
 
-      expect(attendant.sessionId).toBeUndefined()
+      expect(attendant.sessionId.value).toBeUndefined()
       expect(bakeError).toHaveBeenCalledWith(
         userApiErrors.REVIEW_SESSION__CREATION_FAILED,
         undefined,
@@ -182,7 +182,7 @@ describe('review-session-attendant', () => {
     it('should adopt the session id, elapsed time and reviewed flashcards', async () => {
       attendant.init(reviewSession({ flashcardIds: [11, 22], elapsedTime: 4200 }))
 
-      expect(attendant.sessionId).toBe(SESSION_ID)
+      expect(attendant.sessionId.value).toBe(SESSION_ID)
       expect(attendant.elapsedTime.value).toBe(4200)
 
       // and: the adopted ids are replayed when the session is finished
@@ -215,7 +215,7 @@ describe('review-session-attendant', () => {
 
       attendant.init(reviewSession({ id: 200, flashcardIds: [9] }))
 
-      expect(attendant.sessionId).toBe(200)
+      expect(attendant.sessionId.value).toBe(200)
 
       // and: the flush targets the new session, carrying only its own flashcards
       updateRequest.mockResolvedValue(okResponse(reviewSession({ id: 200 })))
@@ -241,7 +241,7 @@ describe('review-session-attendant', () => {
       expect(getRequest).toHaveBeenCalledWith(SET_ID, 55)
       expect(createRequest).not.toHaveBeenCalled()
       expect(onboarding).toHaveBeenCalledWith(stored)
-      expect(attendant.sessionId).toBe(55)
+      expect(attendant.sessionId.value).toBe(55)
       expect(attendant.elapsedTime.value).toBe(900)
     })
 
@@ -255,7 +255,7 @@ describe('review-session-attendant', () => {
         undefined,
       )
       expect(createRequest).toHaveBeenCalledOnce()
-      expect(attendant.sessionId).toBe(SESSION_ID)
+      expect(attendant.sessionId.value).toBe(SESSION_ID)
     })
 
     it('should start a new session when no session id is given', async () => {
@@ -263,7 +263,7 @@ describe('review-session-attendant', () => {
 
       expect(getRequest).not.toHaveBeenCalled()
       expect(createRequest).toHaveBeenCalledOnce()
-      expect(attendant.sessionId).toBe(SESSION_ID)
+      expect(attendant.sessionId.value).toBe(SESSION_ID)
     })
   })
 
@@ -276,7 +276,7 @@ describe('review-session-attendant', () => {
     it('should resume a round that still has cards to show', async () => {
       await loadStored(quizMetadata({ currRoundFlashcardIds: [1, 2] }))
 
-      expect(attendant.sessionId).toBe(55)
+      expect(attendant.sessionId.value).toBe(55)
     })
 
     it('should resume when only the next round has cards left', async () => {
@@ -287,14 +287,14 @@ describe('review-session-attendant', () => {
         }),
       )
 
-      expect(attendant.sessionId).toBe(55)
+      expect(attendant.sessionId.value).toBe(55)
     })
 
     it('should start over once every card has been answered correctly', async () => {
       await loadStored(quizMetadata({ overallCorrectCount: 2, overallTotalCount: 2 }))
 
       expect(createRequest).toHaveBeenCalledOnce()
-      expect(attendant.sessionId).toBe(SESSION_ID)
+      expect(attendant.sessionId.value).toBe(SESSION_ID)
     })
 
     it('should start over when neither round has cards left', async () => {
@@ -306,14 +306,14 @@ describe('review-session-attendant', () => {
       )
 
       expect(createRequest).toHaveBeenCalledOnce()
-      expect(attendant.sessionId).toBe(SESSION_ID)
+      expect(attendant.sessionId.value).toBe(SESSION_ID)
     })
 
     it('should start over when the stored quiz carries no metadata', async () => {
       await loadStored(undefined)
 
       expect(createRequest).toHaveBeenCalledOnce()
-      expect(attendant.sessionId).toBe(SESSION_ID)
+      expect(attendant.sessionId.value).toBe(SESSION_ID)
     })
   })
 
@@ -348,7 +348,7 @@ describe('review-session-attendant', () => {
       await specialAttendant.loadOrCreate({ sessionId: 55 })
 
       expect(createRequest).not.toHaveBeenCalled()
-      expect(specialAttendant.sessionId).toBe(55)
+      expect(specialAttendant.sessionId.value).toBe(55)
     })
 
     it('should start over when the stored session is already finished', async () => {
@@ -365,7 +365,7 @@ describe('review-session-attendant', () => {
       await specialAttendant.loadOrCreate({ sessionId: 55 })
 
       expect(createRequest).toHaveBeenCalledOnce()
-      expect(specialAttendant.sessionId).toBe(SESSION_ID)
+      expect(specialAttendant.sessionId.value).toBe(SESSION_ID)
     })
   })
 
@@ -451,6 +451,73 @@ describe('review-session-attendant', () => {
     })
   })
 
+  describe('touch', () => {
+    beforeEach(async () => {
+      await attendant.create()
+    })
+
+    it('should build a request for only the last tracked flashcard while the review is running', () => {
+      attendant.track(1)
+      attendant.track(2)
+
+      expect(attendant.touch()).toMatchObject({
+        flashcardIds: [{ id: 2 }],
+        finished: false,
+      })
+    })
+
+    it('should build a request for every tracked flashcard when the review is finished', () => {
+      attendant.track(1)
+      attendant.track(2)
+
+      expect(attendant.touch({ all: true })).toMatchObject({
+        flashcardIds: [{ id: 1 }, { id: 2 }],
+        finished: true,
+      })
+    })
+
+    it('should pass metadata through untouched', () => {
+      const request = attendant.touch({
+        metadata: { nextRoundFlashcardIds: [3], overallCorrectCount: 2 },
+      })
+
+      expect(request?.metadata).toEqual({
+        nextRoundFlashcardIds: [3],
+        overallCorrectCount: 2,
+      })
+    })
+
+    it('should send nothing itself', () => {
+      attendant.touch({ all: true })
+
+      expect(updateRequest).not.toHaveBeenCalled()
+    })
+
+    it('should finish the session so that the page cannot finish it twice', async () => {
+      // the carrier request finishes the session server-side
+      attendant.touch({ all: true })
+
+      // the page flushes again on the way out
+      await attendant.flush({ all: true })
+      await attendant.flush()
+
+      expect(updateRequest).not.toHaveBeenCalled()
+    })
+
+    it('should build nothing more once the session is finished', () => {
+      attendant.touch({ all: true })
+
+      expect(attendant.touch()).toBeUndefined()
+      expect(attendant.touch({ all: true })).toBeUndefined()
+    })
+
+    it('should build nothing for a session that was already finished when adopted', () => {
+      attendant.init(reviewSession({ finishedAt: new Date('2026-08-31T11:00:00Z') }))
+
+      expect(attendant.touch()).toBeUndefined()
+    })
+  })
+
   describe('clear', () => {
     it('should let a later session be finished again', async () => {
       // a session that has been finished
@@ -470,7 +537,7 @@ describe('review-session-attendant', () => {
 
       attendant.clear()
 
-      expect(attendant.sessionId).toBeUndefined()
+      expect(attendant.sessionId.value).toBeUndefined()
       expect(attendant.elapsedTime.value).toBe(0)
     })
   })
@@ -543,7 +610,7 @@ describe('review-session-attendant', () => {
 
       // and:
       clear()
-      expect(attendant.sessionId).toBeUndefined()
+      expect(attendant.sessionId.value).toBeUndefined()
     })
 
     it('should keep working when loadOrCreate is pulled off the object', async () => {
@@ -552,7 +619,7 @@ describe('review-session-attendant', () => {
 
       await loadOrCreate({ sessionId: 55 })
 
-      expect(attendant.sessionId).toBe(55)
+      expect(attendant.sessionId.value).toBe(55)
     })
   })
 })

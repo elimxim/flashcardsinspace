@@ -52,10 +52,11 @@ class FlashcardController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @PathVariable id: Long,
+        @RequestParam(name = "sessionId", required = false) sessionId: Long?,
         @RequestBody request: FlashcardUpdateRequest,
-    ): ResponseEntity<FlashcardDto> = withLoggingContext(user) {
-        val dto = flashcardService.update(user, setId, id, request.normalize())
-        return ResponseEntity.ok(dto)
+    ): ResponseEntity<FlashcardUpdateResponse> = withLoggingContext(user) {
+        val response = flashcardService.update(user, setId, id, request.normalize(), sessionId)
+        return ResponseEntity.ok(response)
     }
 
     @DeleteMapping("/{id:\\d+}")

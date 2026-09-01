@@ -97,6 +97,8 @@ class FlashcardUpdateRequest(
     var reviewHistory: ReviewHistory? = null,
     @field:IsoLocalDate
     var lastReviewDate: String? = null,
+    @field:Valid
+    var sessionRequest: ReviewSessionUpdateRequest? = null,
 ) {
     class ReviewHistory(
         @field:Valid
@@ -122,6 +124,7 @@ data class ValidFlashcardUpdateRequest(
     val timesReviewed: Int? = null,
     val reviewHistory: ReviewHistory? = null,
     val lastReviewDate: LocalDate? = null,
+    val sessionRequest: ValidReviewSessionUpdateRequest? = null,
 ) {
     data class ReviewHistory(val history: List<ReviewInfo>)
     data class ReviewInfo(val stage: FlashcardStage, val reviewDate: LocalDate)

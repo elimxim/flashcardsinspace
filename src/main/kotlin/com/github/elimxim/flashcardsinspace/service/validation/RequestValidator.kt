@@ -250,6 +250,7 @@ fun FlashcardUpdateRequest.toValidRequest() = ValidFlashcardUpdateRequest(
         )
     },
     lastReviewDate = lastReviewDate?.let { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) },
+    sessionRequest = sessionRequest?.toValidRequest()
 )
 
 fun FlashcardSetCreationRequest.toValidRequest() = ValidFlashcardSetCreationRequest(

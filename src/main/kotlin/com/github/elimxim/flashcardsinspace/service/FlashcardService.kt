@@ -28,6 +28,7 @@ class FlashcardService(
     private val flashcardPictureRepository: FlashcardPictureRepository,
     private val requestValidator: RequestValidator,
     private val flashcardAddService: FlashcardAddService,
+    private val reviewSessionService: ReviewSessionService,
 ) {
     @Transactional(readOnly = true)
     fun getAll(user: User, setId: Long, pageable: Pageable): Page<FlashcardDto> {
@@ -52,7 +53,11 @@ class FlashcardService(
         }
     }
 
-    private fun addInternal(user: User, setId: Long, action: () -> FlashcardCreationResponse): FlashcardCreationResponse {
+    private fun addInternal(
+        user: User,
+        setId: Long,
+        action: () -> FlashcardCreationResponse
+    ): FlashcardCreationResponse {
         user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
@@ -64,7 +69,13 @@ class FlashcardService(
     }
 
     @Transactional
-    fun update(user: User, setId: Long, id: Long, request: FlashcardUpdateRequest): FlashcardDto {
+    fun update(
+        user: User,
+        setId: Long,
+        id: Long,
+        request: FlashcardUpdateRequest,
+        sessionId: Long?
+    ): FlashcardUpdateResponse {
         log.info("Updating flashcard $id in set $setId")
         user.checkVerified()
         val flashcard = getEntity(id)
@@ -83,7 +94,12 @@ class FlashcardService(
             flashcard
         }
 
-        return updatedFlashcard.toDto()
+        val sessionRequest = request.sessionRequest
+        val sessionDto = if (sessionId != null && sessionRequest != null) {
+            reviewSessionService.updateReviewSession(user, setId, sessionId, sessionRequest)
+        } else null
+
+        return FlashcardUpdateResponse(updatedFlashcard.toDto(), sessionDto)
     }
 
     private fun isReviewOperation(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Boolean {
