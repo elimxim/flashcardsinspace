@@ -2,8 +2,8 @@
   <Modal :visible="toggleStore.calendarOpen" :on-exit="exit" overflow="hidden">
     <template #controls-center>
       <AwesomeButton
-        class="awesome-danger"
         v-if="hasAccess"
+        class="awesome-danger"
         icon="fa-solid fa-circle-arrow-left"
         tooltip-position="bottom"
         tooltip="Back to the past"
@@ -11,8 +11,8 @@
         :disabled="!isDaySwitchPossible"
       />
       <AwesomeButton
-        class="awesome-danger"
         v-if="hasAccess"
+        class="awesome-danger"
         icon="fa-solid fa-circle-arrow-right"
         tooltip-position="bottom"
         tooltip="Forward, into the future"
@@ -80,7 +80,6 @@
 
 <script setup lang="ts">
 import Modal from '@/components/common/Modal.vue'
-import SmartButton from '@/components/common/SmartButton.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useChronoStore } from '@/stores/chrono-store.ts'
