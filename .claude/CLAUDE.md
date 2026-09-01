@@ -1,123 +1,80 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code (claude.ai/code) when working in this repository.
 
-> After every code change, check whether this file needs to be updated to reflect new patterns, conventions, or architectural decisions introduced by the change. If it does, update it before considering the task complete.
+> After every code change, check whether this file needs updating to reflect new patterns, conventions, or architectural decisions introduced by the change. If it does, update it before considering the task complete.
 
 ## Project Overview
 
-Flashcards in Space is a spaced repetition flashcard web application with a space theme. Users create flashcard sets with front/back sides, and the app generates a study schedule ("Lightspeed Schedule") that determines which flashcard stages to review on each day.
+Flashcards in Space is a spaced repetition flashcard web app with a space theme. Users create flashcard sets with front/back sides, and the app generates a study schedule ("Lightspeed Schedule") that determines which flashcard stages to review on each day.
 
-## Tech Stack
+- **Backend**: Kotlin + Spring Boot 3.5, JPA/Hibernate, PostgreSQL, Liquibase. JDK 24, target JVM 23.
+- **Frontend**: Vue 3 + TypeScript, Pinia, Vue Router, Vite, Axios. No UI framework — components are built from scratch.
+- **Auth**: stateless JWT, email verification via Brevo.
+- **Build**: Gradle with node-gradle plugin; the frontend builds into `build/resources/main/static/`.
 
-- **Backend**: Kotlin + Spring Boot 3.5, JPA/Hibernate, PostgreSQL, Liquibase migrations
-- **Frontend**: Vue 3 + TypeScript, Pinia stores, Vue Router, Vite, Axios
-- **Auth**: JWT-based (stateless sessions), email verification via Brevo
-- **Build**: Gradle with node-gradle plugin (frontend built into `build/resources/main/static/`)
-- **Java**: JDK 24 (target JVM 23)
-
-## Build & Dev Commands
+## Commands
 
 ```bash
-# Full build (compiles Vue frontend + Kotlin backend)
-./gradlew build
-
-# Backend only (skips frontend)
-./gradlew compileKotlin
-
-# Run all tests (backend JUnit + frontend Vitest)
-./gradlew test
-
-# Run a single backend test class
+./gradlew build          # frontend + backend
+./gradlew compileKotlin  # backend only
+./gradlew test           # backend JUnit + frontend Vitest
 ./gradlew test --tests "com.github.elimxim.flashcardsinspace.service.LightspeedServiceTest"
 
-# Frontend commands (run from src/main/vue/)
-npm run dev          # Vite dev server on port 5174
-npm run build        # Type-check + Vite production build
-npm run test         # Vitest (watch mode)
-npm run lint         # ESLint
-npm run type-check   # vue-tsc
-
-# Gradle wrappers for frontend
-./gradlew npmRunBuild
-./gradlew npmRunTest
-./gradlew npmRunLint
-./gradlew npmRunTypeCheck
+# frontend via Gradle: npmRunBuild, npmRunTest, npmRunLint, npmRunTypeCheck
+# frontend directly (from src/main/vue/): npm run dev|build|test|lint|type-check
 ```
 
 ## Architecture
 
-### Backend (src/main/kotlin/com/github/elimxim/flashcardsinspace/)
+**Backend** (`src/main/kotlin/com/github/elimxim/flashcardsinspace/`) — standard Spring layering: `entity/`, `service/`, `web/` (with `dto/` and `exception/`, where errors carry `ApiErrorCode` enums), `security/` (`JwtService`, `JwtAuthFilter`, `SecurityConfig`, `VerificationCodeService`), and `schedule/`, which holds `LightspeedSchedule` — the spaced repetition algorithm deciding which stages are reviewed on a given day.
 
-Standard Spring Boot layered architecture:
-- `entity/` — JPA entities and repositories. Core entities: `User`, `FlashcardSet`, `Flashcard`, `Chronoday`, `DayStreak`, `ReviewSession`, `FlashcardAudio`
-- `service/` — Business logic. Key services: `FlashcardSetService`, `FlashcardService`, `ChronoService`, `LightspeedService`, `ReviewSessionService`, `DayStreakService`
-- `web/` — REST controllers. `dto/` has DTOs, `exception/` has error handling with `ApiErrorCode` enums
-- `security/` — JWT auth (`JwtService`, `JwtAuthFilter`), `SecurityConfig`, `AuthController`, email verification (`VerificationCodeService`)
-- `schedule/` — `LightspeedSchedule` — the spaced repetition algorithm that generates which stages to review on each day
+URL patterns: `/api/**` authenticated, `/api-public/**` public, `/auth/**` auth. `ForwardController` forwards all non-API routes to `index.html` for Vue Router.
 
-**API URL patterns**:
-- `/api/**` — authenticated endpoints
-- `/api-public/**` — public endpoints
-- `/auth/**` — authentication endpoints
+**Frontend** (`src/main/vue/src/`) — `pages/`, `components/`, `modals/`, `stores/` (Pinia), `model/`, `utils/`, plus two directories worth knowing:
+- `core-logic/` — pure business logic, unit-tested with Vitest: `stage-logic.ts`, `review-logic.ts`, `chrono-logic.ts`, `review-session-attendant.ts`, `flashcard-media-prefetch.ts`, and `flashcard-audio-logic.ts` / `flashcard-picture-logic.ts` (fetch/upload/remove).
+- `api/` — Axios clients: `api-client.ts` (authenticated), `auth-client.ts`, `public-api-client.ts`. `token-refresh.ts` handles automatic JWT refresh.
 
-**ForwardController** forwards all non-API routes to `index.html` for Vue Router SPA handling.
-
-### Frontend (src/main/vue/src/)
-
-- `pages/` — Route-level page components (ControlPanel, UserPage, auth pages)
-- `components/` — Reusable components built from scratch (no UI framework). `control-panel/` contains the main dashboard widgets; `review/` contains the review session UI (SpaceDeck, ReviewRouter, ReviewResult)
-- `modals/` — Modal dialog components used across pages and features (confirmations, forms, and focused workflows)
-- `stores/` — Pinia stores (flashcard-store, chrono-store, review-store, auth-store, audio-store, etc.)
-- `core-logic/` — Pure business logic with Vitest unit tests: `stage-logic.ts` (stage progression S1-S7 + OUTER_SPACE), `review-logic.ts` (review queue algorithms), `chrono-logic.ts`, `review-session-attendant.ts` (review session lifecycle), plus the media layer: `flashcard-audio-logic.ts` / `flashcard-picture-logic.ts` (fetch/upload/remove), `flashcard-media-prefetch.ts`
-- `api/` — Axios API client (`api-client.ts` for authenticated, `auth-client.ts` for auth, `public-api-client.ts` for public). `token-refresh.ts` handles automatic JWT refresh.
-- `model/` — TypeScript model types
-- `utils/` — Shared utilities
-
-
-### Key Domain Concepts
+## Key Domain Concepts
 
 **Flashcard Stages**: S1 → S2 → S3 → S4 → S5 → S6 → S7 → OUTER_SPACE. Special stages: UNKNOWN (new, never reviewed), ATTEMPTED (reviewed but sent back to S1).
 
-**Chronodays**: Each day in a flashcard set's timeline. The Lightspeed Schedule determines which stages are reviewed on each chronoday based on spaced repetition intervals. Statuses: INITIAL, NOT_STARTED, IN_PROGRESS, COMPLETED, OFF (suspended).
+**Chronodays**: Each day in a flashcard set's timeline. The Lightspeed Schedule determines which stages are reviewed on each chronoday. Statuses: INITIAL, NOT_STARTED, IN_PROGRESS, COMPLETED, OFF (suspended).
 
-**Review Sessions**: Types include LIGHTSPEED (normal schedule-based), UNKNOWN, ATTEMPTED, OUTER_SPACE (special stage reviews), and QUIZ.
+**Review Sessions**: LIGHTSPEED (normal schedule-based), UNKNOWN, ATTEMPTED, OUTER_SPACE (special stage reviews), QUIZ.
 
 **Flashcard media (audio/pictures)**: During a review session the `FlashcardMediaPrefetcher` (`flashcard-media-prefetch.ts`, one instance per review store) is the *only* thing that fetches media.
 
-**Review session lifecycle**: Review pages never call the review-session endpoints directly. Each page owns one `ReviewSessionAttendant` (`review-session-attendant.ts`, built by `createReviewSessionAttendant`) that holds the session, its stopwatch, and the ids of the flashcards reviewed so far. Pages `create`/`loadOrCreate` a session on start, `track(flashcardId)` *after* a flashcard write succeeds, `flush()` to persist progress, and `flush({ all: true })` to finish. A session is finished only by `finishReview()` — the exit button, `onBeforeRouteLeave`, or `onUnmounted` — never mid-review; the attendant refuses to finish twice, since the backend rejects that with `SAF400`. `onUnmounted` (not the route guard) is where `clear()` and `destroyReviewStore` belong, so a cancelled navigation cannot tear down a live page. Quiz rounds chain through child sessions: creating a child closes its parent server-side in `createChildReviewSession`. `loadOrCreate` resumes a stored session only if `canBeOnboarded` accepts it — for a quiz, one whose metadata still shows unanswered cards; for any other type, one that was never finished — otherwise it starts a fresh session.
+**Review session lifecycle**: Review pages never call the review-session endpoints directly. Each page owns one `ReviewSessionAttendant` (`review-session-attendant.ts`, built by `createReviewSessionAttendant`) holding the session, its stopwatch, and the ids of the flashcards reviewed so far. Pages `create`/`loadOrCreate` a session on start, `track(flashcardId)` *after* a flashcard write succeeds, `flush()` to persist progress, and `flush({ all: true })` to finish. A session is finished only by `finishReview()` — the exit button, `onBeforeRouteLeave`, or `onUnmounted` — never mid-review; the attendant refuses to finish twice, since the backend rejects that with `SAF400`. `clear()` and `destroyReviewStore` belong in `onUnmounted`, not the route guard, so a cancelled navigation cannot tear down a live page. Quiz rounds chain through child sessions: `createChildReviewSession` closes the parent server-side. `loadOrCreate` resumes a stored session only if `canBeOnboarded` accepts it — for a quiz, one whose metadata still shows unanswered cards; for any other type, one that was never finished.
 
-**Day Streak**: Tracks consecutive learning days. Off days (OFF status) do not break the streak; IN_PROGRESS days do break it.
+**Day Streak**: Consecutive learning days. OFF days do not break the streak; IN_PROGRESS days do.
 
-### Database
+## Backend Notes
 
-PostgreSQL with Liquibase. Schema: `flashcardsinspace`. Migrations in `src/main/resources/db/changelog/changeset/`. DDL validation mode (`ddl-auto: validate`). HikariCP pool: 4 max connections, 2 idle minimum.
-
-### Additional Backend Notes
-
-- **Timezone**: UTC enforced at app startup; user-facing timezone conversion happens at the presentation layer only.
+- **Database**: PostgreSQL, schema `flashcardsinspace`, `ddl-auto: validate`. Liquibase changesets in `src/main/resources/db/changelog/changeset/`.
+- **Timezone**: UTC enforced at app startup; user-facing conversion happens at the presentation layer only.
 - **Caching**: Caffeine in-memory cache (`CacheConfig.kt`).
-- **Input security**: OWASP HTML sanitizer used for user-supplied content (`UserInputUtils`).
-- **Virtual threads**: Enabled (Project Loom / JDK 21+).
+- **Input security**: OWASP HTML sanitizer for user-supplied content (`UserInputUtils`).
+- **Virtual threads**: enabled.
 
-### Testing
+## Testing
 
-**Backend**: JUnit 5 + AssertJ + MockK (`io.mockk:mockk`) for pure unit tests. `spring-boot-starter-test` (already included) provides `@MockBean` (Mockito) + `org.mockito.kotlin` extensions for Spring context tests.
+**Backend**: JUnit 5 + AssertJ + MockK (`io.mockk:mockk`). `spring-boot-starter-test` also provides `@MockBean` (Mockito) + `org.mockito.kotlin` for Spring context tests.
 
-- Pure unit tests (services, validators): instantiate the class directly, no Spring context needed. Use MockK.
-- Controller tests (`@WebMvcTest`): use `@MockBean` for `FlashcardService`, `JwtService`, and `UserRepository` (the latter two because `SecurityConfig` defines `@Bean` methods that inject them even when `app.security.enabled=false`). Set the authenticated principal with `SecurityMockMvcRequestPostProcessors.user(mockUser)`.
-- To disable the JWT security filter chain in `@WebMvcTest`, set `app.security.enabled=false` via `@TestPropertySource`. `SecurityProperties` binding still requires all `app.security.*` sub-properties (jwt, verification-tokens) to be present.
+- Pure unit tests (services, validators): instantiate the class directly, no Spring context. Use MockK.
+- Controller tests (`@WebMvcTest`): `@MockBean` the service under test plus `JwtService` and `UserRepository` — `SecurityConfig` defines `@Bean` methods that inject the latter two even when `app.security.enabled=false`. Set the principal with `SecurityMockMvcRequestPostProcessors.user(mockUser)`.
+- To disable the JWT filter chain in `@WebMvcTest`, set `app.security.enabled=false` via `@TestPropertySource`. `SecurityProperties` binding still requires all `app.security.*` sub-properties (jwt, verification-tokens) to be present.
 
-**Frontend**: Vitest. Pure unit tests only — no HTTP mocking library currently in use.
+**Frontend**: Vitest, pure unit tests only — no HTTP mocking library in use.
 
-### Frontend Code Style
+## Frontend Code Style
 
 - **No semicolons** in `.ts` and `.vue` files — ESLint forbids it.
-- **No `any` type** in `.ts` and `.vue` files — ESLint forbids it. Use explicit types, generics, or a named alias with a targeted `as` cast where a heterogeneous collection forces it.
-- **Globally registered components** (those registered at runtime via `app.component(...)` in `main.ts`) must be declared in `env.d.ts` under `declare module 'vue' { interface GlobalComponents { ... } }`. Locally imported SFCs need nothing — the import is the registration. Without the declaration neither `vue-tsc` nor the IDE type-checks the tag's props.
+- **No `any` type** — ESLint forbids it. Use explicit types, generics, or a named alias with a targeted `as` cast where a heterogeneous collection forces it.
+- **Globally registered components** (registered via `app.component(...)` in `main.ts`) must be declared in `env.d.ts` under `declare module 'vue' { interface GlobalComponents { ... } }`. Locally imported SFCs need nothing — the import is the registration. Without the declaration neither `vue-tsc` nor the IDE type-checks the tag's props.
 
-### Dev Environment
+## Dev Environment
 
-Vite dev server (port 5174) proxies `/api`, `/api-public`, `/auth`, and `/actuator` to backend on port 8442.
+Vite dev server (port 5174) proxies `/api`, `/api-public`, `/auth`, and `/actuator` to the backend on port 8442.
 
 Runtime config lives in `props/` (sibling to `src/`), passed via `--spring.config.additional-location=file:props/`: `application.yaml` (production, env-var placeholders), `application-dev.yaml` (`dev` profile overrides), and `postgresql.conf`. The release workflow copies only `application.yaml` and does not activate the `dev` profile, so `application-dev.yaml` is safe for local-only settings.
