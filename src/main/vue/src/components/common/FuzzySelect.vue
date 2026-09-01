@@ -47,7 +47,7 @@
 import SmartInput from '@/components/common/SmartInput.vue'
 import { ref, computed, nextTick, watch } from 'vue'
 
-const model = defineModel<T>({ default: null })
+const model = defineModel<T | null>({ default: null })
 
 const props = withDefaults(defineProps<{
   options: T[]

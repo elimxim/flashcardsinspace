@@ -22,7 +22,7 @@ Flashcards in Space is a spaced repetition flashcard web app with a space theme.
 ./gradlew test --tests "com.github.elimxim.flashcardsinspace.service.LightspeedServiceTest"
 
 # frontend via Gradle: npmRunBuild, npmRunTest, npmRunLint, npmRunTypeCheck
-# frontend directly (from src/main/vue/): npm run dev|build|test|lint|type-check
+# frontend directly (from src/main/vue/): npm run dev|build|test|lint|lint-fix|type-check
 ```
 
 ## Architecture

@@ -83,8 +83,8 @@ springBoot {
 }
 
 node {
-    version = "22.17.0"
-    npmVersion = "10.9.2"
+    version = "26.8.1"
+    npmVersion = "11.19.0"
     download = true
     nodeProjectDir = file("src/main/vue")
 }
