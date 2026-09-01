@@ -144,11 +144,8 @@ class ReviewSessionService(
             .findLatestUncompletedReviewSessions(setId, type, 30)
             .filter {
                 val metadata = it.metadata
-                if (metadata != null && metadata is QuizMetadata) {
-                    metadata.overallTotalCount != metadata.overallCorrectCount
-                } else {
-                    false
-                }
+                if (metadata == null || metadata !is QuizMetadata) return@filter false
+                metadata.overallTotalCount != metadata.overallCorrectCount
             }
 
         val latestUncompletedSession = topUncompletedSessions.maxByOrNull { it.startedAt }
