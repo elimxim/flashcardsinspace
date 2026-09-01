@@ -1,5 +1,27 @@
 <template>
   <Modal :visible="toggleStore.calendarOpen" :on-exit="exit" overflow="hidden">
+    <template #controls-center>
+      <AwesomeButton
+        class="awesome-danger"
+        v-if="hasAccess"
+        icon="fa-solid fa-circle-arrow-left"
+        tooltip-position="bottom"
+        tooltip="Back to the past"
+        :on-click="goPrevDay"
+        :disabled="!isDaySwitchPossible"
+      />
+      <AwesomeButton
+        class="awesome-danger"
+        v-if="hasAccess"
+        icon="fa-solid fa-circle-arrow-right"
+        tooltip-position="bottom"
+        tooltip="Forward, into the future"
+        :on-click="goNextDay"
+        :disabled="!isDaySwitchPossible"
+        square
+      />
+    </template>
+
     <div class="calendar calendar--theme">
       <div class="calendar-month">
         <AwesomeButton
@@ -52,22 +74,6 @@
           </div>
         </template>
       </SwipeTape>
-    </div>
-    <div v-if="hasAccess" class="modal-control-buttons">
-      <SmartButton
-        class="dangerous-button"
-        text="Prev"
-        :on-click="goPrevDay"
-        :disabled="!isDaySwitchPossible"
-        auto-blur
-      />
-      <SmartButton
-        class="dangerous-button"
-        text="Next"
-        :on-click="goNextDay"
-        :disabled="!isDaySwitchPossible"
-        auto-blur
-      />
     </div>
   </Modal>
 </template>
@@ -489,12 +495,5 @@ function handleKeydown(event: KeyboardEvent) {
   align-items: center;
   justify-content: center;
   flex: 1;
-}
-
-.modal-control-buttons {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 10px;
 }
 </style>

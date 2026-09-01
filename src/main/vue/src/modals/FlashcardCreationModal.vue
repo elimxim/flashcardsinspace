@@ -5,7 +5,7 @@
     :exit-button="cancelButton"
     :enter-button="createButton"
   >
-    <template #control>
+    <template #controls-right>
       <AwesomeButton
         ref="infiniteLoopButtonRef"
         icon="fa-regular fa-circle"

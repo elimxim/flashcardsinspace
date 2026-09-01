@@ -1,3 +1,8 @@
 .awesome-globe {
   --awesome-container--icon--color: var(--fa-icon--color--globe);
 }
+
+.awesome-danger {
+  --awesome-button--icon--color: var(--dangerous-button--bg-color);
+  --awesome-button--icon--color--hover: var(--dangerous-button--bg-color--hover);
+}

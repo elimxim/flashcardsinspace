@@ -1,9 +1,17 @@
 <template>
   <div v-if="visible" ref="modalOverlay" class="modal-overlay" role="dialog" tabindex="-1">
     <div ref="modalWindow" class="modal-window touch-none" tabindex="-1">
-      <div class="modal-top-control">
-        <slot name="control" />
-        <AwesomeButton icon="fa-solid fa-circle-xmark" :on-click="pressExit" />
+      <div class="modal-topline">
+        <div class="modal-controls modal-controls--left">
+          <slot name="controls-left" />
+        </div>
+        <div class="modal-controls modal-controls--center">
+          <slot name="controls-center" />
+        </div>
+        <div class="modal-controls modal-controls--right">
+          <slot name="controls-right" />
+          <AwesomeButton icon="fa-solid fa-circle-xmark" :on-click="pressExit" />
+        </div>
       </div>
       <div v-if="title" class="modal-title select-text">
         {{ title }}
@@ -150,12 +158,30 @@ function handleKeyUp(event: KeyboardEvent) {
   outline: none;
 }
 
-.modal-top-control {
+.modal-topline {
   display: flex;
   align-items: center;
-  justify-content: right;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 10px;
   padding: 2px;
+}
+
+.modal-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-controls--left {
+  justify-content: left;
+}
+
+.modal-controls--center {
+  justify-content: center;
+}
+
+.modal-controls--right {
+  justify-content: right;
 }
 
 .modal-title {
