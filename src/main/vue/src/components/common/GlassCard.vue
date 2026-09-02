@@ -53,7 +53,6 @@ function startTapAnimation() {
   --gc--border-radius: var(--glass-card--border-radius, 16px);
   --gc--rim-size: var(--glass-card--rim-size, 8px);
   --gc--bg: var(--glass-card--bg, none);
-  --gc--font-family: var(--glass-card--font-family, 'Quicksand Variable', sans-serif);
   --gc--font-size: var(--glass-card--font-size, 2rem);
   --gc--font-weight: var(--glass-card--font-weight, 400);
 }
@@ -154,7 +153,7 @@ function startTapAnimation() {
 }
 
 .glass-text {
-  font-family: var(--gc--font-family);
+  font-family: var(--button--font-family);
   font-size: var(--gc--font-size);
   font-weight: var(--gc--font-weight);
   text-transform: uppercase;

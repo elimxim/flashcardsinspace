@@ -182,7 +182,6 @@ onUnmounted(() => {
 
 <style scoped>
 .navbar--theme {
-  --nav--font-family: var(--navbar--font-family);
   --nav--bg: transparent;
   --nav--text--color: #faf9f6;
   --nav--text--color--hover: #dad0f8;
@@ -228,7 +227,7 @@ onUnmounted(() => {
 }
 
 .nav-text {
-  font-family: var(--nav--font-family);
+  font-family: var(--navbar--font-family);
   font-weight: 600;
   letter-spacing: 0.1rem;
   word-spacing: 0.1rem;

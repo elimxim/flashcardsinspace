@@ -6,13 +6,13 @@
 
   /* fonts */
 
-  --main--font-family: Lato, sans-serif;
-  --button--font-family: 'Quicksand Variable', sans-serif;
-  --error-text--font-family: 'Rubik Variable', sans-serif;
-  --toast--font-family: Lato, sans-serif;
-  --day-streak--font-family: 'Nunito Variable', sans-serif;
-  --navbar--font-family: 'Nunito Variable', sans-serif;
-  --site-content--font-family: 'Quicksand Variable', sans-serif;
+  --main--font-family: Lato, 'Lato Fallback', sans-serif;
+  --button--font-family: 'Quicksand Variable', 'Quicksand Fallback', sans-serif;
+  --error-text--font-family: 'Rubik Variable', 'Rubik Fallback', sans-serif;
+  --toast--font-family: Lato, 'Lato Fallback', sans-serif;
+  --day-streak--font-family: 'Nunito Variable', 'Nunito Fallback', sans-serif;
+  --navbar--font-family: 'Nunito Variable', 'Nunito Fallback', sans-serif;
+  --site-content--font-family: 'Quicksand Variable', 'Quicksand Fallback', sans-serif;
 
   /* pages */
 

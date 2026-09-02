@@ -215,7 +215,6 @@ function handleGlobalMouseUp() {
 
 <style scoped>
 .smart-button--theme {
-  --s-btn--font-family: var(--button--font-family);
   --s-btn--title--font-size: var(--smart-button--title--font-size, 16px);
   --s-btn--title--color: var(--smart-button--title--color, #faf9f6);
   --s-btn--title--color--hover: var(--smart-button--title--color--hover, #faf9f6);
@@ -271,7 +270,7 @@ function handleGlobalMouseUp() {
 .smart-button-title-wrapper {
   position: relative;
   display: inline-block;
-  font-family: var(--s-btn--font-family);
+  font-family: var(--button--font-family);
   font-size: var(--s-btn--title--font-size);
   word-spacing: var(--s-btn--title--word-spacing);
   letter-spacing: var(--s-btn--title--letter-spacing);

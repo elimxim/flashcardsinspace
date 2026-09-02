@@ -4,3 +4,48 @@
 @import '@fontsource-variable/quicksand/index.css';
 @import '@fontsource-variable/nunito/index.css';
 @import '@fontsource-variable/rubik/index.css';
+
+/*
+ * Arial, stretched to occupy exactly the same space as each webfont, so the
+ * text does not move when the real font arrives. Numbers are derived from the
+ * font metrics (Capsize) as ascent/descent/line-gap over units-per-em, divided
+ * by the width ratio against Arial.
+ *
+ * Regenerate them if a family changes.
+ */
+
+@font-face {
+  font-family: 'Lato Fallback';
+  src: local('Arial');
+  size-adjust: 97.69%;
+  ascent-override: 101.03%;
+  descent-override: 21.8%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Quicksand Fallback';
+  src: local('Arial');
+  size-adjust: 104.31%;
+  ascent-override: 95.87%;
+  descent-override: 23.97%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Nunito Fallback';
+  src: local('Arial');
+  size-adjust: 101.39%;
+  ascent-override: 99.71%;
+  descent-override: 34.82%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Rubik Fallback';
+  src: local('Arial');
+  size-adjust: 104.98%;
+  ascent-override: 89.06%;
+  descent-override: 23.81%;
+  line-gap-override: 0%;
+}

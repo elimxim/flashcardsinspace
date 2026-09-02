@@ -47,13 +47,12 @@ const firstErrorText = computed(() => {
 
 <style scoped>
 .error-text--theme {
-  --e-text--font-family: var(--error-text--font-family);
   --e-text--color: var(--error-text--color, #c80f0f);
 }
 
 .error-text {
   display: inline-block;
-  font-family: var(--e-text--font-family);
+  font-family: var(--error-text--font-family);
   font-size: clamp(0.75rem, 1.6vh, 0.9rem);
   color: var(--e-text--color);
   margin: 0;
