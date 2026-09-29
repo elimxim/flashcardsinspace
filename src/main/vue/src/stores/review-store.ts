@@ -25,10 +25,10 @@ export const useReviewStore = (
     const currFlashcard = ref<Flashcard>()
     const autoPlayVoice = ref(false)
     const autoRepeatVoice = ref(false)
-    const flashcardFrontSideAudioBlob = ref<Blob>()
-    const flashcardBackSideAudioBlob = ref<Blob>()
-    const flashcardFrontSidePictureBlob = ref<Blob>()
-    const flashcardBackSidePictureBlob = ref<Blob>()
+    const frontSideAudio = ref<Blob>()
+    const backSideAudio = ref<Blob>()
+    const frontSidePicture = ref<Blob>()
+    const backSidePicture = ref<Blob>()
     const loaded = ref(false)
     let prefetcher: FlashcardMediaPrefetcher | undefined = undefined
 
@@ -95,10 +95,10 @@ export const useReviewStore = (
       // the user moved on while this was in flight
       if (currFlashcard.value?.id !== flashcardId) return
 
-      flashcardFrontSideAudioBlob.value = media.frontAudio
-      flashcardBackSideAudioBlob.value = media.backAudio
-      flashcardFrontSidePictureBlob.value = media.frontPicture
-      flashcardBackSidePictureBlob.value = media.backPicture
+      frontSideAudio.value = media.frontAudio
+      backSideAudio.value = media.backAudio
+      frontSidePicture.value = media.frontPicture
+      backSidePicture.value = media.backPicture
 
       if (media.error !== undefined) {
         useSpaceToaster().bakeError(
@@ -115,10 +115,10 @@ export const useReviewStore = (
     }
 
     function clearMedia() {
-      flashcardFrontSideAudioBlob.value = undefined
-      flashcardBackSideAudioBlob.value = undefined
-      flashcardFrontSidePictureBlob.value = undefined
-      flashcardBackSidePictureBlob.value = undefined
+      frontSideAudio.value = undefined
+      backSideAudio.value = undefined
+      frontSidePicture.value = undefined
+      backSidePicture.value = undefined
     }
 
     function slidePrefetchWindow() {
@@ -164,10 +164,10 @@ export const useReviewStore = (
       flashcardsTotal.value = 0
       autoPlayVoice.value = false
       autoRepeatVoice.value = false
-      flashcardFrontSideAudioBlob.value = undefined
-      flashcardBackSideAudioBlob.value = undefined
-      flashcardFrontSidePictureBlob.value = undefined
-      flashcardBackSidePictureBlob.value = undefined
+      frontSideAudio.value = undefined
+      backSideAudio.value = undefined
+      frontSidePicture.value = undefined
+      backSidePicture.value = undefined
       loaded.value = false
     }
 
@@ -178,10 +178,10 @@ export const useReviewStore = (
       currFlashcard,
       autoPlayVoice,
       autoRepeatVoice,
-      flashcardFrontSideAudioBlob,
-      flashcardBackSideAudioBlob,
-      flashcardFrontSidePictureBlob,
-      flashcardBackSidePictureBlob,
+      frontSideAudio,
+      backSideAudio,
+      frontSidePicture,
+      backSidePicture,
 
       flashcardsRemaining,
       flashcardsSeen,
