@@ -80,6 +80,7 @@ import { storeToRefs } from 'pinia'
 import { UXConfig } from '@/utils/device-utils.ts'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
+import { Log, LogTag } from '@/utils/logger.ts'
 
 const props = withDefaults(
   defineProps<{
@@ -149,6 +150,7 @@ const SWIPE_VELOCITY_THRESHOLD = 0.3
 const SWIPE_MAX_ROTATION = 5
 const SWIPE_ANIMATION_DURATION = 500
 const SWIPE_ANIMATION_DURATION_SLOW = 1000
+const SWIPE_ZOOM_GUARD_SCALE = 1.2
 
 const swipeOffset = ref(0)
 const fingerOffset = ref(0)
@@ -218,7 +220,6 @@ function getInvisibleDuration(direction: 'left' | 'right'): number {
   const totalDistance = getExitOffset()
   const distanceToEdge = direction === 'right' ? window.innerWidth - rect.left : rect.right
 
-  // Calculate duration proportionally based on distance ratio
   const ratio = distanceToEdge / totalDistance
   return Math.round(getAnimationDuration() * ratio)
 }
@@ -228,7 +229,10 @@ function canSwipe() {
 }
 
 function isPageZoomed() {
-  return (window.visualViewport?.scale ?? 1) > 1.01
+  const scale = window.visualViewport?.scale ?? 1
+  if (scale < SWIPE_ZOOM_GUARD_SCALE) return false
+  Log.log(LogTag.DEBUG, `Swipe blocked, page zoomed: scale=${scale}`)
+  return true
 }
 
 function isPinch(event: TouchEvent) {
