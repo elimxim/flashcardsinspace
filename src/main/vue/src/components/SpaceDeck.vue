@@ -227,6 +227,29 @@ function canSwipe() {
   return UXConfig().canSwipe && (props.canSlideLeft || props.canSlideRight)
 }
 
+function isPageZoomed() {
+  return (window.visualViewport?.scale ?? 1) > 1.01
+}
+
+function isPinch(event: TouchEvent) {
+  return event.touches.length > 1
+}
+
+function abortSwipe() {
+  if (!isTouching.value) return
+
+  fingerOffset.value = 0
+  isTouching.value = false
+  isSwiping.value = false
+  isAnimating.value = true
+  swipeOffset.value = isPullingIn.value ? getPullInStartOffset() : 0
+  animationTimeoutId = setTimeout(() => {
+    isAnimating.value = false
+    isPullingIn.value = false
+    swipeOffset.value = 0
+  }, getAnimationDuration())
+}
+
 function cancelAnimation() {
   if (animationTimeoutId) {
     clearTimeout(animationTimeoutId)
@@ -259,7 +282,12 @@ const fingerProgress = computed(() => {
 })
 
 function onTouchStart(event: TouchEvent) {
-  if (isAnimating.value || !canSwipe()) return
+  if (isPinch(event)) {
+    abortSwipe()
+    return
+  }
+
+  if (isAnimating.value || !canSwipe() || isPageZoomed()) return
 
   // Cancel any ongoing animation and capture current position
   cancelAnimation()
@@ -279,6 +307,10 @@ function onTouchStart(event: TouchEvent) {
 
 function onTouchMove(event: TouchEvent) {
   if (!isTouching.value || !canSwipe()) return
+  if (isPinch(event)) {
+    abortSwipe()
+    return
+  }
 
   const touch = event.touches[0]
   const deltaX = touch.clientX - swipeStartX.value
