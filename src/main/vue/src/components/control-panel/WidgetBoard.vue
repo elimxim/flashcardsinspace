@@ -10,8 +10,8 @@
 <script setup lang="ts">
 import FlashcardSetInfoBar from '@/components/control-panel/FlashcardSetInfoBar.vue'
 import MainPanel from '@/components/control-panel/MainPanel.vue'
-import LearningStagesWidget from '@/components/control-panel/LearningStagesWidget.vue'
-import OuterSpaceWidget from '@/components/control-panel/OuterSpaceWidget.vue'
+import LearningStagesWidget from '@/components/control-panel/widgets/LearningStagesWidget.vue'
+import OuterSpaceWidget from '@/components/control-panel/widgets/OuterSpaceWidget.vue'
 import { nextTick, onMounted, ref } from 'vue'
 import { UXConfig } from '@/utils/device-utils.ts'
 

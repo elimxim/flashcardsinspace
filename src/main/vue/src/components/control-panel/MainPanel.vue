@@ -11,13 +11,13 @@
 </template>
 
 <script setup lang="ts">
-import FlashcardWidget from '@/components/control-panel/FlashcardWidget.vue'
-import CalendarWidget from '@/components/control-panel/CalendarWidget.vue'
-import ReviewInfoWidget from '@/components/control-panel/ReviewInfoWidget.vue'
-import SpecialStageWidget from '@/components/control-panel/SpecialStageWidget.vue'
-import DayStreakWidget from '@/components/control-panel/DayStreakWidget.vue'
-import LaunchWidget from '@/components/control-panel/LaunchWidget.vue'
-import QuizWidget from '@/components/control-panel/QuizWidget.vue'
+import FlashcardWidget from '@/components/control-panel/widgets/FlashcardWidget.vue'
+import CalendarWidget from '@/components/control-panel/widgets/CalendarWidget.vue'
+import ReviewInfoWidget from '@/components/control-panel/widgets/ReviewInfoWidget.vue'
+import SpecialStageWidget from '@/components/control-panel/widgets/SpecialStageWidget.vue'
+import DayStreakWidget from '@/components/control-panel/widgets/DayStreakWidget.vue'
+import LaunchWidget from '@/components/control-panel/widgets/LaunchWidget.vue'
+import QuizWidget from '@/components/control-panel/widgets/QuizWidget.vue'
 import { type Component, computed, ComputedRef, onMounted, onUnmounted, ref } from 'vue'
 import { specialStages } from '@/core-logic/stage-logic.ts'
 import { useFlip } from '@/utils/flip.ts'
