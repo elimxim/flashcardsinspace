@@ -24,8 +24,8 @@
         v-if="canShowPullInCard"
         :key="lastFlashcard?.id"
         :stage="lastFlashcard?.stage"
-        :front-side="lastFlashcard?.frontSide"
-        :back-side="lastFlashcard?.backSide"
+        :front-side="reversed ? lastFlashcard?.backSide : lastFlashcard?.frontSide"
+        :back-side="reversed ? lastFlashcard?.frontSide : lastFlashcard?.backSide"
         :auto-play-voice="autoPlayVoice"
         :auto-repeat-voice="autoRepeatVoice"
         :style="pullInCardStyle"
@@ -38,14 +38,14 @@
         v-model:auto-play-voice="autoPlayVoice"
         v-model:auto-repeat-voice="autoRepeatVoice"
         :stage="currFlashcard.stage"
-        :front-side="currFlashcard.frontSide"
-        :back-side="currFlashcard.backSide"
+        :front-side="reversed ? currFlashcard.backSide : currFlashcard.frontSide"
+        :back-side="reversed ? currFlashcard.frontSide : currFlashcard.backSide"
         :viewed-times="viewedTimes"
         :on-edit="toggleStore.toggleFlashcardEdit"
-        :front-side-audio="flashcardFrontSideAudioBlob"
-        :back-side-audio="flashcardBackSideAudioBlob"
-        :front-side-picture="flashcardFrontSidePictureBlob"
-        :back-side-picture="flashcardBackSidePictureBlob"
+        :front-side-audio="reversed ? backSideAudio : frontSideAudio"
+        :back-side-audio="reversed ? frontSideAudio : backSideAudio"
+        :front-side-picture="reversed ? backSidePicture : frontSidePicture"
+        :back-side-picture="reversed ? frontSidePicture : backSidePicture"
         :class="cardAnimationClass"
         :style="cardStyle"
         @animationend="onEnterAnimationEnd"
@@ -85,6 +85,7 @@ import { Log, LogTag } from '@/utils/logger.ts'
 const props = withDefaults(
   defineProps<{
     sessionType: ReviewSessionType
+    reversed?: boolean
     showSlot?: boolean
     canSlideLeft?: boolean
     canSlideRight?: boolean
@@ -94,6 +95,7 @@ const props = withDefaults(
     onSlideRight?: () => Promise<void> | void
   }>(),
   {
+    reversed: false,
     showSlot: true,
     canSlideLeft: true,
     canSlideRight: true,
@@ -117,10 +119,10 @@ const {
   currFlashcard,
   autoPlayVoice,
   autoRepeatVoice,
-  flashcardFrontSideAudioBlob,
-  flashcardBackSideAudioBlob,
-  flashcardFrontSidePictureBlob,
-  flashcardBackSidePictureBlob,
+  frontSideAudio,
+  backSideAudio,
+  frontSidePicture,
+  backSidePicture,
 } = storeToRefs(reviewStore)
 
 const deckReady = ref(false)

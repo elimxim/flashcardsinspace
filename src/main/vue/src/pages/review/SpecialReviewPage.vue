@@ -59,6 +59,7 @@
           <SpaceDeck
             ref="spaceDeck"
             :session-type="reviewMode.sessionType"
+            :reversed="reversed"
             :can-slide-left="!noPrevAvailable"
             :can-slide-right="!noOneAvailable"
             :on-slide-left="prev"
@@ -153,10 +154,17 @@ import { UXConfig } from '@/utils/device-utils.ts'
 import { useRunOnce } from '@/utils/run-once.ts'
 import { createReviewSessionAttendant } from '@/core-logic/review-session-attendant.ts'
 
-const props = defineProps<{
-  sessionId?: number
-  reviewMode: ReviewMode
-}>()
+const props = withDefaults(
+  defineProps<{
+    sessionId?: number
+    reviewMode: ReviewMode
+    reversed?: boolean
+  }>(),
+  {
+    sessionId: undefined,
+    reversed: false,
+  },
+)
 
 const router = useRouter()
 const toaster = useSpaceToaster()
