@@ -26,6 +26,8 @@
         :stage="lastFlashcard?.stage"
         :front-side="lastFlashcard?.frontSide"
         :back-side="lastFlashcard?.backSide"
+        :auto-play-voice="autoPlayVoice"
+        :auto-repeat-voice="autoRepeatVoice"
         :style="pullInCardStyle"
         class="pull-in-card"
       />
@@ -69,7 +71,7 @@
 import SpaceCard from '@/components/SpaceCard.vue'
 import UfoLoader from '@/components/spinners/UfoLoader.vue'
 import FlashcardEditModal from '@/modals/FlashcardEditModal.vue'
-import { computed, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import { deckEmptyMessage, ReviewSessionType } from '@/core-logic/review-logic.ts'
@@ -352,6 +354,7 @@ function onTouchEnd(event: TouchEvent) {
         await props.onSlideLeft()
         isAnimating.value = false
         isPullingIn.value = false
+        await completePullIn()
       }, getAnimationDuration())
     } else {
       // Cancel pull-in - slide back off the screen
@@ -481,6 +484,7 @@ function animatePullIn(onCompleteCallback: () => Promise<void>): boolean {
         await onCompleteCallback()
         isPullingIn.value = false
         isAnimating.value = false
+        await completePullIn()
       }, getAnimationDuration())
     })
   })
@@ -519,6 +523,11 @@ function animateOutRight(slow = false): Promise<boolean> {
     },
     slow,
   )
+}
+
+async function completePullIn() {
+  await nextTick()
+  spaceCard.value?.onCardAnimationComplete()
 }
 
 function onEnterAnimationEnd() {
