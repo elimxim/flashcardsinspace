@@ -5,15 +5,16 @@ const COOKIE_SELECTED_SET_ID = 'selectedSetId'
 const COOKIE_USER_SIGNED_UP = 'userSignedUp'
 const COOKIE_SIDEBAR_EXPANDED = 'sidebarExpanded'
 const COOKIE_LOGGING_ENABLED = 'loggingEnabled'
+const COOKIE_REVERSED_REVIEWS = 'reversedReviews'
 
 function saveCookie(name: string, value: string, expires: number) {
+  Log.log(LogTag.COOKIES, `${value} => ${name}`)
   Cookies.set(name, value, {
     expires: expires,
     sameSite: 'Lax',
     secure: true,
     path: '/', // valid for the entire site
   })
-  Log.log(LogTag.COOKIES, `${value} => ${name}`)
 }
 
 function loadCookie(name: string): string | undefined {
@@ -70,6 +71,15 @@ function loadSidebarExpandedFromCookies(): boolean {
   return loadBooleanCookie(COOKIE_SIDEBAR_EXPANDED)
 }
 
+function saveReversedReviewsToCookies(value: string[]) {
+  saveCookie(COOKIE_REVERSED_REVIEWS, value.join(','), 365)
+}
+
+function loadReversedReviewsFromCookies(): string[] {
+  const value = loadCookie(COOKIE_REVERSED_REVIEWS)
+  return value ? value.split(',') : []
+}
+
 function loadLoggingEnabledFromCookies(): boolean {
   const value = Cookies.get(COOKIE_LOGGING_ENABLED)
   if (value) {
@@ -95,6 +105,8 @@ export {
   removeSelectedSetIdCookie,
   setSidebarExpandedToCookies,
   loadSidebarExpandedFromCookies,
+  saveReversedReviewsToCookies,
+  loadReversedReviewsFromCookies,
   loadLoggingEnabledFromCookies,
   saveLoggingEnabledToCookies,
 }

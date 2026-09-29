@@ -6,12 +6,28 @@
   --awesome-button--bg: var(--cp--widget--color);
   --awesome-button--bg--hover: var(--cp--widget--color--active);
   --awesome-button--bg--disabled: var(--cp--widget--color--inactive);
+  --awesome-button--bg--held: var(--cp--widget--color--reversed);
+  --awesome-button--bg--held--hover: var(--cp--widget--color--reversed--active);
   --awesome-button--border: 1px solid var(--cp--border-color);
   --awesome-button--border-radius: 6px;
 }
 
 .cp-widget--special-stage {
   --awesome-button--icon--size: 44px;
+}
+
+.cp-review-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 0.7rem;
+  color: var(--cp--badge--color);
+  pointer-events: none;
+  transition: transform 0.4s ease-in-out;
+}
+
+.cp-review-badge--reversed {
+  transform: rotateY(180deg);
 }
 
 .cp-text {

@@ -232,6 +232,17 @@
     rgb(121, 121, 121) 0%,
     rgb(64, 64, 64) 100%
   );
+  --cp--widget--color--reversed: linear-gradient(
+    135deg,
+    rgb(134, 214, 214) 0%,
+    rgb(128, 170, 232) 100%
+  );
+  --cp--widget--color--reversed--active: linear-gradient(
+    135deg,
+    rgb(64, 168, 176) 0%,
+    rgb(76, 120, 204) 100%
+  );
+  --cp--badge--color: rgba(13, 18, 74, 0.6);
   --cp--text--color: rgba(13, 18, 74, 0.6);
   --cp--text--color--active: rgba(255, 255, 255, 0.6);
   --cp--text--color--inactive: rgba(255, 255, 255, 0.2);
