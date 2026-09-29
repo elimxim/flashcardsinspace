@@ -6,179 +6,54 @@
   >
     <div class="space-card-flipper">
       <div
-        class="space-card-face space-card-face--front"
+        class="space-card-side space-card-side--front"
         :class="{
-          'space-card-face--front--style': !transparent,
-          'space-card-face--transparent': transparent,
+          'space-card-side--front--style': !transparent,
+          'space-card-side--transparent': transparent,
         }"
       >
-        <div class="space-card-strip select-none">
-          <span v-if="!textOnly" class="space-card-strip-text">
-            <Tooltip text="Learning Stage" position="bottom-right">
-              {{ stageDisplayName }}
-            </Tooltip>
-          </span>
-          <div v-if="!textOnly" class="space-card-strip-group">
-            <AwesomeButton
-              ref="frontCopyButton"
-              icon="fa-regular fa-clone"
-              flip-icon="fa-solid fa-check"
-              class="space-card-button"
-              tooltip="Copy text"
-              tooltip-position="bottom-left"
-              :on-click="copySideToClipboard"
-              disabled-on-press
-            />
-            <AwesomeButton
-              icon="fa-solid fa-pen-to-square"
-              class="space-card-button"
-              tooltip="Edit flashcard"
-              tooltip-position="bottom-left"
-              :on-click="handleEdit"
-            />
-          </div>
-        </div>
-        <TotemScroll v-if="frontHasPicture">
-          <div class="space-card-content space-card-content--picture">
-            <div class="space-card-picture">
-              <SpacePicture :picture-blob="frontSidePicture" />
-            </div>
-            <p v-if="frontSide" class="space-card-text">{{ frontSide }}</p>
-          </div>
-        </TotemScroll>
-        <TotemScroll v-else>
-          <div class="space-card-content space-card-content--text">
-            <p class="space-card-text">{{ frontSide }}</p>
-          </div>
-        </TotemScroll>
-        <div class="space-card-strip select-none">
-          <span v-if="!textOnly">
-            <Tooltip text="Viewed Times" position="top-right">
-              <font-awesome-icon icon="fa-regular fa-eye" />
-            </Tooltip>
-            {{ viewedTimes }}
-          </span>
-          <div v-if="!textOnly" class="space-card-strip-group">
-            <AwesomeButton
-              icon="fa-solid fa-repeat"
-              class="space-card-button"
-              tooltip="Repeat voice"
-              tooltip-position="top-left"
-              :active="autoRepeatVoice"
-              :on-click="toggleAutoRepeatVoice"
-            />
-            <AwesomeButton
-              v-if="!UXConfig().hasStrictAudio"
-              icon="fa-solid fa-a"
-              class="space-card-button"
-              tooltip="Auto play voice"
-              tooltip-position="top-left"
-              :active="autoPlayVoice"
-              :on-click="toggleAutoPlayVoice"
-            />
-            <VoicePlayer
-              ref="frontVoicePlayer"
-              class="space-card-button"
-              :audio-blob="frontSideAudio"
-              :loop-play="autoRepeatVoice"
-            />
-          </div>
-        </div>
+        <SpaceCardSide
+          ref="frontSpaceCardSide"
+          v-model:auto-play-voice="autoPlayVoice"
+          v-model:auto-repeat-voice="autoRepeatVoice"
+          :stage="stage"
+          :text="frontSide"
+          :audio="frontSideAudio"
+          :picture="frontSidePicture"
+          :text-only="textOnly"
+          :viewed-times="viewedTimes"
+          :on-edit="handleEdit"
+          :on-copy-text-to-clipboard="resetClipboardButton"
+        />
       </div>
       <div
-        class="space-card-face space-card-face--back"
+        class="space-card-side space-card-side--back"
         :class="{
-          'space-card-face--back--style': !transparent,
-          'space-card-face--transparent': transparent,
+          'space-card-side--back--style': !transparent,
+          'space-card-side--transparent': transparent,
         }"
       >
-        <div class="space-card-strip select-none">
-          <span v-if="!textOnly" class="space-card-strip-text">
-            <Tooltip text="Learning Stage" position="bottom-right">
-              {{ stageDisplayName }}
-            </Tooltip>
-          </span>
-          <div v-if="!textOnly" class="space-card-strip-group">
-            <AwesomeButton
-              ref="backCopyButton"
-              icon="fa-regular fa-clone"
-              flip-icon="fa-solid fa-check"
-              class="space-card-button"
-              tooltip="Copy text"
-              tooltip-position="bottom-left"
-              :disabled="!backSide"
-              :on-click="copySideToClipboard"
-              disabled-on-press
-            />
-            <AwesomeButton
-              icon="fa-solid fa-pen-to-square"
-              class="space-card-button"
-              tooltip="Edit flashcard"
-              tooltip-position="bottom-left"
-              :on-click="handleEdit"
-            />
-          </div>
-        </div>
-        <TotemScroll v-if="backHasPicture">
-          <div class="space-card-content space-card-content--picture">
-            <div class="space-card-picture">
-              <SpacePicture :picture-blob="backSidePicture" />
-            </div>
-            <p v-if="backSide" class="space-card-text">{{ backSide }}</p>
-          </div>
-        </TotemScroll>
-        <TotemScroll v-else>
-          <div class="space-card-content space-card-content--text">
-            <p class="space-card-text">{{ backSide }}</p>
-          </div>
-        </TotemScroll>
-        <div class="space-card-strip select-none">
-          <span v-if="!textOnly">
-            <Tooltip text="Viewed Times" position="top-right">
-              <font-awesome-icon icon="fa-regular fa-eye" />
-            </Tooltip>
-            {{ viewedTimes }}
-          </span>
-          <div v-if="!textOnly" class="space-card-strip-group">
-            <AwesomeButton
-              icon="fa-solid fa-repeat"
-              class="space-card-button"
-              tooltip="Repeat voice"
-              tooltip-position="top-left"
-              :active="autoRepeatVoice"
-              :on-click="toggleAutoRepeatVoice"
-            />
-            <AwesomeButton
-              v-if="!UXConfig().hasStrictAudio"
-              icon="fa-solid fa-a"
-              class="space-card-button"
-              tooltip="Auto play voice"
-              tooltip-position="top-left"
-              :active="autoPlayVoice"
-              :on-click="toggleAutoPlayVoice"
-            />
-            <VoicePlayer
-              ref="backVoicePlayer"
-              class="space-card-button"
-              :audio-blob="backSideAudio"
-              :loop-play="autoRepeatVoice"
-            />
-          </div>
-        </div>
+        <SpaceCardSide
+          ref="backSpaceCardSide"
+          v-model:auto-play-voice="autoPlayVoice"
+          v-model:auto-repeat-voice="autoRepeatVoice"
+          :stage="stage"
+          :text="backSide"
+          :audio="backSideAudio"
+          :picture="backSidePicture"
+          :text-only="textOnly"
+          :viewed-times="viewedTimes"
+          :on-edit="handleEdit"
+          :on-copy-text-to-clipboard="resetClipboardButton"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import TotemScroll from '@/components/common/TotemScroll.vue'
-import AwesomeButton from '@/components/common/AwesomeButton.vue'
-import VoicePlayer from '@/components/VoicePlayer.vue'
-import SpacePicture from '@/components/SpacePicture.vue'
-import Tooltip from '@/components/common/Tooltip.vue'
 import { ref, nextTick, computed } from 'vue'
-import { stageNameMap } from '@/core-logic/stage-logic.ts'
-import { UXConfig } from '@/utils/device-utils.ts'
+import SpaceCardSide from '@/components/SpaceCardSide.vue'
 
 const autoPlayVoice = defineModel<boolean>('autoPlayVoice', { default: false })
 const autoRepeatVoice = defineModel<boolean>('autoRepeatVoice', { default: false })
@@ -221,22 +96,32 @@ const currentFlipDuration = ref(FLIP_ANIMATION_DURATION_MS)
 const flipAnimationDurationMs = computed(() => `${currentFlipDuration.value}ms`)
 const isAnimating = ref(false)
 const cardAnimationCompleted = ref(false)
+
 let flipDurationTimeout: ReturnType<typeof setTimeout> | null = null
-const frontVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
-const backVoicePlayer = ref<InstanceType<typeof VoicePlayer>>()
-const frontCopyButton = ref<InstanceType<typeof AwesomeButton>>()
-const backCopyButton = ref<InstanceType<typeof AwesomeButton>>()
 
-const frontHasPicture = computed(() => !!props.frontSidePicture)
-const backHasPicture = computed(() => !!props.backSidePicture)
+const frontSpaceCardSide = ref<InstanceType<typeof SpaceCardSide>>()
+const backSpaceCardSide = ref<InstanceType<typeof SpaceCardSide>>()
 
-const stageDisplayName = computed(() => {
-  if (props.stage === undefined || props.stage === 'OUTER_SPACE') {
-    return ''
+function stopAllVoices() {
+  frontSpaceCardSide.value?.stopVoice()
+  backSpaceCardSide.value?.stopVoice()
+}
+
+function playCurrentSideVoice() {
+  if (!flipped.value) {
+    frontSpaceCardSide.value?.playVoice()
   } else {
-    return stageNameMap.get(props.stage)?.displayName ?? props.stage
+    backSpaceCardSide.value?.playVoice()
   }
-})
+}
+
+function resetClipboardButton() {
+  if (flipped.value) {
+    frontSpaceCardSide.value?.resetClipboardButton()
+  } else {
+    backSpaceCardSide.value?.resetClipboardButton()
+  }
+}
 
 function flip() {
   if (!props.unflippable && !isAnimating.value) {
@@ -275,43 +160,9 @@ async function flipToFrontAndWait(): Promise<void> {
   })
 }
 
-function toggleAutoPlayVoice() {
-  autoPlayVoice.value = !autoPlayVoice.value
-}
-
-function toggleAutoRepeatVoice() {
-  autoRepeatVoice.value = !autoRepeatVoice.value
-}
-
-function stopAllVoices() {
-  frontVoicePlayer.value?.stop()
-  backVoicePlayer.value?.stop()
-}
-
-function playCurrentSideVoice() {
-  if (!flipped.value) {
-    frontVoicePlayer.value?.play()
-  } else {
-    backVoicePlayer.value?.play()
-  }
-}
-
 function handleEdit() {
   stopAllVoices()
   props.onEdit()
-}
-
-async function copySideToClipboard() {
-  let side
-  if (flipped.value) {
-    side = props.backSide
-    frontCopyButton.value?.reset()
-  } else {
-    side = props.frontSide
-    backCopyButton.value?.reset()
-  }
-
-  if (side) await navigator.clipboard.writeText(side)
 }
 
 function onCardAnimationComplete() {
@@ -333,9 +184,6 @@ defineExpose({
 
 <style scoped>
 .space-card--theme {
-  --card--color: var(--space-card--color, #686868);
-  --card--color--strip: var(--space-card--color--strip, #9f9f9f);
-  --card--color--strip--hover: var(--space-card--color--strip--hover, #686868);
   --card--border-color: var(--space-card--border-color, none);
   --card--box-shadow: var(--space-card--box-shadow, 0 8px 12px rgba(0, 0, 0, 0.15));
   --card--box-shadow--hover: var(--flashcard--box-shadow--hover, 0 12px 16px rgba(0, 0, 0, 0.2));
@@ -363,11 +211,11 @@ defineExpose({
   transform: rotateY(180deg);
 }
 
-.space-card:not(.space-card--flipped) .space-card-face--back {
+.space-card:not(.space-card--flipped) .space-card-side--back {
   pointer-events: none;
 }
 
-.space-card--flipped .space-card-face--front {
+.space-card--flipped .space-card-side--front {
   pointer-events: none;
 }
 
@@ -380,7 +228,7 @@ defineExpose({
   will-change: transform;
 }
 
-.space-card-face {
+.space-card-side {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -397,17 +245,12 @@ defineExpose({
   border-width: 1px;
 }
 
-.space-card-face--front {
+.space-card-side--front {
   transform: rotateY(0deg);
   --paper-color: var(--card--front--bg-color);
 }
 
-.space-card-face--back {
-  transform: rotateY(180deg);
-  --paper-color: var(--card--back--bg-color);
-}
-
-.space-card-face--front--style {
+.space-card-side--front--style {
   background-color: var(--card--front--bg-color);
   background-image: var(--card--front--bg-image);
   background-size: var(--card--front--bg-size);
@@ -415,99 +258,26 @@ defineExpose({
   transition: box-shadow 0.2s ease-in-out;
 }
 
-.space-card-face--back--style {
+.space-card-side--back {
+  transform: rotateY(180deg);
+  --paper-color: var(--card--back--bg-color);
+}
+
+.space-card-side--back--style {
   background-color: var(--card--back--bg-color);
   box-shadow: var(--card--box-shadow);
   transition: box-shadow 0.2s ease-in-out;
 }
 
-.space-card:hover .space-card-face--front--style,
-.space-card:hover .space-card-face--back--style {
+.space-card:hover .space-card-side--front--style,
+.space-card:hover .space-card-side--back--style {
   box-shadow: var(--card--box-shadow--hover);
 }
 
-.space-card-face--transparent {
+.space-card-side--transparent {
   background: none;
   border: none;
   cursor: default;
   perspective: none;
-}
-
-.space-card-strip {
-  height: 28px;
-  font-size: clamp(1.1rem, 2vw, 1.2rem);
-  color: var(--card--color--strip);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px;
-  gap: 10px;
-}
-
-.space-card-strip-group {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-}
-
-.space-card-content {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  box-sizing: border-box;
-  align-items: center;
-}
-
-.space-card-content--picture {
-  width: 100%;
-  gap: 6px;
-}
-
-.space-card-picture {
-  flex: 1 1 0;
-  min-height: 76%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.space-card-content--text {
-  height: auto;
-  min-height: 100%;
-  justify-content: center;
-}
-
-.space-card-text {
-  margin: 0;
-  width: 100%;
-  color: var(--card--color);
-  font-size: clamp(1.4rem, 2vw, 1.8rem);
-  text-align: center;
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.space-card-content--picture .space-card-text {
-  flex: 0 0 auto;
-}
-
-.space-card-strip-text {
-  background: none;
-  font-size: inherit;
-  color: inherit;
-}
-
-.space-card-button {
-  --awesome-button--icon--size: clamp(1.2rem, 2vw, 1.3rem);
-  --awesome-button--icon--color: var(--card--color--strip);
-  --awesome-button--icon--color--hover: var(--card--color--strip--hover);
-  --awesome-button--icon--color--active: var(--card--color--strip--hover);
 }
 </style>
