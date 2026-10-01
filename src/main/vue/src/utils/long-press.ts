@@ -1,32 +1,36 @@
 import { type MaybeRefOrGetter, onUnmounted, ref, toValue } from 'vue'
 
+interface LongPressOptions {
+  holdTime: MaybeRefOrGetter<number>
+  minDuration?: number
+  canStart: () => boolean
+  onLongPress: () => void
+}
+
 /**
  * Fires `onLongPress` once a press has been held for `holdTime` seconds (0 turns it off).
  */
-export function useLongPress(options: {
-  holdTime: MaybeRefOrGetter<number>
-  canStart: () => boolean
-  onLongPress: () => void
-}) {
+export function useLongPress(options: LongPressOptions) {
+  const { holdTime, minDuration = 250, canStart, onLongPress } = options
   const holding = ref(false)
   let holdTimeout: ReturnType<typeof setTimeout> | null = null
-  let longPressed = false
+  let pressStartTime: number | null = null
 
-  const enabled = () => toValue(options.holdTime) > 0
+  const enabled = () => toValue(holdTime) > 0
 
   function start(event: PointerEvent) {
-    longPressed = false
+    pressStartTime = null
     if (!enabled() || event.button !== 0 || holdTimeout !== null) return
-    if (!options.canStart()) return
+    if (!canStart()) return
+    pressStartTime = performance.now()
     holding.value = true
     holdTimeout = setTimeout(
       () => {
         holdTimeout = null
         holding.value = false
-        longPressed = true
-        options.onLongPress()
+        onLongPress()
       },
-      toValue(options.holdTime) * 1000,
+      toValue(holdTime) * 1000,
     )
   }
 
@@ -39,8 +43,8 @@ export function useLongPress(options: {
   }
 
   function consumeClick(): boolean {
-    const consumed = longPressed
-    longPressed = false
+    const consumed = pressStartTime !== null && performance.now() - pressStartTime >= minDuration
+    pressStartTime = null
     return consumed
   }
 
