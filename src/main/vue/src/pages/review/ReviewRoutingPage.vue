@@ -1,5 +1,10 @@
 <template>
-  <LightspeedReviewPage v-if="reviewMode.isLightspeed()" :session-id="sessionId" :stages="stages" />
+  <LightspeedReviewPage
+    v-if="reviewMode.isLightspeed()"
+    :session-id="sessionId"
+    :stages="stages"
+    :reversed="reversed"
+  />
   <SpecialReviewPage
     v-else-if="reviewMode.isSpecial()"
     :session-id="sessionId"

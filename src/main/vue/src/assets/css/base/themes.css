@@ -220,8 +220,13 @@
 
   /* control panel */
 
-  --cp--widget--color: linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%);
   --cp--launch--color: linear-gradient(135deg, rgb(91, 91, 145) 0%, rgb(105, 83, 125) 100%);
+  --cp--launch--color--reversed: linear-gradient(
+    135deg,
+    rgb(61 120 120) 0%,
+    rgb(59 84 120) 100%
+  );
+  --cp--widget--color: linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%);
   --cp--widget--color--active: linear-gradient(
     135deg,
     rgb(142, 110, 189) 0%,

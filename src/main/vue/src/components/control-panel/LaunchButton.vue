@@ -12,6 +12,9 @@
       icon="fa-solid fa-rocket"
       :disabled="disabled"
       :animation-duration="600"
+      :hold-time="REVERSE_HOLD_TIME"
+      :held="reversed"
+      :on-hold="toggleReversed"
       fill-space
     />
     <div class="curtain">
@@ -20,12 +23,16 @@
         <template v-else> Nothing to Review </template>
       </div>
     </div>
+    <WidgetReviewBadge :reversed="reversed" />
   </div>
 </template>
 
 <script setup lang="ts">
 import Starfield from '@/components/common/Starfield.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
+import { REVERSE_HOLD_TIME, useReverseMode } from '@/utils/reverse-mode.ts'
+import { ReviewSessionType } from '@/core-logic/review-logic.ts'
+import WidgetReviewBadge from '@/components/WidgetReviewBadge.vue'
 
 withDefaults(
   defineProps<{
@@ -35,6 +42,8 @@ withDefaults(
     disabled: false,
   },
 )
+
+const { reversed, toggle: toggleReversed } = useReverseMode(ReviewSessionType.LIGHTSPEED)
 </script>
 
 <style scoped>
@@ -46,6 +55,8 @@ withDefaults(
   --awesome-button--bg: var(--cp--launch--color);
   --awesome-button--bg--hover: var(--cp--widget--color--active);
   --awesome-button--bg--disabled: var(--cp--widget--color--inactive);
+  --awesome-button--bg--held: var(--cp--launch--color--reversed);
+  --awesome-button--bg--held--hover: var(--cp--widget--color--reversed--active);
   --awesome-button--border: 1px solid var(--cp--border-color);
   --awesome-button--border-radius: 6px;
 }
