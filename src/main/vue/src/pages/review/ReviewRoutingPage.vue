@@ -6,7 +6,12 @@
     :review-mode="reviewMode"
     :reversed="reversed"
   />
-  <QuizReviewPage v-else-if="reviewMode.isQuiz()" :session-id="sessionId" :stages="stages" />
+  <QuizReviewPage
+    v-else-if="reviewMode.isQuiz()"
+    :session-id="sessionId"
+    :stages="stages"
+    :reversed="reversed"
+  />
 </template>
 
 <script setup lang="ts">
