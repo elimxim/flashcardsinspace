@@ -132,6 +132,7 @@ const props = withDefaults(
     reversed?: boolean
   }>(),
   {
+    sessionId: undefined,
     reversed: false,
   },
 )

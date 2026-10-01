@@ -128,6 +128,7 @@ withDefaults(
     reversed?: boolean
   }>(),
   {
+    sessionId: undefined,
     reversed: false,
   },
 )

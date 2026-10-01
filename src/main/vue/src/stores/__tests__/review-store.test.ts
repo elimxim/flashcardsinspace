@@ -84,7 +84,7 @@ describe('review-store media', () => {
     // the flashcard on screen was fetched exactly once, by the window
     const currentId = store.currFlashcard?.id
     expect(audioGet.mock.calls.filter((call) => call[1] === currentId).length).toBe(1)
-    expect(store.flashcardFrontSideAudioBlob).toBeDefined()
+    expect(store.frontSideAudio).toBeDefined()
   })
 
   it('should keep the window topped up as the review advances', async () => {
@@ -146,7 +146,7 @@ describe('review-store media', () => {
     await Promise.all([first, second])
 
     expect(store.currFlashcard?.id).not.toBe(slowId)
-    expect(store.flashcardFrontSideAudioBlob).toBe(secondBlob)
+    expect(store.frontSideAudio).toBe(secondBlob)
   })
 
   it('should clear the media refs when the review runs out', async () => {
@@ -158,7 +158,7 @@ describe('review-store media', () => {
     await store.nextFlashcard()
 
     expect(store.currFlashcard).toBeUndefined()
-    expect(store.flashcardFrontSideAudioBlob).toBeUndefined()
+    expect(store.frontSideAudio).toBeUndefined()
   })
 
   it('should leave nothing behind when destroyed', () => {
@@ -205,7 +205,7 @@ describe('review-store media', () => {
     // media of the flashcard now on screen
     expect(revisited).not.toBe(onScreen)
     expect(store.currFlashcard?.id).toBe(onScreen)
-    expect(store.flashcardFrontSideAudioBlob).toBe(blobs.get(onScreen))
+    expect(store.frontSideAudio).toBe(blobs.get(onScreen))
   })
 
   it('should abort outstanding work on reset', async () => {
