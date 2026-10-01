@@ -220,8 +220,13 @@
 
   /* control panel */
 
-  --cp--widget--color: linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%);
   --cp--launch--color: linear-gradient(135deg, rgb(91, 91, 145) 0%, rgb(105, 83, 125) 100%);
+  --cp--launch--color--reversed: linear-gradient(
+    135deg,
+    rgb(61 120 120) 0%,
+    rgb(59 84 120) 100%
+  );
+  --cp--widget--color: linear-gradient(135deg, rgb(154, 170, 241) 0%, rgb(162, 133, 192) 100%);
   --cp--widget--color--active: linear-gradient(
     135deg,
     rgb(142, 110, 189) 0%,
@@ -232,6 +237,17 @@
     rgb(121, 121, 121) 0%,
     rgb(64, 64, 64) 100%
   );
+  --cp--widget--color--reversed: linear-gradient(
+    135deg,
+    rgb(134, 214, 214) 0%,
+    rgb(128, 170, 232) 100%
+  );
+  --cp--widget--color--reversed--active: linear-gradient(
+    135deg,
+    rgb(64, 168, 176) 0%,
+    rgb(76, 120, 204) 100%
+  );
+  --cp--badge--color: rgba(13, 18, 74, 0.6);
   --cp--text--color: rgba(13, 18, 74, 0.6);
   --cp--text--color--active: rgba(255, 255, 255, 0.6);
   --cp--text--color--inactive: rgba(255, 255, 255, 0.2);

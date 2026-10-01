@@ -2,7 +2,7 @@
 
 Guidance for Claude Code (claude.ai/code) when working in this repository.
 
-> After every code change, check whether this file needs updating to reflect new patterns, conventions, or architectural decisions introduced by the change. If it does, update it before considering the task complete.
+> Update this file only for something essential: a new architectural pattern, a cross-cutting convention, or a non-obvious invariant that would otherwise cause bugs. Skip it for feature details, styling, tweaks, and anything the code already makes clear.
 
 ## Project Overview
 
@@ -37,19 +37,19 @@ URL patterns: `/api/**` authenticated, `/api-public/**` public, `/auth/**` auth.
 
 ## Key Domain Concepts
 
-**Flashcard Stages**: S1 → S2 → S3 → S4 → S5 → S6 → S7 → OUTER_SPACE. Special stages: UNKNOWN (new, never reviewed), ATTEMPTED (reviewed but sent back to S1).
+**Flashcard Stages**: S1 → … → S7 → OUTER_SPACE. Special stages: UNKNOWN (never reviewed), ATTEMPTED (sent back to S1).
 
-**Chronodays**: Each day in a flashcard set's timeline. The Lightspeed Schedule determines which stages are reviewed on each chronoday. Statuses: INITIAL, NOT_STARTED, IN_PROGRESS, COMPLETED, OFF (suspended).
+**Chronodays**: Days in a set's timeline; the Lightspeed Schedule picks the stages reviewed on each. Statuses: INITIAL, NOT_STARTED, IN_PROGRESS, COMPLETED, OFF (suspended).
 
-**Review Sessions**: LIGHTSPEED (normal schedule-based), UNKNOWN, ATTEMPTED, OUTER_SPACE (special stage reviews), QUIZ.
+**Day Streak**: Consecutive learning days. OFF days don't break it; IN_PROGRESS days do.
 
-**Flashcard media (audio/pictures)**: During a review session the `FlashcardMediaPrefetcher` (`flashcard-media-prefetch.ts`, one instance per review store) is the *only* thing that fetches media.
+**Review Sessions**: LIGHTSPEED, UNKNOWN, ATTEMPTED, OUTER_SPACE, QUIZ.
 
-**Review session lifecycle**: Review pages never call the review-session endpoints directly. Each page owns one `ReviewSessionAttendant` (`review-session-attendant.ts`, built by `createReviewSessionAttendant`) holding the session, its stopwatch, and the ids of the flashcards reviewed so far. Pages `create`/`loadOrCreate` a session on start, `track(flashcardId)` *after* a flashcard write succeeds, `flush()` to persist progress, and `flush({ all: true })` to finish. A session is finished only by `finishReview()` — the exit button, `onBeforeRouteLeave`, or `onUnmounted` — never mid-review; the attendant refuses to finish twice, since the backend rejects that with `SAF400`. `clear()` and `destroyReviewStore` belong in `onUnmounted`, not the route guard, so a cancelled navigation cannot tear down a live page. Quiz rounds chain through child sessions: `createChildReviewSession` closes the parent server-side. `loadOrCreate` resumes a stored session only if `canBeOnboarded` accepts it — for a quiz, one whose metadata still shows unanswered cards; for any other type, one that was never finished.
-
-**Piggybacked session updates**: `PUT /flashcard-sets/{setId}/flashcards/{id}?sessionId=` optionally carries a `sessionRequest` block, so a flashcard write and a session flush cost one round trip. The session id travels as a query param, never in the body. The response is `FlashcardUpdateResponse` — the `FlashcardDto` `@JsonUnwrapped` at the top level plus an optional `session`, omitted when absent. Two client functions rather than one overloaded one: `sendFlashcardUpdateRequest` for a plain write, `sendFlashcardUpdateRequestWithinSession` for the combined one. The page never builds the session payload itself — `ReviewSessionAttendant.touch(options)` returns what `flush()` would have sent *and* applies the same local bookkeeping (`all: true` sets `finished` and stops the stopwatch), which is what keeps `finishReview()` from finishing a session the flashcard PUT already closed and getting `SAF400`. Since the response is flat, strip `session` (`const { session, ...flashcard } = response.data`) before handing the flashcard to the store *or* to `currFlashcard` — `copyFlashcard` is a deep JSON copy and would otherwise replay a stale session block on the next PUT.
-
-**Day Streak**: Consecutive learning days. OFF days do not break the streak; IN_PROGRESS days do.
+- Pages never call the session endpoints directly — each owns one `ReviewSessionAttendant` (`review-session-attendant.ts`): `create`/`loadOrCreate` on start, `track(id)` after a flashcard write succeeds, `flush()` to persist, `flush({ all: true })` to finish.
+- A session is finished only by `finishReview()` (exit button, `onBeforeRouteLeave`, `onUnmounted`), and only once — the backend rejects a second finish with `SAF400`. `clear()` and `destroyReviewStore` go in `onUnmounted`, not the route guard.
+- A flashcard PUT can piggyback a session flush (`sendFlashcardUpdateRequestWithinSession`, payload from `attendant.touch(options)`, which also does the local bookkeeping). The response is the flashcard with an optional `session` flattened in — strip `session` before storing the flashcard, or `copyFlashcard` replays it on the next PUT.
+- Media (audio/pictures) is fetched only by the review store's `FlashcardMediaPrefetcher`.
+- Reverse mode (front/back swapped) is per session type, saved in a cookie via `useReverseMode`, and reaches the review page only as the `?reversed=true` query param.
 
 ## Backend Notes
 

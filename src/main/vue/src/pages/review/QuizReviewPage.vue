@@ -41,6 +41,7 @@
           <SpaceDeck
             ref="spaceDeck"
             :session-type="ReviewSessionType.QUIZ"
+            :reversed="reversed"
             :can-slide-left="!noOneAvailable"
             :can-slide-right="!noOneAvailable"
             :on-slide-left="() => quizAnswer(false)"
@@ -124,10 +125,17 @@ import { createReviewSessionAttendant } from '@/core-logic/review-session-attend
 import { ReviewSession } from '@/model/review.ts'
 import { errorResponseData } from '@/core-logic/media-error.ts'
 
-const props = defineProps<{
-  sessionId?: number
-  stages: Stage[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    sessionId?: number
+    stages: Stage[]
+    reversed?: boolean
+  }>(),
+  {
+    sessionId: undefined,
+    reversed: false,
+  },
+)
 
 const router = useRouter()
 const toaster = useSpaceToaster()

@@ -6,6 +6,8 @@
   --awesome-button--bg: var(--cp--widget--color);
   --awesome-button--bg--hover: var(--cp--widget--color--active);
   --awesome-button--bg--disabled: var(--cp--widget--color--inactive);
+  --awesome-button--bg--held: var(--cp--widget--color--reversed);
+  --awesome-button--bg--held--hover: var(--cp--widget--color--reversed--active);
   --awesome-button--border: 1px solid var(--cp--border-color);
   --awesome-button--border-radius: 6px;
 }

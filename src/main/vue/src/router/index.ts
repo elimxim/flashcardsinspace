@@ -118,6 +118,7 @@ const routes: RouteRecordRaw[] = [
       sessionType: route.query.sessionType,
       sessionId: parseNumber(route.query.sessionId),
       stages: toLearningStages(route.query.stages),
+      reversed: route.query.reversed === 'true',
     }),
     meta: {
       requiresAuth: true,
@@ -139,22 +140,18 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach(async (to, _, next) => {
+router.beforeEach((to) => {
   const authStore = useAuthStore()
   const { isAuthenticated, isEmailVerified } = storeToRefs(authStore)
 
   if (to.meta.requiresAuth) {
-    const isSignedUp = loadUserSignedUpFromCookies()
-    if (isAuthenticated.value) {
-      if (to.meta.requiresEmailVerified && !isEmailVerified.value) {
-        next({ name: routeNames.codeVerification })
-      } else {
-        next()
-      }
-    } else if (isSignedUp) {
-      next({ name: routeNames.login })
-    } else {
-      next({ name: routeNames.signup })
+    if (!isAuthenticated.value) {
+      return loadUserSignedUpFromCookies()
+        ? { name: routeNames.login }
+        : { name: routeNames.signup }
+    }
+    if (to.meta.requiresEmailVerified && !isEmailVerified.value) {
+      return { name: routeNames.codeVerification }
     }
     return
   }
@@ -163,30 +160,16 @@ router.beforeEach(async (to, _, next) => {
 
   // goes directly to login/signup pages
   if (to.name === routeNames.login || to.name === routeNames.signup) {
-    if (isAuthenticated.value) {
-      if (isEmailVerified.value) {
-        next({ name: routeNames.user })
-      } else {
-        next({ name: routeNames.codeVerification })
-      }
-    } else {
-      next()
-    }
-    return
+    if (!isAuthenticated.value) return
+    return isEmailVerified.value ? { name: routeNames.user } : { name: routeNames.codeVerification }
   }
 
   // goes directly to code verification page
-  if (to.name === routeNames.codeVerification) {
-    if (isEmailVerified.value) {
-      next({ name: routeNames.user })
-    } else {
-      next()
-    }
-    return
+  if (to.name === routeNames.codeVerification && isEmailVerified.value) {
+    return { name: routeNames.user }
   }
 
   // other pages are accessible
-  next()
 })
 
 export default router

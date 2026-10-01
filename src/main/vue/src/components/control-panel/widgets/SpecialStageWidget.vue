@@ -5,6 +5,9 @@
       :icon="icon"
       :on-click="startReview"
       :disabled="flashcardsCount === 0"
+      :hold-time="REVERSE_HOLD_TIME"
+      :held="reversed"
+      :on-hold="toggleReversed"
       fill-space
       square
     >
@@ -17,12 +20,15 @@
             {{ flashcardsCount }}
           </div>
         </div>
+        <WidgetReviewBadge :reversed="reversed" />
       </template>
     </AwesomeButton>
   </div>
 </template>
 
 <script setup lang="ts">
+import AwesomeButton from '@/components/common/AwesomeButton.vue'
+import WidgetReviewBadge from '@/components/WidgetReviewBadge.vue'
 import { Stage } from '@/core-logic/stage-logic.ts'
 import { computed } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
@@ -31,7 +37,7 @@ import { storeToRefs } from 'pinia'
 import { routeNames } from '@/router'
 import { useRouter } from 'vue-router'
 import { useChronoStore } from '@/stores/chrono-store.ts'
-import AwesomeButton from '@/components/common/AwesomeButton.vue'
+import { REVERSE_HOLD_TIME, useReverseMode } from '@/utils/reverse-mode.ts'
 
 const props = defineProps<{
   stage: Stage
@@ -42,6 +48,9 @@ const router = useRouter()
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()
 
+const sessionType = computed(() => specialStageToReviewSessionType(props.stage))
+const { reversed, toggle: toggleReversed } = useReverseMode(sessionType)
+
 const { flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
@@ -51,10 +60,9 @@ const flashcardsCount = computed(() =>
 
 function startReview() {
   if (flashcardsCount.value === 0) return
-  const sessionType = specialStageToReviewSessionType(props.stage)
   router.push({
     name: routeNames.review,
-    query: { sessionType: sessionType },
+    query: { sessionType: sessionType.value, reversed: reversed.value ? 'true' : undefined },
   })
 }
 </script>

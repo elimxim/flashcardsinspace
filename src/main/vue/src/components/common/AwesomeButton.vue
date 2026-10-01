@@ -17,6 +17,10 @@
           'awesome-button--disabled': disabled,
           'awesome-button--invisible': invisible,
           'awesome-button--tapped': animatingOnTap,
+          'awesome-button--holdable': holdTime > 0,
+          'awesome-button--held': held,
+          'awesome-button--holding': holding,
+          'awesome-button--switched': switched,
         }"
         :disabled="disabled"
         v-bind="$attrs"
@@ -24,6 +28,7 @@
         @dblclick.stop="handleDoubleClick"
         @mouseenter="handleHover"
         @mouseleave="handleHover"
+        v-on="longPressListeners"
       >
         <div v-if="resolvedLoading" class="awesome-icon-wrapper">
           <font-awesome-icon icon="fa-solid fa-spinner" class="awesome-icon" spin-pulse />
@@ -56,6 +61,7 @@ import Tooltip from '@/components/common/Tooltip.vue'
 import { computed, ref, watch } from 'vue'
 import { useDeferredLoading } from '@/utils/deferred-loading.ts'
 import { UXConfig } from '@/utils/device-utils.ts'
+import { useLongPress } from '@/utils/long-press.ts'
 
 const props = withDefaults(
   defineProps<{
@@ -83,9 +89,12 @@ const props = withDefaults(
       | 'bottom-left'
       | 'bottom-right'
     tooltipDelay?: number
+    holdTime?: number
+    held?: boolean
     onClick?: () => void | Promise<void>
     onDoubleClick?: () => void | Promise<void>
     onHover?: () => void | Promise<void>
+    onHold?: () => void
   }>(),
   {
     fade: false,
@@ -103,9 +112,12 @@ const props = withDefaults(
     tooltip: undefined,
     tooltipPosition: 'top',
     tooltipDelay: 1000,
+    holdTime: 0,
+    held: false,
     onClick: async () => {},
     onDoubleClick: async () => {},
     onHover: async () => {},
+    onHold: () => {},
   },
 )
 
@@ -116,6 +128,27 @@ const { resolvedLoading, startLoading, stopLoading } = useDeferredLoading()
 const pressed = ref(false)
 const animatingOnTap = ref(false)
 const disabled = ref(props.disabled)
+
+const SWITCH_ANIMATION_DURATION = 350
+
+const switched = ref(false)
+
+const switchAnimationMillis = ref(`${SWITCH_ANIMATION_DURATION}ms`)
+const holdAnimationSeconds = computed(() => `${props.holdTime}s`)
+
+const {
+  holding,
+  listeners: longPressListeners,
+  consumeClick,
+} = useLongPress({
+  holdTime: () => props.holdTime,
+  canStart: () => !disabled.value && !resolvedLoading.value,
+  onLongPress: () => {
+    switched.value = true
+    setTimeout(() => (switched.value = false), SWITCH_ANIMATION_DURATION)
+    props.onHold()
+  },
+})
 
 async function press() {
   pressed.value = !pressed.value
@@ -131,6 +164,7 @@ async function press() {
 }
 
 function handleClick() {
+  if (consumeClick()) return
   if (disabled.value || resolvedLoading.value) return
   if (UXConfig().showAnimationOnTap && props.animateTap) {
     startTapAnimation()
@@ -197,6 +231,8 @@ defineExpose({
   --a-btn--bg--hover: var(--awesome-button--bg--hover, none);
   --a-btn--bg--disabled: var(--awesome-button--bg--disabled, none);
   --a-btn--bg--active: var(--awesome-button--bg--active, none);
+  --a-btn--bg--held: var(--awesome-button--bg--held, none);
+  --a-btn--bg--held--hover: var(--awesome-button--bg--held--hover, none);
   --a-btn--border: var(--awesome-button--border, none);
   --a-btn--border--hover: var(--awesome-button--border--hover, none);
   --a-btn--border-radius: var(--awesome-button--border-radius, none);
@@ -273,6 +309,36 @@ defineExpose({
   background: var(--a-btn--bg--active);
 }
 
+.awesome-button--holdable {
+  -webkit-touch-callout: none;
+}
+
+.awesome-button--holding {
+  animation: rumble v-bind(holdAnimationSeconds) linear;
+}
+
+.awesome-button--switched {
+  animation: switch-pop v-bind(switchAnimationMillis) ease-out;
+}
+
+.awesome-button--held:not(.awesome-button--disabled) {
+  background: var(--a-btn--bg--held);
+}
+
+@media (hover: hover) {
+  .awesome-button.awesome-button--held:not(.awesome-button--disabled):not(
+      .awesome-button--active
+    ):hover {
+    background: var(--a-btn--bg--held--hover);
+  }
+}
+
+.awesome-button--held.awesome-button--tapped:not(.awesome-button--disabled):not(
+    .awesome-button--active
+  ) {
+  background: var(--a-btn--bg--held--hover);
+}
+
 .awesome-button--invisible {
   visibility: hidden;
 }
@@ -337,6 +403,57 @@ defineExpose({
   }
   100% {
     opacity: 1;
+  }
+}
+
+@keyframes rumble {
+  0% {
+    transform: translate(0, 0) rotate(0);
+  }
+  10% {
+    transform: translate(-0.3px, 0.3px) rotate(-0.2deg);
+  }
+  20% {
+    transform: translate(0.4px, -0.4px) rotate(0.3deg);
+  }
+  30% {
+    transform: translate(-0.7px, 0.5px) rotate(-0.5deg);
+  }
+  40% {
+    transform: translate(0.9px, -0.7px) rotate(0.6deg);
+  }
+  50% {
+    transform: translate(-1.1px, 0.9px) rotate(-0.8deg);
+  }
+  60% {
+    transform: translate(1.4px, -1px) rotate(0.9deg);
+  }
+  70% {
+    transform: translate(-1.6px, 1.2px) rotate(-1.1deg);
+  }
+  80% {
+    transform: translate(1.9px, -1.4px) rotate(1.2deg);
+  }
+  90% {
+    transform: translate(-2.1px, 1.6px) rotate(-1.4deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+}
+
+@keyframes switch-pop {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  40% {
+    transform: scale(1.07);
+    filter: brightness(1.25);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
   }
 }
 </style>

@@ -41,6 +41,7 @@
           <SpaceDeck
             ref="spaceDeck"
             :session-type="ReviewSessionType.LIGHTSPEED"
+            :reversed="reversed"
             :can-slide-left="!noOneAvailable"
             :can-slide-right="!noOneAvailable"
             :on-slide-left="stageDown"
@@ -120,10 +121,17 @@ import { Chronoday } from '@/model/chrono.ts'
 import { createReviewSessionAttendant } from '@/core-logic/review-session-attendant.ts'
 import { errorResponseData } from '@/core-logic/media-error.ts'
 
-defineProps<{
-  sessionId?: number
-  stages: Stage[]
-}>()
+withDefaults(
+  defineProps<{
+    sessionId?: number
+    stages: Stage[]
+    reversed?: boolean
+  }>(),
+  {
+    sessionId: undefined,
+    reversed: false,
+  },
+)
 
 const router = useRouter()
 const toaster = useSpaceToaster()

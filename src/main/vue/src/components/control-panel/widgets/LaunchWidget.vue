@@ -13,6 +13,7 @@ import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { createReviewQueue, ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
+import { useReverseMode } from '@/utils/reverse-mode.ts'
 
 const router = useRouter()
 const flashcardStore = useFlashcardStore()
@@ -20,6 +21,8 @@ const chronoStore = useChronoStore()
 
 const { flashcards, isEmpty, isSuspended } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
+
+const { reversed } = useReverseMode(ReviewSessionType.LIGHTSPEED)
 
 const noFlashcardsForReview = computed<boolean>(() => {
   const queue = createReviewQueue(flashcards.value, currDay.value)
@@ -31,7 +34,10 @@ const isDisabled = computed(() => isEmpty.value || isSuspended.value || noFlashc
 function startReview() {
   router.push({
     name: routeNames.review,
-    query: { sessionType: ReviewSessionType.LIGHTSPEED },
+    query: {
+      sessionType: ReviewSessionType.LIGHTSPEED,
+      reversed: reversed.value ? 'true' : undefined,
+    },
   })
 }
 </script>

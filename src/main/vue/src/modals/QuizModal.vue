@@ -90,6 +90,7 @@ import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref, watch } from 'vue'
 import { countFlashcards, ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { sendLatestUncompletedReviewSessionGetRequest } from '@/api/api-client.ts'
+import { useReverseMode } from '@/utils/reverse-mode.ts'
 
 const router = useRouter()
 const toggleStore = useToggleStore()
@@ -100,6 +101,8 @@ const { quizOpen } = storeToRefs(toggleStore)
 const { flashcardSet } = storeToRefs(flashcardStore)
 const { flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
+
+const { reversed } = useReverseMode(ReviewSessionType.QUIZ)
 
 const includeUnknown = ref(false)
 const includeAttempted = ref(false)
@@ -172,6 +175,7 @@ function start(fresh: boolean = false) {
       sessionType: ReviewSessionType.QUIZ,
       sessionId: fresh ? undefined : latestUncompletedSessionId.value,
       stages: reviewStages(),
+      reversed: reversed.value ? 'true' : undefined,
     },
   })
   exit()
