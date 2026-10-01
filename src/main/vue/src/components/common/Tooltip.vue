@@ -1,9 +1,9 @@
 <template>
   <div class="tooltip tooltip--theme" @mouseenter="show" @mouseleave="hide">
     <slot />
-    <template v-if="UXConfig().showTooltips">
+    <template v-if="text && UXConfig().showTooltips">
       <transition name="tooltip-fade">
-        <div v-if="visible && text" :class="['tooltip-message', `tooltip--${position}`]">
+        <div v-if="visible" :class="['tooltip-message', `tooltip--${position}`]">
           {{ text }}
           <div class="tooltip-arrow" />
         </div>

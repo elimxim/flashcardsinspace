@@ -20,11 +20,7 @@
             {{ flashcardsCount }}
           </div>
         </div>
-        <font-awesome-icon
-          icon="fa-solid fa-play"
-          class="cp-review-badge"
-          :class="{ 'cp-review-badge--reversed': reversed }"
-        />
+        <WidgetReviewBadge :reversed="reversed" />
       </template>
     </AwesomeButton>
   </div>
@@ -32,6 +28,7 @@
 
 <script setup lang="ts">
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
+import WidgetReviewBadge from '@/components/WidgetReviewBadge.vue'
 import { Stage } from '@/core-logic/stage-logic.ts'
 import { computed } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'

@@ -16,20 +16,6 @@
   --awesome-button--icon--size: 44px;
 }
 
-.cp-review-badge {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  font-size: 0.7rem;
-  color: var(--cp--badge--color);
-  pointer-events: none;
-  transition: transform 0.4s ease-in-out;
-}
-
-.cp-review-badge--reversed {
-  transform: rotateY(180deg);
-}
-
 .cp-text {
   color: var(--cp--text--color);
   font-weight: 600;
