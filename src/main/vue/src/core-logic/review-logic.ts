@@ -294,9 +294,7 @@ export function createReviewQueue(flashcards: Flashcard[], currDay: Chronoday): 
     .filter((f) => {
       const isStageAvailable = reviewStages.has(f.stage)
       if (f.stage === learningStages.S1.name) {
-        return (
-          isStageAvailable && !isUnknownFlashcard(f, currDay) && !isReviewedFlashcard(f, currDay)
-        )
+        return isStageAvailable && !isFreshFlashcard(f, currDay) && !isReviewedFlashcard(f, currDay)
       }
       return isStageAvailable && !isReviewedFlashcard(f, currDay)
     })
@@ -324,25 +322,17 @@ export function createReviewQueueForStages(
 
   const result: Flashcard[] = []
   if (stageNameSet.has(specialStages.UNKNOWN.name)) {
-    result.push(
-      ...flashcards.filter(
-        (f) => f.stage === learningStages.S1.name && isUnknownFlashcard(f, currDay),
-      ),
-    )
+    result.push(...flashcards.filter((f) => isUnknownFlashcard(f, currDay)))
   }
   if (stageNameSet.has(specialStages.ATTEMPTED.name)) {
-    result.push(
-      ...flashcards.filter(
-        (f) => f.stage === learningStages.S1.name && isReviewedFlashcard(f, currDay),
-      ),
-    )
+    result.push(...flashcards.filter((f) => isAttemptedFlashcard(f, currDay)))
   }
   if (stageNameSet.has(learningStages.S1.name)) {
     result.push(
       ...flashcards.filter(
         (f) =>
           f.stage === learningStages.S1.name &&
-          !isUnknownFlashcard(f, currDay) &&
+          !isFreshFlashcard(f, currDay) &&
           !isReviewedFlashcard(f, currDay),
       ),
     )
@@ -354,7 +344,7 @@ export function createReviewQueueForStages(
   return queue
 }
 
-function isUnknownFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
+function isFreshFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
   return flashcard.creationDate === day.chronodate
 }
 
@@ -362,20 +352,24 @@ function isReviewedFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
   return flashcard.lastReviewDate !== undefined && flashcard.lastReviewDate === day.chronodate
 }
 
+export function isUnknownFlashcard(flashcard: Flashcard, day: Chronoday) {
+  return flashcard.stage === learningStages.S1.name && isFreshFlashcard(flashcard, day)
+}
+
+export function isAttemptedFlashcard(flashcard: Flashcard, day: Chronoday) {
+  return flashcard.stage === learningStages.S1.name && isReviewedFlashcard(flashcard, day)
+}
+
 export function countFlashcards(flashcards: Flashcard[], stage: Stage, currDay: Chronoday): number {
   if (stage === specialStages.UNKNOWN) {
-    return flashcards.filter(
-      (f) => f.stage === learningStages.S1.name && isUnknownFlashcard(f, currDay),
-    ).length
+    return flashcards.filter((f) => isUnknownFlashcard(f, currDay)).length
   } else if (stage === specialStages.ATTEMPTED) {
-    return flashcards.filter(
-      (f) => f.stage === learningStages.S1.name && isReviewedFlashcard(f, currDay),
-    ).length
+    return flashcards.filter((f) => isAttemptedFlashcard(f, currDay)).length
   } else if (stage == learningStages.S1) {
     return flashcards.filter(
       (f) =>
         f.stage === learningStages.S1.name &&
-        !isUnknownFlashcard(f, currDay) &&
+        !isFreshFlashcard(f, currDay) &&
         !isReviewedFlashcard(f, currDay),
     ).length
   } else {

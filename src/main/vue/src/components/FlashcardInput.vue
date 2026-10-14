@@ -15,6 +15,7 @@
         v-model:picture="frontPicture"
         v-model:expanded-down="frontExpandedDown"
         placeholder="Front side"
+        :echo="!!echo"
       />
     </div>
     <div class="side-slot side-slot--back">
@@ -25,6 +26,8 @@
         v-model:picture="backPicture"
         v-model:expanded-down="backExpandedDown"
         placeholder="Back side"
+        :echo="!!echo"
+        :echo-text="echo"
       />
     </div>
   </div>
@@ -33,6 +36,10 @@
 <script setup lang="ts">
 import FlashcardSideInput from '@/components/FlashcardSideInput.vue'
 import { ref, computed, watch } from 'vue'
+
+defineProps<{
+  echo?: string
+}>()
 
 const frontText = defineModel<string | undefined>('frontText', { required: true })
 const frontAudio = defineModel<Blob | undefined>('frontAudio')

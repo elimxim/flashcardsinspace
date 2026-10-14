@@ -102,16 +102,11 @@ export function mapFlashcardSetExtra(
 }
 
 export function findDuplicates(candidates: FlashcardContent[], existing: Flashcard[]): Set<number> {
-  const existingSet = new Set(
-    existing.map(
-      (f) =>
-        `${f.frontSide?.trim().toLowerCase() ?? ''}::${f.backSide?.trim().toLowerCase() ?? ''}`,
-    ),
-  )
+  const existingSet = new Set(existing.map(flashcardContentKey))
   const duplicates = new Set<number>()
   const seen = new Set<string>()
   for (let i = 0; i < candidates.length; i++) {
-    const key = `${candidates[i].frontSide?.toLowerCase() ?? ''}::${candidates[i].backSide?.toLowerCase() ?? ''}`
+    const key = flashcardContentKey(candidates[i])
     if (existingSet.has(key) || seen.has(key)) {
       duplicates.add(i)
     } else {
@@ -119,4 +114,25 @@ export function findDuplicates(candidates: FlashcardContent[], existing: Flashca
     }
   }
   return duplicates
+}
+
+/**
+ * Finds a flashcard which both sides match the given content.
+ * Sides without text (e.g. picture-only) are not be compared.
+ */
+export function findExactDuplicateFlashcard(
+  content: FlashcardContent,
+  existing: Flashcard[],
+): Flashcard | undefined {
+  if (!content.frontSide?.trim() || !content.backSide?.trim()) return undefined
+  const key = flashcardContentKey(content)
+  return existing.find((f) => flashcardContentKey(f) === key)
+}
+
+function flashcardContentKey(content: FlashcardContent): string {
+  return `${normalizeSide(content.frontSide)}::${normalizeSide(content.backSide)}`
+}
+
+function normalizeSide(side: string | undefined): string {
+  return side?.trim().replace(/\s+/g, ' ').toLowerCase() ?? ''
 }
