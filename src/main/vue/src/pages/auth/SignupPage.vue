@@ -75,6 +75,10 @@
               when: userPasswordMaxLengthInvalid,
               text: 'This secret is expanding faster than the universe! Please keep it under 64 characters',
             },
+            {
+              when: userPasswordCharsInvalid,
+              text: 'Alien symbols detected! Please use only English letters, digits, spaces and keyboard symbols like !@#$%',
+            },
           ]"
         />
         <SmartInput
@@ -163,6 +167,7 @@ const $v = useVuelidate(
       required,
       minLength: minLength(6),
       maxLength: maxLength(64),
+      chars: helpers.regex(/^[A-Za-z0-9 !"#$%&'()*+,./:;<=>?@[\\\]^_`{|}~-]+$/),
     },
     confirmPassword: { required, passwordConfirmed },
   },
@@ -194,6 +199,9 @@ const userPasswordMinLengthInvalid = computed(
 )
 const userPasswordMaxLengthInvalid = computed(
   () => $v.value.userPassword.$errors.find((v) => v.$validator === 'maxLength') !== undefined,
+)
+const userPasswordCharsInvalid = computed(
+  () => $v.value.userPassword.$errors.find((v) => v.$validator === 'chars') !== undefined,
 )
 const confirmPasswordInvalid = computed(() => $v.value.confirmPassword.$errors.length > 0)
 const confirmPasswordMismatch = computed(
@@ -257,10 +265,14 @@ async function signup() {
       Log.log(LogTag.LOGIC, 'Successfully signed up: ', authStore.user?.id)
       authStore.setUser(response.data)
       saveUserSignedUpToCookies(true)
-      await router.push({
-        name: routeNames.codeVerification,
-        query: { type: VerificationType.REGISTRATION_REQUEST },
-      })
+      if (response.data.emailVerified) {
+        await router.push({ name: routeNames.user })
+      } else {
+        await router.push({
+          name: routeNames.codeVerification,
+          query: { type: VerificationType.REGISTRATION_REQUEST },
+        })
+      }
     })
     .catch((error) => {
       signupFailed.value = true

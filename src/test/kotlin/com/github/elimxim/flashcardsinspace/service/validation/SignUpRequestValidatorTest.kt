@@ -210,6 +210,19 @@ class SignUpRequestValidatorTest {
     }
 
     @Test
+    fun `should fail validation if secret has non-ASCII chars`() {
+        val request = validRequest().apply {
+            secret = Password("пароль123")
+        }
+
+        val exception = assertThrows<HttpInvalidRequestFieldsException> {
+            validator.validate(request)
+        }
+
+        assertThat(exception.fields).containsExactly("secret")
+    }
+
+    @Test
     fun `should fail validation if languageId is null`() {
         val request = validRequest().apply {
             languageId = null

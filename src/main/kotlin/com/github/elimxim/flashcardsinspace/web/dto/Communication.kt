@@ -2,6 +2,8 @@ package com.github.elimxim.flashcardsinspace.web.dto
 
 import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.security.ConfidentialLength
+import com.github.elimxim.flashcardsinspace.security.ConfidentialPattern
+import com.github.elimxim.flashcardsinspace.security.PASSWORD_REGEX
 import com.github.elimxim.flashcardsinspace.security.Password
 import com.github.elimxim.flashcardsinspace.security.RequiredConfidential
 import com.github.elimxim.flashcardsinspace.service.validation.*
@@ -22,6 +24,7 @@ class SignUpRequest(
     var name: String? = null,
     @field:RequiredConfidential
     @field:ConfidentialLength(min = 6, max = 64)
+    @field:ConfidentialPattern(regexp = PASSWORD_REGEX)
     var secret: Password? = null,
     @field:NotNull
     @field:NotBlank
@@ -349,6 +352,7 @@ data class VerificationIntentResponse(
 class PasswordResetRequest(
     @field:RequiredConfidential
     @field:ConfidentialLength(min = 6, max = 64)
+    @field:ConfidentialPattern(regexp = PASSWORD_REGEX)
     var secret: Password? = null,
 )
 

@@ -22,9 +22,9 @@ class VerificationCodeController(
         @CookieValue(name = VERIFICATION_TOKEN_COOKIE, required = false) verificationToken: String?,
         @RequestBody request: VerificationIntentRequest?,
         response: HttpServletResponse,
-    ): ResponseEntity<Unit> = withLoggingContext(user) {
-        verificationCodeService.send(user, verificationToken, request?.normalize(), response)
-        return ResponseEntity.ok().build()
+    ): ResponseEntity<VerificationIntentResponse> = withLoggingContext(user) {
+        val intentResponse = verificationCodeService.send(user, verificationToken, request?.normalize(), response)
+        return ResponseEntity.ok(intentResponse)
     }
 
     @PostMapping("/code")

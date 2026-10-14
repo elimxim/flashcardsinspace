@@ -15,6 +15,8 @@ import jakarta.validation.Payload
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
+const val PASSWORD_REGEX = """^[A-Za-z0-9 !"#$%&'()*+,./:;<=>?@\[\\\]^_`{|}~-]+$"""
+
 interface Confidential {
     fun masked(): String
     fun unmasked(): String
@@ -155,3 +157,30 @@ class ConfidentialLengthValidator : ConstraintValidator<ConfidentialLength, Conf
     }
 }
 
+
+@Target(
+    AnnotationTarget.FIELD,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.VALUE_PARAMETER
+)
+@Retention(AnnotationRetention.RUNTIME)
+@Constraint(validatedBy = [ConfidentialPatternValidator::class])
+annotation class ConfidentialPattern(
+    val regexp: String,
+    val message: String = "{jakarta.validation.constraints.confidential.patternMismatch.message}",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = [],
+)
+
+class ConfidentialPatternValidator : ConstraintValidator<ConfidentialPattern, Confidential> {
+    lateinit var regex: Regex
+
+    override fun initialize(parameters: ConfidentialPattern) {
+        regex = Regex(parameters.regexp)
+    }
+
+    override fun isValid(value: Confidential?, context: ConstraintValidatorContext?): Boolean {
+        if (value == null || value.unmasked().isBlank()) return true
+        return regex.matches(value.unmasked())
+    }
+}

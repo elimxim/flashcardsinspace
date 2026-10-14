@@ -30,7 +30,7 @@ class GlobalExceptionHandler {
     fun handleUnexpectedException(e: Exception, request: WebRequest): ResponseEntity<ErrorResponseBody> =
         withLoggingContext {
             log.error("UNEXPECTED exception occurred: ${e.message}", e)
-            e.printApplicationStackTrace()
+            e.printStackTrace(System.err)
             val body = buildErrorBody(
                 status = HttpStatus.INTERNAL_SERVER_ERROR,
                 exception = HttpInternalServerErrorException(ApiErrorCode.UNE500, "Unexpected error occurred", e)
@@ -57,7 +57,7 @@ class GlobalExceptionHandler {
         withLoggingContext {
             val httpStatus = getHttpStatus(e)
             log.info("${httpStatus.name} exception occurred: ${e.message}", e.cause)
-            e.printApplicationStackTrace()
+            e.printStackTrace(System.err)
             val body = buildErrorBody(
                 status = httpStatus,
                 exception = e,
