@@ -24,6 +24,7 @@
       v-model:back-text="backSide"
       v-model:back-audio="backSideAudioBlob"
       v-model:back-picture="backSidePictureBlob"
+      :echo="echoText"
     />
 
     <div class="modal-control-buttons">
@@ -51,7 +52,7 @@ import SmartButton from '@/components/common/SmartButton.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import FlashcardInput from '@/components/FlashcardInput.vue'
 import Modal from '@/components/common/Modal.vue'
-import { ref } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
@@ -59,7 +60,15 @@ import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
 import { usePictureStore } from '@/stores/picture-store.ts'
-import { flashcardSides, newFlashcard } from '@/core-logic/flashcard-logic.ts'
+import {
+  findExactDuplicateFlashcard,
+  flashcardSides,
+  newFlashcard,
+} from '@/core-logic/flashcard-logic.ts'
+import {
+  specialStages,
+  stageNameMap,
+} from '@/core-logic/stage-logic.ts'
 import { uploadFlashcardAudioBlob } from '@/core-logic/flashcard-audio-logic.ts'
 import { uploadFlashcardPictureBlob } from '@/core-logic/flashcard-picture-logic.ts'
 import { storeToRefs } from 'pinia'
@@ -71,6 +80,7 @@ import {
 import { Flashcard } from '@/model/flashcard.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
+import { isAttemptedFlashcard, isUnknownFlashcard } from '@/core-logic/review-logic.ts'
 
 const toggleStore = useToggleStore()
 const chronoStore = useChronoStore()
@@ -80,7 +90,7 @@ const audioStore = useAudioStore()
 const pictureStore = usePictureStore()
 const toaster = useSpaceToaster()
 
-const { flashcardSet } = storeToRefs(flashcardStore)
+const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
 const frontSide = ref<string>()
@@ -94,6 +104,41 @@ const infiniteLoopButtonRef = ref<InstanceType<typeof AwesomeButton>>()
 const cancelButton = ref<InstanceType<typeof SmartButton>>()
 const createButton = ref<InstanceType<typeof SmartButton>>()
 const createdFlashcard = ref<Flashcard | undefined>()
+const duplicateFlashcard = ref<Flashcard | undefined>()
+
+const ECHO_DELAY_MS = 300
+let echoTimer: ReturnType<typeof setTimeout> | undefined
+
+watch([frontSide, backSide, flashcards], () => {
+  clearTimeout(echoTimer)
+  const duplicate = findExactDuplicateFlashcard(
+    { frontSide: frontSide.value, backSide: backSide.value },
+    flashcards.value.filter((f) => f.id !== createdFlashcard.value?.id),
+  )
+  if (!duplicate) {
+    duplicateFlashcard.value = undefined
+  } else if (duplicate.id !== duplicateFlashcard.value?.id) {
+    echoTimer = setTimeout(() => (duplicateFlashcard.value = duplicate), ECHO_DELAY_MS)
+  }
+})
+
+onUnmounted(() => clearTimeout(echoTimer))
+
+const echoText = computed(() => {
+  const dup = duplicateFlashcard.value
+  if (!dup) return undefined
+
+  const stage = stageNameMap.get(dup.stage)
+  if (isAttemptedFlashcard(dup, currDay.value)) {
+    return 'Echo detected: this card is already in your set, waiting for another attempt.'
+  } else if (isUnknownFlashcard(dup, currDay.value)) {
+    return 'Echo detected: this card is already in your set, waiting for its first review.'
+  } else if (specialStages.OUTER_SPACE === stage) {
+    return 'Echo detected: this card is already drifting in outer space.'
+  } else {
+    return `Echo detected: this card is already orbiting at ${stage}.`
+  }
+})
 
 async function uploadAudioIfRelevant(): Promise<boolean> {
   const set = flashcardSet.value

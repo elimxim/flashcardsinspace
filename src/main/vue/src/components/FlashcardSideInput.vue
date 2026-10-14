@@ -1,5 +1,5 @@
 ﻿<template>
-  <div class="side" :class="{ 'side--fullscreen': expandedFull }">
+  <div class="side" :class="{ 'side--fullscreen': expandedFull, 'side--echo': echo }">
     <TextInput
       ref="textInputRef"
       v-model="text"
@@ -14,6 +14,7 @@
       :when="maxLengthInvalid"
       text="Your text has its own gravity! Maximum 512 characters."
     />
+    <ErrorText class="echo-text" :when="echo && !invalid" :text="echoText" />
     <div class="side-media">
       <Transition
         name="media-vanish"
@@ -52,9 +53,17 @@ import { useVuelidate } from '@vuelidate/core'
 import { maxLength, requiredIf } from '@vuelidate/validators'
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
 
-defineProps<{
-  placeholder: string
-}>()
+withDefaults(
+  defineProps<{
+    placeholder: string
+    echo?: boolean
+    echoText?: string
+  }>(),
+  {
+    echo: false,
+    echoText: undefined,
+  },
+)
 
 const text = defineModel<string | undefined>('text', { required: true })
 const audio = defineModel<Blob | undefined>('audio')
@@ -163,6 +172,15 @@ onBeforeUnmount(() => {
   gap: 4px;
   min-height: 0;
   min-width: 0;
+}
+
+.side--echo {
+  --text-input--border-color: #8a63d2;
+  --text-input--border-color--focus: #6a3fc0;
+}
+
+.echo-text {
+  --error-text--color: #6a3fc0;
 }
 
 .side--fullscreen {

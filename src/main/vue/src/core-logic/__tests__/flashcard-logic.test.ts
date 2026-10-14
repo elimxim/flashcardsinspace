@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findDuplicates } from '@/core-logic/flashcard-logic.ts'
+import { findExactDuplicateFlashcard, findDuplicates } from '@/core-logic/flashcard-logic.ts'
 import { Flashcard } from '@/model/flashcard.ts'
 
 describe('findDuplicates', () => {
@@ -66,6 +66,44 @@ describe('findDuplicates', () => {
     const result = findDuplicates(candidates, existing)
 
     expect(result).toContain(0)
+  })
+})
+
+describe('findExactDuplicateFlashcard', () => {
+  it('should return the flashcard with matching sides', () => {
+    const existing = [makeFlashcard(1, 'Hello', 'World'), makeFlashcard(2, 'Foo', 'Bar')]
+
+    const result = findExactDuplicateFlashcard({ frontSide: 'Foo', backSide: 'Bar' }, existing)
+
+    expect(result?.id).toBe(2)
+  })
+
+  it('should ignore case and surrounding or repeated whitespace', () => {
+    const existing = [makeFlashcard(1, 'Good  morning', 'Bonjour')]
+
+    const result = findExactDuplicateFlashcard(
+      { frontSide: '  good morning ', backSide: 'BONJOUR\n' },
+      existing,
+    )
+
+    expect(result?.id).toBe(1)
+  })
+
+  it('should NOT match when only one side is the same', () => {
+    const existing = [makeFlashcard(1, 'Hello', 'World')]
+
+    const result = findExactDuplicateFlashcard({ frontSide: 'Hello', backSide: 'Earth' }, existing)
+
+    expect(result).toBeUndefined()
+  })
+
+  it('should NOT match when a side has no text', () => {
+    const existing = [makeFlashcard(1, 'Hello', ''), makeFlashcard(2, '', '')]
+
+    expect(findExactDuplicateFlashcard({ frontSide: 'Hello', backSide: '' }, existing)).toBeUndefined()
+    expect(
+      findExactDuplicateFlashcard({ frontSide: '  ', backSide: undefined }, existing),
+    ).toBeUndefined()
   })
 })
 
