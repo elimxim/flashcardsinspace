@@ -145,7 +145,11 @@ async function verifyCode(code: string): Promise<void> {
 
 async function resendCode(): Promise<void> {
   await sendVerificationRequest()
-    .then(() => {
+    .then(async (response) => {
+      if (response.data.result === VerificationResult.SKIPPED) {
+        await onSuccess()
+        return
+      }
       attempts.value = 0
       ccd.value?.triggerIdle()
       codeResent.value = true

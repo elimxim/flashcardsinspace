@@ -5,6 +5,8 @@ import { useAuthStore } from '@/stores/auth-store.ts'
 
 export enum VerificationResult {
   SUCCESS = 'SUCCESS',
+  SENT = 'SENT',
+  SKIPPED = 'SKIPPED',
   FOUND = 'FOUND',
   NOT_FOUND = 'NOT_FOUND',
   SESSION_EXPIRED = 'SESSION_EXPIRED',

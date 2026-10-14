@@ -33,7 +33,6 @@ services:
       APP_DATASOURCE_USERNAME: fins
       APP_DATASOURCE_PASSWORD: fins
       APP_SECURITY_JWT_SECRET: VOyWwmqaktRJ0PHYs6q3FBHrcuBwkacf02akxwqemoySEYxwkLceALCAQrmInkjAU3v12T1x5L6xBSwPlTD87g==
-      APP_MAIL_ENABLED: false
     volumes:
       - ./props:/app/config:ro
     command: ["--spring.config.additional-location=file:/app/config/"]

@@ -48,7 +48,7 @@ import { useVuelidate } from '@vuelidate/core'
 import { email, required } from '@vuelidate/validators'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { sendVerificationRequestWithBody } from '@/api/auth-client.ts'
-import { VerificationType } from '@/core-logic/user-logic.ts'
+import { VerificationResult, VerificationType } from '@/core-logic/user-logic.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 import { useRouter } from 'vue-router'
@@ -82,11 +82,15 @@ async function sendCode() {
   }
 
   await sendVerificationRequestWithBody(userEmail.value, VerificationType.PASSWORD_RESET_REQUEST)
-    .then(async () => {
-      await router.push({
-        name: routeNames.codeVerification,
-        query: { type: VerificationType.PASSWORD_RESET_REQUEST },
-      })
+    .then(async (response) => {
+      if (response.data.result === VerificationResult.SKIPPED) {
+        await router.push({ name: routeNames.passwordReset })
+      } else {
+        await router.push({
+          name: routeNames.codeVerification,
+          query: { type: VerificationType.PASSWORD_RESET_REQUEST },
+        })
+      }
     })
     .catch((error) => {
       Log.error(LogTag.LOGIC, 'Failed to send verification code', error)

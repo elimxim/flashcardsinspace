@@ -265,10 +265,14 @@ async function signup() {
       Log.log(LogTag.LOGIC, 'Successfully signed up: ', authStore.user?.id)
       authStore.setUser(response.data)
       saveUserSignedUpToCookies(true)
-      await router.push({
-        name: routeNames.codeVerification,
-        query: { type: VerificationType.REGISTRATION_REQUEST },
-      })
+      if (response.data.emailVerified) {
+        await router.push({ name: routeNames.user })
+      } else {
+        await router.push({
+          name: routeNames.codeVerification,
+          query: { type: VerificationType.REGISTRATION_REQUEST },
+        })
+      }
     })
     .catch((error) => {
       signupFailed.value = true

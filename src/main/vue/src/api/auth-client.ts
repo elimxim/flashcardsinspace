@@ -69,7 +69,7 @@ export async function sendPasswordResetRequest(secret: string) {
 
 export async function sendVerificationRequestWithBody(email: string, intent: VerificationType) {
   Log.log(LogTag.POST, '/verification/request')
-  return await authClient.post<void>('/verification/request', {
+  return await authClient.post<VerificationIntentResponse>('/verification/request', {
     email: email,
     type: intent,
   })
@@ -77,7 +77,7 @@ export async function sendVerificationRequestWithBody(email: string, intent: Ver
 
 export async function sendVerificationRequest() {
   Log.log(LogTag.POST, '/verification/request')
-  return await authClient.post<void>('/verification/request')
+  return await authClient.post<VerificationIntentResponse>('/verification/request')
 }
 
 export async function sendVerificationCodeRequest(code: string) {

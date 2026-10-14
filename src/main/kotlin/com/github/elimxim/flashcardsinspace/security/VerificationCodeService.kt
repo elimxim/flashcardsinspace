@@ -6,6 +6,7 @@ import com.github.elimxim.flashcardsinspace.entity.VerificationType
 import com.github.elimxim.flashcardsinspace.entity.repository.VerificationIntentRepository
 import com.github.elimxim.flashcardsinspace.service.UserService
 import com.github.elimxim.flashcardsinspace.service.mail.EmailService
+import com.github.elimxim.flashcardsinspace.service.mail.MailProperties
 import com.github.elimxim.flashcardsinspace.service.mail.client.Recipient
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.*
@@ -28,6 +29,8 @@ private val log = LoggerFactory.getLogger(VerificationCodeService::class.java)
 
 enum class VerificationResult {
     SUCCESS,
+    SENT,
+    SKIPPED,
     FOUND,
     NOT_FOUND,
     SESSION_EXPIRED,
@@ -49,6 +52,7 @@ class VerificationCodeService(
     private val emailService: EmailService,
     private val securityProperties: SecurityProperties,
     private val userService: UserService,
+    private val mailProperties: MailProperties,
 ) {
     @Transactional
     fun send(
@@ -56,7 +60,7 @@ class VerificationCodeService(
         verificationToken: String?,
         request: VerificationIntentRequest?,
         response: HttpServletResponse
-    ) {
+    ): VerificationIntentResponse {
         log.info(
             """
             Sending verification code, 
@@ -67,7 +71,7 @@ class VerificationCodeService(
             """.trimOneLine()
         )
 
-        if (request != null) {
+        return if (request != null) {
             val (email, type) = requestValidator.validate(request)
             val user = user ?: userService.getEntity(email)
             send(user, email, type, response)
@@ -85,8 +89,14 @@ class VerificationCodeService(
     }
 
     @Transactional
-    fun send(user: User, email: String, type: VerificationType, response: HttpServletResponse) =
+    fun send(user: User, email: String, type: VerificationType, response: HttpServletResponse): VerificationIntentResponse =
         withLoggingContext(user) {
+            if (!mailProperties.enabled) {
+                log.info("Mail sending is disabled, completing verification without a code, type: $type")
+                completeVerification(user, email, type, response)
+                return VerificationIntentResponse(VerificationResult.SKIPPED.name, type.name)
+            }
+
             withLock(user) {
                 if (intentsPerWindowExceeded(email, type)) {
                     throw TooManyRequestsException(ApiErrorCode.MIW429, "Intents per window exceeded")
@@ -126,9 +136,9 @@ class VerificationCodeService(
                     log.error("Failed to email verification code to ${maskSecret(email)}", e)
                     throw HttpInternalServerErrorException(ApiErrorCode.ESF500, "Failed to email verification code")
                 }
-
-                verificationIntent
             }
+
+            VerificationIntentResponse(VerificationResult.SENT.name, type.name)
         }
 
     @Transactional
@@ -176,7 +186,7 @@ class VerificationCodeService(
             markAsUsed(intent)
             log.info("Verification code is correct, email: $secretEmail, type: ${intent.type}")
             clearVerificationTokenCookie(response)
-            onSuccessfulVerification(intent, response)
+            completeVerification(intent.user, intent.email, intent.type, response)
             return VerificationIntentResponse(VerificationResult.SUCCESS.name)
         }
     }
@@ -269,35 +279,38 @@ class VerificationCodeService(
         return LookupResult.Success(intent)
     }
 
-    private fun onSuccessfulVerification(intent: VerificationIntent, response: HttpServletResponse) {
-        if (intent.type == VerificationType.REGISTRATION_REQUEST) {
-            log.info("Email ${intent.email} verified")
-            userService.verify(intent.user)
+    private fun completeVerification(user: User, email: String, type: VerificationType, response: HttpServletResponse) {
+        if (type == VerificationType.REGISTRATION_REQUEST) {
+            log.info("Email $email verified")
+            userService.verify(user)
         }
 
-        if (intent.type == VerificationType.PASSWORD_RESET_REQUEST) {
+        if (type == VerificationType.PASSWORD_RESET_REQUEST) {
             log.info("Password reset request verified")
-
-            val tokenProperties = securityProperties.getSecurityTokenProperties(VerificationType.PASSWORD_RESET_ACCESS)
-            val token = TokenHelper.generateRawToken()
-            val tokenHash = TokenHelper.hashToken(token)
-            val now = ZonedDateTime.now()
-            val expiresAt = now.plus(tokenProperties.maxAge.toLong(), ChronoUnit.SECONDS)
-
-            val accessIntent = VerificationIntent(
-                email = intent.email,
-                tokenHash = tokenHash,
-                code = null,
-                type = VerificationType.PASSWORD_RESET_ACCESS,
-                createdAt = now,
-                expiresAt = expiresAt,
-                user = intent.user,
-            )
-
-            verificationIntentRepository.save(accessIntent)
-            addPasswordResetTokenCookie(response, token, tokenProperties.maxAge)
-            log.info("Password reset token generated")
+            issuePasswordResetAccess(user, email, response)
         }
+    }
+
+    private fun issuePasswordResetAccess(user: User, email: String, response: HttpServletResponse) {
+        val tokenProperties = securityProperties.getSecurityTokenProperties(VerificationType.PASSWORD_RESET_ACCESS)
+        val token = TokenHelper.generateRawToken()
+        val tokenHash = TokenHelper.hashToken(token)
+        val now = ZonedDateTime.now()
+        val expiresAt = now.plus(tokenProperties.maxAge.toLong(), ChronoUnit.SECONDS)
+
+        val accessIntent = VerificationIntent(
+            email = email,
+            tokenHash = tokenHash,
+            code = null,
+            type = VerificationType.PASSWORD_RESET_ACCESS,
+            createdAt = now,
+            expiresAt = expiresAt,
+            user = user,
+        )
+
+        verificationIntentRepository.save(accessIntent)
+        addPasswordResetTokenCookie(response, token, tokenProperties.maxAge)
+        log.info("Password reset token generated, user: ${user.id}")
     }
 
     private fun invalidateExistingIntents(email: String, type: VerificationType) {
