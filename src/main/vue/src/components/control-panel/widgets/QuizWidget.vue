@@ -13,9 +13,9 @@
     >
       <template #below>
         <div class="cp-text quiz-text">Start Quiz</div>
-        <WidgetReviewBadge :reversed="reversed" />
       </template>
     </AwesomeButton>
+    <WidgetReviewBadge :reversed="reversed" />
   </div>
 </template>
 

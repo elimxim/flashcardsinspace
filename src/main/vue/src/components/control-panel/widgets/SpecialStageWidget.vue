@@ -20,9 +20,9 @@
             {{ flashcardsCount }}
           </div>
         </div>
-        <WidgetReviewBadge :reversed="reversed" />
       </template>
     </AwesomeButton>
+    <WidgetReviewBadge :reversed="reversed" />
   </div>
 </template>
 
