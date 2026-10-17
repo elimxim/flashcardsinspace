@@ -10,9 +10,11 @@ export interface ReviewSession {
 }
 
 export interface QuizMetadata {
-  round: number
-  currRoundFlashcardIds: number[]
-  nextRoundFlashcardIds: number[]
-  overallCorrectCount: number
-  overallTotalCount: number
+  stages?: string[]
+  round?: number
+  currRoundFlashcardIds?: number[]
+  nextRoundFlashcardIds?: number[]
+  overallCorrectCount?: number
+  overallIncorrectCount?: number
+  elapsedTotalTime?: number
 }

@@ -95,7 +95,8 @@ function quizMetadata(overrides: Partial<QuizMetadata> = {}): QuizMetadata {
     currRoundFlashcardIds: [1, 2],
     nextRoundFlashcardIds: [],
     overallCorrectCount: 1,
-    overallTotalCount: 2,
+    overallIncorrectCount: 2,
+    elapsedTotalTime: 1000,
     ...overrides,
   }
 }
@@ -132,12 +133,12 @@ describe('review-session-attendant', () => {
     })
 
     it('should create the session for the current type and chronoday', async () => {
-      await attendant.create({ metadata: { overallTotalCount: 12 } })
+      await attendant.create({ metadata: { } })
 
       expect(createRequest).toHaveBeenCalledWith(SET_ID, {
         type: ReviewSessionType.QUIZ,
         chronodayId: CHRONODAY_ID,
-        metadata: { overallTotalCount: 12 },
+        metadata: { },
       })
     })
 
@@ -291,7 +292,7 @@ describe('review-session-attendant', () => {
     })
 
     it('should start over once every card has been answered correctly', async () => {
-      await loadStored(quizMetadata({ overallCorrectCount: 2, overallTotalCount: 2 }))
+      await loadStored(quizMetadata({ overallCorrectCount: 2, overallIncorrectCount: 2 }))
 
       expect(createRequest).toHaveBeenCalledOnce()
       expect(attendant.sessionId.value).toBe(SESSION_ID)

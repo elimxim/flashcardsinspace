@@ -5,7 +5,7 @@
         Practice flashcards from selected stages. Missed cards repeat each round until you know them
         all. Doing this will help those tough cards stick better into your long-term memory.
       </p>
-      <div v-if="latestUncompletedSessionId && showBanner" class="quiz-banner">
+      <div v-if="latestUncompletedSession && showBanner" class="quiz-banner">
         <div class="quiz-banner-text">You have an uncompleted quiz session</div>
         <div class="quiz-banner-exit">
           <AwesomeButton icon="fa-solid fa-xmark" :on-click="hideBanner" />
@@ -89,8 +89,9 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref, watch } from 'vue'
 import { countFlashcards, ReviewSessionType } from '@/core-logic/review-logic.ts'
-import { sendLatestUncompletedReviewSessionGetRequest } from '@/api/api-client.ts'
 import { useReverseMode } from '@/utils/reverse-mode.ts'
+import { getActualLatestUncompletedQuizSession } from '@/core-logic/quiz.ts'
+import { ReviewSession } from '@/model/review.ts'
 
 const router = useRouter()
 const toggleStore = useToggleStore()
@@ -146,7 +147,7 @@ const reviewCount = computed(() => {
   return count
 })
 
-const latestUncompletedSessionId = ref<number>()
+const latestUncompletedSession = ref<ReviewSession | undefined>()
 const showBanner = ref(true)
 
 function resetState() {
@@ -173,8 +174,8 @@ function start(fresh: boolean = false) {
     name: routeNames.review,
     query: {
       sessionType: ReviewSessionType.QUIZ,
-      sessionId: fresh ? undefined : latestUncompletedSessionId.value,
-      stages: reviewStages(),
+      sessionId: fresh ? undefined : latestUncompletedSession.value?.id,
+      stages: fresh ? reviewStages() : latestUncompletedSession.value?.metadata?.stages,
       reversed: reversed.value ? 'true' : undefined,
     },
   })
@@ -185,33 +186,22 @@ function hideBanner() {
   showBanner.value = false
 }
 
-async function getLatestUncompletedQuizSessionId(): Promise<number | undefined> {
-  if (!flashcardSet.value) return undefined
-  return await sendLatestUncompletedReviewSessionGetRequest(
-    flashcardSet.value.id,
-    ReviewSessionType.QUIZ,
-  )
-    .then((response) => {
-      if (response.status === 204) {
-        return undefined
-      } else {
-        return response.data.id
-      }
-    })
-    .catch((error) => {
-      console.error(`Failed to fetch latest quiz session`, error.response?.data)
-      return undefined
-    })
-}
-
 watch(flashcardSet, async (newVal, oldValue) => {
-  if (newVal && !oldValue) {
-    latestUncompletedSessionId.value = await getLatestUncompletedQuizSessionId()
+  if (newVal && !oldValue && newVal !== oldValue) {
+    latestUncompletedSession.value = await getActualLatestUncompletedQuizSession(
+      newVal,
+      flashcards.value,
+    )
   }
 })
 
 onMounted(async () => {
-  latestUncompletedSessionId.value = await getLatestUncompletedQuizSessionId()
+  if (flashcardSet.value) {
+    latestUncompletedSession.value = await getActualLatestUncompletedQuizSession(
+      flashcardSet.value,
+      flashcards.value,
+    )
+  }
 })
 </script>
 

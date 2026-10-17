@@ -14,12 +14,12 @@ import { ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { Chronoday } from '@/model/chrono.ts'
 import { errorResponseData } from '@/core-logic/media-error.ts'
 import { useStopWatch } from '@/utils/stop-watch.ts'
-import { ReviewSession } from '@/model/review.ts'
+import { QuizMetadata, ReviewSession } from '@/model/review.ts'
 
 export interface CreateOptions {
   elapsedTime?: number
   flashcardIdsToTrack?: number[]
-  metadata?: Record<string, unknown> | undefined
+  metadata?: QuizMetadata
 }
 
 export interface LoadOrCreateOptions extends CreateOptions {
@@ -28,7 +28,7 @@ export interface LoadOrCreateOptions extends CreateOptions {
 }
 
 export interface FlushOptions {
-  metadata?: Record<string, unknown> | undefined
+  metadata?: QuizMetadata
   all?: boolean
 }
 
@@ -61,7 +61,6 @@ export function createReviewSessionAttendant(
   const { startWatch, stopWatch, resetWatch } = useStopWatch(sessionElapsedTime)
 
   const trackedFlashcardIds: number[] = []
-  let finished = false
 
   function init(session: ReviewSession) {
     clear()
@@ -69,10 +68,17 @@ export function createReviewSessionAttendant(
     sessionId.value = session.id
     trackedFlashcardIds.push(...session.flashcardIds)
     sessionElapsedTime.value = session.elapsedTime
-    finished = !!session.finishedAt
 
-    if (!finished) startWatch()
+    if (shouldStartWatch(session)) startWatch()
   }
+
+  function shouldStartWatch(session: ReviewSession) {
+    if (session.type === ReviewSessionType.QUIZ) {
+      return trackedFlashcardIds.length < (session.metadata?.currRoundFlashcardIds?.length ?? 0)
+    }
+    return !session.finishedAt
+  }
+
 
   async function create(options: CreateOptions = {}) {
     const { elapsedTime = 0, flashcardIdsToTrack = [], metadata = undefined } = options
@@ -143,7 +149,7 @@ export function createReviewSessionAttendant(
       if (existingSession && canBeOnboarded(existingSession)) {
         onboarding(existingSession)
         init(existingSession)
-      } else {
+      } else if (canBeRecreated(existingSession)) {
         await create({ elapsedTime, flashcardIdsToTrack, metadata })
       }
     } else {
@@ -152,19 +158,15 @@ export function createReviewSessionAttendant(
   }
 
   function canBeOnboarded(session: ReviewSession): boolean {
-    if (session.type === ReviewSessionType.QUIZ) {
-      const total = session.metadata?.overallTotalCount ?? 0
-      const correct = session.metadata?.overallCorrectCount ?? 0
-      const currRoundLength = session.metadata?.currRoundFlashcardIds?.length ?? 0
-      const nextRoundLength = session.metadata?.nextRoundFlashcardIds?.length ?? 0
-      return total !== correct && (currRoundLength !== 0 || nextRoundLength !== 0)
-    }
+    if (session.type === ReviewSessionType.QUIZ) return true
     return !session.finishedAt
   }
 
-  async function flush(options: FlushOptions = {}): Promise<void> {
-    if (finished) return
+  function canBeRecreated(session: ReviewSession | undefined): boolean {
+    return session?.type !== ReviewSessionType.QUIZ
+  }
 
+  async function flush(options: FlushOptions = {}): Promise<void> {
     if (!flashcardSet.value) {
       Log.log(LogTag.SYSTEM, `Can't flush review session ${sessionType}, FlashcardSet is undefined`)
       return Promise.resolve()
@@ -183,8 +185,6 @@ export function createReviewSessionAttendant(
   }
 
   function touch(options: FlushOptions = {}) {
-    if (finished) return
-
     const { metadata = undefined, all = false } = options
 
     const request: ReviewSessionUpdateRequest = {
@@ -194,7 +194,6 @@ export function createReviewSessionAttendant(
     }
 
     if (all) {
-      finished = true
       stopWatch()
 
       request.flashcardIds = [...trackedFlashcardIds].map((id) => ({ id: id }))
@@ -212,7 +211,6 @@ export function createReviewSessionAttendant(
 
   function clear() {
     sessionId.value = undefined
-    finished = false
     trackedFlashcardIds.length = 0
     resetWatch()
   }

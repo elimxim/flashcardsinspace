@@ -3,7 +3,7 @@
     <div class="quiz-title">Quiz Round {{ round }}</div>
     <div class="quiz-info">
       <div class="quiz-stats">
-        <div class="quiz-stats-title">Overall Stats</div>
+        <div class="quiz-stats-title">Overall</div>
         <div class="quiz-stats-row">
           <div class="quiz-stats-text">Correct</div>
           <div class="quiz-stats-number">
@@ -13,18 +13,15 @@
         <div class="quiz-stats-row">
           <div class="quiz-stats-text">Incorrect</div>
           <div class="quiz-stats-number">
-            {{ roundFailed }}
-          </div>
-        </div>
-        <div class="quiz-stats-row">
-          <div class="quiz-stats-text">Total</div>
-          <div class="quiz-stats-number">
-            {{ overallTotal }}
+            {{ overallIncorrect }}
           </div>
         </div>
       </div>
       <div class="quiz-clock">
         <Clock :time="elapsedTime" top-label="Round Time" />
+      </div>
+      <div v-if="elapsedTotalTime" class="quiz-clock">
+        <Clock :time="elapsedTotalTime" top-label="Total Time" />
       </div>
     </div>
     <div class="quiz-chart-wrapper">
@@ -71,9 +68,10 @@ import Clock from '@/components/common/Clock.vue'
 withDefaults(
   defineProps<{
     elapsedTime: number
+    elapsedTotalTime: number
     round: number
-    overallTotal: number
     overallCorrect: number
+    overallIncorrect: number
     roundTotal: number
     roundFailed: number
     onNextRound?: () => void

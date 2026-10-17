@@ -1,11 +1,8 @@
 package com.github.elimxim.flashcardsinspace.web
 
-import com.github.elimxim.flashcardsinspace.entity.ReviewSessionType
 import com.github.elimxim.flashcardsinspace.entity.User
-import com.github.elimxim.flashcardsinspace.security.escapeJava
 import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.ReviewSessionService
-import com.github.elimxim.flashcardsinspace.service.validation.ValidReviewSessionType
 import com.github.elimxim.flashcardsinspace.util.withLoggingContext
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionCreateRequest
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewSessionDto
@@ -63,14 +60,12 @@ class ReviewSessionController(
         return ResponseEntity.ok(dto)
     }
 
-    @GetMapping("/latest-uncompleted")
-    fun getLatestUncompletedReviewSession(
+    @GetMapping("/latest-uncompleted-quiz")
+    fun getLatestUncompletedQuizSession(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
-        @RequestParam @ValidReviewSessionType type: String,
     ): ResponseEntity<ReviewSessionDto> = withLoggingContext(user) {
-        val type = ReviewSessionType.valueOf(type.normalize().escapeJava())
-        val dto = reviewSessionService.getLatestUncompletedReviewSession(user, setId, type)
+        val dto = reviewSessionService.getLatestUncompletedQuizSession(user, setId)
         return if (dto != null) {
             ResponseEntity.ok(dto)
         } else {

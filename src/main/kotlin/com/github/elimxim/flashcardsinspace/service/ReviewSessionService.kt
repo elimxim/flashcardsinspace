@@ -8,11 +8,14 @@ import com.github.elimxim.flashcardsinspace.util.updateQuizMetadata
 import com.github.elimxim.flashcardsinspace.web.dto.*
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.HttpBadRequestException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpConflictException
 import com.github.elimxim.flashcardsinspace.web.exception.HttpNotFoundException
+import com.github.elimxim.flashcardsinspace.web.exception.HttpUnprocessableEntityException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
+import kotlin.jvm.optionals.getOrNull
 
 private val log = LoggerFactory.getLogger(ReviewSessionService::class.java)
 
@@ -135,21 +138,24 @@ class ReviewSessionService(
     }
 
     @Transactional(readOnly = true)
-    fun getLatestUncompletedReviewSession(user: User, setId: Long, type: ReviewSessionType): ReviewSessionDto? {
+    fun getLatestUncompletedQuizSession(user: User, setId: Long): ReviewSessionDto? {
         log.info("Getting latest uncompleted review session for set $setId")
         user.checkVerified()
         val flashcardSet = flashcardSetService.getEntity(setId)
         flashcardSetService.verifyUserHasAccess(user, flashcardSet)
-        val topUncompletedSessions = reviewSessionRepository
-            .findLatestUncompletedReviewSessions(setId, type, 30)
+        val latestUncompletedSession = reviewSessionRepository
+            .findLatestQuizSessionWithoutChildren(setId, 30)
             .filter {
-                val metadata = it.metadata
-                if (metadata == null || metadata !is QuizMetadata) return@filter false
-                metadata.overallTotalCount != metadata.overallCorrectCount
+                val meta = it.metadata
+                if (meta == null || meta !is QuizMetadata) return@filter false
+
+                val currRoundNotFinishedYet = (it.flashcardIds?.size ?: 0) < meta.currRoundFlashcardIds.size
+                val nextRoundNotStartedYet = meta.nextRoundFlashcardIds.isNotEmpty()
+
+                currRoundNotFinishedYet || nextRoundNotStartedYet
             }
 
-        val latestUncompletedSession = topUncompletedSessions.maxByOrNull { it.startedAt }
-        return latestUncompletedSession?.toDto()
+        return latestUncompletedSession.getOrNull()?.toDto()
     }
 
     @Transactional(readOnly = true)

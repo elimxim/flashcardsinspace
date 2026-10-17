@@ -1,6 +1,6 @@
 import type { Chronoday, DayStreak } from '@/model/chrono.ts'
 import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
-import { ReviewSession } from '@/model/review.ts'
+import { QuizMetadata, ReviewSession } from '@/model/review.ts'
 
 export interface Page<T> {
   content: T[]
@@ -66,14 +66,14 @@ export interface FlashcardSetSuspendResponse {
 export interface ReviewSessionCreateRequest {
   type: string
   chronodayId: number
-  metadata?: Record<string, unknown>
+  metadata?: QuizMetadata
 }
 
 export interface ReviewSessionUpdateRequest {
   elapsedTime: number
   flashcardIds?: FlashcardId[]
   finished?: boolean
-  metadata?: Record<string, unknown>
+  metadata?: QuizMetadata
 }
 
 export interface FlashcardId {

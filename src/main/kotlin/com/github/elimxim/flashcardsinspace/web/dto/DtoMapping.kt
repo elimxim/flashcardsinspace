@@ -85,21 +85,13 @@ fun ReviewSession.toDto() = ReviewSessionDto(
 fun ReviewSessionMetadata.toDto(): Map<String, Any>? = when (this) {
     is QuizMetadata -> {
         buildMap {
-            getMetadataFieldName(QuizMetadata::round)?.let {
-                put(it, round)
-            }
-            getMetadataFieldName(QuizMetadata::nextRoundFlashcardIds)?.let {
-                put(it, nextRoundFlashcardIds)
-            }
-            getMetadataFieldName(QuizMetadata::currRoundFlashcardIds)?.let {
-                put(it, currRoundFlashcardIds)
-            }
-            getMetadataFieldName(QuizMetadata::overallCorrectCount)?.let {
-                put(it, overallCorrectCount)
-            }
-            getMetadataFieldName(QuizMetadata::overallTotalCount)?.let {
-                put(it, overallTotalCount)
-            }
+            getMetadataFieldName(QuizMetadata::stages)?.let { put(it, stages) }
+            getMetadataFieldName(QuizMetadata::round)?.let { put(it, round) }
+            getMetadataFieldName(QuizMetadata::nextRoundFlashcardIds)?.let { put(it, nextRoundFlashcardIds) }
+            getMetadataFieldName(QuizMetadata::currRoundFlashcardIds)?.let { put(it, currRoundFlashcardIds) }
+            getMetadataFieldName(QuizMetadata::overallCorrectCount)?.let { put(it, overallCorrectCount) }
+            getMetadataFieldName(QuizMetadata::overallIncorrectCount)?.let { put(it, overallIncorrectCount) }
+            getMetadataFieldName(QuizMetadata::elapsedTotalTime)?.let { put(it, elapsedTotalTime) }
         }
     }
 }

@@ -51,9 +51,10 @@
           >
             <QuizResult
               :elapsed-time="elapsedTime"
+              :elapsed-total-time="quizElapsedTotalTime"
               :round="quizRound"
-              :overall-total="quizOverallTotal"
               :overall-correct="quizOverallCorrect"
+              :overall-incorrect="quizOverallIncorrect"
               :round-total="flashcardsTotal"
               :round-failed="incorrectFlashcards.length"
               :on-next-round="startNextQuizRound"
@@ -124,6 +125,7 @@ import { useRunOnce } from '@/utils/run-once.ts'
 import { createReviewSessionAttendant } from '@/core-logic/review-session-attendant.ts'
 import { ReviewSession } from '@/model/review.ts'
 import { errorResponseData } from '@/core-logic/media-error.ts'
+import { readQuizSession } from '@/core-logic/quiz.ts'
 
 const props = withDefaults(
   defineProps<{
@@ -173,8 +175,9 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 const quizRound = ref(1)
-const quizOverallTotal = ref(0)
 const quizOverallCorrect = ref(0)
+const quizOverallIncorrect = ref(0)
+const quizElapsedTotalTime = ref(0)
 const incorrectFlashcards = ref<Flashcard[]>([])
 
 async function startReview() {
@@ -192,13 +195,12 @@ async function startReview() {
       }
     }
     reviewStore.loadState(createReviewQueueForStages(flashcards.value, props.stages, currDay.value))
-    quizOverallTotal.value = flashcardsTotal.value
 
     await sessionAttendant.loadOrCreate({
       sessionId: props.sessionId,
       metadata: {
+        stages: props.stages.map((v) => v.name),
         currRoundFlashcardIds: reviewQueue.value.remainingFlashcards().map((f) => f.id),
-        overallTotalCount: reviewQueue.value.remaining(),
       },
       onboarding: onboardSession,
     })
@@ -215,14 +217,14 @@ function resetState() {
   sessionAttendant.clear()
   reviewStore.$reset()
   incorrectFlashcards.value = []
-  quizOverallTotal.value = 0
+  quizOverallIncorrect.value = 0
   quizOverallCorrect.value = 0
+  quizElapsedTotalTime.value = 0
 }
 
 async function finishReview() {
   Log.log(LogTag.LOGIC, `Finishing review: ${ReviewSessionType.QUIZ}`)
   if (reviewStarting.value) await startReviewOnce()
-  await sessionAttendant.flush({ all: true })
   Log.log(LogTag.LOGIC, `Finished review: ${ReviewSessionType.QUIZ}`)
 }
 
@@ -235,6 +237,7 @@ async function quizAnswer(know: boolean) {
   if (!currFlashcard.value) return
 
   sessionAttendant.track(currFlashcard.value.id)
+  quizElapsedTotalTime.value = quizElapsedTotalTime.value + elapsedTime.value
   if (know) {
     quizOverallCorrect.value = quizOverallCorrect.value + 1
     await sessionAttendant.flush({
@@ -242,15 +245,20 @@ async function quizAnswer(know: boolean) {
       metadata: {
         nextRoundFlashcardIds: [],
         overallCorrectCount: quizOverallCorrect.value,
+        overallIncorrectCount: quizOverallIncorrect.value,
+        elapsedTotalTime: quizElapsedTotalTime.value,
       },
     })
   } else {
+    quizOverallIncorrect.value = quizOverallIncorrect.value + 1
     incorrectFlashcards.value.push(currFlashcard.value)
     await sessionAttendant.flush({
       all: noNextAvailable.value,
       metadata: {
         nextRoundFlashcardIds: [currFlashcard.value.id],
         overallCorrectCount: quizOverallCorrect.value,
+        overallIncorrectCount: quizOverallIncorrect.value,
+        elapsedTotalTime: quizElapsedTotalTime.value,
       },
     })
   }
@@ -292,20 +300,17 @@ async function startNextQuizRound() {
 }
 
 function onboardSession(session: ReviewSession) {
-  quizRound.value = session.metadata?.round ?? 1
-  quizOverallCorrect.value = session.metadata?.overallCorrectCount ?? 0
-  quizOverallTotal.value = session.metadata?.overallTotalCount ?? 0
+  const { round, overallCorrect, overallIncorrect, elapsedTotal, currRound, nextRound, forReview } =
+    readQuizSession(session, flashcards.value)
 
-  const reviewedFlashcardIdSet = new Set(session.flashcardIds ?? [])
-  const nextRoundFlashcardIdSet = new Set(session.metadata?.nextRoundFlashcardIds ?? [])
-  const currRoundFlashcardIdSet = new Set(session.metadata?.currRoundFlashcardIds ?? [])
-  const currRoundFlashcards = flashcards.value.filter((f) => currRoundFlashcardIdSet.has(f.id))
-  const flashcardsForReview = currRoundFlashcards.filter((f) => !reviewedFlashcardIdSet.has(f.id))
+  quizRound.value = round
+  quizOverallCorrect.value = overallCorrect
+  quizOverallIncorrect.value = overallIncorrect
+  quizElapsedTotalTime.value = elapsedTotal
+  incorrectFlashcards.value = nextRound
 
-  incorrectFlashcards.value = currRoundFlashcards.filter((f) => nextRoundFlashcardIdSet.has(f.id))
-
-  reviewStore.loadState(new MonoStageReviewQueue(flashcardsForReview))
-  reviewStore.setFlashcardsTotal(currRoundFlashcards.length)
+  reviewStore.loadState(new MonoStageReviewQueue(forReview))
+  reviewStore.setFlashcardsTotal(currRound.length)
 
   Log.log(LogTag.LOGIC, `Quiz session ${session.id} onboarded`)
 }
