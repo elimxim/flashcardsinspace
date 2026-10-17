@@ -65,6 +65,8 @@ enum class ReviewSessionType {
 sealed class ReviewSessionMetadata
 
 data class QuizMetadata(
+    @field:MetadataField("stages")
+    var stages: MutableSet<String> = mutableSetOf(),
     @field:MetadataField("round")
     var round: Int,
     @field:MetadataField("nextRoundFlashcardIds")
@@ -73,8 +75,10 @@ data class QuizMetadata(
     var currRoundFlashcardIds: MutableSet<Long> = mutableSetOf(),
     @field:MetadataField("overallCorrectCount")
     var overallCorrectCount: Int,
-    @field:MetadataField("overallTotalCount")
-    var overallTotalCount: Int,
+    @field:MetadataField("overallIncorrectCount")
+    var overallIncorrectCount: Int,
+    @field:MetadataField("elapsedTotalTime")
+    var elapsedTotalTime: Long,
 ) : ReviewSessionMetadata()
 
 @Retention(AnnotationRetention.RUNTIME)

@@ -46,8 +46,17 @@ open class Flashcard(
 )
 
 const val TERMINAL_STAGE_NAME = "OUTER_SPACE"
+
 enum class FlashcardStage {
-    S1, S2, S3, S4, S5, S6, S7, OUTER_SPACE
+    S1, S2, S3, S4, S5, S6, S7, OUTER_SPACE;
+
+    companion object {
+        fun valueOfOrNull(value: String): FlashcardStage? = try {
+            FlashcardStage.valueOf(value)
+        } catch (_: IllegalArgumentException) {
+            null
+        }
+    }
 }
 
 enum class FlashcardSide {

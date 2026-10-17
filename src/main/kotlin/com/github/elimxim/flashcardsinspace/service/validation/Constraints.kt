@@ -78,13 +78,7 @@ annotation class ValidFlashcardStage(
 
 class FlashcardStageValidator : ConstraintValidator<ValidFlashcardStage, String> {
     override fun isValid(value: String?, context: ConstraintValidatorContext?): Boolean {
-        if (value == null) return true
-        try {
-            FlashcardStage.valueOf(value)
-            return true
-        } catch (_: IllegalArgumentException) {
-            return false
-        }
+        return value == null || FlashcardStage.valueOfOrNull(value) != null
     }
 }
 

@@ -22,27 +22,31 @@ fun addQuizMetadata(
         }
 
         QuizMetadata(
+            stages = parentMetadata.stages,
             round = parentMetadata.round + 1,
             currRoundFlashcardIds = parentMetadata.nextRoundFlashcardIds,
             nextRoundFlashcardIds = mutableSetOf(),
             overallCorrectCount = parentMetadata.overallCorrectCount,
-            overallTotalCount = parentMetadata.overallTotalCount,
+            overallIncorrectCount = parentMetadata.overallIncorrectCount,
+            elapsedTotalTime = parentMetadata.elapsedTotalTime,
         )
     } else {
-        val currRoundFlashcardIds = getMetadataFieldName(QuizMetadata::currRoundFlashcardIds)?.let { fieldName ->
-            request.metadata[fieldName]?.let { parseFlashcardIds(it) }?.toMutableSet()
+        val stages = getMetadataFieldName(QuizMetadata::stages)?.let { fieldName ->
+            request.metadata[fieldName]?.let { parseStringArray(it) }?.toMutableSet()
         } ?: mutableSetOf()
 
-        val overallTotalCount = getMetadataFieldName(QuizMetadata::overallTotalCount)?.let { fieldName ->
-            request.metadata[fieldName]?.let { it as? Int ?: 0 }
-        } ?: 0
+        val currRoundFlashcardIds = getMetadataFieldName(QuizMetadata::currRoundFlashcardIds)?.let { fieldName ->
+            request.metadata[fieldName]?.let { parseNumericArray(it) }?.toMutableSet()
+        } ?: mutableSetOf()
 
         QuizMetadata(
+            stages = stages,
             round = 1,
             currRoundFlashcardIds = currRoundFlashcardIds,
             nextRoundFlashcardIds = mutableSetOf(),
-            overallCorrectCount = 0,
-            overallTotalCount = overallTotalCount,
+            overallCorrectCount = 0, // a new session doesn't have any correct flashcards
+            overallIncorrectCount = 0, // a new session doesn't have any incorrect flashcards
+            elapsedTotalTime = 0,
         )
     }
 
@@ -67,7 +71,7 @@ fun updateQuizMetadata(session: ReviewSession, metadata: Map<String, Any>): Bool
     getMetadataFieldName(QuizMetadata::nextRoundFlashcardIds)?.let { fieldName ->
         val nextRoundFlashcardIds = metadata[fieldName]
         if (nextRoundFlashcardIds != null) {
-            val ids = parseFlashcardIds(nextRoundFlashcardIds)
+            val ids = parseNumericArray(nextRoundFlashcardIds)
             sessionMetadata.nextRoundFlashcardIds.addAll(ids)
             changed = ids.isNotEmpty()
         }
@@ -81,10 +85,26 @@ fun updateQuizMetadata(session: ReviewSession, metadata: Map<String, Any>): Bool
         }
     }
 
+    getMetadataFieldName(QuizMetadata::overallIncorrectCount)?.let { fieldName ->
+        val overallIncorrectCount = metadata[fieldName]
+        if (overallIncorrectCount != null && overallIncorrectCount is Int && overallIncorrectCount > 0) {
+            sessionMetadata.overallIncorrectCount = overallIncorrectCount
+            changed = true
+        }
+    }
+
+    getMetadataFieldName(QuizMetadata::elapsedTotalTime)?.let { fieldName ->
+        val elapsedTotalTime = metadata[fieldName]
+        if (elapsedTotalTime != null && (elapsedTotalTime is Int || elapsedTotalTime is Long) && elapsedTotalTime > 0) {
+            sessionMetadata.elapsedTotalTime = elapsedTotalTime.toLong()
+            changed = true
+        }
+    }
+
     return changed
 }
 
-private fun parseFlashcardIds(value: Any): List<Long> {
+private fun parseNumericArray(value: Any): List<Long> {
     return when (value) {
         is String -> value.split(",")
             .filter { it.matches(numbersOnlyPattern) }
@@ -94,6 +114,21 @@ private fun parseFlashcardIds(value: Any): List<Long> {
             when (item) {
                 is Number -> item.toLong()
                 is String -> if (item.matches(numbersOnlyPattern)) item.toLong() else null
+                else -> null
+            }
+        }
+
+        else -> emptyList()
+    }
+}
+
+private fun parseStringArray(value: Any): List<String> {
+    return when (value) {
+        is String -> value.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+        is List<*> -> value.mapNotNull { item ->
+            when (item) {
+                is String -> if (item.trim().isNotEmpty()) item else null
                 else -> null
             }
         }

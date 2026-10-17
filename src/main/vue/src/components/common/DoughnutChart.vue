@@ -1,33 +1,35 @@
 <template>
   <div class="doughnut-chart--wrapper doughnut-chart--theme">
     <div class="doughnut-chart">
-      <svg class="doughnut-circle" viewBox="0 0 100 100">
-        <circle
-          class="arc-right"
-          cx="50"
-          cy="50"
-          :r="RADIUS"
-          fill="none"
-          :stroke-dasharray="rightDashArray"
-          transform="rotate(-90, 50, 50)"
-        />
-        <g transform="translate(100, 0) scale(-1, 1)">
+      <div class="doughnut-body">
+        <svg class="doughnut-circle" viewBox="0 0 100 100">
           <circle
-            class="arc-left"
+            class="arc-right"
             cx="50"
             cy="50"
             :r="RADIUS"
             fill="none"
-            :stroke-dasharray="leftDashArray"
+            :stroke-dasharray="rightDashArray"
             transform="rotate(-90, 50, 50)"
           />
-        </g>
-      </svg>
-      <div class="doughnut-center">
-        <div class="doughnut-total">
-          {{ total }}
+          <g transform="translate(100, 0) scale(-1, 1)">
+            <circle
+              class="arc-left"
+              cx="50"
+              cy="50"
+              :r="RADIUS"
+              fill="none"
+              :stroke-dasharray="leftDashArray"
+              transform="rotate(-90, 50, 50)"
+            />
+          </g>
+        </svg>
+        <div class="doughnut-center">
+          <div class="doughnut-total">
+            {{ total }}
+          </div>
+          <div class="doughnut-total-label">Total</div>
         </div>
-        <div class="doughnut-total-label">Total</div>
       </div>
     </div>
     <div class="doughnut-legend">
@@ -118,7 +120,7 @@ const leftDashArray = computed(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 10px;
   width: 100%;
   height: 100%;
@@ -126,9 +128,18 @@ const leftDashArray = computed(() => {
 
 .doughnut-chart {
   flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  container-type: size;
+}
+
+.doughnut-body {
   position: relative;
-  aspect-ratio: 1;
-  container-type: inline-size;
+  width: min(100cqw, 100cqh);
+  height: min(100cqw, 100cqh);
   padding: 2px;
 }
 
@@ -170,6 +181,7 @@ const leftDashArray = computed(() => {
 }
 
 .doughnut-legend {
+  flex: none;
   display: flex;
   flex-direction: column;
   justify-content: center;

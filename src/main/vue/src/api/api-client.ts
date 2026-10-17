@@ -28,7 +28,6 @@ import { configureTokenRefreshInterceptor } from '@/api/token-refresh.ts'
 import { configureRetry, DEFAULT_TIMEOUT_MS, LONG_TIMEOUT_MS } from '@/api/retry-config.ts'
 import { User } from '@/model/user.ts'
 import { ReviewSession } from '@/model/review.ts'
-import { ReviewSessionType } from '@/core-logic/review-logic.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 
 const apiClient = axios.create({
@@ -316,13 +315,10 @@ export async function sendUserUpdateRequest(
   })
 }
 
-export async function sendLatestUncompletedReviewSessionGetRequest(
-  setId: number,
-  type: ReviewSessionType,
-) {
-  Log.log(LogTag.GET, `/flashcard-sets/${setId}/review-sessions/latest-uncompleted?type=${type}`)
+export async function sendLatestUncompletedQuizGetRequest(setId: number) {
+  Log.log(LogTag.GET, `/flashcard-sets/${setId}/review-sessions/latest-uncompleted-quiz`)
   return apiClient.get<ReviewSession>(
-    `/flashcard-sets/${setId}/review-sessions/latest-uncompleted?type=${type}`,
+    `/flashcard-sets/${setId}/review-sessions/latest-uncompleted-quiz`,
   )
 }
 
