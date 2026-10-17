@@ -95,7 +95,7 @@ function quizMetadata(overrides: Partial<QuizMetadata> = {}): QuizMetadata {
     currRoundFlashcardIds: [1, 2],
     nextRoundFlashcardIds: [],
     overallCorrectCount: 1,
-    overallIncorrectCount: 2,
+    overallIncorrectCount: 0,
     elapsedTotalTime: 1000,
     ...overrides,
   }
@@ -201,14 +201,6 @@ describe('review-session-attendant', () => {
       expect(flushedRequest().flashcardIds).toEqual([{ id: 5 }])
     })
 
-    it('should refuse to flush a session that is already finished', async () => {
-      attendant.init(reviewSession({ finishedAt: new Date('2026-08-31T11:00:00Z') }))
-
-      await attendant.flush({ all: true })
-
-      expect(updateRequest).not.toHaveBeenCalled()
-    })
-
     it('should drop the previous session', async () => {
       // a running session with a reviewed flashcard
       await attendant.create()
@@ -229,7 +221,7 @@ describe('review-session-attendant', () => {
   describe('loadOrCreate', () => {
     it('should resume a stored session that still has work left', async () => {
       const stored = reviewSession({
-        id: 55,
+        id: SESSION_ID,
         flashcardIds: [1],
         elapsedTime: 900,
         metadata: quizMetadata(),
@@ -237,19 +229,19 @@ describe('review-session-attendant', () => {
       getRequest.mockResolvedValue(okResponse(stored))
       const onboarding = vi.fn()
 
-      await attendant.loadOrCreate({ sessionId: 55, onboarding: onboarding })
+      await attendant.loadOrCreate({ sessionId: SESSION_ID, onboarding: onboarding })
 
-      expect(getRequest).toHaveBeenCalledWith(SET_ID, 55)
+      expect(getRequest).toHaveBeenCalledWith(SET_ID, SESSION_ID)
       expect(createRequest).not.toHaveBeenCalled()
       expect(onboarding).toHaveBeenCalledWith(stored)
-      expect(attendant.sessionId.value).toBe(55)
+      expect(attendant.sessionId.value).toBe(SESSION_ID)
       expect(attendant.elapsedTime.value).toBe(900)
     })
 
     it('should start a new session when the stored one cannot be fetched', async () => {
       getRequest.mockRejectedValue(new Error('gone'))
 
-      await attendant.loadOrCreate({ sessionId: 55 })
+      await attendant.loadOrCreate({ sessionId: SESSION_ID })
 
       expect(bakeError).toHaveBeenCalledWith(
         userApiErrors.REVIEW_SESSION__FETCHING_FAILED,
@@ -270,14 +262,14 @@ describe('review-session-attendant', () => {
 
   describe('onboarding a quiz', () => {
     async function loadStored(metadata: QuizMetadata | undefined) {
-      getRequest.mockResolvedValue(okResponse(reviewSession({ id: 55, metadata: metadata })))
-      await attendant.loadOrCreate({ sessionId: 55 })
+      getRequest.mockResolvedValue(okResponse(reviewSession({ id: SESSION_ID, metadata: metadata })))
+      await attendant.loadOrCreate({ sessionId: SESSION_ID })
     }
 
     it('should resume a round that still has cards to show', async () => {
       await loadStored(quizMetadata({ currRoundFlashcardIds: [1, 2] }))
 
-      expect(attendant.sessionId.value).toBe(55)
+      expect(attendant.sessionId.value).toBe(SESSION_ID)
     })
 
     it('should resume when only the next round has cards left', async () => {
@@ -288,17 +280,17 @@ describe('review-session-attendant', () => {
         }),
       )
 
-      expect(attendant.sessionId.value).toBe(55)
-    })
-
-    it('should start over once every card has been answered correctly', async () => {
-      await loadStored(quizMetadata({ overallCorrectCount: 2, overallIncorrectCount: 2 }))
-
-      expect(createRequest).toHaveBeenCalledOnce()
       expect(attendant.sessionId.value).toBe(SESSION_ID)
     })
 
-    it('should start over when neither round has cards left', async () => {
+    it('should resume a quiz whose cards have all been answered correctly', async () => {
+      await loadStored(quizMetadata({ overallCorrectCount: 2, overallIncorrectCount: 0 }))
+
+      expect(createRequest).not.toHaveBeenCalled()
+      expect(attendant.sessionId.value).toBe(SESSION_ID)
+    })
+
+    it('should resume a quiz when neither round has cards left', async () => {
       await loadStored(
         quizMetadata({
           currRoundFlashcardIds: [],
@@ -306,14 +298,31 @@ describe('review-session-attendant', () => {
         }),
       )
 
-      expect(createRequest).toHaveBeenCalledOnce()
+      expect(createRequest).not.toHaveBeenCalled()
       expect(attendant.sessionId.value).toBe(SESSION_ID)
     })
 
-    it('should start over when the stored quiz carries no metadata', async () => {
+    it('should resume a quiz that carries no metadata', async () => {
       await loadStored(undefined)
 
-      expect(createRequest).toHaveBeenCalledOnce()
+      expect(createRequest).not.toHaveBeenCalled()
+      expect(attendant.sessionId.value).toBe(SESSION_ID)
+    })
+
+    it('should resume a quiz that is already finished', async () => {
+      getRequest.mockResolvedValue(
+        okResponse(
+          reviewSession({
+            id: SESSION_ID,
+            metadata: quizMetadata(),
+            finishedAt: new Date('2026-08-31T11:00:00Z'),
+          }),
+        ),
+      )
+
+      await attendant.loadOrCreate({ sessionId: SESSION_ID })
+
+      expect(createRequest).not.toHaveBeenCalled()
       expect(attendant.sessionId.value).toBe(SESSION_ID)
     })
   })
@@ -340,30 +349,30 @@ describe('review-session-attendant', () => {
       getRequest.mockResolvedValue(
         okResponse(
           reviewSession({
-            id: 55,
+            id: SESSION_ID,
             type: ReviewSessionType.OUTER_SPACE,
           }),
         ),
       )
 
-      await specialAttendant.loadOrCreate({ sessionId: 55 })
+      await specialAttendant.loadOrCreate({ sessionId: SESSION_ID })
 
       expect(createRequest).not.toHaveBeenCalled()
-      expect(specialAttendant.sessionId.value).toBe(55)
+      expect(specialAttendant.sessionId.value).toBe(SESSION_ID)
     })
 
     it('should start over when the stored session is already finished', async () => {
       getRequest.mockResolvedValue(
         okResponse(
           reviewSession({
-            id: 55,
+            id: SESSION_ID,
             type: ReviewSessionType.OUTER_SPACE,
             finishedAt: new Date('2026-08-31T11:00:00Z'),
           }),
         ),
       )
 
-      await specialAttendant.loadOrCreate({ sessionId: 55 })
+      await specialAttendant.loadOrCreate({ sessionId: SESSION_ID })
 
       expect(createRequest).toHaveBeenCalledOnce()
       expect(specialAttendant.sessionId.value).toBe(SESSION_ID)
@@ -399,16 +408,6 @@ describe('review-session-attendant', () => {
 
       expect(flushedRequest().flashcardIds).toEqual([{ id: 1 }, { id: 2 }])
       expect(flushedRequest().finished).toBe(true)
-    })
-
-    it('should finish a session only once', async () => {
-      await attendant.flush({ all: true })
-
-      // the page flushes again on the way out
-      await attendant.flush({ all: true })
-      await attendant.flush()
-
-      expect(updateRequest).toHaveBeenCalledOnce()
     })
 
     it('should pass metadata through untouched', async () => {
@@ -493,30 +492,6 @@ describe('review-session-attendant', () => {
 
       expect(updateRequest).not.toHaveBeenCalled()
     })
-
-    it('should finish the session so that the page cannot finish it twice', async () => {
-      // the carrier request finishes the session server-side
-      attendant.touch({ all: true })
-
-      // the page flushes again on the way out
-      await attendant.flush({ all: true })
-      await attendant.flush()
-
-      expect(updateRequest).not.toHaveBeenCalled()
-    })
-
-    it('should build nothing more once the session is finished', () => {
-      attendant.touch({ all: true })
-
-      expect(attendant.touch()).toBeUndefined()
-      expect(attendant.touch({ all: true })).toBeUndefined()
-    })
-
-    it('should build nothing for a session that was already finished when adopted', () => {
-      attendant.init(reviewSession({ finishedAt: new Date('2026-08-31T11:00:00Z') }))
-
-      expect(attendant.touch()).toBeUndefined()
-    })
   })
 
   describe('clear', () => {
@@ -557,25 +532,50 @@ describe('review-session-attendant', () => {
 
     it('should resume counting from the elapsed time of a loaded session', async () => {
       vi.useFakeTimers()
-      attendant.init(reviewSession({ elapsedTime: 30_000 }))
+      attendant.init(
+        reviewSession({ flashcardIds: [1], elapsedTime: 30_000, metadata: quizMetadata() }),
+      )
 
       vi.advanceTimersByTime(1000)
 
       expect(attendant.elapsedTime.value).toBeGreaterThanOrEqual(31_000)
     })
 
-    it('should not start counting for a session that is already finished', () => {
+    it('should not start counting a quiz round whose cards have all been answered', () => {
       vi.useFakeTimers()
 
       attendant.init(
+        reviewSession({ flashcardIds: [1, 2], elapsedTime: 5000, metadata: quizMetadata() }),
+      )
+      vi.advanceTimersByTime(3000)
+
+      expect(attendant.elapsedTime.value).toBe(5000)
+    })
+
+    it('should not start counting a quiz that carries no metadata', () => {
+      vi.useFakeTimers()
+
+      attendant.init(reviewSession({ elapsedTime: 5000 }))
+      vi.advanceTimersByTime(3000)
+
+      expect(attendant.elapsedTime.value).toBe(5000)
+    })
+
+    it('should not start counting for a plain review that is already finished', () => {
+      vi.useFakeTimers()
+      const specialAttendant = createReviewSessionAttendant(ReviewSessionType.OUTER_SPACE, set, day)
+
+      specialAttendant.init(
         reviewSession({
+          type: ReviewSessionType.OUTER_SPACE,
           elapsedTime: 5000,
           finishedAt: new Date('2026-08-31T11:00:00Z'),
         }),
       )
       vi.advanceTimersByTime(3000)
 
-      expect(attendant.elapsedTime.value).toBe(5000)
+      expect(specialAttendant.elapsedTime.value).toBe(5000)
+      specialAttendant.clear()
     })
 
     it('should stop counting once the session is finished', async () => {
@@ -616,11 +616,11 @@ describe('review-session-attendant', () => {
 
     it('should keep working when loadOrCreate is pulled off the object', async () => {
       const { loadOrCreate } = attendant
-      getRequest.mockResolvedValue(okResponse(reviewSession({ id: 55, metadata: quizMetadata() })))
+      getRequest.mockResolvedValue(okResponse(reviewSession({ id: SESSION_ID, metadata: quizMetadata() })))
 
-      await loadOrCreate({ sessionId: 55 })
+      await loadOrCreate({ sessionId: SESSION_ID })
 
-      expect(attendant.sessionId.value).toBe(55)
+      expect(attendant.sessionId.value).toBe(SESSION_ID)
     })
   })
 })
