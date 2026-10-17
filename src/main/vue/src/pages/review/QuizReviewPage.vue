@@ -51,7 +51,7 @@
           >
             <QuizResult
               :elapsed-time="elapsedTime"
-              :elapsed-total-time="quizElapsedTotalTime"
+              :elapsed-total-time="quizElapsedPreviousTime + elapsedTime"
               :round="quizRound"
               :overall-correct="quizOverallCorrect"
               :overall-incorrect="quizOverallIncorrect"
@@ -177,7 +177,7 @@ const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 const quizRound = ref(1)
 const quizOverallCorrect = ref(0)
 const quizOverallIncorrect = ref(0)
-const quizElapsedTotalTime = ref(0)
+const quizElapsedPreviousTime = ref(0)
 const incorrectFlashcards = ref<Flashcard[]>([])
 
 async function startReview() {
@@ -219,7 +219,7 @@ function resetState() {
   incorrectFlashcards.value = []
   quizOverallIncorrect.value = 0
   quizOverallCorrect.value = 0
-  quizElapsedTotalTime.value = 0
+  quizElapsedPreviousTime.value = 0
 }
 
 async function finishReview() {
@@ -237,7 +237,6 @@ async function quizAnswer(know: boolean) {
   if (!currFlashcard.value) return
 
   sessionAttendant.track(currFlashcard.value.id)
-  quizElapsedTotalTime.value = quizElapsedTotalTime.value + elapsedTime.value
   if (know) {
     quizOverallCorrect.value = quizOverallCorrect.value + 1
     await sessionAttendant.flush({
@@ -246,7 +245,7 @@ async function quizAnswer(know: boolean) {
         nextRoundFlashcardIds: [],
         overallCorrectCount: quizOverallCorrect.value,
         overallIncorrectCount: quizOverallIncorrect.value,
-        elapsedTotalTime: quizElapsedTotalTime.value,
+        elapsedTotalTime: quizElapsedPreviousTime.value + elapsedTime.value,
       },
     })
   } else {
@@ -258,7 +257,7 @@ async function quizAnswer(know: boolean) {
         nextRoundFlashcardIds: [currFlashcard.value.id],
         overallCorrectCount: quizOverallCorrect.value,
         overallIncorrectCount: quizOverallIncorrect.value,
-        elapsedTotalTime: quizElapsedTotalTime.value,
+        elapsedTotalTime: quizElapsedPreviousTime.value + elapsedTime.value,
       },
     })
   }
@@ -306,7 +305,7 @@ function onboardSession(session: ReviewSession) {
   quizRound.value = round
   quizOverallCorrect.value = overallCorrect
   quizOverallIncorrect.value = overallIncorrect
-  quizElapsedTotalTime.value = elapsedTotal
+  quizElapsedPreviousTime.value = elapsedTotal - session.elapsedTime
   incorrectFlashcards.value = nextRound
 
   reviewStore.loadState(new MonoStageReviewQueue(forReview))
