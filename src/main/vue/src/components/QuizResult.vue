@@ -2,6 +2,12 @@
   <div class="quiz-result">
     <div class="quiz-title">Quiz Round {{ round }}</div>
     <div class="quiz-info">
+      <div class="quiz-clock">
+        <Clock :time="elapsedTime" top-label="Round Time" />
+      </div>
+      <div v-if="elapsedTotalTime" class="quiz-clock">
+        <Clock :time="elapsedTotalTime" top-label="Total Time" />
+      </div>
       <div class="quiz-stats">
         <div class="quiz-stats-title">Overall</div>
         <div class="quiz-stats-row">
@@ -16,12 +22,6 @@
             {{ overallIncorrect }}
           </div>
         </div>
-      </div>
-      <div class="quiz-clock">
-        <Clock :time="elapsedTime" top-label="Round Time" />
-      </div>
-      <div v-if="elapsedTotalTime" class="quiz-clock">
-        <Clock :time="elapsedTotalTime" top-label="Total Time" />
       </div>
     </div>
     <div class="quiz-chart-wrapper">
