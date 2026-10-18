@@ -3,57 +3,83 @@
     <div class="doughnut-chart">
       <div class="doughnut-body">
         <svg class="doughnut-circle" viewBox="0 0 100 100">
-          <circle
-            class="arc-right"
-            cx="50"
-            cy="50"
-            :r="RADIUS"
-            fill="none"
-            :stroke-dasharray="rightDashArray"
-            transform="rotate(-90, 50, 50)"
-          />
-          <g transform="translate(100, 0) scale(-1, 1)">
+          <defs v-if="segmented">
+            <mask
+              :id="segmentMaskId"
+              maskUnits="userSpaceOnUse"
+              x="0"
+              y="0"
+              width="100"
+              height="100"
+            >
+              <circle
+                class="segment-mask"
+                cx="50"
+                cy="50"
+                :r="RADIUS"
+                fill="none"
+                :stroke-dasharray="segmentDashArray"
+                :stroke-dashoffset="segmentGap / 2"
+                transform="rotate(-90, 50, 50)"
+              />
+            </mask>
+          </defs>
+          <g :mask="segmented ? `url(#${segmentMaskId})` : undefined">
             <circle
-              class="arc-left"
+              class="arc-right"
               cx="50"
               cy="50"
               :r="RADIUS"
               fill="none"
-              :stroke-dasharray="leftDashArray"
+              :stroke-dasharray="rightDashArray"
               transform="rotate(-90, 50, 50)"
             />
+            <g transform="translate(100, 0) scale(-1, 1)">
+              <circle
+                class="arc-left"
+                cx="50"
+                cy="50"
+                :r="RADIUS"
+                fill="none"
+                :stroke-dasharray="leftDashArray"
+                transform="rotate(-90, 50, 50)"
+              />
+            </g>
           </g>
         </svg>
         <div class="doughnut-center">
           <div class="doughnut-total">
-            {{ total }}
+            {{ shownTotal }}
           </div>
           <div class="doughnut-total-label">Total</div>
         </div>
       </div>
     </div>
-    <div class="doughnut-legend">
+    <div v-if="showLegend" class="doughnut-legend">
       <div class="doughnut-legend-item">
         <span class="doughnut-legend-color right"></span>
         <span class="legend-text">
-          {{ legendRight }}: {{ rightCount }} ({{ rightPercentage }}%)
+          {{ legendRight }}: {{ shownRightCount }} ({{ rightPercentage }}%)
         </span>
       </div>
       <div class="doughnut-legend-item">
         <span class="doughnut-legend-color left"></span>
-        <span class="legend-text"> {{ legendLeft }}: {{ leftCount }} ({{ leftPercentage }}%) </span>
+        <span class="legend-text">
+          {{ legendLeft }}: {{ shownLeftCount }} ({{ leftPercentage }}%)
+        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onUnmounted, ref, useId, watch } from 'vue'
 
 // Fixed radius in viewBox coordinates (viewBox is 100x100)
 // Radius of 42 leaves room for stroke width of ~16 (42 + 8 = 50, centered)
 const RADIUS = 42
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
+const ANIMATION_DURATION = 1200
 
 const props = withDefaults(
   defineProps<{
@@ -62,13 +88,24 @@ const props = withDefaults(
     showLegend?: boolean
     legendLeft?: string
     legendRight?: string
+    animationDelay?: number
+    segmented?: boolean
+    segmentGap?: number
+    segmentCount?: number
   }>(),
   {
     showLegend: true,
     legendLeft: 'Left',
     legendRight: 'Right',
+    animationDelay: 200,
+    segmented: false,
+    segmentGap: 0.7,
+    segmentCount: 40,
   },
 )
+
+const segmentMaskId = `doughnut-segments-${useId()}`
+const segmentDashArray = `${CIRCUMFERENCE / props.segmentCount - props.segmentGap} ${props.segmentGap}`
 
 const rightCount = computed(() => props.total - props.left)
 const leftCount = computed(() => props.left)
@@ -85,23 +122,87 @@ const leftRatio = computed(() => {
   return leftCount.value / props.total
 })
 
+interface ChartValues {
+  total: number
+  rightCount: number
+  leftCount: number
+  rightRatio: number
+  leftRatio: number
+}
+
+const zeroValues: ChartValues = {
+  total: 0,
+  rightCount: 0,
+  leftCount: 0,
+  rightRatio: 0,
+  leftRatio: 0,
+}
+
+const targetValues = computed<ChartValues>(() => ({
+  total: props.total,
+  rightCount: rightCount.value,
+  leftCount: leftCount.value,
+  rightRatio: rightRatio.value,
+  leftRatio: leftRatio.value,
+}))
+
+const shown = ref<ChartValues>({ ...zeroValues })
+let animationFrameId: number | null = null
+let firstSweep = true
+
+function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - t, 3)
+}
+
+function animateTo(target: ChartValues) {
+  if (animationFrameId !== null) cancelAnimationFrame(animationFrameId)
+  const from = { ...shown.value }
+  // The delay holds back only the first sweep, so later value updates follow right away
+  const delay = firstSweep ? props.animationDelay : 0
+  firstSweep = false
+  const startTime = performance.now() + delay
+
+  const step = (now: number) => {
+    const t = Math.min(1, Math.max(0, now - startTime) / ANIMATION_DURATION)
+    const k = easeOutCubic(t)
+    shown.value = {
+      total: from.total + (target.total - from.total) * k,
+      rightCount: from.rightCount + (target.rightCount - from.rightCount) * k,
+      leftCount: from.leftCount + (target.leftCount - from.leftCount) * k,
+      rightRatio: from.rightRatio + (target.rightRatio - from.rightRatio) * k,
+      leftRatio: from.leftRatio + (target.leftRatio - from.leftRatio) * k,
+    }
+    animationFrameId = t < 1 ? requestAnimationFrame(step) : null
+  }
+  animationFrameId = requestAnimationFrame(step)
+}
+
+watch(targetValues, animateTo, { immediate: true })
+
+onUnmounted(() => {
+  if (animationFrameId !== null) cancelAnimationFrame(animationFrameId)
+})
+
+const shownTotal = computed(() => Math.round(shown.value.total))
+const shownRightCount = computed(() => Math.round(shown.value.rightCount))
+const shownLeftCount = computed(() => Math.round(shown.value.leftCount))
+
 const rightPercentage = computed(() => {
-  return (rightRatio.value * 100).toFixed(0)
+  return (shown.value.rightRatio * 100).toFixed(0)
 })
 
 const leftPercentage = computed(() => {
-  if (props.total === 0) return 0
-  return (leftRatio.value * 100).toFixed(0)
+  return (shown.value.leftRatio * 100).toFixed(0)
 })
 
 const rightDashArray = computed(() => {
-  const arcLength = rightRatio.value * CIRCUMFERENCE
+  const arcLength = shown.value.rightRatio * CIRCUMFERENCE
   const gap = CIRCUMFERENCE - arcLength
   return `${arcLength} ${gap}`
 })
 
 const leftDashArray = computed(() => {
-  const arcLength = leftRatio.value * CIRCUMFERENCE
+  const arcLength = shown.value.leftRatio * CIRCUMFERENCE
   const gap = CIRCUMFERENCE - arcLength
   return `${arcLength} ${gap}`
 })
@@ -158,6 +259,11 @@ const leftDashArray = computed(() => {
   stroke: var(--d-chart--arc--left--color);
   stroke-width: var(--d-chart--arc--thickness);
   stroke-linecap: butt;
+}
+
+.segment-mask {
+  stroke: white;
+  stroke-width: calc(var(--d-chart--arc--thickness) + 2);
 }
 
 .doughnut-center {
