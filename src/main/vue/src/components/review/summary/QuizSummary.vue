@@ -8,21 +8,12 @@
         <div v-if="elapsedTotalTime" class="quiz-clock">
           <Clock :time="elapsedTotalTime" top-label="Total Time" />
         </div>
-        <div class="quiz-stats">
-          <div class="quiz-stats-title">Overall</div>
-          <div class="quiz-stats-row">
-            <div class="quiz-stats-text">Correct</div>
-            <div class="quiz-stats-number">
-              {{ overallCorrect }}
-            </div>
-          </div>
-          <div class="quiz-stats-row">
-            <div class="quiz-stats-text">Incorrect</div>
-            <div class="quiz-stats-number">
-              {{ overallIncorrect }}
-            </div>
-          </div>
-        </div>
+        <SummaryAnswerStats
+          class="quiz-stats"
+          title="Overall"
+          :correct="overallCorrect"
+          :incorrect="overallIncorrect"
+        />
       </div>
       <div class="quiz-chart-wrapper">
         <div class="quiz-chart">
@@ -66,6 +57,7 @@ import DoughnutChart from '@/components/common/DoughnutChart.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import Clock from '@/components/common/Clock.vue'
 import ReviewSummary from '@/components/review/summary/ReviewSummary.vue'
+import SummaryAnswerStats from '@/components/review/summary/SummaryAnswerStats.vue'
 
 withDefaults(
   defineProps<{
@@ -125,13 +117,6 @@ withDefaults(
 
 .quiz-stats {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(2px, 1cqw, 4px);
-  padding: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border-radius: 6px;
 }
 
 .quiz-clock {
@@ -139,57 +124,6 @@ withDefaults(
   align-items: flex-start;
   justify-content: center;
   --stopwatch--bg: none;
-}
-
-.quiz-stats-title {
-  font-size: clamp(0.7rem, 2.5cqw, 0.85rem);
-  font-weight: 400;
-  letter-spacing: 0.05rem;
-  word-spacing: 0.05rem;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: nowrap;
-  color: #6a6a6a;
-}
-
-.quiz-stats-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: clamp(4px, 1cqw, 10px);
-  width: 100%;
-}
-
-.quiz-stats-title + .quiz-stats-row {
-  margin-top: auto;
-}
-
-.quiz-stats-row:last-child {
-  margin-bottom: auto;
-}
-
-.quiz-stats-text {
-  font-size: clamp(0.65rem, 2.5cqw, 0.85rem);
-  font-weight: 600;
-  color: #353535;
-  letter-spacing: 0.05rem;
-  word-spacing: 0.05rem;
-  text-transform: uppercase;
-  text-align: start;
-  white-space: nowrap;
-}
-
-.quiz-stats-number {
-  font-size: clamp(0.7rem, 2.5cqw, 0.85rem);
-  font-weight: 600;
-  color: rgba(17, 33, 85, 0.92);
-  background: rgb(225, 228, 240);
-  padding: clamp(2px, 1cqw, 3px);
-  margin: clamp(1px, 0.5cqw, 2px);
-  border-radius: 6px;
-  width: 40px;
-  text-align: center;
 }
 
 .quiz-left-button {
