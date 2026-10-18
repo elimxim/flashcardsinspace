@@ -48,6 +48,10 @@ export interface ReviewSessionAttendant {
 
   track(flashcardId: number): void
 
+  freeze(): void
+
+  unfreeze(): void
+
   clear(): void
 }
 
@@ -217,6 +221,15 @@ export function createReviewSessionAttendant(
     trackedFlashcardIds.push(flashcardId)
   }
 
+  function freeze() {
+    stopWatch()
+  }
+
+  function unfreeze() {
+    Log.log(LogTag.DEBUG, "Unfreezing review session")
+    startWatch()
+  }
+
   function clear() {
     sessionId.value = undefined
     trackedFlashcardIds.length = 0
@@ -233,6 +246,8 @@ export function createReviewSessionAttendant(
     flush,
     touch,
     track,
+    freeze,
+    unfreeze,
     clear,
   }
 }

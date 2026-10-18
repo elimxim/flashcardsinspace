@@ -111,9 +111,11 @@
           </div>
           <template #overlay>
             <SpecialSummary
-              :total="0"
-              :elapsed-time="0"
-              :on-back="noPrevAvailable ? undefined : prev"
+              :total="flashcardsTotal"
+              :viewed="viewedFlashcardIds.size"
+              :elapsed-time="elapsedTime"
+              :on-back="continueReview"
+              :on-finish="finishReviewAndLeave"
             />
           </template>
         </SlideUpOverlay>
@@ -135,7 +137,7 @@ import Starfield from '@/components/common/Starfield.vue'
 import SpecialSummary from '@/components/review/summary/SpecialSummary.vue'
 import SlideUpOverlay from '@/components/common/SlideUpOverlay.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { learningStages, specialStages } from '@/core-logic/stage-logic.ts'
@@ -193,6 +195,8 @@ const sessionAttendant = createReviewSessionAttendant(
   flashcardSet,
   currDay,
 )
+const { elapsedTime } = sessionAttendant
+
 const reviewStore = useReviewStore(props.reviewMode.sessionType, flashcardSet)
 
 const {
@@ -202,6 +206,7 @@ const {
   flashcardsRemaining,
   flashcardsSeen,
   progress,
+  noNextAvailable,
   noPrevAvailable,
   noOneAvailable,
 } = storeToRefs(reviewStore)
@@ -210,11 +215,14 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
+const viewedFlashcardIds = ref(new Set<number>())
+
 async function startReview() {
   Log.log(LogTag.LOGIC, `Starting review: ${props.reviewMode.sessionType}`)
   try {
     startLoading()
     reviewStore.$reset()
+    viewedFlashcardIds.value = new Set()
     if (!flashcardStore.loaded) {
       Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
       const selectedSetId = loadSelectedSetIdFromCookies()
@@ -228,14 +236,24 @@ async function startReview() {
       reviewSessionTypeToSpecialStage(props.reviewMode.sessionType) ?? specialStages.UNKNOWN
     reviewStore.loadState(createReviewQueueForStages(flashcards.value, [stage], currDay.value))
 
-    await sessionAttendant.create()
-    await reviewStore.nextFlashcard()
-
-    Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+    if (reviewQueue.value.remaining() === 0) {
+      Log.log(LogTag.LOGIC, "Can't start review - no flashcards remaining")
+    } else {
+      await sessionAttendant.create()
+      await reviewStore.nextFlashcard()
+      Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+    }
   } finally {
     await stopLoading()
   }
   spaceDeck.value?.setDeckReady()
+}
+
+async function continueReview() {
+  if (!noPrevAvailable.value) {
+    sessionAttendant.unfreeze()
+    await prev()
+  }
 }
 
 async function finishReview() {
@@ -266,9 +284,12 @@ async function slideLeft() {
 
 async function next() {
   if (!currFlashcard.value || noOneAvailable.value) return
+  viewedFlashcardIds.value.add(currFlashcard.value.id)
   sessionAttendant.track(currFlashcard.value.id)
   await sessionAttendant.flush()
-  await reviewStore.nextFlashcard()
+  if (!(await reviewStore.nextFlashcard())) {
+    sessionAttendant.freeze()
+  }
 }
 
 async function moveBack() {
@@ -332,7 +353,11 @@ async function handleKeydown(event: KeyboardEvent) {
     await finishReviewAndLeave()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
-    await slideLeft()
+    if (noNextAvailable.value) {
+      await continueReview()
+    } else {
+      await slideLeft()
+    }
   } else if (event.key === 'ArrowRight') {
     event.stopPropagation()
     await spaceDeck?.value?.slideRight()
