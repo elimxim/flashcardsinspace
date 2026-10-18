@@ -72,7 +72,13 @@
             </div>
           </div>
           <template #overlay>
-            <LightspeedSummary :correct="0" :incorrect="0" :elapsed-time="0"/>
+            <LightspeedSummary
+              :correct="correctCount"
+              :incorrect="incorrectCount"
+              :total="flashcardsTotal"
+              :elapsed-time="elapsedTime"
+              :on-finish="finishReviewAndLeave"
+            />
           </template>
         </SlideUpOverlay>
       </template>
@@ -153,9 +159,12 @@ const sessionAttendant = createReviewSessionAttendant(
   flashcardSet,
   currDay,
 )
+const { elapsedTime } = sessionAttendant
+
 const reviewStore = useReviewStore(ReviewSessionType.LIGHTSPEED, flashcardSet)
 
 const {
+  reviewQueue,
   flashcardsTotal,
   currFlashcard,
   flashcardsRemaining,
@@ -172,12 +181,17 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
+const correctCount = ref(0)
+const incorrectCount = ref(0)
+
 async function startReview() {
   Log.log(LogTag.LOGIC, `Starting review: ${ReviewSessionType.LIGHTSPEED}`)
   try {
     sessionAttendant.clear()
     startLoading()
     reviewStore.$reset()
+    correctCount.value = 0
+    incorrectCount.value = 0
     if (!flashcardStore.loaded) {
       Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
       const selectedSetId = loadSelectedSetIdFromCookies()
@@ -189,10 +203,13 @@ async function startReview() {
     }
     reviewStore.loadState(createReviewQueue(flashcards.value, currDay.value))
 
-    await sessionAttendant.create()
-    await reviewStore.nextFlashcard()
-
-    Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+    if (reviewQueue.value.remaining() === 0) {
+      Log.log(LogTag.LOGIC, "Can't start review - no flashcards remaining")
+    } else {
+      await sessionAttendant.create()
+      await reviewStore.nextFlashcard()
+      Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+    }
   } finally {
     await stopLoading()
   }
@@ -220,6 +237,7 @@ async function stageDown() {
   updateFlashcard(flashcard, prevStage(flashcard.stage), currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   if (success) {
+    incorrectCount.value++
     await getNextAndMarkDays(flashcardSet.value, currDay.value)
   }
 }
@@ -230,6 +248,7 @@ async function stageUp() {
   updateFlashcard(flashcard, nextStage(flashcard.stage), currDay.value.chronodate)
   const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
   if (success) {
+    correctCount.value++
     await getNextAndMarkDays(flashcardSet.value, currDay.value)
   }
 }
