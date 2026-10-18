@@ -116,9 +116,8 @@ withDefaults(
   grid-column: 1 / 3;
   width: 100%;
   height: 100%;
-  display: grid;
-  grid-template-rows: auto 1fr;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: clamp(8px, 1.8cqw, 12px);
 }
 
@@ -138,10 +137,10 @@ withDefaults(
 }
 
 .quiz-stats {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  align-self: flex-start;
   gap: clamp(2px, 1cqw, 4px);
   padding: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -151,7 +150,6 @@ withDefaults(
 .quiz-clock {
   display: flex;
   align-items: flex-start;
-  align-self: flex-start;
   justify-content: center;
   --stopwatch--bg: none;
 }
@@ -174,6 +172,14 @@ withDefaults(
   align-items: center;
   gap: clamp(4px, 1cqw, 10px);
   width: 100%;
+}
+
+.quiz-stats-title + .quiz-stats-row {
+  margin-top: auto;
+}
+
+.quiz-stats-row:last-child {
+  margin-bottom: auto;
 }
 
 .quiz-stats-text {
