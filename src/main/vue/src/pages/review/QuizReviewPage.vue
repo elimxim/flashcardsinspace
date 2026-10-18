@@ -49,7 +49,7 @@
             swipe-left-text="Don't know"
             swipe-right-text="Know"
           >
-            <QuizResult
+            <QuizSummary
               :elapsed-time="elapsedTime"
               :elapsed-total-time="quizElapsedPreviousTime + elapsedTime"
               :round="quizRound"
@@ -96,7 +96,7 @@ import SpaceDeck from '@/components/SpaceDeck.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SpaceToast from '@/components/common/SpaceToast.vue'
-import QuizResult from '@/components/QuizResult.vue'
+import QuizSummary from '@/components/QuizSummary.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'

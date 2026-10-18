@@ -1,5 +1,5 @@
 <template>
-  <div class="quiz-result">
+  <div class="quiz-summary">
     <div class="quiz-title">Quiz Round {{ round }}</div>
     <div class="quiz-info">
       <div class="quiz-clock">
@@ -85,7 +85,7 @@ withDefaults(
 </script>
 
 <style scoped>
-.quiz-result {
+.quiz-summary {
   width: 100%;
   height: auto;
   display: grid;
