@@ -32,7 +32,7 @@ import Starfield from '@/components/common/Starfield.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import { REVERSE_HOLD_TIME, useReverseMode } from '@/utils/reverse-mode.ts'
 import { ReviewSessionType } from '@/core-logic/review-logic.ts'
-import WidgetReviewBadge from '@/components/WidgetReviewBadge.vue'
+import WidgetReviewBadge from '@/components/control-panel/WidgetReviewBadge.vue'
 
 withDefaults(
   defineProps<{

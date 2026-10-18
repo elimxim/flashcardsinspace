@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
-import WidgetReviewBadge from '@/components/WidgetReviewBadge.vue'
+import WidgetReviewBadge from '@/components/control-panel/WidgetReviewBadge.vue'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { storeToRefs } from 'pinia'

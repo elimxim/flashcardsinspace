@@ -29,7 +29,7 @@
 import { ref } from 'vue'
 import { deckEmptyMessage } from '@/core-logic/review-logic.ts'
 import SmartButton from '@/components/common/SmartButton.vue'
-import ReviewSummary from '@/components/ReviewSummary.vue'
+import ReviewSummary from '@/components/review/summary/ReviewSummary.vue'
 import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
 

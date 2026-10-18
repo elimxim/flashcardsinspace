@@ -66,7 +66,7 @@
 import DoughnutChart from '@/components/common/DoughnutChart.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import Clock from '@/components/common/Clock.vue'
-import ReviewSummary from '@/components/ReviewSummary.vue'
+import ReviewSummary from '@/components/review/summary/ReviewSummary.vue'
 
 withDefaults(
   defineProps<{

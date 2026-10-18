@@ -47,8 +47,8 @@
 <script setup lang="ts">
 import TextInput from '@/components/common/TextInput.vue'
 import ErrorText from '@/components/common/ErrorText.vue'
-import VoiceRecorder from '@/components/VoiceRecorder.vue'
-import PictureUploader from '@/components/PictureUploader.vue'
+import VoiceRecorder from '@/components/media/VoiceRecorder.vue'
+import PictureUploader from '@/components/media/PictureUploader.vue'
 import { useVuelidate } from '@vuelidate/core'
 import { maxLength, requiredIf } from '@vuelidate/validators'
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
