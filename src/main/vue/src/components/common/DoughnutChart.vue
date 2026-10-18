@@ -83,8 +83,8 @@ const ANIMATION_DURATION = 1200
 
 const props = withDefaults(
   defineProps<{
-    total: number
     left: number
+    right: number
     showLegend?: boolean
     legendLeft?: string
     legendRight?: string
@@ -107,19 +107,19 @@ const props = withDefaults(
 const segmentMaskId = `doughnut-segments-${useId()}`
 const segmentDashArray = `${CIRCUMFERENCE / props.segmentCount - props.segmentGap} ${props.segmentGap}`
 
-const rightCount = computed(() => props.total - props.left)
+const rightCount = computed(() => props.right)
 const leftCount = computed(() => props.left)
 
+const total = computed(() => props.left + props.right)
+
 const rightRatio = computed(() => {
-  if (props.total === 0) return 0
-  if (leftCount.value === 0) return 1
-  return rightCount.value / props.total
+  if (total.value === 0) return 0
+  return rightCount.value / total.value
 })
 
 const leftRatio = computed(() => {
-  if (props.total === 0) return 0
-  if (rightCount.value === 0) return 1
-  return leftCount.value / props.total
+  if (total.value === 0) return 0
+  return leftCount.value / total.value
 })
 
 interface ChartValues {
@@ -139,7 +139,7 @@ const zeroValues: ChartValues = {
 }
 
 const targetValues = computed<ChartValues>(() => ({
-  total: props.total,
+  total: total.value,
   rightCount: rightCount.value,
   leftCount: leftCount.value,
   rightRatio: rightRatio.value,

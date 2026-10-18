@@ -19,7 +19,7 @@
           class="control-bar-button"
           tooltip="Finish review and leave"
           tooltip-position="bottom-left"
-          :on-click="finishReviewAndLeave"
+          :on-click="requestExit"
         />
       </template>
     </ControlBar>
@@ -37,7 +37,7 @@
             {{ flashcardsRemaining }}
           </div>
         </div>
-        <SlideUpOverlay :visible="noOneAvailable">
+        <SlideUpOverlay :visible="summaryVisible">
           <div class="review-body">
             <SpaceDeck
               ref="spaceDeck"
@@ -77,6 +77,7 @@
               :incorrect="incorrectCount"
               :total="flashcardsTotal"
               :elapsed-time="elapsedTime"
+              :on-back="continueReview"
               :on-finish="finishReviewAndLeave"
             />
           </template>
@@ -181,6 +182,9 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
+const exitRequested = ref(false)
+const summaryVisible = computed(() => noOneAvailable.value || exitRequested.value)
+
 const correctCount = ref(0)
 const incorrectCount = ref(0)
 
@@ -229,6 +233,21 @@ async function finishReview() {
 async function finishReviewAndLeave() {
   await finishReviewOnce()
   await router.push({ name: routeNames.controlPanel })
+}
+
+async function requestExit() {
+  if (summaryVisible.value) {
+    await finishReviewAndLeave()
+  } else {
+    exitRequested.value = true
+    sessionAttendant.freeze()
+  }
+}
+
+function continueReview() {
+  if (!exitRequested.value) return
+  exitRequested.value = false
+  sessionAttendant.unfreeze()
 }
 
 async function stageDown() {
@@ -361,12 +380,14 @@ async function handleKeydown(event: KeyboardEvent) {
 
   if (event.key === 'Escape') {
     event.stopPropagation()
-    await finishReviewAndLeave()
+    await requestExit()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
+    if (summaryVisible.value) return
     await spaceDeck?.value?.slideLeft()
   } else if (event.key === 'ArrowRight') {
     event.stopPropagation()
+    if (summaryVisible.value) return
     await spaceDeck?.value?.slideRight()
   }
 }

@@ -16,14 +16,14 @@
       <div class="lightspeed-chart-wrapper">
         <div class="lightspeed-chart">
           <DoughnutChart
-            :total="correct + incorrect"
+            :right="correct"
             :left="incorrect"
             legend-left="Incorrect"
             legend-right="Correct"
           />
         </div>
       </div>
-      <div class="lightspeed-button">
+      <div :class="onBack ? 'lightspeed-left-button' : 'lightspeed-central-button'">
         <SmartButton
           text="Finish Review"
           class="off-button"
@@ -31,6 +31,9 @@
           fill-width
           auto-blur
         />
+      </div>
+      <div v-if="onBack" class="lightspeed-right-button">
+        <SmartButton text="Back" class="calm-button" :on-click="onBack" fill-width auto-blur />
       </div>
     </div>
   </ReviewSummary>
@@ -50,9 +53,11 @@ withDefaults(
     incorrect: number
     total: number
     elapsedTime: number
+    onBack?: () => void
     onFinish?: () => void
   }>(),
   {
+    onBack: undefined,
     onFinish: () => {},
   },
 )
@@ -108,8 +113,18 @@ const title = deckEmptyMessage()
   padding: clamp(4px, 1.8cqw, 10px);
 }
 
-.lightspeed-button {
+.lightspeed-left-button {
+  margin-top: 4px;
+  grid-column: 1 / 3;
+}
+
+.lightspeed-central-button {
   margin-top: 4px;
   grid-column: 1 / -1;
+}
+
+.lightspeed-right-button {
+  margin-top: 4px;
+  grid-column: 3 / -1;
 }
 </style>

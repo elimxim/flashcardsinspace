@@ -19,7 +19,7 @@
           class="control-bar-button"
           tooltip="Finish review and leave"
           tooltip-position="bottom-left"
-          :on-click="finishReviewAndLeave"
+          :on-click="requestExit"
         />
       </template>
     </ControlBar>
@@ -37,7 +37,7 @@
             {{ flashcardsRemaining }}
           </div>
         </div>
-        <SlideUpOverlay :visible="noOneAvailable">
+        <SlideUpOverlay :visible="summaryVisible">
           <div class="review-body">
             <SpaceDeck
               ref="spaceDeck"
@@ -78,9 +78,11 @@
               :round="quizRound"
               :overall-correct="quizOverallCorrect"
               :overall-incorrect="quizOverallIncorrect"
+              :round-correct="flashcardsTotal - incorrectFlashcards.length"
+              :round-incorrect="incorrectFlashcards.length"
               :round-total="flashcardsTotal"
-              :round-failed="incorrectFlashcards.length"
               :on-next-round="startNextQuizRound"
+              :on-back="continueReview"
               :on-finish="finishReviewAndLeave"
             />
           </template>
@@ -178,6 +180,9 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
+const exitRequested = ref(false)
+const summaryVisible = computed(() => noOneAvailable.value || exitRequested.value)
+
 const quizRound = ref(1)
 const quizOverallCorrect = ref(0)
 const quizOverallIncorrect = ref(0)
@@ -218,6 +223,7 @@ async function startReview() {
 }
 
 function resetState() {
+  exitRequested.value = false
   sessionAttendant.clear()
   reviewStore.$reset()
   incorrectFlashcards.value = []
@@ -235,6 +241,21 @@ async function finishReview() {
 async function finishReviewAndLeave() {
   await finishReviewOnce()
   await router.push({ name: routeNames.controlPanel })
+}
+
+async function requestExit() {
+  if (summaryVisible.value) {
+    await finishReviewAndLeave()
+  } else {
+    exitRequested.value = true
+    sessionAttendant.freeze()
+  }
+}
+
+function continueReview() {
+  if (!exitRequested.value) return
+  exitRequested.value = false
+  sessionAttendant.unfreeze()
 }
 
 async function quizAnswer(know: boolean) {
@@ -339,12 +360,14 @@ async function handleKeydown(event: KeyboardEvent) {
 
   if (event.key === 'Escape') {
     event.stopPropagation()
-    await finishReviewAndLeave()
+    await requestExit()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
+    if (summaryVisible.value) return
     await spaceDeck?.value?.slideLeft()
   } else if (event.key === 'ArrowRight') {
     event.stopPropagation()
+    if (summaryVisible.value) return
     await spaceDeck?.value?.slideRight()
   }
 }

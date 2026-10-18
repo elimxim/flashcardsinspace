@@ -6,7 +6,12 @@
       </div>
       <div class="special-chart-wrapper">
         <div class="special-chart">
-          <DoughnutChart :total="total" :left="total - viewed" :show-legend="false" />
+          <DoughnutChart
+            :left="total - viewed"
+            :right="viewed"
+            legend-left="Remaining"
+            legend-right="Viewed"
+          />
         </div>
       </div>
       <div :class="onBack ? 'special-left-button' : 'special-central-button'">

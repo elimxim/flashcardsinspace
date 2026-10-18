@@ -26,7 +26,7 @@
           class="control-bar-button"
           tooltip="Finish review and leave"
           tooltip-position="bottom-left"
-          :on-click="finishReviewAndLeave"
+          :on-click="requestExit"
         />
       </template>
     </ControlBar>
@@ -55,7 +55,7 @@
             {{ flashcardsRemaining }}
           </div>
         </div>
-        <SlideUpOverlay :visible="noOneAvailable">
+        <SlideUpOverlay :visible="summaryVisible">
           <div class="review-body">
             <SpaceDeck
               ref="spaceDeck"
@@ -137,7 +137,7 @@ import Starfield from '@/components/common/Starfield.vue'
 import SpecialSummary from '@/components/review/summary/SpecialSummary.vue'
 import SlideUpOverlay from '@/components/common/SlideUpOverlay.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { learningStages, specialStages } from '@/core-logic/stage-logic.ts'
@@ -215,6 +215,9 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
+const exitRequested = ref(false)
+const summaryVisible = computed(() => noNextAvailable.value || exitRequested.value)
+
 const viewedFlashcardIds = ref(new Set<number>())
 
 async function startReview() {
@@ -250,7 +253,10 @@ async function startReview() {
 }
 
 async function continueReview() {
-  if (!noPrevAvailable.value) {
+  if (exitRequested.value) {
+    exitRequested.value = false
+    sessionAttendant.unfreeze()
+  } else if (!noPrevAvailable.value) {
     sessionAttendant.unfreeze()
     await prev()
   }
@@ -266,6 +272,15 @@ async function finishReview() {
 async function finishReviewAndLeave() {
   await finishReviewOnce()
   await router.push({ name: routeNames.controlPanel })
+}
+
+async function requestExit() {
+  if (summaryVisible.value) {
+    await finishReviewAndLeave()
+  } else {
+    exitRequested.value = true
+    sessionAttendant.freeze()
+  }
 }
 
 async function prev() {
@@ -350,16 +365,17 @@ async function handleKeydown(event: KeyboardEvent) {
 
   if (event.key === 'Escape') {
     event.stopPropagation()
-    await finishReviewAndLeave()
+    await requestExit()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
-    if (noNextAvailable.value) {
+    if (summaryVisible.value) {
       await continueReview()
     } else {
       await slideLeft()
     }
   } else if (event.key === 'ArrowRight') {
     event.stopPropagation()
+    if (summaryVisible.value) return
     await spaceDeck?.value?.slideRight()
   }
 }

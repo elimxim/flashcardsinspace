@@ -18,8 +18,8 @@
       <div class="quiz-chart-wrapper">
         <div class="quiz-chart">
           <DoughnutChart
-            :total="roundTotal"
-            :left="roundFailed"
+            :left="roundIncorrect"
+            :right="roundCorrect"
             legend-left="Incorrect"
             legend-right="Correct"
           />
@@ -27,8 +27,8 @@
       </div>
       <div
         :class="{
-          'quiz-central-button': roundFailed === 0,
-          'quiz-left-button': roundFailed > 0,
+          'quiz-central-button': !hasNextRoundButton,
+          'quiz-left-button': hasNextRoundButton,
         }"
       >
         <SmartButton
@@ -39,7 +39,10 @@
           auto-blur
         />
       </div>
-      <div v-if="roundFailed > 0" class="quiz-right-button">
+      <div v-if="!hasNextRoundButton" class="quiz-right-button">
+        <SmartButton text="Back" class="calm-button" :on-click="onBack" fill-width auto-blur />
+      </div>
+      <div v-else-if="roundIncorrect > 0" class="quiz-right-button">
         <SmartButton
           text="Next Round"
           class="calm-button"
@@ -53,28 +56,36 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import DoughnutChart from '@/components/common/DoughnutChart.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import Clock from '@/components/common/Clock.vue'
 import ReviewSummary from '@/components/review/summary/ReviewSummary.vue'
 import SummaryAnswerStats from '@/components/review/summary/SummaryAnswerStats.vue'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     elapsedTime: number
     elapsedTotalTime: number
     round: number
     overallCorrect: number
     overallIncorrect: number
+    roundCorrect: number
+    roundIncorrect: number
     roundTotal: number
-    roundFailed: number
     onNextRound?: () => void
+    onBack?: () => void
     onFinish?: () => void
   }>(),
   {
     onNextRound: () => {},
+    onBack: () => {},
     onFinish: () => {},
   },
+)
+
+const hasNextRoundButton = computed(
+  () => (props.roundCorrect + props.roundIncorrect) === props.roundTotal,
 )
 </script>
 
