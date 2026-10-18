@@ -44,7 +44,12 @@
         :track-color="reviewMode.isOuterSpace() ? 'rgb(28,20,57)' : '#f1f5f9'"
       />
       <template v-else-if="!loadingStarted">
-        <div class="review-progressbar">
+        <div
+          :class="[
+            'review-progressbar',
+            { 'review-progressbar--outer-space': reviewMode.isOuterSpace() },
+          ]"
+        >
           <Progressbar :progress="progress" height="16px" glide />
         </div>
         <div class="review-info">
@@ -111,7 +116,9 @@
           </div>
           <template #overlay>
             <SpecialSummary
+              :session-type="reviewMode.sessionType"
               :total="flashcardsTotal"
+              :outer-space="reviewMode.isOuterSpace()"
               :viewed="viewedFlashcardIds.size"
               :elapsed-time="elapsedTime"
               :on-back="continueReview"
@@ -206,7 +213,6 @@ const {
   flashcardsRemaining,
   flashcardsSeen,
   progress,
-  noNextAvailable,
   noPrevAvailable,
   noOneAvailable,
 } = storeToRefs(reviewStore)
@@ -216,7 +222,7 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
 const exitRequested = ref(false)
-const summaryVisible = computed(() => noNextAvailable.value || exitRequested.value)
+const summaryVisible = computed(() => noOneAvailable.value || exitRequested.value)
 
 const viewedFlashcardIds = ref(new Set<number>())
 
@@ -395,6 +401,13 @@ async function handleKeydown(event: KeyboardEvent) {
 .review-mode {
   color: rgba(243, 239, 239, 0.7);
   font-size: 18px;
+}
+
+.review-progressbar--outer-space {
+  --review-progressbar--from: #a78bfa;
+  --review-progressbar--via: #8b5cf6;
+  --review-progressbar--to: #7c3aed;
+  --review-progressbar--bg-color: rgba(255, 255, 255, 0.15);
 }
 
 .review-info {

@@ -35,6 +35,6 @@ withDefaults(
   letter-spacing: 0.02rem;
   text-align: center;
   text-wrap: balance;
-  color: #353535;
+  color: var(--review-summary--title--color, #353535);
 }
 </style>
