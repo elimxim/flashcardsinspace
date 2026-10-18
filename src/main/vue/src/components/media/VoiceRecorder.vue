@@ -53,7 +53,7 @@
 
 <script lang="ts" setup>
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
-import VoicePlayer from '@/components/VoicePlayer.vue'
+import VoicePlayer from '@/components/media/VoicePlayer.vue'
 import { ref, computed, onBeforeUnmount, watch } from 'vue'
 import { Log, LogTag } from '@/utils/logger.ts'
 

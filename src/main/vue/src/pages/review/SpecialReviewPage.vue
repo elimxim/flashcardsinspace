@@ -26,7 +26,7 @@
           class="control-bar-button"
           tooltip="Finish review and leave"
           tooltip-position="bottom-left"
-          :on-click="finishReviewAndLeave"
+          :on-click="requestExit"
         />
       </template>
     </ControlBar>
@@ -44,7 +44,12 @@
         :track-color="reviewMode.isOuterSpace() ? 'rgb(28,20,57)' : '#f1f5f9'"
       />
       <template v-else-if="!loadingStarted">
-        <div class="review-progressbar">
+        <div
+          :class="[
+            'review-progressbar',
+            { 'review-progressbar--outer-space': reviewMode.isOuterSpace() },
+          ]"
+        >
           <Progressbar :progress="progress" height="16px" glide />
         </div>
         <div class="review-info">
@@ -55,61 +60,72 @@
             {{ flashcardsRemaining }}
           </div>
         </div>
-        <div class="review-body">
-          <SpaceDeck
-            ref="spaceDeck"
-            :session-type="reviewMode.sessionType"
-            :reversed="reversed"
-            :can-slide-left="!noPrevAvailable"
-            :can-slide-right="!noOneAvailable"
-            :on-slide-left="prev"
-            :on-slide-right="next"
-            swipe-left-text="Prev"
-            swipe-right-text="Next"
-          >
-            <ReviewResult />
-          </SpaceDeck>
-          <div v-if="UXConfig().showNavButtons" class="review-nav">
-            <SmartButton
-              class="calm-button"
-              text="Prev"
-              :disabled="noPrevAvailable"
-              :on-click="spaceDeck?.slideLeft"
-              auto-blur
-              rounded
+        <SlideUpOverlay :visible="summaryVisible">
+          <div class="review-body">
+            <SpaceDeck
+              ref="spaceDeck"
+              :session-type="reviewMode.sessionType"
+              :reversed="reversed"
+              :can-slide-left="!noPrevAvailable"
+              :can-slide-right="!noOneAvailable"
+              :on-slide-left="prev"
+              :on-slide-right="next"
+              swipe-left-text="Prev"
+              swipe-right-text="Next"
             />
-            <SmartButton
-              v-if="reviewMode.isOuterSpace()"
-              class="decision-button dangerous-button"
-              text="Move back"
-              :disabled="noOneAvailable"
-              :hidden="noOneAvailable"
-              :on-click="moveBack"
-              :hold-time="1.2"
-              auto-blur
-              rounded
-            />
-            <SmartButton
-              class="calm-button"
-              text="Next"
-              :disabled="noOneAvailable"
-              :on-click="spaceDeck?.slideRight"
-              auto-blur
-              rounded
-            />
+            <div v-if="UXConfig().showNavButtons" class="review-nav">
+              <SmartButton
+                class="calm-button"
+                text="Prev"
+                :disabled="noPrevAvailable"
+                :on-click="slideLeft"
+                auto-blur
+                rounded
+              />
+              <SmartButton
+                v-if="reviewMode.isOuterSpace()"
+                class="decision-button dangerous-button"
+                text="Move back"
+                :disabled="noOneAvailable"
+                :hidden="noOneAvailable"
+                :on-click="moveBack"
+                :hold-time="1.2"
+                auto-blur
+                rounded
+              />
+              <SmartButton
+                class="calm-button"
+                text="Next"
+                :disabled="noOneAvailable"
+                :on-click="spaceDeck?.slideRight"
+                auto-blur
+                rounded
+              />
+            </div>
+            <div v-else-if="reviewMode.isOuterSpace()" class="review-nav review-nav--centered">
+              <SmartButton
+                class="decision-button dangerous-button"
+                text="Move back"
+                :disabled="noOneAvailable"
+                :on-click="moveBack"
+                :hold-time="1.2"
+                auto-blur
+                rounded
+              />
+            </div>
           </div>
-          <div v-else-if="reviewMode.isOuterSpace()" class="review-nav review-nav--centered">
-            <SmartButton
-              class="decision-button dangerous-button"
-              text="Move back"
-              :disabled="noOneAvailable"
-              :on-click="moveBack"
-              :hold-time="1.2"
-              auto-blur
-              rounded
+          <template #overlay>
+            <SpecialSummary
+              :session-type="reviewMode.sessionType"
+              :total="flashcardsTotal"
+              :outer-space="reviewMode.isOuterSpace()"
+              :viewed="viewedFlashcardIds.size"
+              :elapsed-time="elapsedTime"
+              :on-back="continueReview"
+              :on-finish="finishReviewAndLeave"
             />
-          </div>
-        </div>
+          </template>
+        </SlideUpOverlay>
       </template>
     </div>
   </div>
@@ -125,7 +141,8 @@ import SmartButton from '@/components/common/SmartButton.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SpaceToast from '@/components/common/SpaceToast.vue'
 import Starfield from '@/components/common/Starfield.vue'
-import ReviewResult from '@/components/ReviewResult.vue'
+import SpecialSummary from '@/components/review/summary/SpecialSummary.vue'
+import SlideUpOverlay from '@/components/common/SlideUpOverlay.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -185,6 +202,8 @@ const sessionAttendant = createReviewSessionAttendant(
   flashcardSet,
   currDay,
 )
+const { elapsedTime } = sessionAttendant
+
 const reviewStore = useReviewStore(props.reviewMode.sessionType, flashcardSet)
 
 const {
@@ -202,11 +221,17 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
+const exitRequested = ref(false)
+const summaryVisible = computed(() => noOneAvailable.value || exitRequested.value)
+
+const viewedFlashcardIds = ref(new Set<number>())
+
 async function startReview() {
   Log.log(LogTag.LOGIC, `Starting review: ${props.reviewMode.sessionType}`)
   try {
     startLoading()
     reviewStore.$reset()
+    viewedFlashcardIds.value = new Set()
     if (!flashcardStore.loaded) {
       Log.log(LogTag.LOGIC, 'Flashcard set is not loaded, loading...')
       const selectedSetId = loadSelectedSetIdFromCookies()
@@ -220,14 +245,27 @@ async function startReview() {
       reviewSessionTypeToSpecialStage(props.reviewMode.sessionType) ?? specialStages.UNKNOWN
     reviewStore.loadState(createReviewQueueForStages(flashcards.value, [stage], currDay.value))
 
-    await sessionAttendant.create()
-    await reviewStore.nextFlashcard()
-
-    Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+    if (reviewQueue.value.remaining() === 0) {
+      Log.log(LogTag.LOGIC, "Can't start review - no flashcards remaining")
+    } else {
+      await sessionAttendant.create()
+      await reviewStore.nextFlashcard()
+      Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
+    }
   } finally {
     await stopLoading()
   }
   spaceDeck.value?.setDeckReady()
+}
+
+async function continueReview() {
+  if (exitRequested.value) {
+    exitRequested.value = false
+    sessionAttendant.unfreeze()
+  } else if (!noPrevAvailable.value) {
+    sessionAttendant.unfreeze()
+    await prev()
+  }
 }
 
 async function finishReview() {
@@ -242,17 +280,37 @@ async function finishReviewAndLeave() {
   await router.push({ name: routeNames.controlPanel })
 }
 
+async function requestExit() {
+  if (summaryVisible.value) {
+    await finishReviewAndLeave()
+  } else {
+    exitRequested.value = true
+    sessionAttendant.freeze()
+  }
+}
+
 async function prev() {
   if (noPrevAvailable.value) return
   await sessionAttendant.flush()
   await reviewStore.prevFlashcard()
 }
 
+async function slideLeft() {
+  if (noOneAvailable.value) {
+    await prev()
+  } else {
+    await spaceDeck.value?.slideLeft()
+  }
+}
+
 async function next() {
   if (!currFlashcard.value || noOneAvailable.value) return
+  viewedFlashcardIds.value.add(currFlashcard.value.id)
   sessionAttendant.track(currFlashcard.value.id)
   await sessionAttendant.flush()
-  await reviewStore.nextFlashcard()
+  if (!(await reviewStore.nextFlashcard())) {
+    sessionAttendant.freeze()
+  }
 }
 
 async function moveBack() {
@@ -313,12 +371,17 @@ async function handleKeydown(event: KeyboardEvent) {
 
   if (event.key === 'Escape') {
     event.stopPropagation()
-    await finishReviewAndLeave()
+    await requestExit()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
-    await spaceDeck?.value?.slideLeft()
+    if (summaryVisible.value) {
+      await continueReview()
+    } else {
+      await slideLeft()
+    }
   } else if (event.key === 'ArrowRight') {
     event.stopPropagation()
+    if (summaryVisible.value) return
     await spaceDeck?.value?.slideRight()
   }
 }
@@ -340,6 +403,13 @@ async function handleKeydown(event: KeyboardEvent) {
   font-size: 18px;
 }
 
+.review-progressbar--outer-space {
+  --review-progressbar--from: #a78bfa;
+  --review-progressbar--via: #8b5cf6;
+  --review-progressbar--to: #7c3aed;
+  --review-progressbar--bg-color: rgba(255, 255, 255, 0.15);
+}
+
 .review-info {
   display: flex;
   align-items: start;
@@ -349,7 +419,6 @@ async function handleKeydown(event: KeyboardEvent) {
 }
 
 .review-body {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;

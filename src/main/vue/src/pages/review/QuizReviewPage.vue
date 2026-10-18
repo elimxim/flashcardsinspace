@@ -19,7 +19,7 @@
           class="control-bar-button"
           tooltip="Finish review and leave"
           tooltip-position="bottom-left"
-          :on-click="finishReviewAndLeave"
+          :on-click="requestExit"
         />
       </template>
     </ControlBar>
@@ -37,51 +37,56 @@
             {{ flashcardsRemaining }}
           </div>
         </div>
-        <div class="review-body">
-          <SpaceDeck
-            ref="spaceDeck"
-            :session-type="ReviewSessionType.QUIZ"
-            :reversed="reversed"
-            :can-slide-left="!noOneAvailable"
-            :can-slide-right="!noOneAvailable"
-            :on-slide-left="() => quizAnswer(false)"
-            :on-slide-right="() => quizAnswer(true)"
-            swipe-left-text="Don't know"
-            swipe-right-text="Know"
-          >
-            <QuizResult
+        <SlideUpOverlay :visible="summaryVisible">
+          <div class="review-body">
+            <SpaceDeck
+              ref="spaceDeck"
+              :session-type="ReviewSessionType.QUIZ"
+              :reversed="reversed"
+              :can-slide-left="!noOneAvailable"
+              :can-slide-right="!noOneAvailable"
+              :on-slide-left="() => quizAnswer(false)"
+              :on-slide-right="() => quizAnswer(true)"
+              swipe-left-text="Don't know"
+              swipe-right-text="Know"
+            />
+            <div v-if="UXConfig().showNavButtons" class="review-nav">
+              <SmartButton
+                class="decision-button dangerous-button"
+                text="Don't know"
+                :disabled="noOneAvailable"
+                :hidden="noOneAvailable"
+                :on-click="spaceDeck?.slideLeft"
+                auto-blur
+                rounded
+              />
+              <SmartButton
+                class="decision-button safe-button"
+                text="Know"
+                :disabled="noOneAvailable"
+                :hidden="noOneAvailable"
+                :on-click="spaceDeck?.slideRight"
+                auto-blur
+                rounded
+              />
+            </div>
+          </div>
+          <template #overlay>
+            <QuizSummary
               :elapsed-time="elapsedTime"
               :elapsed-total-time="quizElapsedPreviousTime + elapsedTime"
               :round="quizRound"
               :overall-correct="quizOverallCorrect"
               :overall-incorrect="quizOverallIncorrect"
+              :round-correct="flashcardsTotal - incorrectFlashcards.length"
+              :round-incorrect="incorrectFlashcards.length"
               :round-total="flashcardsTotal"
-              :round-failed="incorrectFlashcards.length"
               :on-next-round="startNextQuizRound"
+              :on-back="continueReview"
               :on-finish="finishReviewAndLeave"
             />
-          </SpaceDeck>
-          <div v-if="UXConfig().showNavButtons" class="review-nav">
-            <SmartButton
-              class="decision-button dangerous-button"
-              text="Don't know"
-              :disabled="noOneAvailable"
-              :hidden="noOneAvailable"
-              :on-click="spaceDeck?.slideLeft"
-              auto-blur
-              rounded
-            />
-            <SmartButton
-              class="decision-button safe-button"
-              text="Know"
-              :disabled="noOneAvailable"
-              :hidden="noOneAvailable"
-              :on-click="spaceDeck?.slideRight"
-              auto-blur
-              rounded
-            />
-          </div>
-        </div>
+          </template>
+        </SlideUpOverlay>
       </template>
     </div>
   </div>
@@ -96,7 +101,8 @@ import SpaceDeck from '@/components/SpaceDeck.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SpaceToast from '@/components/common/SpaceToast.vue'
-import QuizResult from '@/components/QuizResult.vue'
+import QuizSummary from '@/components/review/summary/QuizSummary.vue'
+import SlideUpOverlay from '@/components/common/SlideUpOverlay.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -174,6 +180,9 @@ const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
 
+const exitRequested = ref(false)
+const summaryVisible = computed(() => noOneAvailable.value || exitRequested.value)
+
 const quizRound = ref(1)
 const quizOverallCorrect = ref(0)
 const quizOverallIncorrect = ref(0)
@@ -214,6 +223,7 @@ async function startReview() {
 }
 
 function resetState() {
+  exitRequested.value = false
   sessionAttendant.clear()
   reviewStore.$reset()
   incorrectFlashcards.value = []
@@ -231,6 +241,21 @@ async function finishReview() {
 async function finishReviewAndLeave() {
   await finishReviewOnce()
   await router.push({ name: routeNames.controlPanel })
+}
+
+async function requestExit() {
+  if (summaryVisible.value) {
+    await finishReviewAndLeave()
+  } else {
+    exitRequested.value = true
+    sessionAttendant.freeze()
+  }
+}
+
+function continueReview() {
+  if (!exitRequested.value) return
+  exitRequested.value = false
+  sessionAttendant.unfreeze()
 }
 
 async function quizAnswer(know: boolean) {
@@ -335,12 +360,14 @@ async function handleKeydown(event: KeyboardEvent) {
 
   if (event.key === 'Escape') {
     event.stopPropagation()
-    await finishReviewAndLeave()
+    await requestExit()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
+    if (summaryVisible.value) return
     await spaceDeck?.value?.slideLeft()
   } else if (event.key === 'ArrowRight') {
     event.stopPropagation()
+    if (summaryVisible.value) return
     await spaceDeck?.value?.slideRight()
   }
 }
@@ -371,7 +398,6 @@ async function handleKeydown(event: KeyboardEvent) {
 }
 
 .review-body {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;

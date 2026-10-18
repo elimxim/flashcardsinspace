@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
-import WidgetReviewBadge from '@/components/WidgetReviewBadge.vue'
+import WidgetReviewBadge from '@/components/control-panel/WidgetReviewBadge.vue'
 import { Stage } from '@/core-logic/stage-logic.ts'
 import { computed } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'

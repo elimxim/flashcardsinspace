@@ -76,7 +76,7 @@
 <script setup lang="ts">
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import Tooltip from '@/components/common/Tooltip.vue'
-import VoicePlayer from '@/components/VoicePlayer.vue'
+import VoicePlayer from '@/components/media/VoicePlayer.vue'
 import SpacePicture from '@/components/SpacePicture.vue'
 import TotemScroll from '@/components/common/TotemScroll.vue'
 import { computed, ref } from 'vue'
