@@ -19,7 +19,7 @@
                 :r="RADIUS"
                 fill="none"
                 :stroke-dasharray="segmentDashArray"
-                :stroke-dashoffset="segmentGap / 2"
+                :stroke-dashoffset="-segmentGap / 2"
                 transform="rotate(-90, 50, 50)"
               />
             </mask>
@@ -128,6 +128,8 @@ interface ChartValues {
   leftCount: number
   rightRatio: number
   leftRatio: number
+  rightArc: number
+  leftArc: number
 }
 
 const zeroValues: ChartValues = {
@@ -136,6 +138,27 @@ const zeroValues: ChartValues = {
   leftCount: 0,
   rightRatio: 0,
   leftRatio: 0,
+  rightArc: 0,
+  leftArc: 0,
+}
+
+// Segmented arcs end on whole segments, so one segment never shows both colors
+function toSegments(ratio: number): number {
+  if (ratio <= 0) return 0
+  return Math.max(1, Math.round(ratio * props.segmentCount))
+}
+
+// Only the target is snapped to segments; the sweep towards it stays smooth
+function arcRatios(rightRatio: number, leftRatio: number) {
+  if (!props.segmented) return { rightArc: rightRatio, leftArc: leftRatio }
+
+  const reservedForLeft = leftRatio > 0 ? 1 : 0
+  const rightSegments = Math.min(toSegments(rightRatio), props.segmentCount - reservedForLeft)
+  const leftSegments = Math.min(toSegments(leftRatio), props.segmentCount - rightSegments)
+  return {
+    rightArc: rightSegments / props.segmentCount,
+    leftArc: leftSegments / props.segmentCount,
+  }
 }
 
 const targetValues = computed<ChartValues>(() => ({
@@ -144,6 +167,7 @@ const targetValues = computed<ChartValues>(() => ({
   leftCount: leftCount.value,
   rightRatio: rightRatio.value,
   leftRatio: leftRatio.value,
+  ...arcRatios(rightRatio.value, leftRatio.value),
 }))
 
 const shown = ref<ChartValues>({ ...zeroValues })
@@ -171,6 +195,8 @@ function animateTo(target: ChartValues) {
       leftCount: from.leftCount + (target.leftCount - from.leftCount) * k,
       rightRatio: from.rightRatio + (target.rightRatio - from.rightRatio) * k,
       leftRatio: from.leftRatio + (target.leftRatio - from.leftRatio) * k,
+      rightArc: from.rightArc + (target.rightArc - from.rightArc) * k,
+      leftArc: from.leftArc + (target.leftArc - from.leftArc) * k,
     }
     animationFrameId = t < 1 ? requestAnimationFrame(step) : null
   }
@@ -195,17 +221,14 @@ const leftPercentage = computed(() => {
   return (shown.value.leftRatio * 100).toFixed(0)
 })
 
-const rightDashArray = computed(() => {
-  const arcLength = shown.value.rightRatio * CIRCUMFERENCE
+function arcDashArray(ratio: number): string {
+  const arcLength = ratio * CIRCUMFERENCE
   const gap = CIRCUMFERENCE - arcLength
   return `${arcLength} ${gap}`
-})
+}
 
-const leftDashArray = computed(() => {
-  const arcLength = shown.value.leftRatio * CIRCUMFERENCE
-  const gap = CIRCUMFERENCE - arcLength
-  return `${arcLength} ${gap}`
-})
+const rightDashArray = computed(() => arcDashArray(shown.value.rightArc))
+const leftDashArray = computed(() => arcDashArray(shown.value.leftArc))
 </script>
 
 <style scoped>
