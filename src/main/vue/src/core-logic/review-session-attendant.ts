@@ -62,12 +62,15 @@ export function createReviewSessionAttendant(
 
   const trackedFlashcardIds: number[] = []
 
+  let finished = false
+
   function init(session: ReviewSession) {
     clear()
 
     sessionId.value = session.id
     trackedFlashcardIds.push(...session.flashcardIds)
     sessionElapsedTime.value = session.elapsedTime
+    finished = false
 
     if (shouldStartWatch(session)) startWatch()
   }
@@ -167,6 +170,8 @@ export function createReviewSessionAttendant(
   }
 
   async function flush(options: FlushOptions = {}): Promise<void> {
+    if (finished) return
+
     if (!flashcardSet.value) {
       Log.log(LogTag.SYSTEM, `Can't flush review session ${sessionType}, FlashcardSet is undefined`)
       return Promise.resolve()
@@ -185,6 +190,8 @@ export function createReviewSessionAttendant(
   }
 
   function touch(options: FlushOptions = {}) {
+    if (finished) return
+
     const { metadata = undefined, all = false } = options
 
     const request: ReviewSessionUpdateRequest = {
@@ -195,6 +202,7 @@ export function createReviewSessionAttendant(
 
     if (all) {
       stopWatch()
+      finished = true
 
       request.flashcardIds = [...trackedFlashcardIds].map((id) => ({ id: id }))
     } else {
@@ -213,6 +221,7 @@ export function createReviewSessionAttendant(
     sessionId.value = undefined
     trackedFlashcardIds.length = 0
     resetWatch()
+    finished = false
   }
 
   return {
