@@ -110,7 +110,11 @@
             </div>
           </div>
           <template #overlay>
-            <ReviewResult :on-back="noPrevAvailable ? undefined : prev" />
+            <SpecialSummary
+              :total="0"
+              :elapsed-time="0"
+              :on-back="noPrevAvailable ? undefined : prev"
+            />
           </template>
         </SlideUpOverlay>
       </template>
@@ -128,7 +132,7 @@ import SmartButton from '@/components/common/SmartButton.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SpaceToast from '@/components/common/SpaceToast.vue'
 import Starfield from '@/components/common/Starfield.vue'
-import ReviewResult from '@/components/review/summary/ReviewResult.vue'
+import SpecialSummary from '@/components/review/summary/SpecialSummary.vue'
 import SlideUpOverlay from '@/components/common/SlideUpOverlay.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'

@@ -14,7 +14,7 @@
           auto-blur
         />
         <SmartButton
-          text="Exit Review"
+          text="Finish Review"
           class="calm-button review-result-button"
           :on-click="goToControlPanel"
           fit-content
@@ -34,6 +34,8 @@ import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
 
 defineProps<{
+  total: number
+  elapsedTime: number
   onBack?: () => void
 }>()
 

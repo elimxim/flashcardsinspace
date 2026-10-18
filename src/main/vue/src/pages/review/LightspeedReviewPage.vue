@@ -72,7 +72,7 @@
             </div>
           </div>
           <template #overlay>
-            <ReviewResult />
+            <LightspeedSummary :correct="0" :incorrect="0" :elapsed-time="0"/>
           </template>
         </SlideUpOverlay>
       </template>
@@ -89,7 +89,6 @@ import SpaceDeck from '@/components/SpaceDeck.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SpaceToast from '@/components/common/SpaceToast.vue'
-import ReviewResult from '@/components/review/summary/ReviewResult.vue'
 import SlideUpOverlay from '@/components/common/SlideUpOverlay.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
@@ -124,6 +123,7 @@ import { useRunOnce } from '@/utils/run-once.ts'
 import { Chronoday } from '@/model/chrono.ts'
 import { createReviewSessionAttendant } from '@/core-logic/review-session-attendant.ts'
 import { errorResponseData } from '@/core-logic/media-error.ts'
+import LightspeedSummary from '@/components/review/summary/LightspeedSummary.vue'
 
 withDefaults(
   defineProps<{
