@@ -1,12 +1,12 @@
 <template>
-  <ReviewSummary :title="`Quiz Round ${round}`">
+  <ReviewSummary :title="`Quiz Round ${round}`" with-shadow>
     <div class="quiz-summary">
       <div class="quiz-info">
         <div class="quiz-clock">
-          <Clock :time="elapsedTime" top-label="Round Time" />
+          <Clock :time="elapsedTime" top-label="Round Time" with-shadow />
         </div>
         <div v-if="elapsedTotalTime" class="quiz-clock">
-          <Clock :time="elapsedTotalTime" top-label="Total Time" />
+          <Clock :time="elapsedTotalTime" top-label="Total Time" with-shadow />
         </div>
         <SummaryAnswerStats
           class="quiz-stats"
@@ -85,7 +85,7 @@ const props = withDefaults(
 )
 
 const hasNextRoundButton = computed(
-  () => (props.roundCorrect + props.roundIncorrect) === props.roundTotal,
+  () => props.roundCorrect + props.roundIncorrect === props.roundTotal,
 )
 </script>
 

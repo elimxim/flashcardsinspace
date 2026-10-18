@@ -1,6 +1,6 @@
 <template>
   <div class="stopwatch stopwatch--theme">
-    <div class="rectangle-display">
+    <div :class="['rectangle-display', { 'rectangle-display--shadow': withShadow }]">
       <div v-if="topLabel" class="clock-top-label">{{ topLabel }}</div>
       <div class="clock-time">
         <div v-if="moreThanOneHour || alwaysShowHours" class="clock-segment-group">
@@ -30,11 +30,13 @@ const props = withDefaults(
     time?: number
     topLabel?: string
     alwaysShowHours?: boolean
+    withShadow?: boolean
   }>(),
   {
     time: 0,
     topLabel: undefined,
     alwaysShowHours: false,
+    withShadow: false,
   },
 )
 
@@ -84,9 +86,12 @@ const seconds = computed(() => {
   padding: clamp(4px, 4cqw, 14px) clamp(6px, 4cqw, 18px);
   background: var(--sw--bg);
   border-radius: var(--sw--border-radius);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   width: 100%;
   height: fit-content;
+}
+
+.rectangle-display--shadow {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .clock-time {

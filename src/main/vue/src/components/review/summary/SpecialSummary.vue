@@ -1,17 +1,22 @@
 <template>
-  <ReviewSummary :title="title" :class="{ 'special-summary--outer-space': outerSpace }">
+  <ReviewSummary
+    :title="title"
+    :with-shadow="!outerSpace"
+    :class="{ 'special-summary--outer-space': outerSpace }"
+  >
+    <CometBorder v-if="outerSpace" />
     <div class="special-summary">
       <div class="special-clock">
-        <Clock :time="elapsedTime" top-label="Elapsed" />
+        <Clock :time="elapsedTime" top-label="Elapsed" :with-shadow="!outerSpace" />
       </div>
       <div class="special-chart-wrapper">
-        <div class="special-chart">
+        <div :class="['special-chart', { 'special-chart--shadow': !outerSpace }]">
           <DoughnutChart
             :left="total - viewed"
             :right="viewed"
             legend-left="Remaining"
             legend-right="Viewed"
-            :segmented="sessionType === ReviewSessionType.OUTER_SPACE"
+            :segmented="outerSpace"
             :segment-gap="2"
             :segment-count="20"
           />
@@ -34,19 +39,19 @@
 </template>
 
 <script setup lang="ts">
+import CometBorder from '@/components/common/CometBorder.vue'
 import DoughnutChart from '@/components/common/DoughnutChart.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import Clock from '@/components/common/Clock.vue'
 import ReviewSummary from '@/components/review/summary/ReviewSummary.vue'
-import { deckEmptyMessage, ReviewSessionType } from '@/core-logic/review-logic.ts'
+import { deckEmptyMessage } from '@/core-logic/review-logic.ts'
 
 withDefaults(
   defineProps<{
-    sessionType: ReviewSessionType
+    outerSpace?: boolean
     total: number
     viewed: number
     elapsedTime: number
-    outerSpace?: boolean
     onBack?: () => void
     onFinish?: () => void
   }>(),
@@ -105,11 +110,14 @@ const title = deckEmptyMessage()
   width: 100%;
   height: 100%;
   aspect-ratio: 1 / 1;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border-radius: 6px;
   padding: clamp(4px, 1.8cqw, 10px);
   --doughnut-chart--arc--right--color: var(--special-summary--viewed--color, #3b82f6);
   --doughnut-chart--arc--left--color: var(--special-summary--unviewed--color, rgb(225, 228, 240));
+}
+
+.special-chart--shadow {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .special-left-button {

@@ -116,9 +116,8 @@
           </div>
           <template #overlay>
             <SpecialSummary
-              :session-type="reviewMode.sessionType"
-              :total="flashcardsTotal"
               :outer-space="reviewMode.isOuterSpace()"
+              :total="flashcardsTotal"
               :viewed="viewedFlashcardIds.size"
               :elapsed-time="elapsedTime"
               :on-back="continueReview"

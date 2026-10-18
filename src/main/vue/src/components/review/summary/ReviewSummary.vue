@@ -1,5 +1,5 @@
 <template>
-  <div class="review-summary">
+  <div :class="['review-summary', { 'review-summary--shadow': withShadow }]">
     <div v-if="title" class="review-summary-title">{{ title }}</div>
     <slot />
   </div>
@@ -9,23 +9,29 @@
 withDefaults(
   defineProps<{
     title?: string
+    withShadow?: boolean
   }>(),
   {
     title: undefined,
+    withShadow: false,
   },
 )
 </script>
 
 <style scoped>
 .review-summary {
+  position: relative;
   width: clamp(280px, 92vw, 760px);
   height: auto;
   margin: auto;
   display: flex;
   flex-direction: column;
   border-radius: 18px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   container-type: inline-size;
+}
+
+.review-summary--shadow {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .review-summary-title {

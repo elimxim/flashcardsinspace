@@ -1,9 +1,9 @@
 <template>
-  <ReviewSummary :title="title">
+  <ReviewSummary :title="title" with-shadow>
     <div class="lightspeed-summary">
       <div class="lightspeed-info">
         <div class="lightspeed-clock">
-          <Clock :time="elapsedTime" top-label="Elapsed" />
+          <Clock :time="elapsedTime" top-label="Elapsed" with-shadow />
         </div>
         <SummaryAnswerStats
           class="lightspeed-stats"
