@@ -1,7 +1,6 @@
 <template>
-  <ReviewSummary>
+  <ReviewSummary :title="`Quiz Round ${round}`">
     <div class="quiz-summary">
-      <div class="quiz-title">Quiz Round {{ round }}</div>
       <div class="quiz-info">
         <div class="quiz-clock">
           <Clock :time="elapsedTime" top-label="Round Time" />
@@ -92,24 +91,12 @@ withDefaults(
   width: 100%;
   height: auto;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: 1fr auto;
   grid-template-columns: repeat(4, 1fr);
   align-items: start;
   gap: clamp(4px, 1.5cqw, 8px);
   padding: clamp(8px, 1.2cqw, 12px);
   container-type: inline-size;
-}
-
-.quiz-title {
-  grid-column: 1 / -1;
-  font-size: clamp(0.9rem, 3cqw, 1.2rem);
-  font-weight: 600;
-  letter-spacing: 0.05rem;
-  word-spacing: 0.05rem;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: nowrap;
-  color: #353535;
 }
 
 .quiz-info {

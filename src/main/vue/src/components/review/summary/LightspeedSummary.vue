@@ -1,10 +1,11 @@
 <template>
-  <ReviewSummary>
+  <ReviewSummary :title="deckEmptyMessage()">
 
   </ReviewSummary>
 </template>
 
 <script setup lang="ts">
+import { deckEmptyMessage } from '@/core-logic/review-logic.ts'
 
 defineProps<{
   correct: number
