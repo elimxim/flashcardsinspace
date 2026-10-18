@@ -3,13 +3,23 @@
     <div class="empty-deck-message">
       {{ emptyMessage }}
     </div>
-    <SmartButton
-      text="Exit Review"
-      class="calm-button exit-review-button"
-      :on-click="goToControlPanel"
-      fit-content
-      auto-blur
-    />
+    <div class="review-result-buttons">
+      <SmartButton
+        v-if="onBack"
+        text="Back"
+        class="off-button review-result-button"
+        :on-click="onBack"
+        fit-content
+        auto-blur
+      />
+      <SmartButton
+        text="Exit Review"
+        class="calm-button review-result-button"
+        :on-click="goToControlPanel"
+        fit-content
+        auto-blur
+      />
+    </div>
   </div>
 </template>
 
@@ -19,6 +29,10 @@ import { deckEmptyMessage } from '@/core-logic/review-logic.ts'
 import SmartButton from '@/components/common/SmartButton.vue'
 import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
+
+defineProps<{
+  onBack?: () => void
+}>()
 
 const router = useRouter()
 
@@ -53,7 +67,12 @@ function goToControlPanel() {
   color: rgba(100, 116, 139, 0.9);
 }
 
-.exit-review-button {
+.review-result-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.review-result-button {
   --smart-button--padding: 10px;
 }
 </style>

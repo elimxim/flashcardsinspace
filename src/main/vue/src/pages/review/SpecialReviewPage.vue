@@ -55,61 +55,66 @@
             {{ flashcardsRemaining }}
           </div>
         </div>
-        <div class="review-body">
-          <SpaceDeck
-            ref="spaceDeck"
-            :session-type="reviewMode.sessionType"
-            :reversed="reversed"
-            :can-slide-left="!noPrevAvailable"
-            :can-slide-right="!noOneAvailable"
-            :on-slide-left="prev"
-            :on-slide-right="next"
-            swipe-left-text="Prev"
-            swipe-right-text="Next"
-          >
-            <ReviewResult />
-          </SpaceDeck>
-          <div v-if="UXConfig().showNavButtons" class="review-nav">
-            <SmartButton
-              class="calm-button"
-              text="Prev"
-              :disabled="noPrevAvailable"
-              :on-click="spaceDeck?.slideLeft"
-              auto-blur
-              rounded
+        <SlideUpOverlay :visible="noOneAvailable">
+          <div class="review-body">
+            <SpaceDeck
+              ref="spaceDeck"
+              :session-type="reviewMode.sessionType"
+              :reversed="reversed"
+              :can-slide-left="!noPrevAvailable"
+              :can-slide-right="!noOneAvailable"
+              :on-slide-left="prev"
+              :on-slide-right="next"
+              swipe-left-text="Prev"
+              swipe-right-text="Next"
             />
-            <SmartButton
-              v-if="reviewMode.isOuterSpace()"
-              class="decision-button dangerous-button"
-              text="Move back"
-              :disabled="noOneAvailable"
-              :hidden="noOneAvailable"
-              :on-click="moveBack"
-              :hold-time="1.2"
-              auto-blur
-              rounded
-            />
-            <SmartButton
-              class="calm-button"
-              text="Next"
-              :disabled="noOneAvailable"
-              :on-click="spaceDeck?.slideRight"
-              auto-blur
-              rounded
-            />
+            <div v-if="UXConfig().showNavButtons" class="review-nav">
+              <SmartButton
+                class="calm-button"
+                text="Prev"
+                :disabled="noPrevAvailable"
+                :on-click="slideLeft"
+                auto-blur
+                rounded
+              />
+              <SmartButton
+                v-if="reviewMode.isOuterSpace()"
+                class="decision-button dangerous-button"
+                text="Move back"
+                :disabled="noOneAvailable"
+                :hidden="noOneAvailable"
+                :on-click="moveBack"
+                :hold-time="1.2"
+                auto-blur
+                rounded
+              />
+              <SmartButton
+                class="calm-button"
+                text="Next"
+                :disabled="noOneAvailable"
+                :on-click="spaceDeck?.slideRight"
+                auto-blur
+                rounded
+              />
+            </div>
+            <div v-else-if="reviewMode.isOuterSpace()" class="review-nav review-nav--centered">
+              <SmartButton
+                class="decision-button dangerous-button"
+                text="Move back"
+                :disabled="noOneAvailable"
+                :on-click="moveBack"
+                :hold-time="1.2"
+                auto-blur
+                rounded
+              />
+            </div>
           </div>
-          <div v-else-if="reviewMode.isOuterSpace()" class="review-nav review-nav--centered">
-            <SmartButton
-              class="decision-button dangerous-button"
-              text="Move back"
-              :disabled="noOneAvailable"
-              :on-click="moveBack"
-              :hold-time="1.2"
-              auto-blur
-              rounded
-            />
-          </div>
-        </div>
+          <template #overlay>
+            <div class="review-summary">
+              <ReviewResult :on-back="noPrevAvailable ? undefined : prev" />
+            </div>
+          </template>
+        </SlideUpOverlay>
       </template>
     </div>
   </div>
@@ -126,6 +131,7 @@ import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SpaceToast from '@/components/common/SpaceToast.vue'
 import Starfield from '@/components/common/Starfield.vue'
 import ReviewResult from '@/components/ReviewResult.vue'
+import SlideUpOverlay from '@/components/common/SlideUpOverlay.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -248,6 +254,14 @@ async function prev() {
   await reviewStore.prevFlashcard()
 }
 
+async function slideLeft() {
+  if (noOneAvailable.value) {
+    await prev()
+  } else {
+    await spaceDeck.value?.slideLeft()
+  }
+}
+
 async function next() {
   if (!currFlashcard.value || noOneAvailable.value) return
   sessionAttendant.track(currFlashcard.value.id)
@@ -316,7 +330,7 @@ async function handleKeydown(event: KeyboardEvent) {
     await finishReviewAndLeave()
   } else if (event.key === 'ArrowLeft') {
     event.stopPropagation()
-    await spaceDeck?.value?.slideLeft()
+    await slideLeft()
   } else if (event.key === 'ArrowRight') {
     event.stopPropagation()
     await spaceDeck?.value?.slideRight()
@@ -349,13 +363,17 @@ async function handleKeydown(event: KeyboardEvent) {
 }
 
 .review-body {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: fit-content;
   gap: 20px;
+}
+
+.review-summary {
+  width: clamp(280px, 92vw, 600px);
+  margin: auto;
 }
 
 .review-nav {

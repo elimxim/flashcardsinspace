@@ -37,51 +37,56 @@
             {{ flashcardsRemaining }}
           </div>
         </div>
-        <div class="review-body">
-          <SpaceDeck
-            ref="spaceDeck"
-            :session-type="ReviewSessionType.QUIZ"
-            :reversed="reversed"
-            :can-slide-left="!noOneAvailable"
-            :can-slide-right="!noOneAvailable"
-            :on-slide-left="() => quizAnswer(false)"
-            :on-slide-right="() => quizAnswer(true)"
-            swipe-left-text="Don't know"
-            swipe-right-text="Know"
-          >
-            <QuizSummary
-              :elapsed-time="elapsedTime"
-              :elapsed-total-time="quizElapsedPreviousTime + elapsedTime"
-              :round="quizRound"
-              :overall-correct="quizOverallCorrect"
-              :overall-incorrect="quizOverallIncorrect"
-              :round-total="flashcardsTotal"
-              :round-failed="incorrectFlashcards.length"
-              :on-next-round="startNextQuizRound"
-              :on-finish="finishReviewAndLeave"
+        <SlideUpOverlay :visible="noOneAvailable">
+          <div class="review-body">
+            <SpaceDeck
+              ref="spaceDeck"
+              :session-type="ReviewSessionType.QUIZ"
+              :reversed="reversed"
+              :can-slide-left="!noOneAvailable"
+              :can-slide-right="!noOneAvailable"
+              :on-slide-left="() => quizAnswer(false)"
+              :on-slide-right="() => quizAnswer(true)"
+              swipe-left-text="Don't know"
+              swipe-right-text="Know"
             />
-          </SpaceDeck>
-          <div v-if="UXConfig().showNavButtons" class="review-nav">
-            <SmartButton
-              class="decision-button dangerous-button"
-              text="Don't know"
-              :disabled="noOneAvailable"
-              :hidden="noOneAvailable"
-              :on-click="spaceDeck?.slideLeft"
-              auto-blur
-              rounded
-            />
-            <SmartButton
-              class="decision-button safe-button"
-              text="Know"
-              :disabled="noOneAvailable"
-              :hidden="noOneAvailable"
-              :on-click="spaceDeck?.slideRight"
-              auto-blur
-              rounded
-            />
+            <div v-if="UXConfig().showNavButtons" class="review-nav">
+              <SmartButton
+                class="decision-button dangerous-button"
+                text="Don't know"
+                :disabled="noOneAvailable"
+                :hidden="noOneAvailable"
+                :on-click="spaceDeck?.slideLeft"
+                auto-blur
+                rounded
+              />
+              <SmartButton
+                class="decision-button safe-button"
+                text="Know"
+                :disabled="noOneAvailable"
+                :hidden="noOneAvailable"
+                :on-click="spaceDeck?.slideRight"
+                auto-blur
+                rounded
+              />
+            </div>
           </div>
-        </div>
+          <template #overlay>
+            <div class="review-summary">
+              <QuizSummary
+                :elapsed-time="elapsedTime"
+                :elapsed-total-time="quizElapsedPreviousTime + elapsedTime"
+                :round="quizRound"
+                :overall-correct="quizOverallCorrect"
+                :overall-incorrect="quizOverallIncorrect"
+                :round-total="flashcardsTotal"
+                :round-failed="incorrectFlashcards.length"
+                :on-next-round="startNextQuizRound"
+                :on-finish="finishReviewAndLeave"
+              />
+            </div>
+          </template>
+        </SlideUpOverlay>
       </template>
     </div>
   </div>
@@ -97,6 +102,7 @@ import SmartButton from '@/components/common/SmartButton.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SpaceToast from '@/components/common/SpaceToast.vue'
 import QuizSummary from '@/components/QuizSummary.vue'
+import SlideUpOverlay from '@/components/common/SlideUpOverlay.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -371,13 +377,17 @@ async function handleKeydown(event: KeyboardEvent) {
 }
 
 .review-body {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: fit-content;
   gap: 20px;
+}
+
+.review-summary {
+  width: clamp(280px, 92vw, 760px);
+  margin: auto;
 }
 
 .review-nav {
