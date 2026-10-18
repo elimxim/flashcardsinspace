@@ -1,69 +1,72 @@
 <template>
-  <div class="quiz-summary">
-    <div class="quiz-title">Quiz Round {{ round }}</div>
-    <div class="quiz-info">
-      <div class="quiz-clock">
-        <Clock :time="elapsedTime" top-label="Round Time" />
-      </div>
-      <div v-if="elapsedTotalTime" class="quiz-clock">
-        <Clock :time="elapsedTotalTime" top-label="Total Time" />
-      </div>
-      <div class="quiz-stats">
-        <div class="quiz-stats-title">Overall</div>
-        <div class="quiz-stats-row">
-          <div class="quiz-stats-text">Correct</div>
-          <div class="quiz-stats-number">
-            {{ overallCorrect }}
+  <ReviewSummary>
+    <div class="quiz-summary">
+      <div class="quiz-title">Quiz Round {{ round }}</div>
+      <div class="quiz-info">
+        <div class="quiz-clock">
+          <Clock :time="elapsedTime" top-label="Round Time" />
+        </div>
+        <div v-if="elapsedTotalTime" class="quiz-clock">
+          <Clock :time="elapsedTotalTime" top-label="Total Time" />
+        </div>
+        <div class="quiz-stats">
+          <div class="quiz-stats-title">Overall</div>
+          <div class="quiz-stats-row">
+            <div class="quiz-stats-text">Correct</div>
+            <div class="quiz-stats-number">
+              {{ overallCorrect }}
+            </div>
+          </div>
+          <div class="quiz-stats-row">
+            <div class="quiz-stats-text">Incorrect</div>
+            <div class="quiz-stats-number">
+              {{ overallIncorrect }}
+            </div>
           </div>
         </div>
-        <div class="quiz-stats-row">
-          <div class="quiz-stats-text">Incorrect</div>
-          <div class="quiz-stats-number">
-            {{ overallIncorrect }}
-          </div>
+      </div>
+      <div class="quiz-chart-wrapper">
+        <div class="quiz-chart">
+          <DoughnutChart
+            :total="roundTotal"
+            :left="roundFailed"
+            legend-left="Incorrect"
+            legend-right="Correct"
+          />
         </div>
       </div>
-    </div>
-    <div class="quiz-chart-wrapper">
-      <div class="quiz-chart">
-        <DoughnutChart
-          :total="roundTotal"
-          :left="roundFailed"
-          legend-left="Incorrect"
-          legend-right="Correct"
+      <div
+        :class="{
+          'quiz-central-button': roundFailed === 0,
+          'quiz-left-button': roundFailed > 0,
+        }"
+      >
+        <SmartButton
+          text="Finish Quiz"
+          class="off-button"
+          :on-click="onFinish"
+          fill-width
+          auto-blur
+        />
+      </div>
+      <div v-if="roundFailed > 0" class="quiz-right-button">
+        <SmartButton
+          text="Next Round"
+          class="calm-button"
+          :on-click="onNextRound"
+          fill-width
+          auto-blur
         />
       </div>
     </div>
-    <div
-      :class="{
-        'quiz-central-button': roundFailed === 0,
-        'quiz-left-button': roundFailed > 0,
-      }"
-    >
-      <SmartButton
-        text="Finish Quiz"
-        class="off-button"
-        :on-click="onFinish"
-        fill-width
-        auto-blur
-      />
-    </div>
-    <div v-if="roundFailed > 0" class="quiz-right-button">
-      <SmartButton
-        text="Next Round"
-        class="calm-button"
-        :on-click="onNextRound"
-        fill-width
-        auto-blur
-      />
-    </div>
-  </div>
+  </ReviewSummary>
 </template>
 
 <script setup lang="ts">
 import DoughnutChart from '@/components/common/DoughnutChart.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import Clock from '@/components/common/Clock.vue'
+import ReviewSummary from '@/components/ReviewSummary.vue'
 
 withDefaults(
   defineProps<{
@@ -94,9 +97,6 @@ withDefaults(
   align-items: start;
   gap: clamp(4px, 1.5cqw, 8px);
   padding: clamp(8px, 1.2cqw, 12px);
-  border-radius: 6px;
-  border: 1px solid rgb(225, 228, 240);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   container-type: inline-size;
 }
 

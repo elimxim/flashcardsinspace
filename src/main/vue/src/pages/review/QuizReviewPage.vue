@@ -72,19 +72,17 @@
             </div>
           </div>
           <template #overlay>
-            <div class="review-summary">
-              <QuizSummary
-                :elapsed-time="elapsedTime"
-                :elapsed-total-time="quizElapsedPreviousTime + elapsedTime"
-                :round="quizRound"
-                :overall-correct="quizOverallCorrect"
-                :overall-incorrect="quizOverallIncorrect"
-                :round-total="flashcardsTotal"
-                :round-failed="incorrectFlashcards.length"
-                :on-next-round="startNextQuizRound"
-                :on-finish="finishReviewAndLeave"
-              />
-            </div>
+            <QuizSummary
+              :elapsed-time="elapsedTime"
+              :elapsed-total-time="quizElapsedPreviousTime + elapsedTime"
+              :round="quizRound"
+              :overall-correct="quizOverallCorrect"
+              :overall-incorrect="quizOverallIncorrect"
+              :round-total="flashcardsTotal"
+              :round-failed="incorrectFlashcards.length"
+              :on-next-round="startNextQuizRound"
+              :on-finish="finishReviewAndLeave"
+            />
           </template>
         </SlideUpOverlay>
       </template>
@@ -383,11 +381,6 @@ async function handleKeydown(event: KeyboardEvent) {
   justify-content: center;
   width: fit-content;
   gap: 20px;
-}
-
-.review-summary {
-  width: clamp(280px, 92vw, 760px);
-  margin: auto;
 }
 
 .review-nav {

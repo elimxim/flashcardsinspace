@@ -1,32 +1,35 @@
 <template>
-  <div class="review-result">
-    <div class="empty-deck-message">
-      {{ emptyMessage }}
+  <ReviewSummary>
+    <div class="review-result">
+      <div class="empty-deck-message">
+        {{ emptyMessage }}
+      </div>
+      <div class="review-result-buttons">
+        <SmartButton
+          v-if="onBack"
+          text="Back"
+          class="off-button review-result-button"
+          :on-click="onBack"
+          fit-content
+          auto-blur
+        />
+        <SmartButton
+          text="Exit Review"
+          class="calm-button review-result-button"
+          :on-click="goToControlPanel"
+          fit-content
+          auto-blur
+        />
+      </div>
     </div>
-    <div class="review-result-buttons">
-      <SmartButton
-        v-if="onBack"
-        text="Back"
-        class="off-button review-result-button"
-        :on-click="onBack"
-        fit-content
-        auto-blur
-      />
-      <SmartButton
-        text="Exit Review"
-        class="calm-button review-result-button"
-        :on-click="goToControlPanel"
-        fit-content
-        auto-blur
-      />
-    </div>
-  </div>
+  </ReviewSummary>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { deckEmptyMessage } from '@/core-logic/review-logic.ts'
 import SmartButton from '@/components/common/SmartButton.vue'
+import ReviewSummary from '@/components/ReviewSummary.vue'
 import { useRouter } from 'vue-router'
 import { routeNames } from '@/router'
 
@@ -53,7 +56,6 @@ function goToControlPanel() {
   justify-content: center;
   gap: clamp(8px, 1.5cqw, 12px);
   padding: clamp(8px, 1.2cqw, 12px);
-  border-radius: 24px;
   container-type: inline-size;
 }
 

@@ -110,9 +110,7 @@
             </div>
           </div>
           <template #overlay>
-            <div class="review-summary">
-              <ReviewResult :on-back="noPrevAvailable ? undefined : prev" />
-            </div>
+            <ReviewResult :on-back="noPrevAvailable ? undefined : prev" />
           </template>
         </SlideUpOverlay>
       </template>
@@ -369,11 +367,6 @@ async function handleKeydown(event: KeyboardEvent) {
   justify-content: center;
   width: fit-content;
   gap: 20px;
-}
-
-.review-summary {
-  width: clamp(280px, 92vw, 600px);
-  margin: auto;
 }
 
 .review-nav {
