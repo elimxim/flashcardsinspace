@@ -3,21 +3,24 @@
   Flashcards in Space
 </h1>
 
-[![Deploy](https://github.com/elimxim/flashcardsinspace/actions/workflows/deploy-release.yml/badge.svg)](https://github.com/elimxim/flashcardsinspace/actions/workflows/deploy-release.yml)
-![GitHub Issues](https://img.shields.io/github/issues/elimxim/flashcardsinspace)
-![Closed Issues](https://img.shields.io/github/issues-closed/elimxim/flashcardsinspace)
-![GitHub Last Commit](https://img.shields.io/github/last-commit/elimxim/flashcardsinspace)
-![GitHub Repo Size](https://img.shields.io/github/repo-size/elimxim/flashcardsinspace)
-![GitHub Code Size](https://img.shields.io/github/languages/code-size/elimxim/flashcardsinspace)
-![GitHub Top Language](https://img.shields.io/github/languages/top/elimxim/flashcardsinspace)
-![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green)
-![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-blue)
+![Github Tag](https://img.shields.io/github/v/tag/elimxim/flashcardsinspace?style=flat)
+![Github Production Deployment](https://img.shields.io/github/deployments/elimxim/flashcardsinspace/production?style=flat)
+![GitHub Issues](https://img.shields.io/github/issues/elimxim/flashcardsinspace?style=flat)
+![Closed Issues](https://img.shields.io/github/issues-closed/elimxim/flashcardsinspace?style=flat)
+![GitHub Last Commit](https://img.shields.io/github/last-commit/elimxim/flashcardsinspace?style=flat)
+![GitHub Commit Activity](https://img.shields.io/github/commit-activity/m/elimxim/flashcardsinspace?style=flat)
+![GitHub Created At](https://img.shields.io/github/created-at/elimxim/flashcardsinspace?style=flat)
+![GitHub Repo Size](https://img.shields.io/github/repo-size/elimxim/flashcardsinspace?style=flat)
+![GitHub Code Size](https://img.shields.io/github/languages/code-size/elimxim/flashcardsinspace?style=flat)
+![GitHub Top Language](https://img.shields.io/github/languages/top/elimxim/flashcardsinspace?style=flat)
+![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green?style=flat)
+![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-blue?style=flat)
 
 Flashcards in Space is a personal mission to make long-term learning feel less like a chore and more 
 like an exploration. It combines the proven science of spaced repetition with a modern, space-themed 
 interface designed to keep you curious and consistent.
 
-<a href="https://flashcardsinspace.com"><img src="https://img.shields.io/badge/Visit-flashcardsinspace.com-033270?style=for-the-badge&labelColor=4091c9" alt="Website" height="40"/></a>
+<a href="https://flashcardsinspace.com"><img src="https://img.shields.io/badge/Visit-flashcardsinspace.com-033270?style=flat&labelColor=4091c9" alt="Website" height="40"/></a>
 
 <p align="center">
   <a href="https://flashcardsinspace.com"><img src="src/main/vue/public/images/rockets/original.svg" alt="Visit flashcardsinspace.com" width="150"/></a>
