@@ -11,10 +11,11 @@
       v-bind="$attrs"
       icon="fa-solid fa-rocket"
       :disabled="disabled"
-      :animation-duration="600"
+      :tap-animation-duration="600"
       :hold-time="REVERSE_HOLD_TIME"
       :held="reversed"
       :on-hold="toggleReversed"
+      await-tap-animation
       fill-space
     />
     <WidgetReviewBadge style="z-index: 4" :reversed="reversed" />

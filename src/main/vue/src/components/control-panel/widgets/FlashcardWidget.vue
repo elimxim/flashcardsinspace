@@ -5,6 +5,7 @@
       class="cp-widget"
       :disabled="!flashcardSet"
       :on-click="toggleStore.toggleFlashcardCreation"
+      await-tap-animation
       fill-space
       square
     >

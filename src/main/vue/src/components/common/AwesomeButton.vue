@@ -77,7 +77,8 @@ const props = withDefaults(
     square?: boolean
     fillSpace?: boolean
     animateTap?: boolean
-    animationDuration?: number
+    tapAnimationDuration?: number
+    awaitTapAnimation?: boolean
     tooltip?: string
     tooltipPosition?:
       | 'top'
@@ -108,7 +109,8 @@ const props = withDefaults(
     square: false,
     fillSpace: false,
     animateTap: true,
-    animationDuration: 300,
+    tapAnimationDuration: 300,
+    awaitTapAnimation: false,
     tooltip: undefined,
     tooltipPosition: 'top',
     tooltipDelay: 1000,
@@ -121,7 +123,9 @@ const props = withDefaults(
   },
 )
 
-const animationDurationSeconds = computed(() => `${(props.animationDuration / 1000).toFixed(1)}s`)
+const tapAnimationDurationSeconds = computed(
+  () => `${(props.tapAnimationDuration / 1000).toFixed(1)}s`,
+)
 
 const { resolvedLoading, startLoading, stopLoading } = useDeferredLoading()
 
@@ -190,10 +194,17 @@ async function handleHover() {
 
 function startTapAnimation() {
   animatingOnTap.value = true
-  setTimeout(() => {
-    animatingOnTap.value = false
+  if (props.awaitTapAnimation) {
+    setTimeout(() => {
+      animatingOnTap.value = false
+      press()
+    }, props.tapAnimationDuration)
+  } else {
+    setTimeout(() => {
+      animatingOnTap.value = false
+    }, props.tapAnimationDuration)
     press()
-  }, props.animationDuration)
+  }
 }
 
 function isPressed(): boolean {
@@ -280,7 +291,7 @@ defineExpose({
   cursor: pointer;
   margin: 0;
   padding: var(--a-btn--padding);
-  transition: all v-bind(animationDurationSeconds) ease-in-out;
+  transition: all v-bind(tapAnimationDurationSeconds) ease-in-out;
   overflow: visible;
 }
 

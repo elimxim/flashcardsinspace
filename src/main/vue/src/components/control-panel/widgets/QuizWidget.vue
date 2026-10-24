@@ -8,6 +8,7 @@
       :hold-time="REVERSE_HOLD_TIME"
       :held="reversed"
       :on-hold="toggleReversed"
+      await-tap-animation
       fill-space
       square
     >

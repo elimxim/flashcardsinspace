@@ -7,6 +7,7 @@
       :text="isDisabled ? 'VOID' : 'ENTER OUTER SPACE'"
       :disabled="isDisabled"
       :on-click="startReview"
+      await-tap-animation
       fit-content
       auto-blur
     />
