@@ -17,13 +17,13 @@
       :on-hold="toggleReversed"
       fill-space
     />
+    <WidgetReviewBadge style="z-index: 4" :reversed="reversed" />
     <div class="curtain">
       <div class="curtain-text">
         <template v-if="!disabled"> Start Review </template>
         <template v-else> Nothing to Review </template>
       </div>
     </div>
-    <WidgetReviewBadge :reversed="reversed" />
   </div>
 </template>
 
