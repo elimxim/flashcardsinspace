@@ -397,16 +397,42 @@ export function calcStageReviews(flashcards: Flashcard[], currDay: Chronoday): R
     })
 }
 
-export const deckEmptyMessages = [
-  'Mission complete! No cards in orbit.',
-  'The deck is empty. Time to refuel!',
-  'Orbit cleared. All flashcards reviewed!',
-  'All caught up! Check back later.',
-  'Nothing left to review. Well done!',
-  'No flashcards to review.',
+const deckEmptyMessages = [
+  'Mission complete!',
+  'Orbit cleared. Well done!',
+  'All cards safely landed!',
+  'Deck empty. Time to refuel!',
+  'Houston, all clear!',
+  'Nothing left in orbit.',
+  'Stellar work, astronaut!',
+  'Galaxy explored. For today.',
+  'Touchdown! All caught up.',
+  'Clear skies ahead!',
+  'Your brain is in hyperdrive!',
+  'One more star in your sky!',
+]
+
+const deckNotEmptyMessages = [
+  'Docking early? Cards will wait.',
+  'Every light-year counts!',
+  'Pit stop. Refuel and return!',
+  'Cards still in orbit. No rush!',
+  'Even rockets need a break.',
+  'Houston, we have a pause.',
+  'The galaxy will wait for you.',
+  'Small step, giant leap!',
+  'Brief orbit. Still counts!',
+  'Saving fuel for next launch?',
+  'Rest up, the stars stay put.',
+  'Mission paused, not aborted.',
 ]
 
 export const deckEmptyMessage = (): string => {
   const index = Math.floor(Math.random() * deckEmptyMessages.length)
   return deckEmptyMessages[index]
+}
+
+export const deckNotEmptyMessage = (): string => {
+  const index = Math.floor(Math.random() * deckNotEmptyMessages.length)
+  return deckNotEmptyMessages[index]
 }

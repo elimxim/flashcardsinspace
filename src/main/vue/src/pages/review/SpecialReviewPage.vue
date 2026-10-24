@@ -116,6 +116,7 @@
           </div>
           <template #overlay>
             <SpecialSummary
+              :completed="noOneAvailable"
               :outer-space="reviewMode.isOuterSpace()"
               :total="flashcardsTotal"
               :viewed="viewedFlashcardIds.size"

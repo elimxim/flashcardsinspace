@@ -44,25 +44,28 @@ import DoughnutChart from '@/components/common/DoughnutChart.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import Clock from '@/components/common/Clock.vue'
 import ReviewSummary from '@/components/review/summary/ReviewSummary.vue'
-import { deckEmptyMessage } from '@/core-logic/review-logic.ts'
+import { deckEmptyMessage, deckNotEmptyMessage } from '@/core-logic/review-logic.ts'
+import { computed } from 'vue'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     outerSpace?: boolean
     total: number
     viewed: number
     elapsedTime: number
+    completed?: boolean
     onBack?: () => void
     onFinish?: () => void
   }>(),
   {
     outerSpace: false,
+    completed: false,
     onBack: undefined,
     onFinish: () => {},
   },
 )
 
-const title = deckEmptyMessage()
+const title = computed(() => props.completed ? deckEmptyMessage() : deckNotEmptyMessage())
 </script>
 
 <style scoped>

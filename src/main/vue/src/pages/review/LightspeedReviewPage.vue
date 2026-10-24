@@ -73,6 +73,7 @@
           </div>
           <template #overlay>
             <LightspeedSummary
+              :completed="noOneAvailable"
               :correct="correctCount"
               :incorrect="incorrectCount"
               :total="flashcardsTotal"
