@@ -37,7 +37,7 @@ const props = withDefaults(
   defineProps<{
     visible: boolean
     title?: string
-    focusOn?: HTMLElement
+    focusOn?: Pick<HTMLElement, 'focus'>
     overflow?: string
     exitButton?: InstanceType<typeof SmartButton>
     enterButton?: InstanceType<typeof SmartButton>

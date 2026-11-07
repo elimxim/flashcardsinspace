@@ -110,7 +110,11 @@ function resetState() {
   backRef.value?.resetState()
 }
 
-defineExpose({ validate, resetState, invalid })
+function focus() {
+  frontRef.value?.focus()
+}
+
+defineExpose({ validate, resetState, invalid, focus })
 </script>
 
 <style scoped>

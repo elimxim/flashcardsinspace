@@ -2,6 +2,7 @@
   <Modal
     title="New Flashcard"
     :visible="toggleStore.flashcardCreationOpen"
+    :focus-on="flashcardSidesRef"
     :exit-button="cancelButton"
     :enter-button="createButton"
   >

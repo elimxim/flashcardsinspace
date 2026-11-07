@@ -1,21 +1,22 @@
 <template>
-  <Transition :css="false" @enter="onEnter" @leave="onLeave">
+  <Transition name="modal-sheet" :duration="{ enter: 420, leave: 280 }">
     <div
       v-if="visible"
-      ref="overlay"
       class="modal-overlay"
+      :class="{ 'modal-overlay--dragging': dragging }"
+      :style="sheetPosition"
       role="dialog"
       aria-modal="true"
       tabindex="-1"
     >
       <div class="modal-backdrop" />
-      <div class="modal-panel modal-sheet touch-none" tabindex="-1">
+      <div ref="panel" class="modal-sheet touch-none" tabindex="-1">
         <div
           class="modal-sheet-grip"
-          @pointerdown="onGripPointerDown"
-          @pointermove="onGripPointerMove"
-          @pointerup="onGripPointerUp"
-          @pointercancel="onGripPointerCancel"
+          @pointerdown="onPointerDown"
+          @pointermove="onPointerMove"
+          @pointerup="onPointerUp"
+          @pointercancel="onPointerUp"
         >
           <div class="modal-sheet-handle" />
           <slot name="header" />
@@ -27,31 +28,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import {
-  dragVelocity,
-  isDismissFlick,
-  reachedDismissDistance,
-  remainingSlideDuration,
-  sheetDragOffset,
-  type MotionSample,
-} from '@/utils/modal-motion.ts'
-import {
-  EASE_IN,
-  EASE_OUT,
-  fade,
-  finish,
-  freeze,
-  modalParts,
-  play,
-  prefersReducedMotion,
-  type ModalParts,
-} from '@/utils/modal-animation.ts'
+import { computed, ref, watch } from 'vue'
 
 const props = withDefaults(
   defineProps<{
     visible: boolean
-    focusOn?: HTMLElement
+    focusOn?: Pick<HTMLElement, 'focus'>
     onDismiss?: () => void
   }>(),
   {
@@ -60,198 +42,98 @@ const props = withDefaults(
   },
 )
 
-const OPEN_MS = 420
-const CLOSE_MS = 280
-const SETTLE_MS = 260
 const DRAG_START_PX = 6
-// Long enough for exit buttons that close only after their tap animation.
+const DISMISS_DISTANCE = 0.4 // of the sheet height
+const FLICK_SPEED = 0.5 // px per ms
+const FLICK_MAX_PAUSE_MS = 100
 const DISMISS_REFUSED_MS = 1500
-const OFFSCREEN = 'translateY(100%)'
 
-const overlay = ref<HTMLDivElement>()
+const panel = ref<HTMLDivElement>()
+const offset = ref(0)
+const dragging = ref(false)
+const dismissed = ref(false)
 
-let dismissedBySwipe = false
-let restOffset = 0
+const sheetPosition = computed(() => ({
+  '--sheet-offset': dismissed.value ? '100%' : `${offset.value}px`,
+  '--sheet-progress': dismissed.value ? 1 : offset.value / (panel.value?.offsetHeight || 1),
+}))
 
 watch(
   () => props.visible,
   (visible) => {
     if (!visible) return
-    dismissedBySwipe = false
-    restOffset = 0
+    offset.value = 0
+    dismissed.value = false
   },
 )
 
-function offsetOf(el: HTMLElement): number {
-  const transform = getComputedStyle(el).transform
-  return transform === 'none' ? 0 : new DOMMatrixReadOnly(transform).m42
-}
+let drag:
+  | {
+      pointerId: number
+      startY: number
+      startOffset: number
+      lastY: number
+      lastTime: number
+      speed: number
+    }
+  | undefined
 
-/** Moves the sheet from wherever it is now; the backdrop dims or clears with it. */
-function slide(
-  { panel, backdrop }: ModalParts,
-  transform: string,
-  duration: number,
-  easing: string,
-): Animation[] {
-  const panelNow = freeze(panel)
-  const backdropNow = freeze(backdrop)
-  const opacity = transform === OFFSCREEN ? 0 : 1
-  return [
-    play(panel, [{ transform: panelNow.transform }, { transform }], { duration, easing }),
-    play(backdrop, [{ opacity: backdropNow.opacity }, { opacity }], { duration }),
-  ]
-}
-
-function closeDuration(panel: HTMLElement): number {
-  return remainingSlideDuration(offsetOf(panel), panel.offsetHeight, CLOSE_MS)
-}
-
-async function onEnter(el: Element, done: () => void) {
-  const parts = modalParts(el)
-  if (!parts) return done()
-
-  const animations = prefersReducedMotion()
-    ? fade(parts.overlay, true)
-    : [
-        play(parts.backdrop, [{ opacity: 0 }, { opacity: 1 }], { duration: OPEN_MS * 0.7 }),
-        play(parts.panel, [{ transform: OFFSCREEN }, { transform: 'none' }], {
-          duration: OPEN_MS,
-          easing: EASE_OUT,
-        }),
-      ]
-  if (!(await finish(animations))) return
-
-  // Focus only now: focusing an input while the sheet is still below the
-  // screen makes mobile browsers jump to it.
-  const target = props.focusOn ?? parts.panel
-  target.focus({ preventScroll: true })
-  done()
-}
-
-async function onLeave(el: Element, done: () => void) {
-  drag = undefined
-  const parts = modalParts(el)
-  if (parts) {
-    const animations = prefersReducedMotion()
-      ? fade(parts.overlay, false)
-      : slide(parts, OFFSCREEN, closeDuration(parts.panel), dismissedBySwipe ? EASE_OUT : EASE_IN)
-    await finish(animations)
-  }
-  done()
-}
-
-// --- Swipe down to close ---------------------------------------------------
-
-interface Drag {
-  pointerId: number
-  startY: number
-  baseOffset: number
-  offset: number
-  active: boolean
-  samples: MotionSample[]
-}
-
-let drag: Drag | undefined
-
-function onGripPointerDown(event: PointerEvent) {
-  if (dismissedBySwipe || event.button !== 0) return
+function onPointerDown(event: PointerEvent) {
+  if (dismissed.value || event.button !== 0) return
   drag = {
     pointerId: event.pointerId,
     startY: event.clientY,
-    baseOffset: restOffset,
-    offset: restOffset,
-    active: false,
-    samples: [{ y: event.clientY, time: event.timeStamp }],
+    startOffset: offset.value,
+    lastY: event.clientY,
+    lastTime: event.timeStamp,
+    speed: 0,
   }
 }
 
-function onGripPointerMove(event: PointerEvent) {
-  const parts = modalParts(overlay.value)
-  if (!drag || event.pointerId !== drag.pointerId || !parts) return
+function onPointerMove(event: PointerEvent) {
+  if (!drag || event.pointerId !== drag.pointerId || !panel.value) return
 
   const delta = event.clientY - drag.startY
-  if (!drag.active) {
-    // Below the threshold it's still a tap, so the header buttons keep working.
+  if (!dragging.value) {
+    // Below this it's still a tap, so the header buttons keep working.
     if (Math.abs(delta) < DRAG_START_PX) return
-    drag.active = true
-    freeze(parts.panel)
+    dragging.value = true
     const grip = event.currentTarget as Element
-    try {
-      grip.setPointerCapture(event.pointerId)
-    } catch {
-      // The pointer is already gone; the drag still works while it stays on the grip.
-    }
+    grip.setPointerCapture(event.pointerId)
   }
 
-  drag.offset = sheetDragOffset(drag.baseOffset + delta)
-  drag.samples.push({ y: event.clientY, time: event.timeStamp })
-  if (drag.samples.length > 20) drag.samples.shift()
+  const elapsed = event.timeStamp - drag.lastTime
+  if (elapsed > 0) drag.speed = (event.clientY - drag.lastY) / elapsed
+  drag.lastY = event.clientY
+  drag.lastTime = event.timeStamp
 
-  place(parts, drag.offset)
-  if (reachedDismissDistance(drag.offset, parts.panel.offsetHeight)) {
-    drag = undefined
-    dismiss()
-  }
+  offset.value = Math.max(0, drag.startOffset + delta)
+  if (offset.value >= panel.value.offsetHeight * DISMISS_DISTANCE) dismiss()
 }
 
-function onGripPointerUp(event: PointerEvent) {
+function onPointerUp(event: PointerEvent) {
   if (!drag || event.pointerId !== drag.pointerId) return
-  const released = drag
+  // A finger that stopped before lifting isn't a flick.
+  const flick = drag.speed > FLICK_SPEED && event.timeStamp - drag.lastTime < FLICK_MAX_PAUSE_MS
   drag = undefined
-  if (!released.active) return
-
-  if (isDismissFlick(dragVelocity(released.samples))) {
-    dismiss()
-  } else {
-    hold(released.offset)
-  }
-}
-
-function onGripPointerCancel(event: PointerEvent) {
-  if (!drag || event.pointerId !== drag.pointerId) return
-  const released = drag
-  drag = undefined
-  if (released.active) hold(released.offset)
-}
-
-function place({ panel, backdrop }: ModalParts, offset: number) {
-  panel.style.transform = `translateY(${offset}px)`
-  const progress = Math.min(Math.max(offset / panel.offsetHeight, 0), 1)
-  backdrop.style.opacity = String(1 - progress)
-}
-
-/** Leaves the sheet where the finger let go; only an upward overpull returns to the top. */
-function hold(offset: number) {
-  if (offset < 0) {
-    settle()
-  } else {
-    restOffset = offset
-  }
-}
-
-function settle() {
-  const parts = modalParts(overlay.value)
-  if (!parts) return
-  restOffset = 0
-  finish(slide(parts, 'none', SETTLE_MS, EASE_OUT))
+  dragging.value = false
+  // Otherwise the sheet stays where it was let go.
+  if (flick) dismiss()
 }
 
 function dismiss() {
-  const parts = modalParts(overlay.value)
-  if (!parts) return
-  dismissedBySwipe = true
-
-  // Start sliding right away: some exit buttons close the modal only after
-  // their tap animation. The leave animation picks up from wherever this got to.
-  slide(parts, OFFSCREEN, closeDuration(parts.panel), EASE_OUT)
+  drag = undefined
+  dragging.value = false
+  // Slides down right away, even when the exit button closes the modal
+  // only after its tap animation.
+  dismissed.value = true
   props.onDismiss()
 
   // The modal may refuse to close; bring the sheet back instead of leaving it hidden.
   setTimeout(() => {
-    if (props.visible && dismissedBySwipe && overlay.value === parts.overlay) {
-      dismissedBySwipe = false
-      settle()
+    if (props.visible && dismissed.value) {
+      dismissed.value = false
+      offset.value = 0
     }
   }, DISMISS_REFUSED_MS)
 }
@@ -270,6 +152,8 @@ function dismiss() {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
+  opacity: calc(1 - var(--sheet-progress, 0));
+  transition: opacity 280ms;
 }
 
 .modal-sheet {
@@ -286,6 +170,14 @@ function dismiss() {
   box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.2);
   user-select: none;
   outline: none;
+  transform: translateY(var(--sheet-offset, 0px));
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* The sheet follows the finger exactly while dragged. */
+.modal-overlay--dragging .modal-sheet,
+.modal-overlay--dragging .modal-backdrop {
+  transition: none;
 }
 
 .modal-sheet-grip {
@@ -298,5 +190,36 @@ function dismiss() {
   margin: 8px auto 4px;
   border-radius: 3px;
   background: rgba(0, 0, 0, 0.2);
+}
+
+.modal-sheet-enter-active .modal-sheet {
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modal-sheet-leave-active .modal-sheet {
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.9, 0.4);
+}
+
+.modal-sheet-enter-from .modal-sheet,
+.modal-sheet-leave-to .modal-sheet {
+  transform: translateY(100%);
+}
+
+.modal-sheet-enter-from .modal-backdrop,
+.modal-sheet-leave-to .modal-backdrop {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-sheet-enter-active .modal-sheet,
+  .modal-sheet-leave-active .modal-sheet {
+    transition: opacity 160ms;
+  }
+
+  .modal-sheet-enter-from .modal-sheet,
+  .modal-sheet-leave-to .modal-sheet {
+    transform: translateY(var(--sheet-offset, 0px));
+    opacity: 0;
+  }
 }
 </style>
