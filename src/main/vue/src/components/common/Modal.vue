@@ -119,9 +119,9 @@ function handleKeyUp(event: KeyboardEvent) {
 
 <style scoped>
 .modal-topline {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
   padding: 2px;
 }
