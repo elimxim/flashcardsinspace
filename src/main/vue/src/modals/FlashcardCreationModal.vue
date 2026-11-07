@@ -65,10 +65,7 @@ import {
   flashcardSides,
   newFlashcard,
 } from '@/core-logic/flashcard-logic.ts'
-import {
-  specialStages,
-  stageNameMap,
-} from '@/core-logic/stage-logic.ts'
+import { specialStages, stageNameMap } from '@/core-logic/stage-logic.ts'
 import { uploadFlashcardAudioBlob } from '@/core-logic/flashcard-audio-logic.ts'
 import { uploadFlashcardPictureBlob } from '@/core-logic/flashcard-picture-logic.ts'
 import { storeToRefs } from 'pinia'
@@ -206,8 +203,8 @@ async function uploadPictureIfRelevant(): Promise<boolean> {
 }
 
 async function cancel() {
-  await resetState()
-  toggleModalForm()
+  toggleStore.toggleFlashcardCreation()
+  resetState()
 }
 
 async function create() {
@@ -218,9 +215,9 @@ async function create() {
     const uploaded = await Promise.all([uploadAudioIfRelevant(), uploadPictureIfRelevant()])
     if (uploaded.every(Boolean)) {
       if (!infiniteLoopButtonRef.value?.isPressed()) {
-        toggleModalForm()
+        toggleStore.toggleFlashcardCreation()
       }
-      await resetState()
+      resetState()
     }
   }
 }
@@ -295,11 +292,7 @@ async function addNewFlashcard(): Promise<boolean> {
     })
 }
 
-function toggleModalForm() {
-  toggleStore.toggleFlashcardCreation()
-}
-
-async function resetState() {
+function resetState() {
   createdFlashcard.value = undefined
   frontSideAudioBlob.value = undefined
   frontSidePictureBlob.value = undefined

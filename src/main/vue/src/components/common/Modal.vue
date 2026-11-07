@@ -1,32 +1,37 @@
 <template>
-  <div v-if="visible" ref="modalOverlay" class="modal-overlay" role="dialog" tabindex="-1">
-    <div ref="modalWindow" class="modal-window touch-none" tabindex="-1">
-      <div class="modal-topline">
-        <div class="modal-controls modal-controls--left">
-          <slot name="controls-left" />
+  <Teleport to="#app">
+    <component :is="frame" :visible="visible" :focus-on="focusOn" v-bind="frameProps">
+      <template #header>
+        <div class="modal-topline">
+          <div class="modal-controls modal-controls--left">
+            <slot name="controls-left" />
+          </div>
+          <div class="modal-controls modal-controls--center">
+            <slot name="controls-center" />
+          </div>
+          <div class="modal-controls modal-controls--right">
+            <slot name="controls-right" />
+            <AwesomeButton icon="fa-solid fa-circle-xmark" :on-click="pressExit" />
+          </div>
         </div>
-        <div class="modal-controls modal-controls--center">
-          <slot name="controls-center" />
-        </div>
-        <div class="modal-controls modal-controls--right">
-          <slot name="controls-right" />
-          <AwesomeButton icon="fa-solid fa-circle-xmark" :on-click="pressExit" />
-        </div>
-      </div>
+      </template>
       <div v-if="title" class="modal-title select-text">
         {{ title }}
       </div>
-      <div class="modal-body">
+      <div class="modal-body" :style="{ overflow }">
         <slot />
       </div>
-    </div>
-  </div>
+    </component>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
-import { nextTick, ref, watch, onUnmounted, onMounted } from 'vue'
+import ModalSheet from '@/components/common/ModalSheet.vue'
+import ModalWindow from '@/components/common/ModalWindow.vue'
+import { onUnmounted, onMounted } from 'vue'
+import { UXConfig } from '@/utils/device-utils.ts'
 
 const props = withDefaults(
   defineProps<{
@@ -50,7 +55,9 @@ const props = withDefaults(
   },
 )
 
-const modalWindow = ref<HTMLDivElement>()
+const isSheet = UXConfig().showSheetModals
+const frame = isSheet ? ModalSheet : ModalWindow
+const frameProps = isSheet ? { onDismiss: pressExit } : {}
 
 function pressExit() {
   props.exitButton?.click()
@@ -68,21 +75,6 @@ function holdDelete(event: Event) {
 function releaseDelete() {
   props.deleteButton?.release()
 }
-
-watch(
-  () => props.visible,
-  (newVal) => {
-    if (newVal) {
-      nextTick().then(() => {
-        if (props.focusOn) {
-          props.focusOn.focus()
-        } else {
-          modalWindow.value?.focus()
-        }
-      })
-    }
-  },
-)
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
@@ -126,38 +118,6 @@ function handleKeyUp(event: KeyboardEvent) {
 </script>
 
 <style scoped>
-.modal-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: 900;
-}
-
-.modal-window {
-  position: relative;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  border-radius: 8px;
-  width: clamp(240px, 92vw, 540px);
-  min-width: 240px;
-  height: clamp(360px, 90vh, 480px);
-  min-height: 360px;
-  padding: 8px;
-  margin: 10px 10px clamp(10px, 10vh, 100px);
-  user-select: none;
-  resize: none;
-  outline: none;
-}
-
 .modal-topline {
   display: flex;
   align-items: center;
@@ -199,6 +159,5 @@ function handleKeyUp(event: KeyboardEvent) {
   min-height: 0;
   min-width: 0;
   padding: 2px;
-  overflow: v-bind(overflow);
 }
 </style>

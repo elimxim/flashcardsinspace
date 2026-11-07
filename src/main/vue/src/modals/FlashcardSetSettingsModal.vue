@@ -1,11 +1,11 @@
 <template>
   <Modal
+    title="Flashcard Set Settings"
     :visible="toggleStore.flashcardSetSettingsOpen"
     :focus-on="nameInput"
     :exit-button="cancelButton"
     :enter-button="updateButton"
     :delete-button="removeButton"
-    title="Flashcard Set Settings"
   >
     <div class="modal-main-area">
       <div class="modal-main-area--inner">

@@ -1,5 +1,10 @@
 <template>
-  <Modal title="Quiz Settings" :visible="quizOpen" :on-exit="exit">
+  <Modal
+    title="Quiz Settings"
+    :visible="quizOpen"
+    :exit-button="cancelButton"
+    :enter-button="startButton"
+  >
     <div class="modal-main-area">
       <p class="note-paragraph">
         Practice flashcards from selected stages. Missed cards repeat each round until you know them
@@ -55,10 +60,17 @@
         </div>
       </div>
       <div class="modal-control-buttons">
-        <SmartButton class="off-button" text="Cancel" :on-click="cancel" auto-blur />
+        <SmartButton
+          class="off-button"
+          text="Cancel"
+          ref="cancelButton"
+          :on-click="exit"
+          auto-blur
+        />
         <SmartButton
           class="calm-button counter-button"
           text="Start"
+          ref="startButton"
           :on-click="startNew"
           :disabled="reviewCount <= 0"
           auto-blur
@@ -108,6 +120,9 @@ const { reversed } = useReverseMode(ReviewSessionType.QUIZ)
 const includeUnknown = ref(false)
 const includeAttempted = ref(false)
 const includeOuterSpace = ref(false)
+
+const cancelButton = ref<InstanceType<typeof SmartButton>>()
+const startButton = ref<InstanceType<typeof SmartButton>>()
 
 const reviewStages = (): string[] => {
   const stages = []
@@ -159,10 +174,6 @@ function resetState() {
 function exit() {
   toggleStore.toggleQuiz()
   resetState()
-}
-
-function cancel() {
-  toggleStore.toggleQuiz()
 }
 
 function startNew() {

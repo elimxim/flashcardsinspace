@@ -467,8 +467,8 @@ async function removePictureIfRelevant(): Promise<boolean> {
 }
 
 async function cancel() {
+  toggleStore.toggleFlashcardEdit()
   await resetState()
-  toggleModalForm()
   removed.value = false
   audioChanged.value = false
   pictureChanged.value = false
@@ -477,8 +477,7 @@ async function cancel() {
 async function remove() {
   const done = await removeFlashcard()
   if (done) {
-    await resetState()
-    toggleModalForm()
+    toggleStore.toggleFlashcardEdit()
     removed.value = true
     audioChanged.value = false
     pictureChanged.value = false
@@ -494,7 +493,7 @@ async function update() {
         const uploaded = await Promise.all([uploadAudioIfRelevant(), uploadPictureIfRelevant()])
         const removed = await Promise.all([removeAudioIfRelevant(), removePictureIfRelevant()])
         if (uploaded.every(Boolean) && removed.every(Boolean)) {
-          toggleModalForm()
+          toggleStore.toggleFlashcardEdit()
           await resetState()
         }
       }
@@ -564,10 +563,6 @@ async function updateFlashcard(): Promise<boolean> {
       toaster.bakeError(userApiErrors.FLASHCARD__UPDATING_FAILED, error.response?.data)
       return false
     })
-}
-
-function toggleModalForm() {
-  toggleStore.toggleFlashcardEdit()
 }
 
 async function resetState() {
