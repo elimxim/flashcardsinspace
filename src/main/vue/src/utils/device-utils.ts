@@ -59,5 +59,7 @@ export const UXConfig = () => {
     expandLearningStagesWidget: isTouchOnly,
     // Assume mobile/tablet browsers will block autoplay until a user gesture
     hasStrictAudio: isMobile || isTablet,
+    // Whether the user can see sheet modals
+    showSheetModals: isTouchOnly && window.matchMedia('(max-width: 639px)').matches,
   }
 }

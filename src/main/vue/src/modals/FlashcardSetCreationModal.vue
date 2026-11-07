@@ -1,11 +1,10 @@
 <template>
   <Modal
+    title="New Flashcard Set"
     :visible="toggleStore.flashcardSetCreationOpen"
     :focus-on="nameInput"
     :exit-button="cancelButton"
     :enter-button="createButton"
-    title="New Flashcard Set"
-    focusable
   >
     <div class="modal-main-area">
       <div class="modal-main-area--inner">

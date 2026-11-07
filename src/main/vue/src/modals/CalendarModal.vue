@@ -1,5 +1,8 @@
 <template>
-  <Modal :visible="toggleStore.calendarOpen" :on-exit="exit" overflow="hidden">
+  <Modal
+    :visible="toggleStore.calendarOpen"
+    :on-exit="exit"
+  >
     <template #controls-center>
       <AwesomeButton
         v-if="hasAccess"
@@ -197,8 +200,8 @@ function isVacationDay(day: CalendarDay): boolean {
 }
 
 function exit() {
-  currMonth.value = parseIsoDate(currDay.value.chronodate)
   toggleStore.toggleCalendar()
+  currMonth.value = parseIsoDate(currDay.value.chronodate)
 }
 
 async function goPrevDay() {
@@ -295,6 +298,7 @@ function handleKeydown(event: KeyboardEvent) {
   padding: 4px;
   min-width: 0;
   min-height: 0;
+  max-height: 440px;
 }
 
 .calendar-month {

@@ -1,5 +1,10 @@
 <template>
-  <Modal title="Upload Flashcards" :visible="toggleStore.fileUploadOpen" :on-exit="cancel">
+  <Modal
+    title="Upload Flashcards"
+    :visible="toggleStore.fileUploadOpen"
+    :exit-button="cancelButton"
+    :enter-button="uploadButton"
+  >
     <div class="modal-main-area">
       <p class="note-paragraph">
         Please be careful when uploading a lot of flashcards. They will be added to UNKNOWN all at
@@ -45,9 +50,16 @@
       </div>
     </div>
     <div class="modal-control-buttons">
-      <SmartButton class="off-button" text="Cancel" :on-click="cancel" auto-blur />
+      <SmartButton
+        class="off-button"
+        text="Cancel"
+        ref="cancelButton"
+        :on-click="cancel"
+        auto-blur
+      />
       <SmartButton
         class="calm-button counter-button"
+        ref="uploadButton"
         :on-click="upload"
         :disabled="uploadState !== 'success' || uploadCount <= 0"
         auto-blur
@@ -98,6 +110,9 @@ const { currDay } = storeToRefs(chronoStore)
 const uploadState = ref<UploadState>('parsing')
 const parsedRows = ref<FlashcardContent[]>([])
 const duplicateIndices = ref<Set<number>>(new Set())
+
+const cancelButton = ref<InstanceType<typeof SmartButton>>()
+const uploadButton = ref<InstanceType<typeof SmartButton>>()
 
 const parsedCount = computed(() => parsedRows.value.length)
 const duplicateCount = computed(() => duplicateIndices.value.size)
