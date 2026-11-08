@@ -74,7 +74,7 @@
           <template #overlay>
             <QuizSummary
               :elapsed-time="elapsedTime"
-              :elapsed-total-time="quizElapsedPreviousTime + elapsedTime"
+              :elapsed-total-time="elapsedPreviousTime + elapsedTime"
               :round="quizRound"
               :overall-correct="quizOverallCorrect"
               :overall-incorrect="quizOverallIncorrect"
@@ -186,7 +186,7 @@ const summaryVisible = computed(() => noOneAvailable.value || exitRequested.valu
 const quizRound = ref(1)
 const quizOverallCorrect = ref(0)
 const quizOverallIncorrect = ref(0)
-const quizElapsedPreviousTime = ref(0)
+const elapsedPreviousTime = ref(0)
 const incorrectFlashcards = ref<Flashcard[]>([])
 
 async function startReview() {
@@ -229,7 +229,7 @@ function resetState() {
   incorrectFlashcards.value = []
   quizOverallIncorrect.value = 0
   quizOverallCorrect.value = 0
-  quizElapsedPreviousTime.value = 0
+  elapsedPreviousTime.value = 0
 }
 
 async function finishReview() {
@@ -270,7 +270,7 @@ async function quizAnswer(know: boolean) {
         nextRoundFlashcardIds: [],
         overallCorrectCount: quizOverallCorrect.value,
         overallIncorrectCount: quizOverallIncorrect.value,
-        elapsedTotalTime: quizElapsedPreviousTime.value + elapsedTime.value,
+        elapsedTotalTime: elapsedPreviousTime.value + elapsedTime.value,
       },
     })
   } else {
@@ -282,7 +282,7 @@ async function quizAnswer(know: boolean) {
         nextRoundFlashcardIds: [currFlashcard.value.id],
         overallCorrectCount: quizOverallCorrect.value,
         overallIncorrectCount: quizOverallIncorrect.value,
-        elapsedTotalTime: quizElapsedPreviousTime.value + elapsedTime.value,
+        elapsedTotalTime: elapsedPreviousTime.value + elapsedTime.value,
       },
     })
   }
@@ -330,7 +330,7 @@ function onboardSession(session: ReviewSession) {
   quizRound.value = round
   quizOverallCorrect.value = overallCorrect
   quizOverallIncorrect.value = overallIncorrect
-  quizElapsedPreviousTime.value = elapsedTotal - session.elapsedTime
+  elapsedPreviousTime.value = elapsedTotal
   incorrectFlashcards.value = nextRound
 
   reviewStore.loadState(new MonoStageReviewQueue(forReview))
