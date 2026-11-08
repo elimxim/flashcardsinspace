@@ -5,12 +5,12 @@ import com.github.elimxim.flashcardsinspace.security.SecurityProperties
 import io.mockk.mockk
 import jakarta.persistence.EntityManager
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.data.jpa.autoconfigure.DataJpaRepositoriesAutoConfiguration
+import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
+import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration
+import org.springframework.boot.liquibase.autoconfigure.LiquibaseAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration
         DataSourceTransactionManagerAutoConfiguration::class,
         HibernateJpaAutoConfiguration::class,
         LiquibaseAutoConfiguration::class,
-        JpaRepositoriesAutoConfiguration::class,
+        DataJpaRepositoriesAutoConfiguration::class,
     ]
 )
 @EnableConfigurationProperties(SecurityProperties::class)

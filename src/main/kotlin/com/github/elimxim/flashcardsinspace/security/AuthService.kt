@@ -58,7 +58,7 @@ class AuthService(
             email = email,
             emailVerified = false,
             name = name,
-            secret = passwordEncoder.encode(secret.unmasked()),
+            secret = passwordEncoder.encode(secret.unmasked())!!,
             language = language,
             roles = "ASTRONAUT",
             registeredAt = ZonedDateTime.now(),
@@ -152,7 +152,7 @@ class AuthService(
                 throw HttpUnauthorizedException(ApiErrorCode.VIT401, "intent")
             }
 
-            user.secret = passwordEncoder.encode(validRequest.secret.unmasked())
+            user.secret = passwordEncoder.encode(validRequest.secret.unmasked())!!
             userRepository.save(user)
             log.info("User password changed")
             verificationCodeService.markAsUsed(intent)

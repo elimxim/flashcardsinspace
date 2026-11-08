@@ -65,7 +65,7 @@ daily ritual a little better every time you return.
 > [Licensing & Use](#%EF%B8%8F-licensing--use) section for details.
 
 ### Prerequisites
-- Java 24+
+- Java 25+
 - Node.js 26+
 - PostgreSQL
 - Docker

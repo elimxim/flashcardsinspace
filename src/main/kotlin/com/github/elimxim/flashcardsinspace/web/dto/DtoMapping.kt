@@ -2,6 +2,7 @@ package com.github.elimxim.flashcardsinspace.web.dto
 
 import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.util.getMetadataFieldName
+import org.springframework.data.domain.Page
 
 fun User.toDto() = UserDto(
     id = id,
@@ -40,6 +41,12 @@ fun Flashcard.toDto() = FlashcardDto(
     creationDate = creationDate,
     lastReviewDate = lastReviewDate,
     lastUpdatedAt = lastUpdatedAt,
+)
+
+fun <T : Any> Page<T>.toDto() = PageDto(
+    content = content,
+    totalPages = totalPages,
+    last = isLast,
 )
 
 fun ReviewHistory.toDto() = ReviewHistoryDto(

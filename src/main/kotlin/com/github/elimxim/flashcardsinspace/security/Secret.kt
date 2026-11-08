@@ -1,17 +1,17 @@
 package com.github.elimxim.flashcardsinspace.security
 
-import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.JsonSerializer
-import com.fasterxml.jackson.databind.SerializerProvider
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 import jakarta.validation.Payload
+import tools.jackson.core.JsonGenerator
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.SerializationContext
+import tools.jackson.databind.ValueDeserializer
+import tools.jackson.databind.ValueSerializer
+import tools.jackson.databind.annotation.JsonDeserialize
+import tools.jackson.databind.annotation.JsonSerialize
 import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
@@ -84,27 +84,27 @@ fun maskSecret(
     }
 }
 
-class SecretSerializer : JsonSerializer<Secret>() {
-    override fun serialize(value: Secret?, gen: JsonGenerator?, serializers: SerializerProvider?) {
-        gen?.writeString(value?.unmasked())
+class SecretSerializer : ValueSerializer<Secret>() {
+    override fun serialize(value: Secret, gen: JsonGenerator, ctxt: SerializationContext) {
+        gen.writeString(value.unmasked())
     }
 }
 
-class SecretDeserializer : JsonDeserializer<Secret>() {
-    override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): Secret? {
-        return p?.text?.let { Secret(it) }
+class SecretDeserializer : ValueDeserializer<Secret>() {
+    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Secret {
+        return Secret(p.string)
     }
 }
 
-class PasswordSerializer : JsonSerializer<Password>() {
-    override fun serialize(value: Password?, gen: JsonGenerator?, serializers: SerializerProvider?) {
-        gen?.writeString(value?.unmasked())
+class PasswordSerializer : ValueSerializer<Password>() {
+    override fun serialize(value: Password, gen: JsonGenerator, ctxt: SerializationContext) {
+        gen.writeString(value.unmasked())
     }
 }
 
-class PasswordDeserializer : JsonDeserializer<Password>() {
-    override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): Password? {
-        return p?.text?.let { Password(it) }
+class PasswordDeserializer : ValueDeserializer<Password>() {
+    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Password {
+        return Password(p.string)
     }
 }
 

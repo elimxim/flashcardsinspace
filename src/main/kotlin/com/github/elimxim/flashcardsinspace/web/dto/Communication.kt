@@ -104,8 +104,7 @@ class FlashcardUpdateRequest(
     var sessionRequest: ReviewSessionUpdateRequest? = null,
 ) {
     class ReviewHistory(
-        @field:Valid
-        var history: List<ReviewInfo> = emptyList()
+        var history: List<@Valid ReviewInfo> = emptyList()
     )
 
     class ReviewInfo(
@@ -136,8 +135,7 @@ data class ValidFlashcardUpdateRequest(
 class FlashcardBulkCreationRequest(
     @field:NotNull
     @field:Size(min = 1)
-    @field:Valid
-    var requests: List<FlashcardCreationRequest>? = null,
+    var requests: List<@Valid FlashcardCreationRequest>? = null,
 )
 
 class ValidFlashcardBulkCreationRequest(
@@ -200,8 +198,7 @@ data class ChronoSyncResponse(
 class ChronoBulkUpdateRequest(
     @field:NotNull
     @field:Size(min = 1)
-    @field:Valid
-    var ids: List<ChronodayId> = emptyList(),
+    var ids: List<@Valid ChronodayId> = emptyList(),
     @field:NotNull
     @field:ValidChronodayStatus
     var status: String? = null,
@@ -294,8 +291,7 @@ data class ReviewSessionUpdateRequest(
     @field:NotBlank
     @field:Pattern(regexp="^\\d+$")
     var elapsedTime: String? = null,
-    @field:Valid
-    var flashcardIds: List<FlashcardId>? = null,
+    var flashcardIds: List<@Valid FlashcardId>? = null,
     @field:Pattern(regexp="^(true|false)$")
     var finished: String? = null,
     @field:ValidMetadata

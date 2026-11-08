@@ -41,7 +41,9 @@ spring:
       hibernate.jdbc.batch_size: 20
       hibernate.order_inserts: true
       hibernate.order_updates: true
+      hibernate.type.json_format_mapper: jackson3
   jackson:
     time-zone: UTC
+    use-jackson2-defaults: true
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-main.yaml

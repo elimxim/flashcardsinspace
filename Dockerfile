@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM eclipse-temurin:24-jdk AS build
+FROM eclipse-temurin:25-jdk AS build
 WORKDIR /project
 
 COPY gradlew settings.gradle.kts build.gradle.kts ./
@@ -11,7 +11,7 @@ RUN ./gradlew --version --no-daemon
 COPY src ./src
 RUN ./gradlew bootJar -x test --no-daemon
 
-FROM eclipse-temurin:24-jre
+FROM eclipse-temurin:25-jre
 WORKDIR /app
 
 RUN useradd --system --create-home --shell /usr/sbin/nologin app

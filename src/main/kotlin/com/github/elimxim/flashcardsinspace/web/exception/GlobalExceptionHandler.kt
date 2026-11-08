@@ -45,7 +45,7 @@ class GlobalExceptionHandler {
         withLoggingContext {
             log.info("Upload exceeded the multipart size limit: ${e.message}")
             val body = buildErrorBody(
-                status = HttpStatus.PAYLOAD_TOO_LARGE,
+                status = HttpStatus.CONTENT_TOO_LARGE,
                 exception = HttpPayloadTooLargeException(ApiErrorCode.FPI413, "Upload exceeds the maximum allowed size"),
             )
 

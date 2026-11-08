@@ -1,28 +1,20 @@
 import com.github.gradle.node.npm.task.NpmTask
 
 plugins {
-    val kotlinVersion = "2.1.0"
+    val kotlinVersion = "2.4.21"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "3.5.4"
+    id("org.springframework.boot") version "4.1.2"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.github.node-gradle.node") version "7.1.0"
     id("application")
 }
 
 kotlin {
+    jvmToolchain(25)
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_23)
-        freeCompilerArgs.addAll("-Xjsr305=strict")
-    }
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_24
-    targetCompatibility = JavaVersion.VERSION_23
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(24)
+        freeCompilerArgs.addAll("-Xjsr305=strict", "-Xemit-jvm-type-annotations")
     }
 }
 
@@ -34,33 +26,30 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-authorization-server")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-cache")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.springframework.boot:spring-boot-starter-liquibase")
+    implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
-    implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
-    implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
-    implementation("org.liquibase:liquibase-core")
-    implementation("com.brevo:brevo:1.1.0")
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1")
-    implementation("io.hawt:hawtio-springboot:4.2.0")
-    implementation("org.jolokia:jolokia-core:1.7.2")
-    implementation("com.github.ben-manes.caffeine:caffeine:3.2.3")
-    implementation("com.github.usefulness:webp-imageio:0.10.2")
+    implementation("io.jsonwebtoken:jjwt-api:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
+    implementation("com.brevo:brevo:1.1.11")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20261107.1")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.3.1")
+    implementation("com.github.usefulness:webp-imageio:0.11.0")
 
     runtimeOnly("org.postgresql:postgresql")
 
     testImplementation(kotlin("test"))
-    testImplementation("io.mockk:mockk:1.13.11")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
+    testImplementation("io.mockk:mockk:1.14.12")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:6.4.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
@@ -72,6 +61,8 @@ application {
         "-Xmx800m",
         "-Xms800m",
         "-XX:+UseSerialGC",
+        "-XX:+UseCompactObjectHeaders",
+        "--enable-native-access=ALL-UNNAMED",
         "-XX:+ExitOnOutOfMemoryError",
         "-XX:+HeapDumpOnOutOfMemoryError",
         "-XX:HeapDumpPath=/tmp/flashcardsinspace.hprof",
@@ -121,4 +112,5 @@ tasks.named("processResources") {
 tasks.withType<Test> {
     dependsOn("npmRunTest")
     useJUnitPlatform()
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
 }

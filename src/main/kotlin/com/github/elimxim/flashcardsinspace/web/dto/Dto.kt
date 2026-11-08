@@ -76,6 +76,12 @@ data class FlashcardPictureDto(
     val uploadedAt: ZonedDateTime?,
 )
 
+data class PageDto<T>(
+    val content: List<T>,
+    val totalPages: Int,
+    val last: Boolean,
+)
+
 data class ReviewHistoryDto(
     val history: List<ReviewInfoDto>
 )

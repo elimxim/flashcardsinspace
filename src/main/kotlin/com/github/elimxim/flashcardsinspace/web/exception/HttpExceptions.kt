@@ -33,11 +33,11 @@ open class HttpNotFoundException(apiErrorCode: ApiErrorCode, message: String, ca
 open class HttpConflictException(apiErrorCode: ApiErrorCode, message: String, cause: Exception? = null) :
     Http4xxException(apiErrorCode, message, cause)
 
-@ExceptionHttpStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+@ExceptionHttpStatus(HttpStatus.CONTENT_TOO_LARGE)
 open class HttpPayloadTooLargeException(apiErrorCode: ApiErrorCode, message: String, cause: Exception? = null) :
     Http4xxException(apiErrorCode, message, cause)
 
-@ExceptionHttpStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+@ExceptionHttpStatus(HttpStatus.UNPROCESSABLE_CONTENT)
 open class HttpUnprocessableEntityException(apiErrorCode: ApiErrorCode, message: String, cause: Exception? = null) :
     Http4xxException(apiErrorCode, message, cause)
 

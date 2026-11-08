@@ -1,30 +1,26 @@
 package com.github.elimxim.flashcardsinspace.web
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.CacheControl
-import org.springframework.util.AntPathMatcher
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.springframework.web.util.pattern.PathPatternParser
+import tools.jackson.databind.cfg.DateTimeFeature
 import java.util.concurrent.TimeUnit
 
 @Configuration
 class WebConfig : WebMvcConfigurer {
     @Bean
-    fun jacksonCustomizer(): Jackson2ObjectMapperBuilderCustomizer {
-        return Jackson2ObjectMapperBuilderCustomizer { builder ->
+    fun jacksonCustomizer(): JsonMapperBuilderCustomizer {
+        return JsonMapperBuilderCustomizer { builder ->
             builder
                 // Disable writing dates as timestamps (arrays of numbers)
-                .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
                 // Disable adjusting dates to context timezone during deserialization
-                .featuresToDisable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
-                // Enable JavaTimeModule for proper LocalDate and ZonedDateTime serialization
-                .modulesToInstall(JavaTimeModule())
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
         }
     }
 
@@ -46,8 +42,8 @@ class WebConfig : WebMvcConfigurer {
     }
 
     override fun configurePathMatch(configurer: PathMatchConfigurer) {
-        val matcher = AntPathMatcher()
-        matcher.setCaseSensitive(false)
-        configurer.setPathMatcher(matcher)
+        val parser = PathPatternParser()
+        parser.isCaseSensitive = false
+        configurer.setPatternParser(parser)
     }
 }
