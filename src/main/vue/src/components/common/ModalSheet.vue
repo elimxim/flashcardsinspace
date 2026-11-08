@@ -3,7 +3,7 @@
     <div
       v-if="visible"
       class="modal-overlay"
-      :class="{ 'modal-overlay--dragging': dragging }"
+      :class="{ 'modal-overlay--dragging': dragging, 'modal-overlay--dismissing': dismissed }"
       :style="sheetPosition"
       role="dialog"
       aria-modal="true"
@@ -208,6 +208,15 @@ function dismiss() {
 .modal-sheet-enter-from .modal-backdrop,
 .modal-sheet-leave-to .modal-backdrop {
   opacity: 0;
+}
+
+/* A swipe-out: slower and softer than snapping back. After the leave rules so it wins. */
+.modal-overlay--dismissing .modal-sheet {
+  transition: transform 420ms cubic-bezier(0.3, 0.3, 0.2, 1);
+}
+
+.modal-overlay--dismissing .modal-backdrop {
+  transition: opacity 420ms ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
