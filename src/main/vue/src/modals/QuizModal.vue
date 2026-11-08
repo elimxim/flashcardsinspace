@@ -61,16 +61,16 @@
       </div>
       <div class="modal-control-buttons">
         <SmartButton
+          ref="cancelButton"
           class="off-button"
           text="Cancel"
-          ref="cancelButton"
           :on-click="exit"
           auto-blur
         />
         <SmartButton
+          ref="startButton"
           class="calm-button counter-button"
           text="Start"
-          ref="startButton"
           :on-click="startNew"
           :disabled="reviewCount <= 0"
           auto-blur

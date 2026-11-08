@@ -69,7 +69,7 @@ import Clock from '@/components/common/Clock.vue'
 import ReviewSummary from '@/components/review/summary/ReviewSummary.vue'
 import SummaryAnswerStats from '@/components/review/summary/SummaryAnswerStats.vue'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     elapsedTime: number
     elapsedTotalTime: number

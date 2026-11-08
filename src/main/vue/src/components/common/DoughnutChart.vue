@@ -95,6 +95,7 @@ const props = withDefaults(
     segmentCount?: number
   }>(),
   {
+    total: undefined,
     showLegend: true,
     legendLeft: 'Left',
     legendRight: 'Right',

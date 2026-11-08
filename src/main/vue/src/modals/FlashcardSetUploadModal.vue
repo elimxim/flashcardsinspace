@@ -51,15 +51,15 @@
     </div>
     <div class="modal-control-buttons">
       <SmartButton
+        ref="cancelButton"
         class="off-button"
         text="Cancel"
-        ref="cancelButton"
         :on-click="cancel"
         auto-blur
       />
       <SmartButton
-        class="calm-button counter-button"
         ref="uploadButton"
+        class="calm-button counter-button"
         :on-click="upload"
         :disabled="uploadState !== 'success' || uploadCount <= 0"
         auto-blur
