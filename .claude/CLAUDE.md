@@ -29,7 +29,7 @@ Flashcards in Space is a spaced repetition flashcard web app with a space theme.
 
 **Backend** (`src/main/kotlin/com/github/elimxim/flashcardsinspace/`) — standard Spring layering: `entity/`, `service/`, `web/` (with `dto/` and `exception/`, where errors carry `ApiErrorCode` enums), `security/` (`JwtService`, `JwtAuthFilter`, `SecurityConfig`, `VerificationCodeService`), and `schedule/`, which holds `LightspeedSchedule` — the spaced repetition algorithm deciding which stages are reviewed on a given day.
 
-URL patterns: `/api/**` authenticated, `/api-public/**` public, `/auth/**` auth. `ForwardController` forwards all non-API routes to `index.html` for Vue Router.
+URL patterns: `/api/**` authenticated, `/api-public/**` public, `/auth/**` auth. `IndexPageController` serves `index.html` (via `IndexPageRenderer`, which sets per-page SEO head tags from `PageHeads.kt`) only for the paths it lists explicitly — a new Vue route must be added there too, or it 404s on reload. `IndexPageControllerTest` checks the two lists match.
 
 **Frontend** (`src/main/vue/src/`) — `pages/`, `components/`, `modals/`, `stores/` (Pinia), `model/`, `utils/`, plus two directories worth knowing:
 - `core-logic/` — pure business logic, unit-tested with Vitest: `stage-logic.ts`, `review-logic.ts`, `chrono-logic.ts`, `review-session-attendant.ts`, `flashcard-media-prefetch.ts`, and `flashcard-audio-logic.ts` / `flashcard-picture-logic.ts` (fetch/upload/remove).
