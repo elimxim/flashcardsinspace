@@ -2,12 +2,10 @@ package com.github.elimxim.flashcardsinspace.security
 
 import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
 import com.github.elimxim.flashcardsinspace.web.filter.RequestLoggingFilter
-import io.hawt.springboot.HawtioEndpoint
-import org.jolokia.support.spring.actuator.JolokiaEndpoint
-import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
-import org.springframework.boot.actuate.health.HealthEndpoint
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.health.actuate.endpoint.HealthEndpoint
+import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -16,6 +14,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.config.web.PathPatternRequestMatcherBuilderFactoryBean
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -48,6 +47,9 @@ class SecurityConfig(
         }
 
     @Bean
+    fun requestMatcherBuilder() = PathPatternRequestMatcherBuilderFactoryBean()
+
+    @Bean
     fun authenticationManager(config: AuthenticationConfiguration): AuthenticationManager =
         config.authenticationManager
 
@@ -67,8 +69,6 @@ class SecurityConfig(
         .authorizeHttpRequests { auth ->
             auth
                 .requestMatchers(EndpointRequest.to(HealthEndpoint::class.java)).permitAll()
-                .requestMatchers(EndpointRequest.to(HawtioEndpoint::class.java)).permitAll()
-                .requestMatchers(EndpointRequest.to(JolokiaEndpoint::class.java)).permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .requestMatchers("/api-public/**").permitAll()
                 .requestMatchers("/auth/**").permitAll()

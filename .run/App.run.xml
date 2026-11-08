@@ -4,6 +4,7 @@
     <option name="PROGRAM_PARAMETERS" value="--spring.config.additional-location=file:props/" />
     <module name="flash-cards-in-space.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.github.elimxim.flashcardsinspace.App" />
+    <option name="VM_PARAMETERS" value="--enable-native-access=ALL-UNNAMED" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

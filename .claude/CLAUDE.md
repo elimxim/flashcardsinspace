@@ -8,7 +8,7 @@ Guidance for Claude Code (claude.ai/code) when working in this repository.
 
 Flashcards in Space is a spaced repetition flashcard web app with a space theme. Users create flashcard sets with front/back sides, and the app generates a study schedule ("Lightspeed Schedule") that determines which flashcard stages to review on each day.
 
-- **Backend**: Kotlin + Spring Boot 3.5, JPA/Hibernate, PostgreSQL, Liquibase. JDK 24, target JVM 23.
+- **Backend**: Kotlin + Spring Boot 4, JPA/Hibernate 7, Jackson 3, PostgreSQL, Liquibase. JDK 25.
 - **Frontend**: Vue 3 + TypeScript, Pinia, Vue Router, Vite, Axios. No UI framework — components are built from scratch.
 - **Auth**: stateless JWT, email verification via Brevo.
 - **Build**: Gradle with node-gradle plugin; the frontend builds into `build/resources/main/static/`.
@@ -58,13 +58,15 @@ URL patterns: `/api/**` authenticated, `/api-public/**` public, `/auth/**` auth.
 - **Caching**: Caffeine in-memory cache (`CacheConfig.kt`).
 - **Input security**: OWASP HTML sanitizer for user-supplied content (`UserInputUtils`).
 - **Virtual threads**: enabled.
+- **Nested validation**: put `@Valid` on the type argument (`List<@Valid Item>`), not the list. This only works because of the `-Xemit-jvm-type-annotations` compiler flag; without it, list items silently stop being validated.
+- **Jackson 3 only**: import from `tools.jackson.*` (annotations stay in `com.fasterxml.jackson.annotation`). Jackson 2 is on the runtime classpath only because jjwt needs it — Spring ignores Jackson 2 serializers, so a `com.fasterxml.jackson.databind` import silently does nothing.
 
 ## Testing
 
-**Backend**: JUnit 5 + AssertJ + MockK (`io.mockk:mockk`). `spring-boot-starter-test` also provides `@MockBean` (Mockito) + `org.mockito.kotlin` for Spring context tests.
+**Backend**: JUnit 5 + AssertJ + MockK (`io.mockk:mockk`). `spring-boot-starter-test` also provides `@MockitoBean` + `org.mockito.kotlin` for Spring context tests. `@WebMvcTest` and `@AutoConfigureMockMvc` live in `spring-boot-starter-webmvc-test`.
 
 - Pure unit tests (services, validators): instantiate the class directly, no Spring context. Use MockK.
-- Controller tests (`@WebMvcTest`): `@MockBean` the service under test plus `JwtService` and `UserRepository` — `SecurityConfig` defines `@Bean` methods that inject the latter two even when `app.security.enabled=false`. Set the principal with `SecurityMockMvcRequestPostProcessors.user(mockUser)`.
+- Controller tests (`@WebMvcTest`): `@MockitoBean` the service under test plus `JwtService` and `UserRepository` — `SecurityConfig` defines `@Bean` methods that inject the latter two even when `app.security.enabled=false`. Set the principal with `SecurityMockMvcRequestPostProcessors.user(mockUser)`.
 - To disable the JWT filter chain in `@WebMvcTest`, set `app.security.enabled=false` via `@TestPropertySource`. `SecurityProperties` binding still requires all `app.security.*` sub-properties (jwt, verification-tokens) to be present.
 
 **Frontend**: Vitest, pure unit tests only — no HTTP mocking library in use.

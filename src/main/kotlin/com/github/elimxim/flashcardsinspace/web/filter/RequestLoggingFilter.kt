@@ -1,6 +1,5 @@
 package com.github.elimxim.flashcardsinspace.web.filter
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -10,13 +9,15 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.util.ContentCachingRequestWrapper
 import org.springframework.web.util.ContentCachingResponseWrapper
+import tools.jackson.databind.json.JsonMapper
 import java.nio.charset.StandardCharsets
 
 private val log = LoggerFactory.getLogger(RequestLoggingFilter::class.java)
+private const val REQUEST_BODY_CACHE_LIMIT = 64 * 1024
 
 @Component
 class RequestLoggingFilter(
-    private val objectMapper: ObjectMapper,
+    private val jsonMapper: JsonMapper,
 ) : OncePerRequestFilter() {
 
     override fun doFilterInternal(
@@ -24,7 +25,7 @@ class RequestLoggingFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val wrappedRequest = ContentCachingRequestWrapper(request)
+        val wrappedRequest = ContentCachingRequestWrapper(request, REQUEST_BODY_CACHE_LIMIT)
         val wrappedResponse = ContentCachingResponseWrapper(response)
 
         try {
@@ -63,7 +64,7 @@ class RequestLoggingFilter(
             "Request Body" to body
         )
 
-        log.info(objectMapper.writeValueAsString(requestDetails))
+        log.info(jsonMapper.writeValueAsString(requestDetails))
     }
 
     private fun headers(request: HttpServletRequest): Map<String, String> =
@@ -79,7 +80,7 @@ class RequestLoggingFilter(
         if (requestBody.isEmpty()) return "NA"
 
         return try {
-            objectMapper.readTree(requestBody)
+            jsonMapper.readTree(requestBody)
         } catch (_: Exception) {
             String(requestBody, StandardCharsets.UTF_8)
         }

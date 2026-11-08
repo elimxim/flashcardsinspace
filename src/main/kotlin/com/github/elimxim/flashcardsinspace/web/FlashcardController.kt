@@ -5,7 +5,6 @@ import com.github.elimxim.flashcardsinspace.security.normalize
 import com.github.elimxim.flashcardsinspace.service.FlashcardService
 import com.github.elimxim.flashcardsinspace.util.withLoggingContext
 import com.github.elimxim.flashcardsinspace.web.dto.*
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.ResponseEntity
@@ -23,8 +22,8 @@ class FlashcardController(
         @AuthenticationPrincipal user: User,
         @PathVariable setId: Long,
         @PageableDefault(size = 256) pageable: Pageable,
-    ): ResponseEntity<Page<FlashcardDto>> = withLoggingContext(user) {
-        return ResponseEntity.ok(flashcardService.getAll(user, setId, pageable))
+    ): ResponseEntity<PageDto<FlashcardDto>> = withLoggingContext(user) {
+        return ResponseEntity.ok(flashcardService.getAll(user, setId, pageable).toDto())
     }
 
     @PostMapping

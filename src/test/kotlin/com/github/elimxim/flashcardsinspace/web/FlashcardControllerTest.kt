@@ -15,10 +15,12 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.then
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
@@ -70,7 +72,7 @@ class FlashcardControllerTest {
 
             assertThat(result.response.contentAsString)
                 .contains("\"last\":true")
-                .contains("\"totalElements\":2")
+                .contains("\"totalPages\":1")
         }
 
         @Test
@@ -95,14 +97,13 @@ class FlashcardControllerTest {
             val page = PageImpl<FlashcardDto>(emptyList(), PageRequest.of(0, 256), 0L)
             given(flashcardService.getAll(any(), anyLong(), any())).willReturn(page)
 
-            val result = mockMvc.get("/api/flashcard-sets/1/flashcards") {
+            mockMvc.get("/api/flashcard-sets/1/flashcards") {
                 with(user(mockUser))
             }.andExpect {
                 status { isOk() }
-            }.andReturn()
+            }
 
-            assertThat(result.response.contentAsString)
-                .contains("\"size\":256")
+            then(flashcardService).should().getAll(any(), anyLong(), argThat { pageSize == 256 })
         }
     }
 

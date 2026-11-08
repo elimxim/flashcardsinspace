@@ -87,10 +87,10 @@ class JwtService(private val securityProperties: SecurityProperties) {
             claims["roles"] = userDetails.roles
         }
         return Jwts.builder()
-            .setClaims(claims)
-            .setSubject(userDetails.username)
-            .setIssuedAt(Date(System.currentTimeMillis()))
-            .setExpiration(Date(System.currentTimeMillis() + expirationMs))
+            .claims(claims)
+            .subject(userDetails.username)
+            .issuedAt(Date(System.currentTimeMillis()))
+            .expiration(Date(System.currentTimeMillis() + expirationMs))
             .signWith(secretKey)
             .compact()
     }
@@ -100,9 +100,9 @@ class JwtService(private val securityProperties: SecurityProperties) {
     private fun extractExpiration(token: String): Date = extractClaim(token, Claims::getExpiration)
 
     private fun extractAllClaims(token: String): Claims =
-        Jwts.parserBuilder()
-            .setSigningKey(secretKey)
+        Jwts.parser()
+            .verifyWith(secretKey)
             .build()
-            .parseClaimsJws(token)
-            .body
+            .parseSignedClaims(token)
+            .payload
 }
