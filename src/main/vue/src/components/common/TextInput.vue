@@ -12,19 +12,22 @@
         :on-click="toggleExpandedFull"
       />
     </div>
-    <textarea
-      ref="textArea"
-      v-model="model"
-      v-bind="$attrs"
-      type="text"
-      :placeholder="inputPlaceholder"
-      :rows="rows"
-    />
+    <div class="text-input--field">
+      <textarea
+        ref="textArea"
+        v-model="model"
+        v-bind="$attrs"
+        type="text"
+        :rows="rows"
+      />
+      <FloatingPlaceholder :text="inputPlaceholder" :floating="!!model" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
+import FloatingPlaceholder from '@/components/common/FloatingPlaceholder.vue'
 import { computed, ref } from 'vue'
 
 const model = defineModel<string | undefined>()
@@ -112,6 +115,20 @@ defineExpose({
   padding: 2px 4px 0;
 }
 
+.text-input--field {
+  --tx-inpt--padding-top: 16px;
+  --tx-inpt--padding-x: 8px;
+  --floating-placeholder--top: var(--tx-inpt--padding-top);
+  --floating-placeholder--top--floating: 4px;
+  --floating-placeholder--left: var(--tx-inpt--padding-x);
+  --floating-placeholder--font-size: var(--tx-inpt--font-size);
+  --floating-placeholder--color: var(--tx-inpt--placeholder--color);
+  position: relative;
+  flex: 1;
+  display: flex;
+  padding-top: var(--tx-inpt--padding-top);
+}
+
 .text-input textarea {
   flex: 1;
   width: 100%;
@@ -119,14 +136,10 @@ defineExpose({
   color: var(--tx-inpt--color);
   background: transparent;
   border: none;
-  padding: clamp(4px, 1.5vh, 8px) clamp(4px, 1vw, 8px);
+  padding: 0 var(--tx-inpt--padding-x) 6px;
   margin: 0;
   resize: none;
   outline: none;
-}
-
-.text-input textarea::placeholder {
-  color: var(--tx-inpt--placeholder--color);
 }
 
 .text-input:hover,
@@ -138,8 +151,8 @@ defineExpose({
   border-color: var(--tx-inpt--border-color--error);
 }
 
-.text-input--error textarea::placeholder {
-  font-size: var(--tx-inpt--font-size--error);
-  color: var(--tx-inpt--color--error);
+.text-input--error .text-input--field {
+  --floating-placeholder--font-size: var(--tx-inpt--font-size--error);
+  --floating-placeholder--color: var(--tx-inpt--color--error);
 }
 </style>

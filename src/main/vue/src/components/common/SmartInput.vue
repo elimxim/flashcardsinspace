@@ -7,7 +7,6 @@
       v-bind="$attrs"
       style="transition: border-color 0.2s ease-in-out"
       :type="inputType"
-      :placeholder="inputPlaceholder"
       :readonly="readonly"
     />
     <input
@@ -17,8 +16,8 @@
       v-bind="$attrs"
       style="transition: border-color 0.2s ease-in-out"
       :type="inputType"
-      :placeholder="inputPlaceholder"
     />
+    <FloatingPlaceholder :text="inputPlaceholder" :floating="!!model" />
     <button
       v-if="isPassword"
       ref="secretButton"
@@ -33,6 +32,7 @@
 </template>
 
 <script setup lang="ts">
+import FloatingPlaceholder from '@/components/common/FloatingPlaceholder.vue'
 import { computed, ref } from 'vue'
 
 type Type = 'text' | 'password' | 'email'
@@ -107,6 +107,13 @@ defineExpose({
 }
 
 .smart-input {
+  --inpt--padding-top: 16px;
+  --inpt--padding-x: 8px;
+  --floating-placeholder--top: var(--inpt--padding-top);
+  --floating-placeholder--top--floating: 4px;
+  --floating-placeholder--left: var(--inpt--padding-x);
+  --floating-placeholder--font-size: var(--inpt--font-size);
+  --floating-placeholder--color: var(--inpt--placeholder--color);
   flex: 1;
   position: relative;
   display: flex;
@@ -122,16 +129,11 @@ defineExpose({
   background-color: var(--inpt--bg-color);
   border-color: var(--inpt--border-color);
   border-radius: var(--inpt--border-radius);
-  padding: clamp(0.75rem, 1.5vh, 1.25rem) clamp(0.75rem, 1vw, 1.25rem);
+  padding: var(--inpt--padding-top) var(--inpt--padding-x) 6px;
   margin: 0;
   border-style: solid;
   border-width: 2px;
   resize: none;
-}
-
-.smart-input textarea::placeholder,
-.smart-input input::placeholder {
-  color: var(--inpt--placeholder--color);
 }
 
 .smart-input:hover textarea,
@@ -147,10 +149,9 @@ defineExpose({
   border-color: var(--inpt--border-color--error);
 }
 
-.smart-input--error textarea::placeholder,
-.smart-input--error input::placeholder {
-  font-size: var(--inpt--font-size--error);
-  color: var(--inpt--color--error);
+.smart-input--error {
+  --floating-placeholder--font-size: var(--inpt--font-size--error);
+  --floating-placeholder--color: var(--inpt--color--error);
 }
 
 .secret-button {
