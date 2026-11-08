@@ -13,13 +13,7 @@
       />
     </div>
     <div class="text-input-field">
-      <textarea
-        ref="textArea"
-        v-model="model"
-        v-bind="$attrs"
-        type="text"
-        :rows="rows"
-      />
+      <textarea ref="textArea" v-model="model" v-bind="$attrs" type="text" :rows="rows" />
       <FloatingPlaceholder :text="inputPlaceholder" :floating="!!model" />
     </div>
   </div>
@@ -136,7 +130,7 @@ defineExpose({
   color: var(--tx-inpt--color);
   background: transparent;
   border: none;
-  padding: 0 var(--tx-inpt--padding-x) 6px;
+  padding: 2px var(--tx-inpt--padding-x) 6px;
   margin: 0;
   resize: none;
   outline: none;

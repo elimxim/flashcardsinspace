@@ -111,7 +111,7 @@ defineExpose({
   --inpt--padding-x: 8px;
   --floating-placeholder--top: var(--inpt--padding-top);
   --floating-placeholder--top--floating: 4px;
-  --floating-placeholder--left: var(--inpt--padding-x);
+  --floating-placeholder--left: calc(var(--inpt--padding-x) + 2px);
   --floating-placeholder--font-size: var(--inpt--font-size);
   --floating-placeholder--color: var(--inpt--placeholder--color);
   flex: 1;

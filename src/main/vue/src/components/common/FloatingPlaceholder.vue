@@ -38,6 +38,7 @@ defineProps<{
 }
 
 .floating-placeholder--floating {
-  transform: translateY(calc(var(--flt-plchldr--top--floating) - var(--flt-plchldr--top))) scale(0.7);
+  transform: translateY(calc(var(--flt-plchldr--top--floating) - var(--flt-plchldr--top)))
+    scale(0.8);
 }
 </style>
