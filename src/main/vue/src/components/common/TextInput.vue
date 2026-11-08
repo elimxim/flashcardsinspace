@@ -1,6 +1,6 @@
 <template>
-  <div class="text-input text-input--theme" :class="{ 'text-input--error': invalid }">
-    <div v-if="showToolbar" class="text-input--toolbar">
+  <div class="text-input text-input--theme" :class="{ 'text-input-error': invalid }">
+    <div v-if="showToolbar" class="text-input-toolbar">
       <AwesomeButton
         v-if="showExpandDown"
         :icon="expandedDown ? 'fa-solid fa-angles-up' : 'fa-solid fa-angles-down'"
@@ -12,7 +12,7 @@
         :on-click="toggleExpandedFull"
       />
     </div>
-    <div class="text-input--field">
+    <div class="text-input-field">
       <textarea
         ref="textArea"
         v-model="model"
@@ -108,14 +108,14 @@ defineExpose({
   transition: border-color 0.2s ease-in-out;
 }
 
-.text-input--toolbar {
+.text-input-toolbar {
   display: flex;
   gap: 6px;
   justify-content: flex-end;
   padding: 2px 4px 0;
 }
 
-.text-input--field {
+.text-input-field {
   --tx-inpt--padding-top: 16px;
   --tx-inpt--padding-x: 8px;
   --floating-placeholder--top: var(--tx-inpt--padding-top);
@@ -147,11 +147,11 @@ defineExpose({
   border-color: var(--tx-inpt--border-color--focus);
 }
 
-.text-input--error {
+.text-input-error {
   border-color: var(--tx-inpt--border-color--error);
 }
 
-.text-input--error .text-input--field {
+.text-input-error .text-input-field {
   --floating-placeholder--font-size: var(--tx-inpt--font-size--error);
   --floating-placeholder--color: var(--tx-inpt--color--error);
 }
