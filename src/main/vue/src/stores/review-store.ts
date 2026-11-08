@@ -130,10 +130,15 @@ export const useReviewStore = (
       )
     }
 
+    function showFlashcard(flashcard: Flashcard | undefined) {
+      clearMedia()
+      currFlashcard.value = flashcard
+    }
+
     async function prevFlashcard(
       callback: (success: boolean) => void = () => {},
     ): Promise<boolean> {
-      currFlashcard.value = reviewQueue.value.prev()
+      showFlashcard(reviewQueue.value.prev())
       await fetchMedia()
       const result = currFlashcard.value !== undefined
       callback(result)
@@ -144,7 +149,7 @@ export const useReviewStore = (
     async function nextFlashcard(
       callback: (success: boolean) => void = () => {},
     ): Promise<boolean> {
-      currFlashcard.value = reviewQueue.value.next()
+      showFlashcard(reviewQueue.value.next())
       await fetchMedia()
       const result = currFlashcard.value !== undefined
       callback(result)
