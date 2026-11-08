@@ -1,4 +1,9 @@
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  START_LOCATION,
+  type RouteRecordRaw,
+} from 'vue-router'
 import { useAuthStore } from '@/stores/auth-store.ts'
 import { storeToRefs } from 'pinia'
 import HomePage from '@/pages/HomePage.vue'
@@ -20,7 +25,6 @@ import { parseNumber } from '@/utils/utils.ts'
 import { parseVerificationType } from '@/core-logic/user-logic.ts'
 
 export const routeNames = {
-  base: 'base',
   home: 'home',
   controlPanel: 'controlPanel',
   user: 'user',
@@ -39,12 +43,12 @@ export const routeNames = {
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    name: routeNames.base,
-    redirect: () => {
-      const authStore = useAuthStore()
-      return authStore.isAuthenticated
-        ? { name: routeNames.controlPanel }
-        : { name: routeNames.home }
+    name: routeNames.home,
+    component: HomePage,
+    beforeEnter: (_to, from) => {
+      if (from === START_LOCATION && useAuthStore().isAuthenticated) {
+        return { name: routeNames.controlPanel }
+      }
     },
   },
   {
@@ -55,11 +59,6 @@ const routes: RouteRecordRaw[] = [
       requiresAuth: true,
       requiresEmailVerified: true,
     },
-  },
-  {
-    path: '/home',
-    name: routeNames.home,
-    component: HomePage,
   },
   {
     path: '/get-help',

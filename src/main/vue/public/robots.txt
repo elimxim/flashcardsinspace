@@ -16,9 +16,8 @@ Allow: /code-verification
 
 # Allow main public pages
 Allow: /
-Allow: /home
-Allow: /support
+Allow: /get-help
 Allow: /emotional-support
-Allow: /website-support
+Allow: /website-guide
 
 Sitemap: https://flashcardsinspace.com/sitemap.xml
