@@ -1,5 +1,5 @@
 <template>
-  <Transition name="modal-sheet" :duration="{ enter: 420, leave: 280 }">
+  <Transition name="modal-sheet" :duration="{ enter: 600, leave: 600 }">
     <div
       v-if="visible"
       class="modal-overlay"
@@ -193,11 +193,11 @@ function dismiss() {
 }
 
 .modal-sheet-enter-active .modal-sheet {
-  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .modal-sheet-leave-active .modal-sheet {
-  transition: transform 280ms cubic-bezier(0.4, 0, 0.9, 0.4);
+  transition: transform 600ms cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 .modal-sheet-enter-from .modal-sheet,
