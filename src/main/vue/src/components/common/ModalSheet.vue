@@ -165,7 +165,7 @@ function dismiss() {
   background: #fff;
   display: flex;
   flex-direction: column;
-  padding: 0 8px calc(8px + env(safe-area-inset-bottom));
+  padding: 0 8px 36px;
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.2);
   user-select: none;
