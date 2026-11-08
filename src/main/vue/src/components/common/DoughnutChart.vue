@@ -83,6 +83,7 @@ const ANIMATION_DURATION = 1200
 
 const props = withDefaults(
   defineProps<{
+    total?: number
     left: number
     right: number
     showLegend?: boolean
@@ -110,7 +111,7 @@ const segmentDashArray = `${CIRCUMFERENCE / props.segmentCount - props.segmentGa
 const rightCount = computed(() => props.right)
 const leftCount = computed(() => props.left)
 
-const total = computed(() => props.left + props.right)
+const total = computed(() => props.total ?? props.left + props.right)
 
 const rightRatio = computed(() => {
   if (total.value === 0) return 0

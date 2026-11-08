@@ -18,8 +18,9 @@
       <div class="quiz-chart-wrapper">
         <div class="quiz-chart">
           <DoughnutChart
+            :total="roundTotal"
             :left="roundIncorrect"
-            :right="roundCorrect"
+            :right="roundTotal - roundRemaining - roundIncorrect"
             legend-left="Incorrect"
             legend-right="Correct"
           />
@@ -27,23 +28,29 @@
       </div>
       <div
         :class="{
-          'quiz-central-button': !hasNextRoundButton,
-          'quiz-left-button': hasNextRoundButton,
+          'quiz-central-button': roundRemaining === 0 && roundIncorrect === 0,
+          'quiz-left-button': roundRemaining > 0 || roundIncorrect > 0,
         }"
       >
         <SmartButton
-          text="Finish Quiz"
+          text="Exit Quiz"
           class="off-button"
           :on-click="onFinish"
           fill-width
           auto-blur
         />
       </div>
-      <div v-if="!hasNextRoundButton" class="quiz-right-button">
-        <SmartButton text="Back" class="calm-button" :on-click="onBack" fill-width auto-blur />
-      </div>
-      <div v-else-if="roundIncorrect > 0" class="quiz-right-button">
+      <div class="quiz-right-button">
         <SmartButton
+          v-if="roundRemaining > 0"
+          text="Back"
+          class="calm-button"
+          :on-click="onBack"
+          fill-width
+          auto-blur
+        />
+        <SmartButton
+          v-else-if="roundIncorrect > 0"
           text="Next Round"
           class="calm-button"
           :on-click="onNextRound"
@@ -56,7 +63,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import DoughnutChart from '@/components/common/DoughnutChart.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import Clock from '@/components/common/Clock.vue'
@@ -70,9 +76,9 @@ const props = withDefaults(
     round: number
     overallCorrect: number
     overallIncorrect: number
-    roundCorrect: number
-    roundIncorrect: number
     roundTotal: number
+    roundRemaining: number
+    roundIncorrect: number
     onNextRound?: () => void
     onBack?: () => void
     onFinish?: () => void
@@ -82,10 +88,6 @@ const props = withDefaults(
     onBack: () => {},
     onFinish: () => {},
   },
-)
-
-const hasNextRoundButton = computed(
-  () => props.roundCorrect + props.roundIncorrect === props.roundTotal,
 )
 </script>
 
