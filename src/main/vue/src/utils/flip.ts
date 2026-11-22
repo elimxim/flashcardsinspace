@@ -1,63 +1,38 @@
 import { nextTick, onBeforeUpdate, onMounted, onUpdated, type Ref } from 'vue'
 
 export interface FlipOptions {
-  /** Transform duration in seconds (default: 0.5) */
+  /** Animation duration in seconds (default: 0.45) */
   duration?: number
   /** Don't animate the updates that settle the initial layout (default: true). */
   skipInitialLayout?: boolean
 }
 
-interface Move {
-  element: HTMLElement
-  deltaX: number
-  deltaY: number
-}
+const EASING = 'cubic-bezier(0.22, 1, 0.36, 1)'
+const THRESHOLD_PX = 0.5
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 /**
  * FLIP (First, Last, Invert, Play) animation
- * Smoothly animates elements when they change position in the DOM
+ * Smoothly animates elements with a 'flip-key' attribute when they change
+ * position or size in the DOM. Sizes are animated as real width/height, not as
+ * a scale, so the content reflows instead of being stretched. The elements are
+ * expected to fill their slot (e.g. grid cells), as sizes animate towards 100%.
  */
 export function useFlip(
   containerRef: Ref<HTMLElement | null | undefined>,
   options: FlipOptions = {},
 ) {
-  const { duration = 0.5, skipInitialLayout = true } = options
+  const { duration = 0.45, skipInitialLayout = true } = options
   const positions = new Map<string, DOMRect>()
-  const pendingCleanups = new WeakMap<HTMLElement, () => void>()
+  const running = new Map<HTMLElement, Animation>()
   /** Whether an update is allowed to animate at all */
   let armed = true
 
   function flipElements(): HTMLElement[] {
     if (!containerRef.value) return []
     return Array.from(containerRef.value.querySelectorAll<HTMLElement>('[flip-key]'))
-  }
-
-  /**
-   * Drop the inline styles an animation leaves behind, so no element keeps a
-   * stray transform (which would make it a containing block and a stacking
-   * context) or a transition that other transforms would inherit
-   */
-  function clearInlineStyles(element: HTMLElement) {
-    pendingCleanups.get(element)?.()
-    element.style.transition = ''
-    element.style.transform = ''
-  }
-
-  function cleanUpAfterTransition(element: HTMLElement) {
-    const stopListening = () => {
-      element.removeEventListener('transitionend', onTransitionEnd)
-      pendingCleanups.delete(element)
-    }
-
-    const onTransitionEnd = (event: TransitionEvent) => {
-      if (event.target !== element || event.propertyName !== 'transform') return
-      stopListening()
-      element.style.transition = ''
-      element.style.transform = ''
-    }
-
-    pendingCleanups.set(element, stopListening)
-    element.addEventListener('transitionend', onTransitionEnd)
   }
 
   /**
@@ -69,33 +44,34 @@ export function useFlip(
     for (const element of flipElements()) {
       const key = element.getAttribute('flip-key')
       if (key) {
-        // Includes the transform of a still running animation, which is exactly
-        // where the element is right now and where the next one should start
+        // Includes a still running animation, which is exactly where the
+        // element is right now and where the next one should start
         positions.set(key, element.getBoundingClientRect())
       }
     }
   }
 
   /**
-   * Animate elements from their old positions to new positions
+   * Animate elements from their old positions and sizes to the new ones
    */
   function animateToNewPositions() {
-    if (!armed) {
+    if (!armed || prefersReducedMotion()) {
       positions.clear()
+      for (const animation of running.values()) animation.cancel()
       return
     }
 
     const elements = flipElements()
 
-    // Reads and writes are kept in separate passes: interleaving them makes the
-    // browser re-layout once per element
+    // So that every element is measured at its new layout, not wherever a
+    // running animation happens to have left it
     for (const element of elements) {
-      // So that every element is measured at its new layout position, not
-      // wherever a running animation happens to have left it
-      clearInlineStyles(element)
+      running.get(element)?.cancel()
     }
 
-    const moves: Move[] = []
+    // All reads before any write: interleaving them makes the browser
+    // re-layout once per element
+    const moves: { element: HTMLElement; keyframes: Keyframe[] }[] = []
 
     for (const element of elements) {
       const key = element.getAttribute('flip-key')
@@ -107,35 +83,41 @@ export function useFlip(
       const last = element.getBoundingClientRect()
       const deltaX = first.left - last.left
       const deltaY = first.top - last.top
+      const moved = Math.abs(deltaX) > THRESHOLD_PX || Math.abs(deltaY) > THRESHOLD_PX
+      const resized =
+        Math.abs(first.width - last.width) > THRESHOLD_PX ||
+        Math.abs(first.height - last.height) > THRESHOLD_PX
 
-      // Only animate if the position actually changed
-      if (Math.abs(deltaX) <= 0.5 && Math.abs(deltaY) <= 0.5) continue
+      if (!moved && !resized) continue
 
-      moves.push({ element, deltaX, deltaY })
+      const from: Keyframe = { transform: `translate(${deltaX}px, ${deltaY}px)` }
+      const to: Keyframe = { transform: 'translate(0, 0)' }
+      if (resized) {
+        from.width = `${first.width}px`
+        from.height = `${first.height}px`
+        // Not the measured px: while the container keeps resizing, the slot
+        // keeps changing too, and a px target would leave the element too big
+        // or too small (eating the gaps) until the animation ends
+        to.width = '100%'
+        to.height = '100%'
+      }
+      moves.push({ element, keyframes: [from, to] })
     }
 
     positions.clear()
-    if (moves.length === 0) return
 
-    // Invert: Apply transforms to make the elements look like they are still in
-    // their old positions
-    for (const { element, deltaX, deltaY } of moves) {
-      element.style.transition = 'none'
-      element.style.transform = `translate(${deltaX}px, ${deltaY}px)`
-    }
-
-    // Force a single reflow so the inverted positions are committed before the
-    // transitions are attached
-    void containerRef.value?.offsetHeight
-
-    // Play: Transition to the new positions
-    requestAnimationFrame(() => {
-      for (const { element } of moves) {
-        element.style.transition = `transform ${duration}s cubic-bezier(0.25, 1, 0.5, 1)`
-        element.style.transform = 'translate(0, 0)'
-        cleanUpAfterTransition(element)
+    for (const { element, keyframes } of moves) {
+      const animation = element.animate(keyframes, {
+        duration: duration * 1000,
+        easing: EASING,
+      })
+      running.set(element, animation)
+      const forget = () => {
+        if (running.get(element) === animation) running.delete(element)
       }
-    })
+      animation.addEventListener('finish', forget)
+      animation.addEventListener('cancel', forget)
+    }
   }
 
   /**

@@ -1,11 +1,15 @@
 <template>
   <div ref="mainPanel" class="main-panel">
-    <div v-for="row in widgetRows" :key="row.id" class="main-panel-row">
-      <template v-for="widget in row.widgets" :key="widget.id">
-        <div v-if="!widget.hidden.value" :class="widget.className" :flip-key="widget.id">
-          <component v-bind="widget.props" :is="widget.component" />
-        </div>
-      </template>
+    <div class="main-panel-grid" :style="{ '--main-panel--tracks': layout.cols }">
+      <div
+        v-for="cell in cells"
+        :key="cell.widget.id"
+        class="main-panel-cell"
+        :flip-key="cell.widget.id"
+        :style="cell.style"
+      >
+        <component v-bind="cell.widget.props" :is="cell.widget.component" />
+      </div>
     </div>
   </div>
 </template>
@@ -18,177 +22,169 @@ import SpecialStageWidget from '@/components/control-panel/widgets/SpecialStageW
 import DayStreakWidget from '@/components/control-panel/widgets/DayStreakWidget.vue'
 import LaunchWidget from '@/components/control-panel/widgets/LaunchWidget.vue'
 import QuizWidget from '@/components/control-panel/widgets/QuizWidget.vue'
-import { type Component, computed, ComputedRef, onMounted, onUnmounted, ref } from 'vue'
+import {
+  type Component,
+  computed,
+  type ComputedRef,
+  onMounted,
+  onUnmounted,
+  ref,
+  shallowRef,
+  watch,
+} from 'vue'
 import { specialStages } from '@/core-logic/stage-logic.ts'
 import { useFlip } from '@/utils/flip.ts'
 import { reviewIcons, ReviewSessionType } from '@/core-logic/review-logic.ts'
+import {
+  type GridLayout,
+  type GridMetrics,
+  layoutWidgets,
+  type WidgetSizing,
+} from '@/utils/widget-grid.ts'
 
-const FIRST_REARRANGE_BREAKPOINT = 1000
-const SECOND_REARRANGE_BREAKPOINT = 490
-const THIRD_REARRANGE_BREAKPOINT = 342
+const GRID_METRICS: GridMetrics = {
+  // Lets a 360px phone fit 3 cells
+  minCellWidth: 104,
+  gap: 12,
+  tracksPerCell: 1,
+  // Going from 3 cells to 2 always takes more than 1.5 (1.5 * (w - 12) / (w - 24)),
+  // so phones keep 3 cells while desktops may fall back far enough to fill the rows
+  maxCellGrowth: 1.5,
+}
+
+/** Read by the CSS below via v-bind() */
+const minCellCss = `${GRID_METRICS.minCellWidth}px`
+const gapCss = `${GRID_METRICS.gap}px`
+const tracksPerCellCss = GRID_METRICS.tracksPerCell
+
+const SQUARE = { colSpans: [1], rowSpans: [1] }
+const STRETCHING_SQUARE = { colSpans: [1, 2], rowSpans: [1] }
 
 const mainPanel = ref<HTMLElement>()
 const mainPanelWidth = ref(0)
-const rowHeight = ref(106)
-const rowHeightPx = computed(() => `${rowHeight.value}px`)
 
-const { setupAuto } = useFlip(mainPanel, { duration: 0.5 })
+const { setupAuto } = useFlip(mainPanel)
 
 let resizeObserver: ResizeObserver | null = null
 
 setupAuto()
 
-type Arrangement = 'single-row' | 'two-rows' | 'three-rows' | 'four-rows'
-
 interface Widget {
   id: string
   component: Component
-  className: string
+  colSpans: number[]
+  rowSpans: number[]
+  minWidth?: number
+  maxMoveUp?: number
   props?: Record<string, unknown>
   hidden: ComputedRef<boolean>
 }
 
-const widgets: Record<string, Widget> = {
-  flashcard: {
-    id: 'flashcard',
-    component: FlashcardWidget,
-    className: 'main-panel-square-widget',
-    props: {},
-    hidden: computed(() => false),
-  },
-  calendar: {
-    id: 'calendar',
-    component: CalendarWidget,
-    className: 'main-panel-square-widget',
-    props: {},
-    hidden: computed(() => false),
-  },
-  reviewInfo: {
-    id: 'review-info',
-    component: ReviewInfoWidget,
-    className: 'main-panel-stretching-widget',
-    props: {},
-    hidden: computed(() => false),
-  },
-  launch: {
-    id: 'launch',
-    component: LaunchWidget,
-    className: 'main-panel-stretching-widget',
-    props: {},
-    hidden: computed(() => false),
-  },
-  unknown: {
+/** In display order */
+const widgets: Widget[] = [
+  {
     id: 'unknown',
     component: SpecialStageWidget,
-    className: 'main-panel-square-widget',
+    ...SQUARE,
     props: {
       stage: specialStages.UNKNOWN,
       icon: reviewIcons.get(ReviewSessionType.UNKNOWN),
     },
     hidden: computed(() => false),
   },
-  attempted: {
+  {
+    id: 'flashcard',
+    component: FlashcardWidget,
+    ...SQUARE,
+    hidden: computed(() => false),
+  },
+  {
+    id: 'calendar',
+    component: CalendarWidget,
+    ...SQUARE,
+    hidden: computed(() => false),
+  },
+  {
+    id: 'review-info',
+    component: ReviewInfoWidget,
+    colSpans: [2],
+    rowSpans: [1],
+    hidden: computed(() => false),
+  },
+  {
+    id: 'day-streak',
+    component: DayStreakWidget,
+    ...STRETCHING_SQUARE,
+    hidden: computed(() => false),
+  },
+  {
+    id: 'launch',
+    component: LaunchWidget,
+    colSpans: [2],
+    rowSpans: [1, 2],
+    maxMoveUp: 2,
+    hidden: computed(() => false),
+  },
+  {
     id: 'attempted',
     component: SpecialStageWidget,
-    className: 'main-panel-square-widget',
+    ...SQUARE,
     props: {
       stage: specialStages.ATTEMPTED,
       icon: reviewIcons.get(ReviewSessionType.ATTEMPTED),
     },
     hidden: computed(() => false),
   },
-  dayStreak: {
-    id: 'day-streak',
-    component: DayStreakWidget,
-    className: 'main-panel-square-widget',
-    props: {},
-    hidden: computed(() => false),
-  },
-  quiz: {
-    id: 'quiz-widget',
+  {
+    id: 'quiz',
     component: QuizWidget,
-    className: 'main-panel-square-widget',
-    props: {},
+    ...STRETCHING_SQUARE,
     hidden: computed(() => false),
   },
-}
+]
 
-const arrangement = computed<Arrangement>(() => {
-  const width = mainPanelWidth.value
+const visibleWidgets = computed(() => widgets.filter((widget) => !widget.hidden.value))
 
-  if (width < THIRD_REARRANGE_BREAKPOINT) return 'four-rows'
-  if (width < SECOND_REARRANGE_BREAKPOINT) return 'three-rows'
-  if (width < FIRST_REARRANGE_BREAKPOINT) return 'two-rows'
-  return 'single-row'
+const computedLayout = computed<GridLayout>(() => {
+  const sizings: WidgetSizing[] = visibleWidgets.value.map(
+    ({ id, colSpans, rowSpans, minWidth, maxMoveUp }) => ({
+      id,
+      colSpans,
+      rowSpans,
+      minWidth,
+      maxMoveUp,
+    }),
+  )
+  return layoutWidgets(sizings, mainPanelWidth.value, GRID_METRICS)
 })
 
-const widgetRows = computed(() => {
-  if (arrangement.value === 'four-rows') {
+/**
+ * Replaced only when the placements actually change, so resizing within the
+ * same layout doesn't re-render (and FLIP) on every observed width
+ */
+const layout = shallowRef<GridLayout>(computedLayout.value)
+
+watch(computedLayout, (next) => {
+  if (JSON.stringify(next) !== JSON.stringify(layout.value)) {
+    layout.value = next
+  }
+})
+
+const cells = computed(() => {
+  const byId = new Map(visibleWidgets.value.map((widget) => [widget.id, widget]))
+  return layout.value.placements.flatMap((placement) => {
+    const widget = byId.get(placement.id)
+    if (!widget) return []
     return [
       {
-        id: 'row-1',
-        widgets: [widgets.flashcard, widgets.calendar],
-      },
-      {
-        id: 'row-2',
-        widgets: [widgets.reviewInfo, widgets.dayStreak],
-      },
-      {
-        id: 'row-3',
-        widgets: [widgets.launch, widgets.quiz],
-      },
-      {
-        id: 'row-4',
-        widgets: [widgets.unknown, widgets.attempted],
+        widget,
+        style: {
+          gridColumn: `${placement.col} / span ${placement.colSpan}`,
+          gridRow: `${placement.row} / span ${placement.rowSpan}`,
+        },
       },
     ]
-  }
-
-  if (arrangement.value === 'three-rows') {
-    return [
-      {
-        id: 'row-1',
-        widgets: [widgets.flashcard, widgets.calendar, widgets.dayStreak],
-      },
-      {
-        id: 'row-2',
-        widgets: [widgets.reviewInfo, widgets.launch],
-      },
-      {
-        id: 'row-3',
-        widgets: [widgets.unknown, widgets.attempted, widgets.quiz],
-      },
-    ]
-  }
-
-  if (arrangement.value === 'two-rows') {
-    return [
-      {
-        id: 'row-1',
-        widgets: [widgets.flashcard, widgets.calendar, widgets.dayStreak, widgets.reviewInfo],
-      },
-      {
-        id: 'row-2',
-        widgets: [widgets.unknown, widgets.attempted, widgets.quiz, widgets.launch],
-      },
-    ]
-  }
-
-  return [
-    {
-      id: 'row-1',
-      widgets: [
-        widgets.flashcard,
-        widgets.calendar,
-        widgets.dayStreak,
-        widgets.reviewInfo,
-        widgets.launch,
-        widgets.unknown,
-        widgets.attempted,
-        widgets.quiz,
-      ],
-    },
-  ]
+  })
 })
 
 function updateMainPanelWidth() {
@@ -215,34 +211,35 @@ onUnmounted(() => {
 
 <style scoped>
 .main-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  --main-panel--min-cell: v-bind(minCellCss);
+  --main-panel--max-row: 124px;
+  --main-panel--gap: v-bind(gapCss);
+  --main-panel--tracks-per-cell: v-bind(tracksPerCellCss);
+  container-type: inline-size;
   border-radius: 4px;
 }
 
-.main-panel-row {
-  display: flex;
-  justify-content: flex-start;
-  gap: 12px;
-  height: v-bind(rowHeightPx);
+.main-panel-grid {
+  --main-panel--track-width: calc(
+    (100cqw - (var(--main-panel--tracks) - 1) * var(--main-panel--gap)) / var(--main-panel--tracks)
+  );
+  --main-panel--cell-width: calc(
+    var(--main-panel--tracks-per-cell) * var(--main-panel--track-width) +
+      (var(--main-panel--tracks-per-cell) - 1) * var(--main-panel--gap)
+  );
+  display: grid;
+  grid-template-columns: repeat(var(--main-panel--tracks), minmax(0, 1fr));
+  /* Square cells, but not taller than max-row once there are few columns */
+  grid-auto-rows: clamp(
+    var(--main-panel--min-cell),
+    var(--main-panel--cell-width),
+    var(--main-panel--max-row)
+  );
+  gap: var(--main-panel--gap);
 }
 
-.main-panel-widget {
-  flex: 0 0 auto;
-  height: 100%;
-  width: fit-content;
-}
-
-.main-panel-square-widget {
-  flex: 0 0 auto;
-  height: 100%;
-  aspect-ratio: 1 / 1; /* Fallback for old browsers that miscalculate the width */
-}
-
-.main-panel-stretching-widget {
-  flex: 1 1 auto;
-  height: 100%;
-  max-width: 200px;
+.main-panel-cell {
+  min-width: 0;
+  min-height: 0;
 }
 </style>
