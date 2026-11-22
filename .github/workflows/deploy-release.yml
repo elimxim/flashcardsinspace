@@ -196,15 +196,25 @@ jobs:
             fi
 
             # 5. Stop the currently running application
+            # The PID file can be stale (e.g. the app was restarted after a reboot),
+            # so stop whatever listens on the app port as well.
             echo "----> Stopping the current application"
-            if [ -f "${PID_FILE}" ]; then
-              echo "Found PID file, killing process $(cat ${PID_FILE})"
-              kill $(cat "${PID_FILE}") || true
-              rm -f "${PID_FILE}"
-            else
-              echo "PID file not found, skipping kill."
+            APP_PORT="${{ secrets.APP_PORT }}"
+            PIDS=$( { cat "${PID_FILE}" 2>/dev/null; ss -ltnpH "sport = :${APP_PORT}" | grep -oP 'pid=\K[0-9]+'; } | sort -u)
+            rm -f "${PID_FILE}"
+            for pid in ${PIDS}; do
+              echo "Killing process ${pid}"
+              kill "${pid}" 2>/dev/null || true
+            done
+            for i in {1..30}; do
+              ss -ltnH "sport = :${APP_PORT}" | grep -q . || break
+              sleep 1
+            done
+            if ss -ltnH "sport = :${APP_PORT}" | grep -q .; then
+              echo "Error: port ${APP_PORT} is still in use. Aborting."
+              ss -ltnp "sport = :${APP_PORT}"
+              exit 1
             fi
-            sleep 2
 
             # 6. Atomically switch the symbolic link to the new version
             echo "----> Activating new release by updating the symbolic link"
@@ -227,6 +237,11 @@ jobs:
             HEALTH_CHECK_URL="http://localhost:${{ secrets.APP_PORT }}/actuator/health"
             for i in {1..30}; do
               HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" $HEALTH_CHECK_URL)
+              if ! kill -0 "$(cat ${PID_FILE})" 2>/dev/null; then
+                echo "Error: the new application exited. Last log lines:"
+                tail -50 "${APP_BASE_DIR}/app.log"
+                exit 1
+              fi
               if [ "$HTTP_STATUS" -eq 200 ]; then
                 echo "----> Health check successful! Application is up and running."
                 break
