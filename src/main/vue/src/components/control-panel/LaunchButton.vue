@@ -49,7 +49,7 @@ const { reversed, toggle: toggleReversed } = useReverseMode(ReviewSessionType.LI
 
 <style scoped>
 .launch-button--theme {
-  --awesome-button--icon--size: 70px;
+  --awesome-button--icon--size: max(70px, 50cqmin);
   --awesome-button--icon--color: var(--cp--text--color);
   --awesome-button--icon--color--hover: var(--cp--text--color--active);
   --awesome-button--icon--color--disabled: var(--cp--text--color);
@@ -68,6 +68,7 @@ const { reversed, toggle: toggleReversed } = useReverseMode(ReviewSessionType.LI
 
 .launch-button {
   position: relative;
+  container-type: size;
   width: 100%;
   height: 100%;
   overflow: hidden;
