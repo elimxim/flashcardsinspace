@@ -36,34 +36,4 @@
             <video:family_friendly>yes</video:family_friendly>
         </video:video>
     </url>
-    <url>
-        <loc>https://flashcardsinspace.com/signup</loc>
-        <lastmod>2026-01-19</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.70</priority>
-    </url>
-    <url>
-        <loc>https://flashcardsinspace.com/login</loc>
-        <lastmod>2026-01-19</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.70</priority>
-    </url>
-    <url>
-        <loc>https://flashcardsinspace.com/password-reset</loc>
-        <lastmod>2026-01-19</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.50</priority>
-    </url>
-    <url>
-        <loc>https://flashcardsinspace.com/email-confirmation</loc>
-        <lastmod>2026-01-19</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.50</priority>
-    </url>
-    <url>
-        <loc>https://flashcardsinspace.com/code-verification</loc>
-        <lastmod>2026-01-19</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.50</priority>
-    </url>
 </urlset>

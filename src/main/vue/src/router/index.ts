@@ -56,6 +56,7 @@ const routes: RouteRecordRaw[] = [
     name: routeNames.controlPanel,
     component: ControlPanel,
     meta: {
+      title: 'Control Panel',
       requiresAuth: true,
       requiresEmailVerified: true,
     },
@@ -64,22 +65,26 @@ const routes: RouteRecordRaw[] = [
     path: '/get-help',
     name: routeNames.getHelp,
     component: GetHelpPage,
+    meta: { title: 'Get Help' },
   },
   {
     path: '/website-guide',
     name: routeNames.websiteGuide,
     component: WebsiteGuidePage,
+    meta: { title: 'In-Depth Tutorial' },
   },
   {
     path: '/emotional-support',
     name: routeNames.emotionalSupport,
     component: EmotionalSupportPage,
+    meta: { title: 'Emotional Support' },
   },
   {
     path: '/user',
     name: routeNames.user,
     component: UserPage,
     meta: {
+      title: 'Profile',
       requiresAuth: true,
       requiresEmailVerified: true,
     },
@@ -88,26 +93,31 @@ const routes: RouteRecordRaw[] = [
     path: '/signup',
     name: routeNames.signup,
     component: SignupPage,
+    meta: { title: 'Sign Up' },
   },
   {
     path: '/login',
     name: routeNames.login,
     component: LoginPage,
+    meta: { title: 'Log In' },
   },
   {
     path: '/logout',
     name: routeNames.logout,
     component: LogoutPage,
+    meta: { title: 'Log Out' },
   },
   {
     path: '/password-reset',
     name: routeNames.passwordReset,
     component: PasswordResetPage,
+    meta: { title: 'Reset Password' },
   },
   {
     path: '/email-confirmation',
     name: routeNames.emailConfirmation,
     component: EmailConfirmationPage,
+    meta: { title: 'Confirm Email' },
   },
   {
     path: '/review',
@@ -120,6 +130,7 @@ const routes: RouteRecordRaw[] = [
       reversed: route.query.reversed === 'true',
     }),
     meta: {
+      title: 'Review',
       requiresAuth: true,
       requiresEmailVerified: true,
     },
@@ -131,6 +142,7 @@ const routes: RouteRecordRaw[] = [
     props: (route) => ({
       type: parseVerificationType(route.query.type),
     }),
+    meta: { title: 'Verify Code' },
   },
 ]
 
@@ -169,6 +181,14 @@ router.beforeEach((to) => {
   }
 
   // other pages are accessible
+})
+
+const SITE_NAME = 'Flashcards in Space'
+const DEFAULT_TITLE = document.title
+
+router.afterEach((to) => {
+  const title = to.meta.title as string | undefined
+  document.title = title ? `${title} | ${SITE_NAME}` : DEFAULT_TITLE
 })
 
 export default router

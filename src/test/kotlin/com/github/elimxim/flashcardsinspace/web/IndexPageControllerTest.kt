@@ -40,6 +40,21 @@ class IndexPageControllerTest {
         }
     }
 
+    @Test
+    fun `trailing slash redirects public pages permanently`() {
+        mockMvc.get("/get-help/").andExpect {
+            status { isEqualTo(301) }
+            header { string("Location", "/get-help") }
+        }
+    }
+
+    @Test
+    fun `trailing slash on a private page is not found`() {
+        mockMvc.get("/control-panel/").andExpect {
+            status { isNotFound() }
+        }
+    }
+
     companion object {
         @JvmStatic
         fun routerPaths(): List<String> =

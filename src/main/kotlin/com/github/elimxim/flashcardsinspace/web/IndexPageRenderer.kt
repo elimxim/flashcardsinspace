@@ -38,11 +38,13 @@ class IndexPageRenderer(
             .replaceTag(LINK_CANONICAL, url)
             .replaceTag(META_OG_URL, url)
             .replaceTag(META_TWITTER_URL, url)
+            .replaceTag(TITLE, head.title)
+            .replaceTag(META_TITLE, head.title)
+            .replaceTag(META_OG_TITLE, head.title)
+            .replaceTag(META_TWITTER_TITLE, head.title)
 
-        head.title?.let {
-            result = result
-                .replaceTag(META_OG_TITLE, it)
-                .replaceTag(META_TWITTER_TITLE, it)
+        if (head.noindex) {
+            result = result.replaceTag(META_ROBOTS, "noindex, follow")
         }
 
         head.description?.let {
@@ -50,6 +52,15 @@ class IndexPageRenderer(
                 .replaceTag(META_DESCRIPTION, it)
                 .replaceTag(META_OG_DESCRIPTION, it)
                 .replaceTag(META_TWITTER_DESCRIPTION, it)
+        }
+
+        if (head.summary.isNotEmpty()) {
+            val heading = "<h1>${HtmlUtils.htmlEscape(head.summary.first())}</h1>"
+            val paragraphs = head.summary.drop(1).joinToString("") { "<p>${HtmlUtils.htmlEscape(it)}</p>" }
+            result = result.replaceFirst(
+                APP_DIV,
+                "$APP_DIV\n    <div class=\"seo-summary\">$heading$paragraphs</div>",
+            )
         }
 
         head.structuredDataResource?.let {
@@ -73,6 +84,10 @@ class IndexPageRenderer(
     }
 
     private companion object {
+        const val APP_DIV = "<div id=\"app\">"
+        val TITLE = Regex("<title>([^<]*)</title>")
+        val META_TITLE = attr("meta", "name", "title", "content")
+        val META_ROBOTS = attr("meta", "name", "robots", "content")
         val LINK_CANONICAL = attr("link", "rel", "canonical", "href")
         val META_DESCRIPTION = attr("meta", "name", "description", "content")
         val META_OG_URL = attr("meta", "property", "og:url", "content")

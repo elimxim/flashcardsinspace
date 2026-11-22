@@ -7,7 +7,7 @@ Disallow: /user
 Disallow: /review
 Disallow: /logout
 
-# Allow authentication pages for SEO
+# Authentication pages are crawlable but carry noindex
 Allow: /signup
 Allow: /login
 Allow: /password-reset
