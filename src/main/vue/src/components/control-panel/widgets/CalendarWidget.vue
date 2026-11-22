@@ -7,7 +7,6 @@
       :on-click="toggleStore.toggleCalendar"
       await-tap-animation
       fill-space
-      square
     >
       <template #below>
         <div class="calendar-button-slot">
@@ -134,9 +133,8 @@ onUnmounted(() => {
 <style scoped>
 .calendar-widget {
   position: relative;
+  width: 100%;
   height: 100%;
-  width: fit-content;
-  aspect-ratio: 1 / 1; /* Fallback for old browsers that miscalculate the width for absolute button positioning */
 }
 
 .calendar-button-slot {

@@ -64,6 +64,7 @@ const reviewTotal = computed(() => reviewStages.value.reduce((acc, v) => acc + v
   position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
   height: 100%;
   overflow: hidden;
   background: var(--cp--widget--color);

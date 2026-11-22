@@ -10,7 +10,6 @@
       :on-hold="toggleReversed"
       await-tap-animation
       fill-space
-      square
     >
       <template #below>
         <div class="special-stage-title">
@@ -71,8 +70,8 @@ function startReview() {
 <style scoped>
 .special-stage-widget {
   position: relative;
+  width: 100%;
   height: 100%;
-  width: fit-content;
 }
 
 .special-stage-title {
