@@ -7,10 +7,9 @@
       :on-click="toggleStore.toggleFlashcardCreation"
       await-tap-animation
       fill-space
-      square
     >
       <template #below>
-        <div class="cp-text">Add flashcard</div>
+        <div class="cp-text">Add<br/> flashcard</div>
       </template>
     </AwesomeButton>
   </div>
@@ -31,7 +30,7 @@ const { flashcardSet } = storeToRefs(flashcardStore)
 <style scoped>
 .flashcard-widget {
   position: relative;
+  width: 100%;
   height: 100%;
-  width: fit-content;
 }
 </style>

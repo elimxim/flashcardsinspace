@@ -4,7 +4,7 @@
       <div class="day-steak-number">
         {{ dayStreak.streak }}
       </div>
-      <div class="cp-text cp-text--active">Day Streak</div>
+      <div class="cp-text cp-text--nowrap cp-text--active">Day Streak</div>
     </div>
   </div>
 </template>
@@ -21,8 +21,8 @@ const { dayStreak } = storeToRefs(chronoStore)
 <style scoped>
 .day-streak-widget {
   position: relative;
+  width: 100%;
   height: 100%;
-  width: fit-content;
 }
 
 .day-streak {
