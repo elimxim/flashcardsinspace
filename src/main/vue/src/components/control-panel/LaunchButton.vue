@@ -1,5 +1,10 @@
 <template>
-  <div class="launch-button launch-button--theme" :class="{ 'launch-button--disabled': disabled }">
+  <div
+    class="launch-button launch-button--theme"
+    :class="{ 'launch-button--disabled': disabled, 'launch-button--lifted': lifted }"
+    @pointerdown="liftOnTouch"
+    @pointercancel="lifted = false"
+  >
     <Starfield
       class="launch-button-starfield"
       :star-size="4"
@@ -14,7 +19,7 @@
       :tap-animation-duration="600"
       :hold-time="REVERSE_HOLD_TIME"
       :held="reversed"
-      :on-hold="toggleReversed"
+      :on-hold="toggleReversedAndDropCurtain"
       await-tap-animation
       fill-space
     />
@@ -34,8 +39,9 @@ import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import { REVERSE_HOLD_TIME, useReverseMode } from '@/utils/reverse-mode.ts'
 import { ReviewSessionType } from '@/core-logic/review-logic.ts'
 import WidgetReviewBadge from '@/components/control-panel/WidgetReviewBadge.vue'
+import { ref } from 'vue'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     disabled?: boolean
   }>(),
@@ -45,6 +51,17 @@ withDefaults(
 )
 
 const { reversed, toggle: toggleReversed } = useReverseMode(ReviewSessionType.LIGHTSPEED)
+
+const lifted = ref(false)
+
+function liftOnTouch(event: PointerEvent) {
+  if (event.pointerType !== 'mouse' && !props.disabled) lifted.value = true
+}
+
+function toggleReversedAndDropCurtain() {
+  toggleReversed()
+  lifted.value = false
+}
 </script>
 
 <style scoped>
@@ -102,7 +119,13 @@ const { reversed, toggle: toggleReversed } = useReverseMode(ReviewSessionType.LI
   text-align: center;
 }
 
-.launch-button:hover .curtain {
+@media (hover: hover) {
+  .launch-button:hover .curtain {
+    transform: translateY(-100%);
+  }
+}
+
+.launch-button--lifted .curtain {
   transform: translateY(-100%);
 }
 
