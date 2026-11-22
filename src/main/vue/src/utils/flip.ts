@@ -1,14 +1,47 @@
 import { nextTick, onBeforeUpdate, onMounted, onUpdated, type Ref } from 'vue'
 
 export interface FlipOptions {
-  /** Animation duration in seconds (default: 0.45) */
+  /** Animation duration in seconds (default: 0.6) */
   duration?: number
+  /**
+   * Spring damping ratio: 1 settles without overshoot, lower values overshoot
+   * and settle more (default: 0.8, about 1.5% overshoot)
+   */
+  damping?: number
+  /** Delay between consecutive elements, in reading order, in seconds (default: 0.015) */
+  stagger?: number
   /** Don't animate the updates that settle the initial layout (default: true). */
   skipInitialLayout?: boolean
 }
 
-const EASING = 'cubic-bezier(0.22, 1, 0.36, 1)'
+/** For browsers without linear() easing */
+const FALLBACK_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)'
 const THRESHOLD_PX = 0.5
+const MAX_STAGGER_STEPS = 8
+
+/**
+ * A damped spring from 0 to 1 as a CSS linear() easing, scaled so that it has
+ * settled (within 0.1%) by the end of the animation
+ */
+export function springEasing(damping: number, samples = 40): string {
+  const ratio = Math.min(Math.max(damping, 0.05), 0.999)
+  const omega = Math.log(1000) / ratio
+  const dampedOmega = omega * Math.sqrt(1 - ratio * ratio)
+  const points: string[] = []
+  for (let i = 0; i <= samples; i++) {
+    const t = i / samples
+    const decay = Math.exp(-ratio * omega * t)
+    const value =
+      1 -
+      decay *
+        (Math.cos(dampedOmega * t) + ((ratio * omega) / dampedOmega) * Math.sin(dampedOmega * t))
+    points.push(i === samples ? '1' : String(Math.round(value * 10000) / 10000))
+  }
+  return `linear(${points.join(', ')})`
+}
+
+const supportsLinearEasing = () =>
+  typeof CSS !== 'undefined' && CSS.supports?.('transition-timing-function', 'linear(0, 1)')
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -16,7 +49,7 @@ const prefersReducedMotion = () =>
 /**
  * FLIP (First, Last, Invert, Play) animation
  * Smoothly animates elements with a 'flip-key' attribute when they change
- * position or size in the DOM. Sizes are animated as real width/height, not as
+ * position or size in the DOM, on a spring and slightly staggered. Sizes are animated as real width/height, not as
  * a scale, so the content reflows instead of being stretched. The elements are
  * expected to fill their slot (e.g. grid cells), as sizes animate towards 100%.
  */
@@ -24,7 +57,8 @@ export function useFlip(
   containerRef: Ref<HTMLElement | null | undefined>,
   options: FlipOptions = {},
 ) {
-  const { duration = 0.45, skipInitialLayout = true } = options
+  const { duration = 0.6, damping = 0.75, stagger = 0, skipInitialLayout = true } = options
+  const easing = supportsLinearEasing() ? springEasing(damping) : FALLBACK_EASING
   const positions = new Map<string, DOMRect>()
   const running = new Map<HTMLElement, Animation>()
   /** Whether an update is allowed to animate at all */
@@ -71,7 +105,7 @@ export function useFlip(
 
     // All reads before any write: interleaving them makes the browser
     // re-layout once per element
-    const moves: { element: HTMLElement; keyframes: Keyframe[] }[] = []
+    const moves: { element: HTMLElement; keyframes: Keyframe[]; last: DOMRect }[] = []
 
     for (const element of elements) {
       const key = element.getAttribute('flip-key')
@@ -101,15 +135,21 @@ export function useFlip(
         to.width = '100%'
         to.height = '100%'
       }
-      moves.push({ element, keyframes: [from, to] })
+      moves.push({ element, keyframes: [from, to], last })
     }
 
     positions.clear()
 
-    for (const { element, keyframes } of moves) {
+    // A wave in reading order of the new layout rather than all at once
+    moves.sort((a, b) => a.last.top - b.last.top || a.last.left - b.last.left)
+
+    moves.forEach(({ element, keyframes }, index) => {
       const animation = element.animate(keyframes, {
         duration: duration * 1000,
-        easing: EASING,
+        delay: Math.min(index, MAX_STAGGER_STEPS) * stagger * 1000,
+        easing,
+        // Holds the old position and size while waiting for its turn
+        fill: 'backwards',
       })
       running.set(element, animation)
       const forget = () => {
@@ -117,7 +157,7 @@ export function useFlip(
       }
       animation.addEventListener('finish', forget)
       animation.addEventListener('cancel', forget)
-    }
+    })
   }
 
   /**
@@ -157,8 +197,6 @@ export function useFlip(
   }
 
   return {
-    capturePositions,
-    animateToNewPositions,
     flip,
     setupAuto,
   }
