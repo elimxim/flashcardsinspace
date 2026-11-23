@@ -1,5 +1,8 @@
 import { ref, type Ref } from 'vue'
 
+// A gap between ticks longer than this means the machine slept or the page was suspended
+const MAX_TICK_GAP_MS = 10_000
+
 export function useStopWatch(timeRef?: Ref<number>) {
   const elapsedTime = timeRef ?? ref(0)
   let lastTickTime = 0
@@ -12,7 +15,7 @@ export function useStopWatch(timeRef?: Ref<number>) {
       const now = Date.now()
       const delta = now - lastTickTime
       lastTickTime = now
-      elapsedTime.value += delta
+      if (delta <= MAX_TICK_GAP_MS) elapsedTime.value += delta
     }, 100)
   }
 

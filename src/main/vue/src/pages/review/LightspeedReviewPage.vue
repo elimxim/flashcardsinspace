@@ -100,6 +100,7 @@ import SpaceToast from '@/components/common/SpaceToast.vue'
 import SlideUpOverlay from '@/components/common/SlideUpOverlay.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { usePageHidden } from '@/utils/page-hidden.ts'
 import { storeToRefs } from 'pinia'
 import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
 import { nextStage, prevStage, Stage } from '@/core-logic/stage-logic.ts'
@@ -179,6 +180,8 @@ const {
 const { runOnce: startReviewOnce, isPending: reviewStarting } = useRunOnce(startReview)
 const { runOnce: finishReviewOnce } = useRunOnce(finishReview)
 
+usePageHidden(pauseReview)
+
 const flashcardSetName = computed(() => flashcardSet.value?.name || '')
 
 const spaceDeck = ref<InstanceType<typeof SpaceDeck>>()
@@ -240,9 +243,14 @@ async function requestExit() {
   if (summaryVisible.value) {
     await finishReviewAndLeave()
   } else {
-    exitRequested.value = true
-    sessionAttendant.freeze()
+    pauseReview()
   }
+}
+
+function pauseReview() {
+  if (summaryVisible.value) return
+  exitRequested.value = true
+  sessionAttendant.freeze()
 }
 
 function continueReview() {

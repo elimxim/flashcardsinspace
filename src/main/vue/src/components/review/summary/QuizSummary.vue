@@ -43,7 +43,7 @@
       <div class="quiz-right-button">
         <SmartButton
           v-if="roundRemaining > 0"
-          text="Back"
+          text="Continue"
           class="calm-button"
           :on-click="onBack"
           fill-width
