@@ -208,15 +208,20 @@ async function startReview() {
     }
     reviewStore.loadState(createReviewQueueForStages(flashcards.value, props.stages, currDay.value))
 
+    let resumed = false
     await sessionAttendant.loadOrCreate({
       sessionId: props.sessionId,
       metadata: {
         stages: props.stages.map((v) => v.name),
         currRoundFlashcardIds: reviewQueue.value.remainingFlashcards().map((f) => f.id),
       },
-      onboarding: onboardSession,
+      onboarding: (session) => {
+        onboardSession(session)
+        resumed = true
+      },
     })
     await reviewStore.nextFlashcard()
+    if (resumed) pauseReview()
 
     Log.log(LogTag.LOGIC, `Flashcards TOTAL: ${flashcardsTotal.value}`)
   } finally {
