@@ -37,8 +37,7 @@
               :r="RADIUS"
               fill="none"
               :stroke-dasharray="arc.dashArray"
-              :stroke-dashoffset="arc.dashOffset"
-              :transform="rotation"
+              :transform="arc.rotation"
             />
             <!-- The lift scales the mask along with the piece, so the segments stay aligned -->
             <g
@@ -53,8 +52,7 @@
                 fill="none"
                 :style="{ stroke: arc.color }"
                 :stroke-dasharray="arc.dashArray"
-                :stroke-dashoffset="arc.dashOffset"
-                :transform="rotation"
+                :transform="arc.rotation"
               />
             </g>
           </g>
@@ -240,11 +238,14 @@ const arcs = computed(() => {
   let offset = 0
   return props.pieces.map((piece, i) => {
     const length = (shown.value.arcs[i] ?? 0) * CIRCUMFERENCE
+    // Each circle is rotated so its piece starts where the circle's path starts.
+    // A dash shifted along the path instead would end on the path's closing point for the last piece,
+    // and the browser joins it across that point, drawing a stray shape over the first piece
     const arc = {
       color: piece.color,
       lift: piece.liftOnHover ?? true,
-      dashArray: `${length} ${CIRCUMFERENCE - length}`,
-      dashOffset: -offset,
+      dashArray: `${length} ${CIRCUMFERENCE}`,
+      rotation: `rotate(${props.startAngle - 90 + (offset / CIRCUMFERENCE) * 360}, 50, 50)`,
     }
     offset += length
     return arc
