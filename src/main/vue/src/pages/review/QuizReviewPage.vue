@@ -324,13 +324,20 @@ async function startNextQuizRound() {
 }
 
 function onboardSession(session: ReviewSession) {
-  const { round, overallCorrect, overallIncorrect, elapsedTotal, currRound, nextRound, forReview } =
-    readQuizSession(session, flashcards.value)
+  const {
+    round,
+    overallCorrect,
+    overallIncorrect,
+    elapsedPrevious,
+    currRound,
+    nextRound,
+    forReview,
+  } = readQuizSession(session, flashcards.value)
 
   quizRound.value = round
   quizOverallCorrect.value = overallCorrect
   quizOverallIncorrect.value = overallIncorrect
-  elapsedPreviousTime.value = elapsedTotal
+  elapsedPreviousTime.value = elapsedPrevious
   incorrectFlashcards.value = nextRound
 
   reviewStore.loadState(new MonoStageReviewQueue(forReview))

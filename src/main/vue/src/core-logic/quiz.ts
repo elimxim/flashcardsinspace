@@ -7,7 +7,9 @@ export function readQuizSession(session: ReviewSession, flashcards: Flashcard[])
   const round = session.metadata?.round ?? 1
   const overallCorrect = session.metadata?.overallCorrectCount ?? 0
   const overallIncorrect = session.metadata?.overallIncorrectCount ?? 0
+  // elapsedTotalTime already includes this session's elapsedTime
   const elapsedTotal = session.metadata?.elapsedTotalTime ?? 0
+  const elapsedPrevious = Math.max(0, elapsedTotal - session.elapsedTime)
 
   const reviewedFlashcardIdSet = new Set(session.flashcardIds ?? [])
   const currRoundFlashcardIdSet = new Set(session.metadata?.currRoundFlashcardIds ?? [])
@@ -22,7 +24,7 @@ export function readQuizSession(session: ReviewSession, flashcards: Flashcard[])
     round,
     overallCorrect,
     overallIncorrect,
-    elapsedTotal,
+    elapsedPrevious, // elapsed time of the previous rounds
     currRound, // all flashcards for this session / quiz round
     nextRound, // flashcards for the next round
     forReview, // not yet reviewed flashcards
