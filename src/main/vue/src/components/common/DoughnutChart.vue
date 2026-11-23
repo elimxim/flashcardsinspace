@@ -7,10 +7,10 @@
             <mask
               :id="segmentMaskId"
               maskUnits="userSpaceOnUse"
-              x="0"
-              y="0"
-              width="100"
-              height="100"
+              x="-10"
+              y="-10"
+              width="120"
+              height="120"
             >
               <circle
                 class="segment-mask"
@@ -24,20 +24,39 @@
               />
             </mask>
           </defs>
-          <g :mask="segmented ? `url(#${segmentMaskId})` : undefined">
+          <g
+            v-for="(arc, index) in arcs"
+            :key="index"
+            :class="['doughnut-piece', { 'doughnut-piece--lift': arc.lift }]"
+          >
+            <!-- Stays in place, so the piece keeps its hover while lifting away from the pointer -->
             <circle
-              v-for="(arc, index) in arcs"
-              :key="index"
-              class="doughnut-arc"
+              class="doughnut-arc-hit"
               cx="50"
               cy="50"
               :r="RADIUS"
               fill="none"
-              :style="{ stroke: arc.color }"
               :stroke-dasharray="arc.dashArray"
               :stroke-dashoffset="arc.dashOffset"
               :transform="rotation"
             />
+            <!-- The lift scales the mask along with the piece, so the segments stay aligned -->
+            <g
+              class="doughnut-arc-lift"
+              :mask="segmented ? `url(#${segmentMaskId})` : undefined"
+            >
+              <circle
+                class="doughnut-arc"
+                cx="50"
+                cy="50"
+                :r="RADIUS"
+                fill="none"
+                :style="{ stroke: arc.color }"
+                :stroke-dasharray="arc.dashArray"
+                :stroke-dashoffset="arc.dashOffset"
+                :transform="rotation"
+              />
+            </g>
           </g>
         </svg>
         <div class="doughnut-center">
@@ -65,6 +84,8 @@ export interface DoughnutPiece {
   legend: string
   // Any CSS color, including var(--...), so callers can keep theming through custom properties
   color: string
+  // Whether the piece lifts off the ring on hover; true by default
+  liftOnHover?: boolean
 }
 </script>
 
@@ -221,6 +242,7 @@ const arcs = computed(() => {
     const length = (shown.value.arcs[i] ?? 0) * CIRCUMFERENCE
     const arc = {
       color: piece.color,
+      lift: piece.liftOnHover ?? true,
       dashArray: `${length} ${CIRCUMFERENCE - length}`,
       dashOffset: -offset,
     }
@@ -243,6 +265,7 @@ const legendItems = computed(() => {
 <style scoped>
 .doughnut-chart--theme {
   --d-chart--arc--thickness: var(--doughnut-chart--arc--thickness, 16);
+  --d-chart--arc--hover-scale: var(--doughnut-chart--arc--hover-scale, 1.07);
   --d-chart--text--color: var(--doughnut-chart--text--color, #6a6a6a);
   --d-chart--total--color: var(--doughnut-chart--total--color, #353535);
 }
@@ -277,11 +300,33 @@ const legendItems = computed(() => {
 .doughnut-circle {
   width: 100%;
   height: 100%;
+  overflow: visible;
+}
+
+.doughnut-arc-hit {
+  stroke: transparent;
+  stroke-width: var(--d-chart--arc--thickness);
+  pointer-events: stroke;
+}
+
+.doughnut-arc-lift {
+  pointer-events: none;
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+  transition: transform 0.2s ease-out;
 }
 
 .doughnut-arc {
   stroke-width: var(--d-chart--arc--thickness);
   stroke-linecap: butt;
+}
+
+@media (hover: hover) {
+  /* Scaling from the center moves every point of the piece outward, both edges included,
+     so even a piece wider than half the ring lifts off instead of growing inward */
+  .doughnut-piece--lift:hover .doughnut-arc-lift {
+    transform: scale(var(--d-chart--arc--hover-scale));
+  }
 }
 
 .segment-mask {

@@ -91,7 +91,12 @@ const pieces = computed<DoughnutPiece[]>(() => [
     legend: 'Correct',
     color: '#4caf50',
   },
-  { value: props.roundRemaining, legend: 'Remaining', color: 'rgb(225, 228, 240)' },
+  {
+    value: props.roundRemaining,
+    legend: 'Remaining',
+    color: 'rgb(225, 228, 240)',
+    liftOnHover: false,
+  },
   { value: props.roundIncorrect, legend: 'Incorrect', color: '#f44336' },
 ])
 </script>

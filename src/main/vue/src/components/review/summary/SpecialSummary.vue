@@ -74,6 +74,7 @@ const pieces = computed<DoughnutPiece[]>(() => [
     value: props.total - props.viewed,
     legend: 'Remaining',
     color: props.outerSpace ? 'rgba(255, 255, 255, 0.25)' : 'rgb(225, 228, 240)',
+    liftOnHover: false,
   },
 ])
 </script>
