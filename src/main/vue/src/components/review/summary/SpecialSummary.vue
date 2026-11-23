@@ -12,10 +12,7 @@
       <div class="special-chart-wrapper">
         <div :class="['special-chart', { 'special-chart--shadow': !outerSpace }]">
           <DoughnutChart
-            :left="total - viewed"
-            :right="viewed"
-            legend-left="Remaining"
-            legend-right="Viewed"
+            :pieces="pieces"
             :segmented="outerSpace"
             :segment-gap="2"
             :segment-count="20"
@@ -32,7 +29,7 @@
         />
       </div>
       <div v-if="onBack" class="special-right-button">
-        <SmartButton text="Back" class="calm-button" :on-click="onBack" fill-width auto-blur />
+        <SmartButton text="Continue" class="calm-button" :on-click="onBack" fill-width auto-blur />
       </div>
     </div>
   </ReviewSummary>
@@ -40,7 +37,7 @@
 
 <script setup lang="ts">
 import CometBorder from '@/components/common/CometBorder.vue'
-import DoughnutChart from '@/components/common/DoughnutChart.vue'
+import DoughnutChart, { type DoughnutPiece } from '@/components/common/DoughnutChart.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import Clock from '@/components/common/Clock.vue'
 import ReviewSummary from '@/components/review/summary/ReviewSummary.vue'
@@ -65,7 +62,20 @@ const props = withDefaults(
   },
 )
 
-const title = computed(() => props.completed ? deckEmptyMessage() : deckNotEmptyMessage())
+const title = computed(() => (props.completed ? deckEmptyMessage() : deckNotEmptyMessage()))
+
+const pieces = computed<DoughnutPiece[]>(() => [
+  {
+    value: props.viewed,
+    legend: 'Viewed',
+    color: props.outerSpace ? '#8b5cf6' : '#3b82f6',
+  },
+  {
+    value: props.total - props.viewed,
+    legend: 'Remaining',
+    color: props.outerSpace ? 'rgba(255, 255, 255, 0.25)' : 'rgb(225, 228, 240)',
+  },
+])
 </script>
 
 <style scoped>
@@ -115,8 +125,6 @@ const title = computed(() => props.completed ? deckEmptyMessage() : deckNotEmpty
   aspect-ratio: 1 / 1;
   border-radius: 6px;
   padding: clamp(4px, 1.8cqw, 10px);
-  --doughnut-chart--arc--right--color: var(--special-summary--viewed--color, #3b82f6);
-  --doughnut-chart--arc--left--color: var(--special-summary--unviewed--color, rgb(225, 228, 240));
 }
 
 .special-chart--shadow {

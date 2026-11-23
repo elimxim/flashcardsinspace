@@ -20,31 +20,24 @@
                 fill="none"
                 :stroke-dasharray="segmentDashArray"
                 :stroke-dashoffset="-segmentGap / 2"
-                transform="rotate(-90, 50, 50)"
+                :transform="rotation"
               />
             </mask>
           </defs>
           <g :mask="segmented ? `url(#${segmentMaskId})` : undefined">
             <circle
-              class="arc-right"
+              v-for="(arc, index) in arcs"
+              :key="index"
+              class="doughnut-arc"
               cx="50"
               cy="50"
               :r="RADIUS"
               fill="none"
-              :stroke-dasharray="rightDashArray"
-              transform="rotate(-90, 50, 50)"
+              :style="{ stroke: arc.color }"
+              :stroke-dasharray="arc.dashArray"
+              :stroke-dashoffset="arc.dashOffset"
+              :transform="rotation"
             />
-            <g transform="translate(100, 0) scale(-1, 1)">
-              <circle
-                class="arc-left"
-                cx="50"
-                cy="50"
-                :r="RADIUS"
-                fill="none"
-                :stroke-dasharray="leftDashArray"
-                transform="rotate(-90, 50, 50)"
-              />
-            </g>
           </g>
         </svg>
         <div class="doughnut-center">
@@ -56,21 +49,24 @@
       </div>
     </div>
     <div v-if="showLegend" class="doughnut-legend">
-      <div class="doughnut-legend-item">
-        <span class="doughnut-legend-color right"></span>
+      <div v-for="(item, index) in legendItems" :key="index" class="doughnut-legend-item">
+        <span class="doughnut-legend-color" :style="{ background: item.color }"></span>
         <span class="legend-text">
-          {{ legendRight }}: {{ shownRightCount }} ({{ rightPercentage }}%)
-        </span>
-      </div>
-      <div class="doughnut-legend-item">
-        <span class="doughnut-legend-color left"></span>
-        <span class="legend-text">
-          {{ legendLeft }}: {{ shownLeftCount }} ({{ leftPercentage }}%)
+          {{ item.legend }}: {{ item.count }} ({{ item.percentage }}%)
         </span>
       </div>
     </div>
   </div>
 </template>
+
+<script lang="ts">
+export interface DoughnutPiece {
+  value: number
+  legend: string
+  // Any CSS color, including var(--...), so callers can keep theming through custom properties
+  color: string
+}
+</script>
 
 <script setup lang="ts">
 import { computed, onUnmounted, ref, useId, watch } from 'vue'
@@ -81,24 +77,23 @@ const RADIUS = 42
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 const ANIMATION_DURATION = 1200
 
+// Pieces go clockwise from startAngle in array order
 const props = withDefaults(
   defineProps<{
-    total?: number
-    left: number
-    right: number
+    pieces: DoughnutPiece[]
+    startAngle?: number
     showLegend?: boolean
-    legendLeft?: string
-    legendRight?: string
+    // Piece indices in the order the legend lists them; defaults to the drawing order
+    legendOrder?: number[]
     animationDelay?: number
     segmented?: boolean
     segmentGap?: number
     segmentCount?: number
   }>(),
   {
-    total: undefined,
+    startAngle: 0,
     showLegend: true,
-    legendLeft: 'Left',
-    legendRight: 'Right',
+    legendOrder: undefined,
     animationDelay: 200,
     segmented: false,
     segmentGap: 0.7,
@@ -109,70 +104,57 @@ const props = withDefaults(
 const segmentMaskId = `doughnut-segments-${useId()}`
 const segmentDashArray = `${CIRCUMFERENCE / props.segmentCount - props.segmentGap} ${props.segmentGap}`
 
-const rightCount = computed(() => props.right)
-const leftCount = computed(() => props.left)
-
-const total = computed(() => props.total ?? props.left + props.right)
-
-const rightRatio = computed(() => {
-  if (total.value === 0) return 0
-  return rightCount.value / total.value
-})
-
-const leftRatio = computed(() => {
-  if (total.value === 0) return 0
-  return leftCount.value / total.value
-})
+// SVG circles start at 3 o'clock, so -90 moves the start to the top
+const rotation = computed(() => `rotate(${props.startAngle - 90}, 50, 50)`)
 
 interface ChartValues {
   total: number
-  rightCount: number
-  leftCount: number
-  rightRatio: number
-  leftRatio: number
-  rightArc: number
-  leftArc: number
+  counts: number[]
+  ratios: number[]
+  arcs: number[]
 }
 
-const zeroValues: ChartValues = {
-  total: 0,
-  rightCount: 0,
-  leftCount: 0,
-  rightRatio: 0,
-  leftRatio: 0,
-  rightArc: 0,
-  leftArc: 0,
+function sum(values: number[]): number {
+  return values.reduce((acc, v) => acc + v, 0)
 }
 
-// Segmented arcs end on whole segments, so one segment never shows both colors
+// Segmented arcs end on whole segments, so one segment never shows two colors
 function toSegments(ratio: number): number {
   if (ratio <= 0) return 0
   return Math.max(1, Math.round(ratio * props.segmentCount))
 }
 
-// Only the target is snapped to segments; the sweep towards it stays smooth
-function arcRatios(rightRatio: number, leftRatio: number) {
-  if (!props.segmented) return { rightArc: rightRatio, leftArc: leftRatio }
+// Rounding each piece on its own can over- or undershoot the ring,
+// so the difference goes to the pieces whose rounding was furthest off
+function segmentArcs(ratios: number[]): number[] {
+  const count = props.segmentCount
+  const segments = ratios.map(toSegments)
+  const error = (i: number) => ratios[i] * count - segments[i]
+  let diff = segments.some((s) => s > 0) ? count - sum(segments) : 0
 
-  const reservedForLeft = leftRatio > 0 ? 1 : 0
-  const rightSegments = Math.min(toSegments(rightRatio), props.segmentCount - reservedForLeft)
-  const leftSegments = Math.min(toSegments(leftRatio), props.segmentCount - rightSegments)
-  return {
-    rightArc: rightSegments / props.segmentCount,
-    leftArc: leftSegments / props.segmentCount,
+  while (diff !== 0) {
+    let pick = -1
+    for (let i = 0; i < segments.length; i++) {
+      if (diff > 0 ? ratios[i] <= 0 : segments[i] <= 1) continue
+      if (pick === -1 || (diff > 0 ? error(i) > error(pick) : error(i) < error(pick))) pick = i
+    }
+    if (pick === -1) break
+    segments[pick] += Math.sign(diff)
+    diff -= Math.sign(diff)
   }
+  return segments.map((s) => s / count)
 }
 
-const targetValues = computed<ChartValues>(() => ({
-  total: total.value,
-  rightCount: rightCount.value,
-  leftCount: leftCount.value,
-  rightRatio: rightRatio.value,
-  leftRatio: leftRatio.value,
-  ...arcRatios(rightRatio.value, leftRatio.value),
-}))
+const targetValues = computed<ChartValues>(() => {
+  const counts = props.pieces.map((p) => Math.max(0, p.value))
+  const total = sum(counts)
+  const ratios = counts.map((c) => (total === 0 ? 0 : c / total))
+  // Only the target is snapped to segments; the sweep towards it stays smooth
+  const arcs = props.segmented ? segmentArcs(ratios) : ratios
+  return { total, counts, ratios, arcs }
+})
 
-const shown = ref<ChartValues>({ ...zeroValues })
+const shown = ref<ChartValues>({ total: 0, counts: [], ratios: [], arcs: [] })
 let animationFrameId: number | null = null
 let firstSweep = true
 
@@ -180,9 +162,31 @@ function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3)
 }
 
+// Each value moves from its old to its new number by its own progress (0..1)
+function lerpAll(from: number[], to: number[], progress: number[]): number[] {
+  return to.map((v, i) => {
+    const start = from[i] ?? 0
+    return start + (v - start) * progress[i]
+  })
+}
+
+// The ring fills like one stroke going clockwise: a piece starts growing
+// only once the stroke reaches it, i.e. after the previous piece is complete
+function sweepProgress(arcs: number[], k: number): number[] {
+  let start = 0
+  return arcs.map((arc) => {
+    const progress = arc > 0 ? Math.min(1, Math.max(0, (k - start) / arc)) : k >= start ? 1 : 0
+    start += arc
+    return progress
+  })
+}
+
 function animateTo(target: ChartValues) {
   if (animationFrameId !== null) cancelAnimationFrame(animationFrameId)
-  const from = { ...shown.value }
+  const from = shown.value
+  // Growing one by one only works from an empty ring. When a filled ring changes,
+  // all pieces move together, so the ring stays whole instead of gapping or overlapping
+  const fromEmpty = sum(from.arcs) === 0
   // The delay holds back only the first sweep, so later value updates follow right away
   const delay = firstSweep ? props.animationDelay : 0
   firstSweep = false
@@ -191,14 +195,12 @@ function animateTo(target: ChartValues) {
   const step = (now: number) => {
     const t = Math.min(1, Math.max(0, now - startTime) / ANIMATION_DURATION)
     const k = easeOutCubic(t)
+    const progress = fromEmpty ? sweepProgress(target.arcs, k) : target.arcs.map(() => k)
     shown.value = {
       total: from.total + (target.total - from.total) * k,
-      rightCount: from.rightCount + (target.rightCount - from.rightCount) * k,
-      leftCount: from.leftCount + (target.leftCount - from.leftCount) * k,
-      rightRatio: from.rightRatio + (target.rightRatio - from.rightRatio) * k,
-      leftRatio: from.leftRatio + (target.leftRatio - from.leftRatio) * k,
-      rightArc: from.rightArc + (target.rightArc - from.rightArc) * k,
-      leftArc: from.leftArc + (target.leftArc - from.leftArc) * k,
+      counts: lerpAll(from.counts, target.counts, progress),
+      ratios: lerpAll(from.ratios, target.ratios, progress),
+      arcs: lerpAll(from.arcs, target.arcs, progress),
     }
     animationFrameId = t < 1 ? requestAnimationFrame(step) : null
   }
@@ -212,32 +214,35 @@ onUnmounted(() => {
 })
 
 const shownTotal = computed(() => Math.round(shown.value.total))
-const shownRightCount = computed(() => Math.round(shown.value.rightCount))
-const shownLeftCount = computed(() => Math.round(shown.value.leftCount))
 
-const rightPercentage = computed(() => {
-  return (shown.value.rightRatio * 100).toFixed(0)
+const arcs = computed(() => {
+  let offset = 0
+  return props.pieces.map((piece, i) => {
+    const length = (shown.value.arcs[i] ?? 0) * CIRCUMFERENCE
+    const arc = {
+      color: piece.color,
+      dashArray: `${length} ${CIRCUMFERENCE - length}`,
+      dashOffset: -offset,
+    }
+    offset += length
+    return arc
+  })
 })
 
-const leftPercentage = computed(() => {
-  return (shown.value.leftRatio * 100).toFixed(0)
+const legendItems = computed(() => {
+  const order = props.legendOrder ?? props.pieces.map((_, i) => i)
+  return order.map((i) => ({
+    legend: props.pieces[i].legend,
+    color: props.pieces[i].color,
+    count: Math.round(shown.value.counts[i] ?? 0),
+    percentage: ((shown.value.ratios[i] ?? 0) * 100).toFixed(0),
+  }))
 })
-
-function arcDashArray(ratio: number): string {
-  const arcLength = ratio * CIRCUMFERENCE
-  const gap = CIRCUMFERENCE - arcLength
-  return `${arcLength} ${gap}`
-}
-
-const rightDashArray = computed(() => arcDashArray(shown.value.rightArc))
-const leftDashArray = computed(() => arcDashArray(shown.value.leftArc))
 </script>
 
 <style scoped>
 .doughnut-chart--theme {
   --d-chart--arc--thickness: var(--doughnut-chart--arc--thickness, 16);
-  --d-chart--arc--right--color: var(--doughnut-chart--arc--right--color, #4caf50);
-  --d-chart--arc--left--color: var(--doughnut-chart--arc--left--color, #f44336);
   --d-chart--text--color: var(--doughnut-chart--text--color, #6a6a6a);
   --d-chart--total--color: var(--doughnut-chart--total--color, #353535);
 }
@@ -274,14 +279,7 @@ const leftDashArray = computed(() => arcDashArray(shown.value.leftArc))
   height: 100%;
 }
 
-.arc-right {
-  stroke: var(--d-chart--arc--right--color);
-  stroke-width: var(--d-chart--arc--thickness);
-  stroke-linecap: butt;
-}
-
-.arc-left {
-  stroke: var(--d-chart--arc--left--color);
+.doughnut-arc {
   stroke-width: var(--d-chart--arc--thickness);
   stroke-linecap: butt;
 }
@@ -330,14 +328,6 @@ const leftDashArray = computed(() => arcDashArray(shown.value.leftArc))
   width: 12px;
   height: 12px;
   border-radius: 2px;
-}
-
-.doughnut-legend-color.right {
-  background: var(--d-chart--arc--right--color);
-}
-
-.doughnut-legend-color.left {
-  background: var(--d-chart--arc--left--color);
 }
 
 .legend-text {

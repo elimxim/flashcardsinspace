@@ -15,12 +15,7 @@
       </div>
       <div class="lightspeed-chart-wrapper">
         <div class="lightspeed-chart">
-          <DoughnutChart
-            :right="correct"
-            :left="incorrect"
-            legend-left="Incorrect"
-            legend-right="Correct"
-          />
+          <DoughnutChart :pieces="pieces" :legend-order="[0, 2, 1]" />
         </div>
       </div>
       <div :class="onBack ? 'lightspeed-left-button' : 'lightspeed-central-button'">
@@ -33,14 +28,14 @@
         />
       </div>
       <div v-if="onBack" class="lightspeed-right-button">
-        <SmartButton text="Back" class="calm-button" :on-click="onBack" fill-width auto-blur />
+        <SmartButton text="Continue" class="calm-button" :on-click="onBack" fill-width auto-blur />
       </div>
     </div>
   </ReviewSummary>
 </template>
 
 <script setup lang="ts">
-import DoughnutChart from '@/components/common/DoughnutChart.vue'
+import DoughnutChart, { type DoughnutPiece } from '@/components/common/DoughnutChart.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import Clock from '@/components/common/Clock.vue'
 import ReviewSummary from '@/components/review/summary/ReviewSummary.vue'
@@ -65,7 +60,17 @@ const props = withDefaults(
   },
 )
 
-const title = computed(() => props.completed ? deckEmptyMessage() : deckNotEmptyMessage())
+const title = computed(() => (props.completed ? deckEmptyMessage() : deckNotEmptyMessage()))
+
+const pieces = computed<DoughnutPiece[]>(() => [
+  { value: props.correct, legend: 'Correct', color: '#4caf50' },
+  {
+    value: props.total - props.correct - props.incorrect,
+    legend: 'Remaining',
+    color: 'rgb(225, 228, 240)',
+  },
+  { value: props.incorrect, legend: 'Incorrect', color: '#f44336' },
+])
 </script>
 
 <style scoped>

@@ -17,13 +17,7 @@
       </div>
       <div class="quiz-chart-wrapper">
         <div class="quiz-chart">
-          <DoughnutChart
-            :total="roundTotal"
-            :left="roundIncorrect"
-            :right="roundTotal - roundRemaining - roundIncorrect"
-            legend-left="Incorrect"
-            legend-right="Correct"
-          />
+          <DoughnutChart :pieces="pieces" :legend-order="[0, 2, 1]" />
         </div>
       </div>
       <div
@@ -63,13 +57,14 @@
 </template>
 
 <script setup lang="ts">
-import DoughnutChart from '@/components/common/DoughnutChart.vue'
+import DoughnutChart, { type DoughnutPiece } from '@/components/common/DoughnutChart.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import Clock from '@/components/common/Clock.vue'
 import ReviewSummary from '@/components/review/summary/ReviewSummary.vue'
 import SummaryAnswerStats from '@/components/review/summary/SummaryAnswerStats.vue'
+import { computed } from 'vue'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     elapsedTime: number
     elapsedTotalTime: number
@@ -89,6 +84,16 @@ withDefaults(
     onFinish: () => {},
   },
 )
+
+const pieces = computed<DoughnutPiece[]>(() => [
+  {
+    value: props.roundTotal - props.roundRemaining - props.roundIncorrect,
+    legend: 'Correct',
+    color: '#4caf50',
+  },
+  { value: props.roundRemaining, legend: 'Remaining', color: 'rgb(225, 228, 240)' },
+  { value: props.roundIncorrect, legend: 'Incorrect', color: '#f44336' },
+])
 </script>
 
 <style scoped>
