@@ -41,6 +41,8 @@ URL patterns: `/api/**` authenticated, `/api-public/**` public, `/auth/**` auth.
 
 **Chronodays**: Days in a set's timeline; the Lightspeed Schedule picks the stages reviewed on each. Statuses: INITIAL, NOT_STARTED, IN_PROGRESS, COMPLETED, OFF (suspended).
 
+**Due flashcards**: a stage on today's chronoday isn't enough — S3+ flashcards are due only after resting `minDaysInStage` days since `lastReviewDate` (`review-logic.ts`). Get due flashcards and counts from `createReviewQueue` / `calcStageReviews`, never by filtering on `currDay.stages` alone.
+
 **Day Streak**: Consecutive learning days. OFF days don't break it; IN_PROGRESS days do.
 
 **Review Sessions**: LIGHTSPEED, UNKNOWN, ATTEMPTED, OUTER_SPACE, QUIZ.

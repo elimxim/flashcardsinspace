@@ -1,11 +1,15 @@
 import { describe, it, expect } from 'vitest'
 import {
+  calcStageReviews,
+  createReviewQueue,
   EmptyReviewQueue,
   MonoStageReviewQueue,
   MultiStageReviewQueue,
   ReviewQueue,
 } from '@/core-logic/review-logic.ts'
+import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
+import { type Chronoday } from '@/model/chrono.ts'
 import { type Stage, learningStages } from '@/core-logic/stage-logic.ts'
 
 describe('MultiStageReviewQueue', () => {
@@ -318,6 +322,76 @@ describe('EmptyReviewQueue', () => {
     expect(queue.lookbehind(3)).toEqual([])
   })
 })
+
+describe('createReviewQueue', () => {
+  const day = (stages: string[]): Chronoday => ({
+    id: 1,
+    chronodate: '2026-03-20',
+    seqNumber: 40,
+    status: chronodayStatuses.NOT_STARTED,
+    stages: stages,
+  })
+
+  it('should skip a flashcard that reached its stage too recently', () => {
+    const early = reviewedOn(31, learningStages.S3, '2026-03-18')
+    const ready = reviewedOn(32, learningStages.S3, '2026-03-17')
+
+    const queue = createReviewQueue([early, ready], day(['S3', 'S1']))
+
+    expect(queueResult(queue)).toEqual([ready])
+  })
+
+  it('should apply the rest time of each stage', () => {
+    const cards = [
+      reviewedOn(41, learningStages.S4, '2026-03-15'),
+      reviewedOn(42, learningStages.S4, '2026-03-14'),
+      reviewedOn(51, learningStages.S5, '2026-03-09'),
+      reviewedOn(52, learningStages.S5, '2026-03-08'),
+      reviewedOn(61, learningStages.S6, '2026-02-25'),
+      reviewedOn(62, learningStages.S6, '2026-02-24'),
+      reviewedOn(71, learningStages.S7, '2026-02-01'),
+      reviewedOn(72, learningStages.S7, '2026-01-31'),
+    ]
+
+    const queue = createReviewQueue(cards, day(['S7', 'S6', 'S5', 'S4', 'S1']))
+
+    expect(queueResult(queue).map((f) => f.id)).toEqual([72, 62, 52, 42])
+  })
+
+  it('should not hold back stage 2 flashcards', () => {
+    const card = reviewedOn(21, learningStages.S2, '2026-03-19')
+
+    const queue = createReviewQueue([card], day(['S2', 'S1']))
+
+    expect(queueResult(queue)).toEqual([card])
+  })
+
+  it('should keep a flashcard without a review date', () => {
+    const card = flashcard(31, learningStages.S3)
+
+    const queue = createReviewQueue([card], day(['S3', 'S1']))
+
+    expect(queueResult(queue)).toEqual([card])
+  })
+
+  it('should count only flashcards that are ready', () => {
+    const cards = [
+      reviewedOn(31, learningStages.S3, '2026-03-19'),
+      reviewedOn(32, learningStages.S3, '2026-03-10'),
+    ]
+
+    const reviews = calcStageReviews(cards, day(['S3', 'S1']))
+
+    expect(reviews).toEqual([
+      { stage: learningStages.S3.displayName, count: 1 },
+      { stage: learningStages.S1.displayName, count: 0 },
+    ])
+  })
+})
+
+function reviewedOn(id: number, stage: Stage, lastReviewDate: string): Flashcard {
+  return { ...flashcard(id, stage), lastReviewDate: lastReviewDate }
+}
 
 function flashcard(id: number, stage: Stage): Flashcard {
   return {
