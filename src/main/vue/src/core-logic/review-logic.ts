@@ -360,7 +360,7 @@ const minDaysInStage = new Map<string, number>([
 function hasRestedEnough(flashcard: Flashcard, day: Chronoday): boolean {
   const minDays = minDaysInStage.get(flashcard.stage)
   if (minDays === undefined || flashcard.lastReviewDate === undefined) return true
-  return toUtcDay(flashcard.lastReviewDate) - toUtcDay(day.chronodate) >= minDays
+  return toUtcDay(day.chronodate) - toUtcDay(flashcard.lastReviewDate) >= minDays
 }
 
 function isFreshFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
