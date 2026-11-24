@@ -50,7 +50,7 @@ URL patterns: `/api/**` authenticated, `/api-public/**` public, `/auth/**` auth.
 - Pages never call the session endpoints directly — each owns one `ReviewSessionAttendant` (`review-session-attendant.ts`): `create`/`loadOrCreate` on start, `track(id)` after a flashcard write succeeds, `flush()` to persist, `flush({ all: true })` to finish.
 - A session is finished only by `finishReview()` (exit button, `onBeforeRouteLeave`, `onUnmounted`), and only once — the backend rejects a second finish with `SAF400`. `clear()` and `destroyReviewStore` go in `onUnmounted`, not the route guard.
 - A flashcard PUT can piggyback a session flush (`sendFlashcardUpdateRequestWithinSession`, payload from `attendant.touch(options)`, which also does the local bookkeeping). The response is the flashcard with an optional `session` flattened in — strip `session` before storing the flashcard, or `copyFlashcard` replays it on the next PUT.
-- Media (audio/pictures) is fetched only by the review store's `FlashcardMediaPrefetcher`.
+- In review, media (audio/pictures) is fetched only by the review store's `FlashcardMediaPrefetcher`. Elsewhere (e.g. the gallery) use `fetchFlashcardMedia`, which the prefetcher is built on.
 - Reverse mode (front/back swapped) is per session type, saved in a cookie via `useReverseMode`, and reaches the review page only as the `?reversed=true` query param.
 
 ## Backend Notes
