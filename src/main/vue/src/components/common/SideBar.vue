@@ -2,31 +2,23 @@
   <div class="sidebar-wrapper">
     <div
       class="sidebar-overlay"
-      :class="{ 'sidebar-overlay--visible': sidebarExpandedCookie && isOverlay }"
+      :class="{ 'sidebar-overlay--visible': expanded && isOverlay }"
       @click="toggle"
     />
     <div
       class="sidebar"
       :class="{
-        'sidebar--collapsed': !sidebarExpandedCookie,
+        'sidebar--collapsed': !expanded,
         'sidebar--overlay': isOverlay,
         'sidebar--no-transition': isTransitioning,
       }"
     >
-      <ControlBar class="sidebar-control-bar" title="FLASHCARD SETS" center-title shadow>
+      <ControlBar class="sidebar-control-bar" :title="title" center-title shadow>
         <template #left>
-          <AwesomeButton
-            ref="createButton"
-            icon="fa-solid fa-plus"
-            class="control-bar-button"
-            tooltip="Create New Flashcard Set"
-            tooltip-position="bottom-right"
-            :on-click="toggleStore.toggleFlashcardSetCreation"
-          />
+          <slot name="left" />
         </template>
         <template #right>
           <AwesomeButton
-            ref="toggleButton"
             icon="fa-solid fa-chevron-left"
             class="control-bar-button"
             :on-click="toggle"
@@ -34,12 +26,7 @@
         </template>
       </ControlBar>
       <div class="sidebar-content">
-        <DeferredLoading :wait-for="flashcardSetListAwaitCond">
-          <FlashcardSetList :on-flashcard-set-changed="onFlashcardSetChanged" />
-          <template #fallback>
-            <FlashcardSetListSkeleton />
-          </template>
-        </DeferredLoading>
+        <slot />
       </div>
     </div>
   </div>
@@ -47,32 +34,19 @@
 
 <script setup lang="ts">
 import ControlBar from '@/components/ControlBar.vue'
-import DeferredLoading from '@/components/common/DeferredLoading.vue'
-import FlashcardSetList from '@/components/control-panel/FlashcardSetList.vue'
-import FlashcardSetListSkeleton from '@/components/control-panel/FlashcardSetListSkeleton.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
-import { useToggleStore } from '@/stores/toggle-store.ts'
-import { useLanguageStore } from '@/stores/language-store.ts'
-import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { onMounted, onUnmounted, ref } from 'vue'
-import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
-import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 defineProps<{
-  onFlashcardSetChanged: (setId: number) => Promise<boolean>
+  title: string
 }>()
+
+const expanded = defineModel<boolean>('expanded', { required: true })
 
 const OVERLAY_BREAKPOINT = 620
 
-const toggleStore = useToggleStore()
-const languageStore = useLanguageStore()
-const flashcardSetStore = useFlashcardSetStore()
-
 const isOverlay = ref(window.innerWidth <= OVERLAY_BREAKPOINT)
 const isTransitioning = ref(false)
-
-const flashcardSetListAwaitCond = () =>
-  Promise.all([waitUntilStoreLoaded(languageStore), waitUntilStoreLoaded(flashcardSetStore)])
 
 function updateOverlayMode() {
   const wasOverlay = isOverlay.value
@@ -90,7 +64,7 @@ function updateOverlayMode() {
 }
 
 function toggle() {
-  sidebarExpandedCookie.value = !sidebarExpandedCookie.value
+  expanded.value = !expanded.value
 }
 
 defineExpose({

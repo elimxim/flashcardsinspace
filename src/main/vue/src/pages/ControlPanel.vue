@@ -1,6 +1,10 @@
 <template>
   <div :class="['page', 'page--bg--light', 'flex-row']">
-    <SideBar ref="sidebar" style="z-index: 200" :on-flashcard-set-changed="onFlashcardSetChanged" />
+    <FlashcardSetListSideBar
+      ref="sidebar"
+      style="z-index: 200"
+      :on-flashcard-set-changed="onFlashcardSetChanged"
+    />
     <div class="control-panel-layout">
       <ControlBar :title="flashcardSetName" shadow>
         <template #left>
@@ -43,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import SideBar from '@/components/control-panel/SideBar.vue'
+import FlashcardSetListSideBar from '@/components/control-panel/FlashcardSetListSideBar.vue'
 import ControlBar from '@/components/ControlBar.vue'
 import KineticRingSpinner from '@/components/spinners/KineticRingSpinner.vue'
 import WelcomeWidget from '@/components/control-panel/widgets/WelcomeWidget.vue'
@@ -81,7 +85,7 @@ const { loadingStarted, resolvedLoading, startLoading, stopLoading, resetLoading
 
 const flashcardSetName = ref<string>()
 
-const sidebar = ref<InstanceType<typeof SideBar>>()
+const sidebar = ref<InstanceType<typeof FlashcardSetListSideBar>>()
 const isSidebarOverlay = computed(() => sidebar.value?.isOverlay ?? false)
 
 function openFlashcardSetSettings() {
