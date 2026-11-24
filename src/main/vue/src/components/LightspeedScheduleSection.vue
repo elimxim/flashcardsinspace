@@ -45,12 +45,27 @@
     </div>
 
     <div class="section-description">
+      <strong>Why aren't all flashcards of a stage in today's review?</strong>
+      <p class="section-description">
+        Every time you remember a flashcard, it moves up a stage and rests there for a while before
+        you see it again. The higher the stage, the longer the rest: a couple of days at first, and
+        about two months in the last stage.
+      </p>
+      <p class="section-description">
+        Each stage has its own review days in your calendar. If a flashcard moves to a new stage
+        right before that stage's review day, it hasn't rested enough yet, so it skips that day and
+        comes back on the next one. That's why today's review may not include every flashcard of a
+        stage. They aren't lost, just resting.
+      </p>
+    </div>
+
+    <div class="section-description">
+      <strong>What are Unknown and Attempted stages?</strong><br />
       <p class="section-description">
         Additionally, our schedule has two special stages: <em>Unknown</em> and <em>Attempted</em>.
         We added them to give you more control over your learning process. You can review them at
         any time. You can even create a custom review session for them.
       </p>
-      <strong>What are Unknown and Attempted stages?</strong><br />
       <p class="section-description">
         The <em>Unknown</em> stage contains flashcards that you have just created. You can review
         them an unlimited number of times before they move to the first stage on the next day.
@@ -131,7 +146,7 @@ const stages = [
   {
     title: 'Outer Space Mastery',
     description:
-      'After competing Stage S7, information is permanently stored in long-term memory. No further reviews needed.',
+      'After completing Stage S7, information is permanently stored in long-term memory. No further reviews needed.',
     icon: 'fa-solid fa-star',
     iconClass: 'stage-icon--mastery',
     timing: 'Outer Space • Mastered',

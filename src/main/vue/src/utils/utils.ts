@@ -1,5 +1,3 @@
-import { Log, LogTag } from '@/utils/logger.ts'
-
 /**
  * Creates a seeded pseudorandom number generator using the Mulberry32 algorithm.
  *
@@ -42,9 +40,13 @@ export function asIsoDateStr(date: Date): string {
  * @returns Date object at midnight local time
  */
 export function parseIsoDate(dateStr: string): Date {
-  Log.log(LogTag.DEBUG, `parseIsoDateStr: ${dateStr}`)
   const [year, month, day] = dateStr.split('-').map(Number)
   return new Date(year, month - 1, day)
+}
+
+export function toUtcDay(date: string) {
+  const [year, month, day] = date.split('-').map(Number)
+  return Date.UTC(year, month - 1, day) / 86_400_000
 }
 
 export function parseNumber(value?: unknown): number | undefined {

@@ -10,7 +10,7 @@ import {
 } from '@/core-logic/stage-logic.ts'
 import type { Chronoday } from '@/model/chrono.ts'
 import { chronodayStatusesToStartReview } from '@/core-logic/chrono-logic.ts'
-import { shuffle } from '@/utils/utils.ts'
+import { shuffle, toUtcDay } from '@/utils/utils.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 
 export enum ReviewSessionType {
@@ -296,7 +296,7 @@ export function createReviewQueue(flashcards: Flashcard[], currDay: Chronoday): 
       if (f.stage === learningStages.S1.name) {
         return isStageAvailable && !isFreshFlashcard(f, currDay) && !isReviewedFlashcard(f, currDay)
       }
-      return isStageAvailable && !isReviewedFlashcard(f, currDay)
+      return isStageAvailable && !isReviewedFlashcard(f, currDay) && hasRestedEnough(f, currDay)
     })
     .forEach((f) => {
       const stage = getStage(f.stage)
@@ -342,6 +342,25 @@ export function createReviewQueueForStages(
   const queue = new MonoStageReviewQueue(result)
   queue.shuffle()
   return queue
+}
+
+/**
+ * Days a flashcard rests in its stage before a Lightspeed day reviews it: about ¾ of the time
+ * each stage is meant to take (4, 8, 16, 32, 64 days). A flashcard that reaches a stage shortly
+ * before that stage's day waits for the next one instead of coming back almost immediately.
+ */
+const minDaysInStage = new Map<string, number>([
+  [learningStages.S3.name, 3],
+  [learningStages.S4.name, 6],
+  [learningStages.S5.name, 12],
+  [learningStages.S6.name, 24],
+  [learningStages.S7.name, 48],
+])
+
+function hasRestedEnough(flashcard: Flashcard, day: Chronoday): boolean {
+  const minDays = minDaysInStage.get(flashcard.stage)
+  if (minDays === undefined || flashcard.lastReviewDate === undefined) return true
+  return toUtcDay(day.chronodate) - toUtcDay(flashcard.lastReviewDate) >= minDays
 }
 
 function isFreshFlashcard(flashcard: Flashcard, day: Chronoday): boolean {
