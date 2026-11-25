@@ -1,33 +1,39 @@
 <template>
-  <div class="selection-actions">
-    <div class="selection-actions-buttons scrollbar-hidden">
-      <span
-        v-for="action in actions"
-        :key="action.key"
-        class="selection-action"
-        :class="{ 'selection-action--unavailable': action.unavailableReason !== undefined }"
-        @pointerenter="hintedKey = action.key"
-        @pointerdown="hintedKey = action.key"
-        @pointerleave="onPointerLeave"
-      >
-        <SmartButton
-          class="selection-action-button"
-          :class="{ 'dangerous-button': action.danger }"
-          :disabled="busy || selectedFlashcards.length === 0 || !!action.unavailableReason"
-          :hold-time="action.danger ? CONFIRM_HOLD_TIME : 0"
-          :on-click="() => run(action)"
-          rounded
-          auto-blur
-        >
-          <span class="selection-action-content">
-            <font-awesome-icon :icon="action.icon" />
-            <span>{{ action.text }}</span>
-          </span>
-        </SmartButton>
-      </span>
+  <Transition name="selection-actions">
+    <div v-if="open" class="selection-actions">
+      <div class="selection-actions-track">
+        <div class="selection-actions-panel">
+          <div class="selection-actions-buttons scrollbar-hidden">
+            <span
+              v-for="action in actions"
+              :key="action.key"
+              class="selection-action"
+              :class="{ 'selection-action--unavailable': action.unavailableReason !== undefined }"
+              @pointerenter="hintedKey = action.key"
+              @pointerdown="hintedKey = action.key"
+              @pointerleave="onPointerLeave"
+            >
+              <SmartButton
+                class="selection-action-button"
+                :class="{ 'dangerous-button': action.danger }"
+                :disabled="busy || selectedFlashcards.length === 0 || !!action.unavailableReason"
+                :hold-time="action.danger ? CONFIRM_HOLD_TIME : 0"
+                :on-click="() => run(action)"
+                rounded
+                auto-blur
+              >
+                <span class="selection-action-content">
+                  <font-awesome-icon :icon="action.icon" />
+                  <span>{{ action.text }}</span>
+                </span>
+              </SmartButton>
+            </span>
+          </div>
+          <span class="selection-actions-hint">{{ hint }}</span>
+        </div>
+      </div>
     </div>
-    <span class="selection-actions-hint">{{ hint }}</span>
-  </div>
+  </Transition>
 </template>
 
 <script setup lang="ts">
@@ -55,6 +61,10 @@ interface SelectionAction {
 const CONFIRM_HOLD_TIME = 1.2
 
 const selectedIds = defineModel<number[]>('selectedIds', { required: true })
+
+defineProps<{
+  open: boolean
+}>()
 
 const flashcardStore = useFlashcardStore()
 const { flashcardSet, flashcardMap, isSuspended } = storeToRefs(flashcardStore)
@@ -168,7 +178,50 @@ async function removeSelected() {
 </script>
 
 <style scoped>
+/*
+ * Sliding in and out also grows and shrinks the bar's height (grid rows 0fr <-> 1fr),
+ * so the grid above resizes smoothly instead of jumping
+ */
 .selection-actions {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.selection-actions-track {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.selection-actions-enter-active,
+.selection-actions-leave-active {
+  transition: grid-template-rows 0.25s ease;
+}
+
+.selection-actions-enter-active .selection-actions-panel,
+.selection-actions-leave-active .selection-actions-panel {
+  transition: transform 0.25s ease;
+}
+
+  .selection-actions-enter-from,
+  .selection-actions-leave-to {
+    grid-template-rows: 0fr;
+  }
+
+.selection-actions-enter-from .selection-actions-panel,
+.selection-actions-leave-to .selection-actions-panel {
+  transform: translateY(100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selection-actions-enter-active,
+  .selection-actions-leave-active,
+  .selection-actions-enter-active .selection-actions-panel,
+  .selection-actions-leave-active .selection-actions-panel {
+    transition: none;
+  }
+}
+
+.selection-actions-panel {
   display: flex;
   flex-direction: column;
   align-items: center;

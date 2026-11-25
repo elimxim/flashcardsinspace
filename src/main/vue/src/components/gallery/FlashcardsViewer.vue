@@ -37,7 +37,7 @@
         </div>
       </template>
     </FlashcardGrid>
-    <GallerySelectionActions v-if="selecting" v-model:selected-ids="selectedIds" />
+    <GallerySelectionActions v-model:selected-ids="selectedIds" :open="selecting" />
     <ZoomOverlay v-model:open="zoomOpen" :z-index="850" :close-on-escape="!flashcardEditOpen">
       <div v-if="zoomedFlashcard" class="viewer-zoomed-card">
         <SpaceCard
