@@ -59,10 +59,10 @@ const props = withDefaults(
 
 const selectedIdSet = computed(() => new Set(props.selectedIds))
 
-// Cards are sized from the tab width, not the grid's, so opening or closing a sidebar
-// never resizes them; only the number of cards per row changes. The card size aims at a
-// tile width and fits as many columns as the tab allows, so wider screens get more columns;
-// pinching (or ctrl + wheel, which is what a trackpad pinch sends) changes the tile width.
+// Cards are fitted to the grid's width: whole columns near the tile width that pinching
+// (or ctrl + wheel, which is what a trackpad pinch sends) aims at. They are refitted only
+// on zoom and on window resize, so opening or closing a sidebar never resizes them; only
+// the number of cards per row changes.
 
 const DEFAULT_TILE_WIDTH = 180
 // stops zooming out sooner on narrow (mobile) screens than the column limit alone would
@@ -74,35 +74,37 @@ const GRID_GAP = 6
 const RESIZE_SETTLE_MS = 150
 
 const scrollArea = ref<HTMLElement>()
-const tabWidth = ref(document.documentElement.clientWidth)
-const scrollPaddingX = ref(0)
 const containerWidth = ref(0)
 const tileWidth = ref(DEFAULT_TILE_WIDTH)
+const fittedWidth = ref(0)
+let scrollPaddingX = 0
 let resizeTimeout: ReturnType<typeof setTimeout> | undefined
+let windowResizeTimeout: ReturnType<typeof setTimeout> | undefined
 
 function maxColumns(width: number): number {
   return Math.max(1, Math.min(MAX_COLUMNS, Math.floor(width / MIN_TILE_WIDTH)))
 }
 
-// the grid's width if it took the whole tab
-const tabGridWidth = computed(() => Math.max(0, tabWidth.value - scrollPaddingX.value))
+function gridWidth(): number {
+  const el = scrollArea.value
+  return el ? Math.max(0, el.clientWidth - scrollPaddingX) : 0
+}
 
-const tabColumns = computed(() => {
-  const width = tabGridWidth.value
-  if (width <= 0) return 1
-  return Math.min(maxColumns(width), Math.max(1, Math.round(width / tileWidth.value)))
-})
+function fitCards() {
+  const width = containerWidth.value
+  if (width <= 0) return
+  const columns = Math.min(maxColumns(width), Math.max(1, Math.round(width / tileWidth.value)))
+  fittedWidth.value = (width - GRID_GAP * (columns - 1)) / columns
+}
 
-const cardWidth = computed(
-  () => (tabGridWidth.value - GRID_GAP * (tabColumns.value - 1)) / tabColumns.value,
-)
+// never wider than the grid, e.g. a single column fitted before the sidebar opened
+const cardWidth = computed(() => Math.min(fittedWidth.value, containerWidth.value))
 
 // how many cards of that width fit into the grid (epsilon guards float rounding)
 const columns = computed(() => {
-  const width = containerWidth.value
-  if (width <= 0) return tabColumns.value
-  const fitting = Math.floor((width + GRID_GAP) / (cardWidth.value + GRID_GAP) + 0.001)
-  return Math.max(1, Math.min(tabColumns.value, fitting))
+  const card = cardWidth.value
+  if (card <= 0) return 1
+  return Math.max(1, Math.floor((containerWidth.value + GRID_GAP) / (card + GRID_GAP) + 0.001))
 })
 
 const gridStyle = computed(() => ({
@@ -116,9 +118,10 @@ let pinchStartTileWidth = 0
 // clamped to what the column limits allow, so zooming past a limit
 // doesn't pile up width that has to be unwound later
 function zoomTo(width: number) {
-  const grid = tabGridWidth.value
+  const grid = containerWidth.value
   if (grid <= 0) return
   tileWidth.value = Math.min(grid, Math.max(grid / maxColumns(grid), width))
+  fitCards()
 }
 
 function touchDistance(touches: TouchList): number {
@@ -153,25 +156,28 @@ function onWheel(event: WheelEvent) {
   zoomTo(tileWidth.value * Math.exp(-event.deltaY * 0.01))
 }
 
-const resizeObserver = new ResizeObserver((entries) => {
-  const width = entries[0]?.contentRect.width ?? 0
+// a sidebar keeps the cards' size, the rows just rewrap
+const resizeObserver = new ResizeObserver(() => {
   clearTimeout(resizeTimeout)
-  if (containerWidth.value === 0) {
-    containerWidth.value = width
-  } else {
-    resizeTimeout = setTimeout(() => (containerWidth.value = width), RESIZE_SETTLE_MS)
-  }
+  resizeTimeout = setTimeout(() => (containerWidth.value = gridWidth()), RESIZE_SETTLE_MS)
 })
 
+// a new window size (or a rotated phone) refits the cards to the grid
 function onWindowResize() {
-  tabWidth.value = document.documentElement.clientWidth
+  clearTimeout(windowResizeTimeout)
+  windowResizeTimeout = setTimeout(() => {
+    containerWidth.value = gridWidth()
+    fitCards()
+  }, RESIZE_SETTLE_MS)
 }
 
 onMounted(() => {
   const el = scrollArea.value
   if (!el) return
   const style = getComputedStyle(el)
-  scrollPaddingX.value = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight)
+  scrollPaddingX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight)
+  containerWidth.value = gridWidth()
+  fitCards()
   window.addEventListener('resize', onWindowResize)
   resizeObserver.observe(el)
   el.addEventListener('touchstart', onTouchStart, { passive: true })
@@ -183,6 +189,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearTimeout(resizeTimeout)
+  clearTimeout(windowResizeTimeout)
   window.removeEventListener('resize', onWindowResize)
   resizeObserver.disconnect()
   const el = scrollArea.value
