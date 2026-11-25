@@ -2,15 +2,15 @@
   <div class="viewer">
     <div class="viewer-toolbar">
       <span class="viewer-toolbar-info">{{ infoText }}</span>
-      <button
-        type="button"
-        class="viewer-select-button viewer-select-button--fixed"
-        :class="{ 'viewer-select-button--active': selecting }"
+      <SmartButton
+        class="viewer-button"
+        :text="selecting ? 'Cancel' : 'Select'"
+        :clicked="selecting"
         :disabled="!loaded || (!selecting && visibleCount === 0)"
-        @click="toggleSelecting"
-      >
-        {{ selecting ? 'Cancel' : 'Select' }}
-      </button>
+        :on-click="toggleSelecting"
+        rounded
+        auto-blur
+      />
     </div>
     <FlashcardGrid
       :sections="loaded ? sections : []"
@@ -27,9 +27,13 @@
         </div>
         <div v-else class="viewer-empty">
           <span>No flashcards match the filters</span>
-          <button type="button" class="viewer-select-button" @click="clearFilter">
-            Clear filters
-          </button>
+          <SmartButton
+            class="viewer-button"
+            text="Clear filters"
+            :on-click="clearFilter"
+            rounded
+            auto-blur
+          />
         </div>
       </template>
     </FlashcardGrid>
@@ -70,6 +74,7 @@ export interface GalleryFilter {
 
 <script setup lang="ts">
 import KineticRingSpinner from '@/components/spinners/KineticRingSpinner.vue'
+import SmartButton from '@/components/common/SmartButton.vue'
 import FlashcardGrid, { type FlashcardGridSection } from '@/components/gallery/FlashcardGrid.vue'
 import SpaceCard from '@/components/SpaceCard.vue'
 import ZoomOverlay from '@/components/common/ZoomOverlay.vue'
@@ -274,43 +279,15 @@ onUnmounted(() => {
   font-size: 0.9rem;
 }
 
-.viewer-select-button {
-  padding: 4px 14px;
-  border: none;
-  border-radius: 999px;
-  background: rgba(87, 87, 87, 0.12);
-  color: #2f3340;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out;
-}
-
-@media (hover: hover) {
-  .viewer-select-button:hover:not(:disabled) {
-    background: rgba(87, 87, 87, 0.2);
-  }
-}
-
-.viewer-select-button--fixed {
-  width: 5.5em;
-  text-align: center;
-}
-
-.viewer-select-button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.viewer-select-button--active {
-  background: #007bff;
-  color: white;
-}
-
-@media (hover: hover) {
-  .viewer-select-button--active:hover:not(:disabled) {
-    background: #0068d9;
-  }
+.viewer-button {
+  --smart-button--width: 120px;
+  --smart-button--height: 30px;
+  --smart-button--title--font-size: 0.8rem;
+  --smart-button--bg: #494a6c;
+  --smart-button--bg--hover: #32334a;
+  --smart-button--bg--clicked: var(--calm-button--bg-color);
+  --smart-button--bg--clicked--hover: var(--calm-button--bg-color--hover);
+  --smart-button--bg--disabled: rgba(50, 51, 74, 0.15);
 }
 
 .viewer-spinner {

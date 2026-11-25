@@ -10,6 +10,7 @@
       'smart-button--fill-height': fillHeight,
       'smart-button--fit-content': fitContent,
       'smart-button--tapped': animatingOnTap,
+      'smart-button--clicked': clicked,
     }"
     :disabled="disabled"
     :hidden="hidden"
@@ -47,6 +48,7 @@ const props = withDefaults(
     text?: string
     disabled?: boolean
     hidden?: boolean
+    clicked?: boolean
     rounded?: boolean
     holdTime?: number
     autoBlur?: boolean
@@ -62,6 +64,7 @@ const props = withDefaults(
     text: '',
     disabled: false,
     hidden: false,
+    clicked: false,
     rounded: false,
     holdTime: 0,
     autoBlur: false,
@@ -219,6 +222,10 @@ function handleGlobalMouseUp() {
   --s-btn--title--color: var(--smart-button--title--color, #faf9f6);
   --s-btn--title--color--hover: var(--smart-button--title--color--hover, #faf9f6);
   --s-btn--title--color--disabled: var(--smart-button--title--color--disabled, #a3a3a3);
+  --s-btn--title--color--clicked: var(
+    --smart-button--title--color--clicked,
+    var(--s-btn--title--color--hover)
+  );
   --s-btn--title--word-spacing: var(--smart-button--title--word-spacing, 0.05rem);
   --s-btn--title--letter-spacing: var(--smart-button--title--letter-spacing, 0.05rem);
   --s-btn--border-color: var(--smart-button--border-color, transparent);
@@ -235,6 +242,8 @@ function handleGlobalMouseUp() {
   --s-btn--bg--progress: var(--smart-button--bg--progress, #515151);
   --s-btn--bg--disabled: var(--smart-button--bg--disabled, #c8c8c8ff);
   --s-btn--bg--loading: var(--smart-button--bg--loading, #c8c8c8ff);
+  --s-btn--bg--clicked: var(--smart-button--bg--clicked, var(--s-btn--bg--hover));
+  --s-btn--bg--clicked--hover: var(--smart-button--bg--clicked--hover, var(--s-btn--bg--clicked));
 }
 
 .smart-button {
@@ -245,10 +254,6 @@ function handleGlobalMouseUp() {
   background: var(--s-btn--bg);
   outline: var(--s-btn--border-width) solid var(--s-btn--border-color);
   position: relative;
-  transition:
-    background-color 0.2s ease-in-out,
-    outline 0.2s ease-in-out,
-    box-shadow 0.2s ease-in-out;
   width: var(--s-btn--width);
   height: var(--s-btn--height);
   cursor: pointer;
@@ -309,6 +314,26 @@ function handleGlobalMouseUp() {
 .smart-button:has(.smart-button--tapped:not(.smart-button--disabled):not(.smart-button--loading))
   .smart-button-title {
   transform: scale(v-bind(titleScale));
+}
+
+.smart-button--clicked:not(.smart-button--disabled):not(.smart-button--loading) {
+  color: var(--s-btn--title--color--clicked);
+  background: var(--s-btn--bg--clicked);
+}
+
+@media (hover: hover) {
+  .smart-button--clicked:not(.smart-button--disabled):not(.smart-button--loading):hover,
+  .smart-button--clicked:not(.smart-button--disabled):not(.smart-button--loading):focus {
+    color: var(--s-btn--title--color--clicked);
+    background: var(--s-btn--bg--clicked--hover);
+  }
+}
+
+.smart-button--clicked.smart-button--tapped:not(.smart-button--disabled):not(
+    .smart-button--loading
+  ) {
+  color: var(--s-btn--title--color--clicked);
+  background: var(--s-btn--bg--clicked--hover);
 }
 
 .smart-button--disabled:not(.smart-button--loading) {
