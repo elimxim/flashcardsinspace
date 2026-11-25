@@ -12,8 +12,8 @@
             icon="fa-solid fa-bars"
             class="control-bar-button"
             :on-click="sidebar?.toggle"
-            :hidden="sidebarExpandedCookie && !isSidebarOverlay"
-            :disabled="sidebarExpandedCookie && !isSidebarOverlay"
+            :hidden="controlPanelSidebarExpandedCookie && !isSidebarOverlay"
+            :disabled="controlPanelSidebarExpandedCookie && !isSidebarOverlay"
           />
         </template>
         <template #right>
@@ -32,7 +32,7 @@
         <WelcomeWidget v-else-if="!loadingStarted && !flashcardSet" class="control-welcome" />
         <WidgetBoard
           v-else-if="!loadingStarted"
-          :show-info-bar="sidebarExpandedCookie && !isSidebarOverlay"
+          :show-info-bar="controlPanelSidebarExpandedCookie && !isSidebarOverlay"
         />
       </div>
     </div>
@@ -64,7 +64,7 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref, watch } from 'vue'
-import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
+import { controlPanelSidebarExpandedCookie } from '@/utils/cookies-ref.ts'
 import {
   loadFlashcardSetStore,
   loadStoresForCurrFlashcardSet,

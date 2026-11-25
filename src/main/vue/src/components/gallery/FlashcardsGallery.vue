@@ -3,7 +3,7 @@
     <GalleryFilterSideBar
       ref="sidebar"
       v-model:filter="filter"
-      v-model:expanded="sidebarExpanded"
+      v-model:expanded="gallerySidebarExpandedCookie"
       style="z-index: 200"
       :counts="counts"
     />
@@ -16,8 +16,8 @@
             tooltip="Filters"
             tooltip-position="bottom-right"
             :on-click="sidebar?.toggle"
-            :hidden="sidebarExpanded && !isSidebarOverlay"
-            :disabled="sidebarExpanded && !isSidebarOverlay"
+            :hidden="gallerySidebarExpandedCookie && !isSidebarOverlay"
+            :disabled="gallerySidebarExpandedCookie && !isSidebarOverlay"
           />
         </template>
         <template #right>
@@ -45,6 +45,7 @@ import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { gallerySidebarExpandedCookie } from '@/utils/cookies-ref.ts'
 import { routeNames } from '@/router'
 import { flashcardStageOn } from '@/core-logic/review-logic.ts'
 
@@ -57,7 +58,6 @@ const { currDay } = storeToRefs(chronoStore)
 
 const filter = ref<GalleryFilter>({ unknown: false, attempted: false, stages: [] })
 const selectedIds = ref<number[]>([])
-const sidebarExpanded = ref(false)
 
 const sidebar = ref<InstanceType<typeof GalleryFilterSideBar>>()
 const isSidebarOverlay = computed(() => sidebar.value?.isOverlay ?? false)

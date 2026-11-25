@@ -1,5 +1,5 @@
 <template>
-  <SideBar ref="sidebar" v-model:expanded="sidebarExpandedCookie" title="FLASHCARD SETS">
+  <SideBar ref="sidebar" v-model:expanded="controlPanelSidebarExpandedCookie" title="FLASHCARD SETS">
     <template #left>
       <AwesomeButton
         icon="fa-solid fa-plus"
@@ -28,7 +28,7 @@ import { useToggleStore } from '@/stores/toggle-store.ts'
 import { useLanguageStore } from '@/stores/language-store.ts'
 import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { computed, ref } from 'vue'
-import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
+import { controlPanelSidebarExpandedCookie } from '@/utils/cookies-ref.ts'
 import { waitUntilStoreLoaded } from '@/utils/store-loading.ts'
 
 defineProps<{

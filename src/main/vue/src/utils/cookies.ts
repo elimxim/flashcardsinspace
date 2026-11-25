@@ -3,7 +3,8 @@ import { Log, LogTag } from '@/utils/logger.ts'
 
 const COOKIE_SELECTED_SET_ID = 'selectedSetId'
 const COOKIE_USER_SIGNED_UP = 'userSignedUp'
-const COOKIE_SIDEBAR_EXPANDED = 'sidebarExpanded'
+const COOKIE_CONTROL_PANEL_SIDEBAR_EXPANDED = 'controlPanelSidebarExpanded'
+const COOKIE_GALLERY_SIDEBAR_EXPANDED = 'gallerySidebarExpanded'
 const COOKIE_LOGGING_ENABLED = 'loggingEnabled'
 const COOKIE_REVERSED_REVIEWS = 'reversedReviews'
 
@@ -64,11 +65,19 @@ function removeSelectedSetIdCookie() {
 }
 
 function setSidebarExpandedToCookies(value: boolean) {
-  saveCookie(COOKIE_SIDEBAR_EXPANDED, value.toString(), 30)
+  saveCookie(COOKIE_CONTROL_PANEL_SIDEBAR_EXPANDED, value.toString(), 30)
 }
 
 function loadSidebarExpandedFromCookies(): boolean {
-  return loadBooleanCookie(COOKIE_SIDEBAR_EXPANDED)
+  return loadBooleanCookie(COOKIE_CONTROL_PANEL_SIDEBAR_EXPANDED)
+}
+
+function setGallerySidebarExpandedToCookies(value: boolean) {
+  saveCookie(COOKIE_GALLERY_SIDEBAR_EXPANDED, value.toString(), 30)
+}
+
+function loadGallerySidebarExpandedFromCookies(): boolean {
+  return loadBooleanCookie(COOKIE_GALLERY_SIDEBAR_EXPANDED)
 }
 
 function saveReversedReviewsToCookies(value: string[]) {
@@ -105,6 +114,8 @@ export {
   removeSelectedSetIdCookie,
   setSidebarExpandedToCookies,
   loadSidebarExpandedFromCookies,
+  setGallerySidebarExpandedToCookies,
+  loadGallerySidebarExpandedFromCookies,
   saveReversedReviewsToCookies,
   loadReversedReviewsFromCookies,
   loadLoggingEnabledFromCookies,
