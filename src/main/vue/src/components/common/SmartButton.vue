@@ -24,13 +24,13 @@
     @contextmenu.prevent
   >
     <span class="smart-button-progress" :style="{ width: progressPercentage }" />
-    <span class="smart-button-title-wrapper">
+    <span class="smart-button-title">
       <span v-if="resolvedLoading">
         <font-awesome-icon icon="fa-solid fa-spinner" spin-pulse class="smart-button-spinner" />
       </span>
       <template v-else>
         <slot v-if="hasSlot" />
-        <span v-else class="smart-button-title">
+        <span v-else>
           {{ text }}
         </span>
       </template>
@@ -218,14 +218,11 @@ function handleGlobalMouseUp() {
 
 <style scoped>
 .smart-button--theme {
-  --s-btn--title--font-size: var(--smart-button--title--font-size, 16px);
+  --s-btn--title--font-size: var(--smart-button--title--font-size, 18px);
   --s-btn--title--color: var(--smart-button--title--color, #faf9f6);
   --s-btn--title--color--hover: var(--smart-button--title--color--hover, #faf9f6);
   --s-btn--title--color--disabled: var(--smart-button--title--color--disabled, #a3a3a3);
-  --s-btn--title--color--clicked: var(
-    --smart-button--title--color--clicked,
-    var(--s-btn--title--color--hover)
-  );
+  --s-btn--title--color--clicked: var(--smart-button--title--color--clicked, #faf9f6);
   --s-btn--title--word-spacing: var(--smart-button--title--word-spacing, 0.05rem);
   --s-btn--title--letter-spacing: var(--smart-button--title--letter-spacing, 0.05rem);
   --s-btn--border-color: var(--smart-button--border-color, transparent);
@@ -242,8 +239,8 @@ function handleGlobalMouseUp() {
   --s-btn--bg--progress: var(--smart-button--bg--progress, #515151);
   --s-btn--bg--disabled: var(--smart-button--bg--disabled, #c8c8c8ff);
   --s-btn--bg--loading: var(--smart-button--bg--loading, #c8c8c8ff);
-  --s-btn--bg--clicked: var(--smart-button--bg--clicked, var(--s-btn--bg--hover));
-  --s-btn--bg--clicked--hover: var(--smart-button--bg--clicked--hover, var(--s-btn--bg--clicked));
+  --s-btn--bg--clicked: var(--smart-button--bg--clicked, #515151);
+  --s-btn--bg--clicked--hover: var(--smart-button--bg--clicked--hover, #515151);
 }
 
 .smart-button {
@@ -272,8 +269,9 @@ function handleGlobalMouseUp() {
   z-index: 0;
 }
 
-.smart-button-title-wrapper {
+.smart-button-title {
   position: relative;
+  font-weight: 500;
   display: inline-block;
   font-family: var(--button--font-family);
   font-size: var(--s-btn--title--font-size);
@@ -281,11 +279,6 @@ function handleGlobalMouseUp() {
   letter-spacing: var(--s-btn--title--letter-spacing);
   transition: transform 0.1s ease-in-out;
   z-index: 1;
-}
-
-.smart-button-title {
-  font-weight: 600;
-  text-transform: uppercase;
 }
 
 .smart-button:not(.smart-button--disabled):active {

@@ -28,7 +28,7 @@
         <div v-else class="viewer-empty">
           <span>No flashcards match the filters</span>
           <SmartButton
-            class="viewer-button"
+            class="viewer-button viewer-button--clear-filters"
             text="Clear filters"
             :on-click="clearFilter"
             rounded
@@ -280,14 +280,17 @@ onUnmounted(() => {
 }
 
 .viewer-button {
-  --smart-button--width: 120px;
+  --smart-button--width: 100px;
   --smart-button--height: 30px;
-  --smart-button--title--font-size: 0.8rem;
   --smart-button--bg: #494a6c;
   --smart-button--bg--hover: #32334a;
   --smart-button--bg--clicked: var(--calm-button--bg-color);
   --smart-button--bg--clicked--hover: var(--calm-button--bg-color--hover);
   --smart-button--bg--disabled: rgba(50, 51, 74, 0.15);
+}
+
+.viewer-button--clear-filters {
+  --smart-button--width: 140px;
 }
 
 .viewer-spinner {
