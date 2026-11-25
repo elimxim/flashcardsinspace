@@ -66,6 +66,8 @@
 
 <script lang="ts">
 export interface GalleryFilter {
+  /** Only selected flashcards, on top of the category filter below */
+  selected: boolean
   unknown: boolean
   attempted: boolean
   stages: string[]
@@ -109,7 +111,9 @@ const { currDay } = storeToRefs(chronoStore)
 const { flashcardEditOpen } = storeToRefs(toggleStore)
 const { resolvedLoading, loaded } = storeToRefs(useFlashcardSetLoading())
 
-function isShown(stage: Stage): boolean {
+const selectedIdSet = computed(() => new Set(selectedIds.value))
+
+function isStageShown(stage: Stage): boolean {
   const { unknown, attempted, stages } = filter.value
   if (!unknown && !attempted && stages.length === 0) return true
   if (stage === specialStages.UNKNOWN) return unknown
@@ -121,8 +125,9 @@ function isShown(stage: Stage): boolean {
 const sections = computed<FlashcardGridSection[]>(() => {
   const groups = new Map<Stage, Flashcard[]>()
   flashcards.value.forEach((flashcard) => {
+    if (filter.value.selected && !selectedIdSet.value.has(flashcard.id)) return
     const stage = flashcardStageOn(flashcard, currDay.value)
-    if (!isShown(stage)) return
+    if (!isStageShown(stage)) return
     const group = groups.get(stage)
     if (group) {
       group.push(flashcard)
@@ -248,7 +253,7 @@ watch(flashcardEditOpen, (open) => {
 })
 
 function clearFilter() {
-  filter.value = { unknown: false, attempted: false, stages: [] }
+  filter.value = { selected: false, unknown: false, attempted: false, stages: [] }
 }
 
 onUnmounted(() => {

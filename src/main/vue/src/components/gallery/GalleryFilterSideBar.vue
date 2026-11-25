@@ -10,6 +10,15 @@
       />
     </template>
     <div class="gallery-filter">
+      <template v-if="selectedCount > 0">
+        <div class="gallery-filter-row">
+          <Toggle v-model="selected" class="gallery-filter-toggle" size="M">
+            <span class="gallery-filter-label">Selected</span>
+          </Toggle>
+          <span class="cp-count-box">{{ selectedCount }}</span>
+        </div>
+        <div class="gallery-filter-divider" />
+      </template>
       <div class="gallery-filter-row">
         <Toggle v-model="unknown" class="gallery-filter-toggle" size="M">
           <span class="gallery-filter-label">{{ specialStages.UNKNOWN.displayName }}</span>
@@ -50,12 +59,18 @@ const expanded = defineModel<boolean>('expanded', { required: true })
 
 const props = defineProps<{
   counts: Map<string, number>
+  selectedCount: number
 }>()
 
 const galleryFilterStages: Stage[] = [...learningStageArray, specialStages.OUTER_SPACE]
 
 const sidebar = ref<InstanceType<typeof SideBar>>()
 const isOverlay = computed(() => sidebar.value?.isOverlay ?? false)
+
+const selected = computed({
+  get: () => filter.value.selected,
+  set: (value: boolean) => (filter.value = { ...filter.value, selected: value }),
+})
 
 const unknown = computed({
   get: () => filter.value.unknown,
@@ -77,7 +92,7 @@ function countOf(stage: Stage): number {
 }
 
 function clear() {
-  filter.value = { unknown: false, attempted: false, stages: [] }
+  filter.value = { selected: false, unknown: false, attempted: false, stages: [] }
 }
 
 function toggle() {

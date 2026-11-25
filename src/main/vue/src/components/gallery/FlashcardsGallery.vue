@@ -6,6 +6,7 @@
       v-model:expanded="gallerySidebarExpandedCookie"
       style="z-index: 200"
       :counts="counts"
+      :selected-count="selectedIds.length"
     />
     <div class="gallery-main">
       <ControlBar :title="title" shadow>
@@ -43,7 +44,7 @@ import FlashcardsViewer, { type GalleryFilter } from '@/components/gallery/Flash
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import { storeToRefs } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { gallerySidebarExpandedCookie } from '@/utils/cookies-ref.ts'
 import { routeNames } from '@/router'
@@ -56,8 +57,15 @@ const chronoStore = useChronoStore()
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
-const filter = ref<GalleryFilter>({ unknown: false, attempted: false, stages: [] })
+const filter = ref<GalleryFilter>({ selected: false, unknown: false, attempted: false, stages: [] })
 const selectedIds = ref<number[]>([])
+
+// the Selected toggle disappears with the selection, so it mustn't stay on unseen
+watch(selectedIds, (ids) => {
+  if (ids.length === 0 && filter.value.selected) {
+    filter.value = { ...filter.value, selected: false }
+  }
+})
 
 const sidebar = ref<InstanceType<typeof GalleryFilterSideBar>>()
 const isSidebarOverlay = computed(() => sidebar.value?.isOverlay ?? false)
