@@ -151,7 +151,7 @@ function dismiss() {
 .modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay--backdrop--color);
   opacity: calc(1 - var(--sheet-progress, 0));
   transition: opacity 280ms;
 }

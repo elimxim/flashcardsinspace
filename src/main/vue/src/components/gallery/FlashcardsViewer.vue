@@ -58,7 +58,11 @@
         </div>
       </section>
     </div>
-    <ZoomOverlay v-model:open="zoomOpen">
+    <ZoomOverlay
+      v-model:open="zoomOpen"
+      :z-index="850"
+      :close-on-escape="!flashcardEditOpen"
+    >
       <div v-if="zoomedFlashcard" class="viewer-zoomed-card">
         <SpaceCard
           :key="zoomedFlashcard.id"
@@ -178,10 +182,12 @@ const infoText = computed(() => {
 const zoomOpen = ref(false)
 const zoomedFlashcard = ref<Flashcard>()
 const zoomedMedia = ref<FlashcardMedia>(NO_MEDIA)
-const autoPlayVoice = ref(false)
-const autoRepeatVoice = ref(false)
+
+let zoomedMediaFlashcardId: number | undefined
 let mediaController: AbortController | undefined
 
+const autoPlayVoice = ref(false)
+const autoRepeatVoice = ref(false)
 const editedFlashcard = ref<Flashcard>()
 const editedFlashcardRemoved = ref(false)
 const editedMediaChanged = ref(false)
@@ -211,7 +217,11 @@ function onTileClick(flashcard: Flashcard) {
 
 async function loadZoomedMedia(flashcardId: number) {
   mediaController?.abort()
-  zoomedMedia.value = NO_MEDIA
+  // refetching the same flashcard keeps showing its current media until the new one arrives
+  if (zoomedMediaFlashcardId !== flashcardId) {
+    zoomedMedia.value = NO_MEDIA
+    zoomedMediaFlashcardId = undefined
+  }
   const setId = flashcardSet.value?.id
   if (!setId) return
 
@@ -222,6 +232,7 @@ async function loadZoomedMedia(flashcardId: number) {
   if (controller.signal.aborted || zoomedFlashcard.value?.id !== flashcardId) return
 
   zoomedMedia.value = media
+  zoomedMediaFlashcardId = flashcardId
   if (media.error !== undefined) {
     useSpaceToaster().bakeError(
       userApiErrors.MEDIA__FETCHING_FAILED,
@@ -230,18 +241,15 @@ async function loadZoomedMedia(flashcardId: number) {
   }
 }
 
-// The edit modal sits below the zoom overlay, so the overlay steps aside while
-// the flashcard is edited and comes back with the result (unless it was removed).
+// The zoomed flashcard stays open under the edit modal and shows the result
+// once the modal closes (or closes too, when the flashcard was removed).
 function openEdit() {
   editedFlashcard.value = zoomedFlashcard.value
-  zoomOpen.value = false
   toggleStore.toggleFlashcardEdit()
 }
 
 watch(zoomOpen, (open) => {
-  if (!open && !flashcardEditOpen.value) {
-    mediaController?.abort()
-  }
+  if (!open) mediaController?.abort()
 })
 
 watch(flashcardEditOpen, (open) => {
@@ -252,12 +260,11 @@ watch(flashcardEditOpen, (open) => {
   editedFlashcardRemoved.value = false
   editedMediaChanged.value = false
   if (!flashcard) {
-    zoomedFlashcard.value = undefined
+    zoomOpen.value = false
     return
   }
 
   zoomedFlashcard.value = flashcard
-  zoomOpen.value = true
   if (mediaChanged) {
     loadZoomedMedia(flashcard.id)
   }
