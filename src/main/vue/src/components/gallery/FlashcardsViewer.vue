@@ -295,8 +295,9 @@ onUnmounted(() => {
 }
 
 .viewer-button {
-  --smart-button--width: 100px;
-  --smart-button--height: 36px;
+  --smart-button--title--font-size: 14px;
+  --smart-button--width: 80px;
+  --smart-button--height: 32px;
   --smart-button--bg: #494a6c;
   --smart-button--bg--hover: #32334a;
   --smart-button--bg--clicked: var(--calm-button--bg-color);

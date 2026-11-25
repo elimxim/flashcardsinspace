@@ -195,7 +195,8 @@ async function removeSelected() {
 }
 
 .selection-action-button {
-  --smart-button--width: 120px;
+  --smart-button--width: fit-content;
+  --smart-button--padding: 0 16px;
   --smart-button--height: 40px;
   --smart-button--title--font-size: 14px;
   --smart-button--bg--disabled: rgba(50, 51, 74, 0.15);
