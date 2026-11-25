@@ -71,6 +71,7 @@ export interface GalleryFilter {
   unknown: boolean
   attempted: boolean
   stages: string[]
+  outerSpace: boolean
 }
 </script>
 
@@ -114,10 +115,11 @@ const { resolvedLoading, loaded } = storeToRefs(useFlashcardSetLoading())
 const selectedIdSet = computed(() => new Set(selectedIds.value))
 
 function isStageShown(stage: Stage): boolean {
-  const { unknown, attempted, stages } = filter.value
-  if (!unknown && !attempted && stages.length === 0) return true
+  const { unknown, attempted, stages, outerSpace } = filter.value
+  if (!unknown && !attempted && stages.length === 0 && !outerSpace) return true
   if (stage === specialStages.UNKNOWN) return unknown
   if (stage === specialStages.ATTEMPTED) return attempted
+  if (stage === specialStages.OUTER_SPACE) return outerSpace
   return stages.includes(stage.name)
 }
 
@@ -253,7 +255,13 @@ watch(flashcardEditOpen, (open) => {
 })
 
 function clearFilter() {
-  filter.value = { selected: false, unknown: false, attempted: false, stages: [] }
+  filter.value = {
+    selected: false,
+    unknown: false,
+    attempted: false,
+    stages: [],
+    outerSpace: false,
+  }
 }
 
 onUnmounted(() => {

@@ -32,7 +32,7 @@
         <span class="cp-count-box">{{ countOf(specialStages.ATTEMPTED) }}</span>
       </div>
       <div class="gallery-filter-divider" />
-      <div v-for="stage in galleryFilterStages" :key="stage.name" class="gallery-filter-row">
+      <div v-for="stage in learningStageArray" :key="stage.name" class="gallery-filter-row">
         <SmartCheckbox
           class="gallery-filter-checkbox"
           :model-value="filter.stages.includes(stage.name)"
@@ -40,6 +40,13 @@
           @update:model-value="(checked: boolean) => setStage(stage, checked)"
         />
         <span class="cp-count-box">{{ countOf(stage) }}</span>
+      </div>
+      <div class="gallery-filter-divider" />
+      <div class="gallery-filter-row">
+        <Toggle v-model="outerSpace" class="gallery-filter-toggle" size="M">
+          <span class="gallery-filter-label">{{ specialStages.OUTER_SPACE.displayName }}</span>
+        </Toggle>
+        <span class="cp-count-box">{{ countOf(specialStages.OUTER_SPACE) }}</span>
       </div>
     </div>
   </SideBar>
@@ -62,8 +69,6 @@ const props = defineProps<{
   selectedCount: number
 }>()
 
-const galleryFilterStages: Stage[] = [...learningStageArray, specialStages.OUTER_SPACE]
-
 const sidebar = ref<InstanceType<typeof SideBar>>()
 const isOverlay = computed(() => sidebar.value?.isOverlay ?? false)
 
@@ -82,6 +87,11 @@ const attempted = computed({
   set: (value: boolean) => (filter.value = { ...filter.value, attempted: value }),
 })
 
+const outerSpace = computed({
+  get: () => filter.value.outerSpace,
+  set: (value: boolean) => (filter.value = { ...filter.value, outerSpace: value }),
+})
+
 function setStage(stage: Stage, checked: boolean) {
   const others = filter.value.stages.filter((name) => name !== stage.name)
   filter.value = { ...filter.value, stages: checked ? [...others, stage.name] : others }
@@ -92,7 +102,13 @@ function countOf(stage: Stage): number {
 }
 
 function clear() {
-  filter.value = { selected: false, unknown: false, attempted: false, stages: [] }
+  filter.value = {
+    selected: false,
+    unknown: false,
+    attempted: false,
+    stages: [],
+    outerSpace: false,
+  }
 }
 
 function toggle() {

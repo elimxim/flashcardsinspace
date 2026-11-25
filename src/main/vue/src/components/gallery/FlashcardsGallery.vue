@@ -57,7 +57,14 @@ const chronoStore = useChronoStore()
 const { flashcardSet, flashcards } = storeToRefs(flashcardStore)
 const { currDay } = storeToRefs(chronoStore)
 
-const filter = ref<GalleryFilter>({ selected: false, unknown: false, attempted: false, stages: [] })
+const filter = ref<GalleryFilter>({
+  selected: false,
+  unknown: false,
+  attempted: false,
+  stages: [],
+  outerSpace: false,
+})
+
 const selectedIds = ref<number[]>([])
 
 // the Selected toggle disappears with the selection, so it mustn't stay on unseen
