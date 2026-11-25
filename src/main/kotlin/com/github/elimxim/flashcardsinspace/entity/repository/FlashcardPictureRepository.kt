@@ -43,8 +43,8 @@ interface FlashcardPictureRepository : JpaRepository<FlashcardPicture, Long> {
     @Query(
         """
         DELETE FROM flashcard_picture fp
-        WHERE fp.flashcard_id = :flashcardId
+        WHERE fp.flashcard_id IN (:flashcardIds)
     """, nativeQuery = true
     )
-    fun deleteByFlashcardId(@Param("flashcardId") flashcardId: Long)
+    fun deleteByFlashcardIdIn(@Param("flashcardIds") flashcardIds: Collection<Long>)
 }

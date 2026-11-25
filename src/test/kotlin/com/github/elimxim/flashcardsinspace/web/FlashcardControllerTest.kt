@@ -4,6 +4,7 @@ import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.UserRepository
 import com.github.elimxim.flashcardsinspace.security.JwtService
 import com.github.elimxim.flashcardsinspace.service.FlashcardService
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardBulkUpdateResponse
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardDto
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardUpdateResponse
 import com.github.elimxim.flashcardsinspace.web.dto.ReviewHistoryDto
@@ -29,6 +30,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.put
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -150,6 +152,85 @@ class FlashcardControllerTest {
                 .contains("\"id\":1")
                 .contains("\"session\":{\"id\":7")
                 .doesNotContain("\"flashcard\"")
+        }
+    }
+
+    @Nested
+    @DisplayName("PUT /api/flashcard-sets/{setId}/flashcards/bulk")
+    inner class UpdateFlashcardsBulk {
+
+        @Test
+        fun `should return the updated flashcards`() {
+            given(flashcardService.updateBulk(any(), anyLong(), any()))
+                .willReturn(FlashcardBulkUpdateResponse(listOf(flashcardDto(1L), flashcardDto(2L))))
+
+            val result = mockMvc.put("/api/flashcard-sets/1/flashcards/bulk") {
+                with(user(mockUser))
+                with(csrf())
+                contentType = MediaType.APPLICATION_JSON
+                content = "{\"requests\":[{\"id\":1,\"flashcard\":{\"stage\":\"S1\"}}," +
+                        "{\"id\":2,\"flashcard\":{\"stage\":\"S1\"}}]}"
+            }.andExpect {
+                status { isOk() }
+            }.andReturn()
+
+            assertThat(result.response.contentAsString)
+                .contains("\"flashcards\":[{\"id\":1")
+                .contains("{\"id\":2")
+            then(flashcardService).should().updateBulk(
+                any(),
+                anyLong(),
+                argThat { requests?.map { it.id } == listOf("1", "2") },
+            )
+        }
+    }
+
+    @Nested
+    @DisplayName("DELETE /api/flashcard-sets/{setId}/flashcards/bulk")
+    inner class RemoveFlashcardsBulk {
+
+        @Test
+        fun `should pass comma-separated ids to the service`() {
+            mockMvc.delete("/api/flashcard-sets/1/flashcards/bulk?ids=1,2") {
+                with(user(mockUser))
+                with(csrf())
+            }.andExpect {
+                status { isOk() }
+            }
+
+            then(flashcardService).should().removeBulk(
+                any(),
+                anyLong(),
+                argThat { ids?.map { it.id } == listOf("1", "2") },
+            )
+        }
+
+        @Test
+        fun `should pass repeated ids to the service`() {
+            mockMvc.delete("/api/flashcard-sets/1/flashcards/bulk?ids=1&ids=2") {
+                with(user(mockUser))
+                with(csrf())
+            }.andExpect {
+                status { isOk() }
+            }
+
+            then(flashcardService).should().removeBulk(
+                any(),
+                anyLong(),
+                argThat { ids?.map { it.id } == listOf("1", "2") },
+            )
+        }
+
+        @Test
+        fun `should leave the ids for the validator to reject when they are missing`() {
+            mockMvc.delete("/api/flashcard-sets/1/flashcards/bulk") {
+                with(user(mockUser))
+                with(csrf())
+            }.andExpect {
+                status { isOk() }
+            }
+
+            then(flashcardService).should().removeBulk(any(), anyLong(), argThat { ids == null })
         }
     }
 }

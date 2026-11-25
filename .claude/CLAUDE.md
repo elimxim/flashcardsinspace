@@ -61,6 +61,7 @@ URL patterns: `/api/**` authenticated, `/api-public/**` public, `/auth/**` auth.
 - **Input security**: OWASP HTML sanitizer for user-supplied content (`UserInputUtils`).
 - **Virtual threads**: enabled.
 - **Nested validation**: put `@Valid` on the type argument (`List<@Valid Item>`), not the list. This only works because of the `-Xemit-jvm-type-annotations` compiler flag; without it, list items silently stop being validated.
+- **`HttpException` must stay unchecked** (extends `RuntimeException`): `@Transactional` rolls back only on unchecked exceptions, so a checked one would commit whatever a service wrote before throwing it.
 - **Jackson 3 only**: import from `tools.jackson.*` (annotations stay in `com.fasterxml.jackson.annotation`). Jackson 2 is on the runtime classpath only because jjwt needs it — Spring ignores Jackson 2 serializers, so a `com.fasterxml.jackson.databind` import silently does nothing.
 
 ## Testing

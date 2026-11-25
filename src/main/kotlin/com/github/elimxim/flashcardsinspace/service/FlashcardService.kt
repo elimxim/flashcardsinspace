@@ -82,17 +82,10 @@ class FlashcardService(
         flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
         verifyUserOperation(user, setId, flashcard)
         val validRequest = requestValidator.validate(request)
-
         if (isReviewOperation(flashcard, validRequest)) {
             flashcardSetService.verifyNotSuspended(flashcard.flashcardSet)
         }
-
-        val updatedFlashcard = if (mergeFlashcard(flashcard, validRequest)) {
-            flashcard.lastUpdatedAt = ZonedDateTime.now()
-            flashcardRepository.save(flashcard)
-        } else {
-            flashcard
-        }
+        val updatedFlashcard = saveMerged(flashcard, validRequest)
 
         val sessionRequest = request.sessionRequest
         val sessionDto = if (sessionId != null && sessionRequest != null) {
@@ -100,6 +93,31 @@ class FlashcardService(
         } else null
 
         return FlashcardUpdateResponse(updatedFlashcard.toDto(), sessionDto)
+    }
+
+    @Transactional
+    fun updateBulk(user: User, setId: Long, request: FlashcardBulkUpdateRequest): FlashcardBulkUpdateResponse {
+        log.info("Updating ${request.requests?.size} flashcards in bulk in set $setId")
+        user.checkVerified()
+        val flashcardSet = flashcardSetService.getEntity(setId)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
+        val validRequest = requestValidator.validate(request)
+        val flashcards = getEntities(user, setId, validRequest.requests.map { it.id })
+        val updates = validRequest.requests.map { flashcards.getValue(it.id) to it.flashcard }
+        if (updates.any { (flashcard, update) -> isReviewOperation(flashcard, update) }) {
+            flashcardSetService.verifyNotSuspended(flashcardSet)
+        }
+        val updatedFlashcards = updates.map { (flashcard, update) -> saveMerged(flashcard, update) }
+        return FlashcardBulkUpdateResponse(updatedFlashcards.map { it.toDto() })
+    }
+
+    private fun saveMerged(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Flashcard {
+        return if (mergeFlashcard(flashcard, request)) {
+            flashcard.lastUpdatedAt = ZonedDateTime.now()
+            flashcardRepository.save(flashcard)
+        } else {
+            flashcard
+        }
     }
 
     private fun isReviewOperation(flashcard: Flashcard, request: ValidFlashcardUpdateRequest): Boolean {
@@ -155,9 +173,24 @@ class FlashcardService(
         val flashcard = getEntity(id)
         verifyUserOperation(user, setId, flashcard)
         flashcardSetService.verifyUserHasAccess(user, flashcard.flashcardSet)
-        flashcardAudioRepository.deleteByFlashcardId(flashcard.id)
-        flashcardPictureRepository.deleteByFlashcardId(flashcard.id)
-        flashcardRepository.delete(flashcard)
+        removeEntities(listOf(flashcard))
+    }
+
+    @Transactional
+    fun removeBulk(user: User, setId: Long, request: FlashcardBulkRemovalRequest) {
+        log.info("Removing ${request.ids?.size} flashcards in bulk from set $setId")
+        user.checkVerified()
+        val flashcardSet = flashcardSetService.getEntity(setId)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
+        val validRequest = requestValidator.validate(request)
+        removeEntities(getEntities(user, setId, validRequest.ids).values)
+    }
+
+    private fun removeEntities(flashcards: Collection<Flashcard>) {
+        val ids = flashcards.map { it.id }
+        flashcardAudioRepository.deleteByFlashcardIdIn(ids)
+        flashcardPictureRepository.deleteByFlashcardIdIn(ids)
+        flashcardRepository.deleteAll(flashcards)
     }
 
     @Transactional(readOnly = true)
@@ -165,6 +198,16 @@ class FlashcardService(
         flashcardRepository.findById(id).orElseThrow {
             HttpNotFoundException(ApiErrorCode.FLA404, "Flashcard with id $id not found")
         }
+
+    private fun getEntities(user: User, setId: Long, ids: List<Long>): Map<Long, Flashcard> {
+        val flashcards = flashcardRepository.findAllById(ids).associateBy { it.id }
+        val missingIds = ids.filter { it !in flashcards }
+        if (missingIds.isNotEmpty()) {
+            throw HttpNotFoundException(ApiErrorCode.FLA404, "Flashcards with ids $missingIds not found")
+        }
+        flashcards.values.forEach { verifyUserOperation(user, setId, it) }
+        return flashcards
+    }
 
     @Transactional(readOnly = true)
     fun verifyUserOperation(user: User, setId: Long, flashcard: Flashcard) {

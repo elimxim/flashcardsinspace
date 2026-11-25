@@ -68,6 +68,41 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
+    fun validate(request: FlashcardBulkUpdateRequest): ValidFlashcardBulkUpdateRequest {
+        validateRequest<FlashcardBulkUpdateRequest>(request) { violations ->
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+            )
+        }
+        val items = request.requests!!
+        if (items.any { it.flashcard?.sessionRequest != null }) {
+            throw HttpInvalidRequestFieldsException(
+                listOf("sessionRequest"),
+                "Request is invalid ${request.escapeJava()}, a bulk update can't update a review session",
+            )
+        }
+        if (items.map { it.id }.toSet().size != items.size) {
+            throw HttpInvalidRequestFieldsException(
+                listOf("id"),
+                "Request is invalid ${request.escapeJava()}, a flashcard can be updated only once",
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
+    fun validate(request: FlashcardBulkRemovalRequest): ValidFlashcardBulkRemovalRequest {
+        validateRequest<FlashcardBulkRemovalRequest>(request) { violations ->
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
     fun validate(request: FlashcardSetCreationRequest): ValidFlashcardSetCreationRequest {
         validateRequest<FlashcardSetCreationRequest>(request) { violations ->
             throw HttpInvalidRequestFieldsException(
@@ -251,6 +286,16 @@ fun FlashcardUpdateRequest.toValidRequest() = ValidFlashcardUpdateRequest(
     },
     lastReviewDate = lastReviewDate?.let { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) },
     sessionRequest = sessionRequest?.toValidRequest()
+)
+
+fun FlashcardBulkUpdateRequest.toValidRequest() = ValidFlashcardBulkUpdateRequest(
+    requests = requests!!.map {
+        ValidFlashcardBulkUpdateRequest.Item(id = it.id!!.toLong(), flashcard = it.flashcard!!.toValidRequest())
+    },
+)
+
+fun FlashcardBulkRemovalRequest.toValidRequest() = ValidFlashcardBulkRemovalRequest(
+    ids = ids!!.map { it.id!!.toLong() }.distinct(),
 )
 
 fun FlashcardSetCreationRequest.toValidRequest() = ValidFlashcardSetCreationRequest(
