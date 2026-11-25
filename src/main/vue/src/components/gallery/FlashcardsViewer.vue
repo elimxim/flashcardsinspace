@@ -37,6 +37,7 @@
         </div>
       </template>
     </FlashcardGrid>
+    <GallerySelectionActions v-if="selecting" v-model:selected-ids="selectedIds" />
     <ZoomOverlay v-model:open="zoomOpen" :z-index="850" :close-on-escape="!flashcardEditOpen">
       <div v-if="zoomedFlashcard" class="viewer-zoomed-card">
         <SpaceCard
@@ -79,6 +80,7 @@ export interface GalleryFilter {
 import KineticRingSpinner from '@/components/spinners/KineticRingSpinner.vue'
 import SmartButton from '@/components/common/SmartButton.vue'
 import FlashcardGrid, { type FlashcardGridSection } from '@/components/gallery/FlashcardGrid.vue'
+import GallerySelectionActions from '@/components/gallery/GallerySelectionActions.vue'
 import SpaceCard from '@/components/SpaceCard.vue'
 import ZoomOverlay from '@/components/common/ZoomOverlay.vue'
 import FlashcardEditModal from '@/modals/FlashcardEditModal.vue'
@@ -294,7 +296,7 @@ onUnmounted(() => {
 
 .viewer-button {
   --smart-button--width: 100px;
-  --smart-button--height: 30px;
+  --smart-button--height: 36px;
   --smart-button--bg: #494a6c;
   --smart-button--bg--hover: #32334a;
   --smart-button--bg--clicked: var(--calm-button--bg-color);

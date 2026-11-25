@@ -147,8 +147,8 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { usePageHidden } from '@/utils/page-hidden.ts'
 import { storeToRefs } from 'pinia'
-import { copyFlashcard, updateFlashcard } from '@/core-logic/flashcard-logic.ts'
-import { learningStages, specialStages } from '@/core-logic/stage-logic.ts'
+import { moveFlashcardBack } from '@/core-logic/flashcard-operations.ts'
+import { specialStages } from '@/core-logic/stage-logic.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
 import {
   createReviewQueueForStages,
@@ -160,9 +160,7 @@ import { routeNames } from '@/router'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { loadSelectedSetIdFromCookies } from '@/utils/cookies.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
-import { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { loadStoresForFlashcardSetId } from '@/utils/store-loading.ts'
-import { sendFlashcardUpdateRequest } from '@/api/api-client.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
@@ -331,31 +329,29 @@ async function moveBack() {
     )
     return
   }
-  const flashcard = copyFlashcard(currFlashcard.value)
-  updateFlashcard(flashcard, learningStages.S1, currDay.value.chronodate)
-  const success = await sendUpdatedFlashcard(flashcardSet.value, flashcard)
+  const success = await moveFlashcardBack(
+    flashcardSet.value.id,
+    currFlashcard.value,
+    currDay.value.chronodate,
+  )
+    .then((flashcard) => {
+      currFlashcard.value = flashcard
+      return true
+    })
+    .catch((error) => {
+      Log.error(
+        LogTag.LOGIC,
+        `Failed to move back Flashcard.id=${currFlashcard.value?.id}`,
+        error.response?.data,
+      )
+      toaster.bakeError(userApiErrors.FLASHCARD__PROGRESSION_FAILED, error.response?.data)
+      return false
+    })
   if (success) {
     reviewQueue.value.removeCurrent()
     await spaceDeck.value?.animateOutLeft(true)
     await reviewStore.nextFlashcard()
   }
-}
-
-async function sendUpdatedFlashcard(
-  flashcardSet: FlashcardSet,
-  flashcard: Flashcard,
-): Promise<boolean> {
-  return await sendFlashcardUpdateRequest(flashcardSet.id, flashcard)
-    .then((response) => {
-      flashcardStore.changeFlashcard(response.data)
-      currFlashcard.value = response.data
-      return true
-    })
-    .catch((error) => {
-      Log.error(LogTag.LOGIC, `Failed to update Flashcard.id=${flashcard.id}`, error.response?.data)
-      toaster.bakeError(userApiErrors.FLASHCARD__PROGRESSION_FAILED, error.response?.data)
-      return false
-    })
 }
 
 onMounted(async () => {

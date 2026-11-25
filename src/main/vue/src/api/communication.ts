@@ -57,6 +57,14 @@ export interface FlashcardUpdateResponse extends Flashcard {
   session?: ReviewSession | undefined
 }
 
+export interface FlashcardBulkUpdateRequest {
+  requests: { id: number; flashcard: Flashcard }[]
+}
+
+export interface FlashcardBulkUpdateResponse {
+  flashcards: Flashcard[]
+}
+
 export interface FlashcardSetSuspendResponse {
   flashcardSet: FlashcardSet
   currDay: Chronoday

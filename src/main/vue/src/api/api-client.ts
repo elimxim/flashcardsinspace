@@ -5,6 +5,8 @@ import {
   ChronoSyncRequest,
   ChronoSyncResponse,
   ChronoUpdateResponse,
+  FlashcardBulkUpdateRequest,
+  FlashcardBulkUpdateResponse,
   FlashcardCreationResponse,
   FlashcardSetSuspendResponse,
   FlashcardUpdateRequest,
@@ -129,6 +131,26 @@ export async function sendFlashcardUpdateRequestWithinSession(
     request,
     { params: { sessionId: sessionId } },
   )
+}
+
+/** One transaction: either every flashcard is updated or none is. */
+export async function sendFlashcardBulkUpdateRequest(setId: number, flashcards: Flashcard[]) {
+  const request: FlashcardBulkUpdateRequest = {
+    requests: flashcards.map((flashcard) => ({ id: flashcard.id, flashcard })),
+  }
+  Log.log(LogTag.PUT, `/flashcard-sets/${setId}/flashcards/bulk`)
+  return apiClient.put<FlashcardBulkUpdateResponse>(
+    `/flashcard-sets/${setId}/flashcards/bulk`,
+    request,
+  )
+}
+
+/** One transaction: either every flashcard is removed or none is. */
+export async function sendFlashcardBulkRemovalRequest(setId: number, ids: number[]) {
+  Log.log(LogTag.DELETE, `/flashcard-sets/${setId}/flashcards/bulk`)
+  return apiClient.delete(`/flashcard-sets/${setId}/flashcards/bulk`, {
+    params: { ids: ids.join(',') },
+  })
 }
 
 export async function sendFlashcardRemovalRequest(setId: number, id: number) {
