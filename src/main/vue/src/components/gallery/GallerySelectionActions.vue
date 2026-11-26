@@ -178,10 +178,6 @@ async function removeSelected() {
 </script>
 
 <style scoped>
-/*
- * Sliding in and out also grows and shrinks the bar's height (grid rows 0fr <-> 1fr),
- * so the grid above resizes smoothly instead of jumping
- */
 .selection-actions {
   display: grid;
   grid-template-rows: 1fr;
