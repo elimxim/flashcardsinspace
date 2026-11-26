@@ -91,7 +91,7 @@ class FlashcardAudioService(
             existingAudio.mimeType = file.contentType
             existingAudio.audioData = audioData
             existingAudio.audioSize = audioData.size.toLong()
-            existingAudio.uploadedAt = ZonedDateTime.now()
+            existingAudio.lastUpdatedAt = ZonedDateTime.now()
             existingAudio
         } else {
             FlashcardAudio(

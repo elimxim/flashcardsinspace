@@ -121,6 +121,14 @@ fun FlashcardBulkRemovalRequest.escapeJava() = FlashcardBulkRemovalRequest(
     ids = ids?.map { FlashcardBulkRemovalRequest.FlashcardId(it.id?.escapeJava()) },
 )
 
+fun FlashcardPictureThumbnailsRequest.normalize() = FlashcardPictureThumbnailsRequest(
+    ids = ids?.map { FlashcardPictureThumbnailsRequest.FlashcardId(it.id?.normalize()) },
+)
+
+fun FlashcardPictureThumbnailsRequest.escapeJava() = FlashcardPictureThumbnailsRequest(
+    ids = ids?.map { FlashcardPictureThumbnailsRequest.FlashcardId(it.id?.escapeJava()) },
+)
+
 fun FlashcardSetCreationRequest.normalize() = FlashcardSetCreationRequest(
     name = name?.normalize(),
     languageId = languageId?.normalize(),

@@ -6,6 +6,7 @@ import com.github.elimxim.flashcardsinspace.entity.FlashcardStage
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardAudioRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardPictureRepository
+import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardPictureThumbnailRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardBulkRemovalRequest
@@ -35,6 +36,7 @@ class FlashcardServiceTest {
     private val flashcardRepository = mockk<FlashcardRepository>(relaxed = true)
     private val flashcardAudioRepository = mockk<FlashcardAudioRepository>(relaxed = true)
     private val flashcardPictureRepository = mockk<FlashcardPictureRepository>(relaxed = true)
+    private val flashcardPictureThumbnailRepository = mockk<FlashcardPictureThumbnailRepository>(relaxed = true)
     private val requestValidator = mockk<RequestValidator>()
 
     private val service = FlashcardService(
@@ -42,6 +44,7 @@ class FlashcardServiceTest {
         flashcardRepository = flashcardRepository,
         flashcardAudioRepository = flashcardAudioRepository,
         flashcardPictureRepository = flashcardPictureRepository,
+        flashcardPictureThumbnailRepository = flashcardPictureThumbnailRepository,
         requestValidator = requestValidator,
         flashcardAddService = mockk(),
         reviewSessionService = mockk(),
@@ -149,6 +152,7 @@ class FlashcardServiceTest {
 
             verify { flashcardAudioRepository.deleteByFlashcardIdIn(match { it.toSet() == setOf(10L, 11L) }) }
             verify { flashcardPictureRepository.deleteByFlashcardIdIn(match { it.toSet() == setOf(10L, 11L) }) }
+            verify { flashcardPictureThumbnailRepository.deleteByFlashcardIdIn(match { it.toSet() == setOf(10L, 11L) }) }
             verify { flashcardRepository.deleteAll(match<Iterable<Flashcard>> { it.toSet() == flashcards.toSet() }) }
         }
 
@@ -184,6 +188,7 @@ class FlashcardServiceTest {
         private fun verifyNothingRemoved() {
             verify(exactly = 0) { flashcardAudioRepository.deleteByFlashcardIdIn(any()) }
             verify(exactly = 0) { flashcardPictureRepository.deleteByFlashcardIdIn(any()) }
+            verify(exactly = 0) { flashcardPictureThumbnailRepository.deleteByFlashcardIdIn(any()) }
             verify(exactly = 0) { flashcardRepository.deleteAll(any<Iterable<Flashcard>>()) }
         }
     }

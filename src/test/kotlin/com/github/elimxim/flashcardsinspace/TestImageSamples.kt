@@ -1,4 +1,4 @@
-package com.github.elimxim.flashcardsinspace.service
+package com.github.elimxim.flashcardsinspace
 
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -6,11 +6,7 @@ import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 import javax.imageio.ImageIO
 
-/**
- * Runtime image-generation helper for tests.
- */
-object TestImages {
-
+object TestImageSamples {
     fun webp(width: Int = 8, height: Int = 6): ByteArray {
         val img = solidImage(width, height)
         val baos = ByteArrayOutputStream()

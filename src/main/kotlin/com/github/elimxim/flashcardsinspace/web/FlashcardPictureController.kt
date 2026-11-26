@@ -8,11 +8,18 @@ import com.github.elimxim.flashcardsinspace.service.FlashcardPictureService
 import com.github.elimxim.flashcardsinspace.util.withLoggingContext
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardPictureDto
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardPictureMetadataDto
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardPictureThumbnailsRequest
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.http.ContentDisposition
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
 import org.springframework.web.multipart.MultipartFile
 
 @Controller
@@ -27,6 +34,32 @@ class FlashcardPictureController(
     ): ResponseEntity<List<FlashcardPictureMetadataDto>> = withLoggingContext(user) {
         val result = flashcardPictureService.getMetadata(user, setId)
         return ResponseEntity.ok(result)
+    }
+
+    @GetMapping("/pictures/thumbnails")
+    fun getThumbnails(
+        @AuthenticationPrincipal user: User,
+        @PathVariable setId: Long,
+        @RequestParam side: String,
+        @RequestParam(name = "ids", required = false) ids: List<String>?,
+    ): ResponseEntity<MultiValueMap<String, HttpEntity<*>>> = withLoggingContext(user) {
+        val request = FlashcardPictureThumbnailsRequest(ids = ids?.map { FlashcardPictureThumbnailsRequest.FlashcardId(it) })
+        val thumbnails = flashcardPictureService.getThumbnails(user, setId, side.normalize().escapeJava(), request.normalize())
+        if (thumbnails.isEmpty()) {
+            return ResponseEntity.noContent().build()
+        }
+        val parts = LinkedMultiValueMap<String, HttpEntity<*>>()
+        thumbnails.forEach { (flashcardId, data) ->
+            val headers = HttpHeaders().apply {
+                contentType = MediaType.parseMediaType("image/webp")
+                contentDisposition = ContentDisposition.formData()
+                    .name(flashcardId.toString())
+                    .filename("$flashcardId.webp")
+                    .build()
+            }
+            parts.add(flashcardId.toString(), HttpEntity(ByteArrayResource(data), headers))
+        }
+        return ResponseEntity.ok().contentType(MediaType.MULTIPART_FORM_DATA).body(parts)
     }
 
     @PostMapping("/flashcards/{flashcardId:\\d+}/picture", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])

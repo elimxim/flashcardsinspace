@@ -103,6 +103,17 @@ class RequestValidator(private val validator: Validator) {
         return request.toValidRequest()
     }
 
+    fun validate(request: FlashcardPictureThumbnailsRequest): ValidFlashcardPictureThumbnailsRequest {
+        validateRequest<FlashcardPictureThumbnailsRequest>(request) { violations ->
+            throw HttpInvalidRequestFieldsException(
+                fields(violations),
+                "Request is invalid ${request.escapeJava()}, violations: $violations",
+            )
+        }
+
+        return request.toValidRequest()
+    }
+
     fun validate(request: FlashcardSetCreationRequest): ValidFlashcardSetCreationRequest {
         validateRequest<FlashcardSetCreationRequest>(request) { violations ->
             throw HttpInvalidRequestFieldsException(
@@ -295,6 +306,10 @@ fun FlashcardBulkUpdateRequest.toValidRequest() = ValidFlashcardBulkUpdateReques
 )
 
 fun FlashcardBulkRemovalRequest.toValidRequest() = ValidFlashcardBulkRemovalRequest(
+    ids = ids!!.map { it.id!!.toLong() }.distinct(),
+)
+
+fun FlashcardPictureThumbnailsRequest.toValidRequest() = ValidFlashcardPictureThumbnailsRequest(
     ids = ids!!.map { it.id!!.toLong() }.distinct(),
 )
 

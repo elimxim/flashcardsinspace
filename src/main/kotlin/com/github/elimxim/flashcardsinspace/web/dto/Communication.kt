@@ -183,6 +183,24 @@ data class ValidFlashcardBulkRemovalRequest(
     val ids: List<Long>,
 )
 
+class FlashcardPictureThumbnailsRequest(
+    @field:NotNull
+    @field:Size(min = 1, max = MAX_THUMBNAILS_PER_REQUEST)
+    var ids: List<@Valid FlashcardId>? = null,
+) {
+    class FlashcardId(
+        @field:NotNull
+        @field:Pattern(regexp="^\\d+$")
+        var id: String? = null,
+    )
+}
+
+const val MAX_THUMBNAILS_PER_REQUEST = 100
+
+data class ValidFlashcardPictureThumbnailsRequest(
+    val ids: List<Long>,
+)
+
 class FlashcardSetCreationRequest(
     @field:NotNull
     @field:NotBlank

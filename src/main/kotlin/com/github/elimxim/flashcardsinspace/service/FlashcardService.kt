@@ -3,6 +3,7 @@ package com.github.elimxim.flashcardsinspace.service
 import com.github.elimxim.flashcardsinspace.entity.*
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardAudioRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardPictureRepository
+import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardPictureThumbnailRepository
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardRepository
 import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.trimOneLine
@@ -26,6 +27,7 @@ class FlashcardService(
     private val flashcardRepository: FlashcardRepository,
     private val flashcardAudioRepository: FlashcardAudioRepository,
     private val flashcardPictureRepository: FlashcardPictureRepository,
+    private val flashcardPictureThumbnailRepository: FlashcardPictureThumbnailRepository,
     private val requestValidator: RequestValidator,
     private val flashcardAddService: FlashcardAddService,
     private val reviewSessionService: ReviewSessionService,
@@ -189,6 +191,7 @@ class FlashcardService(
     private fun removeEntities(flashcards: Collection<Flashcard>) {
         val ids = flashcards.map { it.id }
         flashcardAudioRepository.deleteByFlashcardIdIn(ids)
+        flashcardPictureThumbnailRepository.deleteByFlashcardIdIn(ids)
         flashcardPictureRepository.deleteByFlashcardIdIn(ids)
         flashcardRepository.deleteAll(flashcards)
     }
@@ -205,7 +208,7 @@ class FlashcardService(
         if (missingIds.isNotEmpty()) {
             throw HttpNotFoundException(ApiErrorCode.FLA404, "Flashcards with ids $missingIds not found")
         }
-        flashcards.values.forEach { verifyUserOperation(user, setId, it) }
+        flashcards.values.forEach { this.verifyUserOperation(user, setId, it) }
         return flashcards
     }
 

@@ -36,6 +36,9 @@ open class FlashcardPicture(
     @Column(nullable = false)
     open var uploadedAt: ZonedDateTime,
 
+    @Column(nullable = true)
+    open var lastUpdatedAt: ZonedDateTime? = null,
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "flashcard_id", referencedColumnName = "id")
     open var flashcard: Flashcard,
