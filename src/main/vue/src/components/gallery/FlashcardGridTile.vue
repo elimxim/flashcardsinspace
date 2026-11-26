@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { type Flashcard } from '@/model/flashcard.ts'
-import { gridTileTrackerKey } from '@/utils/grid-tile-tracker.ts'
+import { galleryGridTileTrackerKey } from '@/utils/gallery-grid-tile-tracker.ts'
 import { inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 const props = withDefaults(
@@ -44,7 +44,7 @@ const props = withDefaults(
 )
 
 const tile = ref<HTMLElement>()
-const tracker = inject(gridTileTrackerKey, undefined)
+const tracker = inject(galleryGridTileTrackerKey, undefined)
 const pictureUrl = ref<string>()
 
 function revokePictureUrl() {

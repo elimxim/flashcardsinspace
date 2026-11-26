@@ -40,8 +40,11 @@ export interface FlashcardGridSection {
 
 <script setup lang="ts">
 import FlashcardGridTile from '@/components/gallery/FlashcardGridTile.vue'
-import { useGridPictures } from '@/utils/grid-pictures.ts'
-import { gridTileTrackerKey, useGridTileTracker } from '@/utils/grid-tile-tracker.ts'
+import { useGalleryGridPictures } from '@/utils/gallery-grid-pictures.ts'
+import {
+  galleryGridTileTrackerKey,
+  useGalleryGridTileTracker,
+} from '@/utils/gallery-grid-tile-tracker.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import { computed, onMounted, onUnmounted, provide, ref } from 'vue'
 
@@ -71,6 +74,7 @@ const DEFAULT_TILE_WIDTH = 180
 const MIN_TILE_WIDTH = 90
 const MAX_COLUMNS = 12
 const GRID_GAP = 6
+const FIT_SLACK_PX = 0.05
 // a sidebar animates the grid's width; rewrapping the rows on every frame of it
 // makes them jump, so the new width is taken once it settles
 const RESIZE_SETTLE_MS = 150
@@ -95,29 +99,23 @@ function fitCards() {
   fittedWidth.value = (width - GRID_GAP * (columns - 1)) / columns
 }
 
-// never wider than the grid, e.g. a single column fitted before the sidebar opened
-const cardWidth = computed(() => Math.min(fittedWidth.value, containerWidth.value))
+const tiles = useGalleryGridTileTracker(scrollArea)
+provide(galleryGridTileTrackerKey, tiles)
 
-// how many cards of that width fit into the grid (epsilon guards float rounding)
-const columns = computed(() => {
-  const card = cardWidth.value
-  if (card <= 0) return 1
-  return Math.max(1, Math.floor((containerWidth.value + GRID_GAP) / (card + GRID_GAP) + 0.001))
-})
-
-const THUMBNAIL_MAX_DIMENSION = 400
-
-const tiles = useGridTileTracker(scrollArea)
-provide(gridTileTrackerKey, tiles)
-
-const pictures = useGridPictures(
+const pictures = useGalleryGridPictures(
   tiles,
   () => props.sections.flatMap((section) => section.flashcards),
-  () => cardWidth.value * window.devicePixelRatio > THUMBNAIL_MAX_DIMENSION,
+  () => Math.min(fittedWidth.value, containerWidth.value),
 )
 
+// The browser puts as many cards of the fitted width into a row as fit, and never makes one
+// wider than the grid (e.g. a single column fitted before a sidebar opened). The slack keeps
+// its own sub-pixel rounding from dropping a column when the cards fit the row exactly.
 const gridStyle = computed(() => ({
-  gridTemplateColumns: `repeat(${columns.value}, ${cardWidth.value}px)`,
+  gridTemplateColumns:
+    fittedWidth.value > 0
+      ? `repeat(auto-fill, min(${fittedWidth.value - FIT_SLACK_PX}px, 100%))`
+      : undefined,
   gap: `${GRID_GAP}px`,
 }))
 

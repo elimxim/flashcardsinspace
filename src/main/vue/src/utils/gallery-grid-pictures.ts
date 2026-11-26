@@ -11,7 +11,7 @@ import {
 import { flashcardSides } from '@/core-logic/flashcard-logic.ts'
 import { isCanceledError } from '@/core-logic/media-error.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
-import { type GridTileTracker } from '@/utils/grid-tile-tracker.ts'
+import { type GalleryGridTileTracker } from '@/utils/gallery-grid-tile-tracker.ts'
 
 // Tiles show their front picture. Thumbnails of the whole grid are loaded up front, a page
 // at a time; once tiles grow past what a thumbnail renders sharply, the tiles near the
@@ -20,16 +20,18 @@ import { type GridTileTracker } from '@/utils/grid-tile-tracker.ts'
 
 const THUMBNAIL_PAGE_SIZE = 50
 const MAX_ORIGINAL_DOWNLOADS = 3
+// the long edge of a thumbnail (made by the server); wider tiles show it blurred
+const THUMBNAIL_MAX_DIMENSION = 400
 
-export interface GridPictures {
+export interface GalleryGridPictures {
   pictureOf(flashcardId: number): Blob | undefined
 }
 
-export function useGridPictures(
-  tiles: GridTileTracker,
+export function useGalleryGridPictures(
+  tiles: GalleryGridTileTracker,
   flashcards: () => Flashcard[],
-  showOriginals: () => boolean,
-): GridPictures {
+  cardWidth: () => number,
+): GalleryGridPictures {
   const flashcardStore = useFlashcardStore()
   const pictureStore = usePictureStore()
   const thumbnailStore = usePictureThumbnailStore()
@@ -37,6 +39,7 @@ export function useGridPictures(
   const front = flashcardSides.FRONT
 
   const setId = () => flashcardStore.flashcardSet?.id
+  const showOriginals = () => cardWidth() * window.devicePixelRatio > THUMBNAIL_MAX_DIMENSION
 
   function hasFrontPicture(flashcardId: number): boolean {
     return pictureStore.loaded && pictureStore.getPictureId(flashcardId, front) !== undefined
@@ -52,7 +55,10 @@ export function useGridPictures(
     const missing = flashcards()
       .map((flashcard) => flashcard.id)
       .filter((id) => hasFrontPicture(id) && thumbnailStore.getThumbnail(id, front) === undefined)
-    return [...missing.filter((id) => tiles.isNear(id)), ...missing.filter((id) => !tiles.isNear(id))]
+    return [
+      ...missing.filter((id) => tiles.isNear(id)),
+      ...missing.filter((id) => !tiles.isNear(id)),
+    ]
   }
 
   // one page at a time until nothing is missing; a failed page stops it until the grid changes

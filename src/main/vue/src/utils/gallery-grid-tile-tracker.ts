@@ -2,7 +2,7 @@ import { type InjectionKey, onMounted, onUnmounted, type Ref, shallowRef } from 
 
 const NEAR_MARGIN = '50% 0px' // how far beyond the visible area a tile counts as near
 
-export interface GridTileTracker {
+export interface GalleryGridTileTracker {
   track(element: Element, flashcardId: number): void
   untrack(element: Element): void
   /** Whether the tile is on the screen or within the near margin; reactive */
@@ -11,9 +11,12 @@ export interface GridTileTracker {
   closestFirst(flashcardIds: number[]): number[]
 }
 
-export const gridTileTrackerKey: InjectionKey<GridTileTracker> = Symbol('gridTileTracker')
+export const galleryGridTileTrackerKey: InjectionKey<GalleryGridTileTracker> =
+  Symbol('galleryGridTileTracker')
 
-export function useGridTileTracker(scrollArea: Ref<HTMLElement | undefined>): GridTileTracker {
+export function useGalleryGridTileTracker(
+  scrollArea: Ref<HTMLElement | undefined>,
+): GalleryGridTileTracker {
   const nearIds = shallowRef(new Set<number>())
   const elementIds = new Map<Element, number>()
   const idElements = new Map<number, Element>()
