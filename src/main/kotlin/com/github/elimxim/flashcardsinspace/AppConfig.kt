@@ -1,7 +1,9 @@
 package com.github.elimxim.flashcardsinspace
 
+import com.github.elimxim.flashcardsinspace.config.CompositeValidator
 import com.github.elimxim.flashcardsinspace.service.mail.MailProperties
-import com.github.elimxim.flashcardsinspace.service.mail.MailPropertiesValidator
+import com.github.elimxim.flashcardsinspace.config.SecurityPropertiesValidator
+import com.github.elimxim.flashcardsinspace.config.MailPropertiesValidator
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.MessageSource
@@ -31,6 +33,9 @@ class AppConfig {
         @JvmStatic
         @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
         fun configurationPropertiesValidator(environment: Environment): Validator =
-            MailPropertiesValidator(environment)
+            CompositeValidator(
+                MailPropertiesValidator(environment),
+                SecurityPropertiesValidator(environment),
+            )
     }
 }
