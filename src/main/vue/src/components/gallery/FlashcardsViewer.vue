@@ -102,6 +102,7 @@ import {
 import { errorResponseData } from '@/core-logic/media-error.ts'
 import { flashcardSides } from '@/core-logic/flashcard-logic.ts'
 import { usePictureCache } from '@/stores/picture-cache.ts'
+import { usePictureThumbnailStore } from '@/stores/picture-thumbnail-store.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 
 const filter = defineModel<GalleryFilter>('filter', { required: true })
@@ -207,7 +208,11 @@ async function loadZoomedMedia(flashcardId: number) {
   mediaController?.abort()
   // refetching the same flashcard keeps showing its current media until the new one arrives
   if (zoomedMediaFlashcardId !== flashcardId) {
-    const frontPicture = usePictureCache().getPicture(flashcardId, flashcardSides.FRONT)
+    // the original if it's cached, otherwise the grid's thumbnail until the original arrives
+    const frontPicture =
+      usePictureCache().getPicture(flashcardId, flashcardSides.FRONT) ??
+      usePictureThumbnailStore().getThumbnail(flashcardId, flashcardSides.FRONT) ??
+      undefined
     zoomedMedia.value = { ...NO_MEDIA, frontPicture }
     zoomedMediaFlashcardId = undefined
   }
@@ -220,7 +225,9 @@ async function loadZoomedMedia(flashcardId: number) {
   // the user closed it or opened another flashcard while this was in flight
   if (controller.signal.aborted || zoomedFlashcard.value?.id !== flashcardId) return
 
-  zoomedMedia.value = media
+  // a failed fetch keeps the front picture already shown (the thumbnail or the cached original)
+  zoomedMedia.value =
+    media.error === undefined ? media : { ...media, frontPicture: zoomedMedia.value.frontPicture }
   zoomedMediaFlashcardId = flashcardId
   if (media.error !== undefined) {
     useSpaceToaster().bakeError(
