@@ -13,17 +13,13 @@ import { useAudioStore } from '@/stores/audio-store.ts'
 import { useAudioCache } from '@/stores/audio-cache.ts'
 import { usePictureStore } from '@/stores/picture-store.ts'
 import { usePictureCache } from '@/stores/picture-cache.ts'
+import { usePictureThumbnailStore } from '@/stores/picture-thumbnail-store.ts'
 
-/**
- * Removes the flashcard on the server, then from every store and cache that knows it
- * (the server removes its audio and pictures along with it). Rejects with the request error.
- */
 export async function removeFlashcard(setId: number, flashcardId: number): Promise<void> {
   await sendFlashcardRemovalRequest(setId, flashcardId)
   forgetFlashcards(setId, [flashcardId])
 }
 
-/** {@link removeFlashcard} for several flashcards at once: all of them are removed or none is. */
 export async function removeFlashcards(setId: number, flashcardIds: number[]): Promise<void> {
   await sendFlashcardBulkRemovalRequest(setId, flashcardIds)
   forgetFlashcards(setId, flashcardIds)
@@ -36,6 +32,7 @@ function forgetFlashcards(setId: number, flashcardIds: number[]) {
   const audioCache = useAudioCache()
   const pictureStore = usePictureStore()
   const pictureCache = usePictureCache()
+  const thumbnailStore = usePictureThumbnailStore()
   for (const flashcardId of flashcardIds) {
     flashcardStore.removeFlashcard(flashcardId)
     flashcardSetStore.decrementFlashcardsNumber(setId)
@@ -44,14 +41,11 @@ function forgetFlashcards(setId: number, flashcardIds: number[]) {
       audioCache.deleteAudio(flashcardId, side)
       pictureStore.removePictureId(flashcardId, side)
       pictureCache.deletePicture(flashcardId, side)
+      thumbnailStore.deleteThumbnail(flashcardId, side)
     }
   }
 }
 
-/**
- * Sends an Outer space flashcard back to S1 on the given day and stores the result.
- * Rejects with the request error.
- */
 export async function moveFlashcardBack(
   setId: number,
   flashcard: Flashcard,
@@ -62,7 +56,6 @@ export async function moveFlashcardBack(
   return response.data
 }
 
-/** {@link moveFlashcardBack} for several flashcards at once: all of them move or none does. */
 export async function moveFlashcardsBack(
   setId: number,
   flashcards: Flashcard[],

@@ -202,10 +202,10 @@ async function removeSelected() {
   transition: transform 0.25s ease;
 }
 
-  .selection-actions-enter-from,
-  .selection-actions-leave-to {
-    grid-template-rows: 0fr;
-  }
+.selection-actions-enter-from,
+.selection-actions-leave-to {
+  grid-template-rows: 0fr;
+}
 
 .selection-actions-enter-from .selection-actions-panel,
 .selection-actions-leave-to .selection-actions-panel {

@@ -100,6 +100,8 @@ import {
   NO_MEDIA,
 } from '@/core-logic/flashcard-media-prefetch.ts'
 import { errorResponseData } from '@/core-logic/media-error.ts'
+import { flashcardSides } from '@/core-logic/flashcard-logic.ts'
+import { usePictureCache } from '@/stores/picture-cache.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
 
 const filter = defineModel<GalleryFilter>('filter', { required: true })
@@ -205,7 +207,8 @@ async function loadZoomedMedia(flashcardId: number) {
   mediaController?.abort()
   // refetching the same flashcard keeps showing its current media until the new one arrives
   if (zoomedMediaFlashcardId !== flashcardId) {
-    zoomedMedia.value = NO_MEDIA
+    const frontPicture = usePictureCache().getPicture(flashcardId, flashcardSides.FRONT)
+    zoomedMedia.value = { ...NO_MEDIA, frontPicture }
     zoomedMediaFlashcardId = undefined
   }
   const setId = flashcardSet.value?.id

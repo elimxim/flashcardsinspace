@@ -274,6 +274,20 @@ export async function sendFlashcardPictureMetadataRequest(setId: number) {
   return apiClient.get<FlashcardPictureMetadata[]>(`/flashcard-sets/${setId}/pictures/metadata`)
 }
 
+export async function sendFlashcardPictureThumbnailsRequest(
+  setId: number,
+  flashcardIds: number[],
+  side: string,
+  signal?: AbortSignal,
+) {
+  Log.log(LogTag.GET, `/flashcard-sets/${setId}/pictures/thumbnails?side=${side}`)
+  return apiClient.get<Blob>(`/flashcard-sets/${setId}/pictures/thumbnails`, {
+    responseType: 'blob',
+    params: { side, ids: flashcardIds.join(',') },
+    signal: signal,
+  })
+}
+
 export async function sendFlashcardPictureUploadRequest(
   setId: number,
   flashcardId: number,

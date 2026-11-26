@@ -14,6 +14,7 @@
           :flashcard="flashcard"
           :selecting="selecting"
           :selected="selectedIdSet.has(flashcard.id)"
+          :picture="pictures.pictureOf(flashcard.id)"
           :on-click="onTileClick"
         />
       </div>
@@ -31,8 +32,9 @@ export interface FlashcardGridSection {
 
 <script setup lang="ts">
 import FlashcardGridTile from '@/components/gallery/FlashcardGridTile.vue'
+import { gridTileTrackerKey, useGridPictures } from '@/utils/grid-pictures.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, provide, ref } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -97,6 +99,16 @@ const columns = computed(() => {
   if (card <= 0) return 1
   return Math.max(1, Math.floor((containerWidth.value + GRID_GAP) / (card + GRID_GAP) + 0.001))
 })
+
+const THUMBNAIL_MAX_DIMENSION = 400
+
+const pictures = useGridPictures(
+  scrollArea,
+  () => props.sections.flatMap((section) => section.flashcards),
+  () => cardWidth.value * window.devicePixelRatio > THUMBNAIL_MAX_DIMENSION,
+)
+
+provide(gridTileTrackerKey, pictures.tracker)
 
 const gridStyle = computed(() => ({
   gridTemplateColumns: `repeat(${columns.value}, ${cardWidth.value}px)`,

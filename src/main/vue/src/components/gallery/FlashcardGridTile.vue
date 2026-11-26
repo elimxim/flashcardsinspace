@@ -1,5 +1,6 @@
 <template>
   <button
+    ref="tile"
     type="button"
     class="grid-tile"
     :class="{
@@ -8,27 +9,66 @@
     }"
     @click="onClick(flashcard)"
   >
-    <span class="grid-tile-text">{{ flashcard.frontSide }}</span>
+    <img
+      v-if="pictureUrl"
+      :src="pictureUrl"
+      class="grid-tile-picture"
+      alt=""
+      draggable="false"
+      decoding="async"
+    />
+    <span v-else class="grid-tile-text">{{ flashcard.frontSide }}</span>
     <font-awesome-icon v-if="selected" icon="fa-solid fa-circle-check" class="grid-tile-check" />
   </button>
 </template>
 
 <script setup lang="ts">
 import { type Flashcard } from '@/model/flashcard.ts'
+import { gridTileTrackerKey } from '@/utils/grid-pictures.ts'
+import { inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     flashcard: Flashcard
     selecting?: boolean
     selected?: boolean
+    picture?: Blob | undefined
     onClick?: (flashcard: Flashcard) => void
   }>(),
   {
     selecting: false,
     selected: false,
+    picture: undefined,
     onClick: () => {},
   },
 )
+
+const tile = ref<HTMLElement>()
+const tracker = inject(gridTileTrackerKey, undefined)
+const pictureUrl = ref<string>()
+
+function revokePictureUrl() {
+  if (pictureUrl.value) URL.revokeObjectURL(pictureUrl.value)
+  pictureUrl.value = undefined
+}
+
+watch(
+  () => props.picture,
+  (picture) => {
+    revokePictureUrl()
+    if (picture) pictureUrl.value = URL.createObjectURL(picture)
+  },
+  { immediate: true },
+)
+
+onMounted(() => {
+  if (tile.value) tracker?.track(tile.value, props.flashcard.id)
+})
+
+onBeforeUnmount(() => {
+  if (tile.value) tracker?.untrack(tile.value)
+  revokePictureUrl()
+})
 </script>
 
 <style scoped>
@@ -64,8 +104,18 @@ withDefaults(
   background: #f5f5f8;
 }
 
-.grid-tile--selected .grid-tile-text {
+.grid-tile--selected .grid-tile-text,
+.grid-tile--selected .grid-tile-picture {
   opacity: 0.7;
+}
+
+.grid-tile-picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
 }
 
 .grid-tile-check {

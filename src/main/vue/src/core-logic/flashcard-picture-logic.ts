@@ -1,10 +1,12 @@
 import type { Flashcard, FlashcardSet } from '@/model/flashcard.ts'
 import { usePictureStore } from '@/stores/picture-store.ts'
 import { usePictureCache } from '@/stores/picture-cache.ts'
+import { usePictureThumbnailStore } from '@/stores/picture-thumbnail-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import {
   sendFlashcardPictureGetRequest,
   sendFlashcardPictureRemovalRequest,
+  sendFlashcardPictureThumbnailsRequest,
   sendFlashcardPictureUploadRequest,
 } from '@/api/api-client.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
@@ -33,10 +35,48 @@ export async function requestFlashcardPictureBlob(
     flashcardSide,
     signal,
   )
+
   if (response.status === 204) return undefined
 
   pictureCache.addPicture(flashcardId, response.data, flashcardSide)
   return response.data
+}
+
+export async function requestFlashcardPictureThumbnails(
+  flashcardSetId: number,
+  flashcardIds: number[],
+  flashcardSide: string,
+  signal?: AbortSignal,
+): Promise<void> {
+  const thumbnailStore = usePictureThumbnailStore()
+  const response = await sendFlashcardPictureThumbnailsRequest(
+    flashcardSetId,
+    flashcardIds,
+    flashcardSide,
+    signal,
+  )
+
+  const thumbnails = new Map<number, Blob>()
+
+  if (response.status !== 204) {
+    const body = new Response(response.data, {
+      headers: { 'Content-Type': String(response.headers['content-type']) },
+    })
+    const parts = await body.formData()
+    parts.forEach((part, name) => {
+      if (part instanceof Blob) thumbnails.set(Number(name), part)
+    })
+  }
+
+  thumbnailStore.switchSet(flashcardSetId)
+  flashcardIds.forEach((flashcardId) =>
+    thumbnailStore.setThumbnail(flashcardId, flashcardSide, thumbnails.get(flashcardId) ?? null),
+  )
+
+  Log.log(
+    LogTag.LOGIC,
+    `Received ${thumbnails.size} of ${flashcardIds.length} picture thumbnails for FlashcardSet.id=${flashcardSetId}`,
+  )
 }
 
 export async function uploadFlashcardPictureBlob(
@@ -47,6 +87,7 @@ export async function uploadFlashcardPictureBlob(
 ): Promise<boolean> {
   const pictureStore = usePictureStore()
   const pictureCache = usePictureCache()
+  const thumbnailStore = usePictureThumbnailStore()
   const toaster = useSpaceToaster()
 
   Log.log(
@@ -67,6 +108,7 @@ export async function uploadFlashcardPictureBlob(
       )
       pictureStore.setPictureId(flashcard.id, flashcardSide, response.data.id)
       pictureCache.addPicture(flashcard.id, pictureBlob, flashcardSide)
+      thumbnailStore.deleteThumbnail(flashcard.id, flashcardSide)
       return true
     })
     .catch((error) => {
@@ -88,6 +130,7 @@ export async function removeFlashcardPictureBlob(
 ): Promise<boolean> {
   const pictureStore = usePictureStore()
   const pictureCache = usePictureCache()
+  const thumbnailStore = usePictureThumbnailStore()
   const toaster = useSpaceToaster()
 
   return await sendFlashcardPictureRemovalRequest(flashcardSet.id, flashcard.id, pictureId)
@@ -95,6 +138,7 @@ export async function removeFlashcardPictureBlob(
       Log.log(LogTag.LOGIC, `Picture.id=${pictureId} removed`)
       pictureStore.removePictureId(flashcard.id, flashcardSide)
       pictureCache.deletePicture(flashcard.id, flashcardSide)
+      thumbnailStore.deleteThumbnail(flashcard.id, flashcardSide)
       return true
     })
     .catch((error) => {
