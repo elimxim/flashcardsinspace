@@ -20,6 +20,7 @@
           :text="frontSide"
           :audio="frontSideAudio"
           :picture="frontSidePicture"
+          :fill-picture="fillPictures"
           :text-only="textOnly"
           :viewed-times="viewedTimes"
           :on-edit="handleEdit"
@@ -41,6 +42,7 @@
           :text="backSide"
           :audio="backSideAudio"
           :picture="backSidePicture"
+          :fill-picture="fillPictures"
           :text-only="textOnly"
           :viewed-times="viewedTimes"
           :on-edit="handleEdit"
@@ -67,6 +69,7 @@ const props = withDefaults(
     backSide?: string | undefined
     backSideAudio?: Blob | undefined
     backSidePicture?: Blob | undefined
+    fillPictures?: boolean
     viewedTimes?: number
     textOnly?: boolean
     unflippable?: boolean
@@ -81,6 +84,7 @@ const props = withDefaults(
     backSide: undefined,
     backSideAudio: undefined,
     backSidePicture: undefined,
+    fillPictures: false,
     viewedTimes: undefined,
     textOnly: false,
     unflippable: false,

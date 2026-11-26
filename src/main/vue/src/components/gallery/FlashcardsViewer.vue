@@ -52,6 +52,7 @@
           :front-side-picture="zoomedMedia.frontPicture"
           :back-side-picture="zoomedMedia.backPicture"
           :viewed-times="zoomedFlashcard.timesReviewed"
+          fill-pictures
           :on-edit="openEdit"
         />
       </div>
@@ -67,7 +68,6 @@
 
 <script lang="ts">
 export interface GalleryFilter {
-  /** Only selected flashcards, on top of the category filter below */
   selected: boolean
   unknown: boolean
   attempted: boolean
@@ -337,7 +337,7 @@ onUnmounted(() => {
 }
 
 .viewer-zoomed-card {
-  width: clamp(200px, 90vw, 600px);
-  height: clamp(290px, 50vh, 450px);
+  width: clamp(200px, 90vw, 720px);
+  height: clamp(290px, 75vh, 540px);
 }
 </style>
