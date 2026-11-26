@@ -9,8 +9,6 @@ export interface WidgetSizing {
   colSpans: number[]
   /** Allowed row spans, the first one is the preferred size */
   rowSpans: number[]
-  /** Column spans narrower than this (px) are not allowed */
-  minWidth?: number
   /** How many positions earlier than given it may go, when that closes a gap (default 0) */
   maxMoveUp?: number
 }
@@ -240,11 +238,6 @@ export interface GridMetrics {
   minCellWidth: number
   gap: number
   /**
-   * Grid tracks per cell: spans are counted in tracks, so with 3 a widget can
-   * also be 2/3 or 4/3 of a cell wide
-   */
-  tracksPerCell: number
-  /**
    * How much wider than at the most cells that fit the cells may become when
    * falling back to fewer cells to avoid holes, e.g. 1.3 for 30%
    */
@@ -256,45 +249,25 @@ export function maxCells(width: number, minCellWidth: number, gap: number): numb
   return Math.max(1, Math.floor((width + gap) / (minCellWidth + gap)))
 }
 
-/** Px width of a span of tracks, gaps between them included */
-function spanWidth(span: number, trackWidth: number, gap: number): number {
-  return span * trackWidth + (span - 1) * gap
-}
-
-/** Drops the column spans narrower than the widget's minWidth, keeping the widest one at least */
-function withinMinWidth(widget: WidgetSizing, trackWidth: number, gap: number): WidgetSizing {
-  const { minWidth } = widget
-  if (minWidth === undefined) return widget
-  const colSpans = widget.colSpans.filter((span) => spanWidth(span, trackWidth, gap) >= minWidth)
-  return {
-    ...widget,
-    colSpans: colSpans.length > 0 ? colSpans : [Math.max(...widget.colSpans)],
-  }
-}
-
 /**
  * Packs the widgets into the most cells per row that fit and leave no holes;
  * fewer cells just make them wider, up to maxCellGrowth. Past that, holes are
  * preferred over bigger widgets and the layout with the fewest holes wins.
- * The layout's cols are tracks.
  */
 export function layoutWidgets(
   widgets: WidgetSizing[],
   width: number,
   metrics: GridMetrics,
 ): GridLayout {
-  const { minCellWidth, gap, tracksPerCell, maxCellGrowth } = metrics
+  const { minCellWidth, gap, maxCellGrowth } = metrics
   const cellWidth = (cells: number) => (width - (cells - 1) * gap) / cells
   const most = maxCells(width, minCellWidth, gap)
   let best: GridLayout | null = null
   for (let cells = most; cells >= 1; cells--) {
     if (cells < most && cellWidth(cells) > cellWidth(most) * maxCellGrowth) break
-    const tracks = cells * tracksPerCell
-    const trackWidth = (width - (tracks - 1) * gap) / tracks
-    const allowed = widgets.map((widget) => withinMinWidth(widget, trackWidth, gap))
-    const layout = packWidgets(allowed, tracks)
+    const layout = packWidgets(widgets, cells)
     if (layout.holes === 0) return layout
     if (!best || hasFewerHoles(layout, best)) best = layout
   }
-  return best ?? packWidgets(widgets, tracksPerCell)
+  return best ?? packWidgets(widgets, 1)
 }

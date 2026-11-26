@@ -47,7 +47,6 @@ const GRID_METRICS: GridMetrics = {
   // Lets a 360px phone fit 3 cells
   minCellWidth: 104,
   gap: 12,
-  tracksPerCell: 1,
   // Going from 3 cells to 2 always takes more than 1.5 (1.5 * (w - 12) / (w - 24)),
   // so phones keep 3 cells while desktops may fall back far enough to fill the rows
   maxCellGrowth: 1.5,
@@ -56,7 +55,6 @@ const GRID_METRICS: GridMetrics = {
 /** Read by the CSS below via v-bind() */
 const minCellCss = `${GRID_METRICS.minCellWidth}px`
 const gapCss = `${GRID_METRICS.gap}px`
-const tracksPerCellCss = GRID_METRICS.tracksPerCell
 
 const SQUARE = { colSpans: [1], rowSpans: [1] }
 const STRETCHING_SQUARE = { colSpans: [1, 2], rowSpans: [1] }
@@ -75,7 +73,6 @@ interface Widget {
   component: Component
   colSpans: number[]
   rowSpans: number[]
-  minWidth?: number
   maxMoveUp?: number
   props?: Record<string, unknown>
   hidden: ComputedRef<boolean>
@@ -154,11 +151,10 @@ const visibleWidgets = computed(() => widgets.filter((widget) => !widget.hidden.
 
 const computedLayout = computed<GridLayout>(() => {
   const sizings: WidgetSizing[] = visibleWidgets.value.map(
-    ({ id, colSpans, rowSpans, minWidth, maxMoveUp }) => ({
+    ({ id, colSpans, rowSpans, maxMoveUp }) => ({
       id,
       colSpans,
       rowSpans,
-      minWidth,
       maxMoveUp,
     }),
   )
@@ -221,18 +217,13 @@ onUnmounted(() => {
   --main-panel--min-cell: v-bind(minCellCss);
   --main-panel--max-row: 124px;
   --main-panel--gap: v-bind(gapCss);
-  --main-panel--tracks-per-cell: v-bind(tracksPerCellCss);
   container-type: inline-size;
   border-radius: 4px;
 }
 
 .main-panel-grid {
-  --main-panel--track-width: calc(
-    (100cqw - (var(--main-panel--tracks) - 1) * var(--main-panel--gap)) / var(--main-panel--tracks)
-  );
   --main-panel--cell-width: calc(
-    var(--main-panel--tracks-per-cell) * var(--main-panel--track-width) +
-      (var(--main-panel--tracks-per-cell) - 1) * var(--main-panel--gap)
+    (100cqw - (var(--main-panel--tracks) - 1) * var(--main-panel--gap)) / var(--main-panel--tracks)
   );
   display: grid;
   grid-template-columns: repeat(var(--main-panel--tracks), minmax(0, 1fr));
