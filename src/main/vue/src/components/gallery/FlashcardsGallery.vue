@@ -23,6 +23,7 @@
         </template>
         <template #right>
           <AwesomeButton
+            ref="exitButton"
             icon="fa-solid fa-circle-xmark"
             class="control-bar-button"
             tooltip="Leave the gallery"
@@ -43,8 +44,9 @@ import GalleryFilterSideBar from '@/components/gallery/GalleryFilterSideBar.vue'
 import FlashcardsViewer, { type GalleryFilter } from '@/components/gallery/FlashcardsViewer.vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useChronoStore } from '@/stores/chrono-store.ts'
+import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { gallerySidebarExpandedCookie } from '@/utils/cookies-ref.ts'
 import { routeNames } from '@/router'
@@ -91,6 +93,23 @@ const counts = computed(() => {
 async function exit() {
   await router.push({ name: routeNames.controlPanel })
 }
+
+const exitButton = ref<InstanceType<typeof AwesomeButton>>()
+const toggleStore = useToggleStore()
+
+function onKeydown(event: KeyboardEvent) {
+  if (event.key !== 'Escape' || toggleStore.isAnyModalOpen()) return
+  event.stopPropagation()
+  exitButton.value?.press()
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', onKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', onKeydown)
+})
 </script>
 
 <style scoped>

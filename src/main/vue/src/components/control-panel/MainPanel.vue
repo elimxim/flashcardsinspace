@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import GalleryWidget from '@/components/control-panel/widgets/GalleryWidget.vue'
 import FlashcardWidget from '@/components/control-panel/widgets/FlashcardWidget.vue'
 import CalendarWidget from '@/components/control-panel/widgets/CalendarWidget.vue'
 import ReviewInfoWidget from '@/components/control-panel/widgets/ReviewInfoWidget.vue'
@@ -82,6 +83,12 @@ interface Widget {
 
 /** In display order */
 const widgets: Widget[] = [
+  {
+    id: 'gallery',
+    component: GalleryWidget,
+    ...SQUARE,
+    hidden: computed(() => false),
+  },
   {
     id: 'unknown',
     component: SpecialStageWidget,
