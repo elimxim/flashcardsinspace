@@ -132,6 +132,12 @@ export const usePictureCache = defineStore('picture-cache', () => {
     return side === flashcardSides.FRONT ? entry.frontPicture : entry.backPicture
   }
 
+  /** Reads without touching the eviction order or logging, so it can be used in a render */
+  function peekPicture(flashcardId: number, side: string): Blob | undefined {
+    const entry = pictureMap.value.get(flashcardId)
+    return side === flashcardSides.FRONT ? entry?.frontPicture : entry?.backPicture
+  }
+
   function deletePicture(flashcardId: number, side: string): boolean {
     Log.log(LogTag.STORE, `picture-cache.deletePicture: Flashcard.id=${flashcardId}, side=${side}`)
 
@@ -173,6 +179,7 @@ export const usePictureCache = defineStore('picture-cache', () => {
     storagePercentage,
     addPicture,
     getPicture,
+    peekPicture,
     deletePicture,
     $reset,
   }

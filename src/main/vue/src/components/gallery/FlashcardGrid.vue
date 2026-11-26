@@ -1,5 +1,13 @@
 <template>
-  <div ref="scrollArea" class="grid-scroll scrollbar-hidden">
+  <div
+    ref="scrollArea"
+    class="grid-scroll scrollbar-hidden"
+    @touchstart.passive="onTouchStart"
+    @touchmove="onTouchMove"
+    @touchend.passive="onTouchEnd"
+    @touchcancel.passive="onTouchEnd"
+    @wheel="onWheel"
+  >
     <slot v-if="sections.length === 0" name="empty" />
     <section v-for="section in sections" v-else :key="section.key" class="grid-section">
       <div class="grid-section-header">
@@ -32,7 +40,8 @@ export interface FlashcardGridSection {
 
 <script setup lang="ts">
 import FlashcardGridTile from '@/components/gallery/FlashcardGridTile.vue'
-import { gridTileTrackerKey, useGridPictures } from '@/utils/grid-pictures.ts'
+import { useGridPictures } from '@/utils/grid-pictures.ts'
+import { gridTileTrackerKey, useGridTileTracker } from '@/utils/grid-tile-tracker.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import { computed, onMounted, onUnmounted, provide, ref } from 'vue'
 
@@ -70,22 +79,18 @@ const scrollArea = ref<HTMLElement>()
 const containerWidth = ref(0)
 const tileWidth = ref(DEFAULT_TILE_WIDTH)
 const fittedWidth = ref(0)
-let scrollPaddingX = 0
+// the window width the cards were last fitted at
+let fittedWindowWidth = 0
 let resizeTimeout: ReturnType<typeof setTimeout> | undefined
-let windowResizeTimeout: ReturnType<typeof setTimeout> | undefined
 
 function maxColumns(width: number): number {
   return Math.max(1, Math.min(MAX_COLUMNS, Math.floor(width / MIN_TILE_WIDTH)))
 }
 
-function gridWidth(): number {
-  const el = scrollArea.value
-  return el ? Math.max(0, el.clientWidth - scrollPaddingX) : 0
-}
-
 function fitCards() {
   const width = containerWidth.value
   if (width <= 0) return
+  fittedWindowWidth = window.innerWidth
   const columns = Math.min(maxColumns(width), Math.max(1, Math.round(width / tileWidth.value)))
   fittedWidth.value = (width - GRID_GAP * (columns - 1)) / columns
 }
@@ -102,13 +107,14 @@ const columns = computed(() => {
 
 const THUMBNAIL_MAX_DIMENSION = 400
 
+const tiles = useGridTileTracker(scrollArea)
+provide(gridTileTrackerKey, tiles)
+
 const pictures = useGridPictures(
-  scrollArea,
+  tiles,
   () => props.sections.flatMap((section) => section.flashcards),
   () => cardWidth.value * window.devicePixelRatio > THUMBNAIL_MAX_DIMENSION,
 )
-
-provide(gridTileTrackerKey, pictures.tracker)
 
 const gridStyle = computed(() => ({
   gridTemplateColumns: `repeat(${columns.value}, ${cardWidth.value}px)`,
@@ -159,49 +165,29 @@ function onWheel(event: WheelEvent) {
   zoomTo(tileWidth.value * Math.exp(-event.deltaY * 0.01))
 }
 
-// a sidebar keeps the cards' size, the rows just rewrap
-const resizeObserver = new ResizeObserver(() => {
+// A new window size (or a rotated phone) refits the cards to the grid; a sidebar keeps
+// their size and the rows just rewrap. The first width is taken at once, so the grid
+// doesn't start out unfitted.
+const resizeObserver = new ResizeObserver(([entry]) => {
+  const apply = () => {
+    containerWidth.value = entry.contentRect.width
+    if (window.innerWidth !== fittedWindowWidth) fitCards()
+  }
   clearTimeout(resizeTimeout)
-  resizeTimeout = setTimeout(() => (containerWidth.value = gridWidth()), RESIZE_SETTLE_MS)
+  if (containerWidth.value <= 0) {
+    apply()
+  } else {
+    resizeTimeout = setTimeout(apply, RESIZE_SETTLE_MS)
+  }
 })
 
-// a new window size (or a rotated phone) refits the cards to the grid
-function onWindowResize() {
-  clearTimeout(windowResizeTimeout)
-  windowResizeTimeout = setTimeout(() => {
-    containerWidth.value = gridWidth()
-    fitCards()
-  }, RESIZE_SETTLE_MS)
-}
-
 onMounted(() => {
-  const el = scrollArea.value
-  if (!el) return
-  const style = getComputedStyle(el)
-  scrollPaddingX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight)
-  containerWidth.value = gridWidth()
-  fitCards()
-  window.addEventListener('resize', onWindowResize)
-  resizeObserver.observe(el)
-  el.addEventListener('touchstart', onTouchStart, { passive: true })
-  el.addEventListener('touchmove', onTouchMove, { passive: false })
-  el.addEventListener('touchend', onTouchEnd, { passive: true })
-  el.addEventListener('touchcancel', onTouchEnd, { passive: true })
-  el.addEventListener('wheel', onWheel, { passive: false })
+  if (scrollArea.value) resizeObserver.observe(scrollArea.value)
 })
 
 onUnmounted(() => {
   clearTimeout(resizeTimeout)
-  clearTimeout(windowResizeTimeout)
-  window.removeEventListener('resize', onWindowResize)
   resizeObserver.disconnect()
-  const el = scrollArea.value
-  if (!el) return
-  el.removeEventListener('touchstart', onTouchStart)
-  el.removeEventListener('touchmove', onTouchMove)
-  el.removeEventListener('touchend', onTouchEnd)
-  el.removeEventListener('touchcancel', onTouchEnd)
-  el.removeEventListener('wheel', onWheel)
 })
 </script>
 

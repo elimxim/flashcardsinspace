@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { type Flashcard } from '@/model/flashcard.ts'
-import { gridTileTrackerKey } from '@/utils/grid-pictures.ts'
+import { gridTileTrackerKey } from '@/utils/grid-tile-tracker.ts'
 import { inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 const props = withDefaults(

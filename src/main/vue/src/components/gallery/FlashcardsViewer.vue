@@ -213,6 +213,7 @@ async function loadZoomedMedia(flashcardId: number) {
       usePictureCache().getPicture(flashcardId, flashcardSides.FRONT) ??
       usePictureThumbnailStore().getThumbnail(flashcardId, flashcardSides.FRONT) ??
       undefined
+
     zoomedMedia.value = { ...NO_MEDIA, frontPicture }
     zoomedMediaFlashcardId = undefined
   }
@@ -228,7 +229,9 @@ async function loadZoomedMedia(flashcardId: number) {
   // a failed fetch keeps the front picture already shown (the thumbnail or the cached original)
   zoomedMedia.value =
     media.error === undefined ? media : { ...media, frontPicture: zoomedMedia.value.frontPicture }
+
   zoomedMediaFlashcardId = flashcardId
+
   if (media.error !== undefined) {
     useSpaceToaster().bakeError(
       userApiErrors.MEDIA__FETCHING_FAILED,
