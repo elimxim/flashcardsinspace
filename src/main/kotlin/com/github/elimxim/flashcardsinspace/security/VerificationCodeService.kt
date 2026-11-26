@@ -89,7 +89,12 @@ class VerificationCodeService(
     }
 
     @Transactional
-    fun send(user: User, email: String, type: VerificationType, response: HttpServletResponse): VerificationIntentResponse =
+    fun send(
+        user: User,
+        email: String,
+        type: VerificationType,
+        response: HttpServletResponse
+    ): VerificationIntentResponse =
         withLoggingContext(user) {
             if (!mailProperties.enabled) {
                 log.info("Mail sending is disabled, completing verification without a code, type: $type")
@@ -123,7 +128,7 @@ class VerificationCodeService(
 
                 verificationIntentRepository.save(verificationIntent)
                 log.info("Verification intent created, email: ${maskSecret(email)}, type: $type")
-                addVerificationTokenCookie(response, token, tokenProperties.maxAge)
+                addVerificationTokenCookie(response, token, tokenProperties.maxAge, securityProperties.secureCookies)
 
                 try {
                     emailService.sendVerificationIntentEmail(
@@ -155,7 +160,7 @@ class VerificationCodeService(
             is LookupResult.Success -> result.verificationIntent
             is LookupResult.Failure -> {
                 if (result.verificationResult == VerificationResult.EXPIRED) {
-                    clearVerificationTokenCookie(response)
+                    clearVerificationTokenCookie(response, securityProperties.secureCookies)
                 }
 
                 return VerificationIntentResponse(result.verificationResult.name, result.type?.name)
@@ -185,7 +190,7 @@ class VerificationCodeService(
 
             markAsUsed(intent)
             log.info("Verification code is correct, email: $secretEmail, type: ${intent.type}")
-            clearVerificationTokenCookie(response)
+            clearVerificationTokenCookie(response, securityProperties.secureCookies)
             completeVerification(intent.user, intent.email, intent.type, response)
             return VerificationIntentResponse(VerificationResult.SUCCESS.name)
         }
@@ -205,7 +210,7 @@ class VerificationCodeService(
 
             is LookupResult.Failure -> {
                 if (result.verificationResult == VerificationResult.EXPIRED) {
-                    clearVerificationTokenCookie(response)
+                    clearVerificationTokenCookie(response, securityProperties.secureCookies)
                 }
 
                 VerificationIntentResponse(result.verificationResult.name, result.type?.name)
@@ -309,7 +314,7 @@ class VerificationCodeService(
         )
 
         verificationIntentRepository.save(accessIntent)
-        addPasswordResetTokenCookie(response, token, tokenProperties.maxAge)
+        addPasswordResetTokenCookie(response, token, tokenProperties.maxAge, securityProperties.secureCookies)
         log.info("Password reset token generated, user: ${user.id}")
     }
 
