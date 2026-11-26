@@ -148,7 +148,7 @@ describe('maxCells', () => {
 })
 
 describe('layoutWidgets', () => {
-  const metrics = { minCellWidth: 106, gap: 12, tracksPerCell: 1, maxCellGrowth: Infinity }
+  const metrics = { minCellWidth: 106, gap: 12, maxCellGrowth: Infinity }
 
   const sevenSquares = ['A', 'B', 'C', 'D', 'E', 'F', 'G'].map(square)
   const eightCells = 8 * 106 + 7 * 12
@@ -168,21 +168,5 @@ describe('layoutWidgets', () => {
     const layout = layoutWidgets([square('A'), square('B'), square('C')], 224, metrics)
     expect(layout.cols).toBe(1)
     expect(layout.holes).toBe(0)
-  })
-
-  describe('with tracks finer than cells', () => {
-    const tracked = { minCellWidth: 106, gap: 12, tracksPerCell: 3, maxCellGrowth: 2 }
-    const widgets: WidgetSizing[] = [
-      { id: 'D', colSpans: [3, 6, 2], rowSpans: [1], minWidth: 90 },
-      { id: 'R', colSpans: [6, 4], rowSpans: [1], minWidth: 200 },
-    ]
-
-    it('shares a row in partial cells when they are wide enough', () => {
-      expect(draw(layoutWidgets(widgets, 335, tracked))).toEqual(['DDRRRR'])
-    })
-
-    it('keeps whole cells when partial ones would be narrower than minWidth', () => {
-      expect(draw(layoutWidgets(widgets, 300, tracked))).toEqual(['DDDDDD', 'RRRRRR'])
-    })
   })
 })
