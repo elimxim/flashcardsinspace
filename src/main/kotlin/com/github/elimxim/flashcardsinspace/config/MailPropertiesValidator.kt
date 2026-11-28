@@ -11,7 +11,8 @@ class MailPropertiesValidator(private val environment: Environment) : Validator 
 
     override fun validate(target: Any, errors: Errors) {
         val properties = target as MailProperties
-        if (!properties.enabled && !environment.matchesProfiles("dev")) {
+        if (environment.matchesProfiles("dev", "test")) return
+        if (!properties.enabled) {
             errors.rejectValue(
                 "enabled",
                 "mail.disabledOutsideDev",

@@ -59,6 +59,45 @@ class SecurityPropertiesValidatorTest {
     }
 
     @Test
+    fun `should pass if security is disabled with the dev profile`() {
+        val environment = MockEnvironment().apply { setActiveProfiles("dev") }
+
+        val errors = validate(securityProperties(enabled = false), environment)
+
+        assertThat(errors.hasErrors()).isFalse()
+    }
+
+    @Test
+    fun `should pass if security is disabled with the test profile`() {
+        val environment = MockEnvironment().apply { setActiveProfiles("test") }
+
+        val errors = validate(securityProperties(enabled = false), environment)
+
+        assertThat(errors.hasErrors()).isFalse()
+    }
+
+    @Test
+    fun `should reject enabled if security is disabled without the dev or test profile`() {
+        val environment = MockEnvironment().apply { setActiveProfiles("docker") }
+
+        val errors = validate(securityProperties(enabled = false), environment)
+
+        assertThat(errors.fieldErrors.map { it.field }).containsExactly("enabled")
+    }
+
+    @Test
+    fun `should fail startup naming the property if security is disabled without the dev profile`() {
+        contextRunner
+            .withPropertyValues("app.security.enabled=false")
+            .run { context ->
+                assertThat(context).hasFailed()
+                assertThat(context.startupFailure).rootCause()
+                    .isInstanceOf(BindValidationException::class.java)
+                    .hasMessageContaining("app.security.enabled")
+            }
+    }
+
+    @Test
     fun `should default to secure cookies`() {
         contextRunner.run { context ->
             assertThat(context).hasNotFailed()
@@ -92,7 +131,8 @@ class SecurityPropertiesValidatorTest {
             SecurityPropertiesValidator(environment).validate(properties, it)
         }
 
-    private fun securityProperties(secureCookies: Boolean) = SecurityProperties(
+    private fun securityProperties(enabled: Boolean = true, secureCookies: Boolean = true) = SecurityProperties(
+        enabled = enabled,
         secureCookies = secureCookies,
         jwt = JwtProperties(secret = "dummy-secret", accessTokenExpirationMs = 1000, refreshTokenExpirationMs = 2000),
         verificationTokens = VerificationTokenProperties(

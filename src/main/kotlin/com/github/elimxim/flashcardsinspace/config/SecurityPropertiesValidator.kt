@@ -11,7 +11,7 @@ class SecurityPropertiesValidator(private val environment: Environment) : Valida
 
     override fun validate(target: Any, errors: Errors) {
         val properties = target as SecurityProperties
-        if (environment.matchesProfiles("dev")) return
+        if (environment.matchesProfiles("dev", "test")) return
         if (!properties.enabled) {
             errors.rejectValue(
                 "enabled",
