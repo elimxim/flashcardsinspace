@@ -4,6 +4,7 @@
       ref="sidebar"
       v-model:filter="filter"
       v-model:expanded="gallerySidebarExpandedCookie"
+      v-model:zoom="zoom"
       style="z-index: 200"
       :counts="counts"
       :selected-count="selectedIds.length"
@@ -32,7 +33,11 @@
           />
         </template>
       </ControlBar>
-      <FlashcardsViewer v-model:filter="filter" v-model:selected-ids="selectedIds" />
+      <FlashcardsViewer
+        v-model:filter="filter"
+        v-model:selected-ids="selectedIds"
+        v-model:zoom="zoom"
+      />
     </div>
   </div>
 </template>
@@ -68,6 +73,7 @@ const filter = ref<GalleryFilter>({
 })
 
 const selectedIds = ref<number[]>([])
+const zoom = ref(0)
 
 // the Selected toggle disappears with the selection, so it mustn't stay on unseen
 watch(selectedIds, (ids) => {

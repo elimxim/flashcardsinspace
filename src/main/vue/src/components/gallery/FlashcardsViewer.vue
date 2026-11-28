@@ -13,6 +13,7 @@
       />
     </div>
     <FlashcardGrid
+      v-model:zoom="zoom"
       :sections="loaded ? sections : []"
       :selected-ids="selectedIds"
       :selecting="selecting"
@@ -107,6 +108,7 @@ import { userApiErrors } from '@/api/user-api-error.ts'
 
 const filter = defineModel<GalleryFilter>('filter', { required: true })
 const selectedIds = defineModel<number[]>('selectedIds', { required: true })
+const zoom = defineModel<number>('zoom', { required: true })
 
 const flashcardStore = useFlashcardStore()
 const chronoStore = useChronoStore()

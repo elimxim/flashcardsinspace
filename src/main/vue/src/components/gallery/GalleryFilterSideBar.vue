@@ -10,6 +10,14 @@
       />
     </template>
     <div class="gallery-filter">
+      <template v-if="UXConfig().showZoomSlider">
+        <div class="gallery-filter-zoom">
+          <font-awesome-icon icon="fa-solid fa-magnifying-glass-minus" />
+          <SliderLine v-model="zoom" class="gallery-filter-zoom-slider" label="Zoom" />
+          <font-awesome-icon icon="fa-solid fa-magnifying-glass-plus" />
+        </div>
+        <div class="gallery-filter-divider" />
+      </template>
       <template v-if="selectedCount > 0">
         <div class="gallery-filter-row">
           <Toggle v-model="selected" class="gallery-filter-toggle" size="M">
@@ -57,12 +65,15 @@ import SideBar from '@/components/common/SideBar.vue'
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import Toggle from '@/components/common/Toggle.vue'
 import SmartCheckbox from '@/components/common/SmartCheckbox.vue'
+import SliderLine from '@/components/common/SliderLine.vue'
+import { UXConfig } from '@/utils/device-utils.ts'
 import { computed, ref } from 'vue'
 import { type Stage, learningStageArray, specialStages } from '@/core-logic/stage-logic.ts'
 import { type GalleryFilter } from '@/components/gallery/FlashcardsViewer.vue'
 
 const filter = defineModel<GalleryFilter>('filter', { required: true })
 const expanded = defineModel<boolean>('expanded', { required: true })
+const zoom = defineModel<number>('zoom', { required: true })
 
 const props = defineProps<{
   counts: Map<string, number>
@@ -135,6 +146,21 @@ defineExpose({
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+}
+
+.gallery-filter-zoom {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  color: #808daa;
+}
+
+.gallery-filter-zoom-slider {
+  flex: 1;
+  --slider-line--color-track: #575e68;
+  --slider-line--color-fill: #8a9cff;
+  --slider-line--color-thumb: #e6e8f0;
 }
 
 .gallery-filter-toggle {

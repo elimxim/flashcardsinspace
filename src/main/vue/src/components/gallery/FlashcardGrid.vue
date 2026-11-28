@@ -46,7 +46,7 @@ import {
   useGalleryGridTileTracker,
 } from '@/utils/gallery-grid-tile-tracker.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
-import { computed, onMounted, onUnmounted, provide, ref } from 'vue'
+import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -62,12 +62,8 @@ const props = withDefaults(
   },
 )
 
+const zoom = defineModel<number>('zoom', { default: 0 })
 const selectedIdSet = computed(() => new Set(props.selectedIds))
-
-// Cards are fitted to the grid's width: whole columns near the tile width that pinching
-// (or ctrl + wheel, which is what a trackpad pinch sends) aims at. They are refitted only
-// on zoom and on window resize, so opening or closing a sidebar never resizes them; only
-// the number of cards per row changes.
 
 const DEFAULT_TILE_WIDTH = 180
 // stops zooming out sooner on narrow (mobile) screens than the column limit alone would
@@ -122,13 +118,22 @@ const gridStyle = computed(() => ({
 let pinchStartDistance = 0
 let pinchStartTileWidth = 0
 
-// clamped to what the column limits allow, so zooming past a limit
-// doesn't pile up width that has to be unwound later
-function zoomTo(width: number) {
+function zoomRange(): [number, number] {
   const grid = containerWidth.value
-  if (grid <= 0) return
-  tileWidth.value = Math.min(grid, Math.max(grid / maxColumns(grid), width))
+  return [grid / maxColumns(grid), grid]
+}
+
+function zoomTo(width: number) {
+  if (containerWidth.value <= 0) return
+  const [min, max] = zoomRange()
+  tileWidth.value = Math.min(max, Math.max(min, width))
   fitCards()
+}
+
+function zoomOf(width: number): number {
+  const [min, max] = zoomRange()
+  if (max <= min) return 0
+  return Math.min(1, Math.max(0, Math.log(width / min) / Math.log(max / min)))
 }
 
 function touchDistance(touches: TouchList): number {
@@ -162,6 +167,17 @@ function onWheel(event: WheelEvent) {
   event.preventDefault()
   zoomTo(tileWidth.value * Math.exp(-event.deltaY * 0.01))
 }
+
+watch([tileWidth, containerWidth], () => {
+  if (containerWidth.value > 0) zoom.value = zoomOf(tileWidth.value)
+})
+
+watch(zoom, (value) => {
+  if (containerWidth.value <= 0 || Math.abs(value - zoomOf(tileWidth.value)) < 1e-9) return
+  const [min, max] = zoomRange()
+  zoomTo(min * (max / min) ** value)
+  zoom.value = zoomOf(tileWidth.value)
+})
 
 // A new window size (or a rotated phone) refits the cards to the grid; a sidebar keeps
 // their size and the rows just rewrap. The first width is taken at once, so the grid
