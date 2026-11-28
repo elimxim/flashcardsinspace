@@ -3,6 +3,7 @@ import {
   calcStageReviews,
   createReviewQueue,
   EmptyReviewQueue,
+  flashcardStageOn,
   MonoStageReviewQueue,
   MultiStageReviewQueue,
   ReviewQueue,
@@ -10,7 +11,7 @@ import {
 import { chronodayStatuses } from '@/core-logic/chrono-logic.ts'
 import { type Flashcard } from '@/model/flashcard.ts'
 import { type Chronoday } from '@/model/chrono.ts'
-import { type Stage, learningStages } from '@/core-logic/stage-logic.ts'
+import { type Stage, learningStages, specialStages } from '@/core-logic/stage-logic.ts'
 
 describe('MultiStageReviewQueue', () => {
   it('should return flashcards from the highest stage first', () => {
@@ -386,6 +387,38 @@ describe('createReviewQueue', () => {
       { stage: learningStages.S3.displayName, count: 1 },
       { stage: learningStages.S1.displayName, count: 0 },
     ])
+  })
+})
+
+describe('flashcardStageOn', () => {
+  const today: Chronoday = {
+    id: 1,
+    chronodate: '2026-03-20',
+    seqNumber: 40,
+    status: chronodayStatuses.NOT_STARTED,
+    stages: [],
+  }
+
+  it('should treat an S1 flashcard created today as unknown', () => {
+    const card = { ...flashcard(1, learningStages.S1), creationDate: '2026-03-20' }
+
+    expect(flashcardStageOn(card, today)).toBe(specialStages.UNKNOWN)
+  })
+
+  it('should treat an S1 flashcard reviewed today as attempted', () => {
+    const card = { ...reviewedOn(2, learningStages.S1, '2026-03-20'), creationDate: '2026-03-01' }
+
+    expect(flashcardStageOn(card, today)).toBe(specialStages.ATTEMPTED)
+  })
+
+  it('should keep any other flashcard in its own stage', () => {
+    const s1 = { ...reviewedOn(3, learningStages.S1, '2026-03-19'), creationDate: '2026-03-01' }
+    const s4 = { ...flashcard(4, learningStages.S4), creationDate: '2026-03-20' }
+    const outer = { ...flashcard(5, specialStages.OUTER_SPACE), creationDate: '2026-03-01' }
+
+    expect(flashcardStageOn(s1, today)).toBe(learningStages.S1)
+    expect(flashcardStageOn(s4, today)).toBe(learningStages.S4)
+    expect(flashcardStageOn(outer, today)).toBe(specialStages.OUTER_SPACE)
   })
 })
 

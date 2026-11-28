@@ -5,6 +5,8 @@ import {
   ChronoSyncRequest,
   ChronoSyncResponse,
   ChronoUpdateResponse,
+  FlashcardBulkUpdateRequest,
+  FlashcardBulkUpdateResponse,
   FlashcardCreationResponse,
   FlashcardSetSuspendResponse,
   FlashcardUpdateRequest,
@@ -131,6 +133,26 @@ export async function sendFlashcardUpdateRequestWithinSession(
   )
 }
 
+/** One transaction: either every flashcard is updated or none is. */
+export async function sendFlashcardBulkUpdateRequest(setId: number, flashcards: Flashcard[]) {
+  const request: FlashcardBulkUpdateRequest = {
+    requests: flashcards.map((flashcard) => ({ id: flashcard.id, flashcard })),
+  }
+  Log.log(LogTag.PUT, `/flashcard-sets/${setId}/flashcards/bulk`)
+  return apiClient.put<FlashcardBulkUpdateResponse>(
+    `/flashcard-sets/${setId}/flashcards/bulk`,
+    request,
+  )
+}
+
+/** One transaction: either every flashcard is removed or none is. */
+export async function sendFlashcardBulkRemovalRequest(setId: number, ids: number[]) {
+  Log.log(LogTag.DELETE, `/flashcard-sets/${setId}/flashcards/bulk`)
+  return apiClient.delete(`/flashcard-sets/${setId}/flashcards/bulk`, {
+    params: { ids: ids.join(',') },
+  })
+}
+
 export async function sendFlashcardRemovalRequest(setId: number, id: number) {
   Log.log(LogTag.DELETE, `/flashcard-sets/${setId}/flashcards/${id}`)
   return apiClient.delete(`/flashcard-sets/${setId}/flashcards/${id}`)
@@ -250,6 +272,20 @@ export async function sendFlashcardAudioRemovalRequest(
 export async function sendFlashcardPictureMetadataRequest(setId: number) {
   Log.log(LogTag.GET, `/flashcard-sets/${setId}/pictures/metadata`)
   return apiClient.get<FlashcardPictureMetadata[]>(`/flashcard-sets/${setId}/pictures/metadata`)
+}
+
+export async function sendFlashcardPictureThumbnailsRequest(
+  setId: number,
+  flashcardIds: number[],
+  side: string,
+  signal?: AbortSignal,
+) {
+  Log.log(LogTag.GET, `/flashcard-sets/${setId}/pictures/thumbnails?side=${side}`)
+  return apiClient.get<Blob>(`/flashcard-sets/${setId}/pictures/thumbnails`, {
+    responseType: 'blob',
+    params: { side, ids: flashcardIds.join(',') },
+    signal: signal,
+  })
 }
 
 export async function sendFlashcardPictureUploadRequest(

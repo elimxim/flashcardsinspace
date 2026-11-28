@@ -48,6 +48,9 @@ class TestConfigurationContext {
     fun flashcardPictureRepository() = mockk<FlashcardPictureRepository>()
 
     @Bean
+    fun flashcardPictureThumbnailRepository() = mockk<FlashcardPictureThumbnailRepository>()
+
+    @Bean
     fun dayStreakRepository() = mockk<DayStreakRepository>()
 
     @Bean

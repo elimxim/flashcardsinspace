@@ -27,12 +27,64 @@ export interface FlashcardMedia {
   error: unknown
 }
 
-const NO_MEDIA: FlashcardMedia = {
+export const NO_MEDIA: FlashcardMedia = {
   frontAudio: undefined,
   backAudio: undefined,
   frontPicture: undefined,
   backPicture: undefined,
   error: undefined,
+}
+
+export async function fetchFlashcardMedia(
+  flashcardSetId: number,
+  flashcardId: number,
+  signal?: AbortSignal,
+): Promise<FlashcardMedia> {
+  try {
+    const audioStore = useAudioStore()
+    const pictureStore = usePictureStore()
+
+    if (!audioStore.loaded || !pictureStore.loaded) return NO_MEDIA
+
+    const audioId = (side: string) => audioStore.getAudioId(flashcardId, side)
+    const pictureId = (side: string) => pictureStore.getPictureId(flashcardId, side)
+
+    const audio = (side: string) =>
+      audioId(side)
+        ? requestFlashcardAudioBlob(flashcardSetId, flashcardId, side, signal)
+        : Promise.resolve(undefined)
+
+    const picture = (side: string) =>
+      pictureId(side)
+        ? requestFlashcardPictureBlob(flashcardSetId, flashcardId, side, signal)
+        : Promise.resolve(undefined)
+
+    const [frontAudio, backAudio, frontPicture, backPicture] = await Promise.all([
+      audio(flashcardSides.FRONT),
+      audio(flashcardSides.BACK),
+      picture(flashcardSides.FRONT),
+      picture(flashcardSides.BACK),
+    ])
+
+    Log.log(LogTag.SYSTEM, `Media fetched for Flashcard.id=${flashcardId}`, {
+      frontAudio: frontAudio ? 'yes' : 'no',
+      backAudio: backAudio ? 'yes' : 'no',
+      frontPicture: frontPicture ? 'yes' : 'no',
+      backPicture: backPicture ? 'yes' : 'no',
+    })
+
+    return {
+      frontAudio: frontAudio,
+      backAudio: backAudio,
+      frontPicture: frontPicture,
+      backPicture: backPicture,
+      error: undefined,
+    }
+  } catch (error) {
+    if (isCanceledError(error)) return NO_MEDIA
+    Log.error(LogTag.SYSTEM, `Failed to fetch media for Flashcard.id=${flashcardId}`, error)
+    return { ...NO_MEDIA, error: error }
+  }
 }
 
 export interface FlashcardMediaPrefetcher {
@@ -62,52 +114,7 @@ export function createMediaPrefetcher(
 
   async function fetchMedia(flashcardId: number, signal: AbortSignal): Promise<FlashcardMedia> {
     if (disposed || signal.aborted) return NO_MEDIA
-
-    try {
-      const audioStore = useAudioStore()
-      const pictureStore = usePictureStore()
-
-      if (!audioStore.loaded || !pictureStore.loaded) return NO_MEDIA
-
-      const audioId = (side: string) => audioStore.getAudioId(flashcardId, side)
-      const pictureId = (side: string) => pictureStore.getPictureId(flashcardId, side)
-
-      const audio = (side: string) =>
-        audioId(side)
-          ? requestFlashcardAudioBlob(flashcardSetId, flashcardId, side, signal)
-          : Promise.resolve(undefined)
-
-      const picture = (side: string) =>
-        pictureId(side)
-          ? requestFlashcardPictureBlob(flashcardSetId, flashcardId, side, signal)
-          : Promise.resolve(undefined)
-
-      const [frontAudio, backAudio, frontPicture, backPicture] = await Promise.all([
-        audio(flashcardSides.FRONT),
-        audio(flashcardSides.BACK),
-        picture(flashcardSides.FRONT),
-        picture(flashcardSides.BACK),
-      ])
-
-      Log.log(LogTag.SYSTEM, `Media fetched for Flashcard.id=${flashcardId}`, {
-        frontAudio: frontAudio ? 'yes' : 'no',
-        backAudio: backAudio ? 'yes' : 'no',
-        frontPicture: frontPicture ? 'yes' : 'no',
-        backPicture: backPicture ? 'yes' : 'no',
-      })
-
-      return {
-        frontAudio: frontAudio,
-        backAudio: backAudio,
-        frontPicture: frontPicture,
-        backPicture: backPicture,
-        error: undefined,
-      }
-    } catch (error) {
-      if (isCanceledError(error)) return NO_MEDIA
-      Log.error(LogTag.SYSTEM, `Failed to fetch media for Flashcard.id=${flashcardId}`, error)
-      return { ...NO_MEDIA, error: error }
-    }
+    return fetchFlashcardMedia(flashcardSetId, flashcardId, signal)
   }
 
   function entry(flashcardId: number): Promise<FlashcardMedia> {

@@ -53,7 +53,6 @@ import SpaceToast from '@/components/common/SpaceToast.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
-import { useFlashcardSetStore } from '@/stores/flashcard-set-store.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
 import { useAudioStore } from '@/stores/audio-store.ts'
 import { usePictureStore } from '@/stores/picture-store.ts'
@@ -64,11 +63,10 @@ import {
   copyFlashcard,
 } from '@/core-logic/flashcard-logic.ts'
 import { storeToRefs } from 'pinia'
-import { sendFlashcardRemovalRequest, sendFlashcardUpdateRequest } from '@/api/api-client.ts'
+import { sendFlashcardUpdateRequest } from '@/api/api-client.ts'
+import { removeFlashcard as removeFlashcardEverywhere } from '@/core-logic/flashcard-operations.ts'
 import { Log, LogTag } from '@/utils/logger.ts'
 import { userApiErrors } from '@/api/user-api-error.ts'
-import { useAudioCache } from '@/stores/audio-cache.ts'
-import { usePictureCache } from '@/stores/picture-cache.ts'
 import {
   removeFlashcardAudioBlob,
   requestFlashcardAudioBlob,
@@ -87,12 +85,9 @@ const audioChanged = defineModel<boolean>('audioChanged', { default: false })
 const pictureChanged = defineModel<boolean>('pictureChanged', { default: false })
 
 const toggleStore = useToggleStore()
-const flashcardSetStore = useFlashcardSetStore()
 const flashcardStore = useFlashcardStore()
 const audioStore = useAudioStore()
-const audioCache = useAudioCache()
 const pictureStore = usePictureStore()
-const pictureCache = usePictureCache()
 const toaster = useSpaceToaster()
 
 const { flashcardSet } = storeToRefs(flashcardStore)
@@ -503,20 +498,8 @@ async function update() {
 
 async function removeFlashcard(): Promise<boolean> {
   if (!flashcardSet.value || !flashcard.value) return false
-  const setId = flashcardSet.value.id
-  const flashcardId = flashcard.value.id
-  return await sendFlashcardRemovalRequest(flashcardSet.value.id, flashcardId)
+  return await removeFlashcardEverywhere(flashcardSet.value.id, flashcard.value.id)
     .then(() => {
-      flashcardStore.removeFlashcard(flashcardId)
-      flashcardSetStore.decrementFlashcardsNumber(setId)
-      audioStore.removeAudioId(flashcardId, flashcardSides.FRONT)
-      audioStore.removeAudioId(flashcardId, flashcardSides.BACK)
-      audioCache.deleteAudio(flashcardId, flashcardSides.FRONT)
-      audioCache.deleteAudio(flashcardId, flashcardSides.BACK)
-      pictureStore.removePictureId(flashcardId, flashcardSides.FRONT)
-      pictureStore.removePictureId(flashcardId, flashcardSides.BACK)
-      pictureCache.deletePicture(flashcardId, flashcardSides.FRONT)
-      pictureCache.deletePicture(flashcardId, flashcardSides.BACK)
       frontSideAudio.value = undefined
       backSideAudio.value = undefined
       frontSideAudioId.value = undefined

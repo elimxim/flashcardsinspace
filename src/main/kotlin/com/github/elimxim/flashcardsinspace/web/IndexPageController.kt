@@ -19,6 +19,7 @@ class IndexPageController(
     @GetMapping(
         "/",
         "/control-panel",
+        "/flashcards-gallery",
         "/user",
         "/get-help",
         "/website-guide",

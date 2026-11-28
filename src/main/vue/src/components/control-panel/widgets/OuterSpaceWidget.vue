@@ -4,7 +4,7 @@
     <div class="left-spacer"></div>
     <SmartButton
       class="outer-space-button"
-      :text="isDisabled ? 'VOID' : 'ENTER OUTER SPACE'"
+      :text="isDisabled ? 'Void' : 'Enter Outer Space'"
       :disabled="isDisabled"
       :on-click="startReview"
       await-tap-animation

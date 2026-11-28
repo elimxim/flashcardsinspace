@@ -50,7 +50,7 @@ URL patterns: `/api/**` authenticated, `/api-public/**` public, `/auth/**` auth.
 - Pages never call the session endpoints directly — each owns one `ReviewSessionAttendant` (`review-session-attendant.ts`): `create`/`loadOrCreate` on start, `track(id)` after a flashcard write succeeds, `flush()` to persist, `flush({ all: true })` to finish.
 - A session is finished only by `finishReview()` (exit button, `onBeforeRouteLeave`, `onUnmounted`), and only once — the backend rejects a second finish with `SAF400`. `clear()` and `destroyReviewStore` go in `onUnmounted`, not the route guard.
 - A flashcard PUT can piggyback a session flush (`sendFlashcardUpdateRequestWithinSession`, payload from `attendant.touch(options)`, which also does the local bookkeeping). The response is the flashcard with an optional `session` flattened in — strip `session` before storing the flashcard, or `copyFlashcard` replays it on the next PUT.
-- Media (audio/pictures) is fetched only by the review store's `FlashcardMediaPrefetcher`.
+- In review, media (audio/pictures) is fetched only by the review store's `FlashcardMediaPrefetcher`. Elsewhere (e.g. the gallery) use `fetchFlashcardMedia`, which the prefetcher is built on.
 - Reverse mode (front/back swapped) is per session type, saved in a cookie via `useReverseMode`, and reaches the review page only as the `?reversed=true` query param.
 
 ## Backend Notes
@@ -61,6 +61,7 @@ URL patterns: `/api/**` authenticated, `/api-public/**` public, `/auth/**` auth.
 - **Input security**: OWASP HTML sanitizer for user-supplied content (`UserInputUtils`).
 - **Virtual threads**: enabled.
 - **Nested validation**: put `@Valid` on the type argument (`List<@Valid Item>`), not the list. This only works because of the `-Xemit-jvm-type-annotations` compiler flag; without it, list items silently stop being validated.
+- **`HttpException` must stay unchecked** (extends `RuntimeException`): `@Transactional` rolls back only on unchecked exceptions, so a checked one would commit whatever a service wrote before throwing it.
 - **Jackson 3 only**: import from `tools.jackson.*` (annotations stay in `com.fasterxml.jackson.annotation`). Jackson 2 is on the runtime classpath only because jjwt needs it — Spring ignores Jackson 2 serializers, so a `com.fasterxml.jackson.databind` import silently does nothing.
 
 ## Testing

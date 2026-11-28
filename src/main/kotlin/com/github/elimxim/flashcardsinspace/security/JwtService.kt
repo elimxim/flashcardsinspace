@@ -1,11 +1,14 @@
 package com.github.elimxim.flashcardsinspace.security
 
 import com.github.elimxim.flashcardsinspace.entity.User
+import com.github.elimxim.flashcardsinspace.util.addAccessTokenCookie
+import com.github.elimxim.flashcardsinspace.util.addRefreshTokenCookie
+import com.github.elimxim.flashcardsinspace.util.clearAccessTokenCookie
+import com.github.elimxim.flashcardsinspace.util.clearRefreshTokenCookie
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import jakarta.annotation.PostConstruct
-import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
@@ -29,43 +32,16 @@ class JwtService(private val securityProperties: SecurityProperties) {
     }
 
     fun setCookies(userDetails: UserDetails, response: HttpServletResponse) {
-        val accessToken = generateAccessToken(userDetails)
-        val accessTokenCookie = Cookie("accessToken", accessToken).apply {
-            isHttpOnly = true
-            secure = true
-            path = "/"
-            maxAge = (securityProperties.jwt.accessTokenExpirationMs / 1000).toInt()
-        }
-
-        val refreshToken = generateRefreshToken(userDetails)
-        val refreshTokenCookie = Cookie("refreshToken", refreshToken).apply {
-            isHttpOnly = true
-            secure = true
-            path = "/auth/refresh"
-            maxAge = (securityProperties.jwt.refreshTokenExpirationMs / 1000).toInt()
-        }
-
-        response.addCookie(accessTokenCookie)
-        response.addCookie(refreshTokenCookie)
+        val secure = securityProperties.secureCookies
+        val accessMaxAge = (securityProperties.jwt.accessTokenExpirationMs / 1000).toInt()
+        val refreshMaxAge = (securityProperties.jwt.refreshTokenExpirationMs / 1000).toInt()
+        addAccessTokenCookie(response, generateAccessToken(userDetails), accessMaxAge, secure)
+        addRefreshTokenCookie(response, generateRefreshToken(userDetails), refreshMaxAge, secure)
     }
 
     fun clearCookies(response: HttpServletResponse) {
-        val accessTokenCookie = Cookie("accessToken", null).apply {
-            isHttpOnly = true
-            secure = true
-            path = "/"
-            maxAge = 0
-        }
-
-        val refreshTokenCookie = Cookie("refreshToken", null).apply {
-            isHttpOnly = true
-            secure = true
-            path = "/auth/refresh"
-            maxAge = 0
-        }
-
-        response.addCookie(accessTokenCookie)
-        response.addCookie(refreshTokenCookie)
+        clearAccessTokenCookie(response, securityProperties.secureCookies)
+        clearRefreshTokenCookie(response, securityProperties.secureCookies)
     }
 
     private fun <T> extractClaim(token: String, claimsResolver: (Claims) -> T): T {

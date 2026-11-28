@@ -1,13 +1,17 @@
 package com.github.elimxim.flashcardsinspace.service
 
 import com.github.elimxim.flashcardsinspace.entity.FlashcardPicture
+import com.github.elimxim.flashcardsinspace.entity.FlashcardPictureThumbnail
 import com.github.elimxim.flashcardsinspace.entity.User
 import com.github.elimxim.flashcardsinspace.entity.checkVerified
 import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardPictureRepository
+import com.github.elimxim.flashcardsinspace.entity.repository.FlashcardPictureThumbnailRepository
 import com.github.elimxim.flashcardsinspace.entity.sizeKB
+import com.github.elimxim.flashcardsinspace.service.validation.RequestValidator
 import com.github.elimxim.flashcardsinspace.util.parseSideOrThrow
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardPictureDto
 import com.github.elimxim.flashcardsinspace.web.dto.FlashcardPictureMetadataDto
+import com.github.elimxim.flashcardsinspace.web.dto.FlashcardPictureThumbnailsRequest
 import com.github.elimxim.flashcardsinspace.web.dto.toDto
 import com.github.elimxim.flashcardsinspace.web.exception.ApiErrorCode
 import com.github.elimxim.flashcardsinspace.web.exception.HttpBadRequestException
@@ -25,9 +29,11 @@ private const val WEBP_MIME_TYPE = "image/webp"
 @Service
 class FlashcardPictureService(
     private val flashcardPictureRepository: FlashcardPictureRepository,
+    private val flashcardPictureThumbnailRepository: FlashcardPictureThumbnailRepository,
     private val flashcardService: FlashcardService,
     private val flashcardSetService: FlashcardSetService,
     private val imageValidator: ImageValidator,
+    private val requestValidator: RequestValidator,
 ) {
     @Transactional(readOnly = true)
     fun getMetadata(user: User, setId: Long): List<FlashcardPictureMetadataDto> {
@@ -45,6 +51,26 @@ class FlashcardPictureService(
                 height = it.getHeight(),
             )
         }
+    }
+
+    @Transactional(readOnly = true)
+    fun getThumbnails(
+        user: User,
+        setId: Long,
+        side: String,
+        request: FlashcardPictureThumbnailsRequest,
+    ): Map<Long, ByteArray> {
+        log.info("Getting ${request.ids?.size} picture thumbnails for flashcard set $setId, side: $side")
+        user.checkVerified()
+        val flashcardSet = flashcardSetService.getEntity(setId)
+        flashcardSetService.verifyUserHasAccess(user, flashcardSet)
+        val flashcardSide = side.parseSideOrThrow {
+            throw HttpBadRequestException(ApiErrorCode.WFS400, "Invalid side $side for fetching thumbnails")
+        }
+        val validRequest = requestValidator.validate(request)
+
+        return flashcardPictureThumbnailRepository.findAllInSet(setId, validRequest.ids, flashcardSide)
+            .associate { it.flashcard.id to it.thumbnailData }
     }
 
     @Transactional(readOnly = true)
@@ -90,18 +116,16 @@ class FlashcardPictureService(
         val validated = imageValidator.validateWebp(file.bytes)
         val pictureData = validated.bytes
 
-        val existingPicture = flashcardPictureRepository.findByFlashcardIdAndSide(flashcardId, flashcardSide)
-
-        val updatedPicture = if (existingPicture != null) {
-            existingPicture.mimeType = WEBP_MIME_TYPE
-            existingPicture.pictureData = pictureData
-            existingPicture.pictureSize = pictureData.size.toLong()
-            existingPicture.width = validated.width
-            existingPicture.height = validated.height
-            existingPicture.uploadedAt = ZonedDateTime.now()
-            existingPicture
-        } else {
-            FlashcardPicture(
+        val picture = flashcardPictureRepository.findByFlashcardIdAndSide(flashcardId, flashcardSide)
+            ?.apply {
+                this.mimeType = WEBP_MIME_TYPE
+                this.pictureData = pictureData
+                this.pictureSize = pictureData.size.toLong()
+                this.width = validated.width
+                this.height = validated.height
+                this.lastUpdatedAt = ZonedDateTime.now()
+            }
+            ?: FlashcardPicture(
                 side = flashcardSide,
                 mimeType = WEBP_MIME_TYPE,
                 pictureData = pictureData,
@@ -111,10 +135,29 @@ class FlashcardPictureService(
                 uploadedAt = ZonedDateTime.now(),
                 flashcard = flashcard,
             )
-        }
 
-        return flashcardPictureRepository.save(updatedPicture).run {
-            log.info("Picture $id saved, side: $side, size: ${sizeKB()} KBs, ${width}x${height}")
+        val savedPicture = flashcardPictureRepository.save(picture)
+
+        val thumbnailData = PictureThumbnails.create(validated.image)
+        val thumbnail = flashcardPictureThumbnailRepository.findByFlashcardIdAndSide(flashcardId, flashcardSide)
+            ?.apply {
+                this.thumbnailData = thumbnailData
+                this.thumbnailSize = thumbnailData.size.toLong()
+                this.lastUpdatedAt = ZonedDateTime.now()
+                this.flashcardPicture = savedPicture
+            }
+            ?: FlashcardPictureThumbnail(
+                side = flashcardSide,
+                thumbnailData = thumbnailData,
+                thumbnailSize = thumbnailData.size.toLong(),
+                createdAt = ZonedDateTime.now(),
+                flashcard = flashcard,
+                flashcardPicture = savedPicture,
+            )
+        flashcardPictureThumbnailRepository.save(thumbnail)
+
+        return savedPicture.run {
+            log.info("Picture $id saved, side: $side, size: ${sizeKB()} KBs, ${width}x${height}, thumbnail: ${thumbnailData.size} bytes")
             toDto()
         }
     }
@@ -128,6 +171,7 @@ class FlashcardPictureService(
         flashcardService.verifyUserOperation(user, setId, flashcard)
 
         val picture = getEntity(pictureId)
+        flashcardPictureThumbnailRepository.deleteByFlashcardIdAndSide(flashcardId, picture.side.name)
         flashcardPictureRepository.delete(picture)
     }
 

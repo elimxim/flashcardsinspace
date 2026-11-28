@@ -1,6 +1,7 @@
 package com.github.elimxim.flashcardsinspace.service.mail
 
 import com.github.elimxim.flashcardsinspace.AppConfig
+import com.github.elimxim.flashcardsinspace.config.MailPropertiesValidator
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.context.properties.bind.validation.BindValidationException

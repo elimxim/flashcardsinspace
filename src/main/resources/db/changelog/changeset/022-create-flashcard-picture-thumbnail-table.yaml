@@ -1,0 +1,66 @@
+databaseChangeLog:
+  - changeSet:
+      id: 022-create-flashcard-picture-thumbnail-table
+      author: elimxim
+      changes:
+        - createTable:
+            tableName: flashcard_picture_thumbnail
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: side
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: thumbnail_data
+                  type: BYTEA
+                  constraints:
+                    nullable: false
+              - column:
+                  name: thumbnail_size
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: flashcard_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_flashcard_picture_thumbnail_2_flashcard_id
+                    references: flashcard(id)
+                    validateForeignKey: true
+              - column:
+                  name: flashcard_picture_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_flashcard_picture_thumbnail_flashcard_picture_id
+                    foreignKeyName: fk_flashcard_picture_thumbnail_2_flashcard_picture_id
+                    references: flashcard_picture(id)
+                    validateForeignKey: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+        - addUniqueConstraint:
+            tableName: flashcard_picture_thumbnail
+            columnNames: flashcard_id, side
+            constraintName: uq_flashcard_picture_thumbnail_flashcard_id_side
+  - changeSet:
+      id: 022-backfill-flashcard-picture-thumbnails
+      author: elimxim
+      changes:
+        - customChange:
+            class: com.github.elimxim.flashcardsinspace.db.FlashcardPictureThumbnailBackfill

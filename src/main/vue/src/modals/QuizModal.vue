@@ -76,7 +76,7 @@
           auto-blur
         >
           <span class="counter-button--layout">
-            <span class="counter-button--text"> Start </span>
+            <span> Start </span>
             <span class="counter-button--number">
               {{ reviewCount }}
             </span>

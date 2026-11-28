@@ -59,19 +59,22 @@
         </div>
       </div>
     </transition>
-    <Teleport to="body">
-      <transition name="picture-preview-fade">
-        <div v-if="previewOpen && previewUrl" class="picture-preview-overlay" @click="closePreview">
-          <img :src="previewUrl" class="picture-preview-image" alt="Picture preview" />
-        </div>
-      </transition>
-    </Teleport>
+    <ZoomOverlay v-model:open="previewOpen">
+      <img
+        v-if="previewUrl"
+        :src="previewUrl"
+        class="picture-preview-image"
+        alt="Picture preview"
+        @click="closePreview"
+      />
+    </ZoomOverlay>
   </div>
 </template>
 
 <script lang="ts" setup>
 import AwesomeButton from '@/components/common/AwesomeButton.vue'
 import PictureThumbButton from '@/components/common/PictureThumbButton.vue'
+import ZoomOverlay from '@/components/common/ZoomOverlay.vue'
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import { decodeAndResize, encodeToWebp } from '@/utils/image-processing.ts'
 import { useSpaceToaster } from '@/stores/toast-store.ts'
@@ -110,22 +113,10 @@ function openPicker() {
 function openPreview() {
   if (!previewUrl.value) return
   previewOpen.value = true
-  // Capture phase so we intercept Escape before the surrounding Modal's window
-  // listener and stop it there - otherwise Escape closes the modal too.
-  window.addEventListener('keydown', onPreviewKeydown, { capture: true })
 }
 
 function closePreview() {
   previewOpen.value = false
-  window.removeEventListener('keydown', onPreviewKeydown, { capture: true })
-}
-
-function onPreviewKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') {
-    event.preventDefault()
-    event.stopPropagation()
-    closePreview()
-  }
 }
 
 async function handleFileChange(event: Event) {
@@ -205,7 +196,6 @@ watch(
 onBeforeUnmount(() => {
   encodeController.value?.abort()
   thumbButton.value?.revoke()
-  window.removeEventListener('keydown', onPreviewKeydown, { capture: true })
 })
 </script>
 
@@ -381,31 +371,11 @@ onBeforeUnmount(() => {
   opacity: 0;
 }
 
-.picture-preview-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: grid;
-  place-items: center;
-  padding: 4vmin;
-  cursor: zoom-out;
-  z-index: 1000;
-}
-
 .picture-preview-image {
   max-width: 92vw;
   max-height: 92vh;
   object-fit: contain;
   border-radius: 8px;
-}
-
-.picture-preview-fade-enter-active,
-.picture-preview-fade-leave-active {
-  transition: opacity 0.2s ease-in-out;
-}
-
-.picture-preview-fade-enter-from,
-.picture-preview-fade-leave-to {
-  opacity: 0;
+  cursor: zoom-out;
 }
 </style>

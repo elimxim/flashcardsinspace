@@ -245,7 +245,7 @@ onUnmounted(() => {
   --smart-button--border-color: rgba(255, 255, 255, 0.2);
   --smart-button--width: 200px;
   --smart-button--height: 50px;
-  --smart-button--title--font-size: 0.9rem;
+  --smart-button--title--font-size: 18px;
   --smart-button--title--letter-spacing: 0.05em;
   transition: all 0.3s ease;
 }

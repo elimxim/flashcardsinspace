@@ -16,10 +16,11 @@ private val log = LoggerFactory.getLogger(ImageValidator::class.java)
 private const val MAX_SIZE_BYTES = 500 * 1024
 private const val MAX_DIMENSION = 1600
 
-data class ValidatedImage(
+class ValidatedImage(
     val bytes: ByteArray,
     val width: Int,
     val height: Int,
+    val image: BufferedImage,
 )
 
 @Component
@@ -89,7 +90,7 @@ class ImageValidator {
                     throw HttpBadRequestException(ApiErrorCode.FPI400, "Picture could not be decoded", e)
                 }
 
-                return ValidatedImage(bytes, image.width, image.height)
+                return ValidatedImage(bytes, image.width, image.height, image)
             } finally {
                 reader.dispose()
             }

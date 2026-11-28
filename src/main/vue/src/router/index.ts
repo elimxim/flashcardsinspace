@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth-store.ts'
 import { storeToRefs } from 'pinia'
 import HomePage from '@/pages/HomePage.vue'
 import ControlPanel from '@/pages/ControlPanel.vue'
+import FlashcardsGalleryPage from '@/pages/FlashcardsGalleryPage.vue'
 import GetHelpPage from '@/pages/GetHelpPage.vue'
 import EmotionalSupportPage from '@/pages/EmotionalSupportPage.vue'
 import WebsiteGuidePage from '@/pages/WebsiteGuidePage.vue'
@@ -27,6 +28,7 @@ import { parseVerificationType } from '@/core-logic/user-logic.ts'
 export const routeNames = {
   home: 'home',
   controlPanel: 'controlPanel',
+  flashcardsGallery: 'flashcardsGallery',
   user: 'user',
   getHelp: 'getHelp',
   signup: 'signup',
@@ -57,6 +59,16 @@ const routes: RouteRecordRaw[] = [
     component: ControlPanel,
     meta: {
       title: 'Control Panel',
+      requiresAuth: true,
+      requiresEmailVerified: true,
+    },
+  },
+  {
+    path: '/flashcards-gallery',
+    name: routeNames.flashcardsGallery,
+    component: FlashcardsGalleryPage,
+    meta: {
+      title: 'Flashcards Gallery',
       requiresAuth: true,
       requiresEmailVerified: true,
     },

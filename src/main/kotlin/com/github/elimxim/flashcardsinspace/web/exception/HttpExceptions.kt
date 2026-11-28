@@ -4,8 +4,12 @@ import org.springframework.http.HttpStatus
 
 annotation class ExceptionHttpStatus(val value: HttpStatus)
 
+/**
+ * Unchecked on purpose: Spring's @Transactional rolls back only on unchecked exceptions,
+ * so a checked one would commit whatever a service wrote before throwing it.
+ */
 sealed class HttpException(val apiErrorCode: ApiErrorCode, message: String, cause: Exception?) :
-    Exception(message, cause)
+    RuntimeException(message, cause)
 
 sealed class Http4xxException(apiErrorCode: ApiErrorCode, message: String, cause: Exception?) :
     HttpException(apiErrorCode, message, cause)

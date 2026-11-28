@@ -23,6 +23,8 @@ app:
     reply-to-email: "no-reply-dot-com"
 
 spring:
+  profiles:
+    active: test
   jpa:
     hibernate:
       ddl-auto: none

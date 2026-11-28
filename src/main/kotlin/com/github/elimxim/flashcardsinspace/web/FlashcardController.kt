@@ -46,6 +46,27 @@ class FlashcardController(
         return ResponseEntity.ok(result)
     }
 
+    @PutMapping("/bulk")
+    fun updateFlashcardsBulk(
+        @AuthenticationPrincipal user: User,
+        @PathVariable setId: Long,
+        @RequestBody request: FlashcardBulkUpdateRequest,
+    ): ResponseEntity<FlashcardBulkUpdateResponse> = withLoggingContext(user) {
+        val response = flashcardService.updateBulk(user, setId, request.normalize())
+        return ResponseEntity.ok(response)
+    }
+
+    @DeleteMapping("/bulk")
+    fun removeFlashcardsBulk(
+        @AuthenticationPrincipal user: User,
+        @PathVariable setId: Long,
+        @RequestParam(name = "ids", required = false) ids: List<String>?,
+    ): ResponseEntity<Unit> = withLoggingContext(user) {
+        val request = FlashcardBulkRemovalRequest(ids = ids?.map { FlashcardBulkRemovalRequest.FlashcardId(it) })
+        flashcardService.removeBulk(user, setId, request.normalize())
+        return ResponseEntity.ok().build()
+    }
+
     @PutMapping("/{id:\\d+}")
     fun updateFlashcard(
         @AuthenticationPrincipal user: User,

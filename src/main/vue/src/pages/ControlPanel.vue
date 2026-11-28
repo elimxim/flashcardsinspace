@@ -1,6 +1,10 @@
 <template>
   <div :class="['page', 'page--bg--light', 'flex-row']">
-    <SideBar ref="sidebar" style="z-index: 200" :on-flashcard-set-changed="onFlashcardSetChanged" />
+    <FlashcardSetListSideBar
+      ref="sidebar"
+      style="z-index: 200"
+      :on-flashcard-set-changed="onFlashcardSetChanged"
+    />
     <div class="control-panel-layout">
       <ControlBar :title="flashcardSetName" shadow>
         <template #left>
@@ -8,8 +12,8 @@
             icon="fa-solid fa-bars"
             class="control-bar-button"
             :on-click="sidebar?.toggle"
-            :hidden="sidebarExpandedCookie && !isSidebarOverlay"
-            :disabled="sidebarExpandedCookie && !isSidebarOverlay"
+            :hidden="controlPanelSidebarExpandedCookie && !isSidebarOverlay"
+            :disabled="controlPanelSidebarExpandedCookie && !isSidebarOverlay"
           />
         </template>
         <template #right>
@@ -28,7 +32,7 @@
         <WelcomeWidget v-else-if="!loadingStarted && !flashcardSet" class="control-welcome" />
         <WidgetBoard
           v-else-if="!loadingStarted"
-          :show-info-bar="sidebarExpandedCookie && !isSidebarOverlay"
+          :show-info-bar="controlPanelSidebarExpandedCookie && !isSidebarOverlay"
         />
       </div>
     </div>
@@ -43,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import SideBar from '@/components/control-panel/SideBar.vue'
+import FlashcardSetListSideBar from '@/components/control-panel/FlashcardSetListSideBar.vue'
 import ControlBar from '@/components/ControlBar.vue'
 import KineticRingSpinner from '@/components/spinners/KineticRingSpinner.vue'
 import WelcomeWidget from '@/components/control-panel/widgets/WelcomeWidget.vue'
@@ -60,7 +64,7 @@ import { useFlashcardStore } from '@/stores/flashcard-store.ts'
 import { useToggleStore } from '@/stores/toggle-store.ts'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref, watch } from 'vue'
-import { sidebarExpandedCookie } from '@/utils/cookies-ref.ts'
+import { controlPanelSidebarExpandedCookie } from '@/utils/cookies-ref.ts'
 import {
   loadFlashcardSetStore,
   loadStoresForCurrFlashcardSet,
@@ -81,7 +85,7 @@ const { loadingStarted, resolvedLoading, startLoading, stopLoading, resetLoading
 
 const flashcardSetName = ref<string>()
 
-const sidebar = ref<InstanceType<typeof SideBar>>()
+const sidebar = ref<InstanceType<typeof FlashcardSetListSideBar>>()
 const isSidebarOverlay = computed(() => sidebar.value?.isOverlay ?? false)
 
 function openFlashcardSetSettings() {

@@ -379,6 +379,12 @@ export function isAttemptedFlashcard(flashcard: Flashcard, day: Chronoday) {
   return flashcard.stage === learningStages.S1.name && isReviewedFlashcard(flashcard, day)
 }
 
+export function flashcardStageOn(flashcard: Flashcard, day: Chronoday): Stage {
+  if (isUnknownFlashcard(flashcard, day)) return specialStages.UNKNOWN
+  if (isAttemptedFlashcard(flashcard, day)) return specialStages.ATTEMPTED
+  return getStage(flashcard.stage)
+}
+
 export function countFlashcards(flashcards: Flashcard[], stage: Stage, currDay: Chronoday): number {
   if (stage === specialStages.UNKNOWN) {
     return flashcards.filter((f) => isUnknownFlashcard(f, currDay)).length

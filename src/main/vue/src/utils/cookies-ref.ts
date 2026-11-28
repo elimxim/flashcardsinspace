@@ -1,17 +1,24 @@
 import { ref, watch } from 'vue'
 import {
+  loadGallerySidebarExpandedFromCookies,
   loadSelectedSetIdFromCookies,
   loadSidebarExpandedFromCookies,
   removeSelectedSetIdCookie,
   saveSelectedSetIdToCookies,
+  setGallerySidebarExpandedToCookies,
   setSidebarExpandedToCookies,
 } from '@/utils/cookies.ts'
 
-const sidebarExpandedCookie = ref(loadSidebarExpandedFromCookies())
+const controlPanelSidebarExpandedCookie = ref(loadSidebarExpandedFromCookies())
+const gallerySidebarExpandedCookie = ref(loadGallerySidebarExpandedFromCookies())
 const selectedSetIdCookie = ref(loadSelectedSetIdFromCookies())
 
-watch(sidebarExpandedCookie, (newVal) => {
+watch(controlPanelSidebarExpandedCookie, (newVal) => {
   setSidebarExpandedToCookies(newVal)
+})
+
+watch(gallerySidebarExpandedCookie, (newVal) => {
+  setGallerySidebarExpandedToCookies(newVal)
 })
 
 watch(selectedSetIdCookie, (newVal) => {
@@ -22,4 +29,4 @@ watch(selectedSetIdCookie, (newVal) => {
   }
 })
 
-export { sidebarExpandedCookie, selectedSetIdCookie }
+export { controlPanelSidebarExpandedCookie, gallerySidebarExpandedCookie, selectedSetIdCookie }

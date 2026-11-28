@@ -28,7 +28,7 @@
   <TotemScroll v-if="hasPicture">
     <div class="space-card-content space-card-content--picture">
       <div class="space-card-picture">
-        <SpacePicture :picture-blob="picture" />
+        <SpacePicture :picture-blob="picture" :fill="fillPicture" />
       </div>
       <p v-if="text" class="space-card-text">{{ text }}</p>
     </div>
@@ -92,6 +92,7 @@ const props = withDefaults(
     text?: string
     audio?: Blob | undefined
     picture?: Blob | undefined
+    fillPicture?: boolean
     textOnly?: boolean
     viewedTimes?: number
     onEdit?: () => void
@@ -102,6 +103,7 @@ const props = withDefaults(
     text: undefined,
     audio: undefined,
     picture: undefined,
+    fillPicture: false,
     textOnly: false,
     viewedTimes: undefined,
     onEdit: () => {},
